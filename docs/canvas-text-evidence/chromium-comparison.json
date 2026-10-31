@@ -1,0 +1,1180 @@
+{
+ "measureX": {
+  "width": {
+   "native": 60.0,
+   "chromium": 60,
+   "delta": 0.0
+  },
+  "actualBoundingBoxLeft": {
+   "native": 0.0,
+   "chromium": 1,
+   "delta": -1.0
+  },
+  "actualBoundingBoxRight": {
+   "native": 60.0,
+   "chromium": 61,
+   "delta": -1.0
+  },
+  "fontBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "fontBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "actualBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "actualBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "emHeightAscent": {
+   "native": 16.0,
+   "chromium": null,
+   "delta": null
+  },
+  "emHeightDescent": {
+   "native": 4.0,
+   "chromium": null,
+   "delta": null
+  },
+  "hangingBaseline": {
+   "native": 16.0,
+   "chromium": 12.800000190734863,
+   "delta": 3.2
+  },
+  "alphabeticBaseline": {
+   "native": -0.0,
+   "chromium": 0,
+   "delta": -0.0
+  },
+  "ideographicBaseline": {
+   "native": -4.0,
+   "chromium": -4,
+   "delta": 0.0
+  }
+ },
+ "measureP": {
+  "width": {
+   "native": 20.0,
+   "chromium": 20,
+   "delta": 0.0
+  },
+  "actualBoundingBoxLeft": {
+   "native": 0.0,
+   "chromium": 1,
+   "delta": -1.0
+  },
+  "actualBoundingBoxRight": {
+   "native": 20.0,
+   "chromium": 21,
+   "delta": -1.0
+  },
+  "fontBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "fontBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "actualBoundingBoxAscent": {
+   "native": 0.0,
+   "chromium": 0,
+   "delta": 0.0
+  },
+  "actualBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "emHeightAscent": {
+   "native": 16.0,
+   "chromium": null,
+   "delta": null
+  },
+  "emHeightDescent": {
+   "native": 4.0,
+   "chromium": null,
+   "delta": null
+  },
+  "hangingBaseline": {
+   "native": 16.0,
+   "chromium": 12.800000190734863,
+   "delta": 3.2
+  },
+  "alphabeticBaseline": {
+   "native": -0.0,
+   "chromium": 0,
+   "delta": -0.0
+  },
+  "ideographicBaseline": {
+   "native": -4.0,
+   "chromium": -4,
+   "delta": 0.0
+  }
+ },
+ "measureE": {
+  "width": {
+   "native": 20.0,
+   "chromium": 20,
+   "delta": 0.0
+  },
+  "actualBoundingBoxLeft": {
+   "native": 0.0,
+   "chromium": 1,
+   "delta": -1.0
+  },
+  "actualBoundingBoxRight": {
+   "native": 20.0,
+   "chromium": 21,
+   "delta": -1.0
+  },
+  "fontBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "fontBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "actualBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "actualBoundingBoxDescent": {
+   "native": 0.0,
+   "chromium": 0,
+   "delta": 0.0
+  },
+  "emHeightAscent": {
+   "native": 16.0,
+   "chromium": null,
+   "delta": null
+  },
+  "emHeightDescent": {
+   "native": 4.0,
+   "chromium": null,
+   "delta": null
+  },
+  "hangingBaseline": {
+   "native": 16.0,
+   "chromium": 12.800000190734863,
+   "delta": 3.2
+  },
+  "alphabeticBaseline": {
+   "native": -0.0,
+   "chromium": 0,
+   "delta": -0.0
+  },
+  "ideographicBaseline": {
+   "native": -4.0,
+   "chromium": -4,
+   "delta": 0.0
+  }
+ },
+ "measureEmpty": {
+  "width": {
+   "native": 0.0,
+   "chromium": 0,
+   "delta": 0.0
+  },
+  "actualBoundingBoxLeft": {
+   "native": 0.0,
+   "chromium": 0,
+   "delta": 0.0
+  },
+  "actualBoundingBoxRight": {
+   "native": 0.0,
+   "chromium": 0,
+   "delta": 0.0
+  },
+  "fontBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "fontBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "actualBoundingBoxAscent": {
+   "native": 0.0,
+   "chromium": 0,
+   "delta": 0.0
+  },
+  "actualBoundingBoxDescent": {
+   "native": 0.0,
+   "chromium": 0,
+   "delta": 0.0
+  },
+  "emHeightAscent": {
+   "native": 16.0,
+   "chromium": null,
+   "delta": null
+  },
+  "emHeightDescent": {
+   "native": 4.0,
+   "chromium": null,
+   "delta": null
+  },
+  "hangingBaseline": {
+   "native": 16.0,
+   "chromium": 12.800000190734863,
+   "delta": 3.2
+  },
+  "alphabeticBaseline": {
+   "native": -0.0,
+   "chromium": 0,
+   "delta": -0.0
+  },
+  "ideographicBaseline": {
+   "native": -4.0,
+   "chromium": -4,
+   "delta": 0.0
+  }
+ },
+ "measureSpace": {
+  "width": {
+   "native": 60.0,
+   "chromium": 60,
+   "delta": 0.0
+  },
+  "actualBoundingBoxLeft": {
+   "native": 0.0,
+   "chromium": 1,
+   "delta": -1.0
+  },
+  "actualBoundingBoxRight": {
+   "native": 60.0,
+   "chromium": 61,
+   "delta": -1.0
+  },
+  "fontBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "fontBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "actualBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "actualBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "emHeightAscent": {
+   "native": 16.0,
+   "chromium": null,
+   "delta": null
+  },
+  "emHeightDescent": {
+   "native": 4.0,
+   "chromium": null,
+   "delta": null
+  },
+  "hangingBaseline": {
+   "native": 16.0,
+   "chromium": 12.800000190734863,
+   "delta": 3.2
+  },
+  "alphabeticBaseline": {
+   "native": -0.0,
+   "chromium": 0,
+   "delta": -0.0
+  },
+  "ideographicBaseline": {
+   "native": -4.0,
+   "chromium": -4,
+   "delta": 0.0
+  }
+ },
+ "letterSpaced": {
+  "width": {
+   "native": 75.0,
+   "chromium": 75,
+   "delta": 0.0
+  },
+  "actualBoundingBoxLeft": {
+   "native": 0.0,
+   "chromium": 1,
+   "delta": -1.0
+  },
+  "actualBoundingBoxRight": {
+   "native": 75.0,
+   "chromium": 71,
+   "delta": 4.0
+  },
+  "fontBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "fontBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "actualBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "actualBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "emHeightAscent": {
+   "native": 16.0,
+   "chromium": null,
+   "delta": null
+  },
+  "emHeightDescent": {
+   "native": 4.0,
+   "chromium": null,
+   "delta": null
+  },
+  "hangingBaseline": {
+   "native": 16.0,
+   "chromium": 12.800000190734863,
+   "delta": 3.2
+  },
+  "alphabeticBaseline": {
+   "native": -0.0,
+   "chromium": 0,
+   "delta": -0.0
+  },
+  "ideographicBaseline": {
+   "native": -4.0,
+   "chromium": -4,
+   "delta": 0.0
+  }
+ },
+ "wordSpaced": {
+  "width": {
+   "native": 67.0,
+   "chromium": 67,
+   "delta": 0.0
+  },
+  "actualBoundingBoxLeft": {
+   "native": 0.0,
+   "chromium": 1,
+   "delta": -1.0
+  },
+  "actualBoundingBoxRight": {
+   "native": 67.0,
+   "chromium": 68,
+   "delta": -1.0
+  },
+  "fontBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "fontBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "actualBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "actualBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "emHeightAscent": {
+   "native": 16.0,
+   "chromium": null,
+   "delta": null
+  },
+  "emHeightDescent": {
+   "native": 4.0,
+   "chromium": null,
+   "delta": null
+  },
+  "hangingBaseline": {
+   "native": 16.0,
+   "chromium": 12.800000190734863,
+   "delta": 3.2
+  },
+  "alphabeticBaseline": {
+   "native": -0.0,
+   "chromium": 0,
+   "delta": -0.0
+  },
+  "ideographicBaseline": {
+   "native": -4.0,
+   "chromium": -4,
+   "delta": 0.0
+  }
+ },
+ "rtlStart": {
+  "width": {
+   "native": 40.0,
+   "chromium": 40,
+   "delta": 0.0
+  },
+  "actualBoundingBoxLeft": {
+   "native": 40.0,
+   "chromium": 41,
+   "delta": -1.0
+  },
+  "actualBoundingBoxRight": {
+   "native": 0.0,
+   "chromium": 1,
+   "delta": -1.0
+  },
+  "fontBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "fontBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "actualBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "actualBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "emHeightAscent": {
+   "native": 16.0,
+   "chromium": null,
+   "delta": null
+  },
+  "emHeightDescent": {
+   "native": 4.0,
+   "chromium": null,
+   "delta": null
+  },
+  "hangingBaseline": {
+   "native": 16.0,
+   "chromium": 12.800000190734863,
+   "delta": 3.2
+  },
+  "alphabeticBaseline": {
+   "native": -0.0,
+   "chromium": 0,
+   "delta": -0.0
+  },
+  "ideographicBaseline": {
+   "native": -4.0,
+   "chromium": -4,
+   "delta": 0.0
+  }
+ },
+ "align_START": {
+  "width": {
+   "native": 40.0,
+   "chromium": 40,
+   "delta": 0.0
+  },
+  "actualBoundingBoxLeft": {
+   "native": 0.0,
+   "chromium": 1,
+   "delta": -1.0
+  },
+  "actualBoundingBoxRight": {
+   "native": 40.0,
+   "chromium": 41,
+   "delta": -1.0
+  },
+  "fontBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "fontBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "actualBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "actualBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "emHeightAscent": {
+   "native": 16.0,
+   "chromium": null,
+   "delta": null
+  },
+  "emHeightDescent": {
+   "native": 4.0,
+   "chromium": null,
+   "delta": null
+  },
+  "hangingBaseline": {
+   "native": 16.0,
+   "chromium": 12.800000190734863,
+   "delta": 3.2
+  },
+  "alphabeticBaseline": {
+   "native": -0.0,
+   "chromium": 0,
+   "delta": -0.0
+  },
+  "ideographicBaseline": {
+   "native": -4.0,
+   "chromium": -4,
+   "delta": 0.0
+  }
+ },
+ "align_END": {
+  "width": {
+   "native": 40.0,
+   "chromium": 40,
+   "delta": 0.0
+  },
+  "actualBoundingBoxLeft": {
+   "native": 40.0,
+   "chromium": 41,
+   "delta": -1.0
+  },
+  "actualBoundingBoxRight": {
+   "native": 0.0,
+   "chromium": 1,
+   "delta": -1.0
+  },
+  "fontBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "fontBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "actualBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "actualBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "emHeightAscent": {
+   "native": 16.0,
+   "chromium": null,
+   "delta": null
+  },
+  "emHeightDescent": {
+   "native": 4.0,
+   "chromium": null,
+   "delta": null
+  },
+  "hangingBaseline": {
+   "native": 16.0,
+   "chromium": 12.800000190734863,
+   "delta": 3.2
+  },
+  "alphabeticBaseline": {
+   "native": -0.0,
+   "chromium": 0,
+   "delta": -0.0
+  },
+  "ideographicBaseline": {
+   "native": -4.0,
+   "chromium": -4,
+   "delta": 0.0
+  }
+ },
+ "align_LEFT": {
+  "width": {
+   "native": 40.0,
+   "chromium": 40,
+   "delta": 0.0
+  },
+  "actualBoundingBoxLeft": {
+   "native": 0.0,
+   "chromium": 1,
+   "delta": -1.0
+  },
+  "actualBoundingBoxRight": {
+   "native": 40.0,
+   "chromium": 41,
+   "delta": -1.0
+  },
+  "fontBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "fontBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "actualBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "actualBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "emHeightAscent": {
+   "native": 16.0,
+   "chromium": null,
+   "delta": null
+  },
+  "emHeightDescent": {
+   "native": 4.0,
+   "chromium": null,
+   "delta": null
+  },
+  "hangingBaseline": {
+   "native": 16.0,
+   "chromium": 12.800000190734863,
+   "delta": 3.2
+  },
+  "alphabeticBaseline": {
+   "native": -0.0,
+   "chromium": 0,
+   "delta": -0.0
+  },
+  "ideographicBaseline": {
+   "native": -4.0,
+   "chromium": -4,
+   "delta": 0.0
+  }
+ },
+ "align_RIGHT": {
+  "width": {
+   "native": 40.0,
+   "chromium": 40,
+   "delta": 0.0
+  },
+  "actualBoundingBoxLeft": {
+   "native": 40.0,
+   "chromium": 41,
+   "delta": -1.0
+  },
+  "actualBoundingBoxRight": {
+   "native": 0.0,
+   "chromium": 1,
+   "delta": -1.0
+  },
+  "fontBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "fontBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "actualBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "actualBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "emHeightAscent": {
+   "native": 16.0,
+   "chromium": null,
+   "delta": null
+  },
+  "emHeightDescent": {
+   "native": 4.0,
+   "chromium": null,
+   "delta": null
+  },
+  "hangingBaseline": {
+   "native": 16.0,
+   "chromium": 12.800000190734863,
+   "delta": 3.2
+  },
+  "alphabeticBaseline": {
+   "native": -0.0,
+   "chromium": 0,
+   "delta": -0.0
+  },
+  "ideographicBaseline": {
+   "native": -4.0,
+   "chromium": -4,
+   "delta": 0.0
+  }
+ },
+ "align_CENTER": {
+  "width": {
+   "native": 40.0,
+   "chromium": 40,
+   "delta": 0.0
+  },
+  "actualBoundingBoxLeft": {
+   "native": 20.0,
+   "chromium": 21,
+   "delta": -1.0
+  },
+  "actualBoundingBoxRight": {
+   "native": 20.0,
+   "chromium": 21,
+   "delta": -1.0
+  },
+  "fontBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "fontBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "actualBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "actualBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "emHeightAscent": {
+   "native": 16.0,
+   "chromium": null,
+   "delta": null
+  },
+  "emHeightDescent": {
+   "native": 4.0,
+   "chromium": null,
+   "delta": null
+  },
+  "hangingBaseline": {
+   "native": 16.0,
+   "chromium": 12.800000190734863,
+   "delta": 3.2
+  },
+  "alphabeticBaseline": {
+   "native": -0.0,
+   "chromium": 0,
+   "delta": -0.0
+  },
+  "ideographicBaseline": {
+   "native": -4.0,
+   "chromium": -4,
+   "delta": 0.0
+  }
+ },
+ "baseline_TOP": {
+  "width": {
+   "native": 20.0,
+   "chromium": 20,
+   "delta": 0.0
+  },
+  "actualBoundingBoxLeft": {
+   "native": 0.0,
+   "chromium": 1,
+   "delta": -1.0
+  },
+  "actualBoundingBoxRight": {
+   "native": 20.0,
+   "chromium": 21,
+   "delta": -1.0
+  },
+  "fontBoundingBoxAscent": {
+   "native": 0.0,
+   "chromium": 0,
+   "delta": 0.0
+  },
+  "fontBoundingBoxDescent": {
+   "native": 20.0,
+   "chromium": 20,
+   "delta": 0.0
+  },
+  "actualBoundingBoxAscent": {
+   "native": 0.0,
+   "chromium": 0,
+   "delta": 0.0
+  },
+  "actualBoundingBoxDescent": {
+   "native": 20.0,
+   "chromium": 20,
+   "delta": 0.0
+  },
+  "emHeightAscent": {
+   "native": 0.0,
+   "chromium": null,
+   "delta": null
+  },
+  "emHeightDescent": {
+   "native": 20.0,
+   "chromium": null,
+   "delta": null
+  },
+  "hangingBaseline": {
+   "native": 0.0,
+   "chromium": -3.1999998092651367,
+   "delta": 3.2
+  },
+  "alphabeticBaseline": {
+   "native": -16.0,
+   "chromium": -16,
+   "delta": 0.0
+  },
+  "ideographicBaseline": {
+   "native": -20.0,
+   "chromium": -20,
+   "delta": 0.0
+  }
+ },
+ "baseline_HANGING": {
+  "width": {
+   "native": 20.0,
+   "chromium": 20,
+   "delta": 0.0
+  },
+  "actualBoundingBoxLeft": {
+   "native": 0.0,
+   "chromium": 1,
+   "delta": -1.0
+  },
+  "actualBoundingBoxRight": {
+   "native": 20.0,
+   "chromium": 21,
+   "delta": -1.0
+  },
+  "fontBoundingBoxAscent": {
+   "native": 0.0,
+   "chromium": 3.1999998092651367,
+   "delta": -3.2
+  },
+  "fontBoundingBoxDescent": {
+   "native": 20.0,
+   "chromium": 16.799999237060547,
+   "delta": 3.200001
+  },
+  "actualBoundingBoxAscent": {
+   "native": 0.0,
+   "chromium": 3.1999998092651367,
+   "delta": -3.2
+  },
+  "actualBoundingBoxDescent": {
+   "native": 20.0,
+   "chromium": 16.799999237060547,
+   "delta": 3.200001
+  },
+  "emHeightAscent": {
+   "native": 0.0,
+   "chromium": null,
+   "delta": null
+  },
+  "emHeightDescent": {
+   "native": 20.0,
+   "chromium": null,
+   "delta": null
+  },
+  "hangingBaseline": {
+   "native": 0.0,
+   "chromium": 0,
+   "delta": 0.0
+  },
+  "alphabeticBaseline": {
+   "native": -16.0,
+   "chromium": -12.800000190734863,
+   "delta": -3.2
+  },
+  "ideographicBaseline": {
+   "native": -20.0,
+   "chromium": -16.799999237060547,
+   "delta": -3.200001
+  }
+ },
+ "baseline_MIDDLE": {
+  "width": {
+   "native": 20.0,
+   "chromium": 20,
+   "delta": 0.0
+  },
+  "actualBoundingBoxLeft": {
+   "native": 0.0,
+   "chromium": 1,
+   "delta": -1.0
+  },
+  "actualBoundingBoxRight": {
+   "native": 20.0,
+   "chromium": 21,
+   "delta": -1.0
+  },
+  "fontBoundingBoxAscent": {
+   "native": 10.0,
+   "chromium": 10,
+   "delta": 0.0
+  },
+  "fontBoundingBoxDescent": {
+   "native": 10.0,
+   "chromium": 10,
+   "delta": 0.0
+  },
+  "actualBoundingBoxAscent": {
+   "native": 10.0,
+   "chromium": 10,
+   "delta": 0.0
+  },
+  "actualBoundingBoxDescent": {
+   "native": 10.0,
+   "chromium": 10,
+   "delta": 0.0
+  },
+  "emHeightAscent": {
+   "native": 10.0,
+   "chromium": null,
+   "delta": null
+  },
+  "emHeightDescent": {
+   "native": 10.0,
+   "chromium": null,
+   "delta": null
+  },
+  "hangingBaseline": {
+   "native": 10.0,
+   "chromium": 6.800000190734863,
+   "delta": 3.2
+  },
+  "alphabeticBaseline": {
+   "native": -6.0,
+   "chromium": -6,
+   "delta": 0.0
+  },
+  "ideographicBaseline": {
+   "native": -10.0,
+   "chromium": -10,
+   "delta": 0.0
+  }
+ },
+ "baseline_ALPHABETIC": {
+  "width": {
+   "native": 20.0,
+   "chromium": 20,
+   "delta": 0.0
+  },
+  "actualBoundingBoxLeft": {
+   "native": 0.0,
+   "chromium": 1,
+   "delta": -1.0
+  },
+  "actualBoundingBoxRight": {
+   "native": 20.0,
+   "chromium": 21,
+   "delta": -1.0
+  },
+  "fontBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "fontBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "actualBoundingBoxAscent": {
+   "native": 16.0,
+   "chromium": 16,
+   "delta": 0.0
+  },
+  "actualBoundingBoxDescent": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "emHeightAscent": {
+   "native": 16.0,
+   "chromium": null,
+   "delta": null
+  },
+  "emHeightDescent": {
+   "native": 4.0,
+   "chromium": null,
+   "delta": null
+  },
+  "hangingBaseline": {
+   "native": 16.0,
+   "chromium": 12.800000190734863,
+   "delta": 3.2
+  },
+  "alphabeticBaseline": {
+   "native": -0.0,
+   "chromium": 0,
+   "delta": -0.0
+  },
+  "ideographicBaseline": {
+   "native": -4.0,
+   "chromium": -4,
+   "delta": 0.0
+  }
+ },
+ "baseline_IDEOGRAPHIC": {
+  "width": {
+   "native": 20.0,
+   "chromium": 20,
+   "delta": 0.0
+  },
+  "actualBoundingBoxLeft": {
+   "native": 0.0,
+   "chromium": 1,
+   "delta": -1.0
+  },
+  "actualBoundingBoxRight": {
+   "native": 20.0,
+   "chromium": 21,
+   "delta": -1.0
+  },
+  "fontBoundingBoxAscent": {
+   "native": 20.0,
+   "chromium": 20,
+   "delta": 0.0
+  },
+  "fontBoundingBoxDescent": {
+   "native": 0.0,
+   "chromium": 0,
+   "delta": 0.0
+  },
+  "actualBoundingBoxAscent": {
+   "native": 20.0,
+   "chromium": 20,
+   "delta": 0.0
+  },
+  "actualBoundingBoxDescent": {
+   "native": 0.0,
+   "chromium": 0,
+   "delta": 0.0
+  },
+  "emHeightAscent": {
+   "native": 20.0,
+   "chromium": null,
+   "delta": null
+  },
+  "emHeightDescent": {
+   "native": 0.0,
+   "chromium": null,
+   "delta": null
+  },
+  "hangingBaseline": {
+   "native": 20.0,
+   "chromium": 16.799999237060547,
+   "delta": 3.200001
+  },
+  "alphabeticBaseline": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "ideographicBaseline": {
+   "native": 0.0,
+   "chromium": 0,
+   "delta": 0.0
+  }
+ },
+ "baseline_BOTTOM": {
+  "width": {
+   "native": 20.0,
+   "chromium": 20,
+   "delta": 0.0
+  },
+  "actualBoundingBoxLeft": {
+   "native": 0.0,
+   "chromium": 1,
+   "delta": -1.0
+  },
+  "actualBoundingBoxRight": {
+   "native": 20.0,
+   "chromium": 21,
+   "delta": -1.0
+  },
+  "fontBoundingBoxAscent": {
+   "native": 20.0,
+   "chromium": 20,
+   "delta": 0.0
+  },
+  "fontBoundingBoxDescent": {
+   "native": 0.0,
+   "chromium": 0,
+   "delta": 0.0
+  },
+  "actualBoundingBoxAscent": {
+   "native": 20.0,
+   "chromium": 20,
+   "delta": 0.0
+  },
+  "actualBoundingBoxDescent": {
+   "native": 0.0,
+   "chromium": 0,
+   "delta": 0.0
+  },
+  "emHeightAscent": {
+   "native": 20.0,
+   "chromium": null,
+   "delta": null
+  },
+  "emHeightDescent": {
+   "native": 0.0,
+   "chromium": null,
+   "delta": null
+  },
+  "hangingBaseline": {
+   "native": 20.0,
+   "chromium": 16.799999237060547,
+   "delta": 3.200001
+  },
+  "alphabeticBaseline": {
+   "native": 4.0,
+   "chromium": 4,
+   "delta": 0.0
+  },
+  "ideographicBaseline": {
+   "native": 0.0,
+   "chromium": 0,
+   "delta": 0.0
+  }
+ }
+}

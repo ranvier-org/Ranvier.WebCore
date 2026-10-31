@@ -639,6 +639,8 @@ static Ref<Page> createPage(IntSize viewportSize, RvScreenOrientationManager& or
     page->settings().setPopoverHintEnabled(true);
     page->settings().setScreenOrientationAPIEnabled(true);
     page->settings().setVisualViewportAPIEnabled(true);
+    // CanvasRenderingContext2D.filter, as Chromium ships it; canvas layers stay off.
+    page->settings().setCanvasFiltersEnabled(true);
     page->settings().setInteractiveFormValidationEnabled(true);
     page->settings().setDataTransferItemsEnabled(true);
 #if ENABLE(POINTER_LOCK)
@@ -1511,6 +1513,8 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "diagnostics"))
         return 1;
     if (!std::strcmp(feature, "canvas-context"))
+        return 1;
+    if (!std::strcmp(feature, "canvas-filters"))
         return 1;
     if (!std::strcmp(feature, "cascade-diagnostics"))
         return 1;

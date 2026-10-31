@@ -1,0 +1,69 @@
+{
+ "group": "R05 canvas text (ranvier-org/Ranvier.WebCore#94)",
+ "nativeHead": "caa223ed331cd44aa09c589c7fccf08977a425fa",
+ "runtimeSourceHead": "2ae2fce569d85df45ee1696ff84ae1bdab0726c1",
+ "abi": 55,
+ "runtime": {
+  "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+  "RanvierWebCoreHost.dll": "239566cd1d11c92d12476b7290b83c3f80892cb17a616b5201fcab8b0bff37ac",
+  "WebCore.dll": "d96d90c90c3bc37b6157ee02ba4eafa89ba5d45a95ac48cebc056d380fc0b9c6"
+ },
+ "canvasTextAssertions": 473,
+ "repeat30": {
+  "runs": 30,
+  "distinct": [
+   "PASS: canvas_text 473 assertions"
+  ]
+ },
+ "fullBatchRaw": 92536,
+ "probes": 70,
+ "teardownProbes": 110,
+ "metricDifferencesFromChromium": {
+  "maxAbsDeltaByMember": {
+   "actualBoundingBoxLeft": 1.0,
+   "actualBoundingBoxRight": 4.0,
+   "emHeightAscent": "absent in Chromium",
+   "emHeightDescent": "absent in Chromium",
+   "hangingBaseline": 3.200001,
+   "fontBoundingBoxAscent": 3.2,
+   "fontBoundingBoxDescent": 3.200001,
+   "actualBoundingBoxAscent": 3.2,
+   "actualBoundingBoxDescent": 3.200001,
+   "alphabeticBaseline": 3.2,
+   "ideographicBaseline": 3.200001
+  },
+  "cases": 19,
+  "detail": "chromium-comparison.json"
+ },
+ "qualifications": [
+  "fontKerning, fontStretch, fontVariantCaps and textRendering are Unsupported: the pinned WebKit IDL has none of them, and adding them needs new CanvasRenderingContext2DBase::State fields (a class layout change); the probe asserts no export exists",
+  "Chromium 156 has no TextMetrics.emHeightAscent/emHeightDescent (undefined); WebKit reports them; Ranvier.Dom TextMeasurement carries them as float option (None in Chromium)",
+  "Chromium inflates glyph ink bounds by 1px (actualBoundingBoxLeft 1 for Ahem); actual bounding boxes are compared within 1px",
+  "WebKit reports the hanging baseline at the font ascent and aligns textBaseline=hanging like top; Chromium synthesises 0.8 of the ascent for fonts without a BASE table",
+  "WebKit reads an inherited direction back resolved (ltr/rtl); Chromium reads \"inherit\"",
+  "WebKit's actualBoundingBoxRight includes the trailing letterSpacing (75 for 'XXX' at 5px; Chromium 70+1)",
+  "pixel samples are taken at least 2px from a glyph edge; strokeText edges are asserted blue-dominant (b>=200, r,g<=80) because both engines antialias them",
+  "viewport_scroll is checked by exit code only (timing-dependent count); its count this run is recorded in batch-results.json",
+  "the Ahem face loads through T01 rv_fonts_load from a data: URL @font-face; nothing sleeps",
+  "text-candidate-1 was built from the working tree that was committed unchanged as caa223e (host/ and gen/ diff empty; the dirty list is in build-runtime-sha256.json); its parent is R04 paints-candidate-1 (65fe9d9) with RanvierDomGlue, T01 RanvierResourceGlue and the four host units recompiled"
+ ],
+ "files": {
+  "batch-results.json": "bf5b0a9b0192fde528c06a8a878bab7b82470c0d59762636d20fbd333a3cd035",
+  "build-runtime-sha256.json": "5a675ca1752e768ef6fa6d74529915d0cfc91a689b47fb4dd7664004655c743d",
+  "build_text_candidate.py": "ac6ad34cb3009b077125751d034cfc5557ee75c6c874ddebb2e99d8c137ed1a1",
+  "canvas-text-repeat30.txt": "d0b7df3fbcd585697ac4f7ef6966aba04cc3e8e91e8dee5e618be1e43415bb1c",
+  "canvas-text-report.json": "72e45a332b104ec0661820d73a7212d3323c41c4ced09f7884eed5b8af8c5d66",
+  "chromium-comparison.json": "382813a2d2e87e2a5630725872ec564cd3f73d0be36445c34b6a5f9339da4485",
+  "make_text_evidence.py": "b27646efd5fa75534ba38d0d78f66af85f561dedf6cf838e8a6940aaa1c0c186",
+  "r05-names.txt": "ae817a6490683f79af890b40846903cd2680c31aabbaa7e10920154c1301fc18",
+  "red-chromium.json": "a48c04fc2870ea67c0927ffcce2c2fe8b58ee79024a7fc56c9c3414b2480d585",
+  "red-native.json": "2632a7cc61517e3842e131ff197f3c34d47692909249bc2ccc559a0be1472e98",
+  "red_chromium.mjs": "f848c472ccb06f33b105512995182182d7f0f16c81a6fc59c142554aa02bc634",
+  "red_native.py": "bbe030e82f5e2cf85c205dce5c47c90e4dd4daa28362a3a9c20c4ea4074011f9",
+  "repeat30.sh": "1711ee3c469bcc2bb5f2b0b2cc25af717bb511d16c75e68e659b8eafad2067df",
+  "run_text_full_batch.py": "787ce5e4ed1a5bed9a539f1232e0a33447da64761f9d176613b6c13de85de5e8",
+  "runtime-receipt.json": "23abfa44229a28c9ebe21792f3bd7252a14876c5fdaa6b1abe31c85e0112183c",
+  "source-patches.json": "a692bf06ef7853408be9ac1366d81e1d3f42a3931b98f75098bd722d0aa5cd13",
+  "teardown-probes.json": "5805d971f2f2f18599268c972c34b5552deb2344501089810d82e9c9215d0465"
+ }
+}

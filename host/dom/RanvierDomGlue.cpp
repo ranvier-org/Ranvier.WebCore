@@ -200,6 +200,7 @@
 #include "HashChangeEvent.h"
 #include "Highlight.h"
 #include "HighlightRegistry.h"
+#include "ImageBitmap.h"
 #include "ImportNodeOptions.h"
 #include "InputEvent.h"
 #include "JavaScriptCore/ArrayBuffer.h"
@@ -224,6 +225,7 @@
 #include "NodeIterator.h"
 #include "NodeList.h"
 #include "PageTransitionEvent.h"
+#include "Path2D.h"
 #include "PointerEvent.h"
 #include "PopStateEvent.h"
 #include "ProgressEvent.h"
@@ -332,6 +334,7 @@
 #include "StyleSheetList.h"
 #include "SubmitEvent.h"
 #include "Text.h"
+#include "TextMetrics.h"
 #include "ToggleEvent.h"
 #include "Touch.h"
 #include "TouchEvent.h"
@@ -355,6 +358,12 @@
 #include "JSWebAnimation.h"
 #include "JSAriaNotifyOptions.h"
 #include "JSAriaNotifyOptions.h"
+#include "JSCanvasDirection.h"
+#include "JSCanvasFillRule.h"
+#include "JSCanvasLineCap.h"
+#include "JSCanvasLineJoin.h"
+#include "JSCanvasTextAlign.h"
+#include "JSCanvasTextBaseline.h"
 #include "JSCompositeOperation.h"
 #include "JSDocument.h"
 #include "JSEndingType.h"
@@ -362,6 +371,7 @@
 #include "JSFontFace.h"
 #include "JSFontFaceSet.h"
 #include "JSHighlight.h"
+#include "JSImageSmoothingQuality.h"
 #include "JSIterationCompositeOperation.h"
 #include "JSScreenOrientation.h"
 #include "JSPlaybackDirection.h"
@@ -742,6 +752,12 @@ static constexpr ASCIILiteral enumerationAnimationPlayState[] = { "idle"_s, "run
 static constexpr ASCIILiteral enumerationAnimationReplaceState[] = { "active"_s, "removed"_s, "persisted"_s };
 static constexpr ASCIILiteral enumerationAriaNotificationInterrupt[] = { "none"_s, "all"_s, "pending"_s };
 static constexpr ASCIILiteral enumerationAriaNotificationPriority[] = { "normal"_s, "high"_s };
+static constexpr ASCIILiteral enumerationCanvasDirection[] = { "ltr"_s, "rtl"_s, "inherit"_s };
+static constexpr ASCIILiteral enumerationCanvasFillRule[] = { "nonzero"_s, "evenodd"_s };
+static constexpr ASCIILiteral enumerationCanvasLineCap[] = { "butt"_s, "round"_s, "square"_s };
+static constexpr ASCIILiteral enumerationCanvasLineJoin[] = { "round"_s, "bevel"_s, "miter"_s };
+static constexpr ASCIILiteral enumerationCanvasTextAlign[] = { "start"_s, "end"_s, "left"_s, "right"_s, "center"_s };
+static constexpr ASCIILiteral enumerationCanvasTextBaseline[] = { "top"_s, "hanging"_s, "middle"_s, "alphabetic"_s, "ideographic"_s, "bottom"_s };
 static constexpr ASCIILiteral enumerationCompositeOperation[] = { "replace"_s, "add"_s, "accumulate"_s };
 static constexpr ASCIILiteral enumerationDocumentReadyState[] = { "loading"_s, "interactive"_s, "complete"_s };
 static constexpr ASCIILiteral enumerationEndingType[] = { "transparent"_s, "native"_s };
@@ -749,6 +765,7 @@ static constexpr ASCIILiteral enumerationFillMode[] = { "none"_s, "forwards"_s, 
 static constexpr ASCIILiteral enumerationFontFaceLoadStatus[] = { "unloaded"_s, "loading"_s, "loaded"_s, "error"_s };
 static constexpr ASCIILiteral enumerationFontFaceSetLoadStatus[] = { "loading"_s, "loaded"_s };
 static constexpr ASCIILiteral enumerationHighlightType[] = { "highlight"_s, "spelling-error"_s, "grammar-error"_s };
+static constexpr ASCIILiteral enumerationImageSmoothingQuality[] = { "low"_s, "medium"_s, "high"_s };
 static constexpr ASCIILiteral enumerationIterationCompositeOperation[] = { "replace"_s, "accumulate"_s };
 static constexpr ASCIILiteral enumerationOrientationType[] = { "portrait-primary"_s, "portrait-secondary"_s, "landscape-primary"_s, "landscape-secondary"_s };
 static constexpr ASCIILiteral enumerationPlaybackDirection[] = { "normal"_s, "reverse"_s, "alternate"_s, "alternate-reverse"_s };
@@ -771,6 +788,13 @@ template<typename T> struct DomSequenceArgument {
         return FixedVector<U> { std::move(converted) };
     }
     operator std::optional<Vector<T>>() && { return std::move(values); }
+    // A span parameter borrows the values for the call, which the argument temporary outlives.
+    operator std::span<const T>() && { return values.span(); }
+};
+// A decoded union passed to an engine variant with other arm order or arms: each arm converts on its own.
+template<typename V> struct DomUnionArgument {
+    V value;
+    template<typename T> operator T() && { return WTF::switchOn(std::move(value), [](auto&& arm) -> T { return T { std::move(arm) }; }); }
 };
 template<typename T> const T* resultField(const T& value) { return &value; }
 template<typename T> const T* resultField(const std::optional<T>& value) { return value ? &*value : nullptr; }
@@ -3627,6 +3651,164 @@ template<typename V> int32_t encodeRvDomUnionDOMStringOrCanvasGradientOrCanvasPa
     return RV_OK;
 }
 
+std::optional<Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>>> decodeRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue(const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        if (!source->arm0) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<HTMLImageElement> arm0 = source->arm0 ? dynamicDowncast<HTMLImageElement>(*reinterpret_cast<Node*>(source->arm0)) : nullptr;
+        if (source->arm0 && !arm0) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { WTF::InPlaceIndex<0>, Ref { *arm0 } } };
+    }
+    case 2: {
+        if (!source->arm1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<HTMLCanvasElement> arm1 = source->arm1 ? dynamicDowncast<HTMLCanvasElement>(*reinterpret_cast<Node*>(source->arm1)) : nullptr;
+        if (source->arm1 && !arm1) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { WTF::InPlaceIndex<1>, Ref { *arm1 } } };
+    }
+    case 3: {
+        if (!source->arm2) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<SVGImageElement> arm2 = source->arm2 ? dynamicDowncast<SVGImageElement>(*reinterpret_cast<Node*>(source->arm2)) : nullptr;
+        if (source->arm2 && !arm2) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { WTF::InPlaceIndex<2>, Ref { *arm2 } } };
+    }
+    case 4: {
+        if (!source->arm3) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<ImageBitmap> arm3 = reinterpret_cast<ImageBitmap*>(source->arm3);
+        if (source->arm3 && !arm3) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { WTF::InPlaceIndex<3>, Ref { *arm3 } } };
+    }
+    case 5: {
+        if (!source->arm4) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<CSSStyleImageValue> arm4 = source->arm4 ? dynamicDowncast<CSSStyleImageValue>(*reinterpret_cast<CSSStyleValue*>(source->arm4)) : nullptr;
+        if (source->arm4 && !arm4) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { WTF::InPlaceIndex<4>, Ref { *arm4 } } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue(RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        if (value->arm0) reinterpret_cast<Node*>(value->arm0)->deref();
+        break;
+    case 2:
+        if (value->arm1) reinterpret_cast<Node*>(value->arm1)->deref();
+        break;
+    case 3:
+        if (value->arm2) reinterpret_cast<Node*>(value->arm2)->deref();
+        break;
+    case 4:
+        if (value->arm3) reinterpret_cast<ImageBitmap*>(value->arm3)->deref();
+        break;
+    case 5:
+        if (value->arm4) reinterpret_cast<CSSStyleValue*>(value->arm4)->deref();
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue(V&& value, RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* result)
+{
+    if constexpr (I < 5) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                storeHandle<Node>(std::get<I>(value), &result->arm0);
+            }
+            else if constexpr (I == 1) {
+                storeHandle<Node>(std::get<I>(value), &result->arm1);
+            }
+            else if constexpr (I == 2) {
+                storeHandle<Node>(std::get<I>(value), &result->arm2);
+            }
+            else if constexpr (I == 3) {
+                storeHandle<ImageBitmap>(std::get<I>(value), &result->arm3);
+            }
+            else if constexpr (I == 4) {
+                storeHandle<CSSStyleValue>(std::get<I>(value), &result->arm4);
+            }
+        } else encodeArmsRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue(V&& input, RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue(value, result);
+    return RV_OK;
+}
+
+std::optional<Variant<double, DOMPointInit>> decodeRvDomUnionUnrestrictedDoubleOrDOMPointInit(const RvDomUnionUnrestrictedDoubleOrDOMPointInit* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        return Variant<double, DOMPointInit> { Variant<double, DOMPointInit> { WTF::InPlaceIndex<0>, static_cast<double>(source->arm0) } };
+    }
+    case 2: {
+        DOMPointInit arm1 { };
+        if (source->arm1) {
+            auto decodeFields = [&]() -> int32_t {
+                if (source->arm1->size >= offsetof(RvDomDOMPointInit, x) + sizeof(source->arm1->x))
+                    assignValue(arm1.x, source->arm1->x);
+                if (source->arm1->size >= offsetof(RvDomDOMPointInit, y) + sizeof(source->arm1->y))
+                    assignValue(arm1.y, source->arm1->y);
+                if (source->arm1->size >= offsetof(RvDomDOMPointInit, z) + sizeof(source->arm1->z))
+                    assignValue(arm1.z, source->arm1->z);
+                if (source->arm1->size >= offsetof(RvDomDOMPointInit, w) + sizeof(source->arm1->w))
+                    assignValue(arm1.w, source->arm1->w);
+                return RV_OK;
+            };
+            status = decodeFields();
+            if (status != RV_OK) return std::nullopt;
+        }
+        return Variant<double, DOMPointInit> { Variant<double, DOMPointInit> { WTF::InPlaceIndex<1>, std::move(arm1) } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionUnrestrictedDoubleOrDOMPointInit(RvDomUnionUnrestrictedDoubleOrDOMPointInit* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        break;
+    case 2:
+        break;
+    }
+    *value = { };
+}
+
+std::optional<Vector<Variant<double, DOMPointInit>>> decodeRvDomSequenceUnrestrictedDoubleOrDOMPointInit(const RvDomSequenceUnrestrictedDoubleOrDOMPointInit* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    Vector<Variant<double, DOMPointInit>> result;
+    result.reserveInitialCapacity(source->count);
+    for (int32_t i = 0; i < source->count; ++i) {
+        auto item = decodeRvDomUnionUnrestrictedDoubleOrDOMPointInit(&source->items[i], status);
+        if (status != RV_OK) return std::nullopt;
+        result.append(std::move(*item));
+    }
+    return Vector<Variant<double, DOMPointInit>> { std::move(result) };
+}
+
+void clearRvDomSequenceUnrestrictedDoubleOrDOMPointInit(RvDomSequenceUnrestrictedDoubleOrDOMPointInit* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        clearRvDomUnionUnrestrictedDoubleOrDOMPointInit(&value->items[i]);
+    }
+    std::free(value->items);
+    *value = { };
+}
+
 void clearRvDomSequenceCSSStyleValue(RvDomSequenceCSSStyleValue* value)
 {
     if (!value) return;
@@ -3932,7 +4114,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:Touch", "dom:TouchList", "dom:TouchEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:ErrorEvent", "dom:ProgressEvent", "dom:CSSAnimationEvent", "dom:CSSTransitionEvent", "dom:ContentVisibilityAutoStateChangeEvent", "dom:AnimationPlaybackEvent", "dom:PageTransitionEvent", "dom:HashChangeEvent", "dom:MediaQueryListEvent", "dom:PopStateEvent", "dom:BeforeUnloadEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom:Blob", "dom:File", "dom:FileList", "dom:CaretPosition", "dom:DOMURL", "dom:URLSearchParams", "dom:URLPattern", "dom:VisualViewport", "dom:Highlight", "dom:HighlightRegistry", "dom:FileReader", "dom:FontFace", "dom:FontFaceSet", "dom:WebAnimation", "dom:AnimationEffect", "dom:KeyframeEffect", "dom:AnimationTimeline", "dom:DocumentTimeline", "dom:DataTransfer", "dom:DataTransferItemList", "dom:DataTransferItem", "dom:ClipboardEvent", "dom:DragEvent", "dom:HTMLCanvasElement", "dom:CanvasRenderingContext2D", "dom:CanvasGradient", "dom:CanvasPattern", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-type-query:Event", "dom-type-query:AnimationEffect", "dom-type-query:AnimationTimeline", "dom-constructor:Text", "dom-constructor:Comment", "dom-constructor:DocumentFragment", "dom-constructor:Document", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:StaticRange", "dom-constructor:Range", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:PointerEvent", "dom-constructor:WheelEvent", "dom-constructor:InputEvent", "dom-constructor:CompositionEvent", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-constructor:ErrorEvent", "dom-constructor:ProgressEvent", "dom-constructor:CSSAnimationEvent", "dom-constructor:CSSTransitionEvent", "dom-constructor:ContentVisibilityAutoStateChangeEvent", "dom-constructor:AnimationPlaybackEvent", "dom-constructor:PageTransitionEvent", "dom-constructor:HashChangeEvent", "dom-constructor:MediaQueryListEvent", "dom-constructor:PopStateEvent", "dom-constructor:Blob", "dom-constructor:File", "dom-constructor:DOMURL", "dom-constructor:URLSearchParams", "dom-constructor:URLPattern", "dom-constructor:URLPattern", "dom-constructor:Highlight", "dom-constructor:FileReader", "dom-constructor:FontFace", "dom-constructor:WebAnimation", "dom-constructor:KeyframeEffect", "dom-constructor:KeyframeEffect", "dom-constructor:DocumentTimeline", "dom-constructor:DataTransfer", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:Touch", "dom:TouchList", "dom:TouchEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:ErrorEvent", "dom:ProgressEvent", "dom:CSSAnimationEvent", "dom:CSSTransitionEvent", "dom:ContentVisibilityAutoStateChangeEvent", "dom:AnimationPlaybackEvent", "dom:PageTransitionEvent", "dom:HashChangeEvent", "dom:MediaQueryListEvent", "dom:PopStateEvent", "dom:BeforeUnloadEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom:Blob", "dom:File", "dom:FileList", "dom:CaretPosition", "dom:DOMURL", "dom:URLSearchParams", "dom:URLPattern", "dom:VisualViewport", "dom:Highlight", "dom:HighlightRegistry", "dom:FileReader", "dom:FontFace", "dom:FontFaceSet", "dom:WebAnimation", "dom:AnimationEffect", "dom:KeyframeEffect", "dom:AnimationTimeline", "dom:DocumentTimeline", "dom:DataTransfer", "dom:DataTransferItemList", "dom:DataTransferItem", "dom:ClipboardEvent", "dom:DragEvent", "dom:HTMLCanvasElement", "dom:CanvasRenderingContext2D", "dom:CanvasGradient", "dom:CanvasPattern", "dom:Path2D", "dom:ImageBitmap", "dom:TextMetrics", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-type-query:Event", "dom-type-query:AnimationEffect", "dom-type-query:AnimationTimeline", "dom-constructor:Text", "dom-constructor:Comment", "dom-constructor:DocumentFragment", "dom-constructor:Document", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:StaticRange", "dom-constructor:Range", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:PointerEvent", "dom-constructor:WheelEvent", "dom-constructor:InputEvent", "dom-constructor:CompositionEvent", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-constructor:ErrorEvent", "dom-constructor:ProgressEvent", "dom-constructor:CSSAnimationEvent", "dom-constructor:CSSTransitionEvent", "dom-constructor:ContentVisibilityAutoStateChangeEvent", "dom-constructor:AnimationPlaybackEvent", "dom-constructor:PageTransitionEvent", "dom-constructor:HashChangeEvent", "dom-constructor:MediaQueryListEvent", "dom-constructor:PopStateEvent", "dom-constructor:Blob", "dom-constructor:File", "dom-constructor:DOMURL", "dom-constructor:URLSearchParams", "dom-constructor:URLPattern", "dom-constructor:URLPattern", "dom-constructor:Highlight", "dom-constructor:FileReader", "dom-constructor:FontFace", "dom-constructor:WebAnimation", "dom-constructor:KeyframeEffect", "dom-constructor:KeyframeEffect", "dom-constructor:DocumentTimeline", "dom-constructor:DataTransfer", "dom-constructor:Path2D", "dom-constructor:Path2D", "dom-constructor:Path2D", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -4295,6 +4477,21 @@ void ranvier_dom_union_unrestricted_double_or_keyframe_effect_options_release(Rv
 void ranvier_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release(RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* value)
 {
     if (isMainThread()) clearRvDomUnionDOMStringOrCanvasGradientOrCanvasPattern(value);
+}
+
+void ranvier_dom_union_html_image_element_or_html_canvas_element_or_svg_image_element_or_image_bitmap_or_css_style_image_value_release(RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* value)
+{
+    if (isMainThread()) clearRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue(value);
+}
+
+void ranvier_dom_union_unrestricted_double_or_dom_point_init_release(RvDomUnionUnrestrictedDoubleOrDOMPointInit* value)
+{
+    if (isMainThread()) clearRvDomUnionUnrestrictedDoubleOrDOMPointInit(value);
+}
+
+void ranvier_dom_sequence_unrestricted_double_or_dom_point_init_release(RvDomSequenceUnrestrictedDoubleOrDOMPointInit* value)
+{
+    if (isMainThread()) clearRvDomSequenceUnrestrictedDoubleOrDOMPointInit(value);
 }
 
 void ranvier_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value)
@@ -5371,6 +5568,48 @@ RvCanvasPattern* ranvier_dom_canvas_pattern_retain(RvCanvasPattern* handle)
     if (!handle || !isMainThread())
         return nullptr;
     reinterpret_cast<CanvasPattern*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_path2_d_release(RvPath2D* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<Path2D*>(handle)->deref();
+}
+
+RvPath2D* ranvier_dom_path2_d_retain(RvPath2D* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<Path2D*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_image_bitmap_release(RvImageBitmap* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<ImageBitmap*>(handle)->deref();
+}
+
+RvImageBitmap* ranvier_dom_image_bitmap_retain(RvImageBitmap* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<ImageBitmap*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_text_metrics_release(RvTextMetrics* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<TextMetrics*>(handle)->deref();
+}
+
+RvTextMetrics* ranvier_dom_text_metrics_retain(RvTextMetrics* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<TextMetrics*>(handle)->ref();
     return handle;
 }
 
@@ -45042,6 +45281,124 @@ int32_t ranvier_dom_canvas_rendering_context2_d_get_canvas(RvCanvasRenderingCont
     return deliver([&]() -> decltype(auto) { return impl->canvas(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
 }
 
+// CanvasRenderingContext2D.globalAlpha getter: attribute unrestricted double globalAlpha
+int32_t ranvier_dom_canvas_rendering_context2_d_get_global_alpha(RvCanvasRenderingContext2D* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->globalAlpha(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// CanvasRenderingContext2D.globalAlpha setter: attribute unrestricted double globalAlpha
+int32_t ranvier_dom_canvas_rendering_context2_d_set_global_alpha(RvCanvasRenderingContext2D* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setGlobalAlpha(value); });
+}
+
+// CanvasRenderingContext2D.globalCompositeOperation getter: attribute DOMString globalCompositeOperation
+int32_t ranvier_dom_canvas_rendering_context2_d_get_global_composite_operation(RvCanvasRenderingContext2D* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->globalCompositeOperation(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// CanvasRenderingContext2D.globalCompositeOperation setter: attribute DOMString globalCompositeOperation
+int32_t ranvier_dom_canvas_rendering_context2_d_set_global_composite_operation(RvCanvasRenderingContext2D* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setGlobalCompositeOperation(a0.string()); });
+}
+
+// CanvasRenderingContext2D.imageSmoothingEnabled getter: attribute boolean imageSmoothingEnabled
+int32_t ranvier_dom_canvas_rendering_context2_d_get_image_smoothing_enabled(RvCanvasRenderingContext2D* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->imageSmoothingEnabled(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// CanvasRenderingContext2D.imageSmoothingEnabled setter: attribute boolean imageSmoothingEnabled
+int32_t ranvier_dom_canvas_rendering_context2_d_set_image_smoothing_enabled(RvCanvasRenderingContext2D* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setImageSmoothingEnabled(!!value); });
+}
+
+// CanvasRenderingContext2D.imageSmoothingQuality getter: attribute ImageSmoothingQuality imageSmoothingQuality
+int32_t ranvier_dom_canvas_rendering_context2_d_get_image_smoothing_quality(RvCanvasRenderingContext2D* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->imageSmoothingQuality(); }, [&](auto&& value) { return storeEnumeration(value, result, enumerationImageSmoothingQuality); });
+}
+
+// CanvasRenderingContext2D.imageSmoothingQuality setter: attribute ImageSmoothingQuality imageSmoothingQuality
+int32_t ranvier_dom_canvas_rendering_context2_d_set_image_smoothing_quality(RvCanvasRenderingContext2D* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    auto a0 = enumerationFromIndex<std::remove_cvref_t<decltype(impl->imageSmoothingQuality())>>(value, enumerationImageSmoothingQuality);
+    if (!a0)
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->setImageSmoothingQuality(*a0); });
+}
+
+// CanvasRenderingContext2D.strokeStyle getter: attribute (DOMString or CanvasGradient or CanvasPattern) strokeStyle; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_canvas_rendering_context2_d_get_stroke_style(RvCanvasRenderingContext2D* target, RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->strokeStyle(); }, [&](auto&& value) { return encodeRvDomUnionDOMStringOrCanvasGradientOrCanvasPattern(value, result); });
+}
+
+// CanvasRenderingContext2D.strokeStyle setter: attribute (DOMString or CanvasGradient or CanvasPattern) strokeStyle
+int32_t ranvier_dom_canvas_rendering_context2_d_set_stroke_style(RvCanvasRenderingContext2D* target, const RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionDOMStringOrCanvasGradientOrCanvasPattern(value, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return WTF::switchOn(std::move(*a0), [&](auto&& arm) { if constexpr (std::is_same_v<std::remove_cvref_t<decltype(arm)>, String>) impl->setStrokeStyle(std::move(arm)); else impl->setStrokeStyle(RefPtr { std::move(arm) }); }); });
+}
+
 // CanvasRenderingContext2D.fillStyle getter: attribute (DOMString or CanvasGradient or CanvasPattern) fillStyle; *result owns its contents; release with the matching rv_dom_*_release
 int32_t ranvier_dom_canvas_rendering_context2_d_get_fill_style(RvCanvasRenderingContext2D* target, RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* result)
 {
@@ -45067,6 +45424,640 @@ int32_t ranvier_dom_canvas_rendering_context2_d_set_fill_style(RvCanvasRendering
     return invoke([&]() -> decltype(auto) { return WTF::switchOn(std::move(*a0), [&](auto&& arm) { if constexpr (std::is_same_v<std::remove_cvref_t<decltype(arm)>, String>) impl->setFillStyle(std::move(arm)); else impl->setFillStyle(RefPtr { std::move(arm) }); }); });
 }
 
+// CanvasRenderingContext2D.shadowOffsetX getter: attribute unrestricted double shadowOffsetX
+int32_t ranvier_dom_canvas_rendering_context2_d_get_shadow_offset_x(RvCanvasRenderingContext2D* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->shadowOffsetX(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// CanvasRenderingContext2D.shadowOffsetX setter: attribute unrestricted double shadowOffsetX
+int32_t ranvier_dom_canvas_rendering_context2_d_set_shadow_offset_x(RvCanvasRenderingContext2D* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setShadowOffsetX(value); });
+}
+
+// CanvasRenderingContext2D.shadowOffsetY getter: attribute unrestricted double shadowOffsetY
+int32_t ranvier_dom_canvas_rendering_context2_d_get_shadow_offset_y(RvCanvasRenderingContext2D* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->shadowOffsetY(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// CanvasRenderingContext2D.shadowOffsetY setter: attribute unrestricted double shadowOffsetY
+int32_t ranvier_dom_canvas_rendering_context2_d_set_shadow_offset_y(RvCanvasRenderingContext2D* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setShadowOffsetY(value); });
+}
+
+// CanvasRenderingContext2D.shadowBlur getter: attribute unrestricted double shadowBlur
+int32_t ranvier_dom_canvas_rendering_context2_d_get_shadow_blur(RvCanvasRenderingContext2D* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->shadowBlur(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// CanvasRenderingContext2D.shadowBlur setter: attribute unrestricted double shadowBlur
+int32_t ranvier_dom_canvas_rendering_context2_d_set_shadow_blur(RvCanvasRenderingContext2D* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setShadowBlur(value); });
+}
+
+// CanvasRenderingContext2D.shadowColor getter: attribute DOMString shadowColor
+int32_t ranvier_dom_canvas_rendering_context2_d_get_shadow_color(RvCanvasRenderingContext2D* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->shadowColor(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// CanvasRenderingContext2D.shadowColor setter: attribute DOMString shadowColor
+int32_t ranvier_dom_canvas_rendering_context2_d_set_shadow_color(RvCanvasRenderingContext2D* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setShadowColor(a0.string()); });
+}
+
+// CanvasRenderingContext2D.filter getter: attribute DOMString filter; RV_ERR_UNSUPPORTED while the setting CanvasFiltersEnabled is off
+int32_t ranvier_dom_canvas_rendering_context2_d_get_filter(RvCanvasRenderingContext2D* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    auto& settings = impl->canvas().document().settingsValues();
+    if (!(settings.canvasFiltersEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->filterString(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// CanvasRenderingContext2D.filter setter: attribute DOMString filter; RV_ERR_UNSUPPORTED while the setting CanvasFiltersEnabled is off
+int32_t ranvier_dom_canvas_rendering_context2_d_set_filter(RvCanvasRenderingContext2D* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    auto& settings = impl->canvas().document().settingsValues();
+    if (!(settings.canvasFiltersEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setFilterString(a0.string()); });
+}
+
+// CanvasRenderingContext2D.lineWidth getter: attribute unrestricted double lineWidth
+int32_t ranvier_dom_canvas_rendering_context2_d_get_line_width(RvCanvasRenderingContext2D* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->lineWidth(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// CanvasRenderingContext2D.lineWidth setter: attribute unrestricted double lineWidth
+int32_t ranvier_dom_canvas_rendering_context2_d_set_line_width(RvCanvasRenderingContext2D* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setLineWidth(value); });
+}
+
+// CanvasRenderingContext2D.lineCap getter: attribute CanvasLineCap lineCap
+int32_t ranvier_dom_canvas_rendering_context2_d_get_line_cap(RvCanvasRenderingContext2D* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->lineCap(); }, [&](auto&& value) { return storeEnumeration(value, result, enumerationCanvasLineCap); });
+}
+
+// CanvasRenderingContext2D.lineCap setter: attribute CanvasLineCap lineCap
+int32_t ranvier_dom_canvas_rendering_context2_d_set_line_cap(RvCanvasRenderingContext2D* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    auto a0 = enumerationFromIndex<std::remove_cvref_t<decltype(impl->lineCap())>>(value, enumerationCanvasLineCap);
+    if (!a0)
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->setLineCap(*a0); });
+}
+
+// CanvasRenderingContext2D.lineJoin getter: attribute CanvasLineJoin lineJoin
+int32_t ranvier_dom_canvas_rendering_context2_d_get_line_join(RvCanvasRenderingContext2D* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->lineJoin(); }, [&](auto&& value) { return storeEnumeration(value, result, enumerationCanvasLineJoin); });
+}
+
+// CanvasRenderingContext2D.lineJoin setter: attribute CanvasLineJoin lineJoin
+int32_t ranvier_dom_canvas_rendering_context2_d_set_line_join(RvCanvasRenderingContext2D* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    auto a0 = enumerationFromIndex<std::remove_cvref_t<decltype(impl->lineJoin())>>(value, enumerationCanvasLineJoin);
+    if (!a0)
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->setLineJoin(*a0); });
+}
+
+// CanvasRenderingContext2D.miterLimit getter: attribute unrestricted double miterLimit
+int32_t ranvier_dom_canvas_rendering_context2_d_get_miter_limit(RvCanvasRenderingContext2D* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->miterLimit(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// CanvasRenderingContext2D.miterLimit setter: attribute unrestricted double miterLimit
+int32_t ranvier_dom_canvas_rendering_context2_d_set_miter_limit(RvCanvasRenderingContext2D* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setMiterLimit(value); });
+}
+
+// CanvasRenderingContext2D.lineDashOffset getter: attribute unrestricted double lineDashOffset
+int32_t ranvier_dom_canvas_rendering_context2_d_get_line_dash_offset(RvCanvasRenderingContext2D* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->lineDashOffset(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// CanvasRenderingContext2D.lineDashOffset setter: attribute unrestricted double lineDashOffset
+int32_t ranvier_dom_canvas_rendering_context2_d_set_line_dash_offset(RvCanvasRenderingContext2D* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setLineDashOffset(value); });
+}
+
+// CanvasRenderingContext2D.font getter: attribute DOMString font
+int32_t ranvier_dom_canvas_rendering_context2_d_get_font(RvCanvasRenderingContext2D* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->font(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// CanvasRenderingContext2D.font setter: attribute DOMString font
+int32_t ranvier_dom_canvas_rendering_context2_d_set_font(RvCanvasRenderingContext2D* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setFont(a0.string()); });
+}
+
+// CanvasRenderingContext2D.textAlign getter: attribute CanvasTextAlign textAlign
+int32_t ranvier_dom_canvas_rendering_context2_d_get_text_align(RvCanvasRenderingContext2D* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->textAlign(); }, [&](auto&& value) { return storeEnumeration(value, result, enumerationCanvasTextAlign); });
+}
+
+// CanvasRenderingContext2D.textAlign setter: attribute CanvasTextAlign textAlign
+int32_t ranvier_dom_canvas_rendering_context2_d_set_text_align(RvCanvasRenderingContext2D* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    auto a0 = enumerationFromIndex<std::remove_cvref_t<decltype(impl->textAlign())>>(value, enumerationCanvasTextAlign);
+    if (!a0)
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->setTextAlign(*a0); });
+}
+
+// CanvasRenderingContext2D.textBaseline getter: attribute CanvasTextBaseline textBaseline
+int32_t ranvier_dom_canvas_rendering_context2_d_get_text_baseline(RvCanvasRenderingContext2D* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->textBaseline(); }, [&](auto&& value) { return storeEnumeration(value, result, enumerationCanvasTextBaseline); });
+}
+
+// CanvasRenderingContext2D.textBaseline setter: attribute CanvasTextBaseline textBaseline
+int32_t ranvier_dom_canvas_rendering_context2_d_set_text_baseline(RvCanvasRenderingContext2D* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    auto a0 = enumerationFromIndex<std::remove_cvref_t<decltype(impl->textBaseline())>>(value, enumerationCanvasTextBaseline);
+    if (!a0)
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->setTextBaseline(*a0); });
+}
+
+// CanvasRenderingContext2D.direction getter: attribute CanvasDirection direction
+int32_t ranvier_dom_canvas_rendering_context2_d_get_direction(RvCanvasRenderingContext2D* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->direction(); }, [&](auto&& value) { return storeEnumeration(value, result, enumerationCanvasDirection); });
+}
+
+// CanvasRenderingContext2D.direction setter: attribute CanvasDirection direction
+int32_t ranvier_dom_canvas_rendering_context2_d_set_direction(RvCanvasRenderingContext2D* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    auto a0 = enumerationFromIndex<std::remove_cvref_t<decltype(impl->direction())>>(value, enumerationCanvasDirection);
+    if (!a0)
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->setDirection(*a0); });
+}
+
+// CanvasRenderingContext2D.letterSpacing getter: attribute DOMString letterSpacing
+int32_t ranvier_dom_canvas_rendering_context2_d_get_letter_spacing(RvCanvasRenderingContext2D* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->letterSpacing(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// CanvasRenderingContext2D.letterSpacing setter: attribute DOMString letterSpacing
+int32_t ranvier_dom_canvas_rendering_context2_d_set_letter_spacing(RvCanvasRenderingContext2D* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setLetterSpacing(a0.string()); });
+}
+
+// CanvasRenderingContext2D.wordSpacing getter: attribute DOMString wordSpacing
+int32_t ranvier_dom_canvas_rendering_context2_d_get_word_spacing(RvCanvasRenderingContext2D* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->wordSpacing(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// CanvasRenderingContext2D.wordSpacing setter: attribute DOMString wordSpacing
+int32_t ranvier_dom_canvas_rendering_context2_d_set_word_spacing(RvCanvasRenderingContext2D* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setWordSpacing(a0.string()); });
+}
+
+// CanvasRenderingContext2D.save() -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_save(RvCanvasRenderingContext2D* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->save(); });
+}
+
+// CanvasRenderingContext2D.restore() -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_restore(RvCanvasRenderingContext2D* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->restore(); });
+}
+
+// CanvasRenderingContext2D.reset() -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_reset(RvCanvasRenderingContext2D* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->reset(); });
+}
+
+// CanvasRenderingContext2D.beginLayer() -> undefined; RV_ERR_UNSUPPORTED while the setting CanvasLayersEnabled is off
+int32_t ranvier_dom_canvas_rendering_context2_d_begin_layer(RvCanvasRenderingContext2D* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    auto& settings = impl->canvas().document().settingsValues();
+    if (!(settings.canvasLayersEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->beginLayer(); });
+}
+
+// CanvasRenderingContext2D.endLayer() -> undefined; RV_ERR_UNSUPPORTED while the setting CanvasLayersEnabled is off
+int32_t ranvier_dom_canvas_rendering_context2_d_end_layer(RvCanvasRenderingContext2D* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    auto& settings = impl->canvas().document().settingsValues();
+    if (!(settings.canvasLayersEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->endLayer(); });
+}
+
+// CanvasRenderingContext2D.scale(unrestricted double x, unrestricted double y) -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_scale(RvCanvasRenderingContext2D* target, double x, double y)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->scale(x, y); });
+}
+
+// CanvasRenderingContext2D.rotate(unrestricted double angle) -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_rotate(RvCanvasRenderingContext2D* target, double angle)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->rotate(angle); });
+}
+
+// CanvasRenderingContext2D.translate(unrestricted double x, unrestricted double y) -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_translate(RvCanvasRenderingContext2D* target, double x, double y)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->translate(x, y); });
+}
+
+// CanvasRenderingContext2D.transform(unrestricted double a, unrestricted double b, unrestricted double c, unrestricted double d, unrestricted double e, unrestricted double f) -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_transform(RvCanvasRenderingContext2D* target, double a, double b, double c, double d, double e, double f)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->transform(a, b, c, d, e, f); });
+}
+
+// CanvasRenderingContext2D.getTransform() -> DOMMatrix; *result is a new reference
+int32_t ranvier_dom_canvas_rendering_context2_d_get_transform(RvCanvasRenderingContext2D* target, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->getTransform(); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// CanvasRenderingContext2D.setTransform(unrestricted double a, unrestricted double b, unrestricted double c, unrestricted double d, unrestricted double e, unrestricted double f) -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_set_transform_6(RvCanvasRenderingContext2D* target, double a, double b, double c, double d, double e, double f)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setTransform(a, b, c, d, e, f); });
+}
+
+// CanvasRenderingContext2D.setTransform(optional DOMMatrix2DInit transform = {}) -> undefined; transform defaults to {} in IDL; transform may be NULL for the IDL default
+int32_t ranvier_dom_canvas_rendering_context2_d_set_transform_1(RvCanvasRenderingContext2D* target, const RvDomDOMMatrix2DInit* transform)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    DOMMatrix2DInit a0 { };
+    if (transform) {
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, a) + sizeof(transform->a) && transform->a)
+            assignValue(a0.a, *transform->a);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, b) + sizeof(transform->b) && transform->b)
+            assignValue(a0.b, *transform->b);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, c) + sizeof(transform->c) && transform->c)
+            assignValue(a0.c, *transform->c);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, d) + sizeof(transform->d) && transform->d)
+            assignValue(a0.d, *transform->d);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, e) + sizeof(transform->e) && transform->e)
+            assignValue(a0.e, *transform->e);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, f) + sizeof(transform->f) && transform->f)
+            assignValue(a0.f, *transform->f);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m11) + sizeof(transform->m11) && transform->m11)
+            assignValue(a0.m11, *transform->m11);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m12) + sizeof(transform->m12) && transform->m12)
+            assignValue(a0.m12, *transform->m12);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m21) + sizeof(transform->m21) && transform->m21)
+            assignValue(a0.m21, *transform->m21);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m22) + sizeof(transform->m22) && transform->m22)
+            assignValue(a0.m22, *transform->m22);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m41) + sizeof(transform->m41) && transform->m41)
+            assignValue(a0.m41, *transform->m41);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m42) + sizeof(transform->m42) && transform->m42)
+            assignValue(a0.m42, *transform->m42);
+    }
+    return invoke([&]() -> decltype(auto) { return impl->setTransform(std::move(a0)); });
+}
+
+// CanvasRenderingContext2D.resetTransform() -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_reset_transform(RvCanvasRenderingContext2D* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->resetTransform(); });
+}
+
+// CanvasRenderingContext2D.createLinearGradient(double x0, double y0, double x1, double y1) -> CanvasGradient; *result is a new reference
+int32_t ranvier_dom_canvas_rendering_context2_d_create_linear_gradient(RvCanvasRenderingContext2D* target, double x0, double y0, double x1, double y1, RvCanvasGradient** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    if (!std::isfinite(x0))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(y0))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(x1))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(y1))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return deliver([&]() -> decltype(auto) { return impl->createLinearGradient(x0, y0, x1, y1); }, [&](auto&& value) { return storeHandle<CanvasGradient>(value, result); });
+}
+
+// CanvasRenderingContext2D.createRadialGradient(double x0, double y0, double r0, double x1, double y1, double r1) -> CanvasGradient; *result is a new reference
+int32_t ranvier_dom_canvas_rendering_context2_d_create_radial_gradient(RvCanvasRenderingContext2D* target, double x0, double y0, double r0, double x1, double y1, double r1, RvCanvasGradient** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    if (!std::isfinite(x0))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(y0))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(r0))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(x1))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(y1))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(r1))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return deliver([&]() -> decltype(auto) { return impl->createRadialGradient(x0, y0, r0, x1, y1, r1); }, [&](auto&& value) { return storeHandle<CanvasGradient>(value, result); });
+}
+
+// CanvasRenderingContext2D.createConicGradient(double angle, double x, double y) -> CanvasGradient; *result is a new reference
+int32_t ranvier_dom_canvas_rendering_context2_d_create_conic_gradient(RvCanvasRenderingContext2D* target, double angle, double x, double y, RvCanvasGradient** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    if (!std::isfinite(angle))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(x))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(y))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return deliver([&]() -> decltype(auto) { return impl->createConicGradient(angle, x, y); }, [&](auto&& value) { return storeHandle<CanvasGradient>(value, result); });
+}
+
+// CanvasRenderingContext2D.createPattern(CanvasImageSource image, DOMString repetition) -> CanvasPattern?; *result is a new reference, or NULL
+int32_t ranvier_dom_canvas_rendering_context2_d_create_pattern(RvCanvasRenderingContext2D* target, const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* image, const uint8_t* repetition, int32_t repetition_length, RvCanvasPattern** result)
+{
+    if (!target || !image || !(repetition_length >= 0 && (repetition_length <= 0 || repetition)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue(image, status0);
+    if (status0 != RV_OK) return status0;
+    StringArg a1 { repetition, repetition_length };
+    if (a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return impl->createPattern(DomUnionArgument<Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>>> { std::move(*a0) }, a1.string()); }, [&](auto&& value) { return storeHandle<CanvasPattern>(value, result); });
+}
+
 // CanvasRenderingContext2D.clearRect(unrestricted double x, unrestricted double y, unrestricted double w, unrestricted double h) -> undefined
 int32_t ranvier_dom_canvas_rendering_context2_d_clear_rect(RvCanvasRenderingContext2D* target, double x, double y, double w, double h)
 {
@@ -45087,6 +46078,751 @@ int32_t ranvier_dom_canvas_rendering_context2_d_fill_rect(RvCanvasRenderingConte
         return RV_ERR_WRONG_THREAD;
     RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
     return invoke([&]() -> decltype(auto) { return impl->fillRect(x, y, w, h); });
+}
+
+// CanvasRenderingContext2D.strokeRect(unrestricted double x, unrestricted double y, unrestricted double w, unrestricted double h) -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_stroke_rect(RvCanvasRenderingContext2D* target, double x, double y, double w, double h)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->strokeRect(x, y, w, h); });
+}
+
+// CanvasRenderingContext2D.beginPath() -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_begin_path(RvCanvasRenderingContext2D* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->beginPath(); });
+}
+
+// CanvasRenderingContext2D.fill(optional CanvasFillRule fillRule = "nonzero") -> undefined; fill_rule defaults to "nonzero" in IDL
+int32_t ranvier_dom_canvas_rendering_context2_d_fill_1(RvCanvasRenderingContext2D* target, int32_t fill_rule)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    auto a0 = enumerationFromIndex<CanvasFillRule>(fill_rule, enumerationCanvasFillRule);
+    if (!a0)
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->fill(*a0); });
+}
+
+// CanvasRenderingContext2D.fill(Path2D path, optional CanvasFillRule fillRule = "nonzero") -> undefined; fill_rule defaults to "nonzero" in IDL
+int32_t ranvier_dom_canvas_rendering_context2_d_fill_2(RvCanvasRenderingContext2D* target, RvPath2D* path, int32_t fill_rule)
+{
+    if (!target || !path)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    RefPtr<Path2D> a0 = reinterpret_cast<Path2D*>(path);
+    auto a1 = enumerationFromIndex<CanvasFillRule>(fill_rule, enumerationCanvasFillRule);
+    if (!a1)
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->fill(HandleArg<Path2D> { a0.get() }, *a1); });
+}
+
+// CanvasRenderingContext2D.stroke() -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_stroke_0(RvCanvasRenderingContext2D* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->stroke(); });
+}
+
+// CanvasRenderingContext2D.stroke(Path2D path) -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_stroke_1(RvCanvasRenderingContext2D* target, RvPath2D* path)
+{
+    if (!target || !path)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    RefPtr<Path2D> a0 = reinterpret_cast<Path2D*>(path);
+    return invoke([&]() -> decltype(auto) { return impl->stroke(HandleArg<Path2D> { a0.get() }); });
+}
+
+// CanvasRenderingContext2D.clip(optional CanvasFillRule fillRule = "nonzero") -> undefined; fill_rule defaults to "nonzero" in IDL
+int32_t ranvier_dom_canvas_rendering_context2_d_clip_1(RvCanvasRenderingContext2D* target, int32_t fill_rule)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    auto a0 = enumerationFromIndex<CanvasFillRule>(fill_rule, enumerationCanvasFillRule);
+    if (!a0)
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->clip(*a0); });
+}
+
+// CanvasRenderingContext2D.clip(Path2D path, optional CanvasFillRule fillRule = "nonzero") -> undefined; fill_rule defaults to "nonzero" in IDL
+int32_t ranvier_dom_canvas_rendering_context2_d_clip_2(RvCanvasRenderingContext2D* target, RvPath2D* path, int32_t fill_rule)
+{
+    if (!target || !path)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    RefPtr<Path2D> a0 = reinterpret_cast<Path2D*>(path);
+    auto a1 = enumerationFromIndex<CanvasFillRule>(fill_rule, enumerationCanvasFillRule);
+    if (!a1)
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->clip(HandleArg<Path2D> { a0.get() }, *a1); });
+}
+
+// CanvasRenderingContext2D.isPointInPath(unrestricted double x, unrestricted double y, optional CanvasFillRule fillRule = "nonzero") -> boolean; fill_rule defaults to "nonzero" in IDL
+int32_t ranvier_dom_canvas_rendering_context2_d_is_point_in_path_3(RvCanvasRenderingContext2D* target, double x, double y, int32_t fill_rule, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    auto a2 = enumerationFromIndex<CanvasFillRule>(fill_rule, enumerationCanvasFillRule);
+    if (!a2)
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->isPointInPath(x, y, *a2); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// CanvasRenderingContext2D.isPointInPath(Path2D path, unrestricted double x, unrestricted double y, optional CanvasFillRule fillRule = "nonzero") -> boolean; fill_rule defaults to "nonzero" in IDL
+int32_t ranvier_dom_canvas_rendering_context2_d_is_point_in_path_4(RvCanvasRenderingContext2D* target, RvPath2D* path, double x, double y, int32_t fill_rule, int32_t* result)
+{
+    if (!target || !path || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    RefPtr<Path2D> a0 = reinterpret_cast<Path2D*>(path);
+    auto a3 = enumerationFromIndex<CanvasFillRule>(fill_rule, enumerationCanvasFillRule);
+    if (!a3)
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->isPointInPath(HandleArg<Path2D> { a0.get() }, x, y, *a3); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// CanvasRenderingContext2D.isPointInStroke(unrestricted double x, unrestricted double y) -> boolean
+int32_t ranvier_dom_canvas_rendering_context2_d_is_point_in_stroke_2(RvCanvasRenderingContext2D* target, double x, double y, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->isPointInStroke(x, y); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// CanvasRenderingContext2D.isPointInStroke(Path2D path, unrestricted double x, unrestricted double y) -> boolean
+int32_t ranvier_dom_canvas_rendering_context2_d_is_point_in_stroke_3(RvCanvasRenderingContext2D* target, RvPath2D* path, double x, double y, int32_t* result)
+{
+    if (!target || !path || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    RefPtr<Path2D> a0 = reinterpret_cast<Path2D*>(path);
+    return deliver([&]() -> decltype(auto) { return impl->isPointInStroke(HandleArg<Path2D> { a0.get() }, x, y); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// CanvasRenderingContext2D.fillText(DOMString text, unrestricted double x, unrestricted double y, optional unrestricted double maxWidth) -> undefined; max_width may be NULL (absent)
+int32_t ranvier_dom_canvas_rendering_context2_d_fill_text(RvCanvasRenderingContext2D* target, const uint8_t* text, int32_t text_length, double x, double y, const double* max_width)
+{
+    if (!target || !(text_length >= 0 && (text_length <= 0 || text)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    StringArg a0 { text, text_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->fillText(a0.string(), x, y, OptionalArg<double> { max_width }); });
+}
+
+// CanvasRenderingContext2D.strokeText(DOMString text, unrestricted double x, unrestricted double y, optional unrestricted double maxWidth) -> undefined; max_width may be NULL (absent)
+int32_t ranvier_dom_canvas_rendering_context2_d_stroke_text(RvCanvasRenderingContext2D* target, const uint8_t* text, int32_t text_length, double x, double y, const double* max_width)
+{
+    if (!target || !(text_length >= 0 && (text_length <= 0 || text)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    StringArg a0 { text, text_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->strokeText(a0.string(), x, y, OptionalArg<double> { max_width }); });
+}
+
+// CanvasRenderingContext2D.measureText(DOMString text) -> TextMetrics; *result is a new reference
+int32_t ranvier_dom_canvas_rendering_context2_d_measure_text(RvCanvasRenderingContext2D* target, const uint8_t* text, int32_t text_length, RvTextMetrics** result)
+{
+    if (!target || !(text_length >= 0 && (text_length <= 0 || text)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    StringArg a0 { text, text_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return impl->measureText(a0.string()); }, [&](auto&& value) { return storeHandle<TextMetrics>(value, result); });
+}
+
+// CanvasRenderingContext2D.setLineDash(sequence<unrestricted double> segments) -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_set_line_dash(RvCanvasRenderingContext2D* target, const RvDomSequenceUnrestrictedDouble* segments)
+{
+    if (!target || !segments)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceUnrestrictedDouble(segments, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->setLineDash(DomSequenceArgument<double> { std::move(*a0) }); });
+}
+
+// CanvasRenderingContext2D.getLineDash() -> sequence<unrestricted double>; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_canvas_rendering_context2_d_get_line_dash(RvCanvasRenderingContext2D* target, RvDomSequenceUnrestrictedDouble* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->getLineDash(); }, [&](auto&& value) { return encodeRvDomSequenceUnrestrictedDouble(value, result); });
+}
+
+// CanvasRenderingContext2D.closePath() -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_close_path(RvCanvasRenderingContext2D* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->closePath(); });
+}
+
+// CanvasRenderingContext2D.moveTo(unrestricted double x, unrestricted double y) -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_move_to(RvCanvasRenderingContext2D* target, double x, double y)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->moveTo(x, y); });
+}
+
+// CanvasRenderingContext2D.lineTo(unrestricted double x, unrestricted double y) -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_line_to(RvCanvasRenderingContext2D* target, double x, double y)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->lineTo(x, y); });
+}
+
+// CanvasRenderingContext2D.quadraticCurveTo(unrestricted double cpx, unrestricted double cpy, unrestricted double x, unrestricted double y) -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_quadratic_curve_to(RvCanvasRenderingContext2D* target, double cpx, double cpy, double x, double y)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->quadraticCurveTo(cpx, cpy, x, y); });
+}
+
+// CanvasRenderingContext2D.bezierCurveTo(unrestricted double cp1x, unrestricted double cp1y, unrestricted double cp2x, unrestricted double cp2y, unrestricted double x, unrestricted double y) -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_bezier_curve_to(RvCanvasRenderingContext2D* target, double cp1x, double cp1y, double cp2x, double cp2y, double x, double y)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y); });
+}
+
+// CanvasRenderingContext2D.arcTo(unrestricted double x1, unrestricted double y1, unrestricted double x2, unrestricted double y2, unrestricted double radius) -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_arc_to(RvCanvasRenderingContext2D* target, double x1, double y1, double x2, double y2, double radius)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->arcTo(x1, y1, x2, y2, radius); });
+}
+
+// CanvasRenderingContext2D.rect(unrestricted double x, unrestricted double y, unrestricted double w, unrestricted double h) -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_rect(RvCanvasRenderingContext2D* target, double x, double y, double w, double h)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->rect(x, y, w, h); });
+}
+
+// CanvasRenderingContext2D.roundRect(unrestricted double x, unrestricted double y, unrestricted double w, unrestricted double h, sequence<(unrestricted double or DOMPointInit)> radii) -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_round_rect_5_list(RvCanvasRenderingContext2D* target, double x, double y, double w, double h, const RvDomSequenceUnrestrictedDoubleOrDOMPointInit* radii)
+{
+    if (!target || !radii)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    int32_t status4 = RV_OK;
+    auto a4 = decodeRvDomSequenceUnrestrictedDoubleOrDOMPointInit(radii, status4);
+    if (status4 != RV_OK) return status4;
+    return invoke([&]() -> decltype(auto) { return impl->roundRect(x, y, w, h, DomSequenceArgument<Variant<double, DOMPointInit>> { std::move(*a4) }); });
+}
+
+// CanvasRenderingContext2D.roundRect(unrestricted double x, unrestricted double y, unrestricted double w, unrestricted double h, optional (unrestricted double or DOMPointInit) radii = 0.0) -> undefined; radii defaults to 0.0 in IDL
+int32_t ranvier_dom_canvas_rendering_context2_d_round_rect_5_value(RvCanvasRenderingContext2D* target, double x, double y, double w, double h, const RvDomUnionUnrestrictedDoubleOrDOMPointInit* radii)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    int32_t status4 = RV_OK;
+    auto a4 = decodeRvDomUnionUnrestrictedDoubleOrDOMPointInit(radii, status4);
+    if (!radii) { a4 = Variant<double, DOMPointInit> { }; status4 = RV_OK; }
+    if (status4 != RV_OK) return status4;
+    return invoke([&]() -> decltype(auto) { return impl->roundRect(x, y, w, h, std::move(*a4)); });
+}
+
+// CanvasRenderingContext2D.arc(unrestricted double x, unrestricted double y, unrestricted double radius, unrestricted double startAngle, unrestricted double endAngle, optional boolean anticlockwise = false) -> undefined; anticlockwise defaults to false in IDL
+int32_t ranvier_dom_canvas_rendering_context2_d_arc(RvCanvasRenderingContext2D* target, double x, double y, double radius, double start_angle, double end_angle, int32_t anticlockwise)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->arc(x, y, radius, start_angle, end_angle, !!anticlockwise); });
+}
+
+// CanvasRenderingContext2D.ellipse(unrestricted double x, unrestricted double y, unrestricted double radiusX, unrestricted double radiusY, unrestricted double rotation, unrestricted double startAngle, unrestricted double endAngle, optional boolean anticlockwise = false) -> undefined; anticlockwise defaults to false in IDL
+int32_t ranvier_dom_canvas_rendering_context2_d_ellipse(RvCanvasRenderingContext2D* target, double x, double y, double radius_x, double radius_y, double rotation, double start_angle, double end_angle, int32_t anticlockwise)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->ellipse(x, y, radius_x, radius_y, rotation, start_angle, end_angle, !!anticlockwise); });
+}
+
+// CanvasGradient.addColorStop(double offset, DOMString color) -> undefined; context is an explicit checked Document for the operation
+int32_t ranvier_dom_canvas_gradient_add_color_stop(RvCanvasGradient* target, RvNode* context, double offset, const uint8_t* color, int32_t color_length)
+{
+    if (!target || !context || !(color_length >= 0 && (color_length <= 0 || color)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasGradient> impl = reinterpret_cast<CanvasGradient*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));
+    if (!contextDocument)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = contextDocument.releaseNonNull();
+    if (!std::isfinite(offset))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    StringArg a1 { color, color_length };
+    if (a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->addColorStop(document.get(), offset, a1.string()); });
+}
+
+// CanvasPattern.setTransform(optional DOMMatrix2DInit transform = {}) -> undefined; transform defaults to {} in IDL; transform may be NULL for the IDL default
+int32_t ranvier_dom_canvas_pattern_set_transform(RvCanvasPattern* target, const RvDomDOMMatrix2DInit* transform)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasPattern> impl = reinterpret_cast<CanvasPattern*>(target);
+    DOMMatrix2DInit a0 { };
+    if (transform) {
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, a) + sizeof(transform->a) && transform->a)
+            assignValue(a0.a, *transform->a);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, b) + sizeof(transform->b) && transform->b)
+            assignValue(a0.b, *transform->b);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, c) + sizeof(transform->c) && transform->c)
+            assignValue(a0.c, *transform->c);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, d) + sizeof(transform->d) && transform->d)
+            assignValue(a0.d, *transform->d);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, e) + sizeof(transform->e) && transform->e)
+            assignValue(a0.e, *transform->e);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, f) + sizeof(transform->f) && transform->f)
+            assignValue(a0.f, *transform->f);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m11) + sizeof(transform->m11) && transform->m11)
+            assignValue(a0.m11, *transform->m11);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m12) + sizeof(transform->m12) && transform->m12)
+            assignValue(a0.m12, *transform->m12);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m21) + sizeof(transform->m21) && transform->m21)
+            assignValue(a0.m21, *transform->m21);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m22) + sizeof(transform->m22) && transform->m22)
+            assignValue(a0.m22, *transform->m22);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m41) + sizeof(transform->m41) && transform->m41)
+            assignValue(a0.m41, *transform->m41);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m42) + sizeof(transform->m42) && transform->m42)
+            assignValue(a0.m42, *transform->m42);
+    }
+    return invoke([&]() -> decltype(auto) { return impl->setTransform(std::move(a0)); });
+}
+
+// Path2D.constructor: target is the Document of the constructed object; *result is a new reference
+int32_t ranvier_dom_path2_d_create_0(RvNode* target, RvPath2D** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return Path2D::create(); }, [&](auto&& value) { return storeHandle<Path2D>(value, result); });
+}
+
+// Path2D.constructor: target is the Document of the constructed object; *result is a new reference
+int32_t ranvier_dom_path2_d_create_1_path(RvNode* target, RvPath2D* path, RvPath2D** result)
+{
+    if (!target || !path || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<Path2D> a0 = reinterpret_cast<Path2D*>(path);
+    return deliver([&]() -> decltype(auto) { return Path2D::create(HandleArg<Path2D> { a0.get() }); }, [&](auto&& value) { return storeHandle<Path2D>(value, result); });
+}
+
+// Path2D.constructor: target is the Document of the constructed object; *result is a new reference
+int32_t ranvier_dom_path2_d_create_1_d(RvNode* target, const uint8_t* d, int32_t d_length, RvPath2D** result)
+{
+    if (!target || !(d_length >= 0 && (d_length <= 0 || d)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { d, d_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return Path2D::create(a0.string()); }, [&](auto&& value) { return storeHandle<Path2D>(value, result); });
+}
+
+// Path2D.addPath(Path2D path, optional DOMMatrix2DInit transform = {}) -> undefined; transform defaults to {} in IDL; transform may be NULL for the IDL default
+int32_t ranvier_dom_path2_d_add_path(RvPath2D* target, RvPath2D* path, const RvDomDOMMatrix2DInit* transform)
+{
+    if (!target || !path)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Path2D> impl = reinterpret_cast<Path2D*>(target);
+    RefPtr<Path2D> a0 = reinterpret_cast<Path2D*>(path);
+    DOMMatrix2DInit a1 { };
+    if (transform) {
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, a) + sizeof(transform->a) && transform->a)
+            assignValue(a1.a, *transform->a);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, b) + sizeof(transform->b) && transform->b)
+            assignValue(a1.b, *transform->b);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, c) + sizeof(transform->c) && transform->c)
+            assignValue(a1.c, *transform->c);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, d) + sizeof(transform->d) && transform->d)
+            assignValue(a1.d, *transform->d);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, e) + sizeof(transform->e) && transform->e)
+            assignValue(a1.e, *transform->e);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, f) + sizeof(transform->f) && transform->f)
+            assignValue(a1.f, *transform->f);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m11) + sizeof(transform->m11) && transform->m11)
+            assignValue(a1.m11, *transform->m11);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m12) + sizeof(transform->m12) && transform->m12)
+            assignValue(a1.m12, *transform->m12);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m21) + sizeof(transform->m21) && transform->m21)
+            assignValue(a1.m21, *transform->m21);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m22) + sizeof(transform->m22) && transform->m22)
+            assignValue(a1.m22, *transform->m22);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m41) + sizeof(transform->m41) && transform->m41)
+            assignValue(a1.m41, *transform->m41);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m42) + sizeof(transform->m42) && transform->m42)
+            assignValue(a1.m42, *transform->m42);
+    }
+    return invoke([&]() -> decltype(auto) { return impl->addPath(HandleArg<Path2D> { a0.get() }, std::move(a1)); });
+}
+
+// Path2D.closePath() -> undefined
+int32_t ranvier_dom_path2_d_close_path(RvPath2D* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Path2D> impl = reinterpret_cast<Path2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->closePath(); });
+}
+
+// Path2D.moveTo(unrestricted double x, unrestricted double y) -> undefined
+int32_t ranvier_dom_path2_d_move_to(RvPath2D* target, double x, double y)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Path2D> impl = reinterpret_cast<Path2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->moveTo(x, y); });
+}
+
+// Path2D.lineTo(unrestricted double x, unrestricted double y) -> undefined
+int32_t ranvier_dom_path2_d_line_to(RvPath2D* target, double x, double y)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Path2D> impl = reinterpret_cast<Path2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->lineTo(x, y); });
+}
+
+// Path2D.quadraticCurveTo(unrestricted double cpx, unrestricted double cpy, unrestricted double x, unrestricted double y) -> undefined
+int32_t ranvier_dom_path2_d_quadratic_curve_to(RvPath2D* target, double cpx, double cpy, double x, double y)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Path2D> impl = reinterpret_cast<Path2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->quadraticCurveTo(cpx, cpy, x, y); });
+}
+
+// Path2D.bezierCurveTo(unrestricted double cp1x, unrestricted double cp1y, unrestricted double cp2x, unrestricted double cp2y, unrestricted double x, unrestricted double y) -> undefined
+int32_t ranvier_dom_path2_d_bezier_curve_to(RvPath2D* target, double cp1x, double cp1y, double cp2x, double cp2y, double x, double y)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Path2D> impl = reinterpret_cast<Path2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y); });
+}
+
+// Path2D.arcTo(unrestricted double x1, unrestricted double y1, unrestricted double x2, unrestricted double y2, unrestricted double radius) -> undefined
+int32_t ranvier_dom_path2_d_arc_to(RvPath2D* target, double x1, double y1, double x2, double y2, double radius)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Path2D> impl = reinterpret_cast<Path2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->arcTo(x1, y1, x2, y2, radius); });
+}
+
+// Path2D.rect(unrestricted double x, unrestricted double y, unrestricted double w, unrestricted double h) -> undefined
+int32_t ranvier_dom_path2_d_rect(RvPath2D* target, double x, double y, double w, double h)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Path2D> impl = reinterpret_cast<Path2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->rect(x, y, w, h); });
+}
+
+// Path2D.roundRect(unrestricted double x, unrestricted double y, unrestricted double w, unrestricted double h, sequence<(unrestricted double or DOMPointInit)> radii) -> undefined
+int32_t ranvier_dom_path2_d_round_rect_5_list(RvPath2D* target, double x, double y, double w, double h, const RvDomSequenceUnrestrictedDoubleOrDOMPointInit* radii)
+{
+    if (!target || !radii)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Path2D> impl = reinterpret_cast<Path2D*>(target);
+    int32_t status4 = RV_OK;
+    auto a4 = decodeRvDomSequenceUnrestrictedDoubleOrDOMPointInit(radii, status4);
+    if (status4 != RV_OK) return status4;
+    return invoke([&]() -> decltype(auto) { return impl->roundRect(x, y, w, h, DomSequenceArgument<Variant<double, DOMPointInit>> { std::move(*a4) }); });
+}
+
+// Path2D.roundRect(unrestricted double x, unrestricted double y, unrestricted double w, unrestricted double h, optional (unrestricted double or DOMPointInit) radii = 0.0) -> undefined; radii defaults to 0.0 in IDL
+int32_t ranvier_dom_path2_d_round_rect_5_value(RvPath2D* target, double x, double y, double w, double h, const RvDomUnionUnrestrictedDoubleOrDOMPointInit* radii)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Path2D> impl = reinterpret_cast<Path2D*>(target);
+    int32_t status4 = RV_OK;
+    auto a4 = decodeRvDomUnionUnrestrictedDoubleOrDOMPointInit(radii, status4);
+    if (!radii) { a4 = Variant<double, DOMPointInit> { }; status4 = RV_OK; }
+    if (status4 != RV_OK) return status4;
+    return invoke([&]() -> decltype(auto) { return impl->roundRect(x, y, w, h, std::move(*a4)); });
+}
+
+// Path2D.arc(unrestricted double x, unrestricted double y, unrestricted double radius, unrestricted double startAngle, unrestricted double endAngle, optional boolean anticlockwise = false) -> undefined; anticlockwise defaults to false in IDL
+int32_t ranvier_dom_path2_d_arc(RvPath2D* target, double x, double y, double radius, double start_angle, double end_angle, int32_t anticlockwise)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Path2D> impl = reinterpret_cast<Path2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->arc(x, y, radius, start_angle, end_angle, !!anticlockwise); });
+}
+
+// Path2D.ellipse(unrestricted double x, unrestricted double y, unrestricted double radiusX, unrestricted double radiusY, unrestricted double rotation, unrestricted double startAngle, unrestricted double endAngle, optional boolean anticlockwise = false) -> undefined; anticlockwise defaults to false in IDL
+int32_t ranvier_dom_path2_d_ellipse(RvPath2D* target, double x, double y, double radius_x, double radius_y, double rotation, double start_angle, double end_angle, int32_t anticlockwise)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Path2D> impl = reinterpret_cast<Path2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->ellipse(x, y, radius_x, radius_y, rotation, start_angle, end_angle, !!anticlockwise); });
+}
+
+// TextMetrics.width getter: readonly attribute double width
+int32_t ranvier_dom_text_metrics_get_width(RvTextMetrics* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TextMetrics> impl = reinterpret_cast<TextMetrics*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->width(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// TextMetrics.actualBoundingBoxLeft getter: readonly attribute double actualBoundingBoxLeft
+int32_t ranvier_dom_text_metrics_get_actual_bounding_box_left(RvTextMetrics* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TextMetrics> impl = reinterpret_cast<TextMetrics*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->actualBoundingBoxLeft(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// TextMetrics.actualBoundingBoxRight getter: readonly attribute double actualBoundingBoxRight
+int32_t ranvier_dom_text_metrics_get_actual_bounding_box_right(RvTextMetrics* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TextMetrics> impl = reinterpret_cast<TextMetrics*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->actualBoundingBoxRight(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// TextMetrics.fontBoundingBoxAscent getter: readonly attribute double fontBoundingBoxAscent
+int32_t ranvier_dom_text_metrics_get_font_bounding_box_ascent(RvTextMetrics* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TextMetrics> impl = reinterpret_cast<TextMetrics*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->fontBoundingBoxAscent(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// TextMetrics.fontBoundingBoxDescent getter: readonly attribute double fontBoundingBoxDescent
+int32_t ranvier_dom_text_metrics_get_font_bounding_box_descent(RvTextMetrics* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TextMetrics> impl = reinterpret_cast<TextMetrics*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->fontBoundingBoxDescent(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// TextMetrics.actualBoundingBoxAscent getter: readonly attribute double actualBoundingBoxAscent
+int32_t ranvier_dom_text_metrics_get_actual_bounding_box_ascent(RvTextMetrics* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TextMetrics> impl = reinterpret_cast<TextMetrics*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->actualBoundingBoxAscent(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// TextMetrics.actualBoundingBoxDescent getter: readonly attribute double actualBoundingBoxDescent
+int32_t ranvier_dom_text_metrics_get_actual_bounding_box_descent(RvTextMetrics* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TextMetrics> impl = reinterpret_cast<TextMetrics*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->actualBoundingBoxDescent(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// TextMetrics.emHeightAscent getter: readonly attribute double emHeightAscent
+int32_t ranvier_dom_text_metrics_get_em_height_ascent(RvTextMetrics* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TextMetrics> impl = reinterpret_cast<TextMetrics*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->emHeightAscent(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// TextMetrics.emHeightDescent getter: readonly attribute double emHeightDescent
+int32_t ranvier_dom_text_metrics_get_em_height_descent(RvTextMetrics* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TextMetrics> impl = reinterpret_cast<TextMetrics*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->emHeightDescent(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// TextMetrics.hangingBaseline getter: readonly attribute double hangingBaseline
+int32_t ranvier_dom_text_metrics_get_hanging_baseline(RvTextMetrics* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TextMetrics> impl = reinterpret_cast<TextMetrics*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->hangingBaseline(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// TextMetrics.alphabeticBaseline getter: readonly attribute double alphabeticBaseline
+int32_t ranvier_dom_text_metrics_get_alphabetic_baseline(RvTextMetrics* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TextMetrics> impl = reinterpret_cast<TextMetrics*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->alphabeticBaseline(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// TextMetrics.ideographicBaseline getter: readonly attribute double ideographicBaseline
+int32_t ranvier_dom_text_metrics_get_ideographic_baseline(RvTextMetrics* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TextMetrics> impl = reinterpret_cast<TextMetrics*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->ideographicBaseline(); }, [&](auto&& value) { return store<double>(value, result); });
 }
 
 // CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths

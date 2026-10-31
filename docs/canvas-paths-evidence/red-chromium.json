@@ -1,0 +1,211 @@
+{
+ "browser": "156.0.8078.4",
+ "triangle": {
+  "inside": [
+   255,
+   0,
+   0,
+   255
+  ],
+  "outside": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "hitInside": true,
+  "hitOutside": false,
+  "strokeOnEdge": true,
+  "strokeInside": false
+ },
+ "afterBeginPath": false,
+ "reuse": {
+  "square": [
+   0,
+   0,
+   255,
+   255
+  ],
+  "moved": [
+   0,
+   255,
+   0,
+   255
+  ],
+  "between": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "hitSquare": true,
+  "hitMovedAtOrigin": false,
+  "hitMoved": true,
+  "squareUnchanged": false
+ },
+ "pathData": {
+  "inside": true,
+  "outside": false,
+  "copyInside": true,
+  "copyMissesLaterRect": false,
+  "originalHasLaterRect": true
+ },
+ "invalidPathData": {
+  "threw": null,
+  "hit": false
+ },
+ "fillRule": {
+  "nonzero": true,
+  "evenodd": false,
+  "ring": true,
+  "ringPixel": [
+   255,
+   255,
+   0,
+   255
+  ],
+  "holePixel": [
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ "shapes": {
+  "arc": [
+   true,
+   false,
+   true
+  ],
+  "halfArc": [
+   true,
+   false
+  ],
+  "anticlockwiseArc": [
+   false,
+   true
+  ],
+  "ellipse": [
+   true,
+   true,
+   false
+  ],
+  "rotatedEllipse": [
+   false,
+   true
+  ],
+  "quadratic": [
+   true,
+   false
+  ],
+  "bezier": [
+   true,
+   false
+  ],
+  "arcTo": [
+   true,
+   false,
+   true
+  ],
+  "rect": [
+   true,
+   false
+  ],
+  "roundRectList": [
+   false,
+   true,
+   true
+  ],
+  "roundRectValue": [
+   false,
+   true
+  ],
+  "roundRectPoint": [
+   true,
+   false,
+   true
+  ],
+  "roundRectFour": [
+   true,
+   true,
+   false
+  ]
+ },
+ "errors": {
+  "arcNegative": "IndexSizeError",
+  "ellipseNegative": "IndexSizeError",
+  "arcToNegative": "IndexSizeError",
+  "roundRectNegative": "RangeError",
+  "roundRectFive": "RangeError",
+  "roundRectEmpty": "RangeError",
+  "addPathConflict": "TypeError",
+  "addPathNonFinite": null
+ },
+ "nonFinite": {
+  "pathKept": true,
+  "hitNaN": false,
+  "strokeNaN": false
+ },
+ "clip": {
+  "inside": [
+   255,
+   0,
+   0,
+   255
+  ],
+  "outside": [
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ "clipCurrent": {
+  "inside": [
+   0,
+   0,
+   255,
+   255
+  ],
+  "outside": [
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ "stroke": {
+  "line": [
+   0,
+   0,
+   0,
+   255
+  ],
+  "belowLine": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "rectEdge": [
+   0,
+   0,
+   0,
+   255
+  ],
+  "rectInside": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "current": [
+   0,
+   0,
+   0,
+   255
+  ],
+  "hitLine": true,
+  "missLine": false
+ }
+}
