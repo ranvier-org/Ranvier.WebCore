@@ -352,23 +352,31 @@
     }
   },
   "nativeQualifications": {
-    "image.networkErrorPaint": [
-      161,
-      201,
-      229,
-      255
-    ],
-    "image.brokenBytesPaint": [
-      161,
-      201,
-      229,
-      255
-    ],
+    "image.networkErrorPaint": {
+      "windows": [
+        161,
+        201,
+        229,
+        255
+      ],
+      "macos": "browser",
+      "linux": "browser"
+    },
+    "image.brokenBytesPaint": {
+      "windows": [
+        161,
+        201,
+        229,
+        255
+      ],
+      "macos": "browser",
+      "linux": "browser"
+    },
     "switch.attribute": ""
   },
   "qualificationNotes": {
-    "image.networkErrorPaint": "native paints the WebCore broken-image placeholder; Chromium paints nothing",
-    "image.brokenBytesPaint": "same placeholder for undecodable bytes",
+    "image.networkErrorPaint": "native paints the WebCore broken-image placeholder on Windows (WebKit.resources/icons); Chromium paints nothing. macOS and Linux paint nothing, as Chromium does: the staged libWebCore.dylib omits WebCore.framework/Resources, so ImageAdapterCocoa finds no missingImage.png; the Linux (WPE) build likewise paints no missingImage placeholder (CI run 41161429103)",
+    "image.brokenBytesPaint": "same placeholder, per platform, for undecodable bytes",
     "switch.attribute": "SVGStringList.clear leaves systemLanguage=\"\" natively; Chromium removes the attribute; both keep the switch fallback"
   }
 }
