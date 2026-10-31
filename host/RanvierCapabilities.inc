@@ -20,7 +20,9 @@ static constexpr const char* capabilityFacilityNames[] = {
     "accessibility", "accessibility-uia", "accessibility-events", "clipboard", "clipboard-read-callback",
     "clipboard-write-callback", "drop", "drag-out", "popups", "tooltip", "input", "ime", "frame", "scroll",
     "speech-synthesis", "gamepad", "spellcheck", "pdfjs", "wk-web-extensions", "notifications", "diagnostics",
-    "inspector-frontend", "cascade-diagnostics"
+    "inspector-frontend", "cascade-diagnostics", "media-preferences", "media-color-scheme", "media-reduced-motion",
+    "media-contrast", "media-pointer", "media-hover", "media-text-scale", "media-forced-colors", "media-contrast-less",
+    "media-reduced-transparency", "media-reduced-data"
 };
 
 static constexpr const char* capabilityHostFacilityNames[] = { "clipboard", "drop", "tooltip", "input", "ime", "scroll" };
@@ -235,6 +237,21 @@ static CapabilityResult capabilityQuery(RvHost& host, int category, const char* 
     else if (!std::strcmp(name, "accessibility-uia")) result.facts[1] = rv_abi_has(name);
     else if (!std::strcmp(name, "diagnostics")) { result.facts[1] = 1; result.boolean(host.diagnostics); }
     else if (!std::strcmp(name, "cascade-diagnostics")) { result.facts[1] = 1; result.boolean(host.diagnostics); }
+    // Supplied by rv_host_set_media_preferences: enabled while the host supplies a value other than the default.
+    else if (!std::strcmp(name, "media-preferences")) {
+        auto& m = host.mediaPreferences;
+        result.facts[1] = 1;
+        result.boolean(m.color_scheme || m.reduced_motion || m.contrast || m.pointer || m.hover || m.any_pointer || m.any_hover || m.text_scale);
+    } else if (!std::strcmp(name, "media-color-scheme")) { result.facts[1] = 1; result.boolean(host.mediaPreferences.color_scheme); }
+    else if (!std::strcmp(name, "media-reduced-motion")) { result.facts[1] = 1; result.boolean(host.mediaPreferences.reduced_motion); }
+    else if (!std::strcmp(name, "media-contrast")) { result.facts[1] = 1; result.boolean(host.mediaPreferences.contrast); }
+    else if (!std::strcmp(name, "media-pointer")) { result.facts[1] = 1; result.boolean(host.mediaPreferences.pointer || host.mediaPreferences.any_pointer); }
+    else if (!std::strcmp(name, "media-hover")) { result.facts[1] = 1; result.boolean(host.mediaPreferences.hover || host.mediaPreferences.any_hover); }
+    else if (!std::strcmp(name, "media-text-scale")) { result.facts[1] = 1; result.boolean(host.mediaPreferences.text_scale); }
+    // WebCore evaluates forced-colors as none and prefers-contrast less as never, and has no reduced-transparency or
+    // reduced-data feature.
+    else if (!std::strcmp(name, "media-forced-colors") || !std::strcmp(name, "media-contrast-less")
+        || !std::strcmp(name, "media-reduced-transparency") || !std::strcmp(name, "media-reduced-data")) result.facts[1] = 0;
     // No flavor ships a developer-tools frontend (WebInspectorUI) or connects one to the page's inspector controller.
     else if (!std::strcmp(name, "inspector-frontend")) { result.facts[1] = 0; result.facts[4] = 0; }
     else if (capabilityContains(capabilityHostFacilityNames, name)) result.facts[1] = 1;

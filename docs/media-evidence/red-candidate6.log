@@ -1,0 +1,3 @@
+    raise AssertionError('required native binding is absent: ' + name) from error
+AssertionError: required native binding is absent: rv_host_set_media_preferences
+EXIT_CODE=1

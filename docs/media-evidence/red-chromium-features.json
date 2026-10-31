@@ -1,0 +1,1073 @@
+{
+ "browser": "156.0.8078.4",
+ "states": {
+  "default": {
+   "(min-width: 300px)": [
+    1,
+    "(min-width: 300px)"
+   ],
+   "(width: 320px)": [
+    1,
+    "(width: 320px)"
+   ],
+   "(height: 240px)": [
+    1,
+    "(height: 240px)"
+   ],
+   "(orientation: landscape)": [
+    1,
+    "(orientation: landscape)"
+   ],
+   "(aspect-ratio: 4/3)": [
+    1,
+    "(aspect-ratio: 4 / 3)"
+   ],
+   "(resolution: 1dppx)": [
+    1,
+    "(resolution: 1dppx)"
+   ],
+   "(resolution: 2dppx)": [
+    0,
+    "(resolution: 2dppx)"
+   ],
+   "(-webkit-device-pixel-ratio: 1)": [
+    1,
+    "(-webkit-device-pixel-ratio: 1)"
+   ],
+   "(device-width: 320px)": [
+    1,
+    "(device-width: 320px)"
+   ],
+   "(color)": [
+    1,
+    "(color)"
+   ],
+   "(color: 8)": [
+    1,
+    "(color: 8)"
+   ],
+   "(color-gamut: srgb)": [
+    1,
+    "(color-gamut: srgb)"
+   ],
+   "(monochrome)": [
+    0,
+    "(monochrome)"
+   ],
+   "(inverted-colors: inverted)": [
+    0,
+    "(inverted-colors: inverted)"
+   ],
+   "(inverted-colors: none)": [
+    0,
+    "(inverted-colors: none)"
+   ],
+   "(pointer: fine)": [
+    1,
+    "(pointer: fine)"
+   ],
+   "(pointer: coarse)": [
+    0,
+    "(pointer: coarse)"
+   ],
+   "(pointer: none)": [
+    0,
+    "(pointer: none)"
+   ],
+   "(hover: hover)": [
+    1,
+    "(hover: hover)"
+   ],
+   "(hover: none)": [
+    0,
+    "(hover: none)"
+   ],
+   "(any-pointer: fine)": [
+    1,
+    "(any-pointer: fine)"
+   ],
+   "(any-pointer: coarse)": [
+    0,
+    "(any-pointer: coarse)"
+   ],
+   "(any-pointer: none)": [
+    0,
+    "(any-pointer: none)"
+   ],
+   "(any-hover: hover)": [
+    1,
+    "(any-hover: hover)"
+   ],
+   "(any-hover: none)": [
+    0,
+    "(any-hover: none)"
+   ],
+   "(prefers-color-scheme: light)": [
+    1,
+    "(prefers-color-scheme: light)"
+   ],
+   "(prefers-color-scheme: dark)": [
+    0,
+    "(prefers-color-scheme: dark)"
+   ],
+   "(prefers-reduced-motion: reduce)": [
+    0,
+    "(prefers-reduced-motion: reduce)"
+   ],
+   "(prefers-reduced-motion: no-preference)": [
+    1,
+    "(prefers-reduced-motion: no-preference)"
+   ],
+   "(prefers-contrast: more)": [
+    0,
+    "(prefers-contrast: more)"
+   ],
+   "(prefers-contrast: less)": [
+    0,
+    "(prefers-contrast: less)"
+   ],
+   "(prefers-contrast: no-preference)": [
+    1,
+    "(prefers-contrast: no-preference)"
+   ],
+   "(prefers-contrast: custom)": [
+    0,
+    "(prefers-contrast: custom)"
+   ],
+   "(forced-colors: active)": [
+    0,
+    "(forced-colors: active)"
+   ],
+   "(forced-colors: none)": [
+    1,
+    "(forced-colors: none)"
+   ],
+   "(prefers-reduced-transparency: reduce)": [
+    0,
+    "(prefers-reduced-transparency: reduce)"
+   ],
+   "(prefers-reduced-data: reduce)": [
+    0,
+    "(prefers-reduced-data: reduce)"
+   ],
+   "(dynamic-range: high)": [
+    0,
+    "(dynamic-range: high)"
+   ],
+   "(dynamic-range: standard)": [
+    1,
+    "(dynamic-range: standard)"
+   ],
+   "(scripting: enabled)": [
+    1,
+    "(scripting: enabled)"
+   ],
+   "(scripting: none)": [
+    0,
+    "(scripting: none)"
+   ],
+   "(update: fast)": [
+    1,
+    "(update: fast)"
+   ],
+   "(display-mode: browser)": [
+    1,
+    "(display-mode: browser)"
+   ],
+   "(overflow-block: scroll)": [
+    1,
+    "(overflow-block: scroll)"
+   ],
+   "(grid: 0)": [
+    1,
+    "(grid: 0)"
+   ],
+   "(scan: progressive)": [
+    0,
+    "(scan: progressive)"
+   ],
+   "(prefers-dark-interface)": [
+    0,
+    "(prefers-dark-interface)"
+   ],
+   "print": [
+    0,
+    "print"
+   ],
+   "screen": [
+    1,
+    "screen"
+   ],
+   "(video-dynamic-range: high)": [
+    0,
+    "(video-dynamic-range: high)"
+   ],
+   "(unknown-feature)": [
+    0,
+    "(unknown-feature)"
+   ]
+  },
+  "emulated": {
+   "(min-width: 300px)": [
+    1,
+    "(min-width: 300px)"
+   ],
+   "(width: 320px)": [
+    1,
+    "(width: 320px)"
+   ],
+   "(height: 240px)": [
+    1,
+    "(height: 240px)"
+   ],
+   "(orientation: landscape)": [
+    1,
+    "(orientation: landscape)"
+   ],
+   "(aspect-ratio: 4/3)": [
+    1,
+    "(aspect-ratio: 4 / 3)"
+   ],
+   "(resolution: 1dppx)": [
+    1,
+    "(resolution: 1dppx)"
+   ],
+   "(resolution: 2dppx)": [
+    0,
+    "(resolution: 2dppx)"
+   ],
+   "(-webkit-device-pixel-ratio: 1)": [
+    1,
+    "(-webkit-device-pixel-ratio: 1)"
+   ],
+   "(device-width: 320px)": [
+    1,
+    "(device-width: 320px)"
+   ],
+   "(color)": [
+    1,
+    "(color)"
+   ],
+   "(color: 8)": [
+    1,
+    "(color: 8)"
+   ],
+   "(color-gamut: srgb)": [
+    1,
+    "(color-gamut: srgb)"
+   ],
+   "(monochrome)": [
+    0,
+    "(monochrome)"
+   ],
+   "(inverted-colors: inverted)": [
+    0,
+    "(inverted-colors: inverted)"
+   ],
+   "(inverted-colors: none)": [
+    0,
+    "(inverted-colors: none)"
+   ],
+   "(pointer: fine)": [
+    1,
+    "(pointer: fine)"
+   ],
+   "(pointer: coarse)": [
+    0,
+    "(pointer: coarse)"
+   ],
+   "(pointer: none)": [
+    0,
+    "(pointer: none)"
+   ],
+   "(hover: hover)": [
+    1,
+    "(hover: hover)"
+   ],
+   "(hover: none)": [
+    0,
+    "(hover: none)"
+   ],
+   "(any-pointer: fine)": [
+    1,
+    "(any-pointer: fine)"
+   ],
+   "(any-pointer: coarse)": [
+    0,
+    "(any-pointer: coarse)"
+   ],
+   "(any-pointer: none)": [
+    0,
+    "(any-pointer: none)"
+   ],
+   "(any-hover: hover)": [
+    1,
+    "(any-hover: hover)"
+   ],
+   "(any-hover: none)": [
+    0,
+    "(any-hover: none)"
+   ],
+   "(prefers-color-scheme: light)": [
+    0,
+    "(prefers-color-scheme: light)"
+   ],
+   "(prefers-color-scheme: dark)": [
+    1,
+    "(prefers-color-scheme: dark)"
+   ],
+   "(prefers-reduced-motion: reduce)": [
+    1,
+    "(prefers-reduced-motion: reduce)"
+   ],
+   "(prefers-reduced-motion: no-preference)": [
+    0,
+    "(prefers-reduced-motion: no-preference)"
+   ],
+   "(prefers-contrast: more)": [
+    1,
+    "(prefers-contrast: more)"
+   ],
+   "(prefers-contrast: less)": [
+    0,
+    "(prefers-contrast: less)"
+   ],
+   "(prefers-contrast: no-preference)": [
+    0,
+    "(prefers-contrast: no-preference)"
+   ],
+   "(prefers-contrast: custom)": [
+    0,
+    "(prefers-contrast: custom)"
+   ],
+   "(forced-colors: active)": [
+    1,
+    "(forced-colors: active)"
+   ],
+   "(forced-colors: none)": [
+    0,
+    "(forced-colors: none)"
+   ],
+   "(prefers-reduced-transparency: reduce)": [
+    0,
+    "(prefers-reduced-transparency: reduce)"
+   ],
+   "(prefers-reduced-data: reduce)": [
+    0,
+    "(prefers-reduced-data: reduce)"
+   ],
+   "(dynamic-range: high)": [
+    0,
+    "(dynamic-range: high)"
+   ],
+   "(dynamic-range: standard)": [
+    1,
+    "(dynamic-range: standard)"
+   ],
+   "(scripting: enabled)": [
+    1,
+    "(scripting: enabled)"
+   ],
+   "(scripting: none)": [
+    0,
+    "(scripting: none)"
+   ],
+   "(update: fast)": [
+    1,
+    "(update: fast)"
+   ],
+   "(display-mode: browser)": [
+    1,
+    "(display-mode: browser)"
+   ],
+   "(overflow-block: scroll)": [
+    1,
+    "(overflow-block: scroll)"
+   ],
+   "(grid: 0)": [
+    1,
+    "(grid: 0)"
+   ],
+   "(scan: progressive)": [
+    0,
+    "(scan: progressive)"
+   ],
+   "(prefers-dark-interface)": [
+    0,
+    "(prefers-dark-interface)"
+   ],
+   "print": [
+    0,
+    "print"
+   ],
+   "screen": [
+    1,
+    "screen"
+   ],
+   "(video-dynamic-range: high)": [
+    0,
+    "(video-dynamic-range: high)"
+   ],
+   "(unknown-feature)": [
+    0,
+    "(unknown-feature)"
+   ]
+  },
+  "metrics200x400dpr2": {
+   "(min-width: 300px)": [
+    0,
+    "(min-width: 300px)"
+   ],
+   "(width: 320px)": [
+    0,
+    "(width: 320px)"
+   ],
+   "(height: 240px)": [
+    0,
+    "(height: 240px)"
+   ],
+   "(orientation: landscape)": [
+    0,
+    "(orientation: landscape)"
+   ],
+   "(aspect-ratio: 4/3)": [
+    0,
+    "(aspect-ratio: 4 / 3)"
+   ],
+   "(resolution: 1dppx)": [
+    0,
+    "(resolution: 1dppx)"
+   ],
+   "(resolution: 2dppx)": [
+    1,
+    "(resolution: 2dppx)"
+   ],
+   "(-webkit-device-pixel-ratio: 1)": [
+    0,
+    "(-webkit-device-pixel-ratio: 1)"
+   ],
+   "(device-width: 320px)": [
+    0,
+    "(device-width: 320px)"
+   ],
+   "(color)": [
+    1,
+    "(color)"
+   ],
+   "(color: 8)": [
+    1,
+    "(color: 8)"
+   ],
+   "(color-gamut: srgb)": [
+    1,
+    "(color-gamut: srgb)"
+   ],
+   "(monochrome)": [
+    0,
+    "(monochrome)"
+   ],
+   "(inverted-colors: inverted)": [
+    0,
+    "(inverted-colors: inverted)"
+   ],
+   "(inverted-colors: none)": [
+    0,
+    "(inverted-colors: none)"
+   ],
+   "(pointer: fine)": [
+    1,
+    "(pointer: fine)"
+   ],
+   "(pointer: coarse)": [
+    0,
+    "(pointer: coarse)"
+   ],
+   "(pointer: none)": [
+    0,
+    "(pointer: none)"
+   ],
+   "(hover: hover)": [
+    1,
+    "(hover: hover)"
+   ],
+   "(hover: none)": [
+    0,
+    "(hover: none)"
+   ],
+   "(any-pointer: fine)": [
+    1,
+    "(any-pointer: fine)"
+   ],
+   "(any-pointer: coarse)": [
+    0,
+    "(any-pointer: coarse)"
+   ],
+   "(any-pointer: none)": [
+    0,
+    "(any-pointer: none)"
+   ],
+   "(any-hover: hover)": [
+    1,
+    "(any-hover: hover)"
+   ],
+   "(any-hover: none)": [
+    0,
+    "(any-hover: none)"
+   ],
+   "(prefers-color-scheme: light)": [
+    0,
+    "(prefers-color-scheme: light)"
+   ],
+   "(prefers-color-scheme: dark)": [
+    1,
+    "(prefers-color-scheme: dark)"
+   ],
+   "(prefers-reduced-motion: reduce)": [
+    1,
+    "(prefers-reduced-motion: reduce)"
+   ],
+   "(prefers-reduced-motion: no-preference)": [
+    0,
+    "(prefers-reduced-motion: no-preference)"
+   ],
+   "(prefers-contrast: more)": [
+    1,
+    "(prefers-contrast: more)"
+   ],
+   "(prefers-contrast: less)": [
+    0,
+    "(prefers-contrast: less)"
+   ],
+   "(prefers-contrast: no-preference)": [
+    0,
+    "(prefers-contrast: no-preference)"
+   ],
+   "(prefers-contrast: custom)": [
+    0,
+    "(prefers-contrast: custom)"
+   ],
+   "(forced-colors: active)": [
+    1,
+    "(forced-colors: active)"
+   ],
+   "(forced-colors: none)": [
+    0,
+    "(forced-colors: none)"
+   ],
+   "(prefers-reduced-transparency: reduce)": [
+    0,
+    "(prefers-reduced-transparency: reduce)"
+   ],
+   "(prefers-reduced-data: reduce)": [
+    0,
+    "(prefers-reduced-data: reduce)"
+   ],
+   "(dynamic-range: high)": [
+    0,
+    "(dynamic-range: high)"
+   ],
+   "(dynamic-range: standard)": [
+    1,
+    "(dynamic-range: standard)"
+   ],
+   "(scripting: enabled)": [
+    1,
+    "(scripting: enabled)"
+   ],
+   "(scripting: none)": [
+    0,
+    "(scripting: none)"
+   ],
+   "(update: fast)": [
+    1,
+    "(update: fast)"
+   ],
+   "(display-mode: browser)": [
+    1,
+    "(display-mode: browser)"
+   ],
+   "(overflow-block: scroll)": [
+    1,
+    "(overflow-block: scroll)"
+   ],
+   "(grid: 0)": [
+    1,
+    "(grid: 0)"
+   ],
+   "(scan: progressive)": [
+    0,
+    "(scan: progressive)"
+   ],
+   "(prefers-dark-interface)": [
+    0,
+    "(prefers-dark-interface)"
+   ],
+   "print": [
+    0,
+    "print"
+   ],
+   "screen": [
+    1,
+    "screen"
+   ],
+   "(video-dynamic-range: high)": [
+    0,
+    "(video-dynamic-range: high)"
+   ],
+   "(unknown-feature)": [
+    0,
+    "(unknown-feature)"
+   ]
+  },
+  "hasTouch": {
+   "(min-width: 300px)": [
+    1,
+    "(min-width: 300px)"
+   ],
+   "(width: 320px)": [
+    1,
+    "(width: 320px)"
+   ],
+   "(height: 240px)": [
+    1,
+    "(height: 240px)"
+   ],
+   "(orientation: landscape)": [
+    1,
+    "(orientation: landscape)"
+   ],
+   "(aspect-ratio: 4/3)": [
+    1,
+    "(aspect-ratio: 4 / 3)"
+   ],
+   "(resolution: 1dppx)": [
+    1,
+    "(resolution: 1dppx)"
+   ],
+   "(resolution: 2dppx)": [
+    0,
+    "(resolution: 2dppx)"
+   ],
+   "(-webkit-device-pixel-ratio: 1)": [
+    1,
+    "(-webkit-device-pixel-ratio: 1)"
+   ],
+   "(device-width: 320px)": [
+    1,
+    "(device-width: 320px)"
+   ],
+   "(color)": [
+    1,
+    "(color)"
+   ],
+   "(color: 8)": [
+    1,
+    "(color: 8)"
+   ],
+   "(color-gamut: srgb)": [
+    1,
+    "(color-gamut: srgb)"
+   ],
+   "(monochrome)": [
+    0,
+    "(monochrome)"
+   ],
+   "(inverted-colors: inverted)": [
+    0,
+    "(inverted-colors: inverted)"
+   ],
+   "(inverted-colors: none)": [
+    0,
+    "(inverted-colors: none)"
+   ],
+   "(pointer: fine)": [
+    0,
+    "(pointer: fine)"
+   ],
+   "(pointer: coarse)": [
+    1,
+    "(pointer: coarse)"
+   ],
+   "(pointer: none)": [
+    0,
+    "(pointer: none)"
+   ],
+   "(hover: hover)": [
+    0,
+    "(hover: hover)"
+   ],
+   "(hover: none)": [
+    1,
+    "(hover: none)"
+   ],
+   "(any-pointer: fine)": [
+    0,
+    "(any-pointer: fine)"
+   ],
+   "(any-pointer: coarse)": [
+    1,
+    "(any-pointer: coarse)"
+   ],
+   "(any-pointer: none)": [
+    0,
+    "(any-pointer: none)"
+   ],
+   "(any-hover: hover)": [
+    0,
+    "(any-hover: hover)"
+   ],
+   "(any-hover: none)": [
+    1,
+    "(any-hover: none)"
+   ],
+   "(prefers-color-scheme: light)": [
+    1,
+    "(prefers-color-scheme: light)"
+   ],
+   "(prefers-color-scheme: dark)": [
+    0,
+    "(prefers-color-scheme: dark)"
+   ],
+   "(prefers-reduced-motion: reduce)": [
+    0,
+    "(prefers-reduced-motion: reduce)"
+   ],
+   "(prefers-reduced-motion: no-preference)": [
+    1,
+    "(prefers-reduced-motion: no-preference)"
+   ],
+   "(prefers-contrast: more)": [
+    0,
+    "(prefers-contrast: more)"
+   ],
+   "(prefers-contrast: less)": [
+    0,
+    "(prefers-contrast: less)"
+   ],
+   "(prefers-contrast: no-preference)": [
+    1,
+    "(prefers-contrast: no-preference)"
+   ],
+   "(prefers-contrast: custom)": [
+    0,
+    "(prefers-contrast: custom)"
+   ],
+   "(forced-colors: active)": [
+    0,
+    "(forced-colors: active)"
+   ],
+   "(forced-colors: none)": [
+    1,
+    "(forced-colors: none)"
+   ],
+   "(prefers-reduced-transparency: reduce)": [
+    0,
+    "(prefers-reduced-transparency: reduce)"
+   ],
+   "(prefers-reduced-data: reduce)": [
+    0,
+    "(prefers-reduced-data: reduce)"
+   ],
+   "(dynamic-range: high)": [
+    0,
+    "(dynamic-range: high)"
+   ],
+   "(dynamic-range: standard)": [
+    1,
+    "(dynamic-range: standard)"
+   ],
+   "(scripting: enabled)": [
+    1,
+    "(scripting: enabled)"
+   ],
+   "(scripting: none)": [
+    0,
+    "(scripting: none)"
+   ],
+   "(update: fast)": [
+    1,
+    "(update: fast)"
+   ],
+   "(display-mode: browser)": [
+    1,
+    "(display-mode: browser)"
+   ],
+   "(overflow-block: scroll)": [
+    1,
+    "(overflow-block: scroll)"
+   ],
+   "(grid: 0)": [
+    1,
+    "(grid: 0)"
+   ],
+   "(scan: progressive)": [
+    0,
+    "(scan: progressive)"
+   ],
+   "(prefers-dark-interface)": [
+    0,
+    "(prefers-dark-interface)"
+   ],
+   "print": [
+    0,
+    "print"
+   ],
+   "screen": [
+    1,
+    "screen"
+   ],
+   "(video-dynamic-range: high)": [
+    0,
+    "(video-dynamic-range: high)"
+   ],
+   "(unknown-feature)": [
+    0,
+    "(unknown-feature)"
+   ]
+  },
+  "isMobile": {
+   "(min-width: 300px)": [
+    1,
+    "(min-width: 300px)"
+   ],
+   "(width: 320px)": [
+    0,
+    "(width: 320px)"
+   ],
+   "(height: 240px)": [
+    0,
+    "(height: 240px)"
+   ],
+   "(orientation: landscape)": [
+    1,
+    "(orientation: landscape)"
+   ],
+   "(aspect-ratio: 4/3)": [
+    1,
+    "(aspect-ratio: 4 / 3)"
+   ],
+   "(resolution: 1dppx)": [
+    1,
+    "(resolution: 1dppx)"
+   ],
+   "(resolution: 2dppx)": [
+    0,
+    "(resolution: 2dppx)"
+   ],
+   "(-webkit-device-pixel-ratio: 1)": [
+    1,
+    "(-webkit-device-pixel-ratio: 1)"
+   ],
+   "(device-width: 320px)": [
+    1,
+    "(device-width: 320px)"
+   ],
+   "(color)": [
+    1,
+    "(color)"
+   ],
+   "(color: 8)": [
+    1,
+    "(color: 8)"
+   ],
+   "(color-gamut: srgb)": [
+    1,
+    "(color-gamut: srgb)"
+   ],
+   "(monochrome)": [
+    0,
+    "(monochrome)"
+   ],
+   "(inverted-colors: inverted)": [
+    0,
+    "(inverted-colors: inverted)"
+   ],
+   "(inverted-colors: none)": [
+    0,
+    "(inverted-colors: none)"
+   ],
+   "(pointer: fine)": [
+    0,
+    "(pointer: fine)"
+   ],
+   "(pointer: coarse)": [
+    1,
+    "(pointer: coarse)"
+   ],
+   "(pointer: none)": [
+    0,
+    "(pointer: none)"
+   ],
+   "(hover: hover)": [
+    0,
+    "(hover: hover)"
+   ],
+   "(hover: none)": [
+    1,
+    "(hover: none)"
+   ],
+   "(any-pointer: fine)": [
+    0,
+    "(any-pointer: fine)"
+   ],
+   "(any-pointer: coarse)": [
+    1,
+    "(any-pointer: coarse)"
+   ],
+   "(any-pointer: none)": [
+    0,
+    "(any-pointer: none)"
+   ],
+   "(any-hover: hover)": [
+    0,
+    "(any-hover: hover)"
+   ],
+   "(any-hover: none)": [
+    1,
+    "(any-hover: none)"
+   ],
+   "(prefers-color-scheme: light)": [
+    1,
+    "(prefers-color-scheme: light)"
+   ],
+   "(prefers-color-scheme: dark)": [
+    0,
+    "(prefers-color-scheme: dark)"
+   ],
+   "(prefers-reduced-motion: reduce)": [
+    0,
+    "(prefers-reduced-motion: reduce)"
+   ],
+   "(prefers-reduced-motion: no-preference)": [
+    1,
+    "(prefers-reduced-motion: no-preference)"
+   ],
+   "(prefers-contrast: more)": [
+    0,
+    "(prefers-contrast: more)"
+   ],
+   "(prefers-contrast: less)": [
+    0,
+    "(prefers-contrast: less)"
+   ],
+   "(prefers-contrast: no-preference)": [
+    1,
+    "(prefers-contrast: no-preference)"
+   ],
+   "(prefers-contrast: custom)": [
+    0,
+    "(prefers-contrast: custom)"
+   ],
+   "(forced-colors: active)": [
+    0,
+    "(forced-colors: active)"
+   ],
+   "(forced-colors: none)": [
+    1,
+    "(forced-colors: none)"
+   ],
+   "(prefers-reduced-transparency: reduce)": [
+    0,
+    "(prefers-reduced-transparency: reduce)"
+   ],
+   "(prefers-reduced-data: reduce)": [
+    0,
+    "(prefers-reduced-data: reduce)"
+   ],
+   "(dynamic-range: high)": [
+    0,
+    "(dynamic-range: high)"
+   ],
+   "(dynamic-range: standard)": [
+    1,
+    "(dynamic-range: standard)"
+   ],
+   "(scripting: enabled)": [
+    1,
+    "(scripting: enabled)"
+   ],
+   "(scripting: none)": [
+    0,
+    "(scripting: none)"
+   ],
+   "(update: fast)": [
+    1,
+    "(update: fast)"
+   ],
+   "(display-mode: browser)": [
+    1,
+    "(display-mode: browser)"
+   ],
+   "(overflow-block: scroll)": [
+    1,
+    "(overflow-block: scroll)"
+   ],
+   "(grid: 0)": [
+    1,
+    "(grid: 0)"
+   ],
+   "(scan: progressive)": [
+    0,
+    "(scan: progressive)"
+   ],
+   "(prefers-dark-interface)": [
+    0,
+    "(prefers-dark-interface)"
+   ],
+   "print": [
+    0,
+    "print"
+   ],
+   "screen": [
+    1,
+    "screen"
+   ],
+   "(video-dynamic-range: high)": [
+    0,
+    "(video-dynamic-range: high)"
+   ],
+   "(unknown-feature)": [
+    0,
+    "(unknown-feature)"
+   ]
+  }
+ },
+ "changeLog": [
+  [
+   "(prefers-color-scheme: dark)",
+   true,
+   "MediaQueryListEvent",
+   true
+  ],
+  [
+   "(prefers-reduced-motion: reduce)",
+   true,
+   "MediaQueryListEvent",
+   true
+  ],
+  [
+   "(prefers-contrast: more)",
+   true,
+   "MediaQueryListEvent",
+   true
+  ],
+  [
+   "(forced-colors: active)",
+   true,
+   "MediaQueryListEvent",
+   true
+  ],
+  [
+   "(min-width: 300px)",
+   false,
+   "MediaQueryListEvent",
+   true
+  ],
+  [
+   "(resolution: 2dppx)",
+   true,
+   "MediaQueryListEvent",
+   true
+  ]
+ ]
+}

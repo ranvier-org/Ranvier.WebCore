@@ -1,0 +1,18 @@
+diff --git a/Source/WebCore/loader/EmptyClients.h b/Source/WebCore/loader/EmptyClients.h
+--- a/Source/WebCore/loader/EmptyClients.h
++++ b/Source/WebCore/loader/EmptyClients.h
+@@ -106,10 +106,10 @@
+     KeyboardUIMode keyboardUIMode() final { return KeyboardAccessDefault; }
+ 
+     bool hasAccessoryMousePointingDevice() const final { return false; }
+-    bool hoverSupportedByPrimaryPointingDevice() const final { return false; };
+-    bool hoverSupportedByAnyAvailablePointingDevice() const final { return false; }
+-    std::optional<PointerCharacteristics> pointerCharacteristicsOfPrimaryPointingDevice() const final { return std::nullopt; };
+-    OptionSet<PointerCharacteristics> pointerCharacteristicsOfAllAvailablePointingDevices() const final { return { }; }
++    bool hoverSupportedByPrimaryPointingDevice() const override { return false; };
++    bool hoverSupportedByAnyAvailablePointingDevice() const override { return false; }
++    std::optional<PointerCharacteristics> pointerCharacteristicsOfPrimaryPointingDevice() const override { return std::nullopt; };
++    OptionSet<PointerCharacteristics> pointerCharacteristicsOfAllAvailablePointingDevices() const override { return { }; }
+ 
+     void invalidateRootView(const IntRect&) override { }
+     void invalidateContentsAndRootView(const IntRect&) override { }

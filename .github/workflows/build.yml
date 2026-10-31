@@ -584,6 +584,10 @@ jobs:
         if: env.FLAVOR == 'slim'
         run: python -I -X utf8 tests/abi/cascade_diagnostics.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
+      - name: Verify media query evaluation and the host's media preferences against the shared conformance fixture
+        if: env.FLAVOR == 'slim'
+        run: python -I -X utf8 tests/abi/media_queries.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
       - name: Verify passive capability catalogue and live host observations
         run: python -I tests/abi/capabilities.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 

@@ -1,0 +1,232 @@
+{
+  "browser": "156.0.8078.4",
+  "headless": "new (channel chromium)",
+  "steps": [
+    {
+      "name": "desktop pointer",
+      "matches": [
+        "(min-width: 300px)",
+        "(pointer: fine)",
+        "(hover: hover)",
+        "(any-pointer: fine)",
+        "(any-hover: hover)",
+        "(prefers-contrast: no-preference)",
+        "(forced-colors: none)",
+        "(color)",
+        "screen and (min-width: 300px) and (prefers-reduced-motion: no-preference)"
+      ],
+      "changes": [],
+      "order": 1,
+      "matchesFixture": true,
+      "changesFixture": true,
+      "orderFixture": true
+    },
+    {
+      "name": "dark, reduced motion and more contrast",
+      "matches": [
+        "(min-width: 300px)",
+        "(pointer: fine)",
+        "(hover: hover)",
+        "(any-pointer: fine)",
+        "(any-hover: hover)",
+        "(prefers-color-scheme: dark)",
+        "(prefers-reduced-motion: reduce)",
+        "(prefers-contrast: more)",
+        "(forced-colors: none)",
+        "(color)"
+      ],
+      "changes": [
+        {
+          "media": "(prefers-color-scheme: dark)",
+          "matches": true,
+          "ownList": true
+        },
+        {
+          "media": "(prefers-reduced-motion: reduce)",
+          "matches": true,
+          "ownList": true
+        },
+        {
+          "media": "(prefers-contrast: more)",
+          "matches": true,
+          "ownList": true
+        },
+        {
+          "media": "(prefers-contrast: no-preference)",
+          "matches": false,
+          "ownList": true
+        },
+        {
+          "media": "screen and (min-width: 300px) and (prefers-reduced-motion: no-preference)",
+          "matches": false,
+          "ownList": true
+        }
+      ],
+      "order": 2,
+      "matchesFixture": true,
+      "changesFixture": true,
+      "orderFixture": true
+    },
+    {
+      "name": "narrow high-density viewport",
+      "matches": [
+        "(max-width: 250px)",
+        "(orientation: portrait)",
+        "(resolution: 2dppx)",
+        "(pointer: fine)",
+        "(hover: hover)",
+        "(any-pointer: fine)",
+        "(any-hover: hover)",
+        "(prefers-color-scheme: dark)",
+        "(prefers-reduced-motion: reduce)",
+        "(prefers-contrast: more)",
+        "(forced-colors: none)",
+        "(color)"
+      ],
+      "changes": [
+        {
+          "media": "(min-width: 300px)",
+          "matches": false,
+          "ownList": true
+        },
+        {
+          "media": "(max-width: 250px)",
+          "matches": true,
+          "ownList": true
+        },
+        {
+          "media": "(orientation: portrait)",
+          "matches": true,
+          "ownList": true
+        },
+        {
+          "media": "(resolution: 2dppx)",
+          "matches": true,
+          "ownList": true
+        }
+      ],
+      "order": 2,
+      "matchesFixture": true,
+      "changesFixture": true,
+      "orderFixture": true
+    },
+    {
+      "name": "touch input",
+      "matches": [
+        "(max-width: 250px)",
+        "(orientation: portrait)",
+        "(resolution: 2dppx)",
+        "(pointer: coarse)",
+        "(any-pointer: coarse)",
+        "(prefers-color-scheme: dark)",
+        "(prefers-reduced-motion: reduce)",
+        "(prefers-contrast: more)",
+        "(forced-colors: none)",
+        "(color)"
+      ],
+      "changes": [
+        {
+          "media": "(pointer: fine)",
+          "matches": false,
+          "ownList": true
+        },
+        {
+          "media": "(pointer: coarse)",
+          "matches": true,
+          "ownList": true
+        },
+        {
+          "media": "(hover: hover)",
+          "matches": false,
+          "ownList": true
+        },
+        {
+          "media": "(any-pointer: fine)",
+          "matches": false,
+          "ownList": true
+        },
+        {
+          "media": "(any-pointer: coarse)",
+          "matches": true,
+          "ownList": true
+        },
+        {
+          "media": "(any-hover: hover)",
+          "matches": false,
+          "ownList": true
+        }
+      ],
+      "order": 3,
+      "matchesFixture": true,
+      "changesFixture": true,
+      "orderFixture": true
+    },
+    {
+      "name": "light and no preference again",
+      "matches": [
+        "(min-width: 300px)",
+        "(pointer: coarse)",
+        "(any-pointer: coarse)",
+        "(prefers-contrast: no-preference)",
+        "(forced-colors: none)",
+        "(color)",
+        "screen and (min-width: 300px) and (prefers-reduced-motion: no-preference)"
+      ],
+      "changes": [
+        {
+          "media": "(min-width: 300px)",
+          "matches": true,
+          "ownList": true
+        },
+        {
+          "media": "(max-width: 250px)",
+          "matches": false,
+          "ownList": true
+        },
+        {
+          "media": "(orientation: portrait)",
+          "matches": false,
+          "ownList": true
+        },
+        {
+          "media": "(resolution: 2dppx)",
+          "matches": false,
+          "ownList": true
+        },
+        {
+          "media": "(prefers-color-scheme: dark)",
+          "matches": false,
+          "ownList": true
+        },
+        {
+          "media": "(prefers-reduced-motion: reduce)",
+          "matches": false,
+          "ownList": true
+        },
+        {
+          "media": "(prefers-contrast: more)",
+          "matches": false,
+          "ownList": true
+        },
+        {
+          "media": "(prefers-contrast: no-preference)",
+          "matches": true,
+          "ownList": true
+        },
+        {
+          "media": "screen and (min-width: 300px) and (prefers-reduced-motion: no-preference)",
+          "matches": true,
+          "ownList": true
+        }
+      ],
+      "order": 3,
+      "matchesFixture": true,
+      "changesFixture": true,
+      "orderFixture": true
+    }
+  ],
+  "unsupported": {
+    "textScale": "no web API or CDP emulation supplies a platform text scale",
+    "engineDefaults": "Chromium always reports a pointing device"
+  }
+}
