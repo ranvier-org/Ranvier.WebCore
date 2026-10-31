@@ -1154,6 +1154,24 @@ RV_EXPORT RvAxNode* rv_ax_parent(RvAxNode*);
 /* Writes *count, then a handle to each child in order. When capacity is below *count it returns
  * RV_ERR_BUFFER_TOO_SMALL and writes no handles, so capacity 0 reads the count. */
 RV_EXPORT int32_t rv_ax_children(RvAxNode*, RvAxNode** nodes, int32_t capacity, int32_t* count);
+
+/* v49: "accessibility-relations" for rv_abi_has. Kinds of rv_ax_relations: the node's ARIA relationship targets,
+ * from the attribute's ID references or the elements set through the matching Element.aria*Element(s) reflection. */
+enum {
+    RV_AX_RELATION_ACTIVE_DESCENDANT = 0,
+    RV_AX_RELATION_CONTROLS = 1,
+    RV_AX_RELATION_DESCRIBED_BY = 2,
+    RV_AX_RELATION_DETAILS = 3,
+    RV_AX_RELATION_ERROR_MESSAGE = 4,
+    RV_AX_RELATION_FLOW_TO = 5,
+    RV_AX_RELATION_LABELLED_BY = 6,
+    RV_AX_RELATION_OWNS = 7,
+};
+/* Writes *count, then a new reference to each target of the relation kind, in the order WebCore records them: the
+ * reference order of the attribute or the reflected elements, each target once. A target without an accessible
+ * object is left out. As rv_ax_children, capacity below *count returns RV_ERR_BUFFER_TOO_SMALL and writes no
+ * handles; an unknown kind returns RV_ERR_UNSUPPORTED, and a node whose object is gone RV_ERR_DETACHED. */
+RV_EXPORT int32_t rv_ax_relations(RvAxNode*, int32_t kind, RvAxNode** nodes, int32_t capacity, int32_t* count);
 /* Performs an action, as an assistive technology asks. Returns 1 when the node performed it, 0 when the action
  * does not apply to the node, or a negative status. */
 RV_EXPORT int32_t rv_ax_action(RvAxNode*, int32_t action);

@@ -16,7 +16,8 @@
     "setlikeBindings and maplikeBindings bind an interface's setlike or maplike declaration through the adapter class of host/dom/<adapter>.h: size, has, values or get and entries (snapshot copies), and add or set, delete and clear unless readonly.",
     "browserWellFormedUnions and browserWellFormedSetters list the unions and interfaces whose USVString inputs the",
     "Fable browser provider converts to well-formed strings. Every generated string input is UTF-8 with an explicit byte",
-    "length; sequenceStringSpans only names the string sequences of its interfaces Utf8."
+    "length; sequenceStringSpans only names the string sequences of its interfaces Utf8.",
+    "elementArrayReflections lists [Reflect] FrozenArray<Element>? attributes bound to the engine's element array reflection: the getter returns a snapshot sequence, or none for null; the setter takes a sequence, or none to clear."
   ],
   "attributeBridges": {
     "Document.adoptedStyleSheets": {
@@ -684,6 +685,15 @@
   ],
   "customGetters": [
     "Node.nodeType"
+  ],
+  "elementArrayReflections": [
+    "Element.ariaActionsElements",
+    "Element.ariaControlsElements",
+    "Element.ariaDescribedByElements",
+    "Element.ariaDetailsElements",
+    "Element.ariaErrorMessageElements",
+    "Element.ariaFlowToElements",
+    "Element.ariaLabelledByElements"
   ],
   "contract": {
     "htmlTags": "html/HTMLTagNames.in",

@@ -16962,6 +16962,142 @@
     },
     {
       "interface": "Element",
+      "member": "ariaActionsElements",
+      "contractOwner": "ARIAMixin",
+      "kind": "getter",
+      "function": "rv_dom_element_get_aria_actions_elements",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomSequenceElementNullable*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "FrozenArray",
+        "nullable": true,
+        "subtypes": [
+          {
+            "name": "Element",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceElementNullable",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "Element sequence",
+        "nullable": true,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "node",
+            "ctype": null,
+            "interface": "Element",
+            "root": null,
+            "class": "Element",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      }
+    },
+    {
+      "interface": "Element",
+      "member": "ariaActionsElements",
+      "contractOwner": "ARIAMixin",
+      "kind": "setter",
+      "function": "rv_dom_element_set_aria_actions_elements",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomSequenceElementNullable*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "FrozenArray<Element>?",
+          "idl": {
+            "name": "FrozenArray",
+            "nullable": true,
+            "subtypes": [
+              {
+                "name": "Element",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceElementNullable",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "Element sequence",
+            "nullable": true,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "node",
+                "ctype": null,
+                "interface": "Element",
+                "root": null,
+                "class": "Element",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "Element",
       "member": "ariaAtomic",
       "contractOwner": "ARIAMixin",
       "kind": "getter",
@@ -18062,6 +18198,142 @@
     },
     {
       "interface": "Element",
+      "member": "ariaControlsElements",
+      "contractOwner": "ARIAMixin",
+      "kind": "getter",
+      "function": "rv_dom_element_get_aria_controls_elements",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomSequenceElementNullable*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "FrozenArray",
+        "nullable": true,
+        "subtypes": [
+          {
+            "name": "Element",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceElementNullable",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "Element sequence",
+        "nullable": true,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "node",
+            "ctype": null,
+            "interface": "Element",
+            "root": null,
+            "class": "Element",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      }
+    },
+    {
+      "interface": "Element",
+      "member": "ariaControlsElements",
+      "contractOwner": "ARIAMixin",
+      "kind": "setter",
+      "function": "rv_dom_element_set_aria_controls_elements",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomSequenceElementNullable*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "FrozenArray<Element>?",
+          "idl": {
+            "name": "FrozenArray",
+            "nullable": true,
+            "subtypes": [
+              {
+                "name": "Element",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceElementNullable",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "Element sequence",
+            "nullable": true,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "node",
+                "ctype": null,
+                "interface": "Element",
+                "root": null,
+                "class": "Element",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "Element",
       "member": "ariaCurrent",
       "contractOwner": "ARIAMixin",
       "kind": "getter",
@@ -18148,6 +18420,142 @@
             "nullable": true,
             "atom": false,
             "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "Element",
+      "member": "ariaDescribedByElements",
+      "contractOwner": "ARIAMixin",
+      "kind": "getter",
+      "function": "rv_dom_element_get_aria_described_by_elements",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomSequenceElementNullable*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "FrozenArray",
+        "nullable": true,
+        "subtypes": [
+          {
+            "name": "Element",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceElementNullable",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "Element sequence",
+        "nullable": true,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "node",
+            "ctype": null,
+            "interface": "Element",
+            "root": null,
+            "class": "Element",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      }
+    },
+    {
+      "interface": "Element",
+      "member": "ariaDescribedByElements",
+      "contractOwner": "ARIAMixin",
+      "kind": "setter",
+      "function": "rv_dom_element_set_aria_described_by_elements",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomSequenceElementNullable*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "FrozenArray<Element>?",
+          "idl": {
+            "name": "FrozenArray",
+            "nullable": true,
+            "subtypes": [
+              {
+                "name": "Element",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceElementNullable",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "Element sequence",
+            "nullable": true,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "node",
+                "ctype": null,
+                "interface": "Element",
+                "root": null,
+                "class": "Element",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
           }
         }
       ],
@@ -18282,6 +18690,142 @@
     },
     {
       "interface": "Element",
+      "member": "ariaDetailsElements",
+      "contractOwner": "ARIAMixin",
+      "kind": "getter",
+      "function": "rv_dom_element_get_aria_details_elements",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomSequenceElementNullable*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "FrozenArray",
+        "nullable": true,
+        "subtypes": [
+          {
+            "name": "Element",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceElementNullable",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "Element sequence",
+        "nullable": true,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "node",
+            "ctype": null,
+            "interface": "Element",
+            "root": null,
+            "class": "Element",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      }
+    },
+    {
+      "interface": "Element",
+      "member": "ariaDetailsElements",
+      "contractOwner": "ARIAMixin",
+      "kind": "setter",
+      "function": "rv_dom_element_set_aria_details_elements",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomSequenceElementNullable*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "FrozenArray<Element>?",
+          "idl": {
+            "name": "FrozenArray",
+            "nullable": true,
+            "subtypes": [
+              {
+                "name": "Element",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceElementNullable",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "Element sequence",
+            "nullable": true,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "node",
+                "ctype": null,
+                "interface": "Element",
+                "root": null,
+                "class": "Element",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "Element",
       "member": "ariaDisabled",
       "contractOwner": "ARIAMixin",
       "kind": "getter",
@@ -18392,6 +18936,142 @@
     },
     {
       "interface": "Element",
+      "member": "ariaErrorMessageElements",
+      "contractOwner": "ARIAMixin",
+      "kind": "getter",
+      "function": "rv_dom_element_get_aria_error_message_elements",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomSequenceElementNullable*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "FrozenArray",
+        "nullable": true,
+        "subtypes": [
+          {
+            "name": "Element",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceElementNullable",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "Element sequence",
+        "nullable": true,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "node",
+            "ctype": null,
+            "interface": "Element",
+            "root": null,
+            "class": "Element",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      }
+    },
+    {
+      "interface": "Element",
+      "member": "ariaErrorMessageElements",
+      "contractOwner": "ARIAMixin",
+      "kind": "setter",
+      "function": "rv_dom_element_set_aria_error_message_elements",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomSequenceElementNullable*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "FrozenArray<Element>?",
+          "idl": {
+            "name": "FrozenArray",
+            "nullable": true,
+            "subtypes": [
+              {
+                "name": "Element",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceElementNullable",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "Element sequence",
+            "nullable": true,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "node",
+                "ctype": null,
+                "interface": "Element",
+                "root": null,
+                "class": "Element",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "Element",
       "member": "ariaExpanded",
       "contractOwner": "ARIAMixin",
       "kind": "getter",
@@ -18478,6 +19158,142 @@
             "nullable": true,
             "atom": false,
             "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "Element",
+      "member": "ariaFlowToElements",
+      "contractOwner": "ARIAMixin",
+      "kind": "getter",
+      "function": "rv_dom_element_get_aria_flow_to_elements",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomSequenceElementNullable*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "FrozenArray",
+        "nullable": true,
+        "subtypes": [
+          {
+            "name": "Element",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceElementNullable",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "Element sequence",
+        "nullable": true,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "node",
+            "ctype": null,
+            "interface": "Element",
+            "root": null,
+            "class": "Element",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      }
+    },
+    {
+      "interface": "Element",
+      "member": "ariaFlowToElements",
+      "contractOwner": "ARIAMixin",
+      "kind": "setter",
+      "function": "rv_dom_element_set_aria_flow_to_elements",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomSequenceElementNullable*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "FrozenArray<Element>?",
+          "idl": {
+            "name": "FrozenArray",
+            "nullable": true,
+            "subtypes": [
+              {
+                "name": "Element",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceElementNullable",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "Element sequence",
+            "nullable": true,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "node",
+                "ctype": null,
+                "interface": "Element",
+                "root": null,
+                "class": "Element",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
           }
         }
       ],
@@ -19028,6 +19844,142 @@
             "nullable": true,
             "atom": false,
             "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "Element",
+      "member": "ariaLabelledByElements",
+      "contractOwner": "ARIAMixin",
+      "kind": "getter",
+      "function": "rv_dom_element_get_aria_labelled_by_elements",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomSequenceElementNullable*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "FrozenArray",
+        "nullable": true,
+        "subtypes": [
+          {
+            "name": "Element",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceElementNullable",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "Element sequence",
+        "nullable": true,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "node",
+            "ctype": null,
+            "interface": "Element",
+            "root": null,
+            "class": "Element",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      }
+    },
+    {
+      "interface": "Element",
+      "member": "ariaLabelledByElements",
+      "contractOwner": "ARIAMixin",
+      "kind": "setter",
+      "function": "rv_dom_element_set_aria_labelled_by_elements",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomSequenceElementNullable*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "FrozenArray<Element>?",
+          "idl": {
+            "name": "FrozenArray",
+            "nullable": true,
+            "subtypes": [
+              {
+                "name": "Element",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceElementNullable",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "Element sequence",
+            "nullable": true,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "node",
+                "ctype": null,
+                "interface": "Element",
+                "root": null,
+                "class": "Element",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
           }
         }
       ],
@@ -149220,6 +150172,34 @@
         ]
       },
       "releaseFunction": "rv_dom_union_boolean_or_import_node_options_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceElementNullable",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "Element sequence",
+        "nullable": true,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "node",
+            "ctype": null,
+            "interface": "Element",
+            "root": null,
+            "class": "Element",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_element_nullable_release"
     },
     {
       "mapping": {
