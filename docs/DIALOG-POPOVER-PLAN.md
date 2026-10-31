@@ -57,3 +57,20 @@ Fixture `tests/fixtures/dialog-popover-cases.json`, oracle `tests/fixtures/dialo
 ## Qualifications
 
 Recorded with numbers in `docs/dialog-popover-evidence/`.
+
+- **close-watcher-activation:** a close request's `cancel` is cancelable only with history-action user
+  activation. Playwright's `evaluate` grants a user gesture on every step, so Chromium is always active; the native
+  host has none after a scripted `showModal`. After an equal trusted click, the first Escape `cancel` is cancelable
+  in both engines.
+- **toggle-before-close:** on the close-request path (Escape, light dismiss, `closedby`) WebKit fires `toggle`
+  before `close`; Chromium fires `close` first. 3 of 3 dialogs in the case differ; `close()` orders both the same way.
+- **coalesced-dialog-toggles:** queued dialog toggles coalesce at task boundaries. In the modal case native delivers
+  8 events and Chromium 10.
+- **hint-light-dismiss-order:** light dismiss closes the auto popover before the hint popover natively and the hint
+  first in Chromium; 1 of 14 `beforetoggle` events is reordered. All hint values match, so the host enables
+  `PopoverHintEnabled`.
+
+## Native result (Native30 candidate 1)
+
+42 probes exit 0, 48486 assertions (`dialog_popover` 845), 76 teardown probes collected. Evidence
+`docs/dialog-popover-evidence/final-evidence.json`.
