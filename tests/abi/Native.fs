@@ -354,6 +354,17 @@ module Calls =
             "rv_host_page_scale"
             "rv_host_set_obscured_insets"
             "rv_host_set_screen"
+            "rv_host_set_diagnostics"
+            "rv_host_inspect_render_tree"
+            "rv_host_inspect_matched_rules"
+            "rv_diagnostic_kind"
+            "rv_diagnostic_text"
+            "rv_diagnostic_count"
+            "rv_diagnostic_entry_string"
+            "rv_diagnostic_entry_number"
+            "rv_diagnostic_release"
+            "rv_diagnostic_live_count"
+            "rv_host_inspect_box_model"
         |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
@@ -1269,6 +1280,38 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_host_set_screen(nativeint host, nativeint metrics)
+    [<DllImport(Lib)>]
+    extern int rv_host_set_diagnostics(nativeint host, int enabled)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_inspect_render_tree(nativeint host, nativeint target, int flags, nativeint[] diagnostic)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_inspect_matched_rules(nativeint host, nativeint element, nativeint[] diagnostic)
+
+    [<DllImport(Lib)>]
+    extern int rv_diagnostic_kind(nativeint diagnostic)
+
+    [<DllImport(Lib)>]
+    extern int rv_diagnostic_text(nativeint diagnostic, byte[] buffer, int capacity, int[] length)
+
+    [<DllImport(Lib)>]
+    extern int rv_diagnostic_count(nativeint diagnostic)
+
+    [<DllImport(Lib)>]
+    extern int rv_diagnostic_entry_string(nativeint diagnostic, int index, int field, byte[] buffer, int capacity, int[] length)
+
+    [<DllImport(Lib)>]
+    extern int rv_diagnostic_entry_number(nativeint diagnostic, int index, int field, double& value)
+
+    [<DllImport(Lib)>]
+    extern void rv_diagnostic_release(nativeint diagnostic)
+
+    [<DllImport(Lib)>]
+    extern int rv_diagnostic_live_count()
+
+    [<DllImport(Lib)>]
+    extern int rv_host_inspect_box_model(nativeint host, nativeint element, double& values)
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -4172,6 +4215,138 @@ let rv_host_set_screen (host: nativeint, metrics: nativeint) : int =
         result
     else
         Raw.rv_host_set_screen (host, metrics)
+
+let rv_host_set_diagnostics (host: nativeint, enabled: int) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_set_diagnostics (host, enabled)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[224] <- Calls.Counts[224] + 1L
+        Calls.Ticks[224] <- Calls.Ticks[224] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_set_diagnostics (host, enabled)
+
+let rv_host_inspect_render_tree (host: nativeint, target: nativeint, flags: int, diagnostic: nativeint[]) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_inspect_render_tree (host, target, flags, diagnostic)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[225] <- Calls.Counts[225] + 1L
+        Calls.Ticks[225] <- Calls.Ticks[225] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_inspect_render_tree (host, target, flags, diagnostic)
+
+let rv_host_inspect_matched_rules (host: nativeint, element: nativeint, diagnostic: nativeint[]) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_inspect_matched_rules (host, element, diagnostic)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[226] <- Calls.Counts[226] + 1L
+        Calls.Ticks[226] <- Calls.Ticks[226] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_inspect_matched_rules (host, element, diagnostic)
+
+let rv_diagnostic_kind (diagnostic: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_diagnostic_kind (diagnostic)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[227] <- Calls.Counts[227] + 1L
+        Calls.Ticks[227] <- Calls.Ticks[227] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_diagnostic_kind (diagnostic)
+
+let rv_diagnostic_text (diagnostic: nativeint, buffer: byte[], capacity: int, length: int[]) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_diagnostic_text (diagnostic, buffer, capacity, length)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[228] <- Calls.Counts[228] + 1L
+        Calls.Ticks[228] <- Calls.Ticks[228] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_diagnostic_text (diagnostic, buffer, capacity, length)
+
+let rv_diagnostic_count (diagnostic: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_diagnostic_count (diagnostic)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[229] <- Calls.Counts[229] + 1L
+        Calls.Ticks[229] <- Calls.Ticks[229] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_diagnostic_count (diagnostic)
+
+let rv_diagnostic_entry_string (diagnostic: nativeint, index: int, field: int, buffer: byte[], capacity: int, length: int[]) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_diagnostic_entry_string (diagnostic, index, field, buffer, capacity, length)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[230] <- Calls.Counts[230] + 1L
+        Calls.Ticks[230] <- Calls.Ticks[230] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_diagnostic_entry_string (diagnostic, index, field, buffer, capacity, length)
+
+let rv_diagnostic_entry_number (diagnostic: nativeint, index: int, field: int, value: byref<double>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_diagnostic_entry_number (diagnostic, index, field, &value)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[231] <- Calls.Counts[231] + 1L
+        Calls.Ticks[231] <- Calls.Ticks[231] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_diagnostic_entry_number (diagnostic, index, field, &value)
+
+let rv_diagnostic_release (diagnostic: nativeint) : unit =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_diagnostic_release (diagnostic)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[232] <- Calls.Counts[232] + 1L
+        Calls.Ticks[232] <- Calls.Ticks[232] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_diagnostic_release (diagnostic)
+
+let rv_diagnostic_live_count () : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_diagnostic_live_count ()
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[233] <- Calls.Counts[233] + 1L
+        Calls.Ticks[233] <- Calls.Ticks[233] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_diagnostic_live_count ()
+
+let rv_host_inspect_box_model (host: nativeint, element: nativeint, values: byref<double>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_inspect_box_model (host, element, &values)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[234] <- Calls.Counts[234] + 1L
+        Calls.Ticks[234] <- Calls.Ticks[234] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_inspect_box_model (host, element, &values)
 
 // END GENERATED
 

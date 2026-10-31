@@ -1,0 +1,26 @@
+<!doctype html><html><head><style>@font-face{font-family:RvAhem;src:url(data:font/ttf;base64,{{FONT_BASE64}})}
+@layer base, top;
+html,body{margin:0}body{font:10px/10px RvAhem;width:600px;height:1200px}
+#target{position:absolute;left:11.3px;top:13.7px;width:50.5px;height:20.25px;margin:3px 4px 5px 6px;
+  border-style:solid;border-width:1px 2px 3px 4px;padding:7px 8px 9px 10px;--order:main}
+div.box#target{--order:compound}
+:where(#target){--order:where}
+:is(#target, .box){--order:is}
+.box, #nomatch, div{--order:list}
+@media (min-width: 1px){.box{--order:media}}
+@media (max-width: 1px){.box{--order:excluded}}
+@layer top{#target{--order:top}}
+@layer base{#target{--order:base}}
+#flow{position:absolute;left:0;top:120px;width:200px;height:30px;margin:2.5px 0 0 1.25px;padding:4px;border:2px solid}
+#action{position:absolute;left:50px;top:5px;width:40px;height:16px;padding:1px 3px;border:2px solid;margin:0 0 0 4px;
+  box-sizing:content-box;appearance:none;font:10px/10px RvAhem}
+#zoomed{position:absolute;left:300px;top:20px;width:40px;height:30px;padding:2px;border:1px solid;margin:1px;zoom:2}
+#turned{position:absolute;left:300px;top:200px;width:40px;height:20px;border:1px solid;transform:rotate(90deg)}
+#hidden{display:none}
+</style></head><body>
+<div id="target" class="box" style="opacity: 0.5">AB</div>
+<div id="flow"><span id="inline">CD</span> <button id="action">Go</button></div>
+<div id="zoomed">Z</div>
+<div id="turned">T</div>
+<div id="hidden">H</div>
+</body></html>

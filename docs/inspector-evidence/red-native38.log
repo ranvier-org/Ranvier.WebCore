@@ -1,0 +1,27 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+Traceback (most recent call last):
+  File "C:\wk\native-inspect\tests\abi\svg_paint_probe.py", line 40, in bind
+    function = getattr(self.library, name)
+  File "C:\Python314\Lib\ctypes\__init__.py", line 486, in __getattr__
+    func = self.__getitem__(name)
+  File "C:\Python314\Lib\ctypes\__init__.py", line 491, in __getitem__
+    func = self._FuncPtr((name_or_ordinal, self))
+AttributeError: function 'rv_host_set_diagnostics' not found
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\wk\native-inspect\tests\abi\inspector_diagnostics.py", line 383, in <module>
+    run(args.native_directory, args.webkit_source, args.repeat)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-inspect\tests\abi\inspector_diagnostics.py", line 369, in run
+    totals.add(run_once(native_directory, webkit_source, oracle))
+               ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-inspect\tests\abi\inspector_diagnostics.py", line 170, in run_once
+    d = Diagnostics(p)
+  File "C:\wk\native-inspect\tests\abi\inspector_diagnostics.py", line 61, in __init__
+    self.enable = p.bind('rv_host_set_diagnostics', I, [P, I])
+                  ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-inspect\tests\abi\svg_paint_probe.py", line 42, in bind
+    raise AssertionError('required native binding is absent: ' + name) from error
+AssertionError: required native binding is absent: rv_host_set_diagnostics
