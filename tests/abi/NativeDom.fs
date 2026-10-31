@@ -606,6 +606,12 @@ let RV_DOM_DOCUMENT_READY_STATE_INTERACTIVE = 1
 let RV_DOM_DOCUMENT_READY_STATE_COMPLETE = 2
 
 [<Literal>]
+let RV_DOM_ENDING_TYPE_TRANSPARENT = 0
+
+[<Literal>]
+let RV_DOM_ENDING_TYPE_NATIVE = 1
+
+[<Literal>]
 let RV_DOM_SCROLL_BEHAVIOR_AUTO = 0
 
 [<Literal>]
@@ -870,6 +876,23 @@ type RvDomDOMMatrix2DInit =
     val mutable m41: nativeint
     val mutable m42: nativeint
 
+/// <summary>The IDL dictionary BlobPropertyBag; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomBlobPropertyBag =
+    val mutable size: uint32
+    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
+    val mutable ``type``: string
+    val mutable endings: int
+
+/// <summary>The IDL dictionary FilePropertyBag; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomFilePropertyBag =
+    val mutable size: uint32
+    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
+    val mutable ``type``: string
+    val mutable endings: int
+    val mutable last_modified: nativeint
+
 /// <summary>The IDL dictionary URLPatternInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomURLPatternInit =
@@ -941,6 +964,12 @@ type RvDomDOMQuadInit =
 /// <summary>Length-delimited UTF-8; compound results own data until their matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomUtf8StringSpan =
+    val mutable data: nativeint
+    val mutable length: int
+
+/// <summary>Bytes the callee copies before it returns.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomByteSpan =
     val mutable data: nativeint
     val mutable length: int
 
@@ -1358,6 +1387,31 @@ type RvDomSequencePointerEvent =
     val mutable count: int
     val mutable items: nativeint
 
+[<Literal>]
+let RV_DOM_UNION_BUFFER_SOURCE_OR_BLOB_OR_USV_STRING_BUFFER_SOURCE = 1
+
+[<Literal>]
+let RV_DOM_UNION_BUFFER_SOURCE_OR_BLOB_OR_USV_STRING_BLOB = 2
+
+[<Literal>]
+let RV_DOM_UNION_BUFFER_SOURCE_OR_BLOB_OR_USV_STRING_STRING = 3
+
+/// <summary>ABI transport for BufferSourceOrBlobOrUSVString; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionBufferSourceOrBlobOrUSVString =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: RvDomByteSpan
+    val mutable arm1: nativeint
+    val mutable arm2: RvDomUtf8StringSpan
+
+/// <summary>ABI transport for BufferSourceOrBlobOrUSVString sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequenceBufferSourceOrBlobOrUSVString =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
 /// <summary>ABI transport for SequenceOfUSVString sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomSequenceSequenceOfUSVString =
@@ -1593,6 +1647,12 @@ extern void rv_dom_sequence_file_or_usv_string_release(RvDomSequenceFileOrUSVStr
 extern void rv_dom_sequence_pointer_event_release(RvDomSequencePointerEvent& value)
 
 [<DllImport(Lib)>]
+extern void rv_dom_union_buffer_source_or_blob_or_usv_string_release(RvDomUnionBufferSourceOrBlobOrUSVString& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_sequence_buffer_source_or_blob_or_usv_string_release(RvDomSequenceBufferSourceOrBlobOrUSVString& value)
+
+[<DllImport(Lib)>]
 extern void rv_dom_sequence_sequence_of_usv_string_release(RvDomSequenceSequenceOfUSVString& value)
 
 [<DllImport(Lib)>]
@@ -1744,12 +1804,6 @@ extern void rv_dom_dom_rect_read_only_release(nativeint handle)
 
 [<DllImport(Lib)>]
 extern nativeint rv_dom_dom_rect_read_only_retain(nativeint handle)
-
-[<DllImport(Lib)>]
-extern void rv_dom_caret_position_release(nativeint handle)
-
-[<DllImport(Lib)>]
-extern nativeint rv_dom_caret_position_retain(nativeint handle)
 
 [<DllImport(Lib)>]
 extern void rv_dom_dom_rect_list_release(nativeint handle)
@@ -1972,6 +2026,24 @@ extern void rv_dom_tree_walker_release(nativeint handle)
 
 [<DllImport(Lib)>]
 extern nativeint rv_dom_tree_walker_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_blob_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_blob_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_file_list_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_file_list_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_caret_position_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_caret_position_retain(nativeint handle)
 
 [<DllImport(Lib)>]
 extern void rv_dom_domurl_release(nativeint handle)
@@ -4027,6 +4099,12 @@ extern int rv_dom_html_input_element_set_disabled(nativeint target, int value)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_get_form(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_input_element_get_files(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_input_element_set_files(nativeint target, nativeint value)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_get_form_action(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -7083,15 +7161,6 @@ extern int rv_dom_dom_rect_read_only_get_bottom(nativeint target, float& result)
 extern int rv_dom_dom_rect_read_only_get_left(nativeint target, float& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_caret_position_get_offset_node(nativeint target, nativeint& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_caret_position_get_offset(nativeint target, uint32& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_caret_position_get_client_rect(nativeint target, nativeint& result)
-
-[<DllImport(Lib)>]
 extern int rv_dom_dom_rect_create(nativeint target, float x, float y, float width, float height, nativeint& result)
 
 [<DllImport(Lib)>]
@@ -7539,6 +7608,9 @@ extern int rv_dom_dom_form_data_create(nativeint target, nativeint form, nativei
 extern int rv_dom_dom_form_data_append(nativeint target, byte[] name, int name_length, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
+extern int rv_dom_dom_form_data_append_3(nativeint target, byte[] name, int name_length, nativeint blob_value, byte[] filename, int filename_length)
+
+[<DllImport(Lib)>]
 extern int rv_dom_dom_form_data_delete(nativeint target, byte[] name, int name_length)
 
 [<DllImport(Lib)>]
@@ -7552,6 +7624,9 @@ extern int rv_dom_dom_form_data_has(nativeint target, byte[] name, int name_leng
 
 [<DllImport(Lib)>]
 extern int rv_dom_dom_form_data_set(nativeint target, byte[] name, int name_length, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_form_data_set_3(nativeint target, byte[] name, int name_length, nativeint blob_value, byte[] filename, int filename_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_validity_state_get_value_missing(nativeint target, int& result)
@@ -9508,6 +9583,42 @@ extern int rv_dom_tree_walker_previous_node(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_tree_walker_next_node(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_blob_create(nativeint target, [<In>] RvDomSequenceBufferSourceOrBlobOrUSVString[] blob_parts, [<In>] RvDomBlobPropertyBag[] options, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_blob_get_size(nativeint target, uint64& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_blob_get_type(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_blob_slice(nativeint target, int64 start, int64 ``end``, byte[] content_type, int content_type_length, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_file_create(nativeint target, [<In>] RvDomSequenceBufferSourceOrBlobOrUSVString[] file_bits, byte[] file_name, int file_name_length, [<In>] RvDomFilePropertyBag[] options, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_file_get_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_file_get_last_modified(nativeint target, int64& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_file_list_get_length(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_file_list_item(nativeint target, uint32 index, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_caret_position_get_offset_node(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_caret_position_get_offset(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_caret_position_get_client_rect(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_domurl_create(nativeint target, byte[] url, int url_length, byte[] ``base``, int base_length, nativeint& result)

@@ -37,6 +37,10 @@ class ComplexGeneratorMixin:
                 self.headers.add(f'{mapped.cls}.h')
             elif mapped.kind == 'enum':
                 self.enums_used[mapped.enum] = self.world.enums[mapped.enum]
+            elif mapped.kind == 'bytes':
+                if not input:
+                    raise self.unsupported_type(f'{mapped.label} result')
+                self.headers.update({'JavaScriptCore/ArrayBuffer.h', 'JavaScriptCore/ArrayBufferView.h'})
             return
         if mapped.kind == 'pair':
             self.headers.add('wtf/KeyValuePair.h')
@@ -143,6 +147,8 @@ class ComplexGeneratorMixin:
             return f'{mapped.handle}*'
         if mapped.kind == 'opaque':
             return 'void*'
+        if mapped.kind == 'bytes':
+            return 'RvDomByteSpan'
         if mapped.kind == 'dict':
             return f'const {mapped.handle}*'
         if mapped.kind in ('union', 'sequence', 'pair'):
@@ -163,15 +169,36 @@ class ComplexGeneratorMixin:
             return mapped.enum
         if kind in ('node', 'event', 'object', 'opaque'):
             return f'{"RefPtr" if mapped.nullable else "Ref"}<{mapped.cls}>'
+        if kind == 'bytes':
+            return 'Ref<JSC::ArrayBuffer>'
         if kind == 'dict':
             return self.dictionary_cpp(mapped.interface)
         if kind == 'pair':
             return 'KeyValuePair<' + ', '.join(self.transport_cpp(child) for child in mapped.subtypes) + '>'
         if kind == 'union':
-            value = 'Variant<' + ', '.join(self.transport_cpp(child) for child in mapped.subtypes) + '>'
+            value = 'Variant<' + ', '.join(self.union_alternatives(mapped)[0]) + '>'
         else:
             value = f'Vector<{self.transport_cpp(mapped.subtypes[0])}>'
         return f'std::optional<{value}>' if mapped.nullable else value
+
+    def union_alternatives(self, mapped):
+        """The C++ alternatives of a union, and the alternative each arm decodes to. A byte-span arm stands for
+        WebKit's flattened BufferSource, ArrayBufferView then ArrayBuffer, and decodes to the ArrayBuffer."""
+        alternatives, arms = [], []
+        for child in mapped.subtypes:
+            if child.kind == 'bytes' and child.label == 'BufferSource':
+                arms.append(len(alternatives) + 1)
+                alternatives += ['Ref<JSC::ArrayBufferView>', 'Ref<JSC::ArrayBuffer>']
+            else:
+                arms.append(len(alternatives))
+                alternatives.append(self.transport_cpp(child))
+        return alternatives, arms
+
+    def contains_bytes(self, mapped):
+        return mapped.kind == 'bytes' or any(self.contains_bytes(child) for child in mapped.subtypes)
+
+    def uses_byte_spans(self):
+        return any(self.contains_bytes(mapped) for mapped in self.complex_used.values())
 
     def contains_opaque(self, mapped):
         return mapped.kind == 'opaque' or any(self.contains_opaque(child) for child in mapped.subtypes)
@@ -188,6 +215,10 @@ class ComplexGeneratorMixin:
             lines += ['/* UTF-8 byte length; -1 is null where permitted. Compound results own data until release. */',
                       'typedef struct RvDomUtf8StringSpan {', '    const uint8_t* data;',
                       '    int32_t length;', '} RvDomUtf8StringSpan;', '']
+        if self.uses_byte_spans():
+            lines += ['/* Bytes the callee copies before it returns; data may be NULL when length is 0. */',
+                      'typedef struct RvDomByteSpan {', '    const uint8_t* data;',
+                      '    int32_t length;', '} RvDomByteSpan;', '']
         for name in self.complex_used:
             lines += [f'typedef struct {name} {name};']
         for name, mapped in self.complex_used.items():
@@ -254,6 +285,11 @@ class ComplexGeneratorMixin:
             return lines, f'{cpp} {{ {variable}.get() }}' if mapped.nullable else f'Ref {{ *{variable} }}'
         if kind == 'opaque':
             raise self.unsupported_type(f'opaque {mapped.interface} input')
+        if kind == 'bytes':
+            return [f'if ({expression}.length < 0 || ({expression}.length > 0 && !{expression}.data)) {{ status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }}',
+                    f'RefPtr {variable} = JSC::ArrayBuffer::tryCreate({expression}.length ? std::span<const uint8_t> {{ {expression}.data, static_cast<size_t>({expression}.length) }} : std::span<const uint8_t> {{ }});',
+                    f'if (!{variable}) {{ status = Ranvier::recordException(Exception {{ ExceptionCode::RangeError, "Out of memory"_s }}); return std::nullopt; }}'], \
+                f'{variable}.releaseNonNull()'
         if kind == 'dict':
             fields = self.use_dictionary(mapped.interface)
             lines = [f'{cpp} {variable} {{ }};', f'if ({expression}) {{',
@@ -359,12 +395,13 @@ class ComplexGeneratorMixin:
                         lines += [f'    auto decoded{index} = {value};']
                     lines += [f'    return {cpp} {{ std::move(decoded0), std::move(decoded1) }};', '}']
                 else:
-                    value_cpp = 'Variant<' + ', '.join(self.transport_cpp(child) for child in mapped.subtypes) + '>'
+                    alternatives, arms = self.union_alternatives(mapped)
+                    value_cpp = 'Variant<' + ', '.join(alternatives) + '>'
                     lines += ['    switch (source->tag) {']
                     for index, child in enumerate(mapped.subtypes):
                         decoded, value = self.decode_value(child, f'source->arm{index}', f'arm{index}')
                         lines += [f'    case {index + 1}: {{'] + ['        ' + line for line in decoded]
-                        lines += [f'        return {cpp} {{ {value_cpp} {{ WTF::InPlaceIndex<{index}>, {value} }} }};', '    }']
+                        lines += [f'        return {cpp} {{ {value_cpp} {{ WTF::InPlaceIndex<{arms[index]}>, {value} }} }};', '    }']
                     lines += ['    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;', '    }', '}']
             lines += ['', f'void clear{name}({name}* value)', '{', '    if (!value) return;']
             if mapped.kind == 'sequence':
@@ -414,6 +451,8 @@ class ComplexGeneratorMixin:
         return lines + dictionary_definitions + ['}']
 
     def transport_can_return(self, mapped):
+        if mapped.kind == 'bytes':
+            return False
         if mapped.kind == 'dict' and mapped.interface not in self.world.config.get('resultDictionaries', []):
             return False
         return all(self.transport_can_return(child) for child in mapped.subtypes)
@@ -423,6 +462,10 @@ class ComplexGeneratorMixin:
         if self.uses_complex_string_spans():
             lines += ['', '/// <summary>Length-delimited UTF-8; compound results own data until their matching release call.</summary>',
                       '[<Struct; StructLayout(LayoutKind.Sequential)>]', 'type RvDomUtf8StringSpan =',
+                      '    val mutable data: nativeint', '    val mutable length: int']
+        if self.uses_byte_spans():
+            lines += ['', '/// <summary>Bytes the callee copies before it returns.</summary>',
+                      '[<Struct; StructLayout(LayoutKind.Sequential)>]', 'type RvDomByteSpan =',
                       '    val mutable data: nativeint', '    val mutable length: int']
         for name, mapped in self.complex_used.items():
             if mapped.kind == 'union':

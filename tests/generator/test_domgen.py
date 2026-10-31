@@ -1559,6 +1559,51 @@ interface CSSFontFaceDescriptors : CSSStyleDeclaration {
         generator.run()
         return generator
 
+    def test_buffer_source_arm_is_a_copied_byte_span_decoding_to_the_flattened_array_buffer(self):
+        generator = self.value_object_generator('''
+typedef (BufferSource or Bytes or USVString) BytesPart;
+interface Bytes {
+    constructor(optional sequence<BytesPart> parts);
+    readonly attribute unsigned long long size;
+};
+''', ['Bytes'], constructors={'Bytes': {'receiver': 'Document', 'factory': 'Bytes::create'}},
+            byteSpanTypes=['BufferSource'], complexStringSpans=['BufferSourceOrBytesOrUSVString'])
+        function = next(item for item in generator.functions if item.name == 'bytes_create')
+        union = function.arguments[0][1].subtypes[0]
+        self.assertEqual(['bytes', 'object', 'string'], [child.kind for child in union.subtypes])
+        header = generator.header()
+        self.assertIn('typedef struct RvDomByteSpan {', header)
+        self.assertIn('    RvDomByteSpan arm0;', header)
+        glue = generator.glue()
+        self.assertIn('Variant<Ref<JSC::ArrayBufferView>, Ref<JSC::ArrayBuffer>, Ref<Bytes>, String>', glue)
+        self.assertIn('WTF::InPlaceIndex<1>, arm0.releaseNonNull()', glue)
+        self.assertIn('WTF::InPlaceIndex<2>', glue)
+        self.assertIn('WTF::InPlaceIndex<3>', glue)
+        self.assertIn('JSC::ArrayBuffer::tryCreate(', glue)
+        self.assertIn('"JavaScriptCore/ArrayBuffer.h"', glue)
+        self.assertNotIn('encodeRvDomUnionBufferSourceOrBytesOrUSVString', glue)
+
+    def test_byte_span_results_are_unsupported(self):
+        generator = self.value_object_generator('''
+interface Bytes { readonly attribute BufferSource data; };
+''', ['Bytes'], byteSpanTypes=['BufferSource'])
+        self.assertNotIn('bytes_get_data', [item.name for item in generator.functions])
+
+    def test_locked_plain_overload_matches_length_delimited_string_parameters(self):
+        generator = self.value_object_generator('''
+interface Pairs {
+    undefined append(USVString name, USVString value);
+    undefined append(USVString name, Pairs other, optional USVString label);
+};
+''', ['Pairs'], interfaceStringInputs={'Pairs': 'utf8-lengths'})
+        generator.lock = {'pairs_append': {'params': [['RvPairs*', 'target'], ['const uint8_t*', 'name'],
+                                                      ['int32_t', 'name_length'], ['const uint8_t*', 'value'],
+                                                      ['int32_t', 'value_length']], 'comment': 'Pairs.append'}}
+        self.assertEqual(0, generator.plain_overload('Pairs', 'append', [
+            (type('M', (), {'arguments': [type('A', (), {'name': 'name'}), type('A', (), {'name': 'value'})]}), None, None),
+            (type('M', (), {'arguments': [type('A', (), {'name': 'name'}), type('A', (), {'name': 'other'}),
+                                          type('A', (), {'name': 'label'})]}), None, None)]))
+
     def test_value_object_constructor_and_static_take_an_absent_optional_string_as_length_minus_one(self):
         generator = self.value_object_generator('''
 interface ValueURL {

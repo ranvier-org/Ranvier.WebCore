@@ -45,7 +45,6 @@ typedef struct RvDOMStringMap RvDOMStringMap;
 typedef struct RvAbstractRange RvAbstractRange;
 typedef struct RvDOMSelection RvDOMSelection;
 typedef struct RvDOMRectReadOnly RvDOMRectReadOnly;
-typedef struct RvCaretPosition RvCaretPosition;
 typedef struct RvDOMRectList RvDOMRectList;
 typedef struct RvDOMPointReadOnly RvDOMPointReadOnly;
 typedef struct RvDOMQuad RvDOMQuad;
@@ -82,6 +81,9 @@ typedef struct RvSVGAnimatedAngle RvSVGAnimatedAngle;
 typedef struct RvSVGAnimatedInteger RvSVGAnimatedInteger;
 typedef struct RvNodeIterator RvNodeIterator;
 typedef struct RvTreeWalker RvTreeWalker;
+typedef struct RvBlob RvBlob;
+typedef struct RvFileList RvFileList;
+typedef struct RvCaretPosition RvCaretPosition;
 typedef struct RvDOMURL RvDOMURL;
 typedef struct RvURLSearchParams RvURLSearchParams;
 typedef struct RvURLPattern RvURLPattern;
@@ -122,6 +124,8 @@ typedef struct RvDomUnionFileOrUSVStringNullable RvDomUnionFileOrUSVStringNullab
 typedef struct RvDomUnionFileOrUSVString RvDomUnionFileOrUSVString;
 typedef struct RvDomSequenceFileOrUSVString RvDomSequenceFileOrUSVString;
 typedef struct RvDomSequencePointerEvent RvDomSequencePointerEvent;
+typedef struct RvDomUnionBufferSourceOrBlobOrUSVString RvDomUnionBufferSourceOrBlobOrUSVString;
+typedef struct RvDomSequenceBufferSourceOrBlobOrUSVString RvDomSequenceBufferSourceOrBlobOrUSVString;
 typedef struct RvDomSequenceSequenceOfUSVString RvDomSequenceSequenceOfUSVString;
 typedef struct RvDomPairUSVStringAndUSVString RvDomPairUSVStringAndUSVString;
 typedef struct RvDomSequencePairUSVStringAndUSVString RvDomSequencePairUSVStringAndUSVString;
@@ -350,6 +354,12 @@ enum {
     RV_DOM_DOCUMENT_READY_STATE_LOADING = 0, /* "loading" */
     RV_DOM_DOCUMENT_READY_STATE_INTERACTIVE = 1, /* "interactive" */
     RV_DOM_DOCUMENT_READY_STATE_COMPLETE = 2, /* "complete" */
+};
+
+/* The values of the IDL enumeration EndingType. */
+enum {
+    RV_DOM_ENDING_TYPE_TRANSPARENT = 0, /* "transparent" */
+    RV_DOM_ENDING_TYPE_NATIVE = 1, /* "native" */
 };
 
 /* The values of the IDL enumeration ScrollBehavior. */
@@ -629,6 +639,23 @@ typedef struct RvDomDOMMatrix2DInit {
     const double* m42; /* unrestricted double, NULL for absent */
 } RvDomDOMMatrix2DInit;
 
+/* The IDL dictionary BlobPropertyBag. size is sizeof(RvDomBlobPropertyBag) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomBlobPropertyBag {
+    uint32_t size;
+    const char* type; /* DOMString, default "" */
+    int32_t endings; /* EndingType, default "transparent", RV_DOM_ENDING_TYPE_* */
+} RvDomBlobPropertyBag;
+
+/* The IDL dictionary FilePropertyBag. size is sizeof(RvDomFilePropertyBag) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomFilePropertyBag {
+    uint32_t size;
+    const char* type; /* DOMString, default "" */
+    int32_t endings; /* EndingType, default "transparent", RV_DOM_ENDING_TYPE_* */
+    const int64_t* last_modified; /* long long, NULL for absent */
+} RvDomFilePropertyBag;
+
 /* The IDL dictionary URLPatternInit. size is sizeof(RvDomURLPatternInit) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. As a result, the glue allocates it,
  * sets size, owns every field and nested value, and rv_dom_url_pattern_init_release frees it. */
@@ -713,6 +740,12 @@ typedef struct RvDomUtf8StringSpan {
     int32_t length;
 } RvDomUtf8StringSpan;
 
+/* Bytes the callee copies before it returns; data may be NULL when length is 0. */
+typedef struct RvDomByteSpan {
+    const uint8_t* data;
+    int32_t length;
+} RvDomByteSpan;
+
 typedef struct RvDomUnionNodeOrDOMString RvDomUnionNodeOrDOMString;
 typedef struct RvDomSequenceNodeOrDOMString RvDomSequenceNodeOrDOMString;
 typedef struct RvDomSequenceCSSStyleSheet RvDomSequenceCSSStyleSheet;
@@ -750,6 +783,8 @@ typedef struct RvDomUnionFileOrUSVStringNullable RvDomUnionFileOrUSVStringNullab
 typedef struct RvDomUnionFileOrUSVString RvDomUnionFileOrUSVString;
 typedef struct RvDomSequenceFileOrUSVString RvDomSequenceFileOrUSVString;
 typedef struct RvDomSequencePointerEvent RvDomSequencePointerEvent;
+typedef struct RvDomUnionBufferSourceOrBlobOrUSVString RvDomUnionBufferSourceOrBlobOrUSVString;
+typedef struct RvDomSequenceBufferSourceOrBlobOrUSVString RvDomSequenceBufferSourceOrBlobOrUSVString;
 typedef struct RvDomSequenceSequenceOfUSVString RvDomSequenceSequenceOfUSVString;
 typedef struct RvDomPairUSVStringAndUSVString RvDomPairUSVStringAndUSVString;
 typedef struct RvDomSequencePairUSVStringAndUSVString RvDomSequencePairUSVStringAndUSVString;
@@ -1137,7 +1172,7 @@ enum {
 struct RvDomUnionFileOrUSVStringNullable {
     int32_t present;
     int32_t tag;
-    void* arm0; /* File: NULL; the tag identifies the arm */
+    RvBlob* arm0;
     RvDomUtf8StringSpan arm1;
 };
 
@@ -1150,7 +1185,7 @@ enum {
 struct RvDomUnionFileOrUSVString {
     int32_t present;
     int32_t tag;
-    void* arm0; /* File: NULL; the tag identifies the arm */
+    RvBlob* arm0;
     RvDomUtf8StringSpan arm1;
 };
 
@@ -1168,6 +1203,29 @@ struct RvDomSequencePointerEvent {
     int32_t present;
     int32_t count;
     RvEvent** items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_BUFFER_SOURCE_OR_BLOB_OR_USV_STRING_BUFFER_SOURCE = 1,
+    RV_DOM_UNION_BUFFER_SOURCE_OR_BLOB_OR_USV_STRING_BLOB = 2,
+    RV_DOM_UNION_BUFFER_SOURCE_OR_BLOB_OR_USV_STRING_STRING = 3,
+};
+struct RvDomUnionBufferSourceOrBlobOrUSVString {
+    int32_t present;
+    int32_t tag;
+    RvDomByteSpan arm0;
+    RvBlob* arm1;
+    RvDomUtf8StringSpan arm2;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceBufferSourceOrBlobOrUSVString {
+    int32_t present;
+    int32_t count;
+    RvDomUnionBufferSourceOrBlobOrUSVString* items;
 };
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
@@ -1335,6 +1393,8 @@ RV_EXPORT void rv_dom_union_file_or_usv_string_nullable_release(RvDomUnionFileOr
 RV_EXPORT void rv_dom_union_file_or_usv_string_release(RvDomUnionFileOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_file_or_usv_string_release(RvDomSequenceFileOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_pointer_event_release(RvDomSequencePointerEvent* value);
+RV_EXPORT void rv_dom_union_buffer_source_or_blob_or_usv_string_release(RvDomUnionBufferSourceOrBlobOrUSVString* value);
+RV_EXPORT void rv_dom_sequence_buffer_source_or_blob_or_usv_string_release(RvDomSequenceBufferSourceOrBlobOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_sequence_of_usv_string_release(RvDomSequenceSequenceOfUSVString* value);
 RV_EXPORT void rv_dom_pair_usv_string_and_usv_string_release(RvDomPairUSVStringAndUSVString* value);
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_usv_string_release(RvDomSequencePairUSVStringAndUSVString* value);
@@ -1423,10 +1483,6 @@ RV_EXPORT RvDOMSelection* rv_dom_dom_selection_retain(RvDOMSelection*);
 RV_EXPORT void rv_dom_dom_rect_read_only_release(RvDOMRectReadOnly*);
 /* Adds a reference to a DOMRectReadOnly and returns it. */
 RV_EXPORT RvDOMRectReadOnly* rv_dom_dom_rect_read_only_retain(RvDOMRectReadOnly*);
-/* Releases a handle to a CaretPosition. */
-RV_EXPORT void rv_dom_caret_position_release(RvCaretPosition*);
-/* Adds a reference to a CaretPosition and returns it. */
-RV_EXPORT RvCaretPosition* rv_dom_caret_position_retain(RvCaretPosition*);
 /* Releases a handle to a DOMRectList. */
 RV_EXPORT void rv_dom_dom_rect_list_release(RvDOMRectList*);
 /* Adds a reference to a DOMRectList and returns it. */
@@ -1575,6 +1631,18 @@ RV_EXPORT RvNodeIterator* rv_dom_node_iterator_retain(RvNodeIterator*);
 RV_EXPORT void rv_dom_tree_walker_release(RvTreeWalker*);
 /* Adds a reference to a TreeWalker and returns it. */
 RV_EXPORT RvTreeWalker* rv_dom_tree_walker_retain(RvTreeWalker*);
+/* Releases a handle to a Blob. */
+RV_EXPORT void rv_dom_blob_release(RvBlob*);
+/* Adds a reference to a Blob and returns it. */
+RV_EXPORT RvBlob* rv_dom_blob_retain(RvBlob*);
+/* Releases a handle to a FileList. */
+RV_EXPORT void rv_dom_file_list_release(RvFileList*);
+/* Adds a reference to a FileList and returns it. */
+RV_EXPORT RvFileList* rv_dom_file_list_retain(RvFileList*);
+/* Releases a handle to a CaretPosition. */
+RV_EXPORT void rv_dom_caret_position_release(RvCaretPosition*);
+/* Adds a reference to a CaretPosition and returns it. */
+RV_EXPORT RvCaretPosition* rv_dom_caret_position_retain(RvCaretPosition*);
 /* Releases a handle to a DOMURL. */
 RV_EXPORT void rv_dom_domurl_release(RvDOMURL*);
 /* Adds a reference to a DOMURL and returns it. */
@@ -3095,6 +3163,10 @@ RV_EXPORT int32_t rv_dom_html_input_element_get_disabled(RvNode* target, int32_t
 RV_EXPORT int32_t rv_dom_html_input_element_set_disabled(RvNode* target, int32_t value);
 /* HTMLInputElement.form getter: readonly attribute HTMLFormElement? form; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_html_input_element_get_form(RvNode* target, RvNode** result);
+/* HTMLInputElement.files getter: attribute FileList? files; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_html_input_element_get_files(RvNode* target, RvFileList** result);
+/* HTMLInputElement.files setter: attribute FileList? files; value may be NULL */
+RV_EXPORT int32_t rv_dom_html_input_element_set_files(RvNode* target, RvFileList* value);
 /* HTMLInputElement.formAction getter: attribute USVString formAction */
 RV_EXPORT int32_t rv_dom_html_input_element_get_form_action(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.formAction setter: attribute USVString formAction */
@@ -5567,14 +5639,6 @@ RV_EXPORT int32_t rv_dom_dom_rect_read_only_get_right(RvDOMRectReadOnly* target,
 RV_EXPORT int32_t rv_dom_dom_rect_read_only_get_bottom(RvDOMRectReadOnly* target, double* result);
 /* DOMRectReadOnly.left getter: readonly attribute unrestricted double left */
 RV_EXPORT int32_t rv_dom_dom_rect_read_only_get_left(RvDOMRectReadOnly* target, double* result);
-/* CaretPosition */
-
-/* CaretPosition.offsetNode getter: readonly attribute Node? offsetNode; *result is a new reference, or NULL */
-RV_EXPORT int32_t rv_dom_caret_position_get_offset_node(RvCaretPosition* target, RvNode** result);
-/* CaretPosition.offset getter: readonly attribute unsigned long offset */
-RV_EXPORT int32_t rv_dom_caret_position_get_offset(RvCaretPosition* target, uint32_t* result);
-/* CaretPosition.getClientRect() -> DOMRect?; *result is a new reference, or NULL */
-RV_EXPORT int32_t rv_dom_caret_position_get_client_rect(RvCaretPosition* target, RvDOMRectReadOnly** result);
 /* DOMRect */
 
 /* DOMRect.constructor: target is the Document of the constructed object; x defaults to 0 in IDL; y defaults to 0 in
@@ -5948,6 +6012,9 @@ RV_EXPORT int32_t rv_dom_html_options_collection_named_item(RvHTMLCollection* ta
 RV_EXPORT int32_t rv_dom_dom_form_data_create(RvNode* target, RvNode* form, RvNode* submitter, RvDOMFormData** result);
 /* DOMFormData.append(USVString name, USVString value) -> undefined */
 RV_EXPORT int32_t rv_dom_dom_form_data_append(RvDOMFormData* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length);
+/* DOMFormData.append(USVString name, Blob blobValue, optional USVString filename) -> undefined; filename_length -1
+ * means absent; filename may be NULL (absent) */
+RV_EXPORT int32_t rv_dom_dom_form_data_append_3(RvDOMFormData* target, const uint8_t* name, int32_t name_length, RvBlob* blob_value, const uint8_t* filename, int32_t filename_length);
 /* DOMFormData.delete(USVString name) -> undefined */
 RV_EXPORT int32_t rv_dom_dom_form_data_delete(RvDOMFormData* target, const uint8_t* name, int32_t name_length);
 /* DOMFormData.get(USVString name) -> FormDataEntryValue?; *result owns its contents; release with the matching
@@ -5960,6 +6027,9 @@ RV_EXPORT int32_t rv_dom_dom_form_data_get_all(RvDOMFormData* target, const uint
 RV_EXPORT int32_t rv_dom_dom_form_data_has(RvDOMFormData* target, const uint8_t* name, int32_t name_length, int32_t* result);
 /* DOMFormData.set(USVString name, USVString value) -> undefined */
 RV_EXPORT int32_t rv_dom_dom_form_data_set(RvDOMFormData* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length);
+/* DOMFormData.set(USVString name, Blob blobValue, optional USVString filename) -> undefined; filename_length -1 means
+ * absent; filename may be NULL (absent) */
+RV_EXPORT int32_t rv_dom_dom_form_data_set_3(RvDOMFormData* target, const uint8_t* name, int32_t name_length, RvBlob* blob_value, const uint8_t* filename, int32_t filename_length);
 /* ValidityState */
 
 /* ValidityState.valueMissing getter: readonly attribute boolean valueMissing */
@@ -7548,6 +7618,42 @@ RV_EXPORT int32_t rv_dom_tree_walker_next_sibling(RvTreeWalker* target, RvNode**
 RV_EXPORT int32_t rv_dom_tree_walker_previous_node(RvTreeWalker* target, RvNode** result);
 /* TreeWalker.nextNode() -> Node?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_tree_walker_next_node(RvTreeWalker* target, RvNode** result);
+/* Blob */
+
+/* Blob.constructor: target is the Document of the constructed object; blob_parts may be NULL for an absent optional
+ * argument; options defaults to {} in IDL; options may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_blob_create(RvNode* target, const RvDomSequenceBufferSourceOrBlobOrUSVString* blob_parts, const RvDomBlobPropertyBag* options, RvBlob** result);
+/* Blob.size getter: readonly attribute unsigned long long size */
+RV_EXPORT int32_t rv_dom_blob_get_size(RvBlob* target, uint64_t* result);
+/* Blob.type getter: readonly attribute DOMString type */
+RV_EXPORT int32_t rv_dom_blob_get_type(RvBlob* target, char* buffer, int32_t capacity, int32_t* length);
+/* Blob.slice(optional long long start = 0, optional long long end = 0x7FFFFFFFFFFFFFFF, optional DOMString
+ * contentType = "") -> Blob; start defaults to 0 in IDL; end defaults to 0x7FFFFFFFFFFFFFFF in IDL; content_type
+ * defaults to "" in IDL; *result is a new reference */
+RV_EXPORT int32_t rv_dom_blob_slice(RvBlob* target, int64_t start, int64_t end, const uint8_t* content_type, int32_t content_type_length, RvBlob** result);
+/* File */
+
+/* File.constructor: target is the Document of the constructed object; options defaults to {} in IDL; options may be
+ * NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_file_create(RvNode* target, const RvDomSequenceBufferSourceOrBlobOrUSVString* file_bits, const uint8_t* file_name, int32_t file_name_length, const RvDomFilePropertyBag* options, RvBlob** result);
+/* File.name getter: readonly attribute DOMString name */
+RV_EXPORT int32_t rv_dom_file_get_name(RvBlob* target, char* buffer, int32_t capacity, int32_t* length);
+/* File.lastModified getter: readonly attribute long long lastModified */
+RV_EXPORT int32_t rv_dom_file_get_last_modified(RvBlob* target, int64_t* result);
+/* FileList */
+
+/* FileList.length getter: readonly attribute unsigned long length */
+RV_EXPORT int32_t rv_dom_file_list_get_length(RvFileList* target, uint32_t* result);
+/* FileList.item(unsigned long index) -> File?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_file_list_item(RvFileList* target, uint32_t index, RvBlob** result);
+/* CaretPosition */
+
+/* CaretPosition.offsetNode getter: readonly attribute Node? offsetNode; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_caret_position_get_offset_node(RvCaretPosition* target, RvNode** result);
+/* CaretPosition.offset getter: readonly attribute unsigned long offset */
+RV_EXPORT int32_t rv_dom_caret_position_get_offset(RvCaretPosition* target, uint32_t* result);
+/* CaretPosition.getClientRect() -> DOMRect?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_caret_position_get_client_rect(RvCaretPosition* target, RvDOMRectReadOnly** result);
 /* DOMURL */
 
 /* DOMURL.constructor: target is the Document of the constructed object; base_length -1 means absent; base may be NULL
