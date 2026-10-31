@@ -1444,7 +1444,7 @@ RV_EXPORT int32_t rv_text_segmentation_version(char* buffer, int32_t capacity, i
  * portrait-secondary 270). A change of orientation fires the engine's change event. Orientation locking is not
  * supported. Set size to sizeof(RvScreenMetrics). Returns RV_ERR_UNSUPPORTED, and changes nothing, for a size
  * below this layout, a width or height of 0 or less, a negative available extent, a color depth outside 1-64 or
- * an unknown orientation. */
+ * an unknown orientation. A document kept past rv_host_destroy has no frame, and its Screen reports 0. */
 enum {
     RV_SCREEN_PORTRAIT_PRIMARY = 0,
     RV_SCREEN_PORTRAIT_SECONDARY = 1,

@@ -643,7 +643,8 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
                 let mutable kept = 0
                 rv_dom_screen_get_width (held.Value, &kept) |> check "screen.width after destroy"
 
-                if kept <> 1080 then
+                // The document has no frame after destroy, and WebKit's Screen reports 0 without one.
+                if kept <> 0 then
                     failwithf "screen.width after destroy %d" kept
 
                 let mutable kind = -1

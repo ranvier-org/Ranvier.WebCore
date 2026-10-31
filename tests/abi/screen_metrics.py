@@ -141,8 +141,10 @@ def after_destroy(native, screen, report):
     document = case.document
     n.bind('rv_node_retain', P, [P])(document)
     case.close()
-    status = n.call('rv_dom_screen_get_width', [P, ctypes.POINTER(I)], document, ctypes.byref(I()))
-    n.expect(status == OK, f'Screen.width after destroy {status}')
+    width = I(-1)
+    status = n.call('rv_dom_screen_get_width', [P, ctypes.POINTER(I)], document, ctypes.byref(width))
+    # The document has no frame after destroy, and WebKit's Screen reports 0 without one.
+    n.expect(status == OK and width.value == 0, f'Screen.width after destroy {status} {width.value}')
     n.bind('rv_node_release', None, [P])(document)
     report['afterDestroy'] = status
 

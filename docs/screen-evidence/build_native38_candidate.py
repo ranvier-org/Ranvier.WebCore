@@ -43,8 +43,11 @@ caret_mtime = os.stat(Path('C:/wk/src') / caret_source).st_mtime_ns
 patch_0037 = repo / 'patches/0037-frame-loader-client-form-submission-hook.patch'
 if not patch_0037.exists():
     patch_0037 = Path('C:/wk/native-formsubmit/patches/0037-frame-loader-client-form-submission-hook.patch')
+patch_0038 = repo / 'patches/0038-platform-screen-win-embedder-screen-data.patch'
+source_patches = [patch_0037] + ([patch_0038] if patch_0038.exists() else [])
 patches = sorted(p.name for p in (repo / 'patches').glob('*.patch')) + [patch_0037.name]
-assert sorted(set(patches))[-1].startswith('0037-'), 'a source patch after 0037 needs its owner objects: ' + patches[-1]
+assert sorted(set(patches))[-1].startswith(source_patches[-1].name[:5]), 'a source patch after the last recompiled one: ' + sorted(set(patches))[-1]
+assert not (patch_0038.exists() and arguments.overlay), 'the overlay stands in for 0038 only before it is applied'
 def hunk_lines(text):
     return [line for line in text.splitlines() if line[:1] in '+-' and not line.startswith(('+++', '---'))]
 def contains(lines, part):
@@ -55,16 +58,30 @@ def contains(lines, part):
     return index == len(part)
 patch_receipt = {}
 recompiled_sources = set()
-text = patch_0037.read_text(encoding='utf-8')
-for section in text.split('\ndiff --git ')[0 if text.startswith('diff --git ') else 1:]:
-    name = re.search(r'a/(\S+) b/', section).group(1)
-    current = subprocess.run(['git', '-C', 'C:/wk/src', 'diff', '--', name], capture_output=True, text=True, check=True).stdout
-    assert contains(hunk_lines(current), hunk_lines(section)), name + ' does not carry ' + patch_0037.name
-    recompiled_sources.add(name)
-    patch_receipt.setdefault(patch_0037.name, {'sha256': hashlib.sha256(patch_0037.read_bytes()).hexdigest(), 'files': {}})['files'][name] = hunk_lines(section)
-scan = subprocess.run([sys.executable, '-I', 'C:/wk/t06-artifacts/units_for_headers.py', '--json', *sorted(recompiled_sources)],
-                      capture_output=True, text=True, check=True)
-patched_units = json.loads(scan.stdout)['all']
+sources_0038 = set()
+for patch_path in source_patches:
+    text = patch_path.read_text(encoding='utf-8').replace('\r\n', '\n')
+    for section in text.split('\ndiff --git ')[0 if text.startswith('diff --git ') else 1:]:
+        name = re.search(r'a/(\S+) b/', section).group(1)
+        current = subprocess.run(['git', '-C', 'C:/wk/src', 'diff', '--', name], capture_output=True, text=True, check=True).stdout
+        assert contains(hunk_lines(current), hunk_lines(section)), name + ' does not carry ' + patch_path.name
+        recompiled_sources.add(name)
+        if patch_path == patch_0038:
+            sources_0038.add(name)
+        patch_receipt.setdefault(patch_path.name, {'sha256': hashlib.sha256(patch_path.read_bytes()).hexdigest(), 'files': {}})['files'][name] = hunk_lines(section)
+def scan_units(sources):
+    scan = subprocess.run([sys.executable, '-I', 'C:/wk/t06-artifacts/units_for_headers.py', '--json', *sorted(sources)],
+                          capture_output=True, text=True, check=True)
+    units = json.loads(scan.stdout)['all']
+    # A source that WebKit compiles on its own, outside a unified source, is its own unit.
+    for source in sources:
+        if source.startswith('Source/WebCore/') and source.endswith('.cpp'):
+            standalone = 'Source/WebCore/CMakeFiles/WebCore.dir/' + source.removeprefix('Source/WebCore/') + '.obj'
+            if ('build ' + standalone.replace('/', '\\') + ':') in (build / 'build.ninja').read_text():
+                units.append(standalone)
+    return sorted(set(units))
+patched_units = scan_units(recompiled_sources)
+units_0038 = scan_units(sources_0038) if sources_0038 else []
 newest_source = max(os.stat(Path('C:/wk/src') / path).st_mtime_ns for path in changed_sources
                     if path != caret_source and path not in recompiled_sources)
 runtime = out / 'runtime'
@@ -156,14 +173,15 @@ from concurrent.futures import ThreadPoolExecutor
 objects = {}
 if arguments.reuse_units:
     reused = json.loads((Path(arguments.reuse_units) / 'source-patches.json').read_text())['recompiledUnits']
-    assert set(reused) == set(patched_units), 'the reused candidate compiled other units'
-    newest_patched = max(os.stat(Path('C:/wk/src') / path).st_mtime_ns for path in changed_sources)
+    reused = {target: obj for target, obj in reused.items() if target not in units_0038}
+    assert set(reused) == set(patched_units) - set(units_0038), 'the reused candidate compiled other units'
+    newest_patched = max(os.stat(Path('C:/wk/src') / path).st_mtime_ns for path in changed_sources if path not in sources_0038)
     for target, obj in reused.items():
         assert Path(obj).stat().st_mtime_ns > newest_patched, obj + ' predates the source'
         borrowed[Path(obj)] = Path(obj).stat().st_mtime_ns
         replacements[target] = obj
         objects[target] = obj
-    patched_units = []
+    patched_units = [unit for unit in patched_units if unit not in reused]
 with ThreadPoolExecutor(max_workers=6) as pool:
     for target, obj, code in pool.map(lambda item: compile_object(item[0], item[1]), enumerate(patched_units, start=1)):
         if code:
