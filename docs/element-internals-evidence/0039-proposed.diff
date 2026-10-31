@@ -1,0 +1,19 @@
+diff --git a/Source/WebCore/dom/Element.cpp b/Source/WebCore/dom/Element.cpp
+--- a/Source/WebCore/dom/Element.cpp
++++ b/Source/WebCore/dom/Element.cpp
+@@ -2645,12 +2645,9 @@ void Element::setElementsArrayAttribute(const QualifiedName& attributeName, std::optional<Vector<Ref<Element>>>&& elements)
+     auto newElements = copyToVectorOf<WeakPtr<Element, WeakPtrImplWithEventTargetData>>(*elements);
+     explicitlySetAttrElementsMap().set(attributeName, WTF::move(newElements));
+ 
+-    if (CheckedPtr cache = protect(document())->existingAXObjectCache()) {
+-        for (auto element : elements.value()) {
+-            // FIXME: Should this pass `element` instead of `*this`?
+-            cache->updateRelations(*this, attributeName);
+-        }
+-    }
++    // The relations of *this follow the new elements, an empty list included: the attribute stays "" across sets.
++    if (CheckedPtr cache = protect(document())->existingAXObjectCache())
++        cache->updateRelations(*this, attributeName);
+ }
+ 
+ void Element::classAttributeChanged(const AtomString& newClassString, AttributeModificationReason reason)

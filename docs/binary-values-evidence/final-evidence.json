@@ -1,0 +1,128 @@
+{
+  "group": [
+    "H11 #114"
+  ],
+  "native": "0.1.0-preview.31",
+  "abi": 39,
+  "features": [
+    "dom-binary-values",
+    "dom:Blob",
+    "dom:File",
+    "dom:FileList",
+    "dom-constructor:Blob",
+    "dom-constructor:File"
+  ],
+  "sourceHeadOfBatch": "00077e3562cb16a447ee94268e2f64dcd343bae4",
+  "candidate": "artifacts/native31-candidate-4 (forms-candidate-4 objects; RanvierDomGlue regenerated; four host units)",
+  "sourceExemption": {
+    "file": "Source/WebCore/dom/Document.cpp",
+    "patch": "C:\\wk\\native-caret\\patches\\0035-caret-position-text-control-shadow-roots.patch",
+    "patchSha256": "756fdb4ef5c6511670ddd8d9144bcb6f5bc0b222d4dc1c74143536736377e5e4",
+    "sourceDiffSha256": "1ecdce5d3519e573bf540bc98a064bccca5c625a13733a8c4a651ef91f625e6c",
+    "assertion": "git diff of the file equals the patch hunk byte for byte",
+    "mtimeNs": 1793430662087056900,
+    "borrowedDocumentUnit": "C:/wk/h05-private/native22-final/023-UnifiedSource-dom-7.cpp.obj"
+  },
+  "red": {
+    "runtime": "native-dialog/artifacts/native30-frozen (Native30/ABI38)",
+    "abiVersion": 38,
+    "exportsPresent": 0,
+    "exportsChecked": 17,
+    "features": {
+      "dom-binary-values": 0,
+      "dom:Blob": 0,
+      "dom:File": 0,
+      "dom:FileList": 0,
+      "dom:FileReader": 0,
+      "dom:DOMFormData": 1
+    },
+    "emptyFileInputEntry": {
+      "present": 1,
+      "tag": 1,
+      "fileTag": true,
+      "arm0IsNull": true
+    },
+    "probe": "binary_values.py fails: dom-binary-values advertised",
+    "files": [
+      "red-native30.json",
+      "red-probe-native30.log"
+    ]
+  },
+  "green": {
+    "binaryValuesAssertions": 446,
+    "probes": 43,
+    "allExitZero": true,
+    "rawAssertions": 48932,
+    "teardownCases": 78,
+    "teardownCasesAdded": 2,
+    "teardownAllCollected": true,
+    "probeHeldPastDestroy": {
+      "blob": {
+        "size": 4,
+        "type": "text/plain",
+        "bytes": "6b657074"
+      },
+      "file": {
+        "size": 4,
+        "type": "",
+        "bytes": "6b657074",
+        "name": "kept.txt",
+        "lastModified": 7
+      },
+      "slice": {
+        "size": 2,
+        "type": "",
+        "bytes": "6570"
+      }
+    }
+  },
+  "chromiumOracle": {
+    "browser": "156.0.8078.4",
+    "fixture": "tests/fixtures/binary-values-oracle.json",
+    "cases": 20
+  },
+  "valueDifferences": 0,
+  "conventionDivergence": {
+    "case": "invalid UTF-8 in a string BlobPart",
+    "behaviour": "RV_ERR_NULL_ARGUMENT (documented in the rv_dom_blob_create and rv_dom_file_create header comments)",
+    "generatedGlueConvention": "a NUL-terminated const char* string argument converts invalid UTF-8 to a null String without an error"
+  },
+  "commentOnlyAfterBatch": "the header and glue comment that documents it was added after the batch; no code changed and the runtime was not rebuilt",
+  "qualifications": [
+    {
+      "qualification": "platform line endings",
+      "case": "endings native",
+      "reason": "expected value depends on the platform: CRLF on Windows (equal to Windows Chromium 610d0a620d0a630d0a64), LF elsewhere; asserted per platform"
+    },
+    {
+      "qualification": "no promise or FileReader engine object",
+      "case": "Blob.text/arrayBuffer/bytes, FileReader",
+      "reason": "the host loader has no blob-URL path; rv_blob_read_bytes reads memory-backed blobs during the call; text, data URL and cancellation are managed (BinaryValueContract, BinaryValueService.ReadBytes)"
+    },
+    {
+      "qualification": "integer slice arguments",
+      "case": "slice(1.9, 4.2)",
+      "reason": "the [Clamp] conversion of a JavaScript number is browser-only; the ABI takes int64 start and end"
+    },
+    {
+      "qualification": "UTF-8 string parts",
+      "case": "USVString parts",
+      "reason": "the caller writes a USVString as UTF-8, with U+FFFD for a lone surrogate; invalid UTF-8 returns RV_ERR_NULL_ARGUMENT"
+    }
+  ],
+  "files": {
+    "allocation-absence.json": "ec8c65aa6b97681f01a458370b29ab53fd0256624a8458192feb7b21875c022f",
+    "batch-green.json": "3a84b0c0c0e33dd8a6e2677f39a7417638a50d9115fb4b0eb16cb53476efc83e",
+    "binary-values-report.json": "c85797a5e5459ecfb4ad66abefce7b3e9626da04c5490d839279ba92c703facd",
+    "build_native31_candidate.py": "c7ffd68708d8c453525146a176d03d587425b5ea9f86b8e328644430822c1e2a",
+    "dialog-popover-repeats-native31.log": "734c750c31630b8cb91b6c5e9419ee654a977c818ef33a6ad82723e4e9db715e",
+    "make_native31_evidence.py": "af724ec34db0761c79af002661043bb9f8c9f979d1fced0a151987e5c5517a4e",
+    "measure_binary_red.py": "1e0a689b8168a1d0b119e2ce7b8cc89a3d8f44ae084ee5b9023c020493668a44",
+    "red-native30.json": "a45c2f68ea39301d478b0fc45086304153367f2720e58611d4e064573b4aa3a5",
+    "red-probe-native30.log": "55adeefa78e5ae693f2780d7c2ab37dc1cf0674bf777df84b40fa4083d688585",
+    "run_native31_batch.py": "1d22cfee18c9e24ebd4128729de367705c1d938e1b462883695885a57c56f3ba",
+    "runtime-receipt.json": "6eb8707ef509e9c17e04837b26b1982baa27489b98c4b07f60262d959e7cfaad",
+    "source-exemption.json": "1b57b60fe56c89bd7f7816aecedeb111c5b0d8b1923f260996a591dd8b47d194",
+    "teardown-probes.json": "2fd53e16fa617cbcdf2a7701d7e4e3097ef18cc20d3eb892ecfeab6f274089ae"
+  }
+}

@@ -1,0 +1,13 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+Traceback (most recent call last):
+  File "C:\wk\native-binary\tests\abi\binary_values.py", line 425, in <module>
+    main()
+    ~~~~^^
+  File "C:\wk\native-binary\tests\abi\binary_values.py", line 418, in main
+    report = verify(args.native_directory)
+  File "C:\wk\native-binary\tests\abi\binary_values.py", line 405, in verify
+    native.expect(has(feature.encode()) == 1, feature + ' advertised')
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-binary\tests\abi\form_collections.py", line 86, in expect
+    raise AssertionError(label)
+AssertionError: dom-binary-values advertised

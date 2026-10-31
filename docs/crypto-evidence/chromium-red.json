@@ -1,0 +1,461 @@
+{
+  "typed": {
+    "Int8Array": {
+      "exists": true,
+      "empty": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 0
+      },
+      "small": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 16
+      },
+      "limit": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 65536
+      },
+      "over": {
+        "ok": false,
+        "name": "QuotaExceededError",
+        "isDOMException": true,
+        "ctor": "QuotaExceededError"
+      }
+    },
+    "Uint8Array": {
+      "exists": true,
+      "empty": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 0
+      },
+      "small": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 16
+      },
+      "limit": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 65536
+      },
+      "over": {
+        "ok": false,
+        "name": "QuotaExceededError",
+        "isDOMException": true,
+        "ctor": "QuotaExceededError"
+      }
+    },
+    "Uint8ClampedArray": {
+      "exists": true,
+      "empty": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 0
+      },
+      "small": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 16
+      },
+      "limit": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 65536
+      },
+      "over": {
+        "ok": false,
+        "name": "QuotaExceededError",
+        "isDOMException": true,
+        "ctor": "QuotaExceededError"
+      }
+    },
+    "Int16Array": {
+      "exists": true,
+      "empty": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 0
+      },
+      "small": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 16
+      },
+      "limit": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 65536
+      },
+      "over": {
+        "ok": false,
+        "name": "QuotaExceededError",
+        "isDOMException": true,
+        "ctor": "QuotaExceededError"
+      }
+    },
+    "Uint16Array": {
+      "exists": true,
+      "empty": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 0
+      },
+      "small": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 16
+      },
+      "limit": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 65536
+      },
+      "over": {
+        "ok": false,
+        "name": "QuotaExceededError",
+        "isDOMException": true,
+        "ctor": "QuotaExceededError"
+      }
+    },
+    "Int32Array": {
+      "exists": true,
+      "empty": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 0
+      },
+      "small": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 16
+      },
+      "limit": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 65536
+      },
+      "over": {
+        "ok": false,
+        "name": "QuotaExceededError",
+        "isDOMException": true,
+        "ctor": "QuotaExceededError"
+      }
+    },
+    "Uint32Array": {
+      "exists": true,
+      "empty": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 0
+      },
+      "small": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 16
+      },
+      "limit": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 65536
+      },
+      "over": {
+        "ok": false,
+        "name": "QuotaExceededError",
+        "isDOMException": true,
+        "ctor": "QuotaExceededError"
+      }
+    },
+    "BigInt64Array": {
+      "exists": true,
+      "empty": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 0
+      },
+      "small": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 16
+      },
+      "limit": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 65536
+      },
+      "over": {
+        "ok": false,
+        "name": "QuotaExceededError",
+        "isDOMException": true,
+        "ctor": "QuotaExceededError"
+      }
+    },
+    "BigUint64Array": {
+      "exists": true,
+      "empty": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 0
+      },
+      "small": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 16
+      },
+      "limit": {
+        "ok": true,
+        "sameObject": true,
+        "byteLength": 65536
+      },
+      "over": {
+        "ok": false,
+        "name": "QuotaExceededError",
+        "isDOMException": true,
+        "ctor": "QuotaExceededError"
+      }
+    },
+    "Float16Array": {
+      "exists": true,
+      "empty": {
+        "ok": false,
+        "name": "TypeMismatchError",
+        "isDOMException": true,
+        "ctor": "DOMException"
+      },
+      "small": {
+        "ok": false,
+        "name": "TypeMismatchError",
+        "isDOMException": true,
+        "ctor": "DOMException"
+      },
+      "limit": {
+        "ok": false,
+        "name": "TypeMismatchError",
+        "isDOMException": true,
+        "ctor": "DOMException"
+      },
+      "over": {
+        "ok": false,
+        "name": "TypeMismatchError",
+        "isDOMException": true,
+        "ctor": "DOMException"
+      }
+    },
+    "Float32Array": {
+      "exists": true,
+      "empty": {
+        "ok": false,
+        "name": "TypeMismatchError",
+        "isDOMException": true,
+        "ctor": "DOMException"
+      },
+      "small": {
+        "ok": false,
+        "name": "TypeMismatchError",
+        "isDOMException": true,
+        "ctor": "DOMException"
+      },
+      "limit": {
+        "ok": false,
+        "name": "TypeMismatchError",
+        "isDOMException": true,
+        "ctor": "DOMException"
+      },
+      "over": {
+        "ok": false,
+        "name": "TypeMismatchError",
+        "isDOMException": true,
+        "ctor": "DOMException"
+      }
+    },
+    "Float64Array": {
+      "exists": true,
+      "empty": {
+        "ok": false,
+        "name": "TypeMismatchError",
+        "isDOMException": true,
+        "ctor": "DOMException"
+      },
+      "small": {
+        "ok": false,
+        "name": "TypeMismatchError",
+        "isDOMException": true,
+        "ctor": "DOMException"
+      },
+      "limit": {
+        "ok": false,
+        "name": "TypeMismatchError",
+        "isDOMException": true,
+        "ctor": "DOMException"
+      },
+      "over": {
+        "ok": false,
+        "name": "TypeMismatchError",
+        "isDOMException": true,
+        "ctor": "DOMException"
+      }
+    },
+    "DataView": {
+      "exists": true,
+      "empty": {
+        "ok": false,
+        "name": "TypeMismatchError",
+        "isDOMException": true,
+        "ctor": "DOMException"
+      },
+      "small": {
+        "ok": false,
+        "name": "TypeMismatchError",
+        "isDOMException": true,
+        "ctor": "DOMException"
+      },
+      "limit": {
+        "ok": false,
+        "name": "TypeMismatchError",
+        "isDOMException": true,
+        "ctor": "DOMException"
+      },
+      "over": {
+        "ok": false,
+        "name": "TypeMismatchError",
+        "isDOMException": true,
+        "ctor": "DOMException"
+      }
+    }
+  },
+  "outsideUntouched": true,
+  "differ": true,
+  "nonView": {
+    "arrayBuffer": {
+      "ok": false,
+      "name": "TypeError",
+      "isDOMException": false,
+      "ctor": "TypeError"
+    },
+    "null": {
+      "ok": false,
+      "name": "TypeError",
+      "isDOMException": false,
+      "ctor": "TypeError"
+    },
+    "number": {
+      "ok": false,
+      "name": "TypeError",
+      "isDOMException": false,
+      "ctor": "TypeError"
+    },
+    "array": {
+      "ok": false,
+      "name": "TypeError",
+      "isDOMException": false,
+      "ctor": "TypeError"
+    }
+  },
+  "shared": {
+    "ok": false,
+    "name": "SharedArrayBuffer undefined"
+  },
+  "quota32": {
+    "16384": {
+      "ok": true
+    },
+    "16385": {
+      "ok": false,
+      "name": "QuotaExceededError",
+      "isDOMException": true,
+      "ctor": "QuotaExceededError"
+    }
+  },
+  "uuid": {
+    "type": "string",
+    "length": 36,
+    "allMatchV4": true,
+    "allLowercase": true,
+    "allDistinct": true,
+    "versionNibble": [
+      "4"
+    ],
+    "variantNibbles": [
+      "8",
+      "9",
+      "a",
+      "b"
+    ]
+  },
+  "subtle": {
+    "isSecureContext": true,
+    "present": true,
+    "algorithms": {
+      "SHA-1": {
+        "digestAbc": "a9993e364706816aba3e25717850c26c9cd0d89d"
+      },
+      "SHA-256": {
+        "digestAbc": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+      },
+      "SHA-384": {
+        "digestAbc": "cb00753f45a35e8bb5a03d699ac65007272c32ab0eded1631a8b605a43ff5bed8086072ba1e7cc2358baeca134c825a7"
+      },
+      "SHA-512": {
+        "digestAbc": "ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f"
+      },
+      "AES-CBC": {
+        "generateKey": "secret"
+      },
+      "AES-CTR": {
+        "generateKey": "secret"
+      },
+      "AES-GCM": {
+        "generateKey": "secret"
+      },
+      "AES-KW": {
+        "generateKey": "secret"
+      },
+      "HMAC": {
+        "generateKey": "secret"
+      },
+      "ECDSA": {
+        "generateKey": "pair"
+      },
+      "ECDH": {
+        "generateKey": "pair"
+      },
+      "Ed25519": {
+        "generateKey": "pair"
+      },
+      "X25519": {
+        "generateKey": "pair"
+      },
+      "RSASSA-PKCS1-v1_5": {
+        "generateKey": "pair"
+      },
+      "RSA-PSS": {
+        "generateKey": "pair"
+      },
+      "RSA-OAEP": {
+        "generateKey": "pair"
+      },
+      "AES-CFB-8": {
+        "generateKey": false,
+        "name": "NotSupportedError",
+        "isDOMException": true,
+        "ctor": "DOMException"
+      },
+      "PBKDF2": {
+        "importKey": "secret"
+      },
+      "HKDF": {
+        "importKey": "secret"
+      }
+    }
+  },
+  "insecureContext": {
+    "isSecureContext": false,
+    "randomUUID": "undefined",
+    "subtle": "undefined",
+    "getRandomValues": "function"
+  },
+  "browser": "156.0.8078.4",
+  "headless": "new"
+}

@@ -48,7 +48,7 @@ let main _ =
         | dir -> dir
 
     Directory.CreateDirectory outDir |> ignore
-    require (rv_abi_version () = 30) "ABI version 30"
+    require (rv_abi_version () = 54) "ABI version 54"
 
     // RANVIER_WEBCORE_PROBE=teardown runs the teardown probes instead of the frames.
     if Environment.GetEnvironmentVariable "RANVIER_WEBCORE_PROBE" = "teardown" then
@@ -466,5 +466,6 @@ let main _ =
     Accessibility.run outDir
     AccessibilityText.run outDir
     Dom.run outDir
+    TraversalProbe.run outDir
     printfn "RANVIER_FSHARP_ABI PASS %s" (JsonSerializer.Serialize summary)
     0

@@ -1,0 +1,113 @@
+{
+ "browser": "156.0.8078.4",
+ "steps": [
+  {
+   "name": "initial",
+   "rect": [
+    0,
+    40
+   ],
+   "scroll": [
+    0,
+    0
+   ],
+   "vv": [
+    0,
+    0,
+    0,
+    0,
+    320,
+    240,
+    1
+   ],
+   "dpr": 2,
+   "hit": "b"
+  },
+  {
+   "name": "scroll 10,20",
+   "rect": [
+    -10,
+    20
+   ],
+   "scroll": [
+    10,
+    20
+   ],
+   "vv": [
+    0,
+    0,
+    10,
+    20,
+    320,
+    240,
+    1
+   ],
+   "dpr": 2,
+   "hit": "b"
+  },
+  {
+   "name": "page scale 2",
+   "rect": [
+    -10,
+    20
+   ],
+   "scroll": [
+    10,
+    20
+   ],
+   "vv": [
+    0,
+    0,
+    10,
+    20,
+    160,
+    120,
+    2
+   ],
+   "dpr": 2,
+   "hit": "b"
+  },
+  {
+   "name": "pan visual viewport 20,30",
+   "rect": [
+    -10,
+    20
+   ],
+   "scroll": [
+    10,
+    20
+   ],
+   "vv": [
+    40,
+    60,
+    50,
+    80,
+    160,
+    120,
+    2
+   ],
+   "dpr": 2,
+   "hit": "b"
+  }
+ ],
+ "members": {
+  "convertPointFromNode": false,
+  "convertQuadFromNode": false,
+  "convertRectFromNode": false,
+  "getBoxQuads": false,
+  "webkitConvertPointFromNodeToPage": false,
+  "DOMQuad": "function",
+  "DOMMatrix": "function"
+ },
+ "mouse": {
+  "at": [
+   -50,
+   -30
+  ],
+  "event": [
+   -10,
+   30,
+   ""
+  ]
+ }
+}

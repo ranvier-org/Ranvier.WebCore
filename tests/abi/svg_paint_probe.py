@@ -4,6 +4,9 @@ import os
 from pathlib import Path
 import sys
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
+
 
 class SvgProbe:
     pointer = ctypes.c_void_p
@@ -37,11 +40,9 @@ class SvgProbe:
 
     def bind(self, name, result, arguments):
         try:
-            function = getattr(self.library, name)
+            return bind_utf8(self.library, name, result, arguments)
         except AttributeError as error:
             raise AssertionError('required native binding is absent: ' + name) from error
-        function.restype, function.argtypes = result, arguments
-        return function
 
     def expect(self, condition, label):
         self.assertions += 1
@@ -100,7 +101,7 @@ class SvgProbe:
         self.call('rv_dom_svg_length_set_value', [self.pointer, self.single], target, value)
 
     def attribute(self, target, name):
-        return self.text('rv_dom_element_get_attribute', [self.pointer, ctypes.c_char_p], target, name.encode())
+        return self.text('rv_dom_element_get_attribute', [self.pointer, Utf8], target, name.encode())
 
     def attributes(self, target):
         count = self.bind('rv_element_attribute_count', self.integer, [self.pointer])(target)

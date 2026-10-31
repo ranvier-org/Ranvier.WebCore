@@ -1,0 +1,29 @@
+# RED: C25 cascade probe against H08 final candidate native42-candidate-3 (ABI50), 2026-10-31T12:33:42Z
+# python -I -X utf8 tests/abi/cascade_diagnostics.py --native-directory C:/wk/native-inspect/artifacts/native42-candidate-3/runtime
+Traceback (most recent call last):
+  File "C:\wk\native-cascade\tests\abi\svg_paint_probe.py", line 40, in bind
+    function = getattr(self.library, name)
+  File "C:\Python314\Lib\ctypes\__init__.py", line 486, in __getattr__
+    func = self.__getitem__(name)
+  File "C:\Python314\Lib\ctypes\__init__.py", line 491, in __getitem__
+    func = self._FuncPtr((name_or_ordinal, self))
+AttributeError: function 'rv_host_inspect_cascade' not found
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\wk\native-cascade\tests\abi\cascade_diagnostics.py", line 388, in <module>
+    run(args.native_directory, args.repeat)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-cascade\tests\abi\cascade_diagnostics.py", line 375, in run
+    totals.add(run_once(native_directory, fixture, oracle))
+               ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-cascade\tests\abi\cascade_diagnostics.py", line 207, in run_once
+    c = Cascade(p)
+  File "C:\wk\native-cascade\tests\abi\cascade_diagnostics.py", line 57, in __init__
+    self.inspect = p.bind('rv_host_inspect_cascade', I, [P, P, ctypes.c_char_p, I, ctypes.POINTER(P)])
+                   ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-cascade\tests\abi\svg_paint_probe.py", line 42, in bind
+    raise AssertionError('required native binding is absent: ' + name) from error
+AssertionError: required native binding is absent: rv_host_inspect_cascade
+# exit 1

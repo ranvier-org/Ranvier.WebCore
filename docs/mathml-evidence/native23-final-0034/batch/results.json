@@ -1,0 +1,512 @@
+[
+  {
+    "name": "css_supports",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\css_supports.log",
+    "logSha256": "05fd7ee5d224db2bdda49560178074bf6224c29dfed768643c846465a3ab3934",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\css_supports.py": "dcbb43a68a90f831a23e26d42930f522d4bf99b9e36438b92273a0b69c434896",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 72
+  },
+  {
+    "name": "computed_style",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\computed_style.log",
+    "logSha256": "70ebb4d87e4cd0001182e37a9082c86ea0337184fdf093a1af5135b7f903c4a7",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\computed_style.py": "628d349da44f0c580de60d92bb93768006bbdc40691e6084331db9c30cf8ee01",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 93
+  },
+  {
+    "name": "fragment_rectangles",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\fragment_rectangles.log",
+    "logSha256": "57a9638643ef3082abeb95f7b9f252efe211cab6677aca91510c564b52b97d40",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\fragment_rectangles.py": "178a03f93e6e11366e787791510c757075dca59b39120afd76cc91e4579b414d",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 140
+  },
+  {
+    "name": "table_surface",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\table_surface.log",
+    "logSha256": "8bae3582a7fb2f662138794d8f64ab15bda8da5b98a4d71e7afab8e74c70b312",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\table_surface.py": "9af4551cbf8de4b54d406812bb18783e8b36c68fb8d03ed35c8fb8b95e48cd95",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 44
+  },
+  {
+    "name": "element_reflection",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\element_reflection.log",
+    "logSha256": "58175ae7a9e94642aaa3480e343152e27b64eac99c977e48f6c6ec7963e93bd4",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\element_reflection.py": "bdb00a71e5569440caddc1b91747b1cd96b5f1c270e879d7f2b08f268768308c",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 269
+  },
+  {
+    "name": "area_surface",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\area_surface.log",
+    "logSha256": "968d2113dff8c257fdbe03256fa57d16913f6043213f4b0af43d768c0b17d49a",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\area_surface.py": "8e4fe511dc047e9173565fc1911737ac7719455082c181922f4beb117dbb8fe8",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 117
+  },
+  {
+    "name": "cssom_surface",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\cssom_surface.log",
+    "logSha256": "6fedf047a7e46989b2d1590a07e9b8e42c6399a07c0bb7fb1ddf72f7c7bda910",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\cssom_surface.py": "4873ee4a1229d3ba4b385807964c9c3500a69fdb67146483b959ea8fb9a00e7f",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 407
+  },
+  {
+    "name": "keyframe_rules",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\keyframe_rules.log",
+    "logSha256": "f6bee323788d263ad2cbf2f40d7e14126ae0953bf2756be2b5bb445abb427733",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\keyframe_rules.py": "dd77ff9ac1683fbfecb01d288809f87010ba02b7de8138726ddd4e6e78ea1085",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 93
+  },
+  {
+    "name": "counter_style_rules",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\counter_style_rules.log",
+    "logSha256": "b2bc8e2d39c7a86523d540ceb732205aadfb4f3fef3d88f51f0c57ec6ab26584",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\counter_style_rules.py": "405c43df03ad3e4945b9b25eb800017403df460bcf46a5adb1d636d9a0d9e3a2",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 86
+  },
+  {
+    "name": "detached_cssom_context",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\detached_cssom_context.log",
+    "logSha256": "848ae3d09d5a9e63440a50d7af89f95236d133df48399209146c792944017c0d",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\detached_cssom_context.py": "56b7549ef1fedd38b3b431cc1c055b1af07af31575dfcaea845aed5a79c9ec6f",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 389
+  },
+  {
+    "name": "svg_mathml_surface",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\svg_mathml_surface.log",
+    "logSha256": "6221d6c18fff05c9aa0010b9b3c6edc3a4752fa82b16782d2182769e16c7e036",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_mathml_surface.py": "5d992a8a0c923080685915368ff537ceaec2c0927558cd04717df06fdf24e9a9",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 95
+  },
+  {
+    "name": "style_property_maps",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\style_property_maps.log",
+    "logSha256": "93d43c1f4e7a811536d7dae8186ad03f818049107c5a612eeb1767a257f8faa6",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\style_property_maps.py": "03955f4fc441d1241f72dd7978aaab14787f5400db16efabb0b31bf854e8dbe3",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 189
+  },
+  {
+    "name": "declared_style_maps",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\declared_style_maps.log",
+    "logSha256": "17c73785458969864abeae85d5f935572174e29b1eecff1a771fa90978c23b7b",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\declared_style_maps.py": "874abf21ad55c20f0f5f47a1198ec1668fb028619aa81a14de8e5d8e0eca8f93",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 2069
+  },
+  {
+    "name": "style_map_entries",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\style_map_entries.log",
+    "logSha256": "a301369b66f47a650587c8bb2ac3011aa9be133a4675428c8d8d96dc271c343d",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\style_map_entries.py": "4a61b612a9573c786cd5d7db9767ce5417f2ffd5e39f7c89f27534332db310c6",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 144
+  },
+  {
+    "name": "typed_style_values",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\typed_style_values.log",
+    "logSha256": "4e691d16e784408ffec8a6f48c76916dab3c05c1053eeb73ae1e70c51e3718d1",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\typed_style_values.py": "48f9e34bb60340b58daf10519eaf71ed947d588e1c03158039d31356f6b49dd4",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 190
+  },
+  {
+    "name": "custom_properties",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\custom_properties.log",
+    "logSha256": "96880645c1fc2da5221bba93ca4b419fc04154cdc2e74a40837edfa45cebbe72",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\custom_properties.py": "6d7118f4eb7834cda8d9a5659d9d9a107468bb2c1471d858fd7205bd332d0965",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 231
+  },
+  {
+    "name": "geometry_values",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\geometry_values.log",
+    "logSha256": "29be327c4ca69a4a3daa3125018c3fd6bf49b541073fb1200180fb70117e8ad5",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\geometry_values.py": "df24fa7a320af87b83633332343e022970e08a204096243b85164de015962fbc",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 260
+  },
+  {
+    "name": "matrix_values",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\matrix_values.log",
+    "logSha256": "072aefb0eecf088e70d410235077a7bc5efeeffa1d27a5af9dc62145229d150e",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\matrix_values.py": "f2572da2574bcb708790e88125cf7a338d4bfb54dd784c39c15475133c692988",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 1091
+  },
+  {
+    "name": "css_transforms",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\css_transforms.log",
+    "logSha256": "5890f78ca29b51c5d29d09139f3d93d92de5346d724bdd72119c2d52b6a278ba",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\css_transforms.py": "54a7f9684fdd0dbe7fc0fe361abb337b156fa5933f2645bbcf65cd5cc1dc55ba",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 405
+  },
+  {
+    "name": "svg_geometry",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\svg_geometry.log",
+    "logSha256": "2fe8049b46ffce2bd4b349dfdd7066caeda689ee3ec0dcdb9f86861c58ed76cb",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_geometry.py": "b357e1a83e97756d0a6d00038081320f0224927b61fa4cf5bc83b17586eb5be0",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 639
+  },
+  {
+    "name": "svg_surfaces",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\svg_surfaces.log",
+    "logSha256": "836c19207512a19d33faf26d61626eddb6f8dcca8d5f1c2b3b9551d69cc68a74",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_surfaces.py": "55b205b6aed085a4578b9eb7bf5460a57824071b803bd8a627e1f1a95acaf4d4",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 1594
+  },
+  {
+    "name": "svg_documents",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\svg_documents.log",
+    "logSha256": "70715fb4da194d2073a68d432087ae0b316e1b35fcd23c300fe24b150ecfa702",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_documents.py": "0e7ea4215e293457d8c20ec805acada6a4060e419694617e1a6350dae0afd8df",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 78
+  },
+  {
+    "name": "svg_view_controls",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\svg_view_controls.log",
+    "logSha256": "2dbdea20c9425e470f860ad8f303fbc8053ce0674e59f96ac24b28853324f6ca",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_view_controls.py": "546c573f0543e440cc19cb383885ab89d9a13e347aaa11d31524cf3382f83922",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 318
+  },
+  {
+    "name": "svg_animation_variants",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\svg_animation_variants.log",
+    "logSha256": "f1bfd6a2fac87ec95676243aaa313b97d3d9ecdbfbbeb172885a8d6eeb76daaf",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_animation_variants.py": "225b0aee8eeee99e8e955af74b388b84ed8df91352bdd7501aa95cdddbcf1f33",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 70
+  },
+  {
+    "name": "capabilities",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\capabilities.log",
+    "logSha256": "a6101bcd2fd662c1d2818f115cd3b44a1286a6fe11d708d8f3c0dc2e8d7fd960",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\capabilities.py": "af1faf6f7db4cee0714ae046629c73ca1b6859e9cff9c7e93cc8f84b9f36a793",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json"
+  },
+  {
+    "name": "svg_view_selection",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\svg_view_selection.log",
+    "logSha256": "9129587146d8041adb4c2084e5ba030df61241146fb6eb2b28b07f15dc63a859",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_view_selection.py": "afba67967d4e549d5bf05a84821c9a760b79d65489ad4b652d373ab7658b2aba",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json"
+  },
+  {
+    "name": "svg_paint_servers",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\svg_paint_servers.log",
+    "logSha256": "4fee53f7e062bb018ebea3b6218dfca73e4fe5cf6a563e36e925c18650dc3731",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_servers.py": "8a31036ef0907f0fa47424c49b925d4d7686f0501c22390329b6dad95c342296",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 565
+  },
+  {
+    "name": "svg_filters",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\svg_filters.log",
+    "logSha256": "866b9c9713548497e6e0a475a65b51c9097d8344f2a8f99073ee8c3a65d1ac32",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_filters.py": "f295b35ecd9afdc815107baf3ed68e22674ce2ab6b6dc52265135bb8724e641b",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 9086
+  },
+  {
+    "name": "svg_clip_mask_marker",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\svg_clip_mask_marker.log",
+    "logSha256": "e16f521e717f252b4f1ea93688bded2b355b95918481a3fe4c93e1c1770a0b55",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_clip_mask_marker.py": "cdc9c9e75b8d96f26a18f5b6741c1fc3fc1509e74ecc84f9cecc47e363af176c",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 565
+  },
+  {
+    "name": "svg_resources",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\svg_resources.log",
+    "logSha256": "a205f7e30a24e5a88f3d18a06349efafde93d4c2217bf46e5655bf2df54683ce",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_resources.py": "2e592c28b1ae5f396a24a262147bd283d16b16dd13f5d0ebc9040234c1dc43c4",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 454
+  },
+  {
+    "name": "mathml_surface",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\mathml_surface.log",
+    "logSha256": "56d48519e6426f8dd3b9ce30e425e4bcdb8706a31bad44a061392e1d903d4ac5",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\mathml_surface.py": "e69e7c5fdbabae76ea5c0836883dcccfbde1dd19efb3161dd21bbfba8d0d22f2",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 371
+  },
+  {
+    "name": "svg_tests_lists",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\svg_tests_lists.log",
+    "logSha256": "acf281005da2802259647ade5f0a0d4ee2599f3d9012e65ccadad5643e3f7d4e",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_tests_lists.py": "2ce6eb3ac5f10ca2f9a3e9ba8a5285912b05172acc0b51823008e294dd308b6f",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 191
+  },
+  {
+    "name": "frames",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\frames.log",
+    "logSha256": "3d85eac6a25ed2c0455a1ccb8585ba67bab332881710e9fe695ae3eaa3ca6f01",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\brotlidec.dll": "d42e2160f76f29a91f8be01b009b585c45496219794e16eab90b3599b6f70a7f",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\FSharp.Core.dll": "1af305b7625c30a54d141caf805c5b0b5a8f6166fb5cef22e3570f55d33152bd",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\harfbuzz-icu.dll": "27662b477f7cb0c20cee64543a06296a48a00a17b6c7b57629bb166a30d5b164",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\harfbuzz.dll": "b519b2abc7f446ca45bff77aae1708f45afc9f557698bcd7295837cce0f12bfa",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\icudt77.dll": "b00d2fb856f548608c137e771257a70d0722654535c6c00b371c0fab3e2b802c",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\icuin77.dll": "e3785739e1fcf2e38053bbb85ef5f0f5dab63f865cbda762da5258566085a240",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\icuuc77.dll": "189c623f996c41488c262867bae04a5bb33dd485bd423e0a8bec05c455a90902",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\jpeg62.dll": "394811c1b1bf1fd914248a145ba3fcad1f5f27c7009754ce08e48ccb0266b785",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\libpng16.dll": "8b46592c5ea338dd6b23ca380d6db64a7849c2a534fc465a006ec668645d8185",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\libsharpyuv.dll": "df165de83480692f494c23061ef9c40c10abe19a89b1fa9fae2f1cd5152c07a7",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\libwebp.dll": "550c5a4860f61d32a274fdd7b5c8cbe266eee28b3a3ca888195248ea1d5e0f71",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\libwebpdemux.dll": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\RanvierWebCoreAbi.Driver.deps.json": "2826e597f87f7fb5628983d27e7fe294021913b60b1b6213bfeb6959cc0bc21a",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\RanvierWebCoreAbi.Driver.dll": "33a19784ef814e39c1ecde640e0ba6ab34f1a2b4f4336d0e75c2025c77cac8b0",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\RanvierWebCoreAbi.Driver.exe": "f667e59ab4d699622c2ebb49fa9ad8e392d8579ff611ab11bb79172c95cca42d",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\RanvierWebCoreAbi.Driver.runtimeconfig.json": "2ca90a18bac3b48286c20acd3c1ae4f83fa38de5acf4b2f8cdd277bf90dc9bd7",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\RanvierWebCoreHost.dll": "513c77c6ad6c0ee500eb635166115cc924d590aa7d32f91b9a6d77f75e544830",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\WebCore.dll": "1bffd0854e2cbe410a05cac9731db884a49f839f930e1a8306d3a99077466786",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\zlib1.dll": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\cs\\FSharp.Core.resources.dll": "6521e3ed8998a2121fdf0951a7320741de7776d100236e3d54f395b781378cf5",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\de\\FSharp.Core.resources.dll": "7b4d4497c939f00e9f77f4ea1544f47a719c9a656fc35f5a23fc05cd08b82766",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\es\\FSharp.Core.resources.dll": "fe48943a4daf55a4a914bd0e4ab280c6debf6e9f02da51721ac7e13c809e452f",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\fr\\FSharp.Core.resources.dll": "a9d4712165ffbb3c076e3aaf51458f6d5aed384ffd3316d7013f54a02e5355cb",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\it\\FSharp.Core.resources.dll": "96f9668d451cf6226ed24400c8ccafe09a175afc15c00d5e2850a6def454afa6",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\ja\\FSharp.Core.resources.dll": "df268f8e7e061a265e9733b6dea143d634d32bd5dc6e98d2ff657a3a5449bf46",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\ko\\FSharp.Core.resources.dll": "2fd195fb6b16dbb24021f721585326c466b1cd1b1305aee5dd5867326d3ee7fe",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\pl\\FSharp.Core.resources.dll": "a1cf152aa5faede420a9f240b4029c6387602153bedde7d98b04ef124420e052",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\pt-BR\\FSharp.Core.resources.dll": "627a76d378b62e3536f7f8ef1513523b37129a780e17328ee447a7ee3bdf43bb",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\ru\\FSharp.Core.resources.dll": "ffc8ca0e104be87dbc963ecdbb8029d614b7d22b1911e7188340076c2a4eb616",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\tr\\FSharp.Core.resources.dll": "184a8ed7b221fa260c5522dee0fc3575993e5a04989d29b7e37a0c64a7f468ed",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\zh-Hans\\FSharp.Core.resources.dll": "9e4a6d6d399ed610d47091498cb3c2bd1b98e6e4bcd6cb803975e3fcb86c1e1e",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\zh-Hant\\FSharp.Core.resources.dll": "bb2e84215725b906da250a2473dc56d1a6fc0f5aecfdf4e30beb81d07a3f7b56"
+    },
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json"
+  },
+  {
+    "name": "teardown",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-full-batch\\teardown.log",
+    "logSha256": "e327895418238dd4b2fcfa6aa326a39b6c99cf6fcc784626b74a30aeb065a277",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\brotlidec.dll": "d42e2160f76f29a91f8be01b009b585c45496219794e16eab90b3599b6f70a7f",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\FSharp.Core.dll": "1af305b7625c30a54d141caf805c5b0b5a8f6166fb5cef22e3570f55d33152bd",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\harfbuzz-icu.dll": "27662b477f7cb0c20cee64543a06296a48a00a17b6c7b57629bb166a30d5b164",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\harfbuzz.dll": "b519b2abc7f446ca45bff77aae1708f45afc9f557698bcd7295837cce0f12bfa",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\icudt77.dll": "b00d2fb856f548608c137e771257a70d0722654535c6c00b371c0fab3e2b802c",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\icuin77.dll": "e3785739e1fcf2e38053bbb85ef5f0f5dab63f865cbda762da5258566085a240",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\icuuc77.dll": "189c623f996c41488c262867bae04a5bb33dd485bd423e0a8bec05c455a90902",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\jpeg62.dll": "394811c1b1bf1fd914248a145ba3fcad1f5f27c7009754ce08e48ccb0266b785",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\libpng16.dll": "8b46592c5ea338dd6b23ca380d6db64a7849c2a534fc465a006ec668645d8185",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\libsharpyuv.dll": "df165de83480692f494c23061ef9c40c10abe19a89b1fa9fae2f1cd5152c07a7",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\libwebp.dll": "550c5a4860f61d32a274fdd7b5c8cbe266eee28b3a3ca888195248ea1d5e0f71",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\libwebpdemux.dll": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\RanvierWebCoreAbi.Driver.deps.json": "2826e597f87f7fb5628983d27e7fe294021913b60b1b6213bfeb6959cc0bc21a",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\RanvierWebCoreAbi.Driver.dll": "33a19784ef814e39c1ecde640e0ba6ab34f1a2b4f4336d0e75c2025c77cac8b0",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\RanvierWebCoreAbi.Driver.exe": "f667e59ab4d699622c2ebb49fa9ad8e392d8579ff611ab11bb79172c95cca42d",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\RanvierWebCoreAbi.Driver.runtimeconfig.json": "2ca90a18bac3b48286c20acd3c1ae4f83fa38de5acf4b2f8cdd277bf90dc9bd7",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\RanvierWebCoreHost.dll": "513c77c6ad6c0ee500eb635166115cc924d590aa7d32f91b9a6d77f75e544830",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\WebCore.dll": "1bffd0854e2cbe410a05cac9731db884a49f839f930e1a8306d3a99077466786",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\zlib1.dll": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\cs\\FSharp.Core.resources.dll": "6521e3ed8998a2121fdf0951a7320741de7776d100236e3d54f395b781378cf5",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\de\\FSharp.Core.resources.dll": "7b4d4497c939f00e9f77f4ea1544f47a719c9a656fc35f5a23fc05cd08b82766",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\es\\FSharp.Core.resources.dll": "fe48943a4daf55a4a914bd0e4ab280c6debf6e9f02da51721ac7e13c809e452f",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\fr\\FSharp.Core.resources.dll": "a9d4712165ffbb3c076e3aaf51458f6d5aed384ffd3316d7013f54a02e5355cb",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\it\\FSharp.Core.resources.dll": "96f9668d451cf6226ed24400c8ccafe09a175afc15c00d5e2850a6def454afa6",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\ja\\FSharp.Core.resources.dll": "df268f8e7e061a265e9733b6dea143d634d32bd5dc6e98d2ff657a3a5449bf46",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\ko\\FSharp.Core.resources.dll": "2fd195fb6b16dbb24021f721585326c466b1cd1b1305aee5dd5867326d3ee7fe",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\pl\\FSharp.Core.resources.dll": "a1cf152aa5faede420a9f240b4029c6387602153bedde7d98b04ef124420e052",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\pt-BR\\FSharp.Core.resources.dll": "627a76d378b62e3536f7f8ef1513523b37129a780e17328ee447a7ee3bdf43bb",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\ru\\FSharp.Core.resources.dll": "ffc8ca0e104be87dbc963ecdbb8029d614b7d22b1911e7188340076c2a4eb616",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\tr\\FSharp.Core.resources.dll": "184a8ed7b221fa260c5522dee0fc3575993e5a04989d29b7e37a0c64a7f468ed",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\zh-Hans\\FSharp.Core.resources.dll": "9e4a6d6d399ed610d47091498cb3c2bd1b98e6e4bcd6cb803975e3fcb86c1e1e",
+      "C:\\wk\\native-mathml\\artifacts\\mathml-driver-23-0034b\\zh-Hant\\FSharp.Core.resources.dll": "bb2e84215725b906da250a2473dc56d1a6fc0f5aecfdf4e30beb81d07a3f7b56"
+    },
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json"
+  }
+]

@@ -11,6 +11,11 @@ open RanvierWebCoreAbi.NativeDom
 let private html =
     "<!doctype html><html><head><title>Dom</title></head><body><div id=box class=\"a b\" data-x=1><span id=s1>one</span><span>two</span></div><input id=field value=hello><select id=pick><option>A</option><option selected>B</option></select></body></html>"
 
+/// The UTF-8 bytes of a generated string input, passed with utf8Length of the same value.
+let private utf8 (value: string) = System.Text.Encoding.UTF8.GetBytes value
+
+let private utf8Length (value: string) = System.Text.Encoding.UTF8.GetByteCount value
+
 let private require condition (message: string) =
     if not condition then
         failwith $"ASSERTION FAILED: {message}"
@@ -38,9 +43,9 @@ let run (_: string) =
         text "element_get_id" (fun b c l -> rv_dom_element_get_id (box.Handle, b, c, l))
 
     require (id () = "box") "Element.id getter"
-    rv_dom_element_set_id (box.Handle, "panel") |> check "element_set_id"
+    rv_dom_element_set_id (box.Handle, utf8 "panel", utf8Length "panel") |> check "element_set_id"
     require (id () = "panel") "Element.id setter"
-    rv_dom_element_set_id (box.Handle, "box") |> check "element_set_id"
+    rv_dom_element_set_id (box.Handle, utf8 "box", utf8Length "box") |> check "element_set_id"
 
     let tag =
         text "element_get_tag_name" (fun b c l -> rv_dom_element_get_tag_name (box.Handle, b, c, l))
@@ -49,7 +54,7 @@ let run (_: string) =
 
     // A nullable string result: getAttribute of a missing attribute is null.
     let attribute name =
-        text "element_get_attribute" (fun b c l -> rv_dom_element_get_attribute (box.Handle, name, b, c, l))
+        text "element_get_attribute" (fun b c l -> rv_dom_element_get_attribute (box.Handle, utf8 name, utf8Length name, b, c, l))
 
     require (attribute "data-x" = "1") "Element.getAttribute"
     require (isNull (attribute "data-missing")) "Element.getAttribute of a missing attribute is null"
@@ -57,17 +62,17 @@ let run (_: string) =
     // An optional boolean argument without a default: NULL toggles, a value forces.
     let mutable present = 0
 
-    rv_dom_element_toggle_attribute (box.Handle, "hidden", null, &present)
+    rv_dom_element_toggle_attribute (box.Handle, utf8 "hidden", utf8Length "hidden", null, &present)
     |> check "element_toggle_attribute"
 
     require (present = 1) "toggleAttribute with force absent adds the attribute"
 
-    rv_dom_element_toggle_attribute (box.Handle, "hidden", [| 1 |], &present)
+    rv_dom_element_toggle_attribute (box.Handle, utf8 "hidden", utf8Length "hidden", [| 1 |], &present)
     |> check "element_toggle_attribute"
 
     require (present = 1) "toggleAttribute with force true keeps it"
 
-    rv_dom_element_toggle_attribute (box.Handle, "hidden", null, &present)
+    rv_dom_element_toggle_attribute (box.Handle, utf8 "hidden", utf8Length "hidden", null, &present)
     |> check "element_toggle_attribute"
 
     require (present = 0) "toggleAttribute with force absent removes it"
@@ -78,7 +83,7 @@ let run (_: string) =
 
     require (value () = "hello") "HTMLInputElement.value getter"
 
-    rv_dom_html_input_element_set_value (field.Handle, "native")
+    rv_dom_html_input_element_set_value (field.Handle, utf8 "native", utf8Length "native")
     |> check "input_set_value"
 
     require (value () = "native") "HTMLInputElement.value setter"
@@ -91,7 +96,7 @@ let run (_: string) =
 
     require (hasSelection = 1) "selectionStart of a text input is present"
 
-    rv_dom_html_input_element_set_type (field.Handle, "checkbox")
+    rv_dom_html_input_element_set_type (field.Handle, utf8 "checkbox", utf8Length "checkbox")
     |> check "input_set_type"
 
     rv_dom_html_input_element_get_selection_start (field.Handle, &selectionStart, &hasSelection)
@@ -114,7 +119,7 @@ let run (_: string) =
 
     let disabledAttribute =
         readString "element_get_attribute" (fun b c l ->
-            rv_dom_element_get_attribute (field.Handle, "disabled", b, c, l))
+            rv_dom_element_get_attribute (field.Handle, utf8 "disabled", utf8Length "disabled", b, c, l))
 
     require (disabledAttribute = "") "a reflected boolean sets its content attribute"
 
@@ -124,7 +129,7 @@ let run (_: string) =
     require (exceptionName () = "IndexSizeError") "the exception is IndexSizeError"
 
     // The interface check: an input member on a div.
-    let wrong = rv_dom_html_input_element_set_value (box.Handle, "x")
+    let wrong = rv_dom_html_input_element_set_value (box.Handle, utf8 "x", utf8Length "x")
 
     require (wrong = WrongInterface) $"an HTMLInputElement member on a div returns RV_ERR_WRONG_INTERFACE, got {wrong}"
 
@@ -132,7 +137,7 @@ let run (_: string) =
     use document = new Node(rv_host_document host.Handle)
     let mutable created = 0n
 
-    rv_dom_document_create_text_node (document.Handle, "three", &created)
+    rv_dom_document_create_text_node (document.Handle, utf8 "three", utf8Length "three", &created)
     |> check "document_create_text_node"
 
     use createdNode = new Node(created)
@@ -152,20 +157,20 @@ let run (_: string) =
     // Mixins: ParentNode.querySelector on an element, with an invalid selector throwing.
     let mutable found = 0n
 
-    rv_dom_element_query_selector (box.Handle, "span", &found)
+    rv_dom_element_query_selector (box.Handle, utf8 "span", utf8Length "span", &found)
     |> check "element_query_selector"
 
     use first = new Node(found)
     require (rv_node_contains (box.Handle, first.Handle) = 1) "querySelector finds a descendant"
 
     let mutable none = 0n
-    let invalid = rv_dom_element_query_selector (box.Handle, "[", &none)
+    let invalid = rv_dom_element_query_selector (box.Handle, utf8 "[", utf8Length "[", &none)
     require (invalid = DomException && exceptionName () = "SyntaxError") "an invalid selector throws SyntaxError"
 
     // Object handles: NodeList, DOMTokenList and CSSStyleDeclaration.
     let mutable list = 0n
 
-    rv_dom_element_query_selector_all (box.Handle, "span", &list)
+    rv_dom_element_query_selector_all (box.Handle, utf8 "span", utf8Length "span", &list)
     |> check "element_query_selector_all"
 
     let mutable count = 0u
@@ -186,10 +191,10 @@ let run (_: string) =
 
     let mutable has = 0
 
-    rv_dom_dom_token_list_toggle (classes, "c", null, &has)
+    rv_dom_dom_token_list_toggle (classes, utf8 "c", utf8Length "c", null, &has)
     |> check "dom_token_list_toggle"
 
-    rv_dom_dom_token_list_contains (classes, "b", &has)
+    rv_dom_dom_token_list_contains (classes, utf8 "b", utf8Length "b", &has)
     |> check "dom_token_list_contains"
 
     require (has = 1) "DOMTokenList.contains"
@@ -211,12 +216,12 @@ let run (_: string) =
     rv_dom_html_element_get_style (box.Handle, &style)
     |> check "html_element_get_style"
 
-    rv_dom_css_style_declaration_set_property (style, "color", "rgb(1, 2, 3)", "")
+    rv_dom_css_style_declaration_set_property (style, utf8 "color", utf8Length "color", utf8 "rgb(1, 2, 3)", utf8Length "rgb(1, 2, 3)", utf8 "", utf8Length "")
     |> check "css_style_declaration_set_property"
 
     let color =
         text "get_property_value" (fun b c l ->
-            rv_dom_css_style_declaration_get_property_value (style, "color", b, c, l))
+            rv_dom_css_style_declaration_get_property_value (style, utf8 "color", utf8Length "color", b, c, l))
 
     require (color = "rgb(1, 2, 3)") "CSSStyleDeclaration.setProperty and getPropertyValue"
     rv_dom_css_style_declaration_release style
@@ -279,7 +284,7 @@ let run (_: string) =
     // String unions: innerHTML and setAttribute take (TrustedHTML or DOMString) as a C string.
     use holder = host.CreateElement "div"
 
-    rv_dom_element_set_inner_html (holder.Handle, "<b>bold</b>")
+    rv_dom_element_set_inner_html (holder.Handle, utf8 "<b>bold</b>", utf8Length "<b>bold</b>")
     |> check "element_set_inner_html"
 
     let inner =
@@ -287,11 +292,11 @@ let run (_: string) =
 
     require (inner = "<b>bold</b>") $"Element.innerHTML through a string union: {inner}"
 
-    rv_dom_element_set_attribute (holder.Handle, "data-y", "2")
+    rv_dom_element_set_attribute (holder.Handle, utf8 "data-y", utf8Length "data-y", utf8 "2", utf8Length "2")
     |> check "element_set_attribute"
 
     let dataY =
-        text "element_get_attribute" (fun b c l -> rv_dom_element_get_attribute (holder.Handle, "data-y", b, c, l))
+        text "element_get_attribute" (fun b c l -> rv_dom_element_get_attribute (holder.Handle, utf8 "data-y", utf8Length "data-y", b, c, l))
 
     require (dataY = "2") "Element.setAttribute through a string union"
 
@@ -302,16 +307,16 @@ let run (_: string) =
     |> check "html_element_get_dataset"
 
     let named key =
-        text "dom_string_map_named_item" (fun b c l -> rv_dom_dom_string_map_named_item (dataset, key, b, c, l))
+        text "dom_string_map_named_item" (fun b c l -> rv_dom_dom_string_map_named_item (dataset, utf8 key, utf8Length key, b, c, l))
 
     require (named "x" = "1") "dataset.x"
 
-    rv_dom_dom_string_map_set_named_item (dataset, "fooBar", "v")
+    rv_dom_dom_string_map_set_named_item (dataset, utf8 "fooBar", utf8Length "fooBar", utf8 "v", utf8Length "v")
     |> check "dom_string_map_set_named_item"
 
     require (attribute "data-foo-bar" = "v") "dataset.fooBar sets data-foo-bar"
 
-    rv_dom_dom_string_map_delete_named_property (dataset, "fooBar")
+    rv_dom_dom_string_map_delete_named_property (dataset, utf8 "fooBar", utf8Length "fooBar")
     |> check "dom_string_map_delete_named_property"
 
     require (isNull (attribute "data-foo-bar")) "deleting dataset.fooBar removes data-foo-bar"
@@ -362,7 +367,7 @@ let run (_: string) =
     // HTMLSlotElement.
     use slot = host.CreateElement "slot"
 
-    rv_dom_html_slot_element_set_name (slot.Handle, "header")
+    rv_dom_html_slot_element_set_name (slot.Handle, utf8 "header", utf8Length "header")
     |> check "html_slot_element_set_name"
 
     let slotName =
@@ -424,7 +429,7 @@ let run (_: string) =
     let mutable threadStatus = 0
 
     let worker =
-        Thread(fun () -> threadStatus <- rv_dom_element_set_id (box.Handle, "elsewhere"))
+        Thread(fun () -> threadStatus <- rv_dom_element_set_id (box.Handle, utf8 "elsewhere", utf8Length "elsewhere"))
 
     worker.Start()
     worker.Join()

@@ -1,0 +1,366 @@
+{
+  "browser": "156.0.8078.4",
+  "headless": "new (channel chromium)",
+  "fixture": "tests/fixtures/cascade-diagnostics.html",
+  "viewport": [
+    320,
+    240
+  ],
+  "cases": [
+    {
+      "name": "specificity",
+      "element": "spec",
+      "property": "order",
+      "expected": 1,
+      "computed": "1",
+      "matchesFixture": true
+    },
+    {
+      "name": "source order",
+      "element": "src",
+      "property": "order",
+      "expected": 5,
+      "computed": "5",
+      "matchesFixture": true
+    },
+    {
+      "name": "specificity over source order",
+      "element": "wh",
+      "property": "order",
+      "expected": 6,
+      "computed": "6",
+      "matchesFixture": true
+    },
+    {
+      "name": "important over specificity",
+      "element": "imp",
+      "property": "order",
+      "expected": 8,
+      "computed": "8",
+      "matchesFixture": true
+    },
+    {
+      "name": "unlayered over layers",
+      "element": "lay",
+      "property": "order",
+      "expected": 12,
+      "computed": "12",
+      "matchesFixture": true
+    },
+    {
+      "name": "important reverses layer order",
+      "element": "limp",
+      "property": "order",
+      "expected": 13,
+      "computed": "13",
+      "matchesFixture": true
+    },
+    {
+      "name": "anonymous layer after named",
+      "element": "anon",
+      "property": "order",
+      "expected": 17,
+      "computed": "17",
+      "matchesFixture": true
+    },
+    {
+      "name": "import layer first",
+      "element": "imported",
+      "property": "order",
+      "expected": 31,
+      "computed": "31",
+      "matchesFixture": true
+    },
+    {
+      "name": "sublayer before its parent",
+      "element": "nest",
+      "property": "order",
+      "expected": 33,
+      "computed": "33",
+      "matchesFixture": true
+    },
+    {
+      "name": "inline over author",
+      "element": "inl",
+      "property": "order",
+      "expected": 19,
+      "computed": "19",
+      "matchesFixture": true
+    },
+    {
+      "name": "author important over inline",
+      "element": "inl2",
+      "property": "order",
+      "expected": 20,
+      "computed": "20",
+      "matchesFixture": true
+    },
+    {
+      "name": "inline important over author important",
+      "element": "inl3",
+      "property": "order",
+      "expected": 23,
+      "computed": "23",
+      "matchesFixture": true
+    },
+    {
+      "name": "user-agent important over author important",
+      "element": "uaimp",
+      "property": "display",
+      "expected": "none",
+      "computed": "none",
+      "matchesFixture": true
+    },
+    {
+      "name": "author over user agent",
+      "element": "uap",
+      "property": "margin-top",
+      "expected": 3,
+      "computed": "3px",
+      "matchesFixture": true
+    },
+    {
+      "name": "user agent alone",
+      "element": "uaonly",
+      "property": "margin-top",
+      "expected": 16,
+      "computed": "16px",
+      "matchesFixture": true
+    },
+    {
+      "name": "presentational hint",
+      "element": "hint",
+      "property": "width",
+      "expected": 30,
+      "computed": "30px",
+      "matchesFixture": true
+    },
+    {
+      "name": "author over presentational hint",
+      "element": "hint2",
+      "property": "width",
+      "expected": 33,
+      "computed": "33px",
+      "matchesFixture": true
+    },
+    {
+      "name": "shorthand longhand",
+      "element": "sh",
+      "property": "margin-top",
+      "expected": 7,
+      "computed": "7px",
+      "matchesFixture": true
+    },
+    {
+      "name": "vertical logical over physical",
+      "element": "vt",
+      "property": "margin-top",
+      "expected": 71,
+      "computed": "71px",
+      "matchesFixture": true
+    },
+    {
+      "name": "vertical physical counterpart",
+      "element": "vt",
+      "property": "margin-inline-start",
+      "expected": 71,
+      "computed": "71px",
+      "matchesFixture": true
+    },
+    {
+      "name": "horizontal physical over logical",
+      "element": "hz",
+      "property": "margin-left",
+      "expected": 73,
+      "computed": "73px",
+      "matchesFixture": true
+    },
+    {
+      "name": "logical pair across rules",
+      "element": "hz2",
+      "property": "margin-left",
+      "expected": 74,
+      "computed": "74px",
+      "matchesFixture": true
+    },
+    {
+      "name": "custom property",
+      "element": "cv",
+      "property": "--x",
+      "expected": 41,
+      "computed": "41",
+      "matchesFixture": true
+    },
+    {
+      "name": "unregistered custom property inherits",
+      "element": "cvkid",
+      "property": "--x",
+      "expected": 41,
+      "computed": "41",
+      "matchesFixture": true
+    },
+    {
+      "name": "registered inherits true",
+      "element": "rikid",
+      "property": "--reg-inh",
+      "expected": 43,
+      "computed": "43",
+      "matchesFixture": true
+    },
+    {
+      "name": "registered inherits false",
+      "element": "rnkid",
+      "property": "--reg-no",
+      "expected": 0,
+      "computed": "0",
+      "matchesFixture": true
+    },
+    {
+      "name": "registered own declaration",
+      "element": "rn",
+      "property": "--reg-no",
+      "expected": 44,
+      "computed": "44",
+      "matchesFixture": true
+    },
+    {
+      "name": "inherit chain",
+      "element": "ch3",
+      "property": "order",
+      "expected": 50,
+      "computed": "50",
+      "matchesFixture": true
+    },
+    {
+      "name": "unset inherited chain",
+      "element": "u3",
+      "property": "tab-size",
+      "expected": 5,
+      "computed": "5",
+      "matchesFixture": true
+    },
+    {
+      "name": "unset non-inherited",
+      "element": "nu2",
+      "property": "order",
+      "expected": 0,
+      "computed": "0",
+      "matchesFixture": true
+    },
+    {
+      "name": "no declaration, not inherited",
+      "element": "plain",
+      "property": "order",
+      "expected": 0,
+      "computed": "0",
+      "matchesFixture": true
+    },
+    {
+      "name": "no declaration to the root",
+      "element": "plain",
+      "property": "tab-size",
+      "expected": 8,
+      "computed": "8",
+      "matchesFixture": true
+    },
+    {
+      "name": "var reference",
+      "element": "var",
+      "property": "order",
+      "expected": 60,
+      "computed": "60",
+      "matchesFixture": true
+    },
+    {
+      "name": "media and supports conditions",
+      "element": "cond",
+      "property": "order",
+      "expected": 61,
+      "computed": "61",
+      "matchesFixture": true
+    },
+    {
+      "name": "container condition",
+      "element": "cq",
+      "property": "order",
+      "expected": 62,
+      "computed": "62",
+      "matchesFixture": true
+    },
+    {
+      "name": "host rules in the shadow tree",
+      "element": "hh",
+      "property": "flex-shrink",
+      "expected": 7,
+      "computed": "7",
+      "matchesFixture": true
+    },
+    {
+      "name": "outer rule over a host rule",
+      "element": "hh",
+      "property": "order",
+      "expected": 69,
+      "computed": "69",
+      "matchesFixture": true
+    },
+    {
+      "name": "important host rule over an important outer rule",
+      "element": "hh",
+      "property": "tab-size",
+      "expected": 6,
+      "computed": "6",
+      "matchesFixture": true
+    },
+    {
+      "name": "slotted rules",
+      "element": "sl",
+      "property": "opacity",
+      "expected": 0.25,
+      "computed": "0.25",
+      "matchesFixture": true
+    },
+    {
+      "name": "outer rule over a slotted rule",
+      "element": "sl",
+      "property": "order",
+      "expected": 68,
+      "computed": "68",
+      "matchesFixture": true
+    },
+    {
+      "name": "outer part rule over an inner rule",
+      "element": "hh/pt",
+      "property": "order",
+      "expected": 77,
+      "computed": "77",
+      "matchesFixture": true
+    },
+    {
+      "name": "important inner rule over an important part rule",
+      "element": "hh/pt2",
+      "property": "order",
+      "expected": 76,
+      "computed": "76",
+      "matchesFixture": true
+    },
+    {
+      "name": "inheritance into slotted content",
+      "element": "inh",
+      "property": "color",
+      "expected": "rgb(1, 2, 3)",
+      "computed": "rgb(1, 2, 3)",
+      "matchesFixture": true
+    },
+    {
+      "name": "custom property inherited from the host",
+      "element": "inh",
+      "property": "--sh",
+      "expected": 80,
+      "computed": "80",
+      "matchesFixture": true
+    }
+  ],
+  "unsupported": {
+    "cascade": "no web API lists the declarations contributing to a property, their origin, layer or position, or the winner"
+  }
+}

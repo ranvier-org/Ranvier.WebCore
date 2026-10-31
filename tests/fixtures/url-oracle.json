@@ -1,0 +1,4256 @@
+{
+ "browser": "156.0.8078.4",
+ "parse": [
+  {
+   "url": {
+    "href": "http://example.com/a/c/d",
+    "origin": "http://example.com",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "example.com",
+    "hostname": "example.com",
+    "port": "",
+    "pathname": "/a/c/d",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://example.com/a/c/d",
+   "json": "http://example.com/a/c/d"
+  },
+  {
+   "url": {
+    "href": "http://h.test/a/x?y#z",
+    "origin": "http://h.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "h.test",
+    "hostname": "h.test",
+    "port": "",
+    "pathname": "/a/x",
+    "search": "?y",
+    "hash": "#z"
+   },
+   "canParse": true,
+   "parse": "http://h.test/a/x?y#z",
+   "json": "http://h.test/a/x?y#z"
+  },
+  {
+   "url": {
+    "href": "http://h.test/a/b/",
+    "origin": "http://h.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "h.test",
+    "hostname": "h.test",
+    "port": "",
+    "pathname": "/a/b/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://h.test/a/b/",
+   "json": "http://h.test/a/b/"
+  },
+  {
+   "url": {
+    "href": "http://h.test/a/",
+    "origin": "http://h.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "h.test",
+    "hostname": "h.test",
+    "port": "",
+    "pathname": "/a/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://h.test/a/",
+   "json": "http://h.test/a/"
+  },
+  {
+   "url": {
+    "href": "http://h.test/x",
+    "origin": "http://h.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "h.test",
+    "hostname": "h.test",
+    "port": "",
+    "pathname": "/x",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://h.test/x",
+   "json": "http://h.test/x"
+  },
+  {
+   "url": {
+    "href": "http://h.test/abs",
+    "origin": "http://h.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "h.test",
+    "hostname": "h.test",
+    "port": "",
+    "pathname": "/abs",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://h.test/abs",
+   "json": "http://h.test/abs"
+  },
+  {
+   "url": {
+    "href": "https://other.test/p",
+    "origin": "https://other.test",
+    "protocol": "https:",
+    "username": "",
+    "password": "",
+    "host": "other.test",
+    "hostname": "other.test",
+    "port": "",
+    "pathname": "/p",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "https://other.test/p",
+   "json": "https://other.test/p"
+  },
+  {
+   "url": {
+    "href": "http://h.test/a/b?q=1",
+    "origin": "http://h.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "h.test",
+    "hostname": "h.test",
+    "port": "",
+    "pathname": "/a/b",
+    "search": "?q=1",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://h.test/a/b?q=1",
+   "json": "http://h.test/a/b?q=1"
+  },
+  {
+   "url": {
+    "href": "http://h.test/a?b#frag",
+    "origin": "http://h.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "h.test",
+    "hostname": "h.test",
+    "port": "",
+    "pathname": "/a",
+    "search": "?b",
+    "hash": "#frag"
+   },
+   "canParse": true,
+   "parse": "http://h.test/a?b#frag",
+   "json": "http://h.test/a?b#frag"
+  },
+  {
+   "url": {
+    "href": "http://h.test/a/b?q",
+    "origin": "http://h.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "h.test",
+    "hostname": "h.test",
+    "port": "",
+    "pathname": "/a/b",
+    "search": "?q",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://h.test/a/b?q",
+   "json": "http://h.test/a/b?q"
+  },
+  {
+   "url": {
+    "href": "http://a/b/c/g;x?y#s",
+    "origin": "http://a",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "a",
+    "hostname": "a",
+    "port": "",
+    "pathname": "/b/c/g;x",
+    "search": "?y",
+    "hash": "#s"
+   },
+   "canParse": true,
+   "parse": "http://a/b/c/g;x?y#s",
+   "json": "http://a/b/c/g;x?y#s"
+  },
+  {
+   "url": {
+    "href": "http://a/b/c/h",
+    "origin": "http://a",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "a",
+    "hostname": "a",
+    "port": "",
+    "pathname": "/b/c/h",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://a/b/c/h",
+   "json": "http://a/b/c/h"
+  },
+  {
+   "url": {
+    "href": "https://h.test/a/other",
+    "origin": "https://h.test",
+    "protocol": "https:",
+    "username": "",
+    "password": "",
+    "host": "h.test",
+    "hostname": "h.test",
+    "port": "",
+    "pathname": "/a/other",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "https://h.test/a/other",
+   "json": "https://h.test/a/other"
+  },
+  {
+   "url": {
+    "error": "TypeError"
+   },
+   "canParse": false,
+   "parse": null,
+   "json": {
+    "error": "TypeError"
+   }
+  },
+  {
+   "url": {
+    "href": "http://example.com/",
+    "origin": "http://example.com",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "example.com",
+    "hostname": "example.com",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://example.com/",
+   "json": "http://example.com/"
+  },
+  {
+   "url": {
+    "href": "https://example.com/x",
+    "origin": "https://example.com",
+    "protocol": "https:",
+    "username": "",
+    "password": "",
+    "host": "example.com",
+    "hostname": "example.com",
+    "port": "",
+    "pathname": "/x",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "https://example.com/x",
+   "json": "https://example.com/x"
+  },
+  {
+   "url": {
+    "href": "http://example.com:8080/x",
+    "origin": "http://example.com:8080",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "example.com:8080",
+    "hostname": "example.com",
+    "port": "8080",
+    "pathname": "/x",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://example.com:8080/x",
+   "json": "http://example.com:8080/x"
+  },
+  {
+   "url": {
+    "href": "http://example.com:65535/",
+    "origin": "http://example.com:65535",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "example.com:65535",
+    "hostname": "example.com",
+    "port": "65535",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://example.com:65535/",
+   "json": "http://example.com:65535/"
+  },
+  {
+   "url": {
+    "error": "TypeError"
+   },
+   "canParse": false,
+   "parse": null,
+   "json": {
+    "error": "TypeError"
+   }
+  },
+  {
+   "url": {
+    "href": "http://a.test/",
+    "origin": "http://a.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://a.test/",
+   "json": "http://a.test/"
+  },
+  {
+   "url": {
+    "href": "ws://a.test/",
+    "origin": "ws://a.test",
+    "protocol": "ws:",
+    "username": "",
+    "password": "",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "ws://a.test/",
+   "json": "ws://a.test/"
+  },
+  {
+   "url": {
+    "href": "wss://a.test/",
+    "origin": "wss://a.test",
+    "protocol": "wss:",
+    "username": "",
+    "password": "",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "wss://a.test/",
+   "json": "wss://a.test/"
+  },
+  {
+   "url": {
+    "href": "ftp://a.test/",
+    "origin": "ftp://a.test",
+    "protocol": "ftp:",
+    "username": "",
+    "password": "",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "ftp://a.test/",
+   "json": "ftp://a.test/"
+  },
+  {
+   "url": {
+    "href": "http://[::1]:3000/",
+    "origin": "http://[::1]:3000",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "[::1]:3000",
+    "hostname": "[::1]",
+    "port": "3000",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://[::1]:3000/",
+   "json": "http://[::1]:3000/"
+  },
+  {
+   "url": {
+    "href": "http://[::1]/",
+    "origin": "http://[::1]",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "[::1]",
+    "hostname": "[::1]",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://[::1]/",
+   "json": "http://[::1]/"
+  },
+  {
+   "url": {
+    "href": "http://[1::]/",
+    "origin": "http://[1::]",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "[1::]",
+    "hostname": "[1::]",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://[1::]/",
+   "json": "http://[1::]/"
+  },
+  {
+   "url": {
+    "href": "http://[::7f00:1]/",
+    "origin": "http://[::7f00:1]",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "[::7f00:1]",
+    "hostname": "[::7f00:1]",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://[::7f00:1]/",
+   "json": "http://[::7f00:1]/"
+  },
+  {
+   "url": {
+    "error": "TypeError"
+   },
+   "canParse": false,
+   "parse": null,
+   "json": {
+    "error": "TypeError"
+   }
+  },
+  {
+   "url": {
+    "error": "TypeError"
+   },
+   "canParse": false,
+   "parse": null,
+   "json": {
+    "error": "TypeError"
+   }
+  },
+  {
+   "url": {
+    "error": "TypeError"
+   },
+   "canParse": false,
+   "parse": null,
+   "json": {
+    "error": "TypeError"
+   }
+  },
+  {
+   "url": {
+    "href": "http://127.0.0.1/",
+    "origin": "http://127.0.0.1",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "127.0.0.1",
+    "hostname": "127.0.0.1",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://127.0.0.1/",
+   "json": "http://127.0.0.1/"
+  },
+  {
+   "url": {
+    "href": "http://127.0.0.1/",
+    "origin": "http://127.0.0.1",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "127.0.0.1",
+    "hostname": "127.0.0.1",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://127.0.0.1/",
+   "json": "http://127.0.0.1/"
+  },
+  {
+   "url": {
+    "href": "http://127.0.0.1/",
+    "origin": "http://127.0.0.1",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "127.0.0.1",
+    "hostname": "127.0.0.1",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://127.0.0.1/",
+   "json": "http://127.0.0.1/"
+  },
+  {
+   "url": {
+    "href": "http://192.168.0.1/",
+    "origin": "http://192.168.0.1",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "192.168.0.1",
+    "hostname": "192.168.0.1",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://192.168.0.1/",
+   "json": "http://192.168.0.1/"
+  },
+  {
+   "url": {
+    "error": "TypeError"
+   },
+   "canParse": false,
+   "parse": null,
+   "json": {
+    "error": "TypeError"
+   }
+  },
+  {
+   "url": {
+    "error": "TypeError"
+   },
+   "canParse": false,
+   "parse": null,
+   "json": {
+    "error": "TypeError"
+   }
+  },
+  {
+   "url": {
+    "href": "http://xn--mnchen-3ya.de/",
+    "origin": "http://xn--mnchen-3ya.de",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "xn--mnchen-3ya.de",
+    "hostname": "xn--mnchen-3ya.de",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://xn--mnchen-3ya.de/",
+   "json": "http://xn--mnchen-3ya.de/"
+  },
+  {
+   "url": {
+    "href": "http://xn--mnchen-3ya.de/",
+    "origin": "http://xn--mnchen-3ya.de",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "xn--mnchen-3ya.de",
+    "hostname": "xn--mnchen-3ya.de",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://xn--mnchen-3ya.de/",
+   "json": "http://xn--mnchen-3ya.de/"
+  },
+  {
+   "url": {
+    "href": "http://example.com/",
+    "origin": "http://example.com",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "example.com",
+    "hostname": "example.com",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://example.com/",
+   "json": "http://example.com/"
+  },
+  {
+   "url": {
+    "href": "http://ex%20ample.com/",
+    "origin": "http://ex%20ample.com",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "ex%20ample.com",
+    "hostname": "ex%20ample.com",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://ex%20ample.com/",
+   "json": "http://ex%20ample.com/"
+  },
+  {
+   "url": {
+    "href": "http://exaample.com/",
+    "origin": "http://exaample.com",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "exaample.com",
+    "hostname": "exaample.com",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://exaample.com/",
+   "json": "http://exaample.com/"
+  },
+  {
+   "url": {
+    "error": "TypeError"
+   },
+   "canParse": false,
+   "parse": null,
+   "json": {
+    "error": "TypeError"
+   }
+  },
+  {
+   "url": {
+    "href": "http://example.com/a%20b/%C3%BC?q=a%20b&%C3%BC#f%20g",
+    "origin": "http://example.com",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "example.com",
+    "hostname": "example.com",
+    "port": "",
+    "pathname": "/a%20b/%C3%BC",
+    "search": "?q=a%20b&%C3%BC",
+    "hash": "#f%20g"
+   },
+   "canParse": true,
+   "parse": "http://example.com/a%20b/%C3%BC?q=a%20b&%C3%BC#f%20g",
+   "json": "http://example.com/a%20b/%C3%BC?q=a%20b&%C3%BC#f%20g"
+  },
+  {
+   "url": {
+    "href": "http://example.com/%zz/%41?%zz#%zz",
+    "origin": "http://example.com",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "example.com",
+    "hostname": "example.com",
+    "port": "",
+    "pathname": "/%zz/%41",
+    "search": "?%zz",
+    "hash": "#%zz"
+   },
+   "canParse": true,
+   "parse": "http://example.com/%zz/%41?%zz#%zz",
+   "json": "http://example.com/%zz/%41?%zz#%zz"
+  },
+  {
+   "url": {
+    "href": "http://example.com/%22%3C%3E%60%7B%7D%7C%5E",
+    "origin": "http://example.com",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "example.com",
+    "hostname": "example.com",
+    "port": "",
+    "pathname": "/%22%3C%3E%60%7B%7D%7C%5E",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://example.com/%22%3C%3E%60%7B%7D%7C%5E",
+   "json": "http://example.com/%22%3C%3E%60%7B%7D%7C%5E"
+  },
+  {
+   "url": {
+    "href": "http://example.com/?%22%3C%3E`%27",
+    "origin": "http://example.com",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "example.com",
+    "hostname": "example.com",
+    "port": "",
+    "pathname": "/",
+    "search": "?%22%3C%3E`%27",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://example.com/?%22%3C%3E`%27",
+   "json": "http://example.com/?%22%3C%3E`%27"
+  },
+  {
+   "url": {
+    "href": "http://example.com/#%22%3C%3E%60",
+    "origin": "http://example.com",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "example.com",
+    "hostname": "example.com",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": "#%22%3C%3E%60"
+   },
+   "canParse": true,
+   "parse": "http://example.com/#%22%3C%3E%60",
+   "json": "http://example.com/#%22%3C%3E%60"
+  },
+  {
+   "url": {
+    "href": "http://user:pa%20ss@host/",
+    "origin": "http://host",
+    "protocol": "http:",
+    "username": "user",
+    "password": "pa%20ss",
+    "host": "host",
+    "hostname": "host",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://user:pa%20ss@host/",
+   "json": "http://user:pa%20ss@host/"
+  },
+  {
+   "url": {
+    "href": "http://us%40er:p%40ss@host/",
+    "origin": "http://host",
+    "protocol": "http:",
+    "username": "us%40er",
+    "password": "p%40ss",
+    "host": "host",
+    "hostname": "host",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://us%40er:p%40ss@host/",
+   "json": "http://us%40er:p%40ss@host/"
+  },
+  {
+   "url": {
+    "href": "http://host/",
+    "origin": "http://host",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "host",
+    "hostname": "host",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://host/",
+   "json": "http://host/"
+  },
+  {
+   "url": {
+    "error": "TypeError"
+   },
+   "canParse": false,
+   "parse": null,
+   "json": {
+    "error": "TypeError"
+   }
+  },
+  {
+   "url": {
+    "error": "TypeError"
+   },
+   "canParse": false,
+   "parse": null,
+   "json": {
+    "error": "TypeError"
+   }
+  },
+  {
+   "url": {
+    "href": "file:///C:/x",
+    "origin": "file://",
+    "protocol": "file:",
+    "username": "",
+    "password": "",
+    "host": "",
+    "hostname": "",
+    "port": "",
+    "pathname": "/C:/x",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "file:///C:/x",
+   "json": "file:///C:/x"
+  },
+  {
+   "url": {
+    "href": "file:///C:/foo/bar",
+    "origin": "file://",
+    "protocol": "file:",
+    "username": "",
+    "password": "",
+    "host": "",
+    "hostname": "",
+    "port": "",
+    "pathname": "/C:/foo/bar",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "file:///C:/foo/bar",
+   "json": "file:///C:/foo/bar"
+  },
+  {
+   "url": {
+    "href": "file://server/share/f",
+    "origin": "file://",
+    "protocol": "file:",
+    "username": "",
+    "password": "",
+    "host": "server",
+    "hostname": "server",
+    "port": "",
+    "pathname": "/share/f",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "file://server/share/f",
+   "json": "file://server/share/f"
+  },
+  {
+   "url": {
+    "href": "file://localhost/etc/x",
+    "origin": "file://",
+    "protocol": "file:",
+    "username": "",
+    "password": "",
+    "host": "localhost",
+    "hostname": "localhost",
+    "port": "",
+    "pathname": "/etc/x",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "file://localhost/etc/x",
+   "json": "file://localhost/etc/x"
+  },
+  {
+   "url": {
+    "href": "file://host/share",
+    "origin": "file://",
+    "protocol": "file:",
+    "username": "",
+    "password": "",
+    "host": "host",
+    "hostname": "host",
+    "port": "",
+    "pathname": "/share",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "file://host/share",
+   "json": "file://host/share"
+  },
+  {
+   "url": {
+    "href": "file:///C:/x",
+    "origin": "file://",
+    "protocol": "file:",
+    "username": "",
+    "password": "",
+    "host": "",
+    "hostname": "",
+    "port": "",
+    "pathname": "/C:/x",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "file:///C:/x",
+   "json": "file:///C:/x"
+  },
+  {
+   "url": {
+    "href": "file:///C:/",
+    "origin": "file://",
+    "protocol": "file:",
+    "username": "",
+    "password": "",
+    "host": "",
+    "hostname": "",
+    "port": "",
+    "pathname": "/C:/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "file:///C:/",
+   "json": "file:///C:/"
+  },
+  {
+   "url": {
+    "href": "mailto:Someone@Example.com",
+    "origin": "null",
+    "protocol": "mailto:",
+    "username": "",
+    "password": "",
+    "host": "",
+    "hostname": "",
+    "port": "",
+    "pathname": "Someone@Example.com",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "mailto:Someone@Example.com",
+   "json": "mailto:Someone@Example.com"
+  },
+  {
+   "url": {
+    "href": "data:text/plain,hello world",
+    "origin": "null",
+    "protocol": "data:",
+    "username": "",
+    "password": "",
+    "host": "",
+    "hostname": "",
+    "port": "",
+    "pathname": "text/plain,hello world",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "data:text/plain,hello world",
+   "json": "data:text/plain,hello world"
+  },
+  {
+   "url": {
+    "href": "javascript:alert(1)",
+    "origin": "null",
+    "protocol": "javascript:",
+    "username": "",
+    "password": "",
+    "host": "",
+    "hostname": "",
+    "port": "",
+    "pathname": "alert(1)",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "javascript:alert(1)",
+   "json": "javascript:alert(1)"
+  },
+  {
+   "url": {
+    "href": "blob:https://a.test/uuid",
+    "origin": "https://a.test",
+    "protocol": "blob:",
+    "username": "",
+    "password": "",
+    "host": "",
+    "hostname": "",
+    "port": "",
+    "pathname": "https://a.test/uuid",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "blob:https://a.test/uuid",
+   "json": "blob:https://a.test/uuid"
+  },
+  {
+   "url": {
+    "href": "urn:isbn:0451450523",
+    "origin": "null",
+    "protocol": "urn:",
+    "username": "",
+    "password": "",
+    "host": "",
+    "hostname": "",
+    "port": "",
+    "pathname": "isbn:0451450523",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "urn:isbn:0451450523",
+   "json": "urn:isbn:0451450523"
+  },
+  {
+   "url": {
+    "href": "non-special://host/b",
+    "origin": "null",
+    "protocol": "non-special:",
+    "username": "",
+    "password": "",
+    "host": "host",
+    "hostname": "host",
+    "port": "",
+    "pathname": "/b",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "non-special://host/b",
+   "json": "non-special://host/b"
+  },
+  {
+   "url": {
+    "href": "non-special://HOST/x",
+    "origin": "null",
+    "protocol": "non-special:",
+    "username": "",
+    "password": "",
+    "host": "HOST",
+    "hostname": "HOST",
+    "port": "",
+    "pathname": "/x",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "non-special://HOST/x",
+   "json": "non-special://HOST/x"
+  },
+  {
+   "url": {
+    "href": "non-special:/b",
+    "origin": "null",
+    "protocol": "non-special:",
+    "username": "",
+    "password": "",
+    "host": "",
+    "hostname": "",
+    "port": "",
+    "pathname": "/b",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "non-special:/b",
+   "json": "non-special:/b"
+  },
+  {
+   "url": {
+    "href": "non-special:opaque path",
+    "origin": "null",
+    "protocol": "non-special:",
+    "username": "",
+    "password": "",
+    "host": "",
+    "hostname": "",
+    "port": "",
+    "pathname": "opaque path",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "non-special:opaque path",
+   "json": "non-special:opaque path"
+  },
+  {
+   "url": {
+    "href": "foo://",
+    "origin": "null",
+    "protocol": "foo:",
+    "username": "",
+    "password": "",
+    "host": "",
+    "hostname": "",
+    "port": "",
+    "pathname": "",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "foo://",
+   "json": "foo://"
+  },
+  {
+   "url": {
+    "href": "sc://%C3%B1/",
+    "origin": "null",
+    "protocol": "sc:",
+    "username": "",
+    "password": "",
+    "host": "%C3%B1",
+    "hostname": "%C3%B1",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "sc://%C3%B1/",
+   "json": "sc://%C3%B1/"
+  },
+  {
+   "url": {
+    "href": "sc://%/",
+    "origin": "null",
+    "protocol": "sc:",
+    "username": "",
+    "password": "",
+    "host": "%",
+    "hostname": "%",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "sc://%/",
+   "json": "sc://%/"
+  },
+  {
+   "url": {
+    "href": "http://trim.test/",
+    "origin": "http://trim.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "trim.test",
+    "hostname": "trim.test",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://trim.test/",
+   "json": "http://trim.test/"
+  },
+  {
+   "url": {
+    "href": "http://a.test/b",
+    "origin": "http://a.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/b",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://a.test/b",
+   "json": "http://a.test/b"
+  },
+  {
+   "url": {
+    "href": "http://a.test/b",
+    "origin": "http://a.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/b",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://a.test/b",
+   "json": "http://a.test/b"
+  },
+  {
+   "url": {
+    "href": "http://a.test/c",
+    "origin": "http://a.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/c",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://a.test/c",
+   "json": "http://a.test/c"
+  },
+  {
+   "url": {
+    "href": "http://a.test/b",
+    "origin": "http://a.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/b",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://a.test/b",
+   "json": "http://a.test/b"
+  },
+  {
+   "url": {
+    "href": "http://a.test/%7Euser",
+    "origin": "http://a.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/%7Euser",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://a.test/%7Euser",
+   "json": "http://a.test/%7Euser"
+  },
+  {
+   "url": {
+    "href": "http://a.test/?%7E#%7E",
+    "origin": "http://a.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/",
+    "search": "?%7E",
+    "hash": "#%7E"
+   },
+   "canParse": true,
+   "parse": "http://a.test/?%7E#%7E",
+   "json": "http://a.test/?%7E#%7E"
+  },
+  {
+   "url": {
+    "error": "TypeError"
+   },
+   "canParse": false,
+   "parse": null,
+   "json": {
+    "error": "TypeError"
+   }
+  },
+  {
+   "url": {
+    "error": "TypeError"
+   },
+   "canParse": false,
+   "parse": null,
+   "json": {
+    "error": "TypeError"
+   }
+  },
+  {
+   "url": {
+    "href": "http://x.test/",
+    "origin": "http://x.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "x.test",
+    "hostname": "x.test",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "http://x.test/",
+   "json": "http://x.test/"
+  },
+  {
+   "url": {
+    "href": "https://x.test/",
+    "origin": "https://x.test",
+    "protocol": "https:",
+    "username": "",
+    "password": "",
+    "host": "x.test",
+    "hostname": "x.test",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   },
+   "canParse": true,
+   "parse": "https://x.test/",
+   "json": "https://x.test/"
+  },
+  {
+   "url": {
+    "href": "https://x.test/%F0%9F%98%80?%F0%9F%98%80#%F0%9F%98%80",
+    "origin": "https://x.test",
+    "protocol": "https:",
+    "username": "",
+    "password": "",
+    "host": "x.test",
+    "hostname": "x.test",
+    "port": "",
+    "pathname": "/%F0%9F%98%80",
+    "search": "?%F0%9F%98%80",
+    "hash": "#%F0%9F%98%80"
+   },
+   "canParse": true,
+   "parse": "https://x.test/%F0%9F%98%80?%F0%9F%98%80#%F0%9F%98%80",
+   "json": "https://x.test/%F0%9F%98%80?%F0%9F%98%80#%F0%9F%98%80"
+  }
+ ],
+ "setters": [
+  {
+   "threw": null,
+   "url": {
+    "href": "http://a.test/p?q#f",
+    "origin": "http://a.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/p",
+    "search": "?q",
+    "hash": "#f"
+   }
+  },
+  {
+   "threw": null,
+   "url": {
+    "href": "ftp://a.test/p",
+    "origin": "ftp://a.test",
+    "protocol": "ftp:",
+    "username": "",
+    "password": "",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/p",
+    "search": "",
+    "hash": ""
+   }
+  },
+  {
+   "threw": null,
+   "url": {
+    "href": "https://a.test/p",
+    "origin": "https://a.test",
+    "protocol": "https:",
+    "username": "",
+    "password": "",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/p",
+    "search": "",
+    "hash": ""
+   }
+  },
+  {
+   "threw": null,
+   "url": {
+    "href": "https://x@y/",
+    "origin": "https://y",
+    "protocol": "https:",
+    "username": "x",
+    "password": "",
+    "host": "y",
+    "hostname": "y",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   }
+  },
+  {
+   "threw": null,
+   "url": {
+    "href": "https://a.test:8080/",
+    "origin": "https://a.test:8080",
+    "protocol": "https:",
+    "username": "",
+    "password": "",
+    "host": "a.test:8080",
+    "hostname": "a.test",
+    "port": "8080",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   }
+  },
+  {
+   "threw": null,
+   "url": {
+    "href": "http://us%20er%40@a.test/",
+    "origin": "http://a.test",
+    "protocol": "http:",
+    "username": "us%20er%40",
+    "password": "",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   }
+  },
+  {
+   "threw": null,
+   "url": {
+    "href": "http://:p%3Aw@a.test/",
+    "origin": "http://a.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "p%3Aw",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   }
+  },
+  {
+   "threw": null,
+   "url": {
+    "href": "file:///x",
+    "origin": "file://",
+    "protocol": "file:",
+    "username": "",
+    "password": "",
+    "host": "",
+    "hostname": "",
+    "port": "",
+    "pathname": "/x",
+    "search": "",
+    "hash": ""
+   }
+  },
+  {
+   "threw": null,
+   "url": {
+    "href": "http://b.test:99/",
+    "origin": "http://b.test:99",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "b.test:99",
+    "hostname": "b.test",
+    "port": "99",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   }
+  },
+  {
+   "threw": null,
+   "url": {
+    "href": "http://b.test/",
+    "origin": "http://b.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "b.test",
+    "hostname": "b.test",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   }
+  },
+  {
+   "threw": null,
+   "url": {
+    "href": "http://a.test/",
+    "origin": "http://a.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   }
+  },
+  {
+   "threw": null,
+   "url": {
+    "href": "http://a.test:81/",
+    "origin": "http://a.test:81",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "a.test:81",
+    "hostname": "a.test",
+    "port": "81",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   }
+  },
+  {
+   "threw": null,
+   "url": {
+    "href": "http://[::1]/",
+    "origin": "http://[::1]",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "[::1]",
+    "hostname": "[::1]",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   }
+  },
+  {
+   "threw": null,
+   "url": {
+    "href": "http://a.test/",
+    "origin": "http://a.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   }
+  },
+  {
+   "threw": null,
+   "url": {
+    "href": "http://a.test:8080/",
+    "origin": "http://a.test:8080",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "a.test:8080",
+    "hostname": "a.test",
+    "port": "8080",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   }
+  },
+  {
+   "threw": null,
+   "url": {
+    "href": "http://a.test/",
+    "origin": "http://a.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   }
+  },
+  {
+   "threw": null,
+   "url": {
+    "href": "http://a.test:81/",
+    "origin": "http://a.test:81",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "a.test:81",
+    "hostname": "a.test",
+    "port": "81",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   }
+  },
+  {
+   "threw": null,
+   "url": {
+    "href": "http://a.test/z",
+    "origin": "http://a.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/z",
+    "search": "",
+    "hash": ""
+   }
+  },
+  {
+   "threw": null,
+   "url": {
+    "href": "http://a.test/no-slash",
+    "origin": "http://a.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/no-slash",
+    "search": "",
+    "hash": ""
+   }
+  },
+  {
+   "threw": null,
+   "url": {
+    "href": "mailto:x",
+    "origin": "null",
+    "protocol": "mailto:",
+    "username": "",
+    "password": "",
+    "host": "",
+    "hostname": "",
+    "port": "",
+    "pathname": "x",
+    "search": "",
+    "hash": ""
+   }
+  },
+  {
+   "threw": null,
+   "url": {
+    "href": "http://a.test/?a%20b=c",
+    "origin": "http://a.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/",
+    "search": "?a%20b=c",
+    "hash": ""
+   }
+  },
+  {
+   "threw": null,
+   "url": {
+    "href": "http://a.test/",
+    "origin": "http://a.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   }
+  },
+  {
+   "threw": null,
+   "url": {
+    "href": "http://a.test/",
+    "origin": "http://a.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   }
+  },
+  {
+   "threw": null,
+   "url": {
+    "href": "http://a.test/#f%20g",
+    "origin": "http://a.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": "#f%20g"
+   }
+  },
+  {
+   "threw": null,
+   "url": {
+    "href": "http://a.test/",
+    "origin": "http://a.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   }
+  },
+  {
+   "threw": null,
+   "url": {
+    "href": "https://b.test/q",
+    "origin": "https://b.test",
+    "protocol": "https:",
+    "username": "",
+    "password": "",
+    "host": "b.test",
+    "hostname": "b.test",
+    "port": "",
+    "pathname": "/q",
+    "search": "",
+    "hash": ""
+   }
+  },
+  {
+   "threw": "TypeError",
+   "url": {
+    "href": "http://a.test/",
+    "origin": "http://a.test",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "a.test",
+    "hostname": "a.test",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+   }
+  }
+ ],
+ "params": [
+  {
+   "ops": [
+    "1",
+    [
+     "1",
+     "3"
+    ],
+    true,
+    true,
+    false,
+    3
+   ]
+  },
+  {
+   "ops": [
+    "b c",
+    "e f",
+    "a=b+c&d=e+f"
+   ]
+  },
+  {
+   "ops": [
+    [
+     [
+      "x",
+      "%zz"
+     ],
+     [
+      "y",
+      "€"
+     ],
+     [
+      "z",
+      "%"
+     ]
+    ],
+    "x=%25zz&y=%E2%82%AC&z=%25"
+   ]
+  },
+  {
+   "ops": [
+    [
+     [
+      "",
+      "empty"
+     ],
+     [
+      "novalue",
+      ""
+     ],
+     [
+      "k",
+      ""
+     ]
+    ],
+    "=empty&novalue=&k=",
+    null,
+    "=empty&k=&novalue="
+   ]
+  },
+  {
+   "ops": [
+    "%C3%BC=%C3%AB&s+p=a+b&%7E*%27%28%29=%21",
+    null,
+    "s+p=a+b&%7E*%27%28%29=%21&%C3%BC=%C3%AB"
+   ]
+  },
+  {
+   "ops": [
+    null,
+    [
+     [
+      "a",
+      "2"
+     ],
+     [
+      "a",
+      "1"
+     ],
+     [
+      "z",
+      "1"
+     ],
+     [
+      "z",
+      "0"
+     ],
+     [
+      "😀",
+      "e"
+     ],
+     [
+      "￿",
+      "f"
+     ]
+    ]
+   ]
+  },
+  {
+   "ops": [
+    "a=1&b=x+y&a=2",
+    null,
+    "a=1&b=x+y",
+    null,
+    "b=x+y"
+   ]
+  },
+  {
+   "error": "TypeError"
+  },
+  {
+   "ops": [
+    "k=v&k2=v%262",
+    null,
+    null,
+    [
+     "w",
+     "x"
+    ],
+    null,
+    "k=y&k2=v%262"
+   ]
+  },
+  {
+   "ops": [
+    0,
+    null,
+    "",
+    null,
+    "a%2Bb=c%3Dd%26e"
+   ]
+  },
+  {
+   "ops": [
+    "x\u0000y",
+    [
+     "x\u0000y",
+     "\u0000"
+    ],
+    [
+     [
+      "a",
+      "x\u0000y"
+     ],
+     [
+      "a",
+      "\u0000"
+     ],
+     [
+      "\u0000k",
+      "v"
+     ]
+    ],
+    "a=x%00y&a=%00&%00k=v"
+   ]
+  },
+  {
+   "ops": [
+    [
+     [
+      "k\u0000",
+      "v\u0000w"
+     ],
+     [
+      "n",
+      "\u0000"
+     ]
+    ],
+    [
+     "v\u0000w"
+    ],
+    "k%00=v%00w&n=%00"
+   ]
+  }
+ ],
+ "linked": [
+  [
+   null,
+   "http://a.test/p?x=1&y=2&z=3+4#f",
+   null,
+   "http://a.test/p?y=2&z=3+4#f",
+   null,
+   "w v",
+   null,
+   "http://a.test/p?q=w+v#f"
+  ],
+  [
+   null,
+   "http://a.test/p",
+   ""
+  ]
+ ],
+ "patterns": [
+  {
+   "components": {
+    "protocol": "https",
+    "username": "*",
+    "password": "*",
+    "hostname": "example.com",
+    "port": "",
+    "pathname": "/books/:id",
+    "search": "*",
+    "hash": "*",
+    "hasRegExpGroups": false
+   },
+   "tests": [
+    {
+     "test": true,
+     "exec": {
+      "inputs": [
+       "https://example.com/books/123"
+      ],
+      "protocol": {
+       "input": "https",
+       "groups": []
+      },
+      "username": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "password": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hostname": {
+       "input": "example.com",
+       "groups": []
+      },
+      "port": {
+       "input": "",
+       "groups": []
+      },
+      "pathname": {
+       "input": "/books/123",
+       "groups": [
+        [
+         "id",
+         "123"
+        ]
+       ]
+      },
+      "search": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hash": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "test": false,
+     "exec": null
+    },
+    {
+     "test": true,
+     "exec": {
+      "inputs": [
+       "/books/abc",
+       "https://example.com"
+      ],
+      "protocol": {
+       "input": "https",
+       "groups": []
+      },
+      "username": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "password": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hostname": {
+       "input": "example.com",
+       "groups": []
+      },
+      "port": {
+       "input": "",
+       "groups": []
+      },
+      "pathname": {
+       "input": "/books/abc",
+       "groups": [
+        [
+         "id",
+         "abc"
+        ]
+       ]
+      },
+      "search": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hash": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "test": false,
+     "exec": null
+    }
+   ]
+  },
+  {
+   "components": {
+    "protocol": "*",
+    "username": "*",
+    "password": "*",
+    "hostname": "*",
+    "port": "*",
+    "pathname": "/books/:id(\\d+)",
+    "search": "*",
+    "hash": "*",
+    "hasRegExpGroups": true
+   },
+   "tests": [
+    {
+     "test": true,
+     "exec": {
+      "inputs": [
+       "https://x.test/books/42"
+      ],
+      "protocol": {
+       "input": "https",
+       "groups": [
+        [
+         "0",
+         "https"
+        ]
+       ]
+      },
+      "username": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "password": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hostname": {
+       "input": "x.test",
+       "groups": [
+        [
+         "0",
+         "x.test"
+        ]
+       ]
+      },
+      "port": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "pathname": {
+       "input": "/books/42",
+       "groups": [
+        [
+         "id",
+         "42"
+        ]
+       ]
+      },
+      "search": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hash": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "test": false,
+     "exec": null
+    },
+    {
+     "test": true,
+     "exec": {
+      "inputs": [
+       {
+        "pathname": "/books/7"
+       }
+      ],
+      "protocol": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "username": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "password": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hostname": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "port": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "pathname": {
+       "input": "/books/7",
+       "groups": [
+        [
+         "id",
+         "7"
+        ]
+       ]
+      },
+      "search": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hash": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "components": {
+    "protocol": "http{s}?",
+    "username": "*",
+    "password": "*",
+    "hostname": ":sub.example.com",
+    "port": "*",
+    "pathname": "/*",
+    "search": "*",
+    "hash": "*",
+    "hasRegExpGroups": false
+   },
+   "tests": [
+    {
+     "test": true,
+     "exec": {
+      "inputs": [
+       "https://api.example.com/v1/x"
+      ],
+      "protocol": {
+       "input": "https",
+       "groups": []
+      },
+      "username": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "password": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hostname": {
+       "input": "api.example.com",
+       "groups": [
+        [
+         "sub",
+         "api"
+        ]
+       ]
+      },
+      "port": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "pathname": {
+       "input": "/v1/x",
+       "groups": [
+        [
+         "0",
+         "v1/x"
+        ]
+       ]
+      },
+      "search": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hash": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "test": false,
+     "exec": null
+    },
+    {
+     "test": false,
+     "exec": null
+    }
+   ]
+  },
+  {
+   "components": {
+    "protocol": "https",
+    "username": "*",
+    "password": "*",
+    "hostname": "*.example.com",
+    "port": "",
+    "pathname": "/:path*",
+    "search": "*",
+    "hash": "*",
+    "hasRegExpGroups": false
+   },
+   "tests": [
+    {
+     "test": true,
+     "exec": {
+      "inputs": [
+       "https://a.b.example.com/x/y/z"
+      ],
+      "protocol": {
+       "input": "https",
+       "groups": []
+      },
+      "username": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "password": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hostname": {
+       "input": "a.b.example.com",
+       "groups": [
+        [
+         "0",
+         "a.b"
+        ]
+       ]
+      },
+      "port": {
+       "input": "",
+       "groups": []
+      },
+      "pathname": {
+       "input": "/x/y/z",
+       "groups": [
+        [
+         "path",
+         "x/y/z"
+        ]
+       ]
+      },
+      "search": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hash": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "test": false,
+     "exec": null
+    }
+   ]
+  },
+  {
+   "components": {
+    "protocol": "*",
+    "username": "*",
+    "password": "*",
+    "hostname": "*",
+    "port": "*",
+    "pathname": "/:a/:b?",
+    "search": "*",
+    "hash": "*",
+    "hasRegExpGroups": false
+   },
+   "tests": [
+    {
+     "test": true,
+     "exec": {
+      "inputs": [
+       {
+        "pathname": "/1"
+       }
+      ],
+      "protocol": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "username": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "password": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hostname": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "port": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "pathname": {
+       "input": "/1",
+       "groups": [
+        [
+         "a",
+         "1"
+        ],
+        [
+         "b",
+         null
+        ]
+       ]
+      },
+      "search": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hash": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "test": true,
+     "exec": {
+      "inputs": [
+       {
+        "pathname": "/1/2"
+       }
+      ],
+      "protocol": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "username": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "password": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hostname": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "port": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "pathname": {
+       "input": "/1/2",
+       "groups": [
+        [
+         "a",
+         "1"
+        ],
+        [
+         "b",
+         "2"
+        ]
+       ]
+      },
+      "search": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hash": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "test": false,
+     "exec": null
+    }
+   ]
+  },
+  {
+   "components": {
+    "protocol": "*",
+    "username": "*",
+    "password": "*",
+    "hostname": "*",
+    "port": "*",
+    "pathname": "/files/:name.:ext",
+    "search": "*",
+    "hash": "*",
+    "hasRegExpGroups": false
+   },
+   "tests": [
+    {
+     "test": true,
+     "exec": {
+      "inputs": [
+       {
+        "pathname": "/files/report.pdf"
+       }
+      ],
+      "protocol": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "username": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "password": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hostname": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "port": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "pathname": {
+       "input": "/files/report.pdf",
+       "groups": [
+        [
+         "name",
+         "report"
+        ],
+        [
+         "ext",
+         "pdf"
+        ]
+       ]
+      },
+      "search": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hash": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "test": true,
+     "exec": {
+      "inputs": [
+       {
+        "pathname": "/files/archive.tar.gz"
+       }
+      ],
+      "protocol": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "username": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "password": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hostname": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "port": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "pathname": {
+       "input": "/files/archive.tar.gz",
+       "groups": [
+        [
+         "name",
+         "archive"
+        ],
+        [
+         "ext",
+         "tar.gz"
+        ]
+       ]
+      },
+      "search": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hash": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "components": {
+    "protocol": "*",
+    "username": "*",
+    "password": "*",
+    "hostname": "*",
+    "port": "*",
+    "pathname": "/(foo|bar)/:rest+",
+    "search": "*",
+    "hash": "*",
+    "hasRegExpGroups": true
+   },
+   "tests": [
+    {
+     "test": true,
+     "exec": {
+      "inputs": [
+       {
+        "pathname": "/foo/a/b"
+       }
+      ],
+      "protocol": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "username": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "password": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hostname": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "port": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "pathname": {
+       "input": "/foo/a/b",
+       "groups": [
+        [
+         "0",
+         "foo"
+        ],
+        [
+         "rest",
+         "a/b"
+        ]
+       ]
+      },
+      "search": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hash": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "test": false,
+     "exec": null
+    }
+   ]
+  },
+  {
+   "components": {
+    "protocol": "*",
+    "username": "*",
+    "password": "*",
+    "hostname": "*",
+    "port": "*",
+    "pathname": "*",
+    "search": "q=:query&*",
+    "hash": "*",
+    "hasRegExpGroups": false
+   },
+   "tests": [
+    {
+     "test": true,
+     "exec": {
+      "inputs": [
+       "https://x.test/?q=cats&page=2"
+      ],
+      "protocol": {
+       "input": "https",
+       "groups": [
+        [
+         "0",
+         "https"
+        ]
+       ]
+      },
+      "username": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "password": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hostname": {
+       "input": "x.test",
+       "groups": [
+        [
+         "0",
+         "x.test"
+        ]
+       ]
+      },
+      "port": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "pathname": {
+       "input": "/",
+       "groups": [
+        [
+         "0",
+         "/"
+        ]
+       ]
+      },
+      "search": {
+       "input": "q=cats&page=2",
+       "groups": [
+        [
+         "0",
+         "page=2"
+        ],
+        [
+         "query",
+         "cats"
+        ]
+       ]
+      },
+      "hash": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "test": false,
+     "exec": null
+    }
+   ]
+  },
+  {
+   "components": {
+    "protocol": "*",
+    "username": "*",
+    "password": "*",
+    "hostname": "*",
+    "port": "*",
+    "pathname": "*",
+    "search": "*",
+    "hash": "section-:n(\\d+)",
+    "hasRegExpGroups": true
+   },
+   "tests": [
+    {
+     "test": true,
+     "exec": {
+      "inputs": [
+       "https://x.test/#section-12"
+      ],
+      "protocol": {
+       "input": "https",
+       "groups": [
+        [
+         "0",
+         "https"
+        ]
+       ]
+      },
+      "username": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "password": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hostname": {
+       "input": "x.test",
+       "groups": [
+        [
+         "0",
+         "x.test"
+        ]
+       ]
+      },
+      "port": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "pathname": {
+       "input": "/",
+       "groups": [
+        [
+         "0",
+         "/"
+        ]
+       ]
+      },
+      "search": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hash": {
+       "input": "section-12",
+       "groups": [
+        [
+         "n",
+         "12"
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "test": false,
+     "exec": null
+    }
+   ]
+  },
+  {
+   "components": {
+    "protocol": "*",
+    "username": "*",
+    "password": "*",
+    "hostname": "*",
+    "port": "*",
+    "pathname": "/Case/:x",
+    "search": "*",
+    "hash": "*",
+    "hasRegExpGroups": false
+   },
+   "tests": [
+    {
+     "test": true,
+     "exec": {
+      "inputs": [
+       {
+        "pathname": "/CASE/y"
+       }
+      ],
+      "protocol": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "username": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "password": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hostname": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "port": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "pathname": {
+       "input": "/CASE/y",
+       "groups": [
+        [
+         "x",
+         "y"
+        ]
+       ]
+      },
+      "search": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hash": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "test": true,
+     "exec": {
+      "inputs": [
+       {
+        "pathname": "/case/Y"
+       }
+      ],
+      "protocol": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "username": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "password": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hostname": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "port": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "pathname": {
+       "input": "/case/Y",
+       "groups": [
+        [
+         "x",
+         "Y"
+        ]
+       ]
+      },
+      "search": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hash": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "components": {
+    "protocol": "*",
+    "username": "*",
+    "password": "*",
+    "hostname": "*",
+    "port": "*",
+    "pathname": "/Case/:x",
+    "search": "*",
+    "hash": "*",
+    "hasRegExpGroups": false
+   },
+   "tests": [
+    {
+     "test": false,
+     "exec": null
+    }
+   ]
+  },
+  {
+   "components": {
+    "protocol": "*",
+    "username": "*",
+    "password": "*",
+    "hostname": "*",
+    "port": "*",
+    "pathname": "/caf%C3%A9/:x",
+    "search": "*",
+    "hash": "*",
+    "hasRegExpGroups": false
+   },
+   "tests": [
+    {
+     "test": true,
+     "exec": {
+      "inputs": [
+       {
+        "pathname": "/caf%C3%A9/1"
+       }
+      ],
+      "protocol": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "username": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "password": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hostname": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "port": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "pathname": {
+       "input": "/caf%C3%A9/1",
+       "groups": [
+        [
+         "x",
+         "1"
+        ]
+       ]
+      },
+      "search": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hash": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "test": true,
+     "exec": {
+      "inputs": [
+       "https://x.test/café/2"
+      ],
+      "protocol": {
+       "input": "https",
+       "groups": [
+        [
+         "0",
+         "https"
+        ]
+       ]
+      },
+      "username": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "password": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hostname": {
+       "input": "x.test",
+       "groups": [
+        [
+         "0",
+         "x.test"
+        ]
+       ]
+      },
+      "port": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "pathname": {
+       "input": "/caf%C3%A9/2",
+       "groups": [
+        [
+         "x",
+         "2"
+        ]
+       ]
+      },
+      "search": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hash": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "components": {
+    "protocol": "*",
+    "username": "*",
+    "password": "*",
+    "hostname": "{*.}?example.com",
+    "port": "*",
+    "pathname": "*",
+    "search": "*",
+    "hash": "*",
+    "hasRegExpGroups": false
+   },
+   "tests": [
+    {
+     "test": true,
+     "exec": {
+      "inputs": [
+       "https://example.com/"
+      ],
+      "protocol": {
+       "input": "https",
+       "groups": [
+        [
+         "0",
+         "https"
+        ]
+       ]
+      },
+      "username": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "password": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hostname": {
+       "input": "example.com",
+       "groups": [
+        [
+         "0",
+         null
+        ]
+       ]
+      },
+      "port": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "pathname": {
+       "input": "/",
+       "groups": [
+        [
+         "0",
+         "/"
+        ]
+       ]
+      },
+      "search": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hash": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "test": true,
+     "exec": {
+      "inputs": [
+       "https://www.example.com/"
+      ],
+      "protocol": {
+       "input": "https",
+       "groups": [
+        [
+         "0",
+         "https"
+        ]
+       ]
+      },
+      "username": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "password": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hostname": {
+       "input": "www.example.com",
+       "groups": [
+        [
+         "0",
+         "www"
+        ]
+       ]
+      },
+      "port": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "pathname": {
+       "input": "/",
+       "groups": [
+        [
+         "0",
+         "/"
+        ]
+       ]
+      },
+      "search": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hash": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "test": false,
+     "exec": null
+    }
+   ]
+  },
+  {
+   "components": {
+    "protocol": "*",
+    "username": "*",
+    "password": "*",
+    "hostname": "*",
+    "port": "(8080|8443)",
+    "pathname": "*",
+    "search": "*",
+    "hash": "*",
+    "hasRegExpGroups": true
+   },
+   "tests": [
+    {
+     "test": true,
+     "exec": {
+      "inputs": [
+       "https://x.test:8443/"
+      ],
+      "protocol": {
+       "input": "https",
+       "groups": [
+        [
+         "0",
+         "https"
+        ]
+       ]
+      },
+      "username": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "password": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hostname": {
+       "input": "x.test",
+       "groups": [
+        [
+         "0",
+         "x.test"
+        ]
+       ]
+      },
+      "port": {
+       "input": "8443",
+       "groups": [
+        [
+         "0",
+         "8443"
+        ]
+       ]
+      },
+      "pathname": {
+       "input": "/",
+       "groups": [
+        [
+         "0",
+         "/"
+        ]
+       ]
+      },
+      "search": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hash": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "test": false,
+     "exec": null
+    },
+    {
+     "test": false,
+     "exec": null
+    }
+   ]
+  },
+  {
+   "components": {
+    "protocol": "https",
+    "username": "*",
+    "password": "*",
+    "hostname": "base.test",
+    "port": "",
+    "pathname": "/a",
+    "search": "*",
+    "hash": "*",
+    "hasRegExpGroups": false
+   },
+   "tests": [
+    {
+     "test": true,
+     "exec": {
+      "inputs": [
+       "https://base.test/a"
+      ],
+      "protocol": {
+       "input": "https",
+       "groups": []
+      },
+      "username": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "password": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hostname": {
+       "input": "base.test",
+       "groups": []
+      },
+      "port": {
+       "input": "",
+       "groups": []
+      },
+      "pathname": {
+       "input": "/a",
+       "groups": []
+      },
+      "search": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hash": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "test": false,
+     "exec": null
+    }
+   ]
+  },
+  {
+   "components": {
+    "protocol": "data",
+    "username": "*",
+    "password": "*",
+    "hostname": "",
+    "port": "",
+    "pathname": "foo*",
+    "search": "*",
+    "hash": "*",
+    "hasRegExpGroups": false
+   },
+   "tests": [
+    {
+     "test": true,
+     "exec": {
+      "inputs": [
+       "data:foobar"
+      ],
+      "protocol": {
+       "input": "data",
+       "groups": []
+      },
+      "username": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "password": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hostname": {
+       "input": "",
+       "groups": []
+      },
+      "port": {
+       "input": "",
+       "groups": []
+      },
+      "pathname": {
+       "input": "foobar",
+       "groups": [
+        [
+         "0",
+         "bar"
+        ]
+       ]
+      },
+      "search": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hash": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "components": {
+    "protocol": "*",
+    "username": "*",
+    "password": "*",
+    "hostname": "*",
+    "port": "*",
+    "pathname": "*",
+    "search": "*",
+    "hash": "*",
+    "hasRegExpGroups": false
+   },
+   "tests": [
+    {
+     "test": true,
+     "exec": {
+      "inputs": [
+       "https://anything.test/x?y#z"
+      ],
+      "protocol": {
+       "input": "https",
+       "groups": [
+        [
+         "0",
+         "https"
+        ]
+       ]
+      },
+      "username": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "password": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hostname": {
+       "input": "anything.test",
+       "groups": [
+        [
+         "0",
+         "anything.test"
+        ]
+       ]
+      },
+      "port": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "pathname": {
+       "input": "/x",
+       "groups": [
+        [
+         "0",
+         "/x"
+        ]
+       ]
+      },
+      "search": {
+       "input": "y",
+       "groups": [
+        [
+         "0",
+         "y"
+        ]
+       ]
+      },
+      "hash": {
+       "input": "z",
+       "groups": [
+        [
+         "0",
+         "z"
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "test": true,
+     "exec": {
+      "inputs": [
+       {}
+      ],
+      "protocol": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "username": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "password": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hostname": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "port": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "pathname": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "search": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      },
+      "hash": {
+       "input": "",
+       "groups": [
+        [
+         "0",
+         ""
+        ]
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "error": "TypeError"
+  },
+  {
+   "error": "TypeError"
+  },
+  {
+   "components": {
+    "protocol": "*",
+    "username": "*",
+    "password": "*",
+    "hostname": "*",
+    "port": "*",
+    "pathname": "/:id(\\d+)(\\d+)",
+    "search": "*",
+    "hash": "*",
+    "hasRegExpGroups": true
+   },
+   "tests": []
+  },
+  {
+   "error": "TypeError"
+  },
+  {
+   "error": "TypeError"
+  }
+ ]
+}

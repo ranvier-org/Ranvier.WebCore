@@ -1,0 +1,616 @@
+{
+  "schemaVersion": 1,
+  "group": "I08 event detail adapters",
+  "status": "green (private Windows x64 slim; not accepted)",
+  "issue": "https://github.com/ranvier-org/Ranvier.WebCore/issues/105",
+  "sourceHead": "176b606d2e4c9646a021165f09fe7bc442f91d1e",
+  "nativeVersion": "0.1.0-preview.39",
+  "abi": 47,
+  "sourcePatches": {
+    "receipt": "source-patches.json",
+    "patches": [
+      "0035-caret-position-text-control-shadow-roots.patch",
+      "0037-frame-loader-client-form-submission-hook.patch",
+      "0038-platform-screen-win-embedder-screen-data.patch"
+    ],
+    "recompiledHere": "host/dom/RanvierDomGlue.cpp only; every other WebCore object is the parent candidate's"
+  },
+  "runtime": {
+    "receipt": "runtime-receipt.json",
+    "sha256": {
+      "brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
+      "brotlidec.dll": "d42e2160f76f29a91f8be01b009b585c45496219794e16eab90b3599b6f70a7f",
+      "harfbuzz-icu.dll": "27662b477f7cb0c20cee64543a06296a48a00a17b6c7b57629bb166a30d5b164",
+      "harfbuzz.dll": "b519b2abc7f446ca45bff77aae1708f45afc9f557698bcd7295837cce0f12bfa",
+      "icudt77.dll": "b00d2fb856f548608c137e771257a70d0722654535c6c00b371c0fab3e2b802c",
+      "icuin77.dll": "e3785739e1fcf2e38053bbb85ef5f0f5dab63f865cbda762da5258566085a240",
+      "icuuc77.dll": "189c623f996c41488c262867bae04a5bb33dd485bd423e0a8bec05c455a90902",
+      "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+      "jpeg62.dll": "394811c1b1bf1fd914248a145ba3fcad1f5f27c7009754ce08e48ccb0266b785",
+      "libpng16.dll": "8b46592c5ea338dd6b23ca380d6db64a7849c2a534fc465a006ec668645d8185",
+      "libsharpyuv.dll": "df165de83480692f494c23061ef9c40c10abe19a89b1fa9fae2f1cd5152c07a7",
+      "libwebp.dll": "550c5a4860f61d32a274fdd7b5c8cbe266eee28b3a3ca888195248ea1d5e0f71",
+      "libwebpdemux.dll": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163",
+      "libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
+      "libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
+      "RanvierWebCoreHost.dll": "7aba0071c923d56cd7251ded189f68f45aada386c9e0d2654eef0abe049fa201",
+      "RanvierWebCoreHost.lib": "decf6cb709c0ba7f83b75bd7836b9b884376e3cd927a5f38d6cd362d23722283",
+      "RanvierWebCoreHost.pdb": "1294be96c63ea1793f69947d72f204f4bc0f84c423d8c34a3ea307705272c4e5",
+      "WebCore.dll": "d70a0ba1fc893541698aa72639b2ed5bd76a2c5930e6188bffccc9b799d8f04c",
+      "WebCore.lib": "fc457dc86c50a1d8ae037cb145bd190cc1f86ae9e2690410fbd4bc028846f032",
+      "WebCore.pdb": "ae09ab96447359704e6d2343f82fda4bc617b3700e759c9c379b3db8dd4ea8ee",
+      "zlib1.dll": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93"
+    }
+  },
+  "chromium": "156.0.8078.4",
+  "batch": {
+    "results": "batch-results.json",
+    "rawAssertions": 73838,
+    "teardownProbes": 92,
+    "probes": 55,
+    "allExit0": true,
+    "eventDetails": 391
+  },
+  "baselineComparison": {
+    "baseline": "C:\\wk\\native-screen\\artifacts\\native38-batch-7",
+    "changes": [
+      {
+        "probe": "capabilities",
+        "assertions": [
+          null,
+          null
+        ],
+        "logLines": [
+          "CAPABILITIES_NATIVE_CHECKS=7928"
+        ]
+      },
+      {
+        "probe": "event_details",
+        "change": "new",
+        "assertions": 391
+      },
+      {
+        "probe": "frames",
+        "assertions": [
+          null,
+          null
+        ],
+        "logLines": [
+          "RANVIER_FSHARP_PAINT {\"after1\":null,\"after2\":null,\"dirty1\":{\"Item1\":300,\"Item2\":200,\"Item3\":40,\"Item4\":40},\"dirty2\":{\"Item1\":300,\"Item2\":200,\"Item3\":40,\"Item4\":40},\"equal1\":true,\"equal2\":true,\"fullMs\":3.87115,\"rectMs\":0.018745,\"size2\":[2560,1440]}",
+          "RANVIER_FSHARP_ABI PASS {\"changed\":{\"frame0to1\":42728,\"frame1to2\":14835},\"events\":{\"afterRemoval\":[],\"cancellation\":{\"cancelable\":true,\"log\":[\"button:2\",\"panel-sees-prevented:True\",\"button:2\",\"panel-sees-prevented:False\"],\"notCancelable\":false},\"changedByReentry\":4263,\"checkbox\":{\"cancelledClick\":true,\"cancelledLog\":[\"checkbox-click:2\"],\"clicked\":true,\"clickedAfterRemoval\":false,\"clickedLog\":[\"checkbox-change:2\"],\"initial\":false},\"failure\":{\"log\":[\"panel-after-throw:3\"],\"raised\":[\"handler failure from F#\"]},\"handlerThreads\":[2],\"nestedFailure\":{\"log\":[\"outer:3\",\"caught-nested\"],\"outerSucceeded\":true},\"offThread\":{\"dispatchStatus\":-2,\"guardedLog\":[\"guarded:2\"],\"removeStatus\":-2},\"propagation\":{\"log\":[\"panel-capture:1\",\"button:2\",\"panel-bubble:3\",\"body-bubble:3\"],\"prevented\":false},\"reentry\":[\"outer-start:3\",\"inner-body:2\",\"outer-end\"],\"removalDuringDispatch\":{\"first\":[\"first:2\"],\"second\":[\"first:2\"]},\"stopPropagation\":[\"button:2\",\"button-second:2\"],\"vmGuardInHandlers\":[1]},\"frame2GreenPixels\":13838,\"managedPid\":48280,\"managedThread\":2,\"nativePid\":48280,\"opaque\":{\"frame0\":230400,\"frame1\":230400,\"frame2\":230400},\"os\":\"Microsoft Windows 10.0.26200\",\"pixel40_40\":{\"frame0\":[20,60,80],\"frame1\":[160,40,30]},\"runtime\":\".NET 10.0.14\",\"scriptsEnabled\":0,\"vmEntryDisallowed\":1,\"wrongThreadStatus\":-2}"
+        ]
+      },
+      {
+        "probe": "teardown",
+        "assertions": [
+          null,
+          null
+        ],
+        "logLines": [
+          "RANVIER_TEARDOWN_PROBES [{\"probe\":\"control\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"document title\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused textarea\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused button\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input, value written\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input, container removed\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":0,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":0,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input with a value attribute, container removed\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":0,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":0,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"unfocused input, container removed\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":0,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":0,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":0,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input removed\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"image with a data source\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"image with a data source, removed\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"image with a missing file source\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"image with a missing file source, removed\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"SVG paint handles retained past host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"SVG paint handles retained past document replacement\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"control\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"document title\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused textarea\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused button\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input, value written\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input, container removed\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":0,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":0,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":0,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input with a value attribute, container removed\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":0,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":0,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":0,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"unfocused input, container removed\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":0,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":0,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":0,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input removed\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"image with a data source\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":2,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"image with a data source, removed\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"image with a missing file source\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"image with a missing file source, removed\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"SVG paint handles retained past host destroy\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"SVG paint handles retained past document replacement\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"control\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"document title\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused textarea\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused button\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input, value written\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input, container removed\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":0,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":0,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":0,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input with a value attribute, container removed\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":0,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":0,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":0,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"unfocused input, container removed\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":0,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":0,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":0,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input removed\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"image with a data source\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"image with a data source, removed\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"image with a missing file source\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"image with a missing file source, removed\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"SVG paint handles retained past host destroy\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"SVG paint handles retained past document replacement\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, node released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, node released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":2,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, dataset released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, dataset released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":2,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, style map released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, style map released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, tree walker released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":2,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, tree walker released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":3,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, node iterator released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":2,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, node iterator released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":3,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, window target released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, window target released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, media query list released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, media query list released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, scrolled document released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":0,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, scrolled document released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":2,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, form controls collection released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, form controls collection released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, options collection released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, options collection released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, form data released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, form data released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, submit event released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, submit event released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, open modal dialog released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, open modal dialog released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, toggle event released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, toggle event released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, error event released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":0,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":0,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":0,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, error event released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, blob slice released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, blob slice released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, caret position released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, caret position released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, crypto released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":0,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, crypto released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":2,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, screen released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":0,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, screen released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":2,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, url values released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, url values released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, url pattern result released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, url pattern result released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, visual viewport released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, visual viewport released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1}]"
+        ]
+      }
+    ],
+    "changeNotes": {
+      "capabilities": "more native checks for the 23 added catalogue entries",
+      "frames": "timing fields (servedMilliseconds, animationMilliseconds, fullMs) and process ids only; every other field is identical",
+      "teardown": "two added records: div and removed div, error event released after host destroy",
+      "event_details": "new probe"
+    },
+    "catalogue": {
+      "description": "catalogue regenerated: +23 entries",
+      "entries": [
+        "dom:ErrorEvent",
+        "dom:ProgressEvent",
+        "dom:CSSAnimationEvent",
+        "dom:CSSTransitionEvent",
+        "dom:ContentVisibilityAutoStateChangeEvent",
+        "dom:AnimationPlaybackEvent",
+        "dom:PageTransitionEvent",
+        "dom:HashChangeEvent",
+        "dom:MediaQueryListEvent",
+        "dom:PopStateEvent",
+        "dom:BeforeUnloadEvent",
+        "dom-constructor:CompositionEvent",
+        "dom-constructor:ErrorEvent",
+        "dom-constructor:ProgressEvent",
+        "dom-constructor:CSSAnimationEvent",
+        "dom-constructor:CSSTransitionEvent",
+        "dom-constructor:ContentVisibilityAutoStateChangeEvent",
+        "dom-constructor:AnimationPlaybackEvent",
+        "dom-constructor:PageTransitionEvent",
+        "dom-constructor:HashChangeEvent",
+        "dom-constructor:MediaQueryListEvent",
+        "dom-constructor:PopStateEvent",
+        "dom-type-query:Event"
+      ]
+    }
+  },
+  "repeats": {
+    "log": "event-details-repeats.log",
+    "runs": 30,
+    "lines": {
+      "event_details: 391 assertions": 30
+    }
+  },
+  "assertionCount": "391 is the fixed count. An earlier 30x rehearsal read 404/405/406 (9/15/6 runs): it counted one expect() per run-loop iteration in the dispatched-step drain; that drain is now an uncounted 10 s hang guard. No case was removed or merged.",
+  "oracleDeterminism": {
+    "log": "oracle-repeats.log",
+    "finding": "30 consecutive recordings of tests/fixtures/event-details-oracle.json were byte-identical"
+  },
+  "teardown": "teardown-probes.json",
+  "qualified": [
+    {
+      "scope": "ErrorEvent attributes",
+      "field": "error",
+      "chromium": "present",
+      "native": "absent",
+      "reason": "ErrorEvent.error is of type any, deferred to the script value group"
+    },
+    {
+      "scope": "AnimationEvent attributes",
+      "field": "animation",
+      "chromium": "present",
+      "native": "absent",
+      "reason": "AnimationEvent.animation is a CSSAnimation handle, deferred to the Web Animations group"
+    },
+    {
+      "scope": "AnimationEvent attributes",
+      "field": "pseudoTarget",
+      "chromium": "present",
+      "native": "absent",
+      "reason": "Chromium-only attribute: WebKit's CSSAnimationEvent.idl has no pseudoTarget (CSSPseudoElement)"
+    },
+    {
+      "scope": "TransitionEvent attributes",
+      "field": "animation",
+      "chromium": "present",
+      "native": "absent",
+      "reason": "TransitionEvent.animation is a CSSTransition handle, deferred to the Web Animations group"
+    },
+    {
+      "scope": "TransitionEvent attributes",
+      "field": "pseudoTarget",
+      "chromium": "present",
+      "native": "absent",
+      "reason": "Chromium-only attribute: WebKit's CSSTransitionEvent.idl has no pseudoTarget (CSSPseudoElement)"
+    },
+    {
+      "scope": "PopStateEvent attributes",
+      "field": "state",
+      "chromium": "present",
+      "native": "absent",
+      "reason": "PopStateEvent.state is of type any, deferred to the script value group"
+    },
+    {
+      "scope": "load events",
+      "field": "event",
+      "chromium": null,
+      "native": {
+        "interface": "ContentVisibilityAutoStateChangeEvent",
+        "skipped": true,
+        "target": "cv",
+        "trusted": false,
+        "type": "contentvisibilityautostatechange"
+      },
+      "reason": "WebKit dispatches contentvisibilityautostatechange untrusted (ContentVisibilityDocumentState.cpp creates it with the default IsTrusted::No); Chromium dispatches it trusted"
+    },
+    {
+      "scope": "load events",
+      "field": "event",
+      "chromium": {
+        "interface": "ContentVisibilityAutoStateChangeEvent",
+        "skipped": true,
+        "target": "cv",
+        "trusted": true,
+        "type": "contentvisibilityautostatechange"
+      },
+      "native": null,
+      "reason": "WebKit dispatches contentvisibilityautostatechange untrusted (ContentVisibilityDocumentState.cpp creates it with the default IsTrusted::No); Chromium dispatches it trusted"
+    },
+    {
+      "scope": "click events",
+      "field": "sequence",
+      "chromium": [
+        {
+          "type": "pointerdown",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "button",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "mousedown",
+          "interface": "MouseEvent",
+          "trusted": true,
+          "target": "button",
+          "button": 0,
+          "detail": 1
+        },
+        {
+          "type": "focus",
+          "interface": "FocusEvent",
+          "trusted": true,
+          "target": "button"
+        },
+        {
+          "type": "focusin",
+          "interface": "FocusEvent",
+          "trusted": true,
+          "target": "button"
+        },
+        {
+          "type": "pointerup",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "button",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "mouseup",
+          "interface": "MouseEvent",
+          "trusted": true,
+          "target": "button",
+          "button": 0,
+          "detail": 1
+        },
+        {
+          "type": "click",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "button",
+          "pointerType": "mouse",
+          "isPrimary": false,
+          "button": 0
+        }
+      ],
+      "native": [
+        {
+          "type": "pointerdown",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "button",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "mousedown",
+          "interface": "MouseEvent",
+          "trusted": true,
+          "target": "button",
+          "button": 0,
+          "detail": 1
+        },
+        {
+          "type": "pointerup",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "button",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "mouseup",
+          "interface": "MouseEvent",
+          "trusted": true,
+          "target": "button",
+          "button": 0,
+          "detail": 1
+        },
+        {
+          "type": "click",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "button",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        }
+      ],
+      "reason": "WebKit does not focus a <button> on a mouse press (HTMLFormControlElement::isMouseFocusable is false off GTK/WPE), so no focus/focusin; WebKit's click PointerEvent reads isPrimary true where Chromium reads false"
+    },
+    {
+      "scope": "type events",
+      "field": "sequence",
+      "chromium": [
+        {
+          "type": "pointerdown",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "field",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "mousedown",
+          "interface": "MouseEvent",
+          "trusted": true,
+          "target": "field",
+          "button": 0,
+          "detail": 1
+        },
+        {
+          "type": "focus",
+          "interface": "FocusEvent",
+          "trusted": true,
+          "target": "field"
+        },
+        {
+          "type": "focusin",
+          "interface": "FocusEvent",
+          "trusted": true,
+          "target": "field"
+        },
+        {
+          "type": "pointerup",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "field",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "mouseup",
+          "interface": "MouseEvent",
+          "trusted": true,
+          "target": "field",
+          "button": 0,
+          "detail": 1
+        },
+        {
+          "type": "click",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "field",
+          "pointerType": "mouse",
+          "isPrimary": false,
+          "button": 0
+        },
+        {
+          "type": "keydown",
+          "interface": "KeyboardEvent",
+          "trusted": true,
+          "target": "field",
+          "key": "a",
+          "code": "KeyA"
+        },
+        {
+          "type": "beforeinput",
+          "interface": "InputEvent",
+          "trusted": true,
+          "target": "field",
+          "data": "a",
+          "inputType": "insertText"
+        },
+        {
+          "type": "input",
+          "interface": "InputEvent",
+          "trusted": true,
+          "target": "field",
+          "data": "a",
+          "inputType": "insertText"
+        },
+        {
+          "type": "keyup",
+          "interface": "KeyboardEvent",
+          "trusted": true,
+          "target": "field",
+          "key": "a",
+          "code": "KeyA"
+        }
+      ],
+      "native": [
+        {
+          "type": "pointerdown",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "field",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "mousedown",
+          "interface": "MouseEvent",
+          "trusted": true,
+          "target": "field",
+          "button": 0,
+          "detail": 1
+        },
+        {
+          "type": "focus",
+          "interface": "FocusEvent",
+          "trusted": true,
+          "target": "field"
+        },
+        {
+          "type": "focusin",
+          "interface": "FocusEvent",
+          "trusted": true,
+          "target": "field"
+        },
+        {
+          "type": "pointerup",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "field",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "mouseup",
+          "interface": "MouseEvent",
+          "trusted": true,
+          "target": "field",
+          "button": 0,
+          "detail": 1
+        },
+        {
+          "type": "click",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "field",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "keydown",
+          "interface": "KeyboardEvent",
+          "trusted": true,
+          "target": "field",
+          "key": "a",
+          "code": "KeyA"
+        },
+        {
+          "type": "beforeinput",
+          "interface": "InputEvent",
+          "trusted": true,
+          "target": "field",
+          "data": "a",
+          "inputType": "insertText"
+        },
+        {
+          "type": "input",
+          "interface": "InputEvent",
+          "trusted": true,
+          "target": "field",
+          "data": "a",
+          "inputType": "insertText"
+        },
+        {
+          "type": "keyup",
+          "interface": "KeyboardEvent",
+          "trusted": true,
+          "target": "field",
+          "key": "a",
+          "code": "KeyA"
+        }
+      ],
+      "reason": "WebKit's click PointerEvent reads isPrimary true where Chromium reads false"
+    }
+  ],
+  "deferred": [
+    {
+      "members": [
+        "MessageEvent",
+        "PromiseRejectionEvent"
+      ],
+      "reason": "fields of type any, MessagePort and Promise need script values",
+      "owner": "messaging / script value groups"
+    },
+    {
+      "members": [
+        "StorageEvent"
+      ],
+      "reason": "storageArea is a Storage handle",
+      "owner": "web storage group"
+    },
+    {
+      "members": [
+        "ClipboardEvent",
+        "DragEvent"
+      ],
+      "reason": "clipboardData and dataTransfer are DataTransfer handles",
+      "owner": "clipboard and drag-and-drop groups"
+    },
+    {
+      "members": [
+        "CloseEvent"
+      ],
+      "reason": "WebSockets live under Modules/, which the generator skips",
+      "owner": "networking group"
+    },
+    {
+      "members": [
+        "TextEvent"
+      ],
+      "reason": "legacy, no constructor; reported as UIEvent by the type query",
+      "owner": "input/IME group"
+    },
+    {
+      "members": [
+        "SecurityPolicyViolationEvent"
+      ],
+      "reason": "not a UI event detail; kept out to keep I08 tight",
+      "owner": "security policy group"
+    },
+    {
+      "members": [
+        "ErrorEvent.error",
+        "ErrorEventInit.error",
+        "PopStateEvent.state",
+        "PopStateEventInit.state"
+      ],
+      "reason": "type any needs a script value",
+      "owner": "script value group"
+    },
+    {
+      "members": [
+        "AnimationEvent.animation",
+        "TransitionEvent.animation",
+        "AnimationEventInit.animation",
+        "TransitionEventInit.animation"
+      ],
+      "reason": "CSSAnimation and CSSTransition handles",
+      "owner": "Web Animations group"
+    }
+  ],
+  "abiConstantSweep": [
+    "host/RanvierWebCoreAbi.cpp:1305:    && offsetof(RvFormSubmission, body_length) == 48 && offsetof(RvFormSubmission, form) == 56 && offsetof(RvFormSubmission, submitter) == 64));",
+    "host/RanvierWebCoreAbi.cpp:1311:int32_t rv_abi_version(void) { return 47; }",
+    "host/RanvierWebCoreAbi.h:2: * Ranvier native WebCore C ABI, version 47.",
+    "tests/abi/Program.fs:51:    require (rv_abi_version () = 47) \"ABI version 47\"",
+    "tests/abi/binary_values.py:20:ABI = 47",
+    "tests/abi/capabilities.py:67:        expect(number(host, 4, b'unknown-future-facility', ctypes.byref(sentinel)) == -9 and sentinel.value == 42, 'Capability assertion failed')",
+    "tests/abi/capabilities.py:71:        expect(length.value == 42 and buffer.value == b'untouched', 'Capability assertion failed')",
+    "tests/abi/capabilities.py:115:        expect(number(host, 1, b'compositing-mode', ctypes.byref(old)) == -9 and old.value == 42, 'Capability assertion failed')",
+    "tests/abi/capabilities.py:119:            expect(sentinel.value == 42, 'Capability assertion failed')",
+    "tests/abi/capabilities.py:152:        expect(fact(host,0,b'input',0,ctypes.byref(stale)) == -9 and stale.value == 42,'Destroyed host is rejected before dereference')",
+    "tests/abi/caret_hit.py:21:ABI = 47",
+    "tests/abi/computed_style.py:110:        expect(query(detached, element, None, -1, ctypes.byref(result)) == -9 and result.value == 42,",
+    "tests/abi/computed_style.py:121:            expect(status == expected and result.value == 42, f'invalid context/input preserves output: {status}')",
+    "tests/abi/crypto_random.py:21:ABI = 47",
+    "tests/abi/css_supports.py:96:            expect(result.value == 42, 'condition error preserves output')",
+    "tests/abi/css_supports.py:110:            expect(result.value == 42, 'declaration error preserves output')",
+    "tests/abi/custom_properties.py:53:        expect(bind('rv_abi_version', unsigned, [])() == 47, 'Native39 ABI47 registration transport')",
+    "tests/abi/dialog_popover.py:19:ABI = 47",
+    "tests/abi/event_construction.py:59:    expect(bind('rv_abi_version', i32, [])() == 47, 'ABI version 47')",
+    "tests/abi/event_construction.py:131:        expect(screen_x(mouse, ctypes.byref(sx)) == OK and sx.value == 40, 'screenX')",
+    "tests/abi/event_construction.py:148:        expect(detail_json(base, None, 0, ctypes.byref(length)) == UNSUPPORTED and length.value == 42, 'non-custom detail unsupported, length untouched')",
+    "tests/abi/event_details.py:15:ABI = 47",
+    "tests/abi/focus_input.py:59:    expect(bind('rv_abi_version', i32, [])() == 47, 'ABI version 47')",
+    "tests/abi/form_collections.py:18:ABI = 47",
+    "tests/abi/form_submission.py:19:ABI = 47",
+    "tests/abi/fragment_rectangles.py:123:        expect(element_rects(document, ctypes.byref(result)) == -11 and result.value == 42, 'wrong element receiver preserves output')",
+    "tests/abi/geometry_values.py:169:        expect(read('point', retained_pointer, 'y') == 42.25, 'point remains mutable after quad release')",
+    "tests/abi/screen_metrics.py:18:ABI = 47",
+    "tests/abi/svg_view_selection.py:41:        expect(select(host,b'zoom',ctypes.byref(sentinel)) == -9 and sentinel.value == 42,'HTML document rejected before mutation')",
+    "tests/abi/svg_view_selection.py:135:            expect(sentinel.value == 42,'Invalid input preserves selected output')",
+    "tests/abi/svg_view_selection.py:150:        expect(select(host,b'zoom',ctypes.byref(sentinel)) == -9 and sentinel.value == 42,'Queries use current document after replacement')",
+    "tests/abi/svg_view_selection.py:157:        expect(select(expired,b'zoom',ctypes.byref(sentinel)) == -9 and sentinel.value == 42,'Expired host rejects before dereference and preserves output')",
+    "tests/abi/text_segmentation.py:18:ABI = 47",
+    "tests/abi/typed_style_values.py:93:        expect(bind('rv_abi_version', unsigned, [])() == 47, 'Native39 ABI47 cohort')",
+    "tests/abi/url_values.py:17:ABI = 47",
+    "tests/abi/viewport_events.py:22:ABI = 47",
+    "tests/abi/viewport_scroll.py:20:ABI = 47",
+    "tests/abi/visual_viewport.py:21:ABI = 47"
+  ],
+  "allocationAbsence": {
+    "record": "allocation-absence.json",
+    "sha256": "22916886cd4cfc57f7534434d77198d98705b3d76a47e660df2920bd2f13ce84"
+  },
+  "teardownImageSettled": {
+    "record": "../form-submission-evidence/teardown-image-settled.json",
+    "commit": "02d97a4"
+  }
+}

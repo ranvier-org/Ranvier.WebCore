@@ -5,6 +5,9 @@ from pathlib import Path
 import sys
 import threading
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
+
 
 def verify(native_directory):
     directory = Path(native_directory).resolve()
@@ -16,9 +19,7 @@ def verify(native_directory):
     assertions = 0
 
     def bind(name, returns, arguments):
-        function = getattr(library, name)
-        function.restype, function.argtypes = returns, arguments
-        return function
+        return bind_utf8(library, name, returns, arguments)
 
     def expect(condition, label):
         nonlocal assertions
@@ -54,7 +55,7 @@ def verify(native_directory):
         markup += b'<li id="item" style="list-style:c19-original inside"><span id="payload" style="display:inline-block">X</span></li>'
         markup += b'<li id="decimal" value="1" style="list-style:decimal inside"><span id="decimal-payload" style="display:inline-block">X</span></li>'
         markup += b'</ol><div id="reference"><span style="display:inline-block">WWWW</span><span id="reference-payload" style="display:inline-block">X</span></div></div>'
-        call('rv_dom_element_set_inner_html', [pointer, string], body, markup)
+        call('rv_dom_element_set_inner_html', [pointer, Utf8], body, markup)
         find = bind('rv_document_get_element_by_id', pointer, [pointer, string])
         nodes = {}
         for name in ['first', 'copy', 'item', 'payload', 'decimal', 'decimal-payload', 'reference', 'reference-payload']:
@@ -88,7 +89,7 @@ def verify(native_directory):
         decimal = advance('decimal', 'decimal-payload')
         expect(abs(literal - decimal) > 2, 'reference glyphs distinguish custom and decimal marker output')
         expect(abs(advance('item', 'payload') - literal) < 0.75, 'initial custom name renders wide symbols')
-        call('rv_dom_css_counter_style_rule_set_name', [pointer, string], rule, b'c19-renamed')
+        call('rv_dom_css_counter_style_rule_set_name', [pointer, Utf8], rule, b'c19-renamed')
         actual = text('rv_dom_css_counter_style_rule_get_name', rule)
         expect(actual == 'c19-renamed', 'name edit metadata: expected c19-renamed, got ' + actual)
         expect(text('rv_dom_css_rule_get_css_text', rule).startswith('@counter-style c19-renamed'), 'serialized rule uses new name')
@@ -98,9 +99,9 @@ def verify(native_directory):
         call('rv_element_set_style', [pointer, string, string, integer], nodes['item'], b'list-style-type', b'c19-renamed', 0)
         expect(abs(advance('item', 'payload') - literal) < 0.75, 'new counter name produces custom output')
         previous = text('rv_dom_css_rule_get_css_text', rule)
-        call('rv_dom_css_counter_style_rule_set_name', [pointer, string], rule, b'123')
+        call('rv_dom_css_counter_style_rule_set_name', [pointer, Utf8], rule, b'123')
         expect(text('rv_dom_css_rule_get_css_text', rule) == previous, 'invalid name preserves complete rule')
-        setter = bind('rv_dom_css_counter_style_rule_set_name', integer, [pointer, string])
+        setter = bind('rv_dom_css_counter_style_rule_set_name', integer, [pointer, Utf8])
         expect(setter(None, b'bad') == -1, 'null target rejected')
         expect(setter(rule, None) == -1, 'null name rejected')
         expect(setter(plain_rule, b'bad') == -11, 'wrong interface rejected')
@@ -115,7 +116,7 @@ def verify(native_directory):
         call('rv_dom_css_rule_get_parent_style_sheet', [pointer, ctypes.POINTER(pointer)], rule, ctypes.byref(parent))
         expect(not parent.value, 'removed counter has no parent sheet')
         expect(abs(advance('item', 'payload') - decimal) < 0.75, 'removed counter no longer formats marker')
-        call('rv_dom_css_counter_style_rule_set_name', [pointer, string], rule, b'c19-detached')
+        call('rv_dom_css_counter_style_rule_set_name', [pointer, Utf8], rule, b'c19-detached')
         expect(text('rv_dom_css_counter_style_rule_get_name', rule) == 'c19-detached', 'detached rule remains editable')
     finally:
         for release, value in reversed(retained):

@@ -6,7 +6,18 @@
     "exclude lists members left out by name, as Interface.member, or member alone for every interface.",
     "atomArguments lists operations whose C++ takes AtomString for string arguments the IDL does not mark [AtomString].",
     "Members whose types or extended attributes the generator does not map are left out on their own and listed",
-    "in gen/dom-report.txt."
+    "in gen/dom-report.txt.",
+    "callbackObjectRoots lists callback interfaces passed as refcounted object handles; contract names the shared",
+    "contract's function type, and resultEnum the integer enumeration it returns.",
+    "typedArrayViewTypes lists the IDL types passed as an in/out typed array: an element kind, a writable buffer and its",
+    "byte length; only a [ReturnValue] argument maps. windowObjectBindings binds the operations of the object a readonly",
+    "Window attribute (accessor) holds, called through the Window of a checked Document.",
+    "eventTargetObjects lists interfaces derived directly from EventTarget whose handles are RvEventTarget references; attached is the C++ condition under which their members answer, else RV_ERR_DETACHED.",
+    "setlikeBindings and maplikeBindings bind an interface's setlike or maplike declaration through the adapter class of host/dom/<adapter>.h: size, has, values or get and entries (snapshot copies), and add or set, delete and clear unless readonly.",
+    "browserWellFormedUnions and browserWellFormedSetters list the unions and interfaces whose USVString inputs the",
+    "Fable browser provider converts to well-formed strings. Every generated string input is UTF-8 with an explicit byte",
+    "length; sequenceStringSpans only names the string sequences of its interfaces Utf8.",
+    "elementArrayReflections lists [Reflect] FrozenArray<Element>? attributes bound to the engine's element array reflection: the getter returns a snapshot sequence, or none for null; the setter takes a sequence, or none to clear."
   ],
   "attributeBridges": {
     "Document.adoptedStyleSheets": {
@@ -108,14 +119,12 @@
     "CSSOMKeywordValue": {
       "receiver": "Document",
       "factory": "CSSOMKeywordValue::create",
-      "passReceiver": false,
-      "stringInputs": "utf8-lengths"
+      "passReceiver": false
     },
     "CSSUnitValue": {
       "receiver": "Document",
       "factory": "CSSUnitValue::create",
-      "passReceiver": false,
-      "stringInputs": "utf8-lengths"
+      "passReceiver": false
     },
     "CSSUnparsedValue": {
       "receiver": "Document",
@@ -125,13 +134,143 @@
     "CSSOMVariableReferenceValue": {
       "receiver": "Document",
       "factory": "CSSOMVariableReferenceValue::create",
+      "passReceiver": false
+    },
+    "SubmitEvent": {
+      "receiver": "Document",
+      "factory": "SubmitEvent::create",
+      "passReceiver": false
+    },
+    "FormDataEvent": {
+      "receiver": "Document",
+      "factory": "FormDataEvent::create",
+      "passReceiver": false
+    },
+    "ToggleEvent": {
+      "receiver": "Document",
+      "factory": "ToggleEvent::create",
+      "passReceiver": false
+    },
+    "CommandEvent": {
+      "receiver": "Document",
+      "factory": "CommandEvent::create",
+      "passReceiver": false
+    },
+    "DOMFormData": {
+      "receiver": "Document",
+      "factory": "DOMFormData::create"
+    },
+    "Blob": {
+      "receiver": "Document",
+      "factory": "Blob::create"
+    },
+    "File": {
+      "receiver": "Document",
+      "factory": "File::create"
+    },
+    "DOMURL": {
+      "receiver": "Document",
+      "factory": "DOMURL::create",
+      "passReceiver": false
+    },
+    "URLSearchParams": {
+      "receiver": "Document",
+      "factory": "URLSearchParams::create",
+      "passReceiver": false
+    },
+    "URLPattern": {
+      "receiver": "Document",
+      "factory": "URLPattern::create",
+      "passReceiver": false
+    },
+    "ErrorEvent": {
+      "receiver": "Document",
+      "factory": "ErrorEvent::create",
       "passReceiver": false,
-      "stringInputs": "utf8-lengths"
+      "globalObject": true
+    },
+    "ProgressEvent": {
+      "receiver": "Document",
+      "factory": "ProgressEvent::create",
+      "passReceiver": false
+    },
+    "CSSAnimationEvent": {
+      "receiver": "Document",
+      "factory": "CSSAnimationEvent::create",
+      "passReceiver": false
+    },
+    "CSSTransitionEvent": {
+      "receiver": "Document",
+      "factory": "CSSTransitionEvent::create",
+      "passReceiver": false
+    },
+    "ContentVisibilityAutoStateChangeEvent": {
+      "receiver": "Document",
+      "factory": "ContentVisibilityAutoStateChangeEvent::create",
+      "passReceiver": false
+    },
+    "AnimationPlaybackEvent": {
+      "receiver": "Document",
+      "factory": "AnimationPlaybackEvent::create",
+      "passReceiver": false
+    },
+    "PageTransitionEvent": {
+      "receiver": "Document",
+      "factory": "PageTransitionEvent::create",
+      "passReceiver": false
+    },
+    "HashChangeEvent": {
+      "receiver": "Document",
+      "factory": "HashChangeEvent::create",
+      "passReceiver": false
+    },
+    "MediaQueryListEvent": {
+      "receiver": "Document",
+      "factory": "MediaQueryListEvent::create",
+      "passReceiver": false
+    },
+    "PopStateEvent": {
+      "receiver": "Document",
+      "factory": "PopStateEvent::create",
+      "passReceiver": false,
+      "globalObject": true
+    },
+    "CompositionEvent": {
+      "receiver": "Document",
+      "factory": "CompositionEvent::create",
+      "passReceiver": false
+    },
+    "Highlight": {
+      "receiver": "Document",
+      "factory": "RanvierCollectionLike::createHighlight",
+      "passReceiver": false
+    },
+    "FileReader": {
+      "receiver": "Document",
+      "factory": "FileReader::create"
     }
   },
   "dictionaryCppTypes": {
-    "CSSStyleSheetInit": "CSSStyleSheet::Init"
+    "CSSStyleSheetInit": "CSSStyleSheet::Init",
+    "SubmitEventInit": "SubmitEvent::Init",
+    "FormDataEventInit": "FormDataEvent::Init",
+    "ToggleEventInit": "ToggleEvent::Init",
+    "CommandEventInit": "CommandEvent::Init",
+    "FilePropertyBag": "File::PropertyBag",
+    "ErrorEventInit": "ErrorEvent::Init",
+    "ProgressEventInit": "ProgressEvent::Init",
+    "AnimationEventInit": "CSSAnimationEvent::Init",
+    "TransitionEventInit": "CSSTransitionEvent::Init",
+    "ContentVisibilityAutoStateChangeEventInit": "ContentVisibilityAutoStateChangeEvent::Init",
+    "PageTransitionEventInit": "PageTransitionEvent::Init",
+    "HashChangeEventInit": "HashChangeEvent::Init",
+    "MediaQueryListEventInit": "MediaQueryListEvent::Init",
+    "PopStateEventInit": "PopStateEvent::Init",
+    "CompositionEventInit": "CompositionEvent::Init"
   },
+  "dictionaryObjectMembers": [
+    "FormDataEventInit.formData"
+  ],
   "flattenUnionTypedefs": [
     "CSSPerspectiveValue"
   ],
@@ -190,6 +329,10 @@
     "CSSSkewY.ay": {
       "interface": "CSSNumericValue",
       "root": "CSSStyleValue"
+    },
+    "FormDataEvent.formData": {
+      "interface": "DOMFormData",
+      "root": "DOMFormData"
     }
   },
   "nestedDictionaries": [
@@ -200,34 +343,44 @@
     "DOMPointReadOnly": "DOMPoint",
     "DOMMatrixReadOnly": "DOMMatrix"
   },
-  "dictionaryStringInputs": {
-    "DOMCSSCustomPropertyDescriptor": "utf8-lengths-presence"
-  },
   "stringifiers": [
     "CSSStyleValue",
     "DOMMatrixReadOnly",
-    "CSSTransformComponent"
+    "CSSTransformComponent",
+    "URLSearchParams"
   ],
-  "complexStringSpans": [
+  "browserWellFormedUnions": [
     "USVStringOrCSSOMVariableReferenceValue",
     "CSSStyleValueOrUSVString",
     "DOMStringOrSequenceOfUnrestrictedDouble",
-    "CSSNumericValueOrDOMStringOrCSSOMKeywordValue"
+    "CSSNumericValueOrDOMStringOrCSSOMKeywordValue",
+    "FileOrUSVString",
+    "BufferSourceOrBlobOrUSVString",
+    "USVStringOrURLPatternInit",
+    "UndefinedOrUSVString",
+    "SequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString"
   ],
   "complexNullableElements": [
     "CSSStyleValue"
   ],
-  "interfaceStringInputs": {
-    "CSSOMKeywordValue": "utf8-lengths",
-    "CSSOMVariableReferenceValue": "utf8-lengths",
-    "StylePropertyMapReadOnly": "utf8-lengths",
-    "StylePropertyMap": "utf8-lengths",
-    "DOMMatrix": "utf8-lengths"
-  },
+  "browserWellFormedSetters": [
+    "CSSOMKeywordValue",
+    "CSSOMVariableReferenceValue",
+    "StylePropertyMapReadOnly",
+    "StylePropertyMap",
+    "DOMMatrix",
+    "DOMFormData",
+    "Blob",
+    "DOMURL",
+    "URLSearchParams",
+    "URLPattern"
+  ],
   "objectContexts": {
     "StylePropertyMapReadOnly": "Document",
     "StylePropertyMap": "Document",
-    "DOMMatrix": "Document"
+    "DOMMatrix": "Document",
+    "DOMFormData": "Document",
+    "URLSearchParams": "Document"
   },
   "finiteNumberInputs": [
     "CSSUnitValue",
@@ -243,7 +396,8 @@
     "SVGAnimatedNumber",
     "SVGAnimationElement",
     "SVGFEGaussianBlurElement",
-    "SVGFEDropShadowElement"
+    "SVGFEDropShadowElement",
+    "Document.caretPositionFromPoint"
   ],
   "interfaces": [
     "Node",
@@ -318,6 +472,7 @@
     "HTMLTitleElement",
     "SVGElement",
     "MathMLElement",
+    "MathMLMathElement",
     "HTMLStyleElement",
     "SVGStyleElement",
     "HTMLLinkElement",
@@ -389,6 +544,9 @@
     "NodeList",
     "RadioNodeList",
     "HTMLCollection",
+    "HTMLFormControlsCollection",
+    "HTMLOptionsCollection",
+    "DOMFormData",
     "ValidityState",
     "Event",
     "UIEvent",
@@ -399,6 +557,21 @@
     "FocusEvent",
     "InputEvent",
     "CompositionEvent",
+    "SubmitEvent",
+    "FormDataEvent",
+    "ToggleEvent",
+    "CommandEvent",
+    "ErrorEvent",
+    "ProgressEvent",
+    "CSSAnimationEvent",
+    "CSSTransitionEvent",
+    "ContentVisibilityAutoStateChangeEvent",
+    "AnimationPlaybackEvent",
+    "PageTransitionEvent",
+    "HashChangeEvent",
+    "MediaQueryListEvent",
+    "PopStateEvent",
+    "BeforeUnloadEvent",
     "SVGGraphicsElement",
     "SVGGeometryElement",
     "SVGPolygonElement",
@@ -493,7 +666,21 @@
     "SVGScriptElement",
     "SVGSwitchElement",
     "SVGTitleElement",
-    "SVGUseElement"
+    "SVGUseElement",
+    "NodeFilter",
+    "NodeIterator",
+    "TreeWalker",
+    "Blob",
+    "File",
+    "FileList",
+    "CaretPosition",
+    "DOMURL",
+    "URLSearchParams",
+    "URLPattern",
+    "VisualViewport",
+    "Highlight",
+    "HighlightRegistry",
+    "FileReader"
   ],
   "skipDirectories": [
     "Modules/",
@@ -503,6 +690,15 @@
   ],
   "customGetters": [
     "Node.nodeType"
+  ],
+  "elementArrayReflections": [
+    "Element.ariaActionsElements",
+    "Element.ariaControlsElements",
+    "Element.ariaDescribedByElements",
+    "Element.ariaDetailsElements",
+    "Element.ariaErrorMessageElements",
+    "Element.ariaFlowToElements",
+    "Element.ariaLabelledByElements"
   ],
   "contract": {
     "htmlTags": "html/HTMLTagNames.in",
@@ -523,7 +719,6 @@
       "ClipboardEvent",
       "DragEvent",
       "ErrorEvent",
-      "FileList",
       "FormDataEvent",
       "GamepadEvent",
       "HTMLFormControlsCollection",
@@ -547,7 +742,6 @@
       "TextTrack",
       "TextTrackList",
       "TimeRanges",
-      "ToggleEvent",
       "TouchEvent"
     ],
     "aliases": {
@@ -555,7 +749,8 @@
       "CSSTransitionEvent": "TransitionEvent",
       "CSSOMKeywordValue": "CSSKeywordValue",
       "CSSStyleImageValue": "CSSImageValue",
-      "CSSOMVariableReferenceValue": "CSSVariableReferenceValue"
+      "CSSOMVariableReferenceValue": "CSSVariableReferenceValue",
+      "DOMURL": "URL"
     },
     "mixins": {
       "AriaAttributes": "ARIAMixin",
@@ -581,7 +776,8 @@
     "DOMRectReadOnly",
     "DOMPointReadOnly",
     "DOMMatrixReadOnly",
-    "CSSTransformComponent"
+    "CSSTransformComponent",
+    "Event"
   ],
   "interfaceHeaders": {
     "SVGAnimatedInteger": "svg/properties/SVGAnimatedPropertyImpl.h",
@@ -611,6 +807,16 @@
       "q"
     ]
   },
+  "eventInterfaceCasts": [
+    "FormDataEvent",
+    "ProgressEvent",
+    "ContentVisibilityAutoStateChangeEvent",
+    "PageTransitionEvent",
+    "HashChangeEvent",
+    "MediaQueryListEvent",
+    "PopStateEvent",
+    "CustomEvent"
+  ],
   "castVia": {
     "SVGAnimationElement": "SVGElement",
     "RadioNodeList": "LiveNodeList",
@@ -639,6 +845,7 @@
     "ElementCreationOptions.customElementRegistry",
     "ImportNodeOptions.customElementRegistry",
     "AddEventListenerOptions.signal",
+    "EventInit.trusted",
     "AddEventListenerOptions.webkitTrustedOnly",
     "Document.cookie",
     "Document.domain",
@@ -691,25 +898,34 @@
     "HTMLAnchorElement.attributionSourceId",
     "HTMLAnchorElement.attributionDestination",
     "HTMLAnchorElement.attributionSourceNonce",
-    "HTMLFormElement.submit",
-    "HTMLFormElement.requestSubmit",
     "HTMLFormElement.requestAutocomplete",
     "HTMLImageElement.decode",
     "HTMLInputElement.showPicker",
-    "HTMLSelectElement.showPicker"
+    "HTMLSelectElement.showPicker",
+    "NodeFilter.acceptNode",
+    "ErrorEvent.error",
+    "ErrorEventInit.error",
+    "PopStateEvent.state",
+    "PopStateEventInit.state",
+    "CSSAnimationEvent.animation",
+    "AnimationEventInit.animation",
+    "CSSTransitionEvent.animation",
+    "TransitionEventInit.animation",
+    "UIEventInit.view"
   ],
   "namespaceBindings": {
     "DOMCSSNamespace": {
       "receiver": "Document",
       "members": [
         "supports",
-        "registerProperty"
+        "registerProperty",
+        "highlights"
       ],
       "feature": "dom-css-supports",
       "memberFeatures": {
-        "registerProperty": "dom-css-register-property"
-      },
-      "stringInputs": "utf8-lengths"
+        "registerProperty": "dom-css-register-property",
+        "highlights": "dom-custom-highlights"
+      }
     }
   },
   "staticBindings": {
@@ -718,48 +934,42 @@
       "members": [
         "fromMatrix"
       ],
-      "feature": "dom-geometry-matrix-readonly",
-      "stringInputs": "utf8-lengths"
+      "feature": "dom-geometry-matrix-readonly"
     },
     "DOMMatrix": {
       "receiver": "Document",
       "members": [
         "fromMatrix"
       ],
-      "feature": "dom-geometry-matrix",
-      "stringInputs": "utf8-lengths"
+      "feature": "dom-geometry-matrix"
     },
     "DOMRectReadOnly": {
       "receiver": "Document",
       "members": [
         "fromRect"
       ],
-      "feature": "dom-geometry-rect-readonly",
-      "stringInputs": "utf8-lengths"
+      "feature": "dom-geometry-rect-readonly"
     },
     "DOMRect": {
       "receiver": "Document",
       "members": [
         "fromRect"
       ],
-      "feature": "dom-geometry-rect",
-      "stringInputs": "utf8-lengths"
+      "feature": "dom-geometry-rect"
     },
     "DOMPointReadOnly": {
       "receiver": "Document",
       "members": [
         "fromPoint"
       ],
-      "feature": "dom-geometry-point-readonly",
-      "stringInputs": "utf8-lengths"
+      "feature": "dom-geometry-point-readonly"
     },
     "DOMPoint": {
       "receiver": "Document",
       "members": [
         "fromPoint"
       ],
-      "feature": "dom-geometry-point",
-      "stringInputs": "utf8-lengths"
+      "feature": "dom-geometry-point"
     },
     "DOMQuad": {
       "receiver": "Document",
@@ -767,8 +977,7 @@
         "fromRect",
         "fromQuad"
       ],
-      "feature": "dom-geometry-quad",
-      "stringInputs": "utf8-lengths"
+      "feature": "dom-geometry-quad"
     },
     "CSSStyleValue": {
       "receiver": "Document",
@@ -776,23 +985,158 @@
         "parse",
         "parseAll"
       ],
-      "feature": "dom-css-style-values",
-      "stringInputs": "utf8-lengths"
+      "feature": "dom-css-style-values"
+    },
+    "DOMURL": {
+      "receiver": "Document",
+      "members": [
+        "parse",
+        "canParse",
+        "createObjectURL",
+        "revokeObjectURL"
+      ],
+      "feature": "dom-url-static",
+      "memberFeatures": {
+        "createObjectURL": "blob-urls",
+        "revokeObjectURL": "blob-urls"
+      }
     }
   },
   "iterableBindings": {
     "StylePropertyMapReadOnly": {
       "feature": "dom-css-style-map-entries"
+    },
+    "DOMFormData": {
+      "feature": "dom-form-data-entries"
+    },
+    "URLSearchParams": {
+      "feature": "dom-url-search-params-entries"
     }
   },
   "windowBindings": {
-    "DOMWindow": {
+    "DOMWindow": [
+      {
+        "receiver": "Document",
+        "members": [
+          "getComputedStyle"
+        ],
+        "feature": "dom-computed-style"
+      },
+      {
+        "receiver": "Document",
+        "members": [
+          "scrollX",
+          "scrollY",
+          "scroll",
+          "scrollTo",
+          "scrollBy"
+        ],
+        "feature": "dom-window-scrolling"
+      },
+      {
+        "receiver": "Document",
+        "members": [
+          "visualViewport"
+        ],
+        "feature": "visual-viewport"
+      }
+    ]
+  },
+  "callbackObjectRoots": {
+    "NodeFilter": {
+      "contract": "Node -> NodeFilterResult",
+      "resultEnum": {
+        "name": "NodeFilterResult",
+        "cases": {
+          "Accept": 1,
+          "Reject": 2,
+          "Skip": 3
+        }
+      }
+    }
+  },
+  "byteSpanTypes": [
+    "BufferSource"
+  ],
+  "typedArrayViewTypes": [
+    "ArrayBufferView"
+  ],
+  "windowObjectBindings": {
+    "Crypto": {
       "receiver": "Document",
+      "accessor": "crypto",
       "members": [
-        "getComputedStyle"
+        "getRandomValues",
+        "randomUUID"
       ],
-      "feature": "dom-computed-style",
-      "stringInputs": "utf8-lengths"
+      "feature": "dom-crypto-random"
+    },
+    "Screen": {
+      "receiver": "Document",
+      "accessor": "screen",
+      "members": [
+        "width",
+        "height",
+        "availLeft",
+        "availTop",
+        "availWidth",
+        "availHeight",
+        "colorDepth",
+        "pixelDepth"
+      ],
+      "feature": "dom-screen"
+    },
+    "ScreenOrientation": {
+      "receiver": "Document",
+      "accessor": "screen.orientation",
+      "members": [
+        "type",
+        "angle"
+      ],
+      "feature": "dom-screen-orientation"
+    }
+  },
+  "creationGatedInterfaces": {
+    "CaretPosition": "Document.caretPositionFromPoint",
+    "VisualViewport": "DOMWindow.visualViewport"
+  },
+  "contextSettingsObjects": [
+    "FileReader"
+  ],
+  "eventTargetObjects": {
+    "FileReader": {},
+    "VisualViewport": {
+      "attached": "impl->frame()"
+    }
+  },
+  "resultDictionaries": [
+    "URLPatternResult",
+    "URLPatternComponentResult",
+    "URLPatternInit"
+  ],
+  "sequenceStringSpans": [
+    "URLSearchParams"
+  ],
+  "runtimeTypePublicNames": [
+    "Event"
+  ],
+  "runtimeTypeExtras": {
+    "Event": [
+      "CustomEvent"
+    ]
+  },
+  "getterExpressions": {
+    "AnimationPlaybackEvent.currentTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->currentTime()) return CSSNumberish { *time }; return std::nullopt; }()",
+    "AnimationPlaybackEvent.timelineTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->timelineTime()) return CSSNumberish { *time }; return std::nullopt; }()"
+  },
+  "setlikeBindings": {
+    "Highlight": {
+      "adapter": "RanvierCollectionLike"
+    }
+  },
+  "maplikeBindings": {
+    "HighlightRegistry": {
+      "adapter": "RanvierCollectionLike"
     }
   }
 }

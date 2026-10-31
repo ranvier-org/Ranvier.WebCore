@@ -1,0 +1,687 @@
+{
+  "browser": "156.0.8078.4",
+  "constructed": [
+    {
+      "interface": "ErrorEvent",
+      "defaults": {
+        "interface": "ErrorEvent",
+        "type": "error",
+        "bubbles": false,
+        "cancelable": false,
+        "composed": false,
+        "isTrusted": false,
+        "fields": {
+          "message": "",
+          "filename": "",
+          "lineno": 0,
+          "colno": 0
+        }
+      },
+      "full": {
+        "interface": "ErrorEvent",
+        "type": "error",
+        "bubbles": true,
+        "cancelable": true,
+        "composed": true,
+        "isTrusted": false,
+        "fields": {
+          "message": "boom",
+          "filename": "https://app.test/a.js",
+          "lineno": 3,
+          "colno": 4
+        }
+      },
+      "engineOnlyAttributes": [
+        "error"
+      ]
+    },
+    {
+      "interface": "ProgressEvent",
+      "defaults": {
+        "interface": "ProgressEvent",
+        "type": "progress",
+        "bubbles": false,
+        "cancelable": false,
+        "composed": false,
+        "isTrusted": false,
+        "fields": {
+          "lengthComputable": false,
+          "loaded": 0,
+          "total": 0
+        }
+      },
+      "full": {
+        "interface": "ProgressEvent",
+        "type": "progress",
+        "bubbles": true,
+        "cancelable": true,
+        "composed": true,
+        "isTrusted": false,
+        "fields": {
+          "lengthComputable": true,
+          "loaded": 5,
+          "total": 10
+        }
+      },
+      "engineOnlyAttributes": []
+    },
+    {
+      "interface": "AnimationEvent",
+      "defaults": {
+        "interface": "AnimationEvent",
+        "type": "animationend",
+        "bubbles": false,
+        "cancelable": false,
+        "composed": false,
+        "isTrusted": false,
+        "fields": {
+          "animationName": "",
+          "elapsedTime": 0,
+          "pseudoElement": ""
+        }
+      },
+      "full": {
+        "interface": "AnimationEvent",
+        "type": "animationend",
+        "bubbles": true,
+        "cancelable": true,
+        "composed": true,
+        "isTrusted": false,
+        "fields": {
+          "animationName": "spin",
+          "elapsedTime": 1.5,
+          "pseudoElement": "::before"
+        }
+      },
+      "engineOnlyAttributes": [
+        "animation",
+        "pseudoTarget"
+      ]
+    },
+    {
+      "interface": "TransitionEvent",
+      "defaults": {
+        "interface": "TransitionEvent",
+        "type": "transitionend",
+        "bubbles": false,
+        "cancelable": false,
+        "composed": false,
+        "isTrusted": false,
+        "fields": {
+          "propertyName": "",
+          "elapsedTime": 0,
+          "pseudoElement": ""
+        }
+      },
+      "full": {
+        "interface": "TransitionEvent",
+        "type": "transitionend",
+        "bubbles": true,
+        "cancelable": true,
+        "composed": true,
+        "isTrusted": false,
+        "fields": {
+          "propertyName": "opacity",
+          "elapsedTime": 0.25,
+          "pseudoElement": "::after"
+        }
+      },
+      "engineOnlyAttributes": [
+        "animation",
+        "pseudoTarget"
+      ]
+    },
+    {
+      "interface": "ContentVisibilityAutoStateChangeEvent",
+      "defaults": {
+        "interface": "ContentVisibilityAutoStateChangeEvent",
+        "type": "contentvisibilityautostatechange",
+        "bubbles": false,
+        "cancelable": false,
+        "composed": false,
+        "isTrusted": false,
+        "fields": {
+          "skipped": false
+        }
+      },
+      "full": {
+        "interface": "ContentVisibilityAutoStateChangeEvent",
+        "type": "contentvisibilityautostatechange",
+        "bubbles": true,
+        "cancelable": true,
+        "composed": true,
+        "isTrusted": false,
+        "fields": {
+          "skipped": true
+        }
+      },
+      "engineOnlyAttributes": []
+    },
+    {
+      "interface": "AnimationPlaybackEvent",
+      "defaults": {
+        "interface": "AnimationPlaybackEvent",
+        "type": "finish",
+        "bubbles": false,
+        "cancelable": false,
+        "composed": false,
+        "isTrusted": false,
+        "fields": {
+          "currentTime": null,
+          "timelineTime": null
+        }
+      },
+      "full": {
+        "interface": "AnimationPlaybackEvent",
+        "type": "finish",
+        "bubbles": true,
+        "cancelable": true,
+        "composed": true,
+        "isTrusted": false,
+        "fields": {
+          "currentTime": 12,
+          "timelineTime": 34
+        }
+      },
+      "engineOnlyAttributes": []
+    },
+    {
+      "interface": "PageTransitionEvent",
+      "defaults": {
+        "interface": "PageTransitionEvent",
+        "type": "pageshow",
+        "bubbles": false,
+        "cancelable": false,
+        "composed": false,
+        "isTrusted": false,
+        "fields": {
+          "persisted": false
+        }
+      },
+      "full": {
+        "interface": "PageTransitionEvent",
+        "type": "pageshow",
+        "bubbles": true,
+        "cancelable": true,
+        "composed": true,
+        "isTrusted": false,
+        "fields": {
+          "persisted": true
+        }
+      },
+      "engineOnlyAttributes": []
+    },
+    {
+      "interface": "HashChangeEvent",
+      "defaults": {
+        "interface": "HashChangeEvent",
+        "type": "hashchange",
+        "bubbles": false,
+        "cancelable": false,
+        "composed": false,
+        "isTrusted": false,
+        "fields": {
+          "oldURL": "",
+          "newURL": ""
+        }
+      },
+      "full": {
+        "interface": "HashChangeEvent",
+        "type": "hashchange",
+        "bubbles": true,
+        "cancelable": true,
+        "composed": true,
+        "isTrusted": false,
+        "fields": {
+          "oldURL": "https://app.test/#one",
+          "newURL": "https://app.test/#two"
+        }
+      },
+      "engineOnlyAttributes": []
+    },
+    {
+      "interface": "MediaQueryListEvent",
+      "defaults": {
+        "interface": "MediaQueryListEvent",
+        "type": "change",
+        "bubbles": false,
+        "cancelable": false,
+        "composed": false,
+        "isTrusted": false,
+        "fields": {
+          "media": "",
+          "matches": false
+        }
+      },
+      "full": {
+        "interface": "MediaQueryListEvent",
+        "type": "change",
+        "bubbles": true,
+        "cancelable": true,
+        "composed": true,
+        "isTrusted": false,
+        "fields": {
+          "media": "(min-width: 300px)",
+          "matches": true
+        }
+      },
+      "engineOnlyAttributes": []
+    },
+    {
+      "interface": "PopStateEvent",
+      "defaults": {
+        "interface": "PopStateEvent",
+        "type": "popstate",
+        "bubbles": false,
+        "cancelable": false,
+        "composed": false,
+        "isTrusted": false,
+        "fields": {
+          "hasUAVisualTransition": false
+        }
+      },
+      "full": {
+        "interface": "PopStateEvent",
+        "type": "popstate",
+        "bubbles": true,
+        "cancelable": true,
+        "composed": true,
+        "isTrusted": false,
+        "fields": {
+          "hasUAVisualTransition": true
+        }
+      },
+      "engineOnlyAttributes": [
+        "state"
+      ]
+    },
+    {
+      "interface": "CompositionEvent",
+      "defaults": {
+        "interface": "CompositionEvent",
+        "type": "compositionupdate",
+        "bubbles": false,
+        "cancelable": false,
+        "composed": false,
+        "isTrusted": false,
+        "fields": {
+          "data": "",
+          "detail": 0
+        }
+      },
+      "full": {
+        "interface": "CompositionEvent",
+        "type": "compositionupdate",
+        "bubbles": true,
+        "cancelable": true,
+        "composed": true,
+        "isTrusted": false,
+        "fields": {
+          "data": "ka",
+          "detail": 2
+        }
+      },
+      "engineOnlyAttributes": []
+    }
+  ],
+  "typeQuery": [
+    {
+      "interface": "Event",
+      "name": "Event"
+    },
+    {
+      "interface": "CustomEvent",
+      "name": "CustomEvent"
+    },
+    {
+      "interface": "UIEvent",
+      "name": "UIEvent"
+    },
+    {
+      "interface": "MouseEvent",
+      "name": "MouseEvent"
+    },
+    {
+      "interface": "KeyboardEvent",
+      "name": "KeyboardEvent"
+    },
+    {
+      "interface": "FocusEvent",
+      "name": "FocusEvent"
+    },
+    {
+      "interface": "SubmitEvent",
+      "name": "SubmitEvent"
+    },
+    {
+      "interface": "FormDataEvent",
+      "name": "FormDataEvent"
+    },
+    {
+      "interface": "ToggleEvent",
+      "name": "ToggleEvent"
+    },
+    {
+      "interface": "CommandEvent",
+      "name": "CommandEvent"
+    }
+  ],
+  "dispatched": [
+    {
+      "name": "load",
+      "order": "set",
+      "events": [
+        {
+          "type": "animationstart",
+          "interface": "AnimationEvent",
+          "trusted": true,
+          "target": "b",
+          "animationName": "spin",
+          "elapsedTime": 0,
+          "pseudoElement": "::before"
+        },
+        {
+          "type": "animationend",
+          "interface": "AnimationEvent",
+          "trusted": true,
+          "target": "b",
+          "animationName": "spin",
+          "elapsedTime": 0,
+          "pseudoElement": "::before"
+        },
+        {
+          "type": "contentvisibilityautostatechange",
+          "interface": "ContentVisibilityAutoStateChangeEvent",
+          "trusted": true,
+          "target": "cv",
+          "skipped": true
+        },
+        {
+          "type": "error",
+          "interface": "Event",
+          "trusted": true,
+          "target": "img"
+        },
+        {
+          "type": "pageshow",
+          "interface": "PageTransitionEvent",
+          "trusted": true,
+          "target": "#document",
+          "persisted": false
+        }
+      ]
+    },
+    {
+      "name": "animation",
+      "order": "sequence",
+      "events": [
+        {
+          "type": "animationstart",
+          "interface": "AnimationEvent",
+          "trusted": true,
+          "target": "a",
+          "animationName": "spin",
+          "elapsedTime": 0,
+          "pseudoElement": ""
+        },
+        {
+          "type": "animationend",
+          "interface": "AnimationEvent",
+          "trusted": true,
+          "target": "a",
+          "animationName": "spin",
+          "elapsedTime": 0.05,
+          "pseudoElement": ""
+        }
+      ]
+    },
+    {
+      "name": "transition",
+      "order": "sequence",
+      "events": [
+        {
+          "type": "transitionrun",
+          "interface": "TransitionEvent",
+          "trusted": true,
+          "target": "t",
+          "propertyName": "opacity",
+          "elapsedTime": 0,
+          "pseudoElement": ""
+        },
+        {
+          "type": "transitionstart",
+          "interface": "TransitionEvent",
+          "trusted": true,
+          "target": "t",
+          "propertyName": "opacity",
+          "elapsedTime": 0,
+          "pseudoElement": ""
+        },
+        {
+          "type": "transitionend",
+          "interface": "TransitionEvent",
+          "trusted": true,
+          "target": "t",
+          "propertyName": "opacity",
+          "elapsedTime": 0.05,
+          "pseudoElement": ""
+        }
+      ]
+    },
+    {
+      "name": "media query change",
+      "order": "sequence",
+      "events": [
+        {
+          "type": "change",
+          "interface": "MediaQueryListEvent",
+          "trusted": true,
+          "target": "media",
+          "media": "(min-width: 380px)",
+          "matches": false
+        }
+      ]
+    },
+    {
+      "name": "dialog show",
+      "order": "sequence",
+      "events": [
+        {
+          "type": "beforetoggle",
+          "interface": "ToggleEvent",
+          "trusted": true,
+          "target": "dialog",
+          "oldState": "closed",
+          "newState": "open"
+        },
+        {
+          "type": "focus",
+          "interface": "FocusEvent",
+          "trusted": true,
+          "target": "dialog"
+        },
+        {
+          "type": "focusin",
+          "interface": "FocusEvent",
+          "trusted": true,
+          "target": "dialog"
+        },
+        {
+          "type": "toggle",
+          "interface": "ToggleEvent",
+          "trusted": true,
+          "target": "dialog",
+          "oldState": "closed",
+          "newState": "open"
+        }
+      ]
+    },
+    {
+      "name": "click",
+      "order": "sequence",
+      "events": [
+        {
+          "type": "pointerdown",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "button",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "mousedown",
+          "interface": "MouseEvent",
+          "trusted": true,
+          "target": "button",
+          "button": 0,
+          "detail": 1
+        },
+        {
+          "type": "focus",
+          "interface": "FocusEvent",
+          "trusted": true,
+          "target": "button"
+        },
+        {
+          "type": "focusin",
+          "interface": "FocusEvent",
+          "trusted": true,
+          "target": "button"
+        },
+        {
+          "type": "pointerup",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "button",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "mouseup",
+          "interface": "MouseEvent",
+          "trusted": true,
+          "target": "button",
+          "button": 0,
+          "detail": 1
+        },
+        {
+          "type": "click",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "button",
+          "pointerType": "mouse",
+          "isPrimary": false,
+          "button": 0
+        }
+      ]
+    },
+    {
+      "name": "wheel",
+      "order": "sequence",
+      "events": [
+        {
+          "type": "wheel",
+          "interface": "WheelEvent",
+          "trusted": true,
+          "target": "DIV",
+          "deltaMode": 0
+        }
+      ]
+    },
+    {
+      "name": "type",
+      "order": "sequence",
+      "events": [
+        {
+          "type": "pointerdown",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "field",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "mousedown",
+          "interface": "MouseEvent",
+          "trusted": true,
+          "target": "field",
+          "button": 0,
+          "detail": 1
+        },
+        {
+          "type": "focus",
+          "interface": "FocusEvent",
+          "trusted": true,
+          "target": "field"
+        },
+        {
+          "type": "focusin",
+          "interface": "FocusEvent",
+          "trusted": true,
+          "target": "field"
+        },
+        {
+          "type": "pointerup",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "field",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "mouseup",
+          "interface": "MouseEvent",
+          "trusted": true,
+          "target": "field",
+          "button": 0,
+          "detail": 1
+        },
+        {
+          "type": "click",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "field",
+          "pointerType": "mouse",
+          "isPrimary": false,
+          "button": 0
+        },
+        {
+          "type": "keydown",
+          "interface": "KeyboardEvent",
+          "trusted": true,
+          "target": "field",
+          "key": "a",
+          "code": "KeyA"
+        },
+        {
+          "type": "beforeinput",
+          "interface": "InputEvent",
+          "trusted": true,
+          "target": "field",
+          "data": "a",
+          "inputType": "insertText"
+        },
+        {
+          "type": "input",
+          "interface": "InputEvent",
+          "trusted": true,
+          "target": "field",
+          "data": "a",
+          "inputType": "insertText"
+        },
+        {
+          "type": "keyup",
+          "interface": "KeyboardEvent",
+          "trusted": true,
+          "target": "field",
+          "key": "a",
+          "code": "KeyA"
+        }
+      ]
+    }
+  ]
+}

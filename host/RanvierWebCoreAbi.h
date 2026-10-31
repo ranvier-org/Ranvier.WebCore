@@ -1,5 +1,5 @@
 /*
- * Ranvier native WebCore C ABI, version 30.
+ * Ranvier native WebCore C ABI, version 54.
  *
  * The boundary consists of C scalars, UTF-8 strings, opaque handles and a caller-owned RGBA8 buffer,
  * and is identical on every WebCore port that compiles RanvierWebCoreAbi.cpp.
@@ -22,6 +22,11 @@
  * Strings out: a getter copies UTF-8 into a caller-owned buffer and writes the byte count, without a
  * terminator, to *length, or -1 for a null string. When capacity is below the byte count it returns
  * RV_ERR_BUFFER_TOO_SMALL with *length set and the buffer untouched.
+ *
+ * Strings in (ABI 51, breaking): every generated rv_dom_* string input carries UTF-8 bytes with an explicit byte
+ * count, so a string may hold U+0000. A plain argument is a pointer and a length, -1 for null or absent; a string
+ * inside a union or sequence is an RvDomUtf8StringSpan; a dictionary string field is an RvDomUtf8StringInput, present
+ * 0 for its default. The hand-written functions of this header take NUL-terminated UTF-8.
  */
 #pragma once
 
@@ -44,6 +49,7 @@ typedef struct RvNode RvNode;
 typedef struct RvListener RvListener;
 typedef struct RvEvent RvEvent;
 typedef struct RvWatch RvWatch;
+typedef struct RvNodeFilter RvNodeFilter;
 typedef struct RvGpuFrame RvGpuFrame;
 
 /* Returns 0 on success. Any other value marks the listener as failed: the dispatch continues with the
@@ -106,6 +112,7 @@ enum {
     RV_EVENT_INPUT = 5,
     RV_EVENT_FOCUS = 6,
     RV_EVENT_OTHER = 7,
+    RV_EVENT_CUSTOM = 8,
 };
 
 /* Bits of rv_event_flags. */
@@ -200,6 +207,22 @@ RV_EXPORT RvListener* rv_node_add_event_listener(RvNode* target, const char* typ
  * when the listener is removed by another listener of the dispatch in progress. */
 RV_EXPORT int32_t rv_listener_remove(RvListener*);
 
+/* Returns RV_DOM_NODE_FILTER_FILTER_ACCEPT, _REJECT or _SKIP (1, 2 or 3) for node, which is borrowed for the call.
+ * Any other value marks the filter as failed: the traversal stops as for a throwing NodeFilter, its call returns
+ * RV_ERR_DOM_EXCEPTION, and rv_last_exception names ExistingExceptionError. */
+typedef int32_t (*RvNodeFilterCallback)(void* context, RvNode* node);
+/* Runs once with the filter's context, on the owning thread, when the engine drops its last reference. */
+typedef void (*RvNodeFilterRelease)(void* context);
+
+/* Creates a NodeFilter for rv_dom_document_create_tree_walker and rv_dom_document_create_node_iterator that calls
+ * callback(context, node). The filter belongs to the document of target. The caller owns the returned reference and
+ * drops it with rv_dom_node_filter_release; walkers, iterators and filter getter results hold their own. release, when
+ * not NULL, runs after the last of those references is dropped. Returns NULL on a NULL argument or the wrong thread. */
+RV_EXPORT RvNodeFilter* rv_node_filter_create(RvNode* target, RvNodeFilterCallback callback, void* context,
+    RvNodeFilterRelease release);
+/* Writes the context passed to rv_node_filter_create to *context, or NULL for a filter the host did not create. */
+RV_EXPORT int32_t rv_node_filter_context(RvNodeFilter* filter, void** context);
+
 /* Dispatches a new untrusted Event. *defaultPrevented is set to 1 when a listener cancelled it. */
 RV_EXPORT int32_t rv_node_dispatch_event(RvNode* target, const char* type, int32_t bubbles, int32_t cancelable,
     int32_t* defaultPrevented);
@@ -265,7 +288,8 @@ RV_EXPORT int32_t rv_event_key(RvEvent*, char* buffer, int32_t capacity, int32_t
 RV_EXPORT RvNode* rv_event_target(RvEvent*, int32_t current);
 
 /* Parts of the engine exception behind the latest RV_ERR_DOM_EXCEPTION, for rv_last_exception.
- * Names include the WebIDL TypeError/RangeError/SyntaxError cases as well as DOMException names. */
+ * Names include the WebIDL TypeError/RangeError/SyntaxError cases as well as DOMException names, and
+ * ExistingExceptionError for a failure reported by a host callback such as an RvNodeFilterCallback. */
 enum {
     RV_EXCEPTION_NAME = 0,
     RV_EXCEPTION_MESSAGE = 1,
@@ -338,6 +362,30 @@ typedef void (*RvResourceHandler)(void* context, RvResourceLoad* load, const cha
 /* Sets the host's resource handler, or with a NULL handler removes it. Without a handler each such load
  * fails. */
 RV_EXPORT int32_t rv_host_set_resource_handler(RvHost*, RvResourceHandler handler, void* context);
+
+/* A form submission ("form-submission", v42), from requestSubmit, submit, a submit button or implicit submission.
+ * method is "GET" or "POST". url is the request URL; a GET carries the entry list in its query. target is the
+ * submitter's formtarget, the form's target or the base target, such as "_blank", or "" without one. content_type is NULL for a GET, and is
+ * "application/x-www-form-urlencoded", "text/plain" or "multipart/form-data; boundary=..." for a POST. body points to
+ * body_length bytes of the encoded entry list, of which a multipart file part carries its headers and no file bytes.
+ * form and the submitter, NULL for none, are borrowed. Every pointer is valid only during the callback. */
+typedef struct RvFormSubmission {
+    uint32_t size;
+    const char* method;
+    const char* url;
+    const char* target;
+    const char* content_type;
+    const uint8_t* body;
+    int32_t body_length;
+    RvNode* form;
+    RvNode* submitter;
+} RvFormSubmission;
+/* Called on the host thread from rv_run_loop_cycle, after the call that submitted has returned and its submit and
+ * formdata events have run. The document is never navigated, with or without a handler. */
+typedef void (*RvFormSubmissionHandler)(void* context, const RvFormSubmission* submission);
+/* Sets the host's form submission handler, or with a NULL handler removes it; a submission without a handler is
+ * dropped. */
+RV_EXPORT int32_t rv_host_set_form_submission_handler(RvHost*, RvFormSubmissionHandler handler, void* context);
 /* Completes the load with a status 200 response of length bytes, which WebCore copies. contentType is a
  * Content-Type value such as "text/css; charset=utf-8". The response allows every origin, so fonts and
  * other CORS-mode loads pass. Inside the handler WebCore receives the response before this returns;
@@ -1106,6 +1154,24 @@ RV_EXPORT RvAxNode* rv_ax_parent(RvAxNode*);
 /* Writes *count, then a handle to each child in order. When capacity is below *count it returns
  * RV_ERR_BUFFER_TOO_SMALL and writes no handles, so capacity 0 reads the count. */
 RV_EXPORT int32_t rv_ax_children(RvAxNode*, RvAxNode** nodes, int32_t capacity, int32_t* count);
+
+/* v49: "accessibility-relations" for rv_abi_has. Kinds of rv_ax_relations: the node's ARIA relationship targets,
+ * from the attribute's ID references or the elements set through the matching Element.aria*Element(s) reflection. */
+enum {
+    RV_AX_RELATION_ACTIVE_DESCENDANT = 0,
+    RV_AX_RELATION_CONTROLS = 1,
+    RV_AX_RELATION_DESCRIBED_BY = 2,
+    RV_AX_RELATION_DETAILS = 3,
+    RV_AX_RELATION_ERROR_MESSAGE = 4,
+    RV_AX_RELATION_FLOW_TO = 5,
+    RV_AX_RELATION_LABELLED_BY = 6,
+    RV_AX_RELATION_OWNS = 7,
+};
+/* Writes *count, then a new reference to each target of the relation kind, in the order WebCore records them: the
+ * reference order of the attribute or the reflected elements, each target once. A target without an accessible
+ * object is left out. As rv_ax_children, capacity below *count returns RV_ERR_BUFFER_TOO_SMALL and writes no
+ * handles; an unknown kind returns RV_ERR_UNSUPPORTED, and a node whose object is gone RV_ERR_DETACHED. */
+RV_EXPORT int32_t rv_ax_relations(RvAxNode*, int32_t kind, RvAxNode** nodes, int32_t capacity, int32_t* count);
 /* Performs an action, as an assistive technology asks. Returns 1 when the node performed it, 0 when the action
  * does not apply to the node, or a negative status. */
 RV_EXPORT int32_t rv_ax_action(RvAxNode*, int32_t action);
@@ -1225,8 +1291,521 @@ RV_EXPORT int32_t rv_resource_cancel(uint64_t operation);
  * registered until released and holds no document. */
 RV_EXPORT int32_t rv_resource_release(uint64_t operation);
 
+/* Event construction and standalone targets ("event-construction", v32). */
+typedef struct RvEventTarget RvEventTarget;
+
+/* Kinds of rv_host_construct_event; each uses the engine's constructor for that interface and its init dictionary. */
+enum {
+    RV_CONSTRUCT_EVENT = 0,
+    RV_CONSTRUCT_CUSTOM = 1,
+    RV_CONSTRUCT_UI = 2,
+    RV_CONSTRUCT_MOUSE = 3,
+    RV_CONSTRUCT_KEYBOARD = 4,
+    RV_CONSTRUCT_FOCUS = 5,
+};
+
+/* The init dictionary fields of rv_host_construct_event. size is sizeof(RvEventInit). Fields that the kind's init
+ * dictionary lacks are ignored: detail for UI, mouse and focus kinds; the coordinates, button, buttons and
+ * relatedTarget for mouse; key, code, location, repeat and isComposing for keyboard; relatedTarget for focus;
+ * modifiers (RV_MODIFIER_* bits) for mouse and keyboard. customDetailJson is CustomEvent.detail as UTF-8 JSON text,
+ * parsed in the host document's realm; NULL is a null detail. key and code may be NULL for empty strings.
+ * relatedTarget is borrowed for the call. UIEvent.view stays null, as for an init dictionary without view. */
+typedef struct RvEventInit {
+    int32_t size;
+    int32_t bubbles;
+    int32_t cancelable;
+    int32_t composed;
+    int32_t detail;
+    int32_t modifiers;
+    double screenX;
+    double screenY;
+    double clientX;
+    double clientY;
+    int32_t button;
+    int32_t buttons;
+    const char* key;
+    const char* code;
+    int32_t location;
+    int32_t repeat;
+    int32_t isComposing;
+    RvEventTarget* relatedTarget;
+    const char* customDetailJson;
+} RvEventInit;
+
+/* A new untrusted event from the engine constructor of kind. The caller owns one reference and releases it with
+ * rv_event_release, before or after rv_host_destroy. A CustomEvent detail is parsed from JSON without running script
+ * (the host keeps script entry disallowed) and stays reachable while the event is alive and its document is the host's
+ * current document. Returns NULL for an unknown kind, a size other than sizeof(RvEventInit), a non-UTF-8 string,
+ * detail JSON the engine's parser rejects, or a call off the owning thread. The engine exposes MouseEvent clientX and
+ * clientY as integers. */
+RV_EXPORT RvEvent* rv_host_construct_event(RvHost*, int32_t kind, const char* type, const RvEventInit* init);
+/* CustomEvent.detail serialized as JSON in the event's realm, with the exact-byte UTF-8 protocol of rv_event_type:
+ * length and capacity exclude the terminator. A null detail writes "null". Returns RV_ERR_UNSUPPORTED, leaving
+ * *length unchanged, for an event that is not a CustomEvent, a detail JSON.stringify cannot serialize, or a detail
+ * whose document was replaced or destroyed (rv_host_load_html, rv_host_load_svg, rv_host_destroy). */
+RV_EXPORT int32_t rv_custom_event_detail_json(RvEvent*, char* buffer, int32_t capacity, int32_t* length);
+
+/* A new standalone EventTarget (the engine's EventTarget constructor) for the host's current document. The caller owns
+ * one reference and releases it with rv_event_target_release, before or after rv_host_destroy. Listeners added with
+ * rv_event_target_add_listener hold the target and are removed with rv_listener_remove, which also remains valid
+ * after rv_host_destroy. After the document is replaced or destroyed the target has no context; dispatch on it
+ * still runs its listeners on the owning thread. */
+RV_EXPORT RvEventTarget* rv_host_create_event_target(RvHost*);
+RV_EXPORT RvEventTarget* rv_event_target_retain(RvEventTarget*);
+RV_EXPORT void rv_event_target_release(RvEventTarget*);
+/* A new reference to the node as an EventTarget, for the rv_event_target_* functions. */
+RV_EXPORT RvEventTarget* rv_node_as_event_target(RvNode*);
+/* A new node reference when the target is a node, else NULL. */
+RV_EXPORT RvNode* rv_event_target_as_node(RvEventTarget*);
+/* 1 when both handles refer to the same target, else 0. */
+RV_EXPORT int32_t rv_event_target_equals(RvEventTarget* left, RvEventTarget* right);
+/* rv_node_add_event_listener for any EventTarget; remove the listener with rv_listener_remove. */
+RV_EXPORT RvListener* rv_event_target_add_listener(RvEventTarget*, const char* type, int32_t flags, RvEventCallback callback, void* context);
+/* rv_node_dispatch for any EventTarget. */
+RV_EXPORT int32_t rv_event_target_dispatch(RvEventTarget*, RvEvent*, int32_t* defaultPrevented);
+/* The event's target, or with current set its currentTarget, as a new EventTarget reference; NULL when it has none. */
+RV_EXPORT RvEventTarget* rv_event_get_target(RvEvent*, int32_t current);
+/* The relatedTarget of a mouse or focus event as a new EventTarget reference, or NULL. */
+RV_EXPORT RvEventTarget* rv_event_get_related_target(RvEvent*);
+
+/* Window event target and input state ("input-state", v34). */
+
+/* A new reference to the window of the host's current document, as an EventTarget for the rv_event_target_*
+ * functions; release it with rv_event_target_release. Each call returns a new reference; rv_event_target_equals is 1
+ * for two references to one window. Listeners receive every event type dispatched to the window: window events such
+ * as focus, blur and resize, and the capture and bubble phases of events dispatched to the document's nodes, with
+ * the window as currentTarget. A host has one window for its lifetime: replacing the document (rv_host_load_html,
+ * rv_host_load_svg) keeps the window and its listeners. A reference and its listeners stay valid after rv_host_destroy,
+ * and rv_listener_remove on them returns RV_OK. Returns NULL for a NULL host, a document without a window, or a call
+ * off the owning thread. */
+RV_EXPORT RvEventTarget* rv_host_window_event_target(RvHost* host);
+/* Writes Navigator.maxTouchPoints of the current document's window. RV_ERR_UNSUPPORTED when the document has no
+ * window. */
+RV_EXPORT int32_t rv_host_max_touch_points(RvHost* host, int32_t* value);
+
+/* v35: "viewport" for rv_abi_has. */
+typedef struct RvWindowMetrics {
+    /* sizeof(RvWindowMetrics), set by the caller. */
+    int32_t size;
+    /* CSS pixels: the viewport including scrollbars, and the window, which for a host is the viewport. */
+    int32_t innerWidth;
+    int32_t innerHeight;
+    int32_t outerWidth;
+    int32_t outerHeight;
+    /* The device scale times the page zoom. */
+    double devicePixelRatio;
+} RvWindowMetrics;
+
+/* Writes the window's Window.innerWidth/innerHeight/outerWidth/outerHeight/devicePixelRatio. Returns
+ * RV_ERR_UNSUPPORTED when metrics->size is smaller than RvWindowMetrics. */
+RV_EXPORT int32_t rv_host_window_metrics(RvHost*, RvWindowMetrics* metrics);
+/* Sets whether the page is visible, as the platform window is shown or minimized, hidden or occluded. A change of
+ * document.visibilityState queues a visibilitychange event at the document; a hidden page defers its resize
+ * event until it is visible. A host starts visible. */
+RV_EXPORT int32_t rv_host_set_visible(RvHost*, int32_t visible);
+/* Window.matchMedia(query) as a new EventTarget reference. Its "change" event fires in rv_host_update, after the
+ * window's resize and scroll events. The handle remains valid after rv_host_destroy. */
+RV_EXPORT RvEventTarget* rv_host_match_media(RvHost*, const char* query);
+/* MediaQueryList.matches and MediaQueryList.media; RV_ERR_WRONG_INTERFACE for another target. */
+RV_EXPORT int32_t rv_media_query_matches(RvEventTarget*, int32_t* matches);
+RV_EXPORT int32_t rv_media_query_media(RvEventTarget*, char* buffer, int32_t capacity, int32_t* length);
+
+/* v39: "dom-binary-values" for rv_abi_has. RvBlob is the generated handle of Blob and File, and RvFileList of
+ * FileList (RanvierWebCoreDom.h). The host's blob registry holds the bytes of every Blob and File it creates in
+ * memory, so reading them completes during the call. */
+typedef struct RvBlob RvBlob;
+typedef struct RvFileList RvFileList;
+
+/* Copies the bytes of blob into buffer and writes their count to *length. A capacity below the count copies
+ * nothing and returns RV_ERR_BUFFER_TOO_SMALL with the count in *length; buffer may be NULL for capacity 0.
+ * Returns RV_ERR_UNSUPPORTED for a blob whose bytes are not held in memory, such as a file-backed one. */
+RV_EXPORT int32_t rv_blob_read_bytes(RvBlob* blob, uint8_t* buffer, int64_t capacity, int64_t* length);
+/* A new FileList holding count files in order, as a new reference. files may be NULL for count 0.
+ * Returns RV_ERR_WRONG_INTERFACE for an item that is a Blob and not a File. */
+RV_EXPORT int32_t rv_file_list_create(RvBlob* const* files, int32_t count, RvFileList** result);
+
+/* v52: "blob-urls" for rv_abi_has. URL.createObjectURL and URL.revokeObjectURL are the generated
+ * rv_dom_domurl_create_object_url and rv_dom_domurl_revoke_object_url, and FileReader is the generated
+ * rv_dom_file_reader_* family over an RvEventTarget. The document's blob: loads, such as an <img> source or a
+ * stylesheet, are served by the engine from its blob registry and never reach the host's resource handler. A URL
+ * stops loading once revoked, and once its document is replaced or its host destroyed. */
+enum {
+    RV_BLOB_READ_TEXT = 0,
+    RV_BLOB_READ_BYTES = 1,
+};
+/* Blob.text() (RV_BLOB_READ_TEXT: the bytes decoded as UTF-8 with replacement, a leading BOM removed, delivered as
+ * UTF-8) or Blob.arrayBuffer() and Blob.bytes() (RV_BLOB_READ_BYTES), read asynchronously by the engine's blob loader
+ * in the host's current document, also for a file-backed blob. The operation follows rv_image_decode's delivery,
+ * rv_resource_cancel and rv_resource_release: SUCCEEDED with the result available from rv_blob_read_result, or
+ * LOAD_FAILED with the DOMException name from rv_blob_read_error, such as "NotFoundError" for a missing file.
+ * width and height are 0. A new document or rv_host_destroy delivers INVALIDATED to a read in flight. */
+RV_EXPORT int32_t rv_blob_read(RvHost*, RvBlob* blob, int32_t mode, RvResourceCompletion completion, void* context, uint64_t* operation);
+/* Reads the bytes of the blob a blob: URL refers to, as a native read of the URL in the host's current document; it is
+ * not fetch(). url is url_length bytes of UTF-8; a fragment is ignored. LOAD_FAILED for a revoked or unknown URL. Delivery
+ * follows rv_blob_read; rv_blob_read_type writes the blob's type. Returns RV_ERR_UNSUPPORTED for a URL that does not
+ * parse or whose scheme is not blob. */
+RV_EXPORT int32_t rv_blob_url_read(RvHost*, const uint8_t* url, int32_t url_length, RvResourceCompletion completion, void* context, uint64_t* operation);
+/* Copies a SUCCEEDED read's result into buffer and writes its byte count to *length, until rv_resource_release.
+ * Capacity, NULL buffer and RV_ERR_BUFFER_TOO_SMALL follow rv_blob_read_bytes. RV_ERR_UNSUPPORTED for another
+ * operation or outcome. */
+RV_EXPORT int32_t rv_blob_read_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length);
+/* The blob's type of a SUCCEEDED read, NUL-terminated UTF-8; capacity counts the NUL. */
+RV_EXPORT int32_t rv_blob_read_type(uint64_t operation, char* buffer, int32_t capacity, int32_t* length);
+/* The DOMException name of a LOAD_FAILED read, NUL-terminated; RV_ERR_UNSUPPORTED for another outcome. */
+RV_EXPORT int32_t rv_blob_read_error(uint64_t operation, char* buffer, int32_t capacity, int32_t* length);
+/* A new File backed by the file at path, which the app supplies and trusts: path_length bytes of UTF-8 naming an absolute
+ * path, or RV_ERR_UNSUPPORTED for a relative one. The file is not opened: name and type come from the path, and a file
+ * missing or deleted when read fails the read with "NotFoundError". rv_blob_read_bytes returns RV_ERR_UNSUPPORTED for
+ * it; read it with rv_blob_read, FileReader or an object URL. */
+RV_EXPORT int32_t rv_file_create_from_path(RvHost*, const uint8_t* path, int32_t path_length, RvBlob** result);
+
+enum {
+    RV_FILE_READER_RESULT_NULL = 0,
+    RV_FILE_READER_RESULT_STRING = 1,
+    RV_FILE_READER_RESULT_BYTES = 2,
+};
+/* FileReader.result: writes its kind, and copies a string as UTF-8 or an ArrayBuffer's bytes into buffer with their
+ * count in *length (0 for NULL). Capacity follows rv_blob_read_bytes. RV_ERR_WRONG_INTERFACE for another target. */
+RV_EXPORT int32_t rv_file_reader_result(RvEventTarget* reader, int32_t* kind, uint8_t* buffer, int64_t capacity, int64_t* length);
+/* FileReader.error: the DOMException name, NUL-terminated, or *length = -1 for a null error. */
+RV_EXPORT int32_t rv_file_reader_error(RvEventTarget* reader, char* buffer, int32_t capacity, int32_t* length);
+
+/* "text-segmentation" for rv_abi_has: graphemes, words, sentences and line-break opportunities of UTF-16 text,
+ * with the engine's ICU. Graphemes and lines use WebKit's caret and line iterators (line-break normal; CSS loose,
+ * strict and anywhere are out of scope); words and sentences use ICU's iterators for the locale. Every word,
+ * sentence and line boundary is a grapheme boundary: a rule boundary inside a grapheme cluster joins its two segments. */
+enum {
+    RV_SEGMENT_GRAPHEME = 0,
+    RV_SEGMENT_WORD = 1,
+    RV_SEGMENT_SENTENCE = 2,
+    RV_SEGMENT_LINE = 3,
+};
+/* The segments of a text. Segment i starts at starts[i], in UTF-16 code units, and ends where segment i + 1 starts,
+ * the last at the text's length. word_like holds one flag per segment for RV_SEGMENT_WORD, 1 where ICU's rule status
+ * is UBRK_WORD_NONE_LIMIT or above (Intl.Segmenter's isWordLike), and is NULL otherwise. locale is ICU's valid
+ * locale for the request, NUL-terminated UTF-8. The buffers are owned until rv_text_segments_release. */
+typedef struct RvTextSegments {
+    int32_t count;
+    int32_t* starts;
+    int32_t* word_like;
+    char* locale;
+} RvTextSegments;
+/* Segments length UTF-16 code units of text at granularity for locale, a BCP 47 language tag; NULL or "" is the
+ * root locale. text may be NULL for length 0, which gives zero segments. A locale that is not a well-formed tag
+ * returns RV_ERR_DOM_EXCEPTION with a RangeError. Runs on the owning thread after the first rv_host_create, and
+ * keeps working after every host is destroyed. Windows packages segment with their own ICU 77; Linux and macOS
+ * packages use the system ICU, so results follow its version (rv_text_segmentation_version). */
+RV_EXPORT int32_t rv_text_segment(int32_t granularity, const char* locale, const uint16_t* text, int32_t length, RvTextSegments* result);
+/* Frees the buffers of segments and zeroes it; on any thread. */
+RV_EXPORT void rv_text_segments_release(RvTextSegments* segments);
+/* The ICU and Unicode versions behind rv_text_segment, such as "icu=77.1 unicode=16.0", as rv_node_get_string
+ * copies a string. Windows packages carry ICU; Linux and macOS packages use the system's. */
+RV_EXPORT int32_t rv_text_segmentation_version(char* buffer, int32_t capacity, int32_t* length);
+
+/* v45: "page-scale" and "obscured-insets" for rv_abi_has, and "visual-viewport" for the generated
+ * rv_dom_window_get_visual_viewport and rv_dom_visual_viewport_* functions (RanvierWebCoreDom.h). A VisualViewport
+ * handle is an RvEventTarget: its resize and scroll events fire in rv_host_update, after the window's. */
+
+/* Sets the page scale, as a pinch zoom does: 1 at creation. Returns RV_ERR_UNSUPPORTED for a non-finite scale or one
+ * at or below 0; any other scale applies unclamped, since the engine has no minimum or maximum. originX and originY
+ * are the scroll position, in CSS pixels of the scaled document, that the viewport takes. The visual viewport is then
+ * the viewport's CSS size divided by the scale, in LayoutUnits of 1/64 CSS pixel: 320 / 1.5 reads 213.328125. While
+ * the page is scaled, window.innerWidth and innerHeight are the visual viewport's size, and the layout viewport stays
+ * at the document's origin, so VisualViewport.offsetLeft and offsetTop equal pageLeft and pageTop. */
+RV_EXPORT int32_t rv_host_set_page_scale(RvHost*, double scale, int32_t originX, int32_t originY);
+/* Writes the page scale. */
+RV_EXPORT int32_t rv_host_page_scale(RvHost*, double* scale);
+/* Sets the CSS pixel widths of the viewport's edges that host UI covers, such as a toolbar or an on-screen
+ * keyboard: 0 at creation. Returns RV_ERR_UNSUPPORTED for a non-finite or negative inset. The insets shrink the
+ * visual viewport and window.innerWidth and innerHeight by the covered edges, and fire the window's and then the
+ * visual viewport's resize event. Document coordinates stay in place, top inset included, and rv_host_element_at
+ * finds nothing in the covered right and bottom areas. */
+RV_EXPORT int32_t rv_host_set_obscured_insets(RvHost*, double top, double right, double bottom, double left);
+
 /* "dom-generated" and "dom:<Interface>" for rv_abi_has: the generated functions of RanvierWebCoreDom.h, one per
  * IDL member of the interfaces gen/dom.json lists, from the same library. */
+
+/* v46: "screen" for rv_abi_has: the app's display integration sets the screen a host's document reports through Screen,
+ * ScreenOrientation and the device-width, device-height and color media features. Until the first call the screen is
+ * the host's size in CSS pixels, all of it available, 24 bits deep, landscape-primary unless taller than wide; it
+ * then follows rv_host_resize. orientation is an RV_SCREEN_* value; ScreenOrientation.angle follows from it on the
+ * natural landscape orientation (landscape-primary 0, portrait-primary 90, landscape-secondary 180,
+ * portrait-secondary 270). A change of orientation fires the engine's change event. Orientation locking is not
+ * supported. Set size to sizeof(RvScreenMetrics). Returns RV_ERR_UNSUPPORTED, and changes nothing, for a size
+ * below this layout, a width or height of 0 or less, a negative available extent, a color depth outside 1-64 or
+ * an unknown orientation. A document kept past rv_host_destroy has no frame, and its Screen reports 0. */
+enum {
+    RV_SCREEN_PORTRAIT_PRIMARY = 0,
+    RV_SCREEN_PORTRAIT_SECONDARY = 1,
+    RV_SCREEN_LANDSCAPE_PRIMARY = 2,
+    RV_SCREEN_LANDSCAPE_SECONDARY = 3,
+};
+typedef struct RvScreenMetrics {
+    uint32_t size;
+    int32_t width;
+    int32_t height;
+    int32_t avail_left;
+    int32_t avail_top;
+    int32_t avail_width;
+    int32_t avail_height;
+    int32_t color_depth;
+    int32_t orientation;
+} RvScreenMetrics;
+RV_EXPORT int32_t rv_host_set_screen(RvHost*, const RvScreenMetrics* metrics);
+
+/* v44: "dom-crypto-random" for rv_abi_has: rv_dom_crypto_get_random_values and rv_dom_crypto_random_uuid
+ * (RanvierWebCoreDom.h) call the crypto object of a document's Window. */
+
+/* v50: "diagnostics" for rv_abi_has: native inspection of a host's document without a developer-tools frontend,
+ * an inspector protocol or script evaluation. Diagnostics are opt-in per host: until rv_host_set_diagnostics enables
+ * them, every rv_host_inspect_* call returns RV_ERR_UNSUPPORTED before reading the document. The platform facility
+ * "diagnostics" reports the opt-in as its enabled fact; "inspector-frontend" reports the developer-tools frontend,
+ * which no flavor implements.
+ *
+ * An RvDiagnostic is a snapshot: UTF-8 copies of what the engine reported, holding no engine object. It stays
+ * readable after its host disables diagnostics or is destroyed, and is freed only by rv_diagnostic_release. The
+ * rv_diagnostic_* functions run on any thread. */
+typedef struct RvDiagnostic RvDiagnostic;
+
+/* Enables (1) or disables (0) diagnostics for the host. Live snapshots are unaffected. */
+RV_EXPORT int32_t rv_host_set_diagnostics(RvHost*, int32_t enabled);
+
+/* Kinds of rv_diagnostic_kind. */
+enum {
+    RV_DIAGNOSTIC_RENDER_TREE = 1,
+    RV_DIAGNOSTIC_MATCHED_RULES = 2,
+    /* v54 */
+    RV_DIAGNOSTIC_CASCADE = 3,
+};
+
+/* Flags of rv_host_inspect_render_tree. The layer flags apply to a document dump only. */
+enum {
+    /* Every RenderLayer, including those that paint nothing. */
+    RV_RENDER_TREE_ALL_LAYERS = 1 << 0,
+    /* Annotates the positive, negative and normal-flow layer lists. */
+    RV_RENDER_TREE_LAYER_NESTING = 1 << 1,
+    /* Adds each box's layout and visual overflow rectangles. */
+    RV_RENDER_TREE_OVERFLOW = 1 << 2,
+    /* Adds the extra geometry of SVG renderers. */
+    RV_RENDER_TREE_SVG_GEOMETRY = 1 << 3,
+    /* Adds each element's id and class attributes. */
+    RV_RENDER_TREE_ID_AND_CLASS = 1 << 4,
+    /* Adds the renderers' pending-layout bits. */
+    RV_RENDER_TREE_LAYOUT_STATE = 1 << 5,
+};
+
+/* Writes a new RV_DIAGNOSTIC_RENDER_TREE snapshot to *diagnostic, with style and layout updated first. With target
+ * NULL or the host's document, its text is the engine's render tree dump of the main frame: one line per renderer
+ * and per text run, nested by two-space indentation, with each RenderLayer as a "layer" line. With an element of
+ * the document, it is the element's renderer subtree, one line per renderer in the same format, with no layer or
+ * text-run lines. Positions and sizes are in CSS pixels of the renderer's containing coordinate space. Returns
+ * RV_ERR_UNSUPPORTED for an unknown flag, a layer flag with an element, an element with no renderer or outside the
+ * document, or diagnostics disabled, and leaves *diagnostic unchanged on every error. */
+RV_EXPORT int32_t rv_host_inspect_render_tree(RvHost*, RvNode* target, int32_t flags, RvDiagnostic** diagnostic);
+
+/* Writes a new RV_DIAGNOSTIC_MATCHED_RULES snapshot for an element of the host's document, with style updated
+ * first: one entry per style rule whose selector list matches the element, in the engine's cascade order (user-agent
+ * rules, then user rules, then author rules, each ordered by cascade layer, specificity and position; rules inside
+ * a non-matching @media are absent), then one RV_RULE_ORIGIN_INLINE entry for a non-empty style attribute. Returns
+ * RV_ERR_NOT_ELEMENT for another node, RV_ERR_UNSUPPORTED for an element outside the document or diagnostics
+ * disabled, and leaves *diagnostic unchanged on every error. */
+RV_EXPORT int32_t rv_host_inspect_matched_rules(RvHost*, RvNode* element, RvDiagnostic** diagnostic);
+
+/* Origins of RV_RULE_ORIGIN. */
+enum {
+    RV_RULE_ORIGIN_USER_AGENT = 0,
+    RV_RULE_ORIGIN_USER = 1,
+    RV_RULE_ORIGIN_AUTHOR = 2,
+    RV_RULE_ORIGIN_INLINE = 3,
+    /* v54: a presentational attribute, or the direction of dir=auto; rv_host_inspect_cascade only. */
+    RV_RULE_ORIGIN_PRESENTATIONAL_HINT = 4,
+};
+
+/* Number fields of rv_diagnostic_entry_number. Specificity is the engine's (a, b, c) of the most specific selector
+ * in the rule's list that matches the element: :where() contributes (0, 0, 0) and :is() the most specific of its
+ * arguments. An inline entry has specificity (0, 0, 0) and no selectors. */
+enum {
+    RV_RULE_ORIGIN = 0,
+    RV_RULE_SPECIFICITY_A = 1,
+    RV_RULE_SPECIFICITY_B = 2,
+    RV_RULE_SPECIFICITY_C = 3,
+    /* Selectors in the rule's selector list. */
+    RV_RULE_SELECTOR_COUNT = 4,
+    /* Selectors of the list that match the element. */
+    RV_RULE_MATCHED_SELECTOR_COUNT = 5,
+};
+
+/* String fields of rv_diagnostic_entry_string, as the engine serialises them; an inline entry's selector fields
+ * are empty. */
+enum {
+    /* The rule's selector list. */
+    RV_RULE_SELECTOR_TEXT = 0,
+    /* The selector the specificity belongs to. */
+    RV_RULE_MATCHED_SELECTOR = 1,
+    /* The rule's declaration block, without braces. */
+    RV_RULE_DECLARATIONS = 2,
+};
+
+/* The snapshot's RV_DIAGNOSTIC_* kind, or RV_ERR_NULL_ARGUMENT. */
+RV_EXPORT int32_t rv_diagnostic_kind(RvDiagnostic* diagnostic);
+/* Copies a render-tree snapshot's text or a cascade snapshot's property name; a matched-rules snapshot's text is empty. */
+RV_EXPORT int32_t rv_diagnostic_text(RvDiagnostic* diagnostic, char* buffer, int32_t capacity, int32_t* length);
+/* The number of entries: 0 for a render-tree snapshot. */
+RV_EXPORT int32_t rv_diagnostic_count(RvDiagnostic* diagnostic);
+/* Copies a string field of entry index. Returns RV_ERR_UNSUPPORTED for an index or field out of range for the snapshot's kind. */
+RV_EXPORT int32_t rv_diagnostic_entry_string(RvDiagnostic* diagnostic, int32_t index, int32_t field, char* buffer, int32_t capacity, int32_t* length);
+/* Writes a number field of entry index. Returns RV_ERR_UNSUPPORTED, leaving *value unchanged, for an index or field
+ * out of range for the snapshot's kind. */
+RV_EXPORT int32_t rv_diagnostic_entry_number(RvDiagnostic* diagnostic, int32_t index, int32_t field, double* value);
+RV_EXPORT void rv_diagnostic_release(RvDiagnostic* diagnostic);
+/* The number of snapshots in the process not yet released. */
+RV_EXPORT int32_t rv_diagnostic_live_count(void);
+
+/* Rectangles of rv_host_inspect_box_model, each four doubles x, y, width, height. */
+enum {
+    RV_BOX_CONTENT = 0,
+    RV_BOX_PADDING = 4,
+    RV_BOX_BORDER = 8,
+    RV_BOX_MARGIN = 12,
+    RV_BOX_VALUES = 16,
+};
+
+/* Writes the element's content, padding, border and margin boxes as RV_BOX_VALUES doubles, with layout updated
+ * first. Each is the bounding rectangle of the box after transforms, in the coordinate space of rv_element_rect
+ * (Element.getBoundingClientRect): CSS pixels of the viewport after scrolling, with the element's zoom applied. The
+ * border box equals rv_element_rect. Without transforms the values are multiples of 1/64 px. Returns
+ * RV_ERR_NOT_ELEMENT for another node, RV_ERR_UNSUPPORTED for an element without a CSS box renderer (display: none
+ * or contents, an inline box, SVG content) or outside the document, or diagnostics disabled, and leaves values
+ * unchanged on every error. */
+RV_EXPORT int32_t rv_host_inspect_box_model(RvHost*, RvNode* element, double* values);
+
+/* v53: "coordinate-spaces" for rv_abi_has: points and box quads converted between named coordinate spaces of one
+ * host's document, through every CSS transform, perspective included, and the current scroll, page scale and device
+ * scale, with layout updated first and without running script. Spaces:
+ *   RV_SPACE_NODE   the local space of a node's CSS box: the border box's top-left corner is 0, 0, before the node's
+ *                   own transform. The document node's local space is its page space.
+ *   RV_SPACE_PAGE   CSS pixels of the document from its top-left corner, independent of scroll and page scale.
+ *   RV_SPACE_CLIENT CSS pixels of Element.getBoundingClientRect, Document.elementFromPoint, rv_host_element_at and
+ *                   MouseEvent.clientX and clientY.
+ *   RV_SPACE_HOST   CSS pixels of the host surface: the space of rv_host_mouse, rv_host_wheel and rv_host_dirty_rect.
+ *                   It equals CLIENT at page scale 1. While page-scaled, HOST is CLIENT times the page scale: the
+ *                   client point x, y is reached by rv_host_mouse at x * scale, y * scale.
+ *   RV_SPACE_DEVICE device pixels of the image rv_host_paint_rgba paints: HOST times the device scale.
+ * The app's window position on the screen is the windowing system's: a screen point is a DEVICE point plus the
+ * origin the app's windowing system reports for the host's surface. Points are double precision; WebCore maps them
+ * in single precision and LayoutUnits of 1/64 CSS pixel. Conversions agree with what the host paints and hit-tests.
+ * The slim software path paints without 3D compositing: the perspective property and transform-style: preserve-3d
+ * have no effect, and a perspective() function maps as the software paint draws it, so points of such chains lie up
+ * to 26.5 CSS pixels from where a 3D-compositing browser such as Chromium places them. */
+enum {
+    RV_SPACE_NODE = 0,
+    RV_SPACE_PAGE = 1,
+    RV_SPACE_CLIENT = 2,
+    RV_SPACE_HOST = 3,
+    RV_SPACE_DEVICE = 4,
+};
+/* Boxes of rv_node_box_quad, as CSS box edges. */
+enum {
+    RV_QUAD_BORDER_BOX = 0,
+    RV_QUAD_PADDING_BOX = 1,
+    RV_QUAD_CONTENT_BOX = 2,
+    RV_QUAD_MARGIN_BOX = 3,
+};
+enum {
+    /* The anchors of a conversion belong to different hosts. */
+    RV_ERR_WRONG_HOST = -12,
+};
+/* Converts count points of xy, as x0, y0, x1, y1 and so on, from fromSpace anchored at from to toSpace anchored at to,
+ * in place. RV_SPACE_NODE is the anchor node's own space; for the other spaces the anchor is any node of the
+ * document, the document node included. A NULL to anchors toSpace at from's document. xy changes only on RV_OK.
+ * Returns RV_ERR_NULL_ARGUMENT for a NULL from, or a NULL xy with count above 0; RV_ERR_DETACHED for an anchor
+ * outside the document a live host shows: a node removed from its document, one in a document that a later
+ * rv_host_load_html or rv_host_load_svg replaced, or one held past rv_host_destroy; RV_ERR_WRONG_HOST for anchors of
+ * two hosts; RV_ERR_UNSUPPORTED for an unknown space, a negative count, a non-finite coordinate, an anchor in a
+ * subframe document (a host's frame loader creates no subframes), an RV_SPACE_NODE anchor without a CSS box
+ * (display: none or contents, inline boxes, text and SVG shapes), or a point mapped into an RV_SPACE_NODE whose
+ * transforms are singular there, such as scale(0) or rotateY(90deg). */
+RV_EXPORT int32_t rv_node_convert_points(RvNode* from, int32_t fromSpace, RvNode* to, int32_t toSpace, double* xy, int32_t count);
+/* Writes the four corners of a node's box in toSpace anchored at to, as x, y pairs in the order of DOMQuad's p1 to
+ * p4: top-left, top-right, bottom-right, bottom-left. box is an RV_QUAD_* value; a NULL to is node's document. The
+ * statuses are those of rv_node_convert_points with node as the RV_SPACE_NODE anchor, and RV_ERR_UNSUPPORTED for an
+ * unknown box. */
+RV_EXPORT int32_t rv_node_box_quad(RvNode* node, int32_t box, RvNode* to, int32_t toSpace, double* quad);
+
+/* v54: "cascade-diagnostics" for rv_abi_has and as a platform facility, enabled with "diagnostics".
+ *
+ * Writes a new RV_DIAGNOSTIC_CASCADE snapshot of a longhand or custom property for an element of the host's document.
+ * property is a CSS property name of property_length UTF-8 bytes; the snapshot text is its canonical name.
+ *
+ * Entries are the declarations of the property in the element's cascade, in the engine's cascade input order: user
+ * agent, user, then author declarations, each ordered by cascade layer, specificity and position, with presentational
+ * hints first and the style attribute after the element's own rules. Rules of other tree scopes follow the shadow
+ * context order: :host() and ::slotted() rules precede the rules of the element's tree, and ::part() rules follow the
+ * style attribute; the winner reverses that order for !important. A logical or physical property also lists the
+ * declarations of its counterpart under the element's writing mode. RV_CASCADE_WINNER marks the declaration the
+ * engine's cascade selects, honouring !important, origin, layer and position; a level with no declaration has no
+ * winner. When the level has no winner and the property inherits, or its winner is inherit (or unset on an inherited
+ * property), the entries continue with the parent element in the composed tree at RV_CASCADE_DEPTH + 1, until a level
+ * whose winner is another value, or a level without a winner whose property does not inherit, or the root. A custom
+ * property inherits unless registered with inherits: false.
+ *
+ * The query reads the current DOM and the current rule sets, applying a pending style sheet change first; it updates
+ * no style and no layout. Container conditions are evaluated against the last layout, and a logical pair against the
+ * element's last computed writing mode. Declared limits: a winning revert or revert-layer is reported as that keyword;
+ * :visited declarations, @starting-style rules and animations are absent; RV_CASCADE_VALUE is the declared value, and
+ * var() resolution is reported by rv_element_computed_style.
+ *
+ * Returns RV_ERR_NULL_ARGUMENT for a NULL property, RV_ERR_NOT_ELEMENT for another node, RV_ERR_UNSUPPORTED for an
+ * unknown or shorthand property, a negative property_length, an element outside the document or diagnostics disabled,
+ * and leaves *diagnostic unchanged on every error. */
+RV_EXPORT int32_t rv_host_inspect_cascade(RvHost*, RvNode* element, const uint8_t* property, int32_t property_length, RvDiagnostic** diagnostic);
+
+/* Number fields of a cascade entry. The origin and specificity fields share the RV_RULE_* indices. */
+enum {
+    RV_CASCADE_ORIGIN = 0,
+    RV_CASCADE_SPECIFICITY_A = 1,
+    RV_CASCADE_SPECIFICITY_B = 2,
+    RV_CASCADE_SPECIFICITY_C = 3,
+    /* 1 for an !important declaration. */
+    RV_CASCADE_IMPORTANT = 4,
+    /* The layer's position in its origin's layer order from 0; -1 for unlayered declarations, hints and inline style. */
+    RV_CASCADE_LAYER_ORDER = 5,
+    /* 1 for the winner of its level. */
+    RV_CASCADE_WINNER = 6,
+    /* 0 for the element, n for its nth ancestor in the composed tree. */
+    RV_CASCADE_DEPTH = 7,
+    /* The rule's style sheet among the active style sheets of the tree scope defining the rule: the element's, its
+     * shadow root's for :host rules, its slot's for ::slotted() rules, or a host's for ::part() rules; -1 when no
+     * active sheet holds it. RV_CASCADE_LAYER_ORDER is the order of that tree scope's layers. */
+    RV_CASCADE_SHEET_INDEX = 8,
+    /* The rule's position among the sheet's style rules in pre-order, an imported sheet's rules in place of its
+     * @import; -1 with no sheet. */
+    RV_CASCADE_RULE_INDEX = 9,
+    /* The declaration's position in its declaration block, a shorthand counting once per longhand. */
+    RV_CASCADE_DECLARATION_INDEX = 10,
+    /* 1 for a value containing var() or another substitution function. */
+    RV_CASCADE_VARIABLE_REFERENCE = 11,
+    RV_CASCADE_NUMBER_FIELDS = 12,
+};
+
+/* String fields of a cascade entry, as the engine serialises them. The selector fields share the RV_RULE_* indices
+ * and are empty for hints and inline style. */
+enum {
+    RV_CASCADE_SELECTOR_TEXT = 0,
+    RV_CASCADE_MATCHED_SELECTOR = 1,
+    /* The declared longhand or custom property: the queried property or its logical counterpart. */
+    RV_CASCADE_PROPERTY = 2,
+    /* The declared value, without !important. */
+    RV_CASCADE_VALUE = 3,
+    /* The shorthand the declaration was expanded from, or empty. */
+    RV_CASCADE_SHORTHAND = 4,
+    /* The dotted cascade layer name, an anonymous layer as an empty segment; empty when unlayered. */
+    RV_CASCADE_LAYER = 5,
+    /* The enclosing @media, @supports and @container conditions, outermost first, one per line as the at-keyword, a
+     * space and the condition text. */
+    RV_CASCADE_CONDITIONS = 6,
+    RV_CASCADE_STRING_FIELDS = 7,
+};
 
 #ifdef __cplusplus
 }

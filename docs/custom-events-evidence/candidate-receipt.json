@@ -1,0 +1,62 @@
+{
+  "status": "private-win-x64-producer-candidate",
+  "nativeVersion": "0.1.0-preview.24",
+  "abi": 32,
+  "parent": {
+    "pr": "ranvier-org/Ranvier.WebCore#133",
+    "head": "0db15104ab52ef6ef54bcebd82fd6f78f0ede11a",
+    "runtime": "C:/wk/h05-private/native22-final (WebCore babc8278, Host 153db475, JSC 95149cdc)"
+  },
+  "builder": "C:/wk/i02-private/build-native24.py (borrows H05 objects and build-win-slim read-only; asserts mtimes and hashes)",
+  "runtime": {
+    "brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
+    "brotlidec.dll": "d42e2160f76f29a91f8be01b009b585c45496219794e16eab90b3599b6f70a7f",
+    "harfbuzz-icu.dll": "27662b477f7cb0c20cee64543a06296a48a00a17b6c7b57629bb166a30d5b164",
+    "harfbuzz.dll": "b519b2abc7f446ca45bff77aae1708f45afc9f557698bcd7295837cce0f12bfa",
+    "icudt77.dll": "b00d2fb856f548608c137e771257a70d0722654535c6c00b371c0fab3e2b802c",
+    "icuin77.dll": "e3785739e1fcf2e38053bbb85ef5f0f5dab63f865cbda762da5258566085a240",
+    "icuuc77.dll": "189c623f996c41488c262867bae04a5bb33dd485bd423e0a8bec05c455a90902",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+    "jpeg62.dll": "394811c1b1bf1fd914248a145ba3fcad1f5f27c7009754ce08e48ccb0266b785",
+    "libpng16.dll": "8b46592c5ea338dd6b23ca380d6db64a7849c2a534fc465a006ec668645d8185",
+    "libsharpyuv.dll": "df165de83480692f494c23061ef9c40c10abe19a89b1fa9fae2f1cd5152c07a7",
+    "libwebp.dll": "550c5a4860f61d32a274fdd7b5c8cbe266eee28b3a3ca888195248ea1d5e0f71",
+    "libwebpdemux.dll": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163",
+    "libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
+    "libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
+    "RanvierWebCoreHost.dll": "b02be2f42d28d7721ab4406c3be7c3741dc1a9f04f663f635e8bb595ab5a6edf",
+    "RanvierWebCoreHost.lib": "7d0c4b7f5e64932f23c30529517535d238f09145c11f113496e75734b2d441cb",
+    "RanvierWebCoreHost.pdb": "4d1bcc4415dd95cfd812c71dc8aa0a8f4925c77ffd32a5941c93d4a857678e9d",
+    "WebCore.dll": "16181e6fd8c2c877a682c02b4f5e82497fdc3b1f144a9f2b64896f515aaff972",
+    "WebCore.lib": "604d9f45802d3a9cfffdd7d7dda37cd66e74d81e478ee168aa545743b5689271",
+    "WebCore.pdb": "86af0749e1a3eac3d62c6dc807dd0af7c0926ff8aa4878ac8810b69e3c75c7c3",
+    "zlib1.dll": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93"
+  },
+  "eventConstructionProbe": 82,
+  "nativeProbes": 34,
+  "driver": {
+    "frames": "exit 0",
+    "teardown": "exit 0",
+    "logSha256": {
+      "frames": "4d2e0ba57a08c5c2509428487abb4c876acab9a017a29a10498a58b3cf83b48c",
+      "teardown": "73ae992d8550608c9f558f03a7293a845e9281cc0f02bfb6f6fcb64f7274c1f8"
+    }
+  },
+  "repositoryGates": {
+    "test_host_prepare": "ccba7e225a87d1416d0da608ca030775246d59ded9b3999f75a461ee9022b64b",
+    "test_package_contract": "ba234b46f149c96f5c273cfbbf09f6b669bfc77c5b8e7c5e587fbc01be1ed783",
+    "test_publish_gate": "a93e58ba3a2c9b1c6000aa5c7b44659b14734213f5211929402e03fdfcf7635b",
+    "test_release": "423a4c0a8b6d9987e20bce545cf47ff520ab99a0b35823c905a01aeb6bc52c72",
+    "test_resource_packages": "e506213cf81519b9b0ef32971c06410763ca5117a7aaa9bf91089ab726012d45"
+  },
+  "disallowVmEntry": "The host holds JSC::DisallowVMEntry from rv_host_create to rv_host_destroy (RvHost::noScript); JSONParse and JSONStringify ran under it.",
+  "providerNotes": [
+    "MouseEvent clientX/clientY are integers in this engine; Chromium measured the same for a constructed MouseEvent (clientX 12.5 reads 12)",
+    "Chromium reports button 0 for a constructed mouseover regardless of init; mousedown and click keep the init button",
+    "At target, capture listeners run before non-capture listeners"
+  ],
+  "chromiumMeasurement": {
+    "script": "new MouseEvent(type, init) in headless Chromium (Playwright 1.64.1)",
+    "result": "[mouseover button, click button, mouseover button, mousedown button, clientX for 12.5] = [0,2,0,2,12]"
+  }
+}

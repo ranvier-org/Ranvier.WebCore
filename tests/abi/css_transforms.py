@@ -6,6 +6,9 @@ from pathlib import Path
 import sys
 import threading
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
+
 
 def verify(native_directory):
     directory = Path(native_directory).resolve()
@@ -38,9 +41,7 @@ def verify(native_directory):
         _fields_ = [('size', unsigned), ('is2_d', ctypes.POINTER(integer))]
 
     def bind(name, result, arguments):
-        function = getattr(library, name)
-        function.restype, function.argtypes = result, arguments
-        return function
+        return bind_utf8(library, name, result, arguments)
 
     translate_create = bind('rv_dom_css_translate_create', integer, [pointer] * 4 + [ctypes.POINTER(pointer)])
 
@@ -247,7 +248,7 @@ def verify(native_directory):
         parsed_matrix = handle('rv_dom_css_transform_value_to_matrix', [pointer], [parsed], 'rv_dom_dom_matrix_read_only_release')
         expect(affine(parsed_matrix) == (2, 0, 0, 3, 10, 20), 'parsed CSS transform exposes structured list')
         markup = b'<style>#paint {position:absolute;left:0;top:0;width:10px;height:10px;transform-origin:0 0}</style><div id="paint"></div>'
-        call('rv_dom_element_set_inner_html', [pointer, ctypes.c_char_p], body, markup)
+        call('rv_dom_element_set_inner_html', [pointer, Utf8], body, markup)
         painted = bind('rv_document_get_element_by_id', pointer, [pointer, ctypes.c_char_p])(host, b'paint')
         expect(bool(painted), 'find rendering fixture element', True)
         retained.append(('rv_node_release', painted))

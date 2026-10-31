@@ -1,0 +1,104 @@
+{
+  "group": [
+    "T06 #76"
+  ],
+  "native": "0.1.0-preview.35",
+  "abi": 43,
+  "features": [
+    "text-segmentation"
+  ],
+  "members": [
+    "rv_text_segment",
+    "rv_text_segments_release",
+    "rv_text_segmentation_version"
+  ],
+  "sourceHeadOfBatch": "3d5774e1cd50e39953d2b2e8c86b055431a4bfba",
+  "route": {
+    "decision": "native: WebKit CachedTextBreakIterator (graphemes, lines) and ICU ubrk with the locale (words, sentences) behind a hand-written export",
+    "icuVsChromium": {
+      "grapheme": "20/20",
+      "word": "17/20",
+      "sentence": "20/20",
+      "line": "20/20"
+    },
+    "dotnetStringInfoGraphemes": "18/20",
+    "files": [
+      "cases.json",
+      "chromium.json",
+      "icu.json",
+      "dotnet-stringinfo.json",
+      "icu_segment.py",
+      "chromium_segmenter.mjs"
+    ]
+  },
+  "green": {
+    "textSegmentationAssertions": 812,
+    "version": "icu=77.1 unicode=16.0\n[rtk] /!\\ No hook installed \u2014 run `rtk init -g` for automatic token savings\n\nEXIT_CODE=0",
+    "qualifiedDifferences": 15,
+    "probes": 48,
+    "allExitZero": true,
+    "rawAssertions": 71951,
+    "teardownCases": 84,
+    "teardownAllCollected": true
+  },
+  "chromiumOracle": {
+    "browser": "156.0.8078.4",
+    "cases": 26,
+    "locales": 16,
+    "line": "Intl.v8BreakIterator({type: \"line\"}); Intl.Segmenter has no line granularity"
+  },
+  "platformIcu": {
+    "win-x64": "packaged ICU 77.1 (Unicode 16.0): exact results checked",
+    "linux-x64": "system ICU (Ubuntu 24.04 runner); invariants checked, version reported by rv_text_segmentation_version in the CI log",
+    "linux-arm64": "system ICU (Ubuntu 24.04 arm runner); invariants checked, version in the CI log",
+    "osx-arm64": "system libicucore; invariants checked, version in the CI log"
+  },
+  "qualifications": [
+    {
+      "name": "full stop between letters",
+      "count": 14,
+      "reason": "UAX #29 WB6/WB7 keep a full stop between letters inside one word (MidNumLet), as the engine's ICU does; Chromium breaks there."
+    },
+    {
+      "name": "Hangul jamo join",
+      "count": 1,
+      "reason": "ICU puts a word boundary inside the grapheme cluster of conjoining jamo and a syllable; the engine joins the two segments so no grapheme splits, where Chromium splits it."
+    },
+    {
+      "name": "resolved locale",
+      "count": null,
+      "reason": "The engine reports ICU's valid locale; the Windows slim ICU data keeps only English locale resources, so most tags resolve to root. Chromium falls back to the browser default (en-GB here) for unknown tags."
+    },
+    {
+      "name": "line oracle",
+      "count": null,
+      "reason": "No standard browser line segmenter exists; the oracle is Chromium's non-standard Intl.v8BreakIterator."
+    },
+    {
+      "name": "system ICU",
+      "count": null,
+      "reason": "Linux and macOS segmentation follows the system ICU version; exact results are measured on ICU 77.1."
+    }
+  ],
+  "files": {
+    "absence_t06.py": "a9b1a8b217e12c81a3d9f918069956c7eae145e09a9685aad55b26d1b7ca2289",
+    "allocation-absence.json": "5f7aa508a323fd265f174b5ac980aad16597325f66c2d37d53090872c2e21d6c",
+    "batch-green.json": "96ff917bcc28671c30742eb5afc16fe087af40191d59f18b74d0f63e4fa81525",
+    "build_native35_candidate.py": "249b3fc0690ef2f7159e6eb5ec4b04e26bd43a3ee8b49ae03d4323094ed7a414",
+    "cases.json": "886f126b20a8bf112d74c7aa703dab1fcf78a0ea8c953da28d5f5b66f2c5ea94",
+    "chromium.json": "4eef5a9ecce33da53d344dda58a6b7cd5413b29e8b0361e9dc71baf2c3aeb4c1",
+    "chromium_segmenter.mjs": "9eaf11e562048a02a750cbc374a281ad44632767a35ec5b3f4b889a61e82938f",
+    "dotnet-stringinfo.json": "696dea647cd0ddd426ad0eb673781e94fe05a08d660ac39e285a71931868f9f3",
+    "icu.json": "c49f9880828f71c49a4f7cffffc5a90aff3023153efa567d2471278bf977d255",
+    "icu_segment.py": "3a086c712e2cd3ef3a90e27b37d56482dabae3dbc722feb08e2b3efc79b0c4d4",
+    "make_native35_evidence.py": "7c5a3f8b3ecd9bcbe1fe285d53cbc067dd82f3d9424d719816f547d9df7823ed",
+    "red-native33.log": "40268fefbf174d99458744d27a8132a34725ffd0aca9ab740e9a84c5fd39f553",
+    "run_native35_full_batch.py": "86ae39a4c1a0db6f05163f00138e76d75c1a4be6530b53a0ef45a5b991909f75",
+    "runtime-receipt.json": "be4dfade457cc78d8cdd2a107935b9a826b4ff87e793c4d5e6b696fb9d34217e",
+    "source-patches.json": "e8c2d291e75bcd0526b3d09465d172836c3e7e2b7b02fb4bbee066bc1b48e9bd",
+    "teardown-probes.json": "e728d223f8325af450b2d762989a624a1027c3bd775fca1bc3408ca148f3f2eb",
+    "text-segmentation-probe.log": "67f31608ea7d6d940b4acf511c284f0c2b68920aca16c4283f4651fbdc650d98",
+    "text-segmentation-repeat30.txt": "0618ee4435bc6aa4a94589f0a94ab22fe59a74fab744531080ef7992697d0da3",
+    "units_for_headers.py": "25cdc95256a4f38bdd7fbff1fcd04076c5263364abc7020841647abb660e2aaa"
+  }
+}

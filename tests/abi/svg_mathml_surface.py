@@ -3,6 +3,10 @@ import ctypes
 import os
 import pathlib
 import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
 
 
 def verify(native_directory):
@@ -18,9 +22,7 @@ def verify(native_directory):
     focus_nodes = []
 
     def bind(name, result, args):
-        function = getattr(library, name)
-        function.restype, function.argtypes = result, args
-        return function
+        return bind_utf8(library, name, result, args)
 
     def expect(condition, message):
         nonlocal count
@@ -57,7 +59,7 @@ def verify(native_directory):
             ('svg_element', b'http://www.w3.org/2000/svg', b'svg'),
             ('math_ml_element', b'http://www.w3.org/1998/Math/MathML', b'math'),
         ]:
-            node = handle('rv_dom_document_create_element_ns', [pointer, string, string, pointer], document, namespace, tag, None)
+            node = handle('rv_dom_document_create_element_ns', [pointer, Utf8, Utf8, pointer], document, namespace, tag, None)
             focus_nodes.append(node)
             expect(text('rv_dom_element_get_namespace_uri', [pointer], node) == namespace.decode(), tag.decode() + ' namespace')
             call('rv_node_append_child', [pointer, pointer], body, node)
@@ -65,14 +67,14 @@ def verify(native_directory):
             wrong_style = bind('rv_dom_html_element_get_style', integer, [pointer, pointers])
             expect(wrong_style(node, ctypes.byref(rejected)) == -11 and not rejected.value, prefix + ' is not HTMLElement')
             style = handle('rv_dom_' + prefix + '_get_style', [pointer], node, release='rv_dom_css_style_declaration_release')
-            call('rv_dom_css_style_declaration_set_property', [pointer, string, string, string], style, b'color', b'red', b'important')
-            expect(text('rv_dom_css_style_declaration_get_property_priority', [pointer, string], style, b'color') == 'important', prefix + ' priority')
-            expect(text('rv_dom_css_style_declaration_remove_property', [pointer, string], style, b'color') == 'red', prefix + ' removed value')
-            expect(text('rv_dom_css_style_declaration_get_property_priority', [pointer, string], style, b'color') == '', prefix + ' priority removed')
+            call('rv_dom_css_style_declaration_set_property', [pointer, Utf8, Utf8, Utf8], style, b'color', b'red', b'important')
+            expect(text('rv_dom_css_style_declaration_get_property_priority', [pointer, Utf8], style, b'color') == 'important', prefix + ' priority')
+            expect(text('rv_dom_css_style_declaration_remove_property', [pointer, Utf8], style, b'color') == 'red', prefix + ' removed value')
+            expect(text('rv_dom_css_style_declaration_get_property_priority', [pointer, Utf8], style, b'color') == '', prefix + ' priority removed')
             dataset = handle('rv_dom_' + prefix + '_get_dataset', [pointer], node, release='rv_dom_dom_string_map_release')
-            call('rv_dom_dom_string_map_set_named_item', [pointer, string, string], dataset, b'probe', 'native-λ'.encode())
-            expect(text('rv_dom_dom_string_map_named_item', [pointer, string], dataset, b'probe') == 'native-λ', prefix + ' dataset')
-            call('rv_dom_' + prefix + '_set_nonce', [pointer, string], node, b'native-nonce')
+            call('rv_dom_dom_string_map_set_named_item', [pointer, Utf8, Utf8], dataset, b'probe', 'native-λ'.encode())
+            expect(text('rv_dom_dom_string_map_named_item', [pointer, Utf8], dataset, b'probe') == 'native-λ', prefix + ' dataset')
+            call('rv_dom_' + prefix + '_set_nonce', [pointer, Utf8], node, b'native-nonce')
             expect(text('rv_dom_' + prefix + '_get_nonce', [pointer], node) == 'native-nonce', prefix + ' nonce')
             call('rv_dom_' + prefix + '_set_autofocus', [pointer, integer], node, 1)
             value = integer()
@@ -81,9 +83,9 @@ def verify(native_directory):
             call('rv_dom_' + prefix + '_set_tab_index', [pointer, integer], node, 0)
             call('rv_dom_' + prefix + '_get_tab_index', [pointer, numbers], node, ctypes.byref(value))
             expect(value.value == 0, prefix + ' tab index')
-            call('rv_dom_node_set_text_content', [pointer, string], node, b'x')
-            call('rv_dom_css_style_declaration_set_property', [pointer, string, string, string], style, b'width', b'40px', b'')
-            call('rv_dom_css_style_declaration_set_property', [pointer, string, string, string], style, b'height', b'20px', b'')
+            call('rv_dom_node_set_text_content', [pointer, Utf8], node, b'x')
+            call('rv_dom_css_style_declaration_set_property', [pointer, Utf8, Utf8, Utf8], style, b'width', b'40px', b'')
+            call('rv_dom_css_style_declaration_set_property', [pointer, Utf8, Utf8, Utf8], style, b'height', b'20px', b'')
             call('rv_host_update', [pointer], host)
             call('rv_dom_' + prefix + '_focus', [pointer, pointer], node, None)
             active = bind('rv_document_active_element', pointer, [pointer])(host)

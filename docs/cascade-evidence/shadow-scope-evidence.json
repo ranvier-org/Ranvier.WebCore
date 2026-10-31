@@ -1,0 +1,59 @@
+{
+  "group": "C25 #45 shadow-tree cascade scope",
+  "status": "lane-green (private Windows x64 slim; not accepted)",
+  "abi": 54,
+  "exports": "none added; rv_host_inspect_cascade contract comments updated (sheet index per defining tree scope, shadow context order)",
+  "red": {
+    "file": "shadow-red-candidate5.txt",
+    "runtime": "native46-candidate-5 (C25 f13cdbb)",
+    "finding": ":host, ::slotted() and ::part() rules from another tree scope reported specificity (0, 0, 0), empty matched selector, sheet and rule -1 and no layer name; winners and computed values already correct"
+  },
+  "fix": "RanvierInspectGlue: selectors matched at MatchedProperties::styleScopeOrdinal; RuleLocations per Style::Scope::forOrdinal",
+  "declaredLimit": "WebKit's ::slotted() specificity counts only its argument (css-scoping-1 adds the pseudo-element)",
+  "fixture": {
+    "casesBefore": 35,
+    "casesAfter": 44,
+    "newCases": 9
+  },
+  "probe": {
+    "assertionsBefore": 5287,
+    "assertionsAfter": 6693,
+    "heldBefore": 114,
+    "heldAfter": 141,
+    "repeats": 30,
+    "repeatsDistinct": [
+      "cascade diagnostics PASS: 6693 assertions, 44 conformance cases with Chromium computed values, 141 snapshots held past destroy, 1 run(s)"
+    ]
+  },
+  "oracle": {
+    "browser": "Chromium 156.0.8078.4",
+    "cases": "44/44",
+    "repeats": 30,
+    "oracleSha256": [
+      "7bc04041a34411f2b8625f18fb847bd3c75a6f691e1b732f96a222d6f9fc0a7e"
+    ]
+  },
+  "batch": {
+    "rawAssertions": 90743,
+    "baselineRawAssertions": 89337,
+    "teardown": 104,
+    "probes": 63,
+    "allExitZero": true
+  },
+  "candidate": "native46-candidate-6 (parent native46-candidate-5)",
+  "runtime": {
+    "WebCore.dll": "ea706c26e8286a80119e9e28edb983c2c5045b3d1c59aa6ebdedfee84166f001",
+    "RanvierWebCoreHost.dll": "30d05791c6c94a62adaa449b8d1f544c5f85f1ffab4b128c01dbc5e1ccf0000c",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+  },
+  "files": {
+    "batch-green.json": "4ea0db4487e77f903ba577e145568498b9237d7705470faa6b1c8b4eca0c8ef5",
+    "runtime-receipt.json": "2c96aecf5f2c3be36ada837278daa7e040959694d78787daa35eda22687e42b1",
+    "source-patches.json": "2c23e9ea8da348f8f9ae434e896be87a17b7c70f125288f742d59b0b0e70d2c7",
+    "teardown-probes.json": "263c729dc539fcce1f0738a1299bf5852c5eb4a6838f9caf7abb99ef436dd33c",
+    "cascade-diagnostics-probe.log": "1f5a429a5338bfaf8bb48f8fa77d040d0524179af01777ffbb49264948d961ea",
+    "cascade-diagnostics-repeat30.txt": "0c038b30f4ae28e54a5b887bdd5079502beabcf808c18f48099c9fcf3a7fce00",
+    "oracle-repeat30.txt": "0906b32333c16a738ca43e27535c434d0df769069978a703073bfff1f7f9b2e8",
+    "shadow-red-candidate5.txt": "1195a84543ab703b0b01f2559d31116a9a66de8b69f4d457e66f5720e4d2fe13"
+  }
+}

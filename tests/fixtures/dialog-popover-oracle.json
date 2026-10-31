@@ -1,0 +1,4449 @@
+{
+  "browser": "156.0.8078.4",
+  "headless": "new",
+  "cases": [
+    {
+      "name": "dialog show and close",
+      "steps": [
+        {
+          "op": "prop",
+          "id": "d",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "show",
+          "id": "d",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "d",
+          "name": "open",
+          "status": "ok",
+          "value": true,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "hasAttr",
+          "id": "d",
+          "name": "open",
+          "status": "ok",
+          "value": true,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "d",
+          "selector": ":modal",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "d",
+          "selector": ":open",
+          "status": "ok",
+          "value": true,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "show",
+          "id": "d",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showModal",
+          "id": "d",
+          "status": "InvalidStateError",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "close",
+          "id": "d",
+          "value": null,
+          "status": "ok",
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "d",
+          "name": "returnValue",
+          "status": "ok",
+          "value": "first",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "close",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "close",
+          "id": "d",
+          "value": null,
+          "status": "ok",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "d",
+          "name": "returnValue",
+          "status": "ok",
+          "value": "first",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "set",
+          "id": "d",
+          "name": "open",
+          "value": null,
+          "status": "ok",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "hasAttr",
+          "id": "d",
+          "name": "open",
+          "status": "ok",
+          "value": true,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "close",
+          "id": "d",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "d",
+          "name": "returnValue",
+          "status": "ok",
+          "value": "first",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "set",
+          "id": "d",
+          "name": "returnValue",
+          "value": null,
+          "status": "ok",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "d",
+          "name": "returnValue",
+          "status": "ok",
+          "value": "manual",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "close",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "modal dialog top layer and focus",
+      "steps": [
+        {
+          "op": "focus",
+          "id": "before",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "active",
+          "status": "ok",
+          "value": "before",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showModal",
+          "id": "m",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "open",
+          "status": "ok",
+          "value": true,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "m",
+          "selector": ":modal",
+          "status": "ok",
+          "value": true,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "active",
+          "status": "ok",
+          "value": "mauto",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "hit",
+          "x": 400,
+          "y": 250,
+          "status": "ok",
+          "value": "m",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "hit",
+          "x": 20,
+          "y": 10,
+          "status": "ok",
+          "value": "m",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "hit",
+          "x": 700,
+          "y": 550,
+          "status": "ok",
+          "value": "m",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "focus",
+          "id": "before",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "active",
+          "status": "ok",
+          "value": "mauto",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "show",
+          "id": "m",
+          "status": "InvalidStateError",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showModal",
+          "id": "m",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showModal",
+          "id": "d",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "d",
+          "selector": ":modal",
+          "status": "ok",
+          "value": true,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "hit",
+          "x": 400,
+          "y": 250,
+          "status": "ok",
+          "value": "d",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "close",
+          "id": "d",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "close",
+          "id": "m",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "m",
+          "selector": ":modal",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "active",
+          "status": "ok",
+          "value": "before",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "hit",
+          "x": 20,
+          "y": 10,
+          "status": "ok",
+          "value": "before",
+          "events": [
+            {
+              "type": "close",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false
+            },
+            {
+              "type": "close",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "dialog requestClose",
+      "steps": [
+        {
+          "op": "showModal",
+          "id": "m",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "requestClose",
+          "id": "m",
+          "value": null,
+          "status": "ok",
+          "events": [
+            {
+              "type": "cancel",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true
+            },
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "returnValue",
+          "status": "ok",
+          "value": "r1",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "close",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prevent",
+          "type": "cancel",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showModal",
+          "id": "m",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "requestClose",
+          "id": "m",
+          "value": null,
+          "status": "ok",
+          "events": [
+            {
+              "type": "cancel",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "prevented": true
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "open",
+          "status": "ok",
+          "value": true,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "returnValue",
+          "status": "ok",
+          "value": "r1",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "close",
+          "id": "m",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "requestClose",
+          "id": "m",
+          "value": null,
+          "status": "ok",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "close",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "close requests and closedby",
+      "steps": [
+        {
+          "op": "prop",
+          "id": "d",
+          "name": "closedBy",
+          "status": "ok",
+          "value": "none",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "closedBy",
+          "status": "ok",
+          "value": "none",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "cb",
+          "name": "closedBy",
+          "status": "ok",
+          "value": "any",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "cn",
+          "name": "closedBy",
+          "status": "ok",
+          "value": "none",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showModal",
+          "id": "m",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "closedBy",
+          "status": "ok",
+          "value": "closerequest",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "press",
+          "key": "Escape",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "cancel",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true
+            },
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "close",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showModal",
+          "id": "cn",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "cn",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "cn",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "press",
+          "key": "Escape",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "cn",
+          "name": "open",
+          "status": "ok",
+          "value": true,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "close",
+          "id": "cn",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "cn",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "close",
+              "target": "cn",
+              "trusted": true,
+              "cancelable": false
+            },
+            {
+              "type": "toggle",
+              "target": "cn",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "show",
+          "id": "cb",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "cb",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "cb",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "mouse",
+          "x": 700,
+          "y": 100,
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "cancel",
+              "target": "cb",
+              "trusted": true,
+              "cancelable": true
+            },
+            {
+              "type": "beforetoggle",
+              "target": "cb",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "cb",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "close",
+              "target": "cb",
+              "trusted": true,
+              "cancelable": false
+            },
+            {
+              "type": "toggle",
+              "target": "cb",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "set",
+          "id": "m",
+          "name": "closedBy",
+          "value": null,
+          "status": "ok",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "closedBy",
+          "status": "ok",
+          "value": "any",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "set",
+          "id": "m",
+          "name": "closedBy",
+          "value": null,
+          "status": "ok",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "closedBy",
+          "status": "ok",
+          "value": "none",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "form method dialog",
+      "steps": [
+        {
+          "op": "show",
+          "id": "d",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "click",
+          "id": "dsubmit",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "d",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": [
+            {
+              "type": "close",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "d",
+          "name": "returnValue",
+          "status": "ok",
+          "value": "ok",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "popover methods",
+      "steps": [
+        {
+          "op": "prop",
+          "id": "p",
+          "name": "popover",
+          "status": "ok",
+          "value": "auto",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "pm",
+          "name": "popover",
+          "status": "ok",
+          "value": "manual",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "ph",
+          "name": "popover",
+          "status": "ok",
+          "value": "hint",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "plain",
+          "name": "popover",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showPopover",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showPopover",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "togglePopover",
+          "id": "p",
+          "status": "ok",
+          "value": false,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "togglePopover",
+          "id": "p",
+          "force": true,
+          "status": "ok",
+          "value": true,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "togglePopover",
+          "id": "p",
+          "force": true,
+          "status": "ok",
+          "value": true,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "hidePopover",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "hidePopover",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showPopover",
+          "id": "plain",
+          "status": "NotSupportedError",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "hidePopover",
+          "id": "plain",
+          "status": "NotSupportedError",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "togglePopover",
+          "id": "plain",
+          "status": "NotSupportedError",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showPopover",
+          "id": "p",
+          "source": "tog",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": "tog"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": "tog"
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "hidePopover",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "set",
+          "id": "plain",
+          "name": "popover",
+          "value": null,
+          "status": "ok",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "plain",
+          "name": "popover",
+          "status": "ok",
+          "value": "manual",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "set",
+          "id": "plain",
+          "name": "popover",
+          "value": null,
+          "status": "ok",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "plain",
+          "name": "popover",
+          "status": "ok",
+          "value": "manual",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "popover stacking and light dismiss",
+      "steps": [
+        {
+          "op": "showPopover",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showPopover",
+          "id": "p2",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p2",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "p2",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showPopover",
+          "id": "pm",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "pm",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "pm",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "hit",
+          "x": 650,
+          "y": 520,
+          "status": "ok",
+          "value": "p2",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "mouse",
+          "x": 400,
+          "y": 300,
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p2",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "p2",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "pm",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "toggle",
+              "target": "p2",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showPopover",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "press",
+          "key": "Escape",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "pm",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showPopover",
+          "id": "ph",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "ph",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "ph",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "ph",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "hidePopover",
+          "id": "pm",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "pm",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "pm",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "hidePopover",
+          "id": "ph",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "ph",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "ph",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "popover beforetoggle cancel",
+      "steps": [
+        {
+          "op": "prevent",
+          "type": "beforetoggle",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showPopover",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null,
+              "prevented": true
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showPopover",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prevent",
+          "type": "beforetoggle",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "hidePopover",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null,
+              "prevented": false
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "popovertarget invokers",
+      "steps": [
+        {
+          "op": "prop",
+          "id": "tog",
+          "name": "popoverTargetElement",
+          "status": "ok",
+          "value": "p",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "tog",
+          "name": "popoverTargetAction",
+          "status": "ok",
+          "value": "toggle",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "show",
+          "name": "popoverTargetAction",
+          "status": "ok",
+          "value": "show",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "click",
+          "id": "tog",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": "tog"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": "tog"
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "click",
+          "id": "tog",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": "tog"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": "tog"
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "click",
+          "id": "show",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": "show"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": "show"
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "click",
+          "id": "show",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "click",
+          "id": "hide",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": "hide"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": "hide"
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "mouse",
+          "x": 20,
+          "y": 50,
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": "tog"
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": "tog"
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "set",
+          "id": "tog",
+          "name": "popoverTargetAction",
+          "value": null,
+          "status": "ok",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "tog",
+          "name": "popoverTargetAction",
+          "status": "ok",
+          "value": "toggle",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "set",
+          "id": "tog",
+          "name": "popoverTargetElement",
+          "value": null,
+          "status": "ok",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "tog",
+          "name": "popoverTargetElement",
+          "status": "ok",
+          "value": "pm",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "set",
+          "id": "tog",
+          "name": "popoverTargetElement",
+          "value": null,
+          "status": "ok",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "tog",
+          "name": "popoverTargetElement",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "command invokers",
+      "steps": [
+        {
+          "op": "prop",
+          "id": "cmodal",
+          "name": "command",
+          "status": "ok",
+          "value": "show-modal",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "cmodal",
+          "name": "commandForElement",
+          "status": "ok",
+          "value": "m",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "cbad",
+          "name": "command",
+          "status": "ok",
+          "value": "",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "ccustom",
+          "name": "command",
+          "status": "ok",
+          "value": "--spin",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "click",
+          "id": "cmodal",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "command",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "command": "show-modal",
+              "source": "cmodal"
+            },
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": "cmodal"
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": "cmodal"
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "open",
+          "status": "ok",
+          "value": true,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "m",
+          "selector": ":modal",
+          "status": "ok",
+          "value": true,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "click",
+          "id": "cclose",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "command",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "command": "close",
+              "source": "cclose"
+            },
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": "cclose"
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": "cclose"
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "returnValue",
+          "status": "ok",
+          "value": "bycmd",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "close",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "click",
+          "id": "cmodal",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "command",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "command": "show-modal",
+              "source": "cmodal"
+            },
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": "cmodal"
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": "cmodal"
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "click",
+          "id": "creq",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "command",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "command": "request-close",
+              "source": "creq"
+            },
+            {
+              "type": "cancel",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true
+            },
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": "creq"
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": "creq"
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "returnValue",
+          "status": "ok",
+          "value": "req",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "close",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "click",
+          "id": "ctoggle",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "command",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "command": "toggle-popover",
+              "source": "ctoggle"
+            },
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": "ctoggle"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": "ctoggle"
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "click",
+          "id": "cshowp",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "command",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "command": "show-popover",
+              "source": "cshowp"
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "click",
+          "id": "chidep",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "command",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "command": "hide-popover",
+              "source": "chidep"
+            },
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": "chidep"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": "chidep"
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "click",
+          "id": "ccustom",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "command",
+              "target": "plain",
+              "trusted": true,
+              "cancelable": true,
+              "command": "--spin",
+              "source": "ccustom"
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "click",
+          "id": "cbad",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "click",
+          "id": "cdialogp",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "command",
+              "target": "d",
+              "trusted": true,
+              "cancelable": true,
+              "command": "show-popover",
+              "source": "cdialogp"
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prevent",
+          "type": "command",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "click",
+          "id": "cmodal",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "command",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "command": "show-modal",
+              "source": "cmodal",
+              "prevented": true
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "set",
+          "id": "ccustom",
+          "name": "command",
+          "value": null,
+          "status": "ok",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "ccustom",
+          "name": "command",
+          "status": "ok",
+          "value": "close",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "set",
+          "id": "ccustom",
+          "name": "commandForElement",
+          "value": null,
+          "status": "ok",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "ccustom",
+          "name": "commandForElement",
+          "status": "ok",
+          "value": "d",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "constructed toggle and command events",
+      "steps": [
+        {
+          "op": "construct",
+          "interface": "ToggleEvent",
+          "type": "toggle",
+          "init": {},
+          "status": "ok",
+          "value": {
+            "type": "toggle",
+            "bubbles": false,
+            "cancelable": false,
+            "trusted": false,
+            "oldState": "",
+            "newState": "",
+            "source": null
+          },
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "construct",
+          "interface": "ToggleEvent",
+          "type": "beforetoggle",
+          "init": {
+            "oldState": "closed",
+            "newState": "open",
+            "source": "tog",
+            "cancelable": true
+          },
+          "status": "ok",
+          "value": {
+            "type": "beforetoggle",
+            "bubbles": false,
+            "cancelable": true,
+            "trusted": false,
+            "oldState": "closed",
+            "newState": "open",
+            "source": "tog"
+          },
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "construct",
+          "interface": "CommandEvent",
+          "type": "command",
+          "init": {},
+          "status": "ok",
+          "value": {
+            "type": "command",
+            "bubbles": false,
+            "cancelable": false,
+            "trusted": false,
+            "command": "",
+            "source": null
+          },
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "construct",
+          "interface": "CommandEvent",
+          "type": "command",
+          "init": {
+            "command": "--spin",
+            "source": "ccustom",
+            "bubbles": true,
+            "cancelable": true
+          },
+          "status": "ok",
+          "value": {
+            "type": "command",
+            "bubbles": true,
+            "cancelable": true,
+            "trusted": false,
+            "command": "--spin",
+            "source": "ccustom"
+          },
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "dispatch",
+          "id": "plain",
+          "interface": "CommandEvent",
+          "type": "command",
+          "init": {
+            "command": "show-modal",
+            "source": "cmodal",
+            "cancelable": true
+          },
+          "status": "ok",
+          "value": true,
+          "events": [
+            {
+              "type": "command",
+              "target": "plain",
+              "trusted": false,
+              "cancelable": true,
+              "command": "show-modal",
+              "source": "cmodal"
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "dispatch",
+          "id": "p",
+          "interface": "ToggleEvent",
+          "type": "beforetoggle",
+          "init": {
+            "oldState": "closed",
+            "newState": "open",
+            "cancelable": true
+          },
+          "status": "ok",
+          "value": true,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": false,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "popover hint stacking",
+      "steps": [
+        {
+          "op": "prop",
+          "id": "ph2",
+          "name": "popover",
+          "status": "ok",
+          "value": "hint",
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showPopover",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showPopover",
+          "id": "ph",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "ph",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "ph",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "ph",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showPopover",
+          "id": "ph2",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "ph2",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "beforetoggle",
+              "target": "ph",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "ph",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "ph2",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "ph",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showPopover",
+          "id": "p2",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p2",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "beforetoggle",
+              "target": "ph2",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "ph2",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "p2",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "ph2",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showPopover",
+          "id": "ph",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "ph",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "ph",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "mouse",
+          "x": 400,
+          "y": 300,
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "ph",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "beforetoggle",
+              "target": "p2",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "ph",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "p2",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "toggle",
+              "target": "ph",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "p2",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showPopover",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showPopover",
+          "id": "ph",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "ph",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "ph",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "press",
+          "key": "Escape",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "ph",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "ph",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "press",
+          "key": "Escape",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "toggle",
+              "target": "ph",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "close request after user activation",
+      "steps": [
+        {
+          "op": "mouse",
+          "x": 780,
+          "y": 590,
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showModal",
+          "id": "m",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "press",
+          "key": "Escape",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "cancel",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true
+            },
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "close",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showModal",
+          "id": "m",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "press",
+          "key": "Escape",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "cancel",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true
+            },
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "close",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "showModal",
+          "id": "m",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "mouse",
+          "x": 780,
+          "y": 590,
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "requestClose",
+          "id": "m",
+          "value": null,
+          "status": "ok",
+          "events": [
+            {
+              "type": "cancel",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true
+            },
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": [],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "close",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            }
+          ],
+          "activationBefore": {
+            "isActive": true,
+            "hasBeenActive": true
+          }
+        }
+      ]
+    }
+  ]
+}

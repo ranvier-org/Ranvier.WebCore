@@ -1,0 +1,3489 @@
+{
+ "description": "Measured differences between the native engine and Chromium 156.0.8078.4 for tests/fixtures/caret-hit-oracle.json. tests/abi/caret_hit.py requires exactly these; any other difference fails.",
+ "native": "Native32 candidate (Source 0000-0035, CaretPositionFromPointEnabled on)",
+ "browser": "156.0.8078.4",
+ "checked": 1476,
+ "qualifications": [
+  {
+   "name": "legacy-range-shadow-retarget",
+   "count": 21,
+   "reason": "Document.caretRangeFromPoint (non-standard; CSSOM View defines only caretPositionFromPoint) retargets a hit inside a shadow tree or text control to the host element at offset 0 (WebKit Document::caretPositionFromPoint(LayoutPoint) retargetToScope). Chromium returns the host's parent at the host's index, as caretPositionFromPoint does in both engines."
+  },
+  {
+   "name": "collapsed-line-end-rect",
+   "count": 48,
+   "reason": "CaretPosition.getClientRect at a line end before a collapsed trailing space (wrap offsets 4 and 9, RTL offset 4): WebKit Range::boundingClientRect of the collapsed range gives 0x0 at (0, 0); Chromium gives the 0x20 caret box at the line end. Node and offset agree."
+  },
+  {
+   "name": "text-control-rect",
+   "count": 18,
+   "reason": "CaretPosition.getClientRect for a position in a text control (offsetNode INPUT, offset 1): WebKit measures the collapsed range (INPUT, 1), which has no layout box, and gives 0x0 at (0, 0); Chromium gives the 0x20 caret box inside the control."
+  },
+  {
+   "name": "stale-offset-rect",
+   "count": 3,
+   "reason": "A held CaretPosition whose text node was shortened below its offset (offset 7, data \"AA\"): WebKit clamps the offset and gives the 0x20 caret box at the text end (x 40); Chromium gives 0x0 at (0, 0)."
+  }
+ ],
+ "differences": [
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "wrap line 1 last glyph right half",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "wrap line 1 last glyph right half",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "wrap line 1 past end inside box",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "wrap line 1 past end inside box",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "rtl line 1 left edge",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "rtl",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "rtl",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 300,
+     "y": 140,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "rtl line 1 left edge",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "rtl",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "rtl",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 300,
+     "y": 140,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "rtl left of line 1",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "rtl",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "rtl",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 300,
+     "y": 140,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "rtl left of line 1",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "rtl",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "rtl",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 300,
+     "y": 140,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "legacy-range-shadow-retarget",
+   "scale": 1,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "open shadow text",
+   "member": "range",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "host",
+     "name": "DIV",
+     "scope": "document"
+    },
+    "offset": 0
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": null,
+     "name": "BODY",
+     "scope": "document"
+    },
+    "offset": 4
+   }
+  },
+  {
+   "qualification": "legacy-range-shadow-retarget",
+   "scale": 1,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "closed shadow text",
+   "member": "range",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "closed",
+     "name": "DIV",
+     "scope": "document"
+    },
+    "offset": 0
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": null,
+     "name": "BODY",
+     "scope": "document"
+    },
+    "offset": 5
+   }
+  },
+  {
+   "qualification": "text-control-rect",
+   "scale": 1,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "text control",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 20,
+     "y": 220,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "text-control-rect",
+   "scale": 1,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "text control",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 20,
+     "y": 220,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "legacy-range-shadow-retarget",
+   "scale": 1,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "text control",
+   "member": "range",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 0
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": null,
+     "name": "BODY",
+     "scope": "document"
+    },
+    "offset": 6
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1,
+   "scroll": "scrolled 0.5, 20.5",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "wrap line 1 last glyph right half",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1,
+   "scroll": "scrolled 0.5, 20.5",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "wrap line 1 last glyph right half",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1,
+   "scroll": "scrolled 0.5, 20.5",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "wrap line 1 past end inside box",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1,
+   "scroll": "scrolled 0.5, 20.5",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "wrap line 1 past end inside box",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "legacy-range-shadow-retarget",
+   "scale": 1,
+   "scroll": "scrolled 0.5, 20.5",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "rtl line 2 middle",
+   "member": "range",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "closed",
+     "name": "DIV",
+     "scope": "document"
+    },
+    "offset": 0
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": null,
+     "name": "BODY",
+     "scope": "document"
+    },
+    "offset": 5
+   }
+  },
+  {
+   "qualification": "text-control-rect",
+   "scale": 1,
+   "scroll": "scrolled 0.5, 20.5",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "open shadow text",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 20,
+     "y": 200,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "text-control-rect",
+   "scale": 1,
+   "scroll": "scrolled 0.5, 20.5",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "open shadow text",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 20,
+     "y": 200,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "legacy-range-shadow-retarget",
+   "scale": 1,
+   "scroll": "scrolled 0.5, 20.5",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "open shadow text",
+   "member": "range",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 0
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": null,
+     "name": "BODY",
+     "scope": "document"
+    },
+    "offset": 6
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1,
+   "scroll": "scrolled 0, 20",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "wrap line 1 last glyph right half",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1,
+   "scroll": "scrolled 0, 20",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "wrap line 1 last glyph right half",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1,
+   "scroll": "scrolled 0, 20",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "wrap line 1 past end inside box",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1,
+   "scroll": "scrolled 0, 20",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "wrap line 1 past end inside box",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "legacy-range-shadow-retarget",
+   "scale": 1,
+   "scroll": "scrolled 0, 20",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "rtl line 2 middle",
+   "member": "range",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "closed",
+     "name": "DIV",
+     "scope": "document"
+    },
+    "offset": 0
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": null,
+     "name": "BODY",
+     "scope": "document"
+    },
+    "offset": 5
+   }
+  },
+  {
+   "qualification": "text-control-rect",
+   "scale": 1,
+   "scroll": "scrolled 0, 20",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "open shadow text",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 20,
+     "y": 200,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "text-control-rect",
+   "scale": 1,
+   "scroll": "scrolled 0, 20",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "open shadow text",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 20,
+     "y": 200,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "legacy-range-shadow-retarget",
+   "scale": 1,
+   "scroll": "scrolled 0, 20",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "open shadow text",
+   "member": "range",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 0
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": null,
+     "name": "BODY",
+     "scope": "document"
+    },
+    "offset": 6
+   }
+  },
+  {
+   "qualification": "stale-offset-rect",
+   "scale": 1,
+   "scroll": "held",
+   "point": "shortened",
+   "member": "getClientRect",
+   "native": {
+    "x": 40.0,
+    "y": 0.0,
+    "width": 0.0,
+    "height": 20.0
+   },
+   "chromium": {
+    "x": 0,
+    "y": 0,
+    "width": 0,
+    "height": 0
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1.5,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "wrap line 1 last glyph right half",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1.5,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "wrap line 1 last glyph right half",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1.5,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "wrap line 1 past end inside box",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1.5,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "wrap line 1 past end inside box",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1.5,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "rtl line 1 left edge",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "rtl",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "rtl",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 300,
+     "y": 140,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1.5,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "rtl line 1 left edge",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "rtl",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "rtl",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 300,
+     "y": 140,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1.5,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "rtl left of line 1",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "rtl",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "rtl",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 300,
+     "y": 140,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1.5,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "rtl left of line 1",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "rtl",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "rtl",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 300,
+     "y": 140,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "legacy-range-shadow-retarget",
+   "scale": 1.5,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "open shadow text",
+   "member": "range",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "host",
+     "name": "DIV",
+     "scope": "document"
+    },
+    "offset": 0
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": null,
+     "name": "BODY",
+     "scope": "document"
+    },
+    "offset": 4
+   }
+  },
+  {
+   "qualification": "legacy-range-shadow-retarget",
+   "scale": 1.5,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "closed shadow text",
+   "member": "range",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "closed",
+     "name": "DIV",
+     "scope": "document"
+    },
+    "offset": 0
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": null,
+     "name": "BODY",
+     "scope": "document"
+    },
+    "offset": 5
+   }
+  },
+  {
+   "qualification": "text-control-rect",
+   "scale": 1.5,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "text control",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 20,
+     "y": 220,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "text-control-rect",
+   "scale": 1.5,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "text control",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 20,
+     "y": 220,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "legacy-range-shadow-retarget",
+   "scale": 1.5,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "text control",
+   "member": "range",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 0
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": null,
+     "name": "BODY",
+     "scope": "document"
+    },
+    "offset": 6
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1.5,
+   "scroll": "scrolled 0.5, 20.5",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "wrap line 1 last glyph right half",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1.5,
+   "scroll": "scrolled 0.5, 20.5",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "wrap line 1 last glyph right half",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1.5,
+   "scroll": "scrolled 0.5, 20.5",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "wrap line 1 past end inside box",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1.5,
+   "scroll": "scrolled 0.5, 20.5",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "wrap line 1 past end inside box",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "legacy-range-shadow-retarget",
+   "scale": 1.5,
+   "scroll": "scrolled 0.5, 20.5",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "rtl line 2 middle",
+   "member": "range",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "closed",
+     "name": "DIV",
+     "scope": "document"
+    },
+    "offset": 0
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": null,
+     "name": "BODY",
+     "scope": "document"
+    },
+    "offset": 5
+   }
+  },
+  {
+   "qualification": "text-control-rect",
+   "scale": 1.5,
+   "scroll": "scrolled 0.5, 20.5",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "open shadow text",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 20,
+     "y": 200,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "text-control-rect",
+   "scale": 1.5,
+   "scroll": "scrolled 0.5, 20.5",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "open shadow text",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 20,
+     "y": 200,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "legacy-range-shadow-retarget",
+   "scale": 1.5,
+   "scroll": "scrolled 0.5, 20.5",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "open shadow text",
+   "member": "range",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 0
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": null,
+     "name": "BODY",
+     "scope": "document"
+    },
+    "offset": 6
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1.5,
+   "scroll": "scrolled 0, 20",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "wrap line 1 last glyph right half",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1.5,
+   "scroll": "scrolled 0, 20",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "wrap line 1 last glyph right half",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1.5,
+   "scroll": "scrolled 0, 20",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "wrap line 1 past end inside box",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 1.5,
+   "scroll": "scrolled 0, 20",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "wrap line 1 past end inside box",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "legacy-range-shadow-retarget",
+   "scale": 1.5,
+   "scroll": "scrolled 0, 20",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "rtl line 2 middle",
+   "member": "range",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "closed",
+     "name": "DIV",
+     "scope": "document"
+    },
+    "offset": 0
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": null,
+     "name": "BODY",
+     "scope": "document"
+    },
+    "offset": 5
+   }
+  },
+  {
+   "qualification": "text-control-rect",
+   "scale": 1.5,
+   "scroll": "scrolled 0, 20",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "open shadow text",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 20,
+     "y": 200,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "text-control-rect",
+   "scale": 1.5,
+   "scroll": "scrolled 0, 20",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "open shadow text",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 20,
+     "y": 200,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "legacy-range-shadow-retarget",
+   "scale": 1.5,
+   "scroll": "scrolled 0, 20",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "open shadow text",
+   "member": "range",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 0
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": null,
+     "name": "BODY",
+     "scope": "document"
+    },
+    "offset": 6
+   }
+  },
+  {
+   "qualification": "stale-offset-rect",
+   "scale": 1.5,
+   "scroll": "held",
+   "point": "shortened",
+   "member": "getClientRect",
+   "native": {
+    "x": 40.0,
+    "y": 0.0,
+    "width": 0.0,
+    "height": 20.0
+   },
+   "chromium": {
+    "x": 0,
+    "y": 0,
+    "width": 0,
+    "height": 0
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 2,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "wrap line 1 last glyph right half",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 2,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "wrap line 1 last glyph right half",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 2,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "wrap line 1 past end inside box",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 2,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "wrap line 1 past end inside box",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 2,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "rtl line 1 left edge",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "rtl",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "rtl",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 300,
+     "y": 140,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 2,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "rtl line 1 left edge",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "rtl",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "rtl",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 300,
+     "y": 140,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 2,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "rtl left of line 1",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "rtl",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "rtl",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 300,
+     "y": 140,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 2,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "rtl left of line 1",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "rtl",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "rtl",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 4,
+    "rect": {
+     "x": 300,
+     "y": 140,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "legacy-range-shadow-retarget",
+   "scale": 2,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "open shadow text",
+   "member": "range",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "host",
+     "name": "DIV",
+     "scope": "document"
+    },
+    "offset": 0
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": null,
+     "name": "BODY",
+     "scope": "document"
+    },
+    "offset": 4
+   }
+  },
+  {
+   "qualification": "legacy-range-shadow-retarget",
+   "scale": 2,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "closed shadow text",
+   "member": "range",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "closed",
+     "name": "DIV",
+     "scope": "document"
+    },
+    "offset": 0
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": null,
+     "name": "BODY",
+     "scope": "document"
+    },
+    "offset": 5
+   }
+  },
+  {
+   "qualification": "text-control-rect",
+   "scale": 2,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "text control",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 20,
+     "y": 220,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "text-control-rect",
+   "scale": 2,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "text control",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 20,
+     "y": 220,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "legacy-range-shadow-retarget",
+   "scale": 2,
+   "scroll": "unscrolled",
+   "oracleCase": "unscrolled",
+   "runtimeScroll": [
+    0.0,
+    0.0
+   ],
+   "point": "text control",
+   "member": "range",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 0
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": null,
+     "name": "BODY",
+     "scope": "document"
+    },
+    "offset": 6
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 2,
+   "scroll": "scrolled 0.5, 20.5",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "wrap line 1 last glyph right half",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 2,
+   "scroll": "scrolled 0.5, 20.5",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "wrap line 1 last glyph right half",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 2,
+   "scroll": "scrolled 0.5, 20.5",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "wrap line 1 past end inside box",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 2,
+   "scroll": "scrolled 0.5, 20.5",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "wrap line 1 past end inside box",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "legacy-range-shadow-retarget",
+   "scale": 2,
+   "scroll": "scrolled 0.5, 20.5",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "rtl line 2 middle",
+   "member": "range",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "closed",
+     "name": "DIV",
+     "scope": "document"
+    },
+    "offset": 0
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": null,
+     "name": "BODY",
+     "scope": "document"
+    },
+    "offset": 5
+   }
+  },
+  {
+   "qualification": "text-control-rect",
+   "scale": 2,
+   "scroll": "scrolled 0.5, 20.5",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "open shadow text",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 20,
+     "y": 200,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "text-control-rect",
+   "scale": 2,
+   "scroll": "scrolled 0.5, 20.5",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "open shadow text",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 20,
+     "y": 200,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "legacy-range-shadow-retarget",
+   "scale": 2,
+   "scroll": "scrolled 0.5, 20.5",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "open shadow text",
+   "member": "range",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 0
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": null,
+     "name": "BODY",
+     "scope": "document"
+    },
+    "offset": 6
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 2,
+   "scroll": "scrolled 0, 20",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "wrap line 1 last glyph right half",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 2,
+   "scroll": "scrolled 0, 20",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "wrap line 1 last glyph right half",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 2,
+   "scroll": "scrolled 0, 20",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "wrap line 1 past end inside box",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "collapsed-line-end-rect",
+   "scale": 2,
+   "scroll": "scrolled 0, 20",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "wrap line 1 past end inside box",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "text",
+     "parent": "wrap",
+     "index": 0,
+     "scope": "document"
+    },
+    "offset": 9,
+    "rect": {
+     "x": 80,
+     "y": 0,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "legacy-range-shadow-retarget",
+   "scale": 2,
+   "scroll": "scrolled 0, 20",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "rtl line 2 middle",
+   "member": "range",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "closed",
+     "name": "DIV",
+     "scope": "document"
+    },
+    "offset": 0
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": null,
+     "name": "BODY",
+     "scope": "document"
+    },
+    "offset": 5
+   }
+  },
+  {
+   "qualification": "text-control-rect",
+   "scale": 2,
+   "scroll": "scrolled 0, 20",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "open shadow text",
+   "member": "position",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 20,
+     "y": 200,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "text-control-rect",
+   "scale": 2,
+   "scroll": "scrolled 0, 20",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "open shadow text",
+   "member": "shadowRoots",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    }
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 1,
+    "rect": {
+     "x": 20,
+     "y": 200,
+     "width": 0,
+     "height": 20
+    }
+   }
+  },
+  {
+   "qualification": "legacy-range-shadow-retarget",
+   "scale": 2,
+   "scroll": "scrolled 0, 20",
+   "oracleCase": "scrolled 0, 20",
+   "runtimeScroll": [
+    0.0,
+    20.0
+   ],
+   "point": "open shadow text",
+   "member": "range",
+   "native": {
+    "node": {
+     "kind": "element",
+     "id": "field",
+     "name": "INPUT",
+     "scope": "document"
+    },
+    "offset": 0
+   },
+   "chromium": {
+    "node": {
+     "kind": "element",
+     "id": null,
+     "name": "BODY",
+     "scope": "document"
+    },
+    "offset": 6
+   }
+  },
+  {
+   "qualification": "stale-offset-rect",
+   "scale": 2,
+   "scroll": "held",
+   "point": "shortened",
+   "member": "getClientRect",
+   "native": {
+    "x": 40.0,
+    "y": 0.0,
+    "width": 0.0,
+    "height": 20.0
+   },
+   "chromium": {
+    "x": 0,
+    "y": 0,
+    "width": 0,
+    "height": 0
+   }
+  }
+ ]
+}

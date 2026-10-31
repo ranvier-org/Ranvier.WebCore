@@ -1,0 +1,3 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+interfaces 249, functions 2455 (getters 1344, setters 622, operations 452, constructors 22, namespace operations 3, static operations 10, iterator snapshots 1, context operations 1), handle types 50, constants 174, enumerations 8, dictionaries 22, stubs 0, left out 756
+EXIT_CODE=0

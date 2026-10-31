@@ -10,6 +10,7 @@ import time
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
+from utf8_inputs import Utf8
 
 
 def verify(native_directory):
@@ -50,7 +51,7 @@ def verify(native_directory):
             if root in scalar_types:
                 p.call('rv_dom_'+roots[root]+'_set_base_val',[p.pointer,scalar_types[root]],target,value)
             elif root == 'SVGAnimatedString':
-                p.call('rv_dom_svg_animated_string_set_base_val',[p.pointer,ctypes.c_char_p],target,value.encode())
+                p.call('rv_dom_svg_animated_string_set_base_val',[p.pointer,Utf8],target,value.encode())
             elif root == 'SVGAnimatedLength':
                 p.set_length(p.property('svg_animated_length',target,'base_val','svg_length'),value)
             elif root == 'SVGAnimatedNumberList':
@@ -175,7 +176,7 @@ def paint_effects(native_directory):
         def enum(identifier,member,value):
             p.call('rv_dom_svg_animated_enumeration_set_base_val',[p.pointer,p.short],prop(identifier,member),value)
         def string(identifier,member,value):
-            p.call('rv_dom_svg_animated_string_set_base_val',[p.pointer,ctypes.c_char_p],prop(identifier,member),value.encode())
+            p.call('rv_dom_svg_animated_string_set_base_val',[p.pointer,Utf8],prop(identifier,member),value.encode())
         def numbers(identifier,member,values):
             base=p.property('svg_animated_number_list',prop(identifier,member),'base_val','svg_number_list')
             p.expect(p.read('svg_number_list',base,'number_of_items',p.unsigned)==len(values),'real filter numeric list shape')
@@ -184,7 +185,7 @@ def paint_effects(native_directory):
                 p.call('rv_dom_svg_number_set_value',[p.pointer,p.single],item,value)
         def style(identifier,property,value):
             declaration=p.property('svg_element',node(identifier),'style','css_style_declaration')
-            p.call('rv_dom_css_style_declaration_set_property',[p.pointer,ctypes.c_char_p,ctypes.c_char_p,ctypes.c_char_p],declaration,property.encode(),value.encode(),b'')
+            p.call('rv_dom_css_style_declaration_set_property',[p.pointer,Utf8,Utf8,Utf8],declaration,property.encode(),value.encode(),b'')
         def wait_image(color):
             pixels=(ctypes.c_uint8*(500*400*4))()
             deadline=time.monotonic()+5
@@ -282,7 +283,7 @@ def convolve_cache_cases(native_directory):
             p.close(p.pixel(p.paint(),30,30),[255,64,64,255],'convolve cached initial effect',tolerance=1)
             if route=='input':
                 value=p.property('svgfe_convolve_matrix_element',target,'in1','svg_animated_string')
-                p.call('rv_dom_svg_animated_string_set_base_val',[p.pointer,ctypes.c_char_p],value,b'blue')
+                p.call('rv_dom_svg_animated_string_set_base_val',[p.pointer,Utf8],value,b'blue')
                 p.close(p.pixel(p.paint(),30,30),[64,64,255,255],'input graph change preserves actual convolve effect',tolerance=1)
             else:
                 value=p.property('svgfe_convolve_matrix_element',target,'order_x','svg_animated_integer')

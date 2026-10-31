@@ -1,0 +1,8 @@
+<!doctype html><html><head><style>@font-face{font-family:RvAhem;src:url(data:font/ttf;base64,{{FONT_BASE64}})}
+html,body{margin:0}body{font:20px/20px RvAhem;width:600px;height:1000px}
+.p{position:absolute;left:0;margin:0;white-space:normal}
+#wrap{top:0;width:100px}#inline{top:80px}#bidi{top:110px}#rtl{top:140px;left:180px;width:120px}
+#host{position:absolute;top:190px;left:0}#closed{position:absolute;top:190px;left:200px}
+#field{position:absolute;top:220px;left:0;width:100px;height:20px;font:20px/20px RvAhem;border:0;padding:0;margin:0}
+#empty{position:absolute;top:0;left:200px;width:50px;height:50px}#far{top:600px}</style></head>
+<body><div id="wrap" class="p">AAAA BBBB CCCC</div><div id="inline" class="p">AA<b id="b">BB</b><i id="i">CC</i>DD</div><div id="bidi" class="p">XX<bdo id="bdo" dir="rtl">ABCD</bdo>YY</div><div id="rtl" class="p" dir="rtl">ABCD EFGH</div><div id="host"></div><div id="closed"></div><input id="field" value="ABCD"><div id="empty"></div><div id="far" class="p">FFFF</div></body></html>

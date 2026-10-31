@@ -1,0 +1,227 @@
+{
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.8078.4 Safari/537.36",
+  "identity": {
+    "math": {
+      "localName": "math",
+      "namespace": "http://www.w3.org/1998/Math/MathML",
+      "mathml": true,
+      "math": false,
+      "html": false
+    },
+    "row": {
+      "localName": "mrow",
+      "namespace": "http://www.w3.org/1998/Math/MathML",
+      "mathml": true,
+      "math": false,
+      "html": false
+    },
+    "mi": {
+      "localName": "mi",
+      "namespace": "http://www.w3.org/1998/Math/MathML",
+      "mathml": true,
+      "math": false,
+      "html": false
+    },
+    "mo": {
+      "localName": "mo",
+      "namespace": "http://www.w3.org/1998/Math/MathML",
+      "mathml": true,
+      "math": false,
+      "html": false
+    },
+    "frac": {
+      "localName": "mfrac",
+      "namespace": "http://www.w3.org/1998/Math/MathML",
+      "mathml": true,
+      "math": false,
+      "html": false
+    },
+    "num": {
+      "localName": "mn",
+      "namespace": "http://www.w3.org/1998/Math/MathML",
+      "mathml": true,
+      "math": false,
+      "html": false
+    },
+    "den": {
+      "localName": "mn",
+      "namespace": "http://www.w3.org/1998/Math/MathML",
+      "mathml": true,
+      "math": false,
+      "html": false
+    },
+    "sqrt": {
+      "localName": "msqrt",
+      "namespace": "http://www.w3.org/1998/Math/MathML",
+      "mathml": true,
+      "math": false,
+      "html": false
+    },
+    "rad": {
+      "localName": "mi",
+      "namespace": "http://www.w3.org/1998/Math/MathML",
+      "mathml": true,
+      "math": false,
+      "html": false
+    },
+    "inline": {
+      "localName": "math",
+      "namespace": "http://www.w3.org/1998/Math/MathML",
+      "mathml": true,
+      "math": false,
+      "html": false
+    },
+    "focusable": {
+      "localName": "mi",
+      "namespace": "http://www.w3.org/1998/Math/MathML",
+      "mathml": true,
+      "math": false,
+      "html": false
+    },
+    "second": {
+      "localName": "mo",
+      "namespace": "http://www.w3.org/1998/Math/MathML",
+      "mathml": true,
+      "math": false,
+      "html": false
+    },
+    "plain": {
+      "localName": "mn",
+      "namespace": "http://www.w3.org/1998/Math/MathML",
+      "mathml": true,
+      "math": false,
+      "html": false
+    }
+  },
+  "members": {
+    "math": {
+      "tabIndex": -1,
+      "autofocus": false,
+      "nonce": "",
+      "nonceAttribute": null,
+      "dataKind": "display"
+    },
+    "row": {
+      "tabIndex": -1,
+      "autofocus": false,
+      "nonce": "",
+      "nonceAttribute": null,
+      "dataKind": null
+    },
+    "mi": {
+      "tabIndex": -1,
+      "autofocus": false,
+      "nonce": "",
+      "nonceAttribute": null,
+      "dataKind": null
+    },
+    "mo": {
+      "tabIndex": -1,
+      "autofocus": false,
+      "nonce": "",
+      "nonceAttribute": null,
+      "dataKind": null
+    },
+    "frac": {
+      "tabIndex": -1,
+      "autofocus": false,
+      "nonce": "",
+      "nonceAttribute": null,
+      "dataKind": null
+    },
+    "num": {
+      "tabIndex": -1,
+      "autofocus": false,
+      "nonce": "",
+      "nonceAttribute": null,
+      "dataKind": null
+    },
+    "den": {
+      "tabIndex": -1,
+      "autofocus": false,
+      "nonce": "",
+      "nonceAttribute": null,
+      "dataKind": null
+    },
+    "sqrt": {
+      "tabIndex": -1,
+      "autofocus": false,
+      "nonce": "",
+      "nonceAttribute": null,
+      "dataKind": null
+    },
+    "rad": {
+      "tabIndex": -1,
+      "autofocus": false,
+      "nonce": "",
+      "nonceAttribute": null,
+      "dataKind": null
+    },
+    "inline": {
+      "tabIndex": -1,
+      "autofocus": false,
+      "nonce": "",
+      "nonceAttribute": null,
+      "dataKind": null
+    },
+    "focusable": {
+      "tabIndex": 0,
+      "autofocus": true,
+      "nonce": "abc",
+      "nonceAttribute": "abc",
+      "dataKind": null
+    },
+    "second": {
+      "tabIndex": 0,
+      "autofocus": false,
+      "nonce": "",
+      "nonceAttribute": null,
+      "dataKind": null
+    },
+    "plain": {
+      "tabIndex": -1,
+      "autofocus": false,
+      "nonce": "",
+      "nonceAttribute": null,
+      "dataKind": null
+    }
+  },
+  "layout": {
+    "initial": {
+      "numAboveDen": true,
+      "fracTallerThanMi": true,
+      "sqrtWiderThanRadicand": true,
+      "moRightOfMi": true
+    },
+    "paddingShift": 5,
+    "paddingTyped": [
+      "CSSUnitValue",
+      10,
+      "px"
+    ],
+    "fontScale": 1.998533724340176,
+    "fontScaleRange": true,
+    "fracBackground": [
+      0,
+      0,
+      255,
+      255
+    ],
+    "compactShrinksFraction": true,
+    "mathStyle": "compact"
+  },
+  "focus": {
+    "initialActive": "",
+    "afterFocus": "focusable",
+    "afterUnfocusable": "focusable",
+    "afterBlur": "",
+    "plainTabIndex": "0",
+    "afterTabIndexFocus": "plain",
+    "autofocusAttribute": null,
+    "nonceAfterSet": "changed",
+    "nonceAttributeAfterSet": "abc",
+    "datasetAttribute": "value-λ",
+    "datasetDeleted": null,
+    "afterTab": "second"
+  }
+}

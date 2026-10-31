@@ -1,0 +1,97 @@
+<!doctype html><html><head><style>@import url("data:text/css,%23imported%7Border%3A30%7D") layer(imported);</style>
+<style>
+@layer one, two;
+@property --reg-inh{syntax:'<integer>';inherits:true;initial-value:0}
+@property --reg-no{syntax:'<integer>';inherits:false;initial-value:0}
+html,body{margin:0}
+.cq{container-type:inline-size;width:100px}
+#spec{order:1}
+.s0.s1{order:2}
+.s0{order:3}
+.src{order:4}
+.wh{order:6}
+:where(#wh){order:7}
+.imp{order:8 !important}
+#imp{order:9}
+@layer two{#lay{order:10}}
+@layer one{#lay{order:11}}
+.lay{order:12}
+@layer one{#limp{order:13 !important}}
+@layer two{#limp{order:14 !important}}
+#limp{order:15 !important}
+@layer two{#anon{order:16}}
+@layer{#anon{order:17}}
+@layer one{#imported{order:31}}
+@layer one{@layer inner{#nest{order:32}}#nest{order:33}}
+#inl{order:18}
+#inl2{order:20 !important}
+#inl3{order:22 !important}
+audio.uaimp{display:block !important}
+.uap{margin-top:3px}
+.hintover{width:33px}
+#sh{margin:7px 1px}
+.cv{--x:42}
+#cv{--x:41}
+#ri{--reg-inh:43}
+#rn{--reg-no:44}
+#ch1{order:50}
+#ch2{order:inherit}
+#ch3{order:inherit}
+#u1{tab-size:5}
+#u2{tab-size:unset}
+#nu1{order:51}
+#nu2{order:unset}
+#var{--o:60;order:var(--o)}
+@media (min-width: 1px){@supports (display: grid){#cond{order:61}}}
+@media (max-width: 1px){#cond{order:99}}
+@container (min-width: 50px){#cq{order:62}}
+@container (min-width: 500px){#cq{order:98}}
+#vt{writing-mode:vertical-rl;margin-top:70px;margin-inline-start:71px}
+#hz{margin-inline-start:72px;margin-left:73px}
+.hz2{margin-inline-start:75px}
+#hz2{margin-left:74px}
+.src{order:5}
+#pend{transition:opacity 1000s linear;opacity:1}
+#pend.pb{opacity:0}
+#probe{transition:opacity 1000s steps(2, jump-start);opacity:1}
+#probe.pb{opacity:0}
+#hh{order:69;flex-grow:2;tab-size:3 !important}
+#sl{order:68}
+::part(pp){order:77}
+#hh::part(pp2){order:78 !important}
+</style></head><body>
+<div id="spec" class="s0 s1"></div>
+<div id="src" class="src"></div>
+<div id="wh" class="wh"></div>
+<div id="imp" class="imp"></div>
+<div id="lay" class="lay"></div>
+<div id="limp"></div>
+<div id="anon"></div>
+<div id="imported"></div>
+<div id="nest"></div>
+<div id="inl" style="order:19"></div>
+<div id="inl2" style="order:21"></div>
+<div id="inl3" style="order:23 !important"></div>
+<audio id="uaimp" class="uaimp"></audio>
+<p id="uap" class="uap">P</p>
+<p id="uaonly">Q</p>
+<hr id="hint" width="30">
+<hr id="hint2" class="hintover" width="30">
+<div id="sh"></div>
+<div id="cv" class="cv"><div id="cvkid"></div></div>
+<div id="ri"><div id="rikid"></div></div>
+<div id="rn"><div id="rnkid"></div></div>
+<div id="ch1"><div id="ch2"><div id="ch3"></div></div></div>
+<div id="u1"><div id="u2"><div id="u3"></div></div></div>
+<div id="nu1"><div id="nu2"></div></div>
+<div id="plain"></div>
+<div id="var"></div>
+<div id="cond"></div>
+<div class="cq"><div id="cq"></div></div>
+<div id="vt">V</div>
+<div id="hz"></div>
+<div id="hz2" class="hz2"></div>
+<div id="pend"></div>
+<div id="probe"></div>
+<div id="hh" class="hh"><template shadowrootmode="open"><style>@layer a{:host{flex-shrink:5}}:host{flex-shrink:6}:host(.hh){flex-shrink:7}:host{order:71;tab-size:6 !important;--sh:80}slot{color:rgb(1,2,3)}::slotted(span){opacity:0.5;order:73}::slotted(.sl){opacity:0.25}#pt{order:75}#pt2{order:76 !important}</style><slot></slot><div id="pt" part="pp"></div><div id="pt2" part="pp2"></div></template><span id="sl" class="sl">S</span><b id="inh">B</b></div>
+</body></html>

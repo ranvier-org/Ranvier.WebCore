@@ -1,6 +1,7 @@
 """A lean Web IDL parser for WebKit's IDL files: the definitions gen/domgen.py reads (interfaces, interface mixins,
 partial interfaces, includes statements, typedefs, enums, dictionaries and callbacks), their members, types and
-extended attributes, namespaces, partial namespaces and iterable declarations. Other unmodeled members are skipped.
+extended attributes, namespaces, partial namespaces, and iterable, setlike and maplike declarations. Other unmodeled
+members are skipped.
 
 WebKit's IDL files hold a few `#if` blocks (Document.idl, DeviceOrientationEvent.idl); the parser keeps the
 `#else` branch of each and drops the `#if` branch, which matches a build with every such macro undefined.
@@ -274,6 +275,19 @@ class Parser:
             found.append(Argument(name, argument_type, optional, variadic, default, attrs))
         return found
 
+    def collection_like(self, attrs, owner, readonly):
+        """A setlike<V> or maplike<K, V> declaration, as a member whose kind is the keyword and whose type holds the
+        value type, or the key and value types."""
+        kind = self.take()
+        self.take('<')
+        children = [self.type()]
+        if kind == 'maplike':
+            self.take(',')
+            children.append(self.type())
+        self.take('>')
+        self.take(';')
+        return Member(kind, kind, Type(kind, subtypes=children), readonly=readonly, attrs=attrs, file=self.file, owner=owner)
+
     def member(self, owner):
         attrs = self.extended_attributes()
         if self.accept('iterable'):
@@ -285,7 +299,9 @@ class Parser:
             self.take(';')
             value = Type('pair', subtypes=children) if len(children) == 2 else children[0]
             return Member('iterable', 'entries', Type('sequence', subtypes=[value]), attrs=attrs, file=self.file, owner=owner)
-        if self.peek() in ("iterable", "maplike", "setlike", "async", "async_iterable"):
+        if self.peek() in ("maplike", "setlike"):
+            return self.collection_like(attrs, owner, False)
+        if self.peek() in ("iterable", "async", "async_iterable"):
             self.skip_to_semicolon()
             return None
         if self.accept("constructor"):
@@ -309,6 +325,8 @@ class Parser:
                 readonly = True
             elif word in ("getter", "setter", "deleter", "stringifier"):
                 special = word
+        if self.peek() in ("maplike", "setlike") and readonly and not static and not special:
+            return self.collection_like(attrs, owner, True)
         if self.peek() in ("iterable", "maplike", "setlike", "async", "async_iterable"):
             self.skip_to_semicolon()
             return None
@@ -346,7 +364,14 @@ class Parser:
                     self.take()
                     name = self.take()
                     document.callbacks.add(name)
-                    self.skip_to_semicolon()
+                    interface = Interface(name, None, False, partial, callback=True, attrs=attrs, file=self.file)
+                    self.take("{")
+                    while not self.accept("}"):
+                        member = self.member(name)
+                        if member:
+                            interface.members.append(member)
+                    self.take(";")
+                    document.interfaces.append(interface)
                 else:
                     name = self.take()
                     document.callbacks.add(name)

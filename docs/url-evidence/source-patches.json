@@ -1,0 +1,59 @@
+{
+  "0035": {
+    "file": "Source/WebCore/dom/Document.cpp",
+    "hunk": [
+      "-        if ((!anchorNode->isInShadowTree() && !options.shadowRoots.size()) || (anchorNode->isInShadowTree() && options.shadowRoots.contains(Ref(anchorNode->treeScope().rootNode()))))",
+      "+        if (!anchorNode->isInShadowTree() || options.shadowRoots.contains(Ref(anchorNode->treeScope().rootNode())))"
+    ],
+    "object": "C:/wk/native-url/artifacts/native33-candidate-6/001-UnifiedSource-dom-7.cpp.obj"
+  },
+  "heldOutLaterPatch": {
+    "patch": "0037-frame-loader-client-form-submission-hook.patch",
+    "reason": "H13 stacks before D14; the patch stays out of this candidate",
+    "files": [
+      "Source/WebCore/loader/FrameLoader.cpp",
+      "Source/WebCore/loader/LocalFrameLoaderClient.h"
+    ],
+    "dependentUnits": [
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-JSBindings-23.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-5.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-9.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-history-1.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-10.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-12.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-16.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-19.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-35.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-4.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-6.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-8.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-1.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-11.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-13.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-2.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-3.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-4.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-5.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-6.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-7.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-9.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-1.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-10.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-18.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-2.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-5.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-6.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-8.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-style-6.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/page/WebKitNamespace.cpp.obj"
+    ],
+    "compiledHere": [
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-7.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/C_/wk/ranvier-webcore/host/dom/RanvierDomGlue.cpp.obj",
+      "Tools/TestWebKitAPI/CMakeFiles/RanvierWebCoreHost.dir/RanvierAbi/RanvierWebCoreAbi.cpp.obj",
+      "Tools/TestWebKitAPI/CMakeFiles/RanvierWebCoreHost.dir/RanvierAbi/RanvierWebCoreDom.cpp.obj"
+    ],
+    "dependentUnitsCompiledHere": [],
+    "recordedAfterBuild": true
+  }
+}

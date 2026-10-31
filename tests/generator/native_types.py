@@ -6,9 +6,12 @@ import os
 from pathlib import Path
 import sys
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'abi'))
+from utf8_inputs import Utf8, Span, bind as bind_utf8, span
+
 
 class NodeOrString(c.Structure):
-    _fields_ = [('present', c.c_int32), ('tag', c.c_int32), ('arm0', c.c_void_p), ('arm1', c.c_char_p)]
+    _fields_ = [('present', c.c_int32), ('tag', c.c_int32), ('arm0', c.c_void_p), ('arm1', Span)]
 
 
 class Sequence(c.Structure):
@@ -16,7 +19,7 @@ class Sequence(c.Structure):
 
 
 class Hidden(c.Structure):
-    _fields_ = [('present', c.c_int32), ('tag', c.c_int32), ('arm0', c.c_int32), ('arm1', c.c_double), ('arm2', c.c_void_p)]
+    _fields_ = [('present', c.c_int32), ('tag', c.c_int32), ('arm0', c.c_int32), ('arm1', c.c_double), ('arm2', Span)]
 
 
 class ImportOptions(c.Structure):
@@ -44,10 +47,7 @@ def main():
     library = c.CDLL(str(native / host_name))
 
     def bind(name, parameters, result=c.c_int32):
-        function = getattr(library, name)
-        function.argtypes = parameters
-        function.restype = result
-        return function
+        return bind_utf8(library, name, result, parameters)
 
     def ok(status):
         assert status == 0, f'native status {status}'
@@ -61,8 +61,8 @@ def main():
     host_document = bind('rv_host_document', [pointer], pointer)
     get_implementation = bind('rv_dom_document_get_implementation', [pointer, out])
     release_implementation = bind('rv_dom_dom_implementation_release', [pointer], None)
-    create_document = bind('rv_dom_dom_implementation_create_html_document', [pointer, c.c_char_p, out])
-    create_ns = bind('rv_dom_document_create_element_ns', [pointer, c.c_char_p, c.c_char_p, pointer, out])
+    create_document = bind('rv_dom_dom_implementation_create_html_document', [pointer, Utf8, out])
+    create_ns = bind('rv_dom_document_create_element_ns', [pointer, Utf8, Utf8, pointer, out])
     get_body = bind('rv_dom_document_get_body', [pointer, out])
     append = bind('rv_dom_element_append', [pointer, c.POINTER(Sequence)])
     import_node = bind('rv_dom_document_import_node', [pointer, pointer, c.POINTER(ImportUnion), out])
@@ -74,7 +74,7 @@ def main():
     clear_strings = bind('rv_dom_sequence_dom_string_release', [c.POINTER(Sequence)], None)
     get_classes = bind('rv_dom_element_get_class_list', [pointer, out])
     add_classes = bind('rv_dom_dom_token_list_add', [pointer, c.POINTER(Sequence)])
-    contains_class = bind('rv_dom_dom_token_list_contains', [pointer, c.c_char_p, c.POINTER(c.c_int32)])
+    contains_class = bind('rv_dom_dom_token_list_contains', [pointer, Utf8, c.POINTER(c.c_int32)])
     release_classes = bind('rv_dom_dom_token_list_release', [pointer], None)
 
     def text(name, target):
@@ -113,7 +113,7 @@ def main():
         event_child = pointer()
         ok(create_ns(second, b'http://www.w3.org/1999/xhtml', b'button', None, c.byref(event_child)))
         owned.append(event_child)
-        event_nodes = (NodeOrString * 1)(NodeOrString(1, 1, event_child, None))
+        event_nodes = (NodeOrString * 1)(NodeOrString(1, 1, event_child))
         ok(append(body, c.byref(Sequence(1, 1, c.cast(event_nodes, pointer)))))
         for flags in (0, 1, 6, 7, 4, 5, 2, 3):
             phases = []
@@ -152,7 +152,7 @@ def main():
         ok(bind('rv_dom_node_get_owner_document', [pointer, out])(svg, c.byref(owner)))
         assert owner.value == second.value
         release(owner)
-        parts = (NodeOrString * 2)(NodeOrString(1, 1, svg.value, None), NodeOrString(1, 2, None, b'tail'))
+        parts = (NodeOrString * 2)(NodeOrString(1, 1, svg.value), NodeOrString(1, 2, None, span('tail')))
         mixed = Sequence(1, len(parts), c.cast(parts, pointer))
         ok(append(body, c.byref(mixed)))
         assert text('rv_dom_node_get_text_content', body) == 'tail'
@@ -179,11 +179,11 @@ def main():
                 assert text('rv_dom_element_get_namespace_uri', child) == 'http://www.w3.org/2000/svg'
                 release(child)
         assert text('rv_dom_node_get_text_content', body) == 'tail', 'importNode must leave the source tree intact'
-        invalid = (NodeOrString * 1)(NodeOrString(1, 99, None, None))
+        invalid = (NodeOrString * 1)(NodeOrString(1, 99, None))
         invalid_sequence = Sequence(1, 1, c.cast(invalid, pointer))
         assert append(body, c.byref(invalid_sequence)) == -9
         assert text('rv_dom_node_get_text_content', body) == 'tail'
-        missing_string = (NodeOrString * 1)(NodeOrString(1, 2, None, None))
+        missing_string = (NodeOrString * 1)(NodeOrString(1, 2, None, Span(None, -1)))
         missing_sequence = Sequence(1, 1, c.cast(missing_string, pointer))
         assert append(body, c.byref(missing_sequence)) == -1
         assert text('rv_dom_node_get_text_content', body) == 'tail'
@@ -191,26 +191,25 @@ def main():
         names = Sequence()
         ok(attribute_names(body, c.byref(names)))
         try:
-            values = c.cast(names.items, c.POINTER(c.c_char_p))
-            assert b'data-proof' in [values[index] for index in range(names.count)]
+            values = c.cast(names.items, c.POINTER(Span))
+            assert 'data-proof' in [values[index].text() for index in range(names.count)]
         finally:
             clear_strings(c.byref(names))
         assert names.count == 0 and not names.items
-        raw_hidden = c.create_string_buffer(b'until-found')
-        hidden = Hidden(1, 3, 0, 0, c.cast(raw_hidden, pointer))
+        hidden = Hidden(1, 3, 0, 0, span('until-found'))
         ok(set_hidden(body, c.byref(hidden)))
         returned_hidden = Hidden()
         ok(get_hidden(body, c.byref(returned_hidden)))
         try:
             assert returned_hidden.present == 1 and returned_hidden.tag == 3
-            assert c.string_at(returned_hidden.arm2) == b'until-found'
+            assert returned_hidden.arm2.text() == 'until-found'
         finally:
             clear_hidden(c.byref(returned_hidden))
-        assert returned_hidden.present == 0 and not returned_hidden.arm2
+        assert returned_hidden.present == 0 and not returned_hidden.arm2.data
         classes = pointer()
         ok(get_classes(body, c.byref(classes)))
         try:
-            tokens = (c.c_char_p * 2)(b'one', b'two')
+            tokens = (Span * 2)(span('one'), span('two'))
             sequence = Sequence(1, 2, c.cast(tokens, pointer))
             ok(add_classes(classes, c.byref(sequence)))
             for token in (b'one', b'two'):

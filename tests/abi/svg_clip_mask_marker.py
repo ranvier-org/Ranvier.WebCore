@@ -7,6 +7,7 @@ import threading
 
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
+from utf8_inputs import Utf8
 
 
 def verify(native_directory):
@@ -76,7 +77,7 @@ def verify(native_directory):
                 p.call('rv_dom_svg_transform_list_clear',[p.pointer],base)
             elif kind=='SVGStringList':
                 p.expect(p.read('svg_string_list',value,'number_of_items',p.unsigned)==0,'initial mask SVGTests list')
-                p.expect(p.text('rv_dom_svg_string_list_append_item',[p.pointer,ctypes.c_char_p],value,b'zz')=='zz','real mask SVGTests append')
+                p.expect(p.text('rv_dom_svg_string_list_append_item',[p.pointer,Utf8],value,b'zz')=='zz','real mask SVGTests append')
                 p.expect(p.text('rv_dom_svg_string_list_get_item',[p.pointer,p.unsigned],value,0)=='zz','real mask SVGTests item')
                 p.call('rv_dom_svg_string_list_clear',[p.pointer],value)
         units=p.property('svg_clip_path_element',clip,'clip_path_units','svg_animated_enumeration')
@@ -102,16 +103,16 @@ def verify(native_directory):
         p.expect(p.pixel(before,175,25)==[0,0,255,255] and p.pixel(before,225,25)==[255,255,255,255],'actual initial mask output')
         for member in ['requiredExtensions','systemLanguage']:
             values=properties[('mask',member)]
-            p.expect(p.text('rv_dom_svg_string_list_append_item',[p.pointer,ctypes.c_char_p],values,b'zz')=='zz','actual mask test list state')
+            p.expect(p.text('rv_dom_svg_string_list_append_item',[p.pointer,Utf8],values,b'zz')=='zz','actual mask test list state')
             p.expect(p.pixel(p.paint(),175,25)==[0,0,255,255],'measured mask test lists do not suppress actual paint')
             p.call('rv_dom_svg_string_list_clear',[p.pointer],values)
-        p.call('rv_dom_element_set_attribute',[p.pointer,ctypes.c_char_p,ctypes.c_char_p],mask_geometry,b'fill',b'black')
+        p.call('rv_dom_element_set_attribute',[p.pointer,Utf8,Utf8],mask_geometry,b'fill',b'black')
         p.expect(p.pixel(p.paint(),175,25)==[255,255,255,255],'luminance mask black removes actual paint')
         style=p.property('svg_element',mask,'style','css_style_declaration')
-        p.call('rv_dom_css_style_declaration_set_property',[p.pointer,ctypes.c_char_p,ctypes.c_char_p,ctypes.c_char_p],style,b'mask-type',b'alpha',b'')
-        p.expect(p.text('rv_dom_css_style_declaration_get_property_value',[p.pointer,ctypes.c_char_p],style,b'mask-type')=='alpha','actual mask alpha style reflection')
+        p.call('rv_dom_css_style_declaration_set_property',[p.pointer,Utf8,Utf8,Utf8],style,b'mask-type',b'alpha',b'')
+        p.expect(p.text('rv_dom_css_style_declaration_get_property_value',[p.pointer,Utf8],style,b'mask-type')=='alpha','actual mask alpha style reflection')
         p.expect(p.pixel(p.paint(),175,25)==[255,255,255,255],'shared native/Chrome cached mask output after style-only change')
-        p.call('rv_dom_element_set_attribute',[p.pointer,ctypes.c_char_p,ctypes.c_char_p],mask_geometry,b'x',b'151')
+        p.call('rv_dom_element_set_attribute',[p.pointer,Utf8,Utf8],mask_geometry,b'x',b'151')
         p.expect(p.pixel(p.paint(),175,25)==[0,0,255,255],'alpha mask uses opacity after actual child geometry invalidation')
         mask_lengths={field:p.length('svg_mask_element',mask,field)[1] for field in ['x','y','width','height']}
         geom_lengths={field:p.length('svg_rect_element',mask_geometry,field)[1] for field in ['x','y','width','height']}

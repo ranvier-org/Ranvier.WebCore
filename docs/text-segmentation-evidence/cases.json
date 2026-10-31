@@ -1,0 +1,25 @@
+{
+  "comment": "T06 text segmentation RED cases: [locale, text]. Each is segmented at grapheme, word and sentence granularity.",
+  "cases": [
+    ["en", "é ä ñ"],
+    ["en", "👨‍👩‍👧‍👦 family, 🇯🇵🇺🇸 flags, 👍🏽 skin tone"],
+    ["en", "\r\n line\nbreaks\r"],
+    ["en", "क्षि and ठ्ठ"],
+    ["ko", "한국어 텍스트 ᄀᄀᄀ각"],
+    ["en", "Don't stop. It's 3.14, not 3,14! Mr. Smith left at 5 p.m. Then?"],
+    ["en", "e-mail me at a.b@c.example or visit https://ex.test/x?y=1."],
+    ["en", "can't won't O'Neil 'quoted' rock'n'roll"],
+    ["th", "ภาษาไทยไม่มีช่องว่างระหว่างคำ"],
+    ["ja", "今日は良い天気ですね。明日も晴れるでしょう。"],
+    ["zh", "我们今天去北京大学。你呢？"],
+    ["de", "Die Straße ist 3,5 km lang. Z.B. hier."],
+    ["en", "Ünïcödé wörds ánd NUMBERS 1,234.56 $5 50% #tag @user"],
+    ["ar", "مرحبا بالعالم. كيف حالك؟"],
+    ["he", "שלום עולם. מה שלומך?"],
+    ["hi", "नमस्ते दुनिया। आप कैसे हैं?"],
+    ["en", "a‍b‌c­d e⁠f"],
+    ["en", "Tab\tseparated　ideographic space and nbsp"],
+    ["en", "...wait... What?! Really?? Yes."],
+    ["en", "\"Quoted sentence.\" Another one (in parens.) Last"]
+  ]
+}

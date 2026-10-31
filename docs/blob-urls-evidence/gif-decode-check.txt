@@ -1,0 +1,2 @@
+probe3x2 {'outcome': 'error', 'width': 0, 'height': 0}
+canonical1x1 {'outcome': 'load', 'width': 1, 'height': 1}

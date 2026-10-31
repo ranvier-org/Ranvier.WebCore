@@ -1,0 +1,24 @@
+diff --git a/Source/WebCore/svg/SVGStringList.cpp b/Source/WebCore/svg/SVGStringList.cpp
+index 707406c..e0753f8 100644
+--- a/Source/WebCore/svg/SVGStringList.cpp
++++ b/Source/WebCore/svg/SVGStringList.cpp
+@@ -36,6 +36,9 @@ void SVGStringList::setFromCommaSeparatedTokens(StringView string)
+ {
+     m_delimiter = ',';
+     clearItems();
++    if (string.isNull())
++        return;
++
+     parseCommaSeparatedTokens(string);
+ 
+     if (m_items.isEmpty())
+@@ -46,6 +49,9 @@ void SVGStringList::setFromSpaceSeparatedTokens(StringView string)
+ {
+     m_delimiter = ' ';
+     clearItems();
++    if (string.isNull())
++        return;
++
+     parseSpaceSeparatedTokens(string);
+ 
+     if (m_items.isEmpty())

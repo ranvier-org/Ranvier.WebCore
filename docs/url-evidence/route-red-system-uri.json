@@ -1,0 +1,57 @@
+{
+  "agree": 30,
+  "diffs": [
+    [
+      "http://192.168.0.257/",
+      "\u003Cfail\u003E",
+      "http://192.168.0.257/"
+    ],
+    [
+      "http://m\u00FCnchen.de/",
+      "http://xn--mnchen-3ya.de/",
+      "http://m\u00FCnchen.de/"
+    ],
+    [
+      "http://ex ample.com/",
+      "http://ex%20ample.com/",
+      "\u003Cfail\u003E"
+    ],
+    [
+      "file:c:\\foo\\bar",
+      "file:///C:/foo/bar",
+      "file:///c:/foo/bar"
+    ],
+    [
+      "mailto:Someone@Example.com",
+      "mailto:Someone@Example.com",
+      "mailto:Someone@example.com"
+    ],
+    [
+      "data:text/plain,hello world",
+      "data:text/plain,hello world",
+      "data:text/plain,hello%20world"
+    ],
+    [
+      "foo://",
+      "foo://",
+      "foo:///"
+    ],
+    [
+      "http://a.test/\t\nb",
+      "http://a.test/b",
+      "http://a.test/%09%0Ab"
+    ],
+    [
+      "http:/\\\\a.test/b",
+      "http://a.test/b",
+      "\u003Cfail\u003E"
+    ],
+    [
+      "http://a.test/%7Euser",
+      "http://a.test/%7Euser",
+      "http://a.test/~user"
+    ]
+  ],
+  "runtime": "11.0.0",
+  "total": 40
+}

@@ -5,6 +5,9 @@ from pathlib import Path
 import sys
 import threading
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
+
 
 def verify(native_directory):
     directory = Path(native_directory).resolve()
@@ -23,9 +26,7 @@ def verify(native_directory):
                     ('inherits', integer), ('initial_value', Utf8StringInput)]
 
     def bind(name, returns, arguments):
-        function = getattr(library, name)
-        function.restype, function.argtypes = returns, arguments
-        return function
+        return bind_utf8(library, name, returns, arguments)
 
     def expect(condition, label):
         nonlocal assertions
@@ -50,7 +51,7 @@ def verify(native_directory):
     host = bind('rv_host_create', pointer, [integer, integer])(320, 240)
     expect(bool(host), 'host creation')
     try:
-        expect(bind('rv_abi_version', unsigned, [])() == 30, 'Native22 ABI30 registration transport')
+        expect(bind('rv_abi_version', unsigned, [])() == 54, 'Native46 ABI54 registration transport')
         expect(bind('rv_abi_has', integer, [string])(b'dom-css-register-property') == 1, 'registration capability')
         body = bind('rv_document_body', pointer, [pointer])(host)
         retained.append(('rv_node_release', body))
@@ -138,7 +139,7 @@ def verify(native_directory):
             <div id="initial"></div><div id="rule-value"></div>
             <div id="registered-priority"></div><div id="plain-priority"></div>
             <div id="registered-cascade"></div><div id="plain-cascade"></div>'''
-        call('rv_dom_element_set_inner_html', [pointer, string], body, markup)
+        call('rv_dom_element_set_inner_html', [pointer, Utf8], body, markup)
         find = bind('rv_document_get_element_by_id', pointer, [pointer, string])
 
         def node(name):
@@ -174,7 +175,7 @@ def verify(native_directory):
         def property_text(style, member, name):
             buffer, length = ctypes.create_string_buffer(1024), integer()
             call('rv_dom_css_style_declaration_get_property_' + member,
-                 [pointer, string, pointer, integer, ctypes.POINTER(integer)],
+                 [pointer, Utf8, pointer, integer, ctypes.POINTER(integer)],
                  style, name, buffer, len(buffer), ctypes.byref(length))
             return buffer.raw[:length.value].decode('utf-8')
 
@@ -183,7 +184,7 @@ def verify(native_directory):
             element = node(element_name)
             declaration = handle('rv_dom_html_element_get_style', [pointer], [element], 'rv_dom_css_style_declaration_release')
             def set_value(value, priority):
-                call('rv_dom_css_style_declaration_set_property', [pointer, string, string, string],
+                call('rv_dom_css_style_declaration_set_property', [pointer, Utf8, Utf8, Utf8],
                      declaration, property_name, value, priority)
             def state(expected_value, expected_priority, expected_width):
                 expect(property_text(declaration, 'value', property_name) == expected_value, 'custom specified value')

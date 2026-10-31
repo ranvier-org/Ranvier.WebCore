@@ -36,7 +36,7 @@ KEYWORDS = set(
 )
 
 # The parameter name for an unnamed handle, by its pointee type.
-HANDLE_NAMES = {"RvHost": "host", "RvNode": "node", "RvEvent": "event", "RvWatch": "watch", "RvListener": "listener", "RvAnimation": "animation", "RvAxNode": "ax"}
+HANDLE_NAMES = {"RvHost": "host", "RvNode": "node", "RvEvent": "event", "RvWatch": "watch", "RvListener": "listener", "RvAnimation": "animation", "RvAxNode": "ax", "RvEventTarget": "target", "RvNodeFilter": "filter"}
 
 
 def strip_comments(text: str) -> str:
@@ -88,6 +88,12 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
         return "int", ""
     if ctype == "uint64_t":
         return "uint64", ""
+    if ctype == "int64_t":
+        return "int64", ""
+    if ctype == "int64_t*":
+        return "int64&", ""
+    if ctype == "RvBlob* const*":
+        return "nativeint[]", "[<In>] "
     if ctype == "uint64_t*":
         return "uint64&", ""
     if ctype == "float":
@@ -110,6 +116,14 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
     if ctype == "int32_t*":
         # A string getter's length is passed as a one-element array, as readString passes it.
         return ("int[]", "") if name == "length" else ("int&", "")
+    if ctype == "const RvScreenMetrics*":
+        return "nativeint", ""
+    if ctype == "const RvEventInit*":
+        return "EventInit&", ""
+    if ctype == "const uint16_t*":
+        return "uint16[]", "[<In>] "
+    if ctype == "RvTextSegments*":
+        return "TextSegments&", ""
     if ctype == "void**":
         return "nativeint&", ""
     if ctype == "RvGpuFrame**":
@@ -137,9 +151,57 @@ def generated(header: str) -> str:
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
         "type EventCallback = delegate of context: nativeint * event: nativeint -> int",
         "",
+        "/// <summary>The <c>RvEventInit</c> of the header; strings are caller-owned NUL-terminated UTF-8 pointers.</summary>",
+        "[<Struct; StructLayout(LayoutKind.Sequential)>]",
+        "type EventInit =",
+        "    val mutable size: int",
+        "    val mutable bubbles: int",
+        "    val mutable cancelable: int",
+        "    val mutable composed: int",
+        "    val mutable detail: int",
+        "    val mutable modifiers: int",
+        "    val mutable screenX: float",
+        "    val mutable screenY: float",
+        "    val mutable clientX: float",
+        "    val mutable clientY: float",
+        "    val mutable button: int",
+        "    val mutable buttons: int",
+        "    val mutable key: nativeint",
+        "    val mutable code: nativeint",
+        "    val mutable location: int",
+        "    val mutable repeat: int",
+        "    val mutable isComposing: int",
+        "    val mutable relatedTarget: nativeint",
+        "    val mutable customDetailJson: nativeint",
+        "",
+        "/// <summary>The <c>RvTextSegments</c> of the header: owned until <c>rv_text_segments_release</c>.</summary>",
+        "[<Struct; StructLayout(LayoutKind.Sequential)>]",
+        "type TextSegments =",
+        "    val mutable count: int",
+        "    val mutable starts: nativeint",
+        "    val mutable word_like: nativeint",
+        "    val mutable locale: nativeint",
+        "",
         "/// <summary>The <c>RvResourceHandler</c> of the header; <c>url</c> is a NUL-terminated UTF-8 string.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
         "type ResourceHandler = delegate of context: nativeint * load: nativeint * url: nativeint -> unit",
+        "",
+        "/// <summary>The <c>RvFormSubmission</c> of the header; every pointer is valid only during the handler call.</summary>",
+        "[<Struct; StructLayout(LayoutKind.Sequential)>]",
+        "type FormSubmission =",
+        "    val mutable size: uint32",
+        "    val mutable method: nativeint",
+        "    val mutable url: nativeint",
+        "    val mutable target: nativeint",
+        "    val mutable contentType: nativeint",
+        "    val mutable body: nativeint",
+        "    val mutable bodyLength: int",
+        "    val mutable form: nativeint",
+        "    val mutable submitter: nativeint",
+        "",
+        "/// <summary>The <c>RvFormSubmissionHandler</c> of the header; <c>submission</c> points to a <c>FormSubmission</c>.</summary>",
+        "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+        "type FormSubmissionHandler = delegate of context: nativeint * submission: nativeint -> unit",
         "",
         "/// <summary>The <c>RvResourceCompletion</c> of the header: one terminal outcome with an image's natural size.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
@@ -176,6 +238,14 @@ def generated(header: str) -> str:
         "/// <summary>The <c>RvAxCallback</c> of the header.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
         "type AxCallback = delegate of context: nativeint * node: nativeint * event: int -> unit",
+        "",
+        "/// <summary>The <c>RvNodeFilterCallback</c> of the header.</summary>",
+        "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+        "type NodeFilterCallback = delegate of context: nativeint * node: nativeint -> int",
+        "",
+        "/// <summary>The <c>RvNodeFilterRelease</c> of the header.</summary>",
+        "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+        "type NodeFilterRelease = delegate of context: nativeint -> unit",
     ]
 
     found = declarations(header)
@@ -258,6 +328,17 @@ def externs(fsharp: str):
     return found
 
 
+def preamble_types(fsharp: str):
+    """Each type declared before the Calls module, with its struct fields, in order."""
+    head = fsharp.split("module Calls", 1)[0]
+    found = []
+    for match in re.finditer(r"^type (\w+) =(.*?)(?=^(?:///|\[<|type |module )|\Z)", head, flags=re.M | re.S):
+        fields = re.findall(r"val mutable (\w+): (\S+)", match.group(2))
+        delegate = " ".join(match.group(2).split()) if "delegate of" in match.group(2) else None
+        found.append((match.group(1), fields, delegate))
+    return found
+
+
 def compare(native: str, header: str) -> int:
     expected = {
         name: (return_type(r), [parameter(c, n)[1] + parameter(c, n)[0] for c, n in params])
@@ -309,7 +390,12 @@ def main() -> int:
         if not ordered:
             print("the generated section's externs are out of the header's order; run write")
 
-        return 1 if status or not ordered or BEGIN not in native else 0
+        # The types before the externs must be the generator's: a type added to Native.fs by hand is lost on write.
+        expected_types, actual_types = preamble_types(section), preamble_types(current)
+        if expected_types != actual_types:
+            print(f"the generated section's types differ from the generator's; add them to generated(): generator {expected_types}, Native.fs {actual_types}")
+
+        return 1 if status or not ordered or BEGIN not in native or expected_types != actual_types else 0
 
     if mode == "write":
         tail = native[stop:]
