@@ -133,6 +133,7 @@ with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
     run([sys.executable, '-I', '-X', 'utf8', tests / 'url_values.py', '--native-directory', out])
     run([sys.executable, '-I', '-X', 'utf8', tests / 'url_wpt.py', '--native-directory', out])
     run([sys.executable, '-I', '-X', 'utf8', tests / 'text_segmentation.py', '--native-directory', out])
+    run([sys.executable, '-I', '-X', 'utf8', tests / 'visual_viewport.py', '--native-directory', out])
     run([sys.executable, '-I', '-X', 'utf8', tests / 'custom_highlights.py', '--native-directory', out, '--webkit-source', args.source])
     run([sys.executable, '-I', tests / 'form_navigation.py', '--native-directory', out])
     run([sys.executable, '-I', '-X', 'utf8', tests / 'form_submission.py', '--native-directory', out])

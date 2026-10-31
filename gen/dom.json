@@ -12,6 +12,7 @@
     "typedArrayViewTypes lists the IDL types passed as an in/out typed array: an element kind, a writable buffer and its",
     "byte length; only a [ReturnValue] argument maps. windowObjectBindings binds the operations of the object a readonly",
     "Window attribute (accessor) holds, called through the Window of a checked Document.",
+    "eventTargetObjects lists interfaces derived directly from EventTarget whose handles are RvEventTarget references; attached is the C++ condition under which their members answer, else RV_ERR_DETACHED.",
     "setlikeBindings and maplikeBindings bind an interface's setlike or maplike declaration through the adapter class of host/dom/<adapter>.h: size, has, values or get and entries (snapshot copies), and add or set, delete and clear unless readonly."
   ],
   "attributeBridges": {
@@ -607,6 +608,7 @@
     "DOMURL",
     "URLSearchParams",
     "URLPattern",
+    "VisualViewport",
     "Highlight",
     "HighlightRegistry"
   ],
@@ -940,6 +942,14 @@
         ],
         "feature": "dom-window-scrolling",
         "stringInputs": "utf8-lengths"
+      },
+      {
+        "receiver": "Document",
+        "members": [
+          "visualViewport"
+        ],
+        "feature": "visual-viewport",
+        "stringInputs": "utf8-lengths"
       }
     ]
   },
@@ -975,7 +985,13 @@
     }
   },
   "creationGatedInterfaces": {
-    "CaretPosition": "Document.caretPositionFromPoint"
+    "CaretPosition": "Document.caretPositionFromPoint",
+    "VisualViewport": "DOMWindow.visualViewport"
+  },
+  "eventTargetObjects": {
+    "VisualViewport": {
+      "attached": "impl->frame()"
+    }
   },
   "resultDictionaries": [
     "URLPatternResult",

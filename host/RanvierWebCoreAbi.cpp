@@ -161,6 +161,7 @@
 #if PLATFORM(COCOA)
 #include <WebCore/AttributedString.h>
 #endif
+#include <cmath>
 #include <mutex>
 #include <pal/SessionID.h>
 #include <cstring>
@@ -536,6 +537,7 @@ static Ref<Page> createPage(IntSize viewportSize)
     page->settings().setCSSFontFaceMetricOverrideDescriptorsEnabled(true);
     page->settings().setCSSAnchorPositioningEnabled(true);
     page->settings().setPopoverHintEnabled(true);
+    page->settings().setVisualViewportAPIEnabled(true);
     page->settings().setInteractiveFormValidationEnabled(true);
     // Markup arrives decoded, so the document's encoding, which form submission and URL query encoding use, is UTF-8.
     page->settings().setDefaultTextEncodingName("UTF-8"_s);
@@ -1281,6 +1283,10 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "viewport"))
         return 1;
     if (!std::strcmp(feature, "dom-binary-values"))
+        return 1;
+    if (!std::strcmp(feature, "page-scale"))
+        return 1;
+    if (!std::strcmp(feature, "obscured-insets"))
         return 1;
     if (!std::strcmp(feature, "form-submission"))
         return 1;
@@ -2831,6 +2837,46 @@ int32_t rv_host_set_device_scale(RvHost* host, float scale)
         return RV_ERR_UNSUPPORTED;
     host->deviceScale = scale;
     host->page->setDeviceScaleFactor(scale);
+    host->dirty = { { }, host->size };
+    host->requestFrame();
+    return RV_OK;
+}
+
+int32_t rv_host_set_page_scale(RvHost* host, double scale, int32_t originX, int32_t originY)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!std::isfinite(scale) || scale <= 0)
+        return RV_ERR_UNSUPPORTED;
+    host->page->setPageScaleFactor(static_cast<float>(scale), { originX, originY });
+    host->dirty = { { }, host->size };
+    host->requestFrame();
+    return RV_OK;
+}
+
+int32_t rv_host_page_scale(RvHost* host, double* scale)
+{
+    if (!host || !scale)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    *scale = host->page->pageScaleFactor();
+    return RV_OK;
+}
+
+int32_t rv_host_set_obscured_insets(RvHost* host, double top, double right, double bottom, double left)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    for (double inset : { top, right, bottom, left }) {
+        if (!std::isfinite(inset) || inset < 0)
+            return RV_ERR_UNSUPPORTED;
+    }
+    host->page->setObscuredContentInsets(FloatBoxExtent { static_cast<float>(top), static_cast<float>(right), static_cast<float>(bottom), static_cast<float>(left) });
     host->dirty = { { }, host->size };
     host->requestFrame();
     return RV_OK;

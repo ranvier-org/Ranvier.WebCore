@@ -1433,6 +1433,26 @@ RV_EXPORT void rv_text_segments_release(RvTextSegments* segments);
  * copies a string. Windows packages carry ICU; Linux and macOS packages use the system's. */
 RV_EXPORT int32_t rv_text_segmentation_version(char* buffer, int32_t capacity, int32_t* length);
 
+/* v45: "page-scale" and "obscured-insets" for rv_abi_has, and "visual-viewport" for the generated
+ * rv_dom_window_get_visual_viewport and rv_dom_visual_viewport_* functions (RanvierWebCoreDom.h). A VisualViewport
+ * handle is an RvEventTarget: its resize and scroll events fire in rv_host_update, after the window's. */
+
+/* Sets the page scale, as a pinch zoom does: 1 at creation. Returns RV_ERR_UNSUPPORTED for a non-finite scale or one
+ * at or below 0; any other scale applies unclamped, since the engine has no minimum or maximum. originX and originY
+ * are the scroll position, in CSS pixels of the scaled document, that the viewport takes. The visual viewport is then
+ * the viewport's CSS size divided by the scale, in LayoutUnits of 1/64 CSS pixel: 320 / 1.5 reads 213.328125. While
+ * the page is scaled, window.innerWidth and innerHeight are the visual viewport's size, and the layout viewport stays
+ * at the document's origin, so VisualViewport.offsetLeft and offsetTop equal pageLeft and pageTop. */
+RV_EXPORT int32_t rv_host_set_page_scale(RvHost*, double scale, int32_t originX, int32_t originY);
+/* Writes the page scale. */
+RV_EXPORT int32_t rv_host_page_scale(RvHost*, double* scale);
+/* Sets the CSS pixel widths of the viewport's edges that host UI covers, such as a toolbar or an on-screen
+ * keyboard: 0 at creation. Returns RV_ERR_UNSUPPORTED for a non-finite or negative inset. The insets shrink the
+ * visual viewport and window.innerWidth and innerHeight by the covered edges, and fire the window's and then the
+ * visual viewport's resize event. Document coordinates stay in place, top inset included, and rv_host_element_at
+ * finds nothing in the covered right and bottom areas. */
+RV_EXPORT int32_t rv_host_set_obscured_insets(RvHost*, double top, double right, double bottom, double left);
+
 /* "dom-generated" and "dom:<Interface>" for rv_abi_has: the generated functions of RanvierWebCoreDom.h, one per
  * IDL member of the interfaces gen/dom.json lists, from the same library. */
 

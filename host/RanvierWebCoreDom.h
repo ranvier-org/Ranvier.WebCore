@@ -7840,6 +7840,27 @@ RV_EXPORT int32_t rv_dom_url_pattern_test(RvURLPattern* target, const RvDomUnion
  * defaults to {} in IDL; base_url_length -1 means absent; base_url may be NULL (absent); *result is NULL for null;
  * *result is owned; release it with rv_dom_url_pattern_result_release */
 RV_EXPORT int32_t rv_dom_url_pattern_exec(RvURLPattern* target, const RvDomUnionUSVStringOrURLPatternInit* input, const uint8_t* base_url, int32_t base_url_length, RvDomURLPatternResult** result);
+/* VisualViewport */
+
+/* VisualViewport.offsetLeft getter: readonly attribute double offsetLeft; RV_ERR_DETACHED once the object's window
+ * has no frame */
+RV_EXPORT int32_t rv_dom_visual_viewport_get_offset_left(RvEventTarget* target, double* result);
+/* VisualViewport.offsetTop getter: readonly attribute double offsetTop; RV_ERR_DETACHED once the object's window has
+ * no frame */
+RV_EXPORT int32_t rv_dom_visual_viewport_get_offset_top(RvEventTarget* target, double* result);
+/* VisualViewport.pageLeft getter: readonly attribute double pageLeft; RV_ERR_DETACHED once the object's window has no
+ * frame */
+RV_EXPORT int32_t rv_dom_visual_viewport_get_page_left(RvEventTarget* target, double* result);
+/* VisualViewport.pageTop getter: readonly attribute double pageTop; RV_ERR_DETACHED once the object's window has no
+ * frame */
+RV_EXPORT int32_t rv_dom_visual_viewport_get_page_top(RvEventTarget* target, double* result);
+/* VisualViewport.width getter: readonly attribute double width; RV_ERR_DETACHED once the object's window has no frame */
+RV_EXPORT int32_t rv_dom_visual_viewport_get_width(RvEventTarget* target, double* result);
+/* VisualViewport.height getter: readonly attribute double height; RV_ERR_DETACHED once the object's window has no
+ * frame */
+RV_EXPORT int32_t rv_dom_visual_viewport_get_height(RvEventTarget* target, double* result);
+/* VisualViewport.scale getter: readonly attribute double scale; RV_ERR_DETACHED once the object's window has no frame */
+RV_EXPORT int32_t rv_dom_visual_viewport_get_scale(RvEventTarget* target, double* result);
 /* Highlight */
 
 /* Highlight.constructor: target is the Document of the constructed object; *result is a new reference */
@@ -7886,6 +7907,9 @@ RV_EXPORT int32_t rv_dom_window_scroll_to_2(RvNode* target, double x, double y);
 RV_EXPORT int32_t rv_dom_window_scroll_by_1(RvNode* target, const RvDomScrollToOptions* option);
 /* Window.scrollBy: checked Document context; nullable string byte length -1 means null */
 RV_EXPORT int32_t rv_dom_window_scroll_by_2(RvNode* target, double x, double y);
+/* Window.visualViewport getter: checked Document context; *result is a new reference; RV_ERR_UNSUPPORTED while the
+ * setting VisualViewportAPIEnabled is off */
+RV_EXPORT int32_t rv_dom_window_get_visual_viewport(RvNode* target, RvEventTarget** result);
 /* Crypto */
 
 /* Window.crypto.getRandomValues: checked Document context; array_kind is an RV_DOM_ARRAY_BUFFER_VIEW_* element kind

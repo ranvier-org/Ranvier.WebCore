@@ -474,6 +474,31 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
 
                 if viewportCalls <> 0 then
                     failwith "scroll listener ran after host destroy"
+        | "visual viewport" ->
+            rv_dom_window_get_visual_viewport (document, &held.contents) |> check "Window.visualViewport"
+            let listener = rv_event_target_add_listener (held.Value, "resize", 0, viewportCallback, 0n)
+
+            if listener = 0n then
+                failwith "no visualViewport resize listener"
+
+            rv_host_set_page_scale (host, 2.0, 0, 0) |> check "page scale 2"
+            let mutable width = -1.0
+            rv_dom_visual_viewport_get_width (held.Value, &width) |> check "VisualViewport.width"
+
+            if width <> 32.0 then
+                failwithf "VisualViewport.width %f at page scale 2" width
+
+            fun () ->
+                let status = rv_dom_visual_viewport_get_width (held.Value, &width)
+
+                if status <> -10 then
+                    failwithf "VisualViewport.width after destroy: %d" status
+
+                rv_listener_remove listener |> check "visualViewport listener removal after destroy"
+                rv_event_target_release held.Value
+
+                if viewportCalls <> 0 then
+                    failwith "visualViewport listener ran after host destroy"
         | "form controls collection"
         | "options collection"
         | "form data"
@@ -849,6 +874,7 @@ let run (outDir: string) =
                     "crypto"
                     "url values"
                     "url pattern result"
+                    "visual viewport"
                 ] do
                 for remove in [ false; true ] do
                     releaseAfterDestroy kind remove
