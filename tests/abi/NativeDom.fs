@@ -1602,7 +1602,7 @@ type RvDomSequencePairUSVStringAndUnionFileOrUSVString =
 type RvDomPairDOMStringAndHighlight =
     val mutable present: int
     val mutable key: RvDomUtf8StringSpan
-    val mutable value: RvHighlight*
+    val mutable value: nativeint
 
 /// <summary>ABI transport for PairDOMStringAndHighlight sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
