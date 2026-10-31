@@ -305,6 +305,18 @@ invented members to the shared DOM interfaces. CSS rule, stylesheet and declarat
 queries because CSSOM's historical `CSSRule.type` returns zero for modern rule types. An unscoped subtype
 reports its nearest scoped ancestor. Query names are reported separately from the IDL member count.
 
+An `Event` root reads an `RvEvent` handle (`rv_dom_event_get_interface_name`). A root listed in
+`runtimeTypePublicNames` reports the exposed interface name, `AnimationEvent` for `CSSAnimationEvent`, and
+`runtimeTypeExtras` names unscoped interfaces the query still reports, such as `CustomEvent`. An event outside
+both reports its nearest generated base: a `DragEvent` reads `MouseEvent`, a `TextEvent` `UIEvent`, a
+`ClipboardEvent` `Event`.
+
+A constructor with `"globalObject": true` serves `[CallWith=CurrentGlobalObject]`: the factory receives the
+receiver Document's global object first, and a document without a browsing context, such as one of a destroyed
+host, fails with `InvalidStateError`. `getterExpressions` maps `Interface.member` to the C++ expression a getter
+reads, for a member whose C++ type differs from its IDL type (`AnimationPlaybackEvent.currentTime` converts a
+`WebAnimationTime` to `CSSNumberish`).
+
 `callbackObjectRoots` makes a callback interface, such as `NodeFilter`, an object handle root. Its arguments and
 attributes pass `Rv<Name>*` handles with the generated `rv_dom_<name>_retain`/`_release`, and its members are
 excluded by name. The host creates the handles (`rv_node_filter_create`), so `RanvierWebCoreAbi.h` declares the

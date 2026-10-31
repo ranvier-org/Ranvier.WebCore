@@ -1,5 +1,6 @@
 /// Probes what keeps a document and its nodes alive after the host's destruction. Each probe runs one action on a fresh
-/// host, destroys the host, and reads the watched nodes before and after a run-loop cycle.
+/// host, destroys the host, and reads the watched nodes before and after a run-loop cycle. An image probe takes the
+/// after-cycle read once the image's load has settled.
 module RanvierWebCoreAbi.Teardown
 
 open System
@@ -60,9 +61,33 @@ type ProbeResult =
         targetRefsAfterCollection: int
     }
 
+/// The probe-name substring set by RANVIER_TEARDOWN_ONLY; unset or empty selects every probe.
+let private only = Environment.GetEnvironmentVariable "RANVIER_TEARDOWN_ONLY"
+
+let private selected (name: string) =
+    String.IsNullOrEmpty only || name.Contains(only, StringComparison.Ordinal)
+
+/// Cycles the run loop until WebCore destroys the watched image, which ends its load. The image's loader holds the image
+/// until its pending load or error event and the zero-delay timer that releases the image have both run.
+let private settleImageLoad (imageWatch: nativeint) =
+    cycle ()
+    let elapsed = Diagnostics.Stopwatch.StartNew()
+
+    while refsOf imageWatch <> -1 do
+        if elapsed.Elapsed > TimeSpan.FromSeconds 10.0 then
+            failwith "image load still pending 10 s after host destroy"
+
+        cycleFor 0
+
 /// Runs the action on a fresh host, with the host, its document and its body; the action returns the node it targets,
-/// or 0. A node reads -1 once WebCore destroyed it.
-let private probe (name: string) (cycleBefore: string) (action: nativeint -> nativeint -> nativeint -> nativeint) =
+/// or 0. After the host is destroyed, afterDestroy runs with the target's watch before the after-cycle read. A node
+/// reads -1 once WebCore destroyed it.
+let private probeWith
+    (afterDestroy: nativeint -> unit)
+    (name: string)
+    (cycleBefore: string)
+    (action: nativeint -> nativeint -> nativeint -> nativeint)
+    =
     let host = rv_host_create (64, 64)
 
     rv_host_load_html (host, html) |> check "load_html"
@@ -88,7 +113,7 @@ let private probe (name: string) (cycleBefore: string) (action: nativeint -> nat
     rv_host_destroy host
     let documentAfterDisposal = refsOf documentWatch
     let targetAfterDisposal = refsOf targetWatch
-    cycle ()
+    afterDestroy targetWatch
 
     let result =
         {
@@ -131,6 +156,20 @@ let private probe (name: string) (cycleBefore: string) (action: nativeint -> nat
         rv_watch_release targetWatch
 
     result
+
+/// Runs probeWith with a 20 ms cycle after host destroy, for a selected probe.
+let private probe (name: string) (cycleBefore: string) action =
+    if selected name then
+        Some(probeWith (fun _ -> cycle ()) name cycleBefore action)
+    else
+        None
+
+/// Runs probeWith on an image action; the after-cycle read follows the settled load.
+let private imageProbe (name: string) (cycleBefore: string) action =
+    if selected name then
+        Some(probeWith settleImageLoad name cycleBefore action)
+    else
+        None
 
 /// Appends a new element of the tag to the body and focuses it.
 let private focused (tag: string) (host: nativeint) (_: nativeint) (body: nativeint) =
@@ -338,7 +377,10 @@ let private viewportCallback =
 /// Appends a div with a child span, takes one extra handle of the kind from the div (removing the div first when
 /// <c>remove</c> is set), destroys the host, then releases that handle. The document and the div must be destroyed
 /// after collection whatever the destroy order.
-let private releaseAfterDestroy (kind: string) (remove: bool) =
+let private releaseName (kind: string) (remove: bool) =
+    (if remove then "removed div, " else "div, ") + kind + " released after host destroy"
+
+let private runReleaseAfterDestroy (kind: string) (remove: bool) =
     let host = rv_host_create (64, 64)
     rv_host_load_html (host, html) |> check "load_html"
     let document = rv_host_document host
@@ -721,6 +763,33 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
                     failwith "ToggleEvent.newState changed after destroy"
 
                 rv_event_release held.Value
+        | "error event" ->
+            let mutable init = RvDomErrorEventInit()
+            init.size <- uint32 (Runtime.InteropServices.Marshal.SizeOf<RvDomErrorEventInit>())
+            init.message <- "boom"
+            init.lineno <- 3u
+            let name = Text.Encoding.UTF8.GetBytes "error"
+
+            rv_dom_error_event_create (document, name, name.Length, [| init |], &held.contents)
+            |> check "ErrorEvent"
+
+            fun () ->
+                let buffer = Array.zeroCreate<byte> 32
+                let length = [| 0 |]
+
+                rv_dom_error_event_get_message (held.Value, buffer, buffer.Length, length)
+                |> check "ErrorEvent.message after destroy"
+
+                if Text.Encoding.UTF8.GetString(buffer, 0, length[0]) <> "boom" then
+                    failwith "ErrorEvent.message changed after destroy"
+
+                rv_dom_event_get_interface_name (held.Value, buffer, buffer.Length, length)
+                |> check "Event interface name after destroy"
+
+                if Text.Encoding.UTF8.GetString(buffer, 0, length[0]) <> "ErrorEvent" then
+                    failwith "ErrorEvent interface name changed after destroy"
+
+                rv_event_release held.Value
         | "screen" ->
             let metrics = Runtime.InteropServices.Marshal.AllocHGlobal 36
             let values = [| 36; 1080; 1920; 0; 40; 1080; 1880; 30; 0 |]
@@ -849,10 +918,7 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
 
     let result =
         {
-            probe =
-                (if remove then "removed div, " else "div, ")
-                + kind
-                + " released after host destroy"
+            probe = releaseName kind remove
             cycleBeforeDisposal = "none"
             documentRefsAfterDisposal = documentAfterDisposal
             targetRefsAfterDisposal = divAfterDisposal
@@ -867,6 +933,12 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
     rv_watch_release documentWatch
     rv_watch_release divWatch
     result
+
+let private releaseAfterDestroy (kind: string) (remove: bool) =
+    if selected (releaseName kind remove) then
+        Some(runReleaseAfterDestroy kind remove)
+    else
+        None
 
 /// Runs each probe without a run-loop cycle before disposal, with a single cycle and with a 20 ms cycle, and writes
 /// teardown-probes.json.
@@ -901,11 +973,11 @@ let run (outDir: string) =
                     rv_node_remove input |> check "remove"
                     input)
 
-                probe "image with a data source" cycleBefore (image gif false)
-                probe "image with a data source, removed" cycleBefore (image gif true)
-                probe "image with a missing file source" cycleBefore (image "file:///C:/ranvier-missing.png" false)
+                imageProbe "image with a data source" cycleBefore (image gif false)
+                imageProbe "image with a data source, removed" cycleBefore (image gif true)
+                imageProbe "image with a missing file source" cycleBefore (image "file:///C:/ranvier-missing.png" false)
 
-                probe
+                imageProbe
                     "image with a missing file source, removed"
                     cycleBefore
                     (image "file:///C:/ranvier-missing.png" true)
@@ -929,6 +1001,7 @@ let run (outDir: string) =
                     "submit event"
                     "open modal dialog"
                     "toggle event"
+                    "error event"
                     "blob slice"
                     "caret position"
                     "crypto"
@@ -941,6 +1014,7 @@ let run (outDir: string) =
                 for remove in [ false; true ] do
                     releaseAfterDestroy kind remove
         ]
+        |> List.choose id
 
     let json =
         JsonSerializer.Serialize(results, JsonSerializerOptions(WriteIndented = true))
