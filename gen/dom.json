@@ -480,7 +480,9 @@
     "SVGFETileElement",
     "SVGFETurbulenceElement",
     "SVGFilterElement",
-    "SVGComponentTransferFunctionElement"
+    "SVGComponentTransferFunctionElement",
+    "SVGClipPathElement",
+    "SVGMaskElement"
   ],
   "skipDirectories": [
     "Modules/",

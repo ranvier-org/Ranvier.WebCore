@@ -1220,6 +1220,14 @@
     {
       "name": "SVGComponentTransferFunctionElement",
       "base": "SVGElement"
+    },
+    {
+      "name": "SVGClipPathElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGMaskElement",
+      "base": "SVGElement"
     }
   ],
   "contractInterfaces": [
@@ -3400,6 +3408,24 @@
       "source": "svg/SVGComponentTransferFunctionElement.idl"
     },
     {
+      "name": "SVGClipPathElement",
+      "idlName": "SVGClipPathElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGClipPathElement.idl"
+    },
+    {
+      "name": "SVGMaskElement",
+      "idlName": "SVGMaskElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGMaskElement.idl"
+    },
+    {
       "name": "HTMLUnknownElement",
       "idlName": "HTMLUnknownElement",
       "base": "HTMLElement",
@@ -3526,15 +3552,6 @@
       "source": "svg/SVGAElement.idl"
     },
     {
-      "name": "SVGClipPathElement",
-      "idlName": "SVGClipPathElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGClipPathElement.idl"
-    },
-    {
       "name": "SVGDefsElement",
       "idlName": "SVGDefsElement",
       "base": "SVGGraphicsElement",
@@ -3578,15 +3595,6 @@
       "mixin": false,
       "contractOnly": true,
       "source": "svg/SVGImageElement.idl"
-    },
-    {
-      "name": "SVGMaskElement",
-      "idlName": "SVGMaskElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGMaskElement.idl"
     },
     {
       "name": "SVGMetadataElement",
@@ -129254,6 +129262,366 @@
         "interface": "SVGAnimatedNumber",
         "root": "SVGAnimatedNumber",
         "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGClipPathElement",
+      "member": "clipPathUnits",
+      "contractOwner": "SVGClipPathElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_clip_path_element_get_clip_path_units",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedEnumeration**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedEnumeration",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedEnumeration",
+        "root": "SVGAnimatedEnumeration",
+        "class": "SVGAnimatedEnumeration",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGClipPathElement",
+      "member": "transform",
+      "contractOwner": "SVGClipPathElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_clip_path_element_get_transform",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedTransformList**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedTransformList",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedTransformList",
+        "root": "SVGAnimatedTransformList",
+        "class": "SVGAnimatedTransformList",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGMaskElement",
+      "member": "maskUnits",
+      "contractOwner": "SVGMaskElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_mask_element_get_mask_units",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedEnumeration**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedEnumeration",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedEnumeration",
+        "root": "SVGAnimatedEnumeration",
+        "class": "SVGAnimatedEnumeration",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGMaskElement",
+      "member": "maskContentUnits",
+      "contractOwner": "SVGMaskElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_mask_element_get_mask_content_units",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedEnumeration**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedEnumeration",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedEnumeration",
+        "root": "SVGAnimatedEnumeration",
+        "class": "SVGAnimatedEnumeration",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGMaskElement",
+      "member": "x",
+      "contractOwner": "SVGMaskElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_mask_element_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGMaskElement",
+      "member": "y",
+      "contractOwner": "SVGMaskElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_mask_element_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGMaskElement",
+      "member": "width",
+      "contractOwner": "SVGMaskElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_mask_element_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGMaskElement",
+      "member": "height",
+      "contractOwner": "SVGMaskElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_mask_element_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGMaskElement",
+      "member": "requiredExtensions",
+      "contractOwner": "SVGMaskElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_mask_element_get_required_extensions",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGStringList**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGStringList",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGStringList",
+        "root": "SVGStringList",
+        "class": "SVGStringList",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGMaskElement",
+      "member": "systemLanguage",
+      "contractOwner": "SVGMaskElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_mask_element_get_system_language",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGStringList**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGStringList",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGStringList",
+        "root": "SVGStringList",
+        "class": "SVGStringList",
         "enum": null,
         "label": null,
         "nullable": false,

@@ -8843,6 +8843,36 @@ extern int rv_dom_svg_component_transfer_function_element_get_exponent(nativeint
 extern int rv_dom_svg_component_transfer_function_element_get_offset(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_svg_clip_path_element_get_clip_path_units(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_clip_path_element_get_transform(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_mask_element_get_mask_units(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_mask_element_get_mask_content_units(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_mask_element_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_mask_element_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_mask_element_get_width(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_mask_element_get_height(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_mask_element_get_required_extensions(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_mask_element_get_system_language(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_css_supports_2(nativeint target, byte[] property, int property_length, byte[] value, int value_length, int& result)
 
 [<DllImport(Lib)>]

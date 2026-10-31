@@ -148,11 +148,13 @@ Root-owned patches 0028 and 0029 replace stale convolve structural and FEImage a
 
 **Files:** generator selection/output; `tests/abi/svg_clip_mask_marker.py`; `tests/fixtures/svg-clip-mask-marker.svg`; browser oracle.
 
-- [ ] Capture missing clip/mask binding RED; preserve existing marker bindings.
-- [ ] Mutate units, geometry, transforms, viewBox/aspect-ratio, marker dimensions/reference points and automatic versus explicit angle orientation.
-- [ ] Verify actual clipping, alpha/luminance mask paint and marker output at interior points. Test references to removed/replaced nodes and retained angle/length/value wrappers.
-- [ ] Check SVGTests language/extension list effects honestly against actual providers; do not infer effect solely from reflected list entries.
-- [ ] Verify read-only/invalid arguments and final handle/owner expiry; run full focused browser/native fixtures and commit.
+- [x] Capture missing clip/mask binding RED; preserve existing marker bindings.
+- [x] Mutate units, geometry, transforms, viewBox/aspect-ratio, marker dimensions/reference points and automatic versus explicit angle orientation.
+- [x] Verify actual clipping, alpha/luminance mask paint and marker output at interior points. Test references to removed/replaced nodes and retained angle/length/value wrappers.
+- [x] Check SVGTests language/extension list effects honestly against actual providers; do not infer effect solely from reflected list entries.
+- [x] Verify read-only/invalid arguments and final handle/owner expiry; run full focused browser/native fixtures and commit.
+
+S10 focused checkpoint: SVGClipPathElement and SVGMaskElement compile into the 237-interface/2424-function model (50 roots/22 dictionaries/0 stubs). The 565-assertion native fixture covers 20 member routes, actual clip, luminance/alpha mask and marker paint, subtype/thread errors, retained wrappers and final owner expiry; Chromium supplies 19 member observations, 8 paint phases and 12 pixel assertions (`svg-paint-evidence/s10-red`, `s10-green`). Both engines keep cached mask paint after a style-only `mask-type` change until child geometry changes; mask SVGTests lists do not suppress paint in either provider. Marker `orient` is native-only.
 
 ## Task 5: S11 reuse/content and truthful resource completion
 

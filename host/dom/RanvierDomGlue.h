@@ -2569,6 +2569,16 @@ WEBCORE_EXPORT int32_t ranvier_dom_svg_component_transfer_function_element_get_i
 WEBCORE_EXPORT int32_t ranvier_dom_svg_component_transfer_function_element_get_amplitude(RvNode* target, RvSVGAnimatedNumber** result);
 WEBCORE_EXPORT int32_t ranvier_dom_svg_component_transfer_function_element_get_exponent(RvNode* target, RvSVGAnimatedNumber** result);
 WEBCORE_EXPORT int32_t ranvier_dom_svg_component_transfer_function_element_get_offset(RvNode* target, RvSVGAnimatedNumber** result);
+WEBCORE_EXPORT int32_t ranvier_dom_svg_clip_path_element_get_clip_path_units(RvNode* target, RvSVGAnimatedEnumeration** result);
+WEBCORE_EXPORT int32_t ranvier_dom_svg_clip_path_element_get_transform(RvNode* target, RvSVGAnimatedTransformList** result);
+WEBCORE_EXPORT int32_t ranvier_dom_svg_mask_element_get_mask_units(RvNode* target, RvSVGAnimatedEnumeration** result);
+WEBCORE_EXPORT int32_t ranvier_dom_svg_mask_element_get_mask_content_units(RvNode* target, RvSVGAnimatedEnumeration** result);
+WEBCORE_EXPORT int32_t ranvier_dom_svg_mask_element_get_x(RvNode* target, RvSVGAnimatedLength** result);
+WEBCORE_EXPORT int32_t ranvier_dom_svg_mask_element_get_y(RvNode* target, RvSVGAnimatedLength** result);
+WEBCORE_EXPORT int32_t ranvier_dom_svg_mask_element_get_width(RvNode* target, RvSVGAnimatedLength** result);
+WEBCORE_EXPORT int32_t ranvier_dom_svg_mask_element_get_height(RvNode* target, RvSVGAnimatedLength** result);
+WEBCORE_EXPORT int32_t ranvier_dom_svg_mask_element_get_required_extensions(RvNode* target, RvSVGStringList** result);
+WEBCORE_EXPORT int32_t ranvier_dom_svg_mask_element_get_system_language(RvNode* target, RvSVGStringList** result);
 WEBCORE_EXPORT int32_t ranvier_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_css_supports_1(RvNode* target, const uint8_t* condition_text, int32_t condition_text_length, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_css_register_property(RvNode* target, const RvDomDOMCSSCustomPropertyDescriptor* descriptor);

@@ -181,6 +181,7 @@
 #include "SVGAnimatedString.h"
 #include "SVGAnimationElement.h"
 #include "SVGCircleElement.h"
+#include "SVGClipPathElement.h"
 #include "SVGComponentTransferFunctionElement.h"
 #include "SVGElement.h"
 #include "SVGElementTypeHelpers.h"
@@ -220,6 +221,7 @@
 #include "SVGLinearGradientElement.h"
 #include "SVGMPathElement.h"
 #include "SVGMarkerElement.h"
+#include "SVGMaskElement.h"
 #include "SVGMatrix.h"
 #include "SVGNumber.h"
 #include "SVGNumberList.h"
@@ -2124,7 +2126,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -36409,6 +36411,136 @@ int32_t ranvier_dom_svg_component_transfer_function_element_get_offset(RvNode* t
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return deliver([&]() -> decltype(auto) { return impl->offsetAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGClipPathElement.clipPathUnits getter: readonly attribute SVGAnimatedEnumeration clipPathUnits; *result is a new reference
+int32_t ranvier_dom_svg_clip_path_element_get_clip_path_units(RvNode* target, RvSVGAnimatedEnumeration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGClipPathElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->clipPathUnitsAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedEnumeration>(value, result); });
+}
+
+// SVGClipPathElement.transform getter: readonly attribute SVGAnimatedTransformList transform; *result is a new reference
+int32_t ranvier_dom_svg_clip_path_element_get_transform(RvNode* target, RvSVGAnimatedTransformList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGClipPathElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->transformAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedTransformList>(value, result); });
+}
+
+// SVGMaskElement.maskUnits getter: readonly attribute SVGAnimatedEnumeration maskUnits; *result is a new reference
+int32_t ranvier_dom_svg_mask_element_get_mask_units(RvNode* target, RvSVGAnimatedEnumeration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMaskElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->maskUnitsAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedEnumeration>(value, result); });
+}
+
+// SVGMaskElement.maskContentUnits getter: readonly attribute SVGAnimatedEnumeration maskContentUnits; *result is a new reference
+int32_t ranvier_dom_svg_mask_element_get_mask_content_units(RvNode* target, RvSVGAnimatedEnumeration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMaskElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->maskContentUnitsAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedEnumeration>(value, result); });
+}
+
+// SVGMaskElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference
+int32_t ranvier_dom_svg_mask_element_get_x(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMaskElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGMaskElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference
+int32_t ranvier_dom_svg_mask_element_get_y(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMaskElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGMaskElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference
+int32_t ranvier_dom_svg_mask_element_get_width(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMaskElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->widthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGMaskElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference
+int32_t ranvier_dom_svg_mask_element_get_height(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMaskElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->heightAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGMaskElement.requiredExtensions getter: readonly attribute SVGStringList requiredExtensions; *result is a new reference
+int32_t ranvier_dom_svg_mask_element_get_required_extensions(RvNode* target, RvSVGStringList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMaskElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->requiredExtensions(); }, [&](auto&& value) { return storeHandle<SVGStringList>(value, result); });
+}
+
+// SVGMaskElement.systemLanguage getter: readonly attribute SVGStringList systemLanguage; *result is a new reference
+int32_t ranvier_dom_svg_mask_element_get_system_language(RvNode* target, RvSVGStringList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMaskElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->systemLanguage(); }, [&](auto&& value) { return storeHandle<SVGStringList>(value, result); });
 }
 
 // CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths

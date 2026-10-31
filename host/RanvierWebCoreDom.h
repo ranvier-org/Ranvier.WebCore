@@ -6957,6 +6957,34 @@ RV_EXPORT int32_t rv_dom_svg_component_transfer_function_element_get_exponent(Rv
 /* SVGComponentTransferFunctionElement.offset getter: readonly attribute SVGAnimatedNumber offset; *result is a new
  * reference */
 RV_EXPORT int32_t rv_dom_svg_component_transfer_function_element_get_offset(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGClipPathElement */
+
+/* SVGClipPathElement.clipPathUnits getter: readonly attribute SVGAnimatedEnumeration clipPathUnits; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_clip_path_element_get_clip_path_units(RvNode* target, RvSVGAnimatedEnumeration** result);
+/* SVGClipPathElement.transform getter: readonly attribute SVGAnimatedTransformList transform; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_clip_path_element_get_transform(RvNode* target, RvSVGAnimatedTransformList** result);
+/* SVGMaskElement */
+
+/* SVGMaskElement.maskUnits getter: readonly attribute SVGAnimatedEnumeration maskUnits; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_mask_element_get_mask_units(RvNode* target, RvSVGAnimatedEnumeration** result);
+/* SVGMaskElement.maskContentUnits getter: readonly attribute SVGAnimatedEnumeration maskContentUnits; *result is a
+ * new reference */
+RV_EXPORT int32_t rv_dom_svg_mask_element_get_mask_content_units(RvNode* target, RvSVGAnimatedEnumeration** result);
+/* SVGMaskElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_mask_element_get_x(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGMaskElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_mask_element_get_y(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGMaskElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_mask_element_get_width(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGMaskElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_mask_element_get_height(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGMaskElement.requiredExtensions getter: readonly attribute SVGStringList requiredExtensions; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_mask_element_get_required_extensions(RvNode* target, RvSVGStringList** result);
+/* SVGMaskElement.systemLanguage getter: readonly attribute SVGStringList systemLanguage; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_mask_element_get_system_language(RvNode* target, RvSVGStringList** result);
 /* DOMCSSNamespace */
 
 /* CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths */

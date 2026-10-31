@@ -4505,6 +4505,34 @@ and [<AllowNullLiteral>] SVGComponentTransferFunctionElement =
     /// <summary>SVGComponentTransferFunctionElement.offset.</summary>
     abstract member offset: SVGAnimatedNumber with get
 
+/// <summary>SVGClipPathElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGClipPathElement =
+    inherit SVGElement
+    /// <summary>SVGClipPathElement.clipPathUnits.</summary>
+    abstract member clipPathUnits: SVGAnimatedEnumeration with get
+    /// <summary>SVGClipPathElement.transform.</summary>
+    abstract member transform: SVGAnimatedTransformList with get
+
+/// <summary>SVGMaskElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGMaskElement =
+    inherit SVGElement
+    /// <summary>SVGMaskElement.maskUnits.</summary>
+    abstract member maskUnits: SVGAnimatedEnumeration with get
+    /// <summary>SVGMaskElement.maskContentUnits.</summary>
+    abstract member maskContentUnits: SVGAnimatedEnumeration with get
+    /// <summary>SVGMaskElement.x.</summary>
+    abstract member x: SVGAnimatedLength with get
+    /// <summary>SVGMaskElement.y.</summary>
+    abstract member y: SVGAnimatedLength with get
+    /// <summary>SVGMaskElement.width.</summary>
+    abstract member width: SVGAnimatedLength with get
+    /// <summary>SVGMaskElement.height.</summary>
+    abstract member height: SVGAnimatedLength with get
+    /// <summary>SVGMaskElement.requiredExtensions.</summary>
+    abstract member requiredExtensions: SVGStringList with get
+    /// <summary>SVGMaskElement.systemLanguage.</summary>
+    abstract member systemLanguage: SVGStringList with get
+
 /// <summary>HTMLUnknownElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLUnknownElement =
     inherit HTMLElement
@@ -4561,10 +4589,6 @@ and [<AllowNullLiteral>] HTMLVideoElement =
 and [<AllowNullLiteral>] SVGAElement =
     inherit SVGGraphicsElement
 
-/// <summary>SVGClipPathElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGClipPathElement =
-    inherit SVGElement
-
 /// <summary>SVGDefsElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGDefsElement =
     inherit SVGGraphicsElement
@@ -4584,10 +4608,6 @@ and [<AllowNullLiteral>] SVGGElement =
 /// <summary>SVGImageElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGImageElement =
     inherit SVGGraphicsElement
-
-/// <summary>SVGMaskElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGMaskElement =
-    inherit SVGElement
 
 /// <summary>SVGMetadataElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGMetadataElement =

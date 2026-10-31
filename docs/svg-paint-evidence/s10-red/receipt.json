@@ -1,0 +1,15 @@
+{
+  "baseline": "frozenNative19/ABI27",
+  "exitCode": 1,
+  "runtime": {
+    "RanvierWebCoreHost.dll": "9506e0e995769d85429a6d68ea98a4936000efbe554718f81c01f413ffc39848",
+    "WebCore.dll": "fd4cb94341812dd815c725c2a06aab31793bd8b3e01563d4c1919a295205cd57",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+  },
+  "files": {
+    "native.log": "4bdad255eb8be58cdb0a37738fcda808b72c9254e6c6fa6fdeb66ff436b684e2",
+    "svg-clip-mask-marker.svg": "c46bab751dd30250e6224c7c8fdabdf0a866aade1e35fb6d31d936b3b44110b1",
+    "svg_clip_mask_marker.py": "db803baae5d1223653125714e920bd29cebccb8317e61ee3e6e198d8678d03cf",
+    "svg_paint_probe.py": "5b1298774d637ce06b7fda73495a703f4a9f682ba821320420290c87f2766da1"
+  }
+}

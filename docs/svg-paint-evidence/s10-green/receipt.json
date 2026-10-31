@@ -1,0 +1,68 @@
+{
+  "status": "focused private unallocated S10 checkpoint",
+  "counts": {
+    "interfaces": 237,
+    "functions": 2424,
+    "roots": 50,
+    "dictionaries": 22,
+    "stubs": 0
+  },
+  "nativeAssertions": 565,
+  "memberRoutes": 20,
+  "browserAvailableMemberRoutes": 19,
+  "browserPaintPhases": 8,
+  "browserPixelAssertions": 12,
+  "runtime": {
+    "RanvierWebCoreHost.dll": "3668b6504a59ec1ef40191db856d82135b63fc9400d0f827e7ef553867f37217",
+    "WebCore.dll": "053e4e6d7aeeb85304a648c665042f04a717698723c414be044b0a669cf7a088",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+  },
+  "probes": [
+    {
+      "probe": "native",
+      "exitCode": 0,
+      "log": "native.log"
+    },
+    {
+      "probe": "browser",
+      "exitCode": 0,
+      "log": "browser.log"
+    },
+    {
+      "probe": "browser-pixels",
+      "exitCode": 0,
+      "log": "browser-pixels.log"
+    }
+  ],
+  "files": {
+    "browser-pixels.log": "188f0ad5d4c2b1adb168d78b25a69f21fce6e88367d80d9048d35b98564a37da",
+    "browser.log": "697d2e95964e237559ffa0db83c3f2bea0fcd22bbe78f702d3aa2f1fc54680e6",
+    "check_svg_clip_browser_pixels.py": "ca9b7f83717b50f26d76783225fd72b2f4fe88821a6b29c514a92f3fba5a6dbd",
+    "diagnose_mask_aspect.py": "5866b64bdc412c817e457804046be36cb1f4c361e9d91c098f5538e8e162057b",
+    "native.log": "1e1bc205b04e26a41449b1db78d19ca686f3641e6ed07704b883bc2d7d70884e",
+    "svg-clip-browser-pixels.json": "a283406d3cbe1d52dbec8fd6dccf0c3cb63127479c1d43f16c78c61f0c92e865",
+    "svg-clip-initial.png": "db75df3ff18daa0d1595cc6944d84edd633611fc95a5816ef0eec95fd9ef837f",
+    "svg-clip-markerMeet.png": "a4886affe1c1da806ad9bc0958feeabee3e845a556098a5db6a7bf5302e176a5",
+    "svg-clip-markerNone.png": "223841f614ff623495cd948d0cc839c53c70fbbbfe06aee5ec51bc7498a2d2e4",
+    "svg-clip-mask-marker-browser.json": "432fc5e7254ad226d50407016eb1901ba7a46fb315bd73a3089c2b64e2d0d804",
+    "svg-clip-mask-marker-browser.mjs": "4ed3a6a4bde9b54dbcbc3e3382bdc7229d5152ce96b5d7e4b38a21ce74676685",
+    "svg-clip-mask-marker-oracle.json": "432fc5e7254ad226d50407016eb1901ba7a46fb315bd73a3089c2b64e2d0d804",
+    "svg-clip-mask-marker.svg": "5d60be66cafbe235375caa6b1f8ade63f353164cb2b56438cfcd11a59e0d928b",
+    "svg-clip-maskAlpha.png": "b03b64350b89f86f12e178b7d945dfc31471eb0fe804eba3db7ce060723720bb",
+    "svg-clip-maskAlphaRepaint.png": "97a58cac72ace86f5e8f4107dc386adb0e99ef762353a954cfabac83e73a7c2d",
+    "svg-clip-maskBlack.png": "b03b64350b89f86f12e178b7d945dfc31471eb0fe804eba3db7ce060723720bb",
+    "svg-clip-maskExtension.png": "db75df3ff18daa0d1595cc6944d84edd633611fc95a5816ef0eec95fd9ef837f",
+    "svg-clip-maskLanguage.png": "db75df3ff18daa0d1595cc6944d84edd633611fc95a5816ef0eec95fd9ef837f",
+    "svg-clip-paint-browser.json": "47df76715b7f3763674fd7e09f4c38ef9b40d038122239658c9145f43c95b977",
+    "svg-clip-paint-browser.mjs": "f26d705f190b6ba60f6ca9f9c08ade4ef5aaa12ec72be18624e7eb3766f90548",
+    "svg_clip_mask_marker.py": "cdc9c9e75b8d96f26a18f5b6741c1fc3fc1509e74ecc84f9cecc47e363af176c",
+    "svg_paint_probe.py": "5b1298774d637ce06b7fda73495a703f4a9f682ba821320420290c87f2766da1"
+  },
+  "qualifications": [
+    "Inherited Native19 ABI27; final Native20 merge/source27 and new allocation/coherent integrated proof pending",
+    "Native-only marker.orient returns real source-backed state; measured Chrome has no such property",
+    "Both engines retain cached mask output after mask-type style-only mutation; genuine child geometry change invalidates and reveals alpha behavior",
+    "Mask SVGTests list state does not suppress paint in measured providers",
+    "Shared consumer/platform/official/group acceptance remains pending"
+  ]
+}

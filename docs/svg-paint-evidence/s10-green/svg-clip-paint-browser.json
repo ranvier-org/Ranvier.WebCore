@@ -1,0 +1,53 @@
+{
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.8078.4 Safari/537.36",
+  "rows": [
+    {
+      "phase": "initial",
+      "maskType": "luminance",
+      "markerBox": "0 0 10 10",
+      "aspect": "none"
+    },
+    {
+      "phase": "maskExtension",
+      "maskType": "luminance",
+      "markerBox": "0 0 10 10",
+      "aspect": "none"
+    },
+    {
+      "phase": "maskLanguage",
+      "maskType": "luminance",
+      "markerBox": "0 0 10 10",
+      "aspect": "none"
+    },
+    {
+      "phase": "maskBlack",
+      "maskType": "luminance",
+      "markerBox": "0 0 10 10",
+      "aspect": "none"
+    },
+    {
+      "phase": "maskAlpha",
+      "maskType": "alpha",
+      "markerBox": "0 0 10 10",
+      "aspect": "none"
+    },
+    {
+      "phase": "maskAlphaRepaint",
+      "maskType": "alpha",
+      "markerBox": "0 0 10 10",
+      "aspect": "none"
+    },
+    {
+      "phase": "markerNone",
+      "maskType": "alpha",
+      "markerBox": "0 0 20 10",
+      "aspect": "none"
+    },
+    {
+      "phase": "markerMeet",
+      "maskType": "alpha",
+      "markerBox": "0 0 20 10",
+      "aspect": "xMidYMid meet"
+    }
+  ]
+}
