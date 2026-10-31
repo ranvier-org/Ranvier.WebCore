@@ -28,6 +28,8 @@ class ComplexGeneratorMixin:
         return f'{cpp} {{ }}'
 
     def use_complex(self, mapped, input=True):
+        if not input:
+            self.mark_result_dictionaries(mapped)
         if mapped.kind not in ('union', 'sequence', 'pair'):
             if mapped.kind == 'dict':
                 self.use_dictionary(mapped.interface)
@@ -49,6 +51,88 @@ class ComplexGeneratorMixin:
         for child in mapped.subtypes:
             self.use_complex(child, input=input)
         self.complex_used[mapped.ctype] = mapped
+
+    def mark_result_dictionaries(self, mapped):
+        """Registers each dictionary a result container holds, so the glue emits its owned encoder."""
+        if mapped.kind == 'dict':
+            self.use_result_dictionary(mapped.interface)
+        for child in mapped.subtypes:
+            self.mark_result_dictionaries(child)
+
+    def use_result_dictionary(self, name):
+        """The C struct of a dictionary returned as an owned, heap-allocated result; registers its nested values."""
+        struct = f'RvDom{name}'
+        if name in self.result_dicts:
+            return struct
+        fields = self.use_dictionary(name)
+        self.result_dicts[name] = struct
+        for member, mapped in fields:
+            if mapped.kind in ('node', 'event', 'object', 'opaque', 'enum'):
+                raise self.unsupported_type(f'dictionary {name}: {mapped.kind} member {member.name} in a result')
+            if mapped.kind in ('union', 'sequence'):
+                if not self.transport_can_return(mapped):
+                    raise self.unsupported_type(f'dictionary {name}: member {member.name} cannot be returned')
+                self.use_complex(mapped, input=False)
+            elif mapped.kind == 'dict':
+                self.use_result_dictionary(mapped.interface)
+        return struct
+
+    def result_dictionary_runtime(self):
+        """Forward declarations and definitions of the owned dictionary result encoders and their releases."""
+        declarations, definitions = [], []
+        if not self.result_dicts:
+            return declarations, definitions
+        declarations += ['template<typename T> const T* resultField(const T& value) { return &value; }',
+                         'template<typename T> const T* resultField(const std::optional<T>& value) { return value ? &*value : nullptr; }',
+                         'template<typename V, typename S, typename E> int32_t storeOptionalDictionary(V&& value, S** result, E&& encode)',
+                         '{', '    *result = value ? encode(*value) : nullptr;', '    return RV_OK;', '}']
+        if self.uses_dictionary_string_spans():
+            declarations += ['RvDomUtf8StringInput copyOwnedDomStringInput(const String& value)', '{',
+                             '    if (value.isNull()) return { 0, nullptr, 0 };', '    auto utf8 = value.utf8();',
+                             '    auto* result = static_cast<uint8_t*>(std::malloc(utf8.length() + 1));',
+                             '    RELEASE_ASSERT(result);', '    std::memcpy(result, utf8.data(), utf8.length());',
+                             '    result[utf8.length()] = 0;',
+                             '    return { 1, result, static_cast<int32_t>(utf8.length()) };', '}']
+        for name, struct in self.result_dicts.items():
+            cpp = self.dictionary_cpp(name)
+            declarations += [f'{struct}* encodeDict{struct}(const {cpp}& value);', f'void releaseDict{struct}({struct}* value);']
+            encode = ['', f'{struct}* encodeDict{struct}(const {cpp}& value)', '{',
+                      f'    auto* result = static_cast<{struct}*>(std::calloc(1, sizeof({struct})));',
+                      '    RELEASE_ASSERT(result);', f'    result->size = sizeof({struct});']
+            release = ['', f'void releaseDict{struct}({struct}* value)', '{', '    if (!value) return;']
+            for member, mapped in self.dicts_used[name]:
+                field = self.result_field_name(member.name)
+                cpp_field = member.attrs.get('ImplementedAs', member.name)
+                ctype = self.field_ctype(member, mapped, name)
+                encode += [f'    if (auto* field = resultField(value.{cpp_field})) {{']
+                if mapped.kind == 'string':
+                    if ctype == 'RvDomUtf8StringInput':
+                        encode += [f'        result->{field} = copyOwnedDomStringInput(asString(*field));']
+                        release += [f'    std::free(const_cast<uint8_t*>(value->{field}.data));']
+                    else:
+                        encode += [f'        result->{field} = copyOwnedDomString(asString(*field));']
+                        release += [f'    std::free(const_cast<char*>(value->{field}));']
+                elif mapped.kind == 'dict':
+                    child = self.result_dicts[mapped.interface]
+                    encode += [f'        result->{field} = encodeDict{child}(*field);']
+                    release += [f'    releaseDict{child}(const_cast<{child}*>(value->{field}));']
+                elif mapped.kind in ('union', 'sequence'):
+                    encode += [f'        auto* container = static_cast<{mapped.ctype}*>(std::calloc(1, sizeof({mapped.ctype})));',
+                               '        RELEASE_ASSERT(container);', f'        encode{mapped.ctype}(*field, container);',
+                               f'        result->{field} = container;']
+                    release += [f'    clear{mapped.ctype}(const_cast<{mapped.ctype}*>(value->{field}));',
+                                f'    std::free(const_cast<{mapped.ctype}*>(value->{field}));']
+                elif ctype.endswith('*'):
+                    scalar = ctype.removeprefix('const ').removesuffix('*')
+                    encode += [f'        auto* scalar = static_cast<{scalar}*>(std::malloc(sizeof({scalar})));',
+                               '        RELEASE_ASSERT(scalar);', f'        *scalar = static_cast<{scalar}>(*field);',
+                               f'        result->{field} = scalar;']
+                    release += [f'    std::free(const_cast<{scalar}*>(value->{field}));']
+                else:
+                    encode += [f'        result->{field} = static_cast<{ctype}>(*field);']
+                encode += ['    }']
+            definitions += encode + ['    return result;', '}'] + release + ['    std::free(value);', '}']
+        return declarations, definitions
 
     def transport_ctype(self, mapped):
         if mapped.kind == 'void':
@@ -187,6 +271,8 @@ class ComplexGeneratorMixin:
             return [f'{target} = 0;']
         if kind in ('union', 'sequence', 'pair'):
             return [f'encode{mapped.ctype}({expression}, &{target});']
+        if kind == 'dict':
+            return [f'{target} = encodeDict{self.result_dicts[mapped.interface]}({expression});']
         if kind == 'string':
             if mapped.string_spans:
                 return [f'{target} = copyOwnedDomStringSpan(asString({expression}));']
@@ -205,6 +291,9 @@ class ComplexGeneratorMixin:
     def clear_value(self, mapped, expression):
         if mapped.kind in ('union', 'sequence', 'pair'):
             return [f'clear{mapped.ctype}(&{expression});']
+        if mapped.kind == 'dict' and mapped.interface in self.result_dicts:
+            struct = self.result_dicts[mapped.interface]
+            return [f'releaseDict{struct}(const_cast<{struct}*>({expression}));']
         if mapped.kind == 'string':
             if mapped.string_spans:
                 return [f'std::free(const_cast<uint8_t*>({expression}.data));']
@@ -217,8 +306,9 @@ class ComplexGeneratorMixin:
         return []
 
     def complex_runtime(self):
-        if not self.complex_used:
+        if not self.complex_used and not self.result_dicts:
             return []
+        dictionary_declarations, dictionary_definitions = self.result_dictionary_runtime()
         lines = ['namespace {',
                  'char* copyOwnedDomString(const String& value)', '{',
                  '    if (value.isNull()) return nullptr;',
@@ -234,6 +324,7 @@ class ComplexGeneratorMixin:
                  '            else converted.append(U { value.get() });', '        }',
                  '        return FixedVector<U> { std::move(converted) };', '    }',
                  '    operator std::optional<Vector<T>>() && { return std::move(values); }', '};']
+        lines += dictionary_declarations
         if self.uses_complex_string_spans():
             lines += ['RvDomUtf8StringSpan copyOwnedDomStringSpan(const String& value)', '{',
                       '    if (value.isNull()) return { nullptr, -1 };',
@@ -320,10 +411,12 @@ class ComplexGeneratorMixin:
             else:
                 lines += ['    result->tag = static_cast<int32_t>(value.index()) + 1;', f'    encodeArms{name}(value, result);']
             lines += ['    return RV_OK;', '}']
-        return lines + ['}']
+        return lines + dictionary_definitions + ['}']
 
     def transport_can_return(self, mapped):
-        return mapped.kind != 'dict' and all(self.transport_can_return(child) for child in mapped.subtypes)
+        if mapped.kind == 'dict' and mapped.interface not in self.world.config.get('resultDictionaries', []):
+            return False
+        return all(self.transport_can_return(child) for child in mapped.subtypes)
 
     def complex_fsharp(self):
         lines = []

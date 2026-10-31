@@ -1332,7 +1332,7 @@ namespace DOMCSSNamespace {
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''
 [InterfaceName=CSS] namespace DOMCSSNamespace {
-    [CallWith=CurrentDocument] boolean supports(optional DOMString conditionText);
+    [CallWith=CurrentDocument] boolean supports(optional DOMString? conditionText);
 };
 ''')
         binding = {'receiver': 'Document', 'members': ['supports'],
@@ -1546,6 +1546,130 @@ interface CSSFontFaceDescriptors : CSSStyleDeclaration {
         config = json.loads((ROOT / 'gen/dom.json').read_text())
         self.assertIn('HTMLAreaElement', config['interfaces'])
         self.assertIn('HTMLAreaElement.ping', config['exclude'])
+
+    def value_object_generator(self, extra, interfaces, **overrides):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + extra)
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + interfaces
+        config.update(overrides)
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        return generator
+
+    def test_value_object_constructor_and_static_take_an_absent_optional_string_as_length_minus_one(self):
+        generator = self.value_object_generator('''
+interface ValueURL {
+    constructor(USVString url, optional USVString base);
+    static ValueURL? parse(USVString url, optional USVString base);
+    readonly attribute USVString href;
+};
+''', ['ValueURL'],
+            constructors={'ValueURL': {'receiver': 'Document', 'factory': 'ValueURL::create', 'passReceiver': False,
+                                       'stringInputs': 'utf8-lengths'}},
+            staticBindings={'ValueURL': {'receiver': 'Document', 'members': ['parse'], 'feature': 'dom-value-url-static',
+                                         'stringInputs': 'utf8-lengths'}})
+        for name in ('value_url_create', 'value_url_parse'):
+            function = next(item for item in generator.functions if item.name == name)
+            self.assertEqual([('RvNode*', 'target'), ('const uint8_t*', 'url'), ('int32_t', 'url_length'),
+                              ('const uint8_t*', 'base'), ('int32_t', 'base_length'), ('RvValueURL**', 'result')],
+                             function.params)
+            self.assertIn('base_length -1 means absent', function.comment)
+            body = '\n'.join(function.body)
+            self.assertIn('(base_length >= -1 && (base_length <= 0 || base))', body)
+            self.assertIn('(url_length >= 0 && (url_length <= 0 || url))', body)
+            self.assertIn('if (base_length >= 0 && a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;', body)
+        self.assertIn('ValueURL', generator.handles)
+
+    def test_record_arguments_use_the_entry_sequence_transport_of_their_cpp_vector(self):
+        generator = self.value_object_generator('''
+interface Params {
+    constructor(optional (sequence<sequence<USVString>> or record<USVString, USVString> or USVString) init = "");
+};
+''', ['Params'], constructors={'Params': {'receiver': 'Document', 'factory': 'Params::create', 'passReceiver': False,
+                                          'stringInputs': 'utf8-lengths'}})
+        function = next(item for item in generator.functions if item.name == 'params_create')
+        union = function.arguments[0][1]
+        self.assertEqual(['sequence', 'sequence', 'string'], [child.kind for child in union.subtypes])
+        record = union.subtypes[1]
+        self.assertEqual('pair', record.subtypes[0].kind)
+        self.assertEqual('RvDomSequencePairUSVStringAndUSVString', record.ctype)
+        self.assertTrue(all(child.string_spans for child in record.subtypes[0].subtypes))
+        glue = generator.glue()
+        self.assertIn('Variant<Vector<Vector<String>>, Vector<KeyValuePair<String, String>>, String>', glue)
+        self.assertIn('decodeRvDomSequencePairUSVStringAndUSVString', glue)
+
+    def dictionary_result_idl(self):
+        return '''
+dictionary PartInit { USVString name; };
+dictionary PartResult { USVString input; record<USVString, (undefined or USVString)> groups; };
+dictionary MatchResult { sequence<(USVString or PartInit)> inputs; PartResult part; };
+interface Matcher {
+    MatchResult? exec(optional (USVString or PartInit) input = {});
+    MatchResult match();
+};
+'''
+
+    def test_configured_dictionary_results_are_owned_structs_with_one_paired_release(self):
+        presence = 'utf8-lengths-presence'
+        generator = self.value_object_generator(
+            self.dictionary_result_idl(), ['Matcher'],
+            resultDictionaries=['MatchResult', 'PartResult', 'PartInit'],
+            dictionaryStringInputs={'MatchResult': presence, 'PartResult': presence, 'PartInit': presence})
+        nullable = next(item for item in generator.functions if item.name == 'matcher_exec')
+        required = next(item for item in generator.functions if item.name == 'matcher_match')
+        self.assertEqual(('RvDomMatchResult**', 'result'), nullable.params[-1])
+        self.assertEqual(('RvDomMatchResult**', 'result'), required.params[-1])
+        self.assertIn('storeOptionalDictionary(value, result', '\n'.join(nullable.body))
+        self.assertIn('*result is NULL for null', nullable.comment)
+        self.assertIn('(*result = encodeDictRvDomMatchResult(value), RV_OK)', '\n'.join(required.body))
+        self.assertIn('rv_dom_match_result_release', required.comment)
+        self.assertEqual({'MatchResult': 'RvDomMatchResult', 'PartResult': 'RvDomPartResult', 'PartInit': 'RvDomPartInit'},
+                         generator.result_dicts)
+        glue = generator.glue()
+        for line in ['RvDomMatchResult* encodeDictRvDomMatchResult(const MatchResult& value);',
+                     'result->size = sizeof(RvDomMatchResult);',
+                     'result->part = encodeDictRvDomPartResult(*field);',
+                     'releaseDictRvDomPartResult(const_cast<RvDomPartResult*>(value->part));',
+                     'encodeRvDomSequenceUSVStringOrPartInit(*field, container);',
+                     'clearRvDomSequenceUSVStringOrPartInit(const_cast<RvDomSequenceUSVStringOrPartInit*>(value->inputs));',
+                     'result->input = copyOwnedDomStringInput(asString(*field));',
+                     'std::free(const_cast<uint8_t*>(value->input.data));',
+                     'releaseDictRvDomPartInit(const_cast<RvDomPartInit*>(value->arm1));',
+                     'result->arm1 = encodeDictRvDomPartInit(std::get<I>(value));',
+                     'void ranvier_dom_match_result_release(RvDomMatchResult* value)',
+                     '    if (isMainThread()) releaseDictRvDomMatchResult(value);']:
+            self.assertIn(line, glue)
+        self.assertLess(glue.index('void releaseDictRvDomPartResult(RvDomPartResult* value);'),
+                        glue.index('void clearRvDomSequenceUSVStringOrPartInit('))
+        header = generator.header()
+        self.assertIn('RV_EXPORT void rv_dom_match_result_release(RvDomMatchResult* value);', header)
+        self.assertIn('RV_EXPORT void rv_dom_part_init_release(RvDomPartInit* value);', header)
+        self.assertIn('void rv_dom_match_result_release(RvDomMatchResult* value) { ranvier_dom_match_result_release(value); }',
+                      generator.host())
+        self.assertIn('extern void rv_dom_match_result_release(nativeint value)', generator.fsharp())
+        model = json.loads(generator.api_model())
+        self.assertEqual({'struct': 'RvDomMatchResult', 'releaseFunction': 'rv_dom_match_result_release'},
+                         model['resultDictionaries']['MatchResult'])
+
+    def test_unconfigured_dictionary_results_stay_left_out(self):
+        generator = self.value_object_generator(self.dictionary_result_idl(), ['Matcher'])
+        excluded = dict(generator.excluded)
+        self.assertIn('Matcher.exec', excluded)
+        self.assertIn('Matcher.match', excluded)
+        self.assertEqual({}, generator.result_dicts)
+        self.assertNotIn('encodeDict', generator.glue())
+
+    def test_result_dictionaries_reject_handle_members(self):
+        fixture_idl = '''
+interface Item {};
+dictionary Holder { Item item; };
+interface Source { Holder read(); };
+'''
+        generator = self.value_object_generator(fixture_idl, ['Item', 'Source'], resultDictionaries=['Holder'])
+        self.assertIn('Source.read', dict(generator.excluded))
 
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
