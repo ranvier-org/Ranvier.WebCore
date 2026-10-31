@@ -13,7 +13,8 @@ import types
 repo = Path(__file__).resolve().parents[1]
 producer = Path('C:/wk/native-svg-surfaces/artifacts/svg-surfaces-candidate')
 build = Path('C:/wk/build-win-slim')
-out = repo / 'artifacts/native21-candidate'
+out = repo / 'artifacts' / (sys.argv[1] if len(sys.argv) > 1 else 'native21-candidate')
+assert not (out / 'runtime-sha256.json').exists(), 'Build into a new versioned directory'
 runtime = out / 'runtime'
 runtime.mkdir(parents=True, exist_ok=True)
 shutil.copytree(producer / 'runtime', runtime, dirs_exist_ok=True)
@@ -41,24 +42,48 @@ assert len(replacements) == 51
 borrowed = {Path(path): Path(path).stat().st_mtime_ns for path in replacements.values()}
 glue_target = 'Source/WebCore/CMakeFiles/WebCore.dir/C_/wk/ranvier-webcore/host/dom/RanvierDomGlue.cpp.obj'
 unified = 'Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/'
-engine_targets = [unified + 'UnifiedSource-svg-4.cpp.obj', unified + 'UnifiedSource-svg-5.cpp.obj', unified + 'UnifiedSource-svg-13.cpp.obj', unified + 'UnifiedSource-svg-14.cpp.obj']
+engine_targets = [unified + 'UnifiedSource-svg-3.cpp.obj', unified + 'UnifiedSource-svg-4.cpp.obj', unified + 'UnifiedSource-svg-5.cpp.obj', unified + 'UnifiedSource-svg-13.cpp.obj', unified + 'UnifiedSource-svg-14.cpp.obj', unified + 'UnifiedSource-svg-17.cpp.obj']
 cached = {build / target: (build / target).stat().st_mtime_ns for target in [glue_target, *engine_targets]}
 private_headers = out / 'include/WebCore'
 private_headers.mkdir(parents=True, exist_ok=True)
 for header in ['CSSRule.h', 'CSSFontFaceRule.h', 'PropertySetCSSDescriptors.h']:
     (private_headers / header).write_text('#pragma once\n#include "C:/wk/src/Source/WebCore/css/' + header + '"\n')
+# Shadow the headers that the next producer's H05 patch changes in the shared source, so these objects keep the
+# class layouts of the borrowed objects and of this series.
+h05_overlay = {'ImageLoader.h': 'Source/WebCore/loader/ImageLoader.h', 'HTMLImageElement.h': 'Source/WebCore/html/HTMLImageElement.h',
+               'SVGImageElement.h': 'Source/WebCore/svg/SVGImageElement.h'}
+for header, source in h05_overlay.items():
+    pristine = subprocess.run(['git', '-C', 'C:/wk/src', 'show', 'HEAD:' + source], capture_output=True, check=True).stdout
+    (private_headers.parent / header).write_bytes(pristine)
 command_map = {}
 for command in commands([glue_target, *engine_targets]):
     if 'clang-cl.exe' in command:
         output = re.search(r'/Fo(?:"([^"]+)"|(\S+))', command)
         if output:
             command_map[normalize(output.group(1) or output.group(2))] = command
+# A source file finds a header in its own directory first, so svg-3 compiles private copies of its SVG sources next to
+# the series' SVGImageElement.h.
+private_svg = out / 'private-svg3/svg'
+private_svg.mkdir(parents=True, exist_ok=True)
+(private_svg / 'SVGImageElement.h').write_bytes((private_headers.parent / 'SVGImageElement.h').read_bytes())
+svg3 = unified + 'UnifiedSource-svg-3.cpp.obj'
+unified_text = (build / 'WebCore/DerivedSources/unified-sources/UnifiedSource-svg-3.cpp').read_text()
+private_includes = []
+for name in re.findall(r'#include "svg\\([A-Za-z0-9]+\.cpp)"', unified_text):
+    (private_svg / name).write_bytes(Path('C:/wk/src/Source/WebCore/svg', name).read_bytes())
+    private_includes.append('#include "' + (private_svg / name).as_posix() + '"')
+assert len(private_includes) == 8, private_includes
+private_unified = out / 'private-svg3/UnifiedSource-svg-3.cpp'
+private_unified.write_text('\n'.join(private_includes) + '\n')
+command_map[svg3], count = re.subn(r'C:\\wk\\build-win-slim\\WebCore\\DerivedSources\\unified-sources\\UnifiedSource-svg-3\.cpp',
+                                   private_unified.as_posix(), command_map[svg3])
+assert count == 1, count
 for index, target in enumerate([glue_target, *engine_targets]):
     target, obj, code = compile_object(index, target)
     if code:
         raise SystemExit('Native21 candidate compilation failed: ' + target)
     replacements[target] = obj
-assert len(replacements) == 54
+assert len(replacements) == 56
 (out / 'replacement-objects.json').write_text(json.dumps(replacements, indent=2))
 
 glue_command = next(c for c in commands([glue_target]) if 'clang-cl.exe' in c and 'RanvierDomGlue.cpp' in c)

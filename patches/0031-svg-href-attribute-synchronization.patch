@@ -1,0 +1,53 @@
+diff --git a/Source/WebCore/svg/SVGElement.cpp b/Source/WebCore/svg/SVGElement.cpp
+index 0e44be8b8d..f0c5bad1a6 100644
+--- a/Source/WebCore/svg/SVGElement.cpp
++++ b/Source/WebCore/svg/SVGElement.cpp
+@@ -74,6 +74,7 @@
+ #include "StyleKeyword+Mappings.h"
+ #include "StyleResolver.h"
+ #include "StyleUpdate.h"
++#include "XLinkNames.h"
+ #include "XMLNames.h"
+ #include <wtf/HashMap.h>
+ #include <wtf/NeverDestroyed.h>
+@@ -555,17 +556,29 @@ void SVGElement::attributeChanged(const QualifiedName& name, const AtomString& o
+         svgAttributeChanged(name);
+ }
+ 
++// The href property is registered under both href and xlink:href. Its serialization belongs to xlink:href only
++// when that is the element's sole href attribute.
++static const QualifiedName& synchronizedAttributeName(const SVGElement& element, const QualifiedName& name)
++{
++    if (!name.matches(SVGNames::hrefAttr) && !name.matches(XLinkNames::hrefAttr))
++        return name;
++    if (!element.hasAttributeWithoutSynchronization(SVGNames::hrefAttr) && element.hasAttributeWithoutSynchronization(XLinkNames::hrefAttr))
++        return XLinkNames::hrefAttr;
++    return SVGNames::hrefAttr;
++}
++
+ void SVGElement::synchronizeAttribute(const QualifiedName& name)
+ {
+     // If the value of the property has changed, serialize the new value to the attribute.
+     if (auto value = propertyRegistry().synchronize(name)) {
++        const auto& target = synchronizedAttributeName(*this, name);
+         // If the serialized value is empty and the attribute doesn't exist,
+         // don't recreate it. This handles the case where the attribute was
+         // explicitly removed after the list was emptied.
+-        if (value->isEmpty() && !hasAttribute(name))
++        if (value->isEmpty() && !hasAttribute(target))
+             return;
+ 
+-        setSynchronizedLazyAttribute(name, AtomString { *value });
++        setSynchronizedLazyAttribute(target, AtomString { *value });
+     }
+ }
+ 
+@@ -575,7 +588,7 @@ void SVGElement::synchronizeAllAttributes()
+     // the properties which have changed but not committed yet.
+     auto map = propertyRegistry().synchronizeAllAttributes();
+     for (const auto& entry : map)
+-        setSynchronizedLazyAttribute(entry.key, AtomString { entry.value });
++        setSynchronizedLazyAttribute(synchronizedAttributeName(*this, entry.key), AtomString { entry.value });
+ }
+ 
+ void SVGElement::commitPropertyChange(SVGProperty* property)
