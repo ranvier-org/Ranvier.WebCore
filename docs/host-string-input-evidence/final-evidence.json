@@ -171,8 +171,6 @@
     "teardownAllCollected": true
   },
   "files": {
-    "__pycache__/build_native47_candidate.cpython-314.pyc": "3496dc558367f66f481acd4a02cf37627e3f1c7b6b8d23d7b91a1f5ef84aecde",
-    "__pycache__/make_native47_evidence.cpython-314.pyc": "91315ca1f8007a82a21b16036c6b5d38960c6220fee18592bc0c29106179130b",
     "allocation-absence.json": "073c348e905dab1fb5738a8c86d7037f55bace2f829ee3f7cbe09c9c8b14e1f1",
     "baseline-comparison.json": "1ad4ff4e1148f96afc2c5140fbf474ce589df01aa131818455f81ac574099f26",
     "batch-green.json": "59dde0070ead4ea48989e183e048a1bf977c990cd9d2e9be83825ae5be0bf354",
