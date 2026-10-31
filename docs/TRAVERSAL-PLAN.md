@@ -42,7 +42,9 @@ Select `TreeWalker` and `NodeIterator` (new refcounted value roots), the two `Do
 3. **Lifetime:** release counters prove that the filter's release callback runs exactly once, after the walker, iterator and filter handles are released. This holds whether they are released before or after host destroy and document replacement, with per-entry bookkeeping. Roots and reference nodes expire. New Teardown.fs cases cover a walker and an iterator held past destroy.
 4. The final full batch, the gates, the absence check, Native25/ABI33, evidence, and a PR stacked on #135, refs #17.
 
-## Questions for root
+## Decisions (root, 2026-10-31)
 
-1. Shared contract: does Core's `NodeFilter` contract accept a managed callback, so that native wraps `RvNodeFilterCallback`? Or does it have a `whatToShow`-only form that must also exist?
-2. Is the hand-written `RvNodeFilter` export trio acceptable in the host (as with RvListener), with callback failure mapped to the existing traversal exception path and returned as a status?
+1. One API with an optional managed filter: the contract declares `NodeFilter = Node -> NodeFilterResult` (an integer enumeration equal to FILTER_*), `createTreeWalker`/`createNodeIterator` take `root * ?whatToShow * ?filter`, and the `filter` getters return `NodeFilter option`. No filter is the whatToShow-only form. The acceptNode object form is browser-only.
+2. Host exports: `rv_node_filter_create` and the identity export `rv_node_filter_context`; release and retain are the generated `rv_dom_node_filter_release`/`_retain` of the `callbackObjectRoots` handle root. A failing callback stops the traversal as a throwing filter does: RV_ERR_DOM_EXCEPTION, with `rv_last_exception` naming ExistingExceptionError. Managed exceptions are caught, stored and rethrown after the native call (`Traversal.traversing`), never unwound through native frames.
+3. Re-entrant NodeIterator keeps the engine behaviour, as a measured qualification: the inner call throws InvalidStateError and the results match Chromium; afterwards the reference node is null (the DOM standard continues the iteration), and native reads it as NULL where Chromium 156's renderer crashes.
+4. Native25/ABI33, stacked on I02 (#136), which carries Native24/ABI32.

@@ -1,0 +1,5 @@
+{"qualified": [{"case": "iterator-reenter", "note": "reference node lost after re-entrancy in both engines; native reads NULL where Chromium crashes"}], "failures": [], "objectFormMatchesFunction": true}
+TREE TRAVERSAL PASS 22285 assertions
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+
+EXIT_CODE=0
