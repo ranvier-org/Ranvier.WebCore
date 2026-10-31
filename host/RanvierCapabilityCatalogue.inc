@@ -400,6 +400,7 @@ static constexpr const char* capabilityAbiNames[] = {
     "accessibility-text",
     "svg-document",
     "resize-entries",
+    "intersection-entries",
     "compositing",
     "presentation-d3d11",
     "accessibility-events",
