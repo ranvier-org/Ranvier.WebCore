@@ -1,0 +1,67 @@
+{
+ "schemaVersion": "same",
+ "runtimeTypeQueries": {
+  "removed": 0,
+  "added": []
+ },
+ "interfaces": {
+  "removed": 0,
+  "added": []
+ },
+ "contractInterfaces": {
+  "removed": 0,
+  "added": []
+ },
+ "tagInterfaces": {
+  "removed": 0,
+  "added": []
+ },
+ "contractDictionaries": {
+  "removedKeys": [],
+  "addedKeys": [],
+  "changed": []
+ },
+ "functions": {
+  "removed": 0,
+  "added": [
+   "rv_dom_comment_create",
+   "rv_dom_document_create",
+   "rv_dom_document_fragment_create",
+   "rv_dom_document_parse_html_unsafe",
+   "rv_dom_dom_matrix_from_float32_array",
+   "rv_dom_dom_matrix_from_float64_array",
+   "rv_dom_dom_matrix_read_only_from_float32_array",
+   "rv_dom_dom_matrix_read_only_from_float64_array",
+   "rv_dom_input_event_create",
+   "rv_dom_pointer_event_create",
+   "rv_dom_range_create",
+   "rv_dom_static_range_create",
+   "rv_dom_text_create",
+   "rv_dom_wheel_event_create"
+  ]
+ },
+ "enumerations": {
+  "removedKeys": [],
+  "addedKeys": [],
+  "changed": []
+ },
+ "containers": {
+  "removed": 0,
+  "added": []
+ },
+ "resultDictionaries": {
+  "removedKeys": [],
+  "addedKeys": [],
+  "changed": []
+ },
+ "dictionaries": {
+  "removedKeys": [],
+  "addedKeys": [
+   "InputEventInit",
+   "PointerEventInit",
+   "StaticRangeInit",
+   "WheelEventInit"
+  ],
+  "changed": []
+ }
+}

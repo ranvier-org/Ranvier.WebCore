@@ -35,7 +35,7 @@ assert {name[:4] for name in series} <= covered, ('patches the parent does not c
 patch_receipt = {}
 postdating = {}
 postdating['0040-empty-clients-final-to-override'] = {
-    'note': 'C:/wk/src carries 0040 (EmptyClients.h final -> override), which postdates the parent objects; this tree compiles no unit including EmptyClients.h',
+    'note': 'C:/wk/src carries 0040 (EmptyClients.h final -> override), which postdates the parent WebCore objects; the recompiled RanvierWebCoreAbi.cpp includes the patched header through WebCore/PrivateHeaders, the recompiled RanvierDomGlue.cpp does not, and the change alters no class layout or vtable',
     'emptyClientsDiff': subprocess.run(['git', '-C', 'C:/wk/src', 'diff', '--stat', '--', 'Source/WebCore/loader/EmptyClients.h'], capture_output=True, text=True).stdout.strip()}
 for name in series:
     text = (repo / 'patches' / name).read_text(encoding='utf-8')

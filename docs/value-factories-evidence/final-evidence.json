@@ -1,0 +1,124 @@
+{
+  "group": [
+    "D17 #25"
+  ],
+  "status": "green (private Windows x64 slim; not accepted)",
+  "native": "0.1.0-preview.46",
+  "abi": 54,
+  "abiNote": "placeholder ABI of batch-1 (54); the exports are additive and root assigns the number at integration",
+  "members": [
+    "rv_dom_comment_create",
+    "rv_dom_document_create",
+    "rv_dom_document_fragment_create",
+    "rv_dom_document_parse_html_unsafe",
+    "rv_dom_dom_matrix_from_float32_array",
+    "rv_dom_dom_matrix_from_float64_array",
+    "rv_dom_dom_matrix_read_only_from_float32_array",
+    "rv_dom_dom_matrix_read_only_from_float64_array",
+    "rv_dom_input_event_create",
+    "rv_dom_pointer_event_create",
+    "rv_dom_range_create",
+    "rv_dom_static_range_create",
+    "rv_dom_text_create",
+    "rv_dom_wheel_event_create"
+  ],
+  "generatorKeys": [
+    "referenceDictionaries",
+    "dictionaryEventTargetMembers",
+    "typedArrayInputTypes",
+    "idlDefaultDictionaries"
+  ],
+  "sourceHeadOfBatch": "e5080bb7060cd1ac72cdcdd7edcba0ac850b0ba7",
+  "batchRunHead": "e5080bb",
+  "red": {
+    "file": "red-exports.json",
+    "abi": 32,
+    "runtime": "C:\\wk\\i02-private\\native24-candidate\\runtime",
+    "allAbsent": true,
+    "allLeftOut": true
+  },
+  "generatorDelta": {
+    "reportDiff": "dom-report.diff",
+    "apiDelta": "dom-api-delta.json",
+    "functionsAdded": [
+      "rv_dom_comment_create",
+      "rv_dom_document_create",
+      "rv_dom_document_fragment_create",
+      "rv_dom_document_parse_html_unsafe",
+      "rv_dom_dom_matrix_from_float32_array",
+      "rv_dom_dom_matrix_from_float64_array",
+      "rv_dom_dom_matrix_read_only_from_float32_array",
+      "rv_dom_dom_matrix_read_only_from_float64_array",
+      "rv_dom_input_event_create",
+      "rv_dom_pointer_event_create",
+      "rv_dom_range_create",
+      "rv_dom_static_range_create",
+      "rv_dom_text_create",
+      "rv_dom_wheel_event_create"
+    ],
+    "functionsRemoved": 0
+  },
+  "green": {
+    "valueFactoriesAssertions": 398,
+    "measurements": 46,
+    "repeats": 30,
+    "repeatsDistinct": [
+      "value_factories: 398 assertions"
+    ],
+    "probes": 62,
+    "allExitZero": true,
+    "rawAssertions": 91141,
+    "baselineRawAssertions": 90743,
+    "baselineProbesUnchanged": true,
+    "teardownCases": 104,
+    "teardownAllCollected": true
+  },
+  "chromiumOracle": {
+    "browser": "chromium 156.0.8078.4",
+    "measurements": 46,
+    "repeats": 30,
+    "repeatsDistinct": [
+      "2f068beda3ca1192"
+    ],
+    "qualified": [
+      {
+        "key": "parse.empty",
+        "reason": "Engine: WebKit Document::parseHTMLUnsafe of a string without a doctype leaves the new document in no-quirks mode (CSS1Compat); Chromium parses it in quirks mode (BackCompat). The glue passes the string to the engine factory unchanged."
+      },
+      {
+        "key": "pointer.full",
+        "reason": "Engine: the WebKit PointerEvent constructor treats tiltX 30 and tiltY -20 as a complete tilt pair and replaces both with the tilt computed from the default altitudeAngle and azimuthAngle (0, 0); the altitude and azimuth members are off on this platform (AltitudeAngleEnabled, AzimuthAngleEnabled), so no angle reaches the init. Chromium keeps the given tilt."
+      },
+      {
+        "key": "wheel.full",
+        "reason": "Engine: WebKit derives the legacy wheelDeltaX/wheelDeltaY/wheelDelta as -deltaX/-deltaY (-3, 120); Chromium reports them with the opposite sign for this init (3, -120). deltaX/deltaY/deltaZ/deltaMode match, as do the defaults and the wheelDelta-only init."
+      }
+    ]
+  },
+  "parentRuntime": "C:/wk/native-cascade-shadow/artifacts/native46-candidate-6 (binary inputs equal to batch-1 d247ceb0)",
+  "postdatingPatch": {
+    "patch": "0040 EmptyClients.h final -> override, carried by C:/wk/src after the parent WebCore objects",
+    "recompiledUnitsIncluding": [
+      "host/RanvierWebCoreAbi.cpp (through build-win-slim WebCore/PrivateHeaders/WebCore/EmptyClients.h, identical to C:/wk/src)"
+    ],
+    "effect": "final -> override changes no class layout or vtable; the borrowed WebCore objects stay compatible",
+    "receiptCorrection": "source-patches.json of factories-candidate-2 says no recompiled unit includes EmptyClients.h; RanvierWebCoreAbi.cpp does"
+  },
+  "files": {
+    "batch-green.json": "829dbc045cb2bdefb5b74f3c209023f6503950f803b1533161661711b55aee1f",
+    "build_factories_candidate.py": "bff1fe3063db0c115593e93f9a0c5d24713c38ff43838e2a14396ffe6fd1b578",
+    "dom-api-delta.json": "0332378ea8b5d67f2567a31092f23fed789a646a83cbe58523be31679f05fd0e",
+    "dom-report.diff": "2c4fd04af6a850075c2a38432a724fcbaf5cfb6cb4aa70dc21723a711baef67f",
+    "make_factories_evidence.py": "076e18cc5bae3b2332ba9aa1df0d80035e0c778e3339493fe8b0ad446af1bdf8",
+    "oracle-repeat30.txt": "010af1a79139c9390a720887bf1e738b0fdb8139978974c290d2f87e5b824888",
+    "red-exports.json": "b267053dbc1d1705984468f0ae543a87a995a28c26b5618d36891f4614305dbb",
+    "red_exports.py": "fc2c40359fc20e95bd2971bb28a058b07b746595742c9b51795737bcde5146c3",
+    "repeat30.sh": "4e715d5660332307da04b37b9e9f8b174055ad738f3346b0aae30e41ee10bef6",
+    "run_factories_full_batch.py": "552d2f0bb5306382b4389f245ca592230f7824b2c82276f3fb7ca81b8413cf88",
+    "runtime-receipt.json": "e0f92c4c869b68ace327f9df6341ff86a4d6d6cfa7ca7e418a517010578b4732",
+    "source-patches.json": "77bdd4940a0f28a6fe22bb9a74c59df082ee7eae2eac92001b3662af2281d9f9",
+    "teardown-probes.json": "5483c939d925c8cc0f30c1cba7ddaad63258da92a314e64be68ea35fcde86432",
+    "value-factories-probe.log": "cc44f8c65f3f4f76137268c4cce49611ba284daaa7f1339354c88bc5f8e519eb",
+    "value-factories-repeat30.txt": "474fb4e9c2eb4d9ff9ee9ef41db0e962a94bb1902a8e1469c125665705352fec"
+  }
+}
