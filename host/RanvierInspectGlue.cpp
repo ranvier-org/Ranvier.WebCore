@@ -151,7 +151,7 @@ struct RuleSelectors {
 
 // The selectors of a rule from the tree scope at ordinal, matched as the collector matches them: :host() against the
 // element's shadow tree, ::slotted() against its slot and ::part() from the host's tree.
-RuleSelectors selectorsOf(const StyleRule& rule, Element& element, Style::ScopeOrdinal ordinal)
+RuleSelectors selectorsOf(const StyleRule& rule, Element& element, WebCore::Style::ScopeOrdinal ordinal)
 {
     RuleSelectors result;
     SelectorChecker checker(element.document());
@@ -184,7 +184,7 @@ struct RuleLocation {
 class RuleLocations {
 public:
     RuleLocations() = default;
-    explicit RuleLocations(const Style::Scope& scope)
+    explicit RuleLocations(const WebCore::Style::Scope& scope)
     {
         int32_t sheetIndex = 0;
         for (auto& sheet : scope.activeStyleSheets()) {
@@ -267,7 +267,7 @@ struct CascadeLevel {
         RanvierCascadeEntry fields { };
         std::array<CString, RV_CASCADE_STRING_FIELDS> strings;
         const CSSValue* value { nullptr };
-        Style::CascadeLayerPriority layerPriority { 0 };
+        WebCore::Style::CascadeLayerPriority layerPriority { 0 };
     };
     Vector<Entry> entries;
     const CSSValue* winner { nullptr };
@@ -282,7 +282,7 @@ bool declares(const CascadeQuery& query, const StyleProperties::PropertyReferenc
     return property.id() == query.id || (counterpart != CSSPropertyInvalid && property.id() == counterpart);
 }
 
-const CSSValue* cascadeWinner(const Style::PropertyCascade& cascade, const CascadeQuery& query, WritingMode writingMode)
+const CSSValue* cascadeWinner(const WebCore::Style::PropertyCascade& cascade, const CascadeQuery& query, WritingMode writingMode)
 {
     if (query.isCustom())
         return cascade.hasCustomProperty(query.customName) ? cascade.customProperty(query.customName).cssValue[0] : nullptr;
@@ -299,7 +299,7 @@ CascadeLevel cascadeLevel(Element& element, const CascadeQuery& query, int32_t d
     bool authorAndUser = element.document().settings().authorAndUserStylesEnabled();
 
     // Declaration blocks of the matching style rules.
-    Style::ElementRuleCollector rulesCollector(element, resolver.ruleSets(), nullptr, SelectorChecker::Mode::CollectingRules);
+    WebCore::Style::ElementRuleCollector rulesCollector(element, resolver.ruleSets(), nullptr, SelectorChecker::Mode::CollectingRules);
     rulesCollector.setMedium(resolver.mediaQueryEvaluator());
     rulesCollector.matchUARules();
     size_t userAgentEnd = rulesCollector.matchedRuleList().size();
@@ -310,14 +310,14 @@ CascadeLevel cascadeLevel(Element& element, const CascadeQuery& query, int32_t d
         rulesCollector.matchAuthorRules();
     auto& matchedRules = rulesCollector.matchedRuleList();
 
-    Style::ElementRuleCollector collector(element, resolver.ruleSets(), nullptr);
+    WebCore::Style::ElementRuleCollector collector(element, resolver.ruleSets(), nullptr);
     collector.setMedium(resolver.mediaQueryEvaluator());
     collector.matchAllRules(authorAndUser, true);
     auto& matchResult = collector.matchResult();
     // Locations by the tree scope holding the rule: the element's, or its shadow tree's, slot's or host's.
-    HashMap<const Style::Scope*, RuleLocations> locations;
-    auto locate = [&](const StyleRule& rule, Style::ScopeOrdinal ordinal) -> const RuleLocation* {
-        auto* scope = Style::Scope::forOrdinal(element, ordinal);
+    HashMap<const WebCore::Style::Scope*, RuleLocations> locations;
+    auto locate = [&](const StyleRule& rule, WebCore::Style::ScopeOrdinal ordinal) -> const RuleLocation* {
+        auto* scope = WebCore::Style::Scope::forOrdinal(element, ordinal);
         if (!scope)
             return nullptr;
         return locations.ensure(scope, [&] { return RuleLocations(*scope); }).iterator->value.find(rule);
@@ -335,20 +335,20 @@ CascadeLevel cascadeLevel(Element& element, const CascadeQuery& query, int32_t d
     }
 
     CascadeLevel level;
-    auto addDeclarations = [&](const Vector<Style::MatchedProperties>& declarations, int32_t baseOrigin, size_t rulesBegin, size_t rulesEnd) {
+    auto addDeclarations = [&](const Vector<WebCore::Style::MatchedProperties>& declarations, int32_t baseOrigin, size_t rulesBegin, size_t rulesEnd) {
         // The rule of each matched declaration block: the collected rules are in the same order, without hints and
         // inline style.
         Vector<const StyleRule*> ruleOf(declarations.size(), [](size_t) -> const StyleRule* { return nullptr; });
         size_t cursor = rulesBegin;
         for (size_t index = 0; index < declarations.size(); ++index) {
-            if (declarations[index].fromStyleAttribute == Style::FromStyleAttribute::Yes || cursor >= rulesEnd)
+            if (declarations[index].fromStyleAttribute == WebCore::Style::FromStyleAttribute::Yes || cursor >= rulesEnd)
                 continue;
             if (&matchedRules[cursor]->properties() == declarations[index].properties.ptr())
                 ruleOf[index] = matchedRules[cursor++].ptr();
         }
         for (size_t index = 0; index < declarations.size(); ++index) {
             auto& matched = declarations[index];
-            if (matched.isStartingStyle == Style::IsStartingStyle::Yes)
+            if (matched.isStartingStyle == WebCore::Style::IsStartingStyle::Yes)
                 continue;
             auto* rule = ruleOf[index];
             // A rule matching through several selectors appears once per selector; the last position is the cascade's.
@@ -359,7 +359,7 @@ CascadeLevel cascadeLevel(Element& element, const CascadeQuery& query, int32_t d
                 continue;
             auto& properties = matched.properties.get();
             int32_t origin = baseOrigin;
-            if (matched.fromStyleAttribute == Style::FromStyleAttribute::Yes)
+            if (matched.fromStyleAttribute == WebCore::Style::FromStyleAttribute::Yes)
                 origin = RV_RULE_ORIGIN_INLINE;
             else if (!rule && baseOrigin == RV_RULE_ORIGIN_AUTHOR)
                 origin = RV_RULE_ORIGIN_PRESENTATIONAL_HINT;
@@ -381,9 +381,9 @@ CascadeLevel cascadeLevel(Element& element, const CascadeQuery& query, int32_t d
                 }
                 numbers[RV_CASCADE_IMPORTANT] = property.isImportant();
                 bool layered = origin != RV_RULE_ORIGIN_INLINE && origin != RV_RULE_ORIGIN_PRESENTATIONAL_HINT
-                    && matched.cascadeLayerPriority != Style::RuleSet::cascadeLayerPriorityForUnlayered
-                    && matched.cascadeLayerPriority != Style::RuleSet::cascadeLayerPriorityForPresentationalHints;
-                numbers[RV_CASCADE_LAYER_ORDER] = layered ? matched.cascadeLayerPriority - Style::RuleSet::cascadeLayerPriorityForPresentationalHints - 1 : -1;
+                    && matched.cascadeLayerPriority != WebCore::Style::RuleSet::cascadeLayerPriorityForUnlayered
+                    && matched.cascadeLayerPriority != WebCore::Style::RuleSet::cascadeLayerPriorityForPresentationalHints;
+                numbers[RV_CASCADE_LAYER_ORDER] = layered ? matched.cascadeLayerPriority - WebCore::Style::RuleSet::cascadeLayerPriorityForPresentationalHints - 1 : -1;
                 numbers[RV_CASCADE_DEPTH] = depth;
                 auto* location = rule ? locate(*rule, matched.styleScopeOrdinal) : nullptr;
                 numbers[RV_CASCADE_SHEET_INDEX] = location ? location->sheet : -1;
@@ -412,7 +412,7 @@ CascadeLevel cascadeLevel(Element& element, const CascadeQuery& query, int32_t d
     addDeclarations(matchResult.userDeclarations, RV_RULE_ORIGIN_USER, userAgentEnd, userEnd);
     addDeclarations(matchResult.authorDeclarations, RV_RULE_ORIGIN_AUTHOR, userEnd, matchedRules.size());
 
-    auto cascade = makeUnique<Style::PropertyCascade>(matchResult, Style::PropertyCascade::normalProperties());
+    auto cascade = makeUnique<WebCore::Style::PropertyCascade>(matchResult, WebCore::Style::PropertyCascade::normalProperties());
     level.winner = cascadeWinner(*cascade, query, writingMode);
     // Rules sharing a declaration block share its value: the cascade applies a normal declaration last at its last
     // position, and an important one last in its earliest layer.
@@ -481,7 +481,7 @@ int32_t ranvier_inspect_matched_rules(RvNode* documentHandle, RvNode* elementHan
         return RV_ERR_UNSUPPORTED;
     document->updateStyleIfNeeded();
     auto& resolver = element->styleResolver();
-    Style::ElementRuleCollector collector(*element, resolver.ruleSets(), nullptr, SelectorChecker::Mode::CollectingRules);
+    WebCore::Style::ElementRuleCollector collector(*element, resolver.ruleSets(), nullptr, SelectorChecker::Mode::CollectingRules);
     collector.setMedium(resolver.mediaQueryEvaluator());
     bool authorAndUser = document->settings().authorAndUserStylesEnabled();
     collector.matchUARules();
@@ -558,7 +558,7 @@ int32_t ranvier_inspect_cascade(RvNode* documentHandle, RvNode* elementHandle, c
         return RV_ERR_UNSUPPORTED;
     // The pending style sheet changes the next style update applies, @property registrations included; element styles stay as they are.
     for (RefPtr<Element> scopeElement = element; scopeElement;) {
-        auto& scope = Style::Scope::forNode(*scopeElement);
+        auto& scope = WebCore::Style::Scope::forNode(*scopeElement);
         if (scope.hasPendingUpdate())
             scope.flushPendingUpdate();
         RefPtr shadowRoot = scopeElement->containingShadowRoot();
@@ -569,7 +569,7 @@ int32_t ranvier_inspect_cascade(RvNode* documentHandle, RvNode* elementHandle, c
     if (isCustomPropertyName(name)) {
         query.id = CSSPropertyCustom;
         query.customName = AtomString { name };
-        inherited = Style::Scope::forNode(*element).customPropertyRegistry().isInherited(query.customName);
+        inherited = WebCore::Style::Scope::forNode(*element).customPropertyRegistry().isInherited(query.customName);
     } else {
         query.id = cssPropertyID(name);
         if (query.id == CSSPropertyInvalid || isShorthand(query.id) || !isExposed(query.id, &document->settings()))
