@@ -2,6 +2,7 @@
 #include "RanvierWebCoreAbi.h"
 #include "dom/RanvierDomGlue.h"
 #include "RanvierSvgViewGlue.h"
+#include "RanvierResourceGlue.h"
 #include <JavaScriptCore/DisallowVMEntry.h>
 #include <JavaScriptCore/InitializeThreading.h>
 #include <WebCore/Document.h>
@@ -1120,6 +1121,10 @@ int32_t rv_abi_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "svg-view-selection"))
         return 1;
+    if (!std::strcmp(feature, "image-decode"))
+        return 1;
+    if (!std::strcmp(feature, "font-load"))
+        return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "accessibility-uia"))
         return 1;
@@ -1233,6 +1238,7 @@ void rv_host_destroy(RvHost* host)
 {
     if (!host || !onOwningThread())
         return;
+    ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     rv_host_detach_uia(host);
     rv_host_set_accelerated_compositing(host, RV_COMPOSITING_OFF);
     host->noScript.reset();
@@ -1248,6 +1254,7 @@ int32_t rv_host_load_html(RvHost* host, const char* html)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
+    ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     loadHTML(host->frame(), utf8(html));
     // The new document posts accessibility notifications once its cache exists.
     if (host->accessibility)
@@ -1261,6 +1268,7 @@ int32_t rv_host_load_svg(RvHost* host, const char* svg)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
+    ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     loadDocument(host->frame(), utf8(svg), "image/svg+xml"_s);
     if (host->accessibility)
         host->document().axObjectCache();
@@ -1276,6 +1284,38 @@ int32_t rv_host_select_svg_view(RvHost* host, const char* fragment, int32_t* sel
     if (!liveHosts.contains(host))
         return RV_ERR_UNSUPPORTED;
     return ranvier_host_select_svg_view(reinterpret_cast<RvNode*>(&host->document()), fragment, selected);
+}
+
+int32_t rv_image_decode(RvHost* host, RvNode* image, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !image || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_resource_decode_image(reinterpret_cast<RvNode*>(&host->document()), image, completion, context, operation);
+}
+
+int32_t rv_font_load(RvHost* host, const char* family, const uint8_t* data, int32_t length, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !family || (!data && length) || length < 0 || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_resource_load_font(reinterpret_cast<RvNode*>(&host->document()), family, data, length, completion, context, operation);
+}
+
+int32_t rv_resource_cancel(uint64_t operation)
+{
+    return ranvier_resource_cancel(operation);
+}
+
+int32_t rv_resource_release(uint64_t operation)
+{
+    return ranvier_resource_release(operation);
 }
 
 int32_t rv_host_scripts_enabled(RvHost* host)

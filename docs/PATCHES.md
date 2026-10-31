@@ -336,6 +336,12 @@ Typed transform conversion returns a new matrix whose is2D flag matches the comp
 
 `tests/abi/css_transforms.py` checks repeated conversion identity, mutation isolation, forced-3D options and perspective-none component/list flags. The initial native probe reproduces all these failures before the repair.
 
+## 0033-image-loader-native-decode
+
+ImageLoader keeps native decode waiters beside its decode promises and settles both at the same points, each with an `ImageDecodeResult` naming the reason: source change, access-control error, cancelled load, inactive document, missing source, load error, decode error or decoded. HTMLImageElement and SVGImageElement forward a `Function` waiter; the promise path is unchanged. An already complete image settles a waiter in a queued task instead of a microtask, because a host that disallows VM entry never performs a microtask checkpoint.
+
+`tests/abi/image_decode.py` checks each outcome through `rv_image_decode`. Without the patch, a MutationObserver-based probe in the same host receives no terminal on a source change.
+
 ## 0034-svg-string-list-null-attribute
 
 Removing `requiredExtensions` or `systemLanguage` empties the element's SVGStringList: both setters clear the list and return for a null attribute value, so the list reports `numberOfItems` 0, keeps its identity, and the element passes SVGTests conditional processing again, inside and outside `<switch>`, as in SVG 2 and Chromium. A present empty attribute keeps WebKit's single empty item.

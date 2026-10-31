@@ -86,6 +86,10 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
     """The F# parameter type, with its marshalling attribute, for the C parameter."""
     if ctype == "int32_t":
         return "int", ""
+    if ctype == "uint64_t":
+        return "uint64", ""
+    if ctype == "uint64_t*":
+        return "uint64&", ""
     if ctype == "float":
         return "float32", ""
     if ctype == "double":
