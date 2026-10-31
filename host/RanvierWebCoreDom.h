@@ -45,7 +45,6 @@ typedef struct RvDOMStringMap RvDOMStringMap;
 typedef struct RvAbstractRange RvAbstractRange;
 typedef struct RvDOMSelection RvDOMSelection;
 typedef struct RvDOMRectReadOnly RvDOMRectReadOnly;
-typedef struct RvCaretPosition RvCaretPosition;
 typedef struct RvDOMRectList RvDOMRectList;
 typedef struct RvDOMPointReadOnly RvDOMPointReadOnly;
 typedef struct RvDOMQuad RvDOMQuad;
@@ -84,6 +83,10 @@ typedef struct RvNodeIterator RvNodeIterator;
 typedef struct RvTreeWalker RvTreeWalker;
 typedef struct RvBlob RvBlob;
 typedef struct RvFileList RvFileList;
+typedef struct RvCaretPosition RvCaretPosition;
+typedef struct RvDOMURL RvDOMURL;
+typedef struct RvURLSearchParams RvURLSearchParams;
+typedef struct RvURLPattern RvURLPattern;
 typedef struct RvDomUnionNodeOrDOMString RvDomUnionNodeOrDOMString;
 typedef struct RvDomSequenceNodeOrDOMString RvDomSequenceNodeOrDOMString;
 typedef struct RvDomSequenceCSSStyleSheet RvDomSequenceCSSStyleSheet;
@@ -123,6 +126,15 @@ typedef struct RvDomSequenceFileOrUSVString RvDomSequenceFileOrUSVString;
 typedef struct RvDomSequencePointerEvent RvDomSequencePointerEvent;
 typedef struct RvDomUnionBufferSourceOrBlobOrUSVString RvDomUnionBufferSourceOrBlobOrUSVString;
 typedef struct RvDomSequenceBufferSourceOrBlobOrUSVString RvDomSequenceBufferSourceOrBlobOrUSVString;
+typedef struct RvDomSequenceSequenceOfUSVString RvDomSequenceSequenceOfUSVString;
+typedef struct RvDomPairUSVStringAndUSVString RvDomPairUSVStringAndUSVString;
+typedef struct RvDomSequencePairUSVStringAndUSVString RvDomSequencePairUSVStringAndUSVString;
+typedef struct RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString;
+typedef struct RvDomUnionUSVStringOrURLPatternInit RvDomUnionUSVStringOrURLPatternInit;
+typedef struct RvDomSequenceUSVStringOrURLPatternInit RvDomSequenceUSVStringOrURLPatternInit;
+typedef struct RvDomUnionUndefinedOrUSVString RvDomUnionUndefinedOrUSVString;
+typedef struct RvDomPairUSVStringAndUnionUndefinedOrUSVString RvDomPairUSVStringAndUnionUndefinedOrUSVString;
+typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
@@ -644,6 +656,54 @@ typedef struct RvDomFilePropertyBag {
     const int64_t* last_modified; /* long long, NULL for absent */
 } RvDomFilePropertyBag;
 
+/* The IDL dictionary URLPatternInit. size is sizeof(RvDomURLPatternInit) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. As a result, the glue allocates it,
+ * sets size, owns every field and nested value, and rv_dom_url_pattern_init_release frees it. */
+typedef struct RvDomURLPatternInit {
+    uint32_t size;
+    RvDomUtf8StringInput protocol; /* USVString */
+    RvDomUtf8StringInput username; /* USVString */
+    RvDomUtf8StringInput password; /* USVString */
+    RvDomUtf8StringInput hostname; /* USVString */
+    RvDomUtf8StringInput port; /* USVString */
+    RvDomUtf8StringInput pathname; /* USVString */
+    RvDomUtf8StringInput search; /* USVString */
+    RvDomUtf8StringInput hash; /* USVString */
+    RvDomUtf8StringInput base_url; /* USVString */
+} RvDomURLPatternInit;
+
+/* The IDL dictionary URLPatternOptions. size is sizeof(RvDomURLPatternOptions) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomURLPatternOptions {
+    uint32_t size;
+    int32_t ignore_case; /* boolean, default false */
+} RvDomURLPatternOptions;
+
+/* The IDL dictionary URLPatternComponentResult. size is sizeof(RvDomURLPatternComponentResult) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. As a result, the glue allocates it,
+ * sets size, owns every field and nested value, and rv_dom_url_pattern_component_result_release frees it. */
+typedef struct RvDomURLPatternComponentResult {
+    uint32_t size;
+    RvDomUtf8StringInput input; /* USVString */
+    const RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString* groups; /* record<USVString, (undefined or USVString)>, NULL for absent */
+} RvDomURLPatternComponentResult;
+
+/* The IDL dictionary URLPatternResult. size is sizeof(RvDomURLPatternResult) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. As a result, the glue allocates it,
+ * sets size, owns every field and nested value, and rv_dom_url_pattern_result_release frees it. */
+typedef struct RvDomURLPatternResult {
+    uint32_t size;
+    const RvDomSequenceUSVStringOrURLPatternInit* inputs; /* sequence<URLPatternInput>, NULL for absent */
+    const RvDomURLPatternComponentResult* protocol; /* URLPatternComponentResult, NULL for absent */
+    const RvDomURLPatternComponentResult* username; /* URLPatternComponentResult, NULL for absent */
+    const RvDomURLPatternComponentResult* password; /* URLPatternComponentResult, NULL for absent */
+    const RvDomURLPatternComponentResult* hostname; /* URLPatternComponentResult, NULL for absent */
+    const RvDomURLPatternComponentResult* port; /* URLPatternComponentResult, NULL for absent */
+    const RvDomURLPatternComponentResult* pathname; /* URLPatternComponentResult, NULL for absent */
+    const RvDomURLPatternComponentResult* search; /* URLPatternComponentResult, NULL for absent */
+    const RvDomURLPatternComponentResult* hash; /* URLPatternComponentResult, NULL for absent */
+} RvDomURLPatternResult;
+
 /* The IDL dictionary DOMCSSCustomPropertyDescriptor. size is sizeof(RvDomDOMCSSCustomPropertyDescriptor) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
 typedef struct RvDomDOMCSSCustomPropertyDescriptor {
@@ -725,6 +785,15 @@ typedef struct RvDomSequenceFileOrUSVString RvDomSequenceFileOrUSVString;
 typedef struct RvDomSequencePointerEvent RvDomSequencePointerEvent;
 typedef struct RvDomUnionBufferSourceOrBlobOrUSVString RvDomUnionBufferSourceOrBlobOrUSVString;
 typedef struct RvDomSequenceBufferSourceOrBlobOrUSVString RvDomSequenceBufferSourceOrBlobOrUSVString;
+typedef struct RvDomSequenceSequenceOfUSVString RvDomSequenceSequenceOfUSVString;
+typedef struct RvDomPairUSVStringAndUSVString RvDomPairUSVStringAndUSVString;
+typedef struct RvDomSequencePairUSVStringAndUSVString RvDomSequencePairUSVStringAndUSVString;
+typedef struct RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString;
+typedef struct RvDomUnionUSVStringOrURLPatternInit RvDomUnionUSVStringOrURLPatternInit;
+typedef struct RvDomSequenceUSVStringOrURLPatternInit RvDomSequenceUSVStringOrURLPatternInit;
+typedef struct RvDomUnionUndefinedOrUSVString RvDomUnionUndefinedOrUSVString;
+typedef struct RvDomPairUSVStringAndUnionUndefinedOrUSVString RvDomPairUSVStringAndUnionUndefinedOrUSVString;
+typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
@@ -1161,6 +1230,95 @@ struct RvDomSequenceBufferSourceOrBlobOrUSVString {
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceSequenceOfUSVString {
+    int32_t present;
+    int32_t count;
+    RvDomSequenceUSVString* items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomPairUSVStringAndUSVString {
+    int32_t present;
+    RvDomUtf8StringSpan key;
+    RvDomUtf8StringSpan value;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequencePairUSVStringAndUSVString {
+    int32_t present;
+    int32_t count;
+    RvDomPairUSVStringAndUSVString* items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_SEQUENCE_OF_SEQUENCE_OF_USV_STRING_OR_RECORD_OF_USV_STRING_AND_USV_STRING_OR_USV_STRING_SEQUENCE_SEQUENCE_OF_USV_STRING = 1,
+    RV_DOM_UNION_SEQUENCE_OF_SEQUENCE_OF_USV_STRING_OR_RECORD_OF_USV_STRING_AND_USV_STRING_OR_USV_STRING_SEQUENCE_PAIR_USV_STRING_AND_USV_STRING = 2,
+    RV_DOM_UNION_SEQUENCE_OF_SEQUENCE_OF_USV_STRING_OR_RECORD_OF_USV_STRING_AND_USV_STRING_OR_USV_STRING_STRING = 3,
+};
+struct RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString {
+    int32_t present;
+    int32_t tag;
+    RvDomSequenceSequenceOfUSVString arm0;
+    RvDomSequencePairUSVStringAndUSVString arm1;
+    RvDomUtf8StringSpan arm2;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_USV_STRING_OR_URL_PATTERN_INIT_STRING = 1,
+    RV_DOM_UNION_USV_STRING_OR_URL_PATTERN_INIT_URL_PATTERN_INIT = 2,
+};
+struct RvDomUnionUSVStringOrURLPatternInit {
+    int32_t present;
+    int32_t tag;
+    RvDomUtf8StringSpan arm0;
+    const RvDomURLPatternInit* arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceUSVStringOrURLPatternInit {
+    int32_t present;
+    int32_t count;
+    RvDomUnionUSVStringOrURLPatternInit* items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_UNDEFINED_OR_USV_STRING_VOID = 1,
+    RV_DOM_UNION_UNDEFINED_OR_USV_STRING_STRING = 2,
+};
+struct RvDomUnionUndefinedOrUSVString {
+    int32_t present;
+    int32_t tag;
+    int32_t arm0;
+    RvDomUtf8StringSpan arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomPairUSVStringAndUnionUndefinedOrUSVString {
+    int32_t present;
+    RvDomUtf8StringSpan key;
+    RvDomUnionUndefinedOrUSVString value;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString {
+    int32_t present;
+    int32_t count;
+    RvDomPairUSVStringAndUnionUndefinedOrUSVString* items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
 struct RvDomSequenceCSSStyleValue {
     int32_t present;
     int32_t count;
@@ -1237,11 +1395,26 @@ RV_EXPORT void rv_dom_sequence_file_or_usv_string_release(RvDomSequenceFileOrUSV
 RV_EXPORT void rv_dom_sequence_pointer_event_release(RvDomSequencePointerEvent* value);
 RV_EXPORT void rv_dom_union_buffer_source_or_blob_or_usv_string_release(RvDomUnionBufferSourceOrBlobOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_buffer_source_or_blob_or_usv_string_release(RvDomSequenceBufferSourceOrBlobOrUSVString* value);
+RV_EXPORT void rv_dom_sequence_sequence_of_usv_string_release(RvDomSequenceSequenceOfUSVString* value);
+RV_EXPORT void rv_dom_pair_usv_string_and_usv_string_release(RvDomPairUSVStringAndUSVString* value);
+RV_EXPORT void rv_dom_sequence_pair_usv_string_and_usv_string_release(RvDomSequencePairUSVStringAndUSVString* value);
+RV_EXPORT void rv_dom_union_sequence_of_sequence_of_usv_string_or_record_of_usv_string_and_usv_string_or_usv_string_release(RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString* value);
+RV_EXPORT void rv_dom_union_usv_string_or_url_pattern_init_release(RvDomUnionUSVStringOrURLPatternInit* value);
+RV_EXPORT void rv_dom_sequence_usv_string_or_url_pattern_init_release(RvDomSequenceUSVStringOrURLPatternInit* value);
+RV_EXPORT void rv_dom_union_undefined_or_usv_string_release(RvDomUnionUndefinedOrUSVString* value);
+RV_EXPORT void rv_dom_pair_usv_string_and_union_undefined_or_usv_string_release(RvDomPairUSVStringAndUnionUndefinedOrUSVString* value);
+RV_EXPORT void rv_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string_release(RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value);
 RV_EXPORT void rv_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* value);
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* value);
 RV_EXPORT void rv_dom_pair_usv_string_and_union_file_or_usv_string_release(RvDomPairUSVStringAndUnionFileOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_union_file_or_usv_string_release(RvDomSequencePairUSVStringAndUnionFileOrUSVString* value);
+/* Releases an owned URLPatternResult result, its strings and nested values, and the struct. */
+RV_EXPORT void rv_dom_url_pattern_result_release(RvDomURLPatternResult* value);
+/* Releases an owned URLPatternInit result, its strings and nested values, and the struct. */
+RV_EXPORT void rv_dom_url_pattern_init_release(RvDomURLPatternInit* value);
+/* Releases an owned URLPatternComponentResult result, its strings and nested values, and the struct. */
+RV_EXPORT void rv_dom_url_pattern_component_result_release(RvDomURLPatternComponentResult* value);
 /* Releases a handle to a DOMImplementation. */
 RV_EXPORT void rv_dom_dom_implementation_release(RvDOMImplementation*);
 /* Adds a reference to a DOMImplementation and returns it. */
@@ -1310,10 +1483,6 @@ RV_EXPORT RvDOMSelection* rv_dom_dom_selection_retain(RvDOMSelection*);
 RV_EXPORT void rv_dom_dom_rect_read_only_release(RvDOMRectReadOnly*);
 /* Adds a reference to a DOMRectReadOnly and returns it. */
 RV_EXPORT RvDOMRectReadOnly* rv_dom_dom_rect_read_only_retain(RvDOMRectReadOnly*);
-/* Releases a handle to a CaretPosition. */
-RV_EXPORT void rv_dom_caret_position_release(RvCaretPosition*);
-/* Adds a reference to a CaretPosition and returns it. */
-RV_EXPORT RvCaretPosition* rv_dom_caret_position_retain(RvCaretPosition*);
 /* Releases a handle to a DOMRectList. */
 RV_EXPORT void rv_dom_dom_rect_list_release(RvDOMRectList*);
 /* Adds a reference to a DOMRectList and returns it. */
@@ -1470,6 +1639,22 @@ RV_EXPORT RvBlob* rv_dom_blob_retain(RvBlob*);
 RV_EXPORT void rv_dom_file_list_release(RvFileList*);
 /* Adds a reference to a FileList and returns it. */
 RV_EXPORT RvFileList* rv_dom_file_list_retain(RvFileList*);
+/* Releases a handle to a CaretPosition. */
+RV_EXPORT void rv_dom_caret_position_release(RvCaretPosition*);
+/* Adds a reference to a CaretPosition and returns it. */
+RV_EXPORT RvCaretPosition* rv_dom_caret_position_retain(RvCaretPosition*);
+/* Releases a handle to a DOMURL. */
+RV_EXPORT void rv_dom_domurl_release(RvDOMURL*);
+/* Adds a reference to a DOMURL and returns it. */
+RV_EXPORT RvDOMURL* rv_dom_domurl_retain(RvDOMURL*);
+/* Releases a handle to a URLSearchParams. */
+RV_EXPORT void rv_dom_url_search_params_release(RvURLSearchParams*);
+/* Adds a reference to a URLSearchParams and returns it. */
+RV_EXPORT RvURLSearchParams* rv_dom_url_search_params_retain(RvURLSearchParams*);
+/* Releases a handle to a URLPattern. */
+RV_EXPORT void rv_dom_url_pattern_release(RvURLPattern*);
+/* Adds a reference to a URLPattern and returns it. */
+RV_EXPORT RvURLPattern* rv_dom_url_pattern_retain(RvURLPattern*);
 /* Concrete scoped interface name of a CSSRule handle; borrows target. */
 RV_EXPORT int32_t rv_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* Concrete scoped interface name of a StyleSheet handle; borrows target. */
@@ -5454,14 +5639,6 @@ RV_EXPORT int32_t rv_dom_dom_rect_read_only_get_right(RvDOMRectReadOnly* target,
 RV_EXPORT int32_t rv_dom_dom_rect_read_only_get_bottom(RvDOMRectReadOnly* target, double* result);
 /* DOMRectReadOnly.left getter: readonly attribute unrestricted double left */
 RV_EXPORT int32_t rv_dom_dom_rect_read_only_get_left(RvDOMRectReadOnly* target, double* result);
-/* CaretPosition */
-
-/* CaretPosition.offsetNode getter: readonly attribute Node? offsetNode; *result is a new reference, or NULL */
-RV_EXPORT int32_t rv_dom_caret_position_get_offset_node(RvCaretPosition* target, RvNode** result);
-/* CaretPosition.offset getter: readonly attribute unsigned long offset */
-RV_EXPORT int32_t rv_dom_caret_position_get_offset(RvCaretPosition* target, uint32_t* result);
-/* CaretPosition.getClientRect() -> DOMRect?; *result is a new reference, or NULL */
-RV_EXPORT int32_t rv_dom_caret_position_get_client_rect(RvCaretPosition* target, RvDOMRectReadOnly** result);
 /* DOMRect */
 
 /* DOMRect.constructor: target is the Document of the constructed object; x defaults to 0 in IDL; y defaults to 0 in
@@ -7471,6 +7648,124 @@ RV_EXPORT int32_t rv_dom_file_get_last_modified(RvBlob* target, int64_t* result)
 RV_EXPORT int32_t rv_dom_file_list_get_length(RvFileList* target, uint32_t* result);
 /* FileList.item(unsigned long index) -> File?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_file_list_item(RvFileList* target, uint32_t index, RvBlob** result);
+/* CaretPosition */
+
+/* CaretPosition.offsetNode getter: readonly attribute Node? offsetNode; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_caret_position_get_offset_node(RvCaretPosition* target, RvNode** result);
+/* CaretPosition.offset getter: readonly attribute unsigned long offset */
+RV_EXPORT int32_t rv_dom_caret_position_get_offset(RvCaretPosition* target, uint32_t* result);
+/* CaretPosition.getClientRect() -> DOMRect?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_caret_position_get_client_rect(RvCaretPosition* target, RvDOMRectReadOnly** result);
+/* DOMURL */
+
+/* DOMURL.constructor: target is the Document of the constructed object; base_length -1 means absent; base may be NULL
+ * (absent); *result is a new reference */
+RV_EXPORT int32_t rv_dom_domurl_create(RvNode* target, const uint8_t* url, int32_t url_length, const uint8_t* base, int32_t base_length, RvDOMURL** result);
+/* DOMURL.href getter: attribute USVString href */
+RV_EXPORT int32_t rv_dom_domurl_get_href(RvDOMURL* target, char* buffer, int32_t capacity, int32_t* length);
+/* DOMURL.href setter: attribute USVString href */
+RV_EXPORT int32_t rv_dom_domurl_set_href(RvDOMURL* target, const uint8_t* value, int32_t value_length);
+/* DOMURL.origin getter: readonly attribute USVString origin */
+RV_EXPORT int32_t rv_dom_domurl_get_origin(RvDOMURL* target, char* buffer, int32_t capacity, int32_t* length);
+/* DOMURL.protocol getter: attribute USVString protocol */
+RV_EXPORT int32_t rv_dom_domurl_get_protocol(RvDOMURL* target, char* buffer, int32_t capacity, int32_t* length);
+/* DOMURL.protocol setter: attribute USVString protocol */
+RV_EXPORT int32_t rv_dom_domurl_set_protocol(RvDOMURL* target, const uint8_t* value, int32_t value_length);
+/* DOMURL.username getter: attribute USVString username */
+RV_EXPORT int32_t rv_dom_domurl_get_username(RvDOMURL* target, char* buffer, int32_t capacity, int32_t* length);
+/* DOMURL.username setter: attribute USVString username */
+RV_EXPORT int32_t rv_dom_domurl_set_username(RvDOMURL* target, const uint8_t* value, int32_t value_length);
+/* DOMURL.password getter: attribute USVString password */
+RV_EXPORT int32_t rv_dom_domurl_get_password(RvDOMURL* target, char* buffer, int32_t capacity, int32_t* length);
+/* DOMURL.password setter: attribute USVString password */
+RV_EXPORT int32_t rv_dom_domurl_set_password(RvDOMURL* target, const uint8_t* value, int32_t value_length);
+/* DOMURL.host getter: attribute USVString host */
+RV_EXPORT int32_t rv_dom_domurl_get_host(RvDOMURL* target, char* buffer, int32_t capacity, int32_t* length);
+/* DOMURL.host setter: attribute USVString host */
+RV_EXPORT int32_t rv_dom_domurl_set_host(RvDOMURL* target, const uint8_t* value, int32_t value_length);
+/* DOMURL.hostname getter: attribute USVString hostname */
+RV_EXPORT int32_t rv_dom_domurl_get_hostname(RvDOMURL* target, char* buffer, int32_t capacity, int32_t* length);
+/* DOMURL.hostname setter: attribute USVString hostname */
+RV_EXPORT int32_t rv_dom_domurl_set_hostname(RvDOMURL* target, const uint8_t* value, int32_t value_length);
+/* DOMURL.port getter: attribute USVString port */
+RV_EXPORT int32_t rv_dom_domurl_get_port(RvDOMURL* target, char* buffer, int32_t capacity, int32_t* length);
+/* DOMURL.port setter: attribute USVString port */
+RV_EXPORT int32_t rv_dom_domurl_set_port(RvDOMURL* target, const uint8_t* value, int32_t value_length);
+/* DOMURL.pathname getter: attribute USVString pathname */
+RV_EXPORT int32_t rv_dom_domurl_get_pathname(RvDOMURL* target, char* buffer, int32_t capacity, int32_t* length);
+/* DOMURL.pathname setter: attribute USVString pathname */
+RV_EXPORT int32_t rv_dom_domurl_set_pathname(RvDOMURL* target, const uint8_t* value, int32_t value_length);
+/* DOMURL.hash getter: attribute USVString hash */
+RV_EXPORT int32_t rv_dom_domurl_get_hash(RvDOMURL* target, char* buffer, int32_t capacity, int32_t* length);
+/* DOMURL.hash setter: attribute USVString hash */
+RV_EXPORT int32_t rv_dom_domurl_set_hash(RvDOMURL* target, const uint8_t* value, int32_t value_length);
+/* DOMURL.search getter: attribute USVString search */
+RV_EXPORT int32_t rv_dom_domurl_get_search(RvDOMURL* target, char* buffer, int32_t capacity, int32_t* length);
+/* DOMURL.search setter: attribute USVString search */
+RV_EXPORT int32_t rv_dom_domurl_set_search(RvDOMURL* target, const uint8_t* value, int32_t value_length);
+/* DOMURL.searchParams getter: readonly attribute URLSearchParams searchParams; *result is a new reference */
+RV_EXPORT int32_t rv_dom_domurl_get_search_params(RvDOMURL* target, RvURLSearchParams** result);
+/* DOMURL.toJSON() -> USVString */
+RV_EXPORT int32_t rv_dom_domurl_to_json(RvDOMURL* target, char* buffer, int32_t capacity, int32_t* length);
+/* URLSearchParams */
+
+/* URLSearchParams.constructor: target is the Document of the constructed object; init defaults to "" in IDL; *result
+ * is a new reference */
+RV_EXPORT int32_t rv_dom_url_search_params_create(RvNode* target, const RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString* init, RvURLSearchParams** result);
+/* URLSearchParams.size getter: readonly attribute unsigned long size */
+RV_EXPORT int32_t rv_dom_url_search_params_get_size(RvURLSearchParams* target, uint32_t* result);
+/* URLSearchParams.append(USVString name, USVString value) -> undefined */
+RV_EXPORT int32_t rv_dom_url_search_params_append(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length);
+/* URLSearchParams.delete(USVString name, optional USVString value) -> undefined; value_length -1 means absent; value
+ * may be NULL (absent) */
+RV_EXPORT int32_t rv_dom_url_search_params_delete(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length);
+/* URLSearchParams.get(USVString name) -> USVString? */
+RV_EXPORT int32_t rv_dom_url_search_params_get(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, char* buffer, int32_t capacity, int32_t* length);
+/* URLSearchParams.getAll(USVString name) -> sequence<USVString>; *result owns its contents; release with the matching
+ * rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_url_search_params_get_all(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, RvDomSequenceUSVString* result);
+/* URLSearchParams.has(USVString name, optional USVString value) -> boolean; value_length -1 means absent; value may
+ * be NULL (absent) */
+RV_EXPORT int32_t rv_dom_url_search_params_has(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length, int32_t* result);
+/* URLSearchParams.set(USVString name, USVString value) -> undefined */
+RV_EXPORT int32_t rv_dom_url_search_params_set(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length);
+/* URLSearchParams.sort() -> undefined */
+RV_EXPORT int32_t rv_dom_url_search_params_sort(RvURLSearchParams* target);
+/* URLSearchParams.toString() -> DOMString */
+RV_EXPORT int32_t rv_dom_url_search_params_to_string(RvURLSearchParams* target, char* buffer, int32_t capacity, int32_t* length);
+/* URLPattern */
+
+/* URLPattern.constructor: target is the Document of the constructed object; options defaults to {} in IDL; options
+ * may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_url_pattern_create_3(RvNode* target, const RvDomUnionUSVStringOrURLPatternInit* input, const uint8_t* base_url, int32_t base_url_length, const RvDomURLPatternOptions* options, RvURLPattern** result);
+/* URLPattern.constructor: target is the Document of the constructed object; input defaults to {} in IDL; options
+ * defaults to {} in IDL; options may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_url_pattern_create_2(RvNode* target, const RvDomUnionUSVStringOrURLPatternInit* input, const RvDomURLPatternOptions* options, RvURLPattern** result);
+/* URLPattern.protocol getter: readonly attribute USVString protocol */
+RV_EXPORT int32_t rv_dom_url_pattern_get_protocol(RvURLPattern* target, char* buffer, int32_t capacity, int32_t* length);
+/* URLPattern.username getter: readonly attribute USVString username */
+RV_EXPORT int32_t rv_dom_url_pattern_get_username(RvURLPattern* target, char* buffer, int32_t capacity, int32_t* length);
+/* URLPattern.password getter: readonly attribute USVString password */
+RV_EXPORT int32_t rv_dom_url_pattern_get_password(RvURLPattern* target, char* buffer, int32_t capacity, int32_t* length);
+/* URLPattern.hostname getter: readonly attribute USVString hostname */
+RV_EXPORT int32_t rv_dom_url_pattern_get_hostname(RvURLPattern* target, char* buffer, int32_t capacity, int32_t* length);
+/* URLPattern.port getter: readonly attribute USVString port */
+RV_EXPORT int32_t rv_dom_url_pattern_get_port(RvURLPattern* target, char* buffer, int32_t capacity, int32_t* length);
+/* URLPattern.pathname getter: readonly attribute USVString pathname */
+RV_EXPORT int32_t rv_dom_url_pattern_get_pathname(RvURLPattern* target, char* buffer, int32_t capacity, int32_t* length);
+/* URLPattern.search getter: readonly attribute USVString search */
+RV_EXPORT int32_t rv_dom_url_pattern_get_search(RvURLPattern* target, char* buffer, int32_t capacity, int32_t* length);
+/* URLPattern.hash getter: readonly attribute USVString hash */
+RV_EXPORT int32_t rv_dom_url_pattern_get_hash(RvURLPattern* target, char* buffer, int32_t capacity, int32_t* length);
+/* URLPattern.hasRegExpGroups getter: readonly attribute boolean hasRegExpGroups */
+RV_EXPORT int32_t rv_dom_url_pattern_get_has_reg_exp_groups(RvURLPattern* target, int32_t* result);
+/* URLPattern.test(optional URLPatternInput input = {}, optional USVString baseURL) -> boolean; input defaults to {}
+ * in IDL; base_url_length -1 means absent; base_url may be NULL (absent) */
+RV_EXPORT int32_t rv_dom_url_pattern_test(RvURLPattern* target, const RvDomUnionUSVStringOrURLPatternInit* input, const uint8_t* base_url, int32_t base_url_length, int32_t* result);
+/* URLPattern.exec(optional URLPatternInput input = {}, optional USVString baseURL) -> URLPatternResult?; input
+ * defaults to {} in IDL; base_url_length -1 means absent; base_url may be NULL (absent); *result is NULL for null;
+ * *result is owned; release it with rv_dom_url_pattern_result_release */
+RV_EXPORT int32_t rv_dom_url_pattern_exec(RvURLPattern* target, const RvDomUnionUSVStringOrURLPatternInit* input, const uint8_t* base_url, int32_t base_url_length, RvDomURLPatternResult** result);
 /* VisualViewport */
 
 /* VisualViewport.offsetLeft getter: readonly attribute double offsetLeft; RV_ERR_DETACHED once the object's window
@@ -7573,6 +7868,14 @@ RV_EXPORT int32_t rv_dom_css_style_value_parse(RvNode* target, const uint8_t* pr
 /* CSSStyleValue.parseAll: static operation with checked Document context and UTF-8 byte lengths; *result owns its
  * contents; release with the matching rv_dom_*_release */
 RV_EXPORT int32_t rv_dom_css_style_value_parse_all(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* css_text, int32_t css_text_length, RvDomSequenceCSSStyleValue* result);
+/* DOMURL */
+
+/* DOMURL.parse: static operation with checked Document context and UTF-8 byte lengths; base_length -1 means absent;
+ * base may be NULL (absent); *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_domurl_parse(RvNode* target, const uint8_t* url, int32_t url_length, const uint8_t* base, int32_t base_length, RvDOMURL** result);
+/* DOMURL.canParse: static operation with checked Document context and UTF-8 byte lengths; base_length -1 means
+ * absent; base may be NULL (absent) */
+RV_EXPORT int32_t rv_dom_domurl_can_parse(RvNode* target, const uint8_t* url, int32_t url_length, const uint8_t* base, int32_t base_length, int32_t* result);
 /* StylePropertyMapReadOnly */
 
 /* StylePropertyMapReadOnly.entries: owned snapshot of the engine key/value iterable; context is an explicit checked
@@ -7583,6 +7886,11 @@ RV_EXPORT int32_t rv_dom_style_property_map_read_only_entries(RvStylePropertyMap
 /* DOMFormData.entries: owned snapshot of the engine key/value iterable; context is an explicit checked Document for
  * the operation; *result owns its contents; release with the matching rv_dom_*_release */
 RV_EXPORT int32_t rv_dom_dom_form_data_entries(RvDOMFormData* target, RvNode* context, RvDomSequencePairUSVStringAndUnionFileOrUSVString* result);
+/* URLSearchParams */
+
+/* URLSearchParams.entries: owned snapshot of the engine key/value iterable; context is an explicit checked Document
+ * for the operation; *result owns its contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_url_search_params_entries(RvURLSearchParams* target, RvNode* context, RvDomSequencePairUSVStringAndUSVString* result);
 
 #ifdef __cplusplus
 }

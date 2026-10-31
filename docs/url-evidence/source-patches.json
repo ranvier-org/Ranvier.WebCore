@@ -1,0 +1,10 @@
+{
+  "0035": {
+    "file": "Source/WebCore/dom/Document.cpp",
+    "hunk": [
+      "-        if ((!anchorNode->isInShadowTree() && !options.shadowRoots.size()) || (anchorNode->isInShadowTree() && options.shadowRoots.contains(Ref(anchorNode->treeScope().rootNode()))))",
+      "+        if (!anchorNode->isInShadowTree() || options.shadowRoots.contains(Ref(anchorNode->treeScope().rootNode())))"
+    ],
+    "object": "C:/wk/native-url/artifacts/native33-candidate-5/001-UnifiedSource-dom-7.cpp.obj"
+  }
+}

@@ -167,6 +167,24 @@
       "receiver": "Document",
       "factory": "File::create",
       "stringInputs": "utf8-lengths"
+    },
+    "DOMURL": {
+      "receiver": "Document",
+      "factory": "DOMURL::create",
+      "passReceiver": false,
+      "stringInputs": "utf8-lengths"
+    },
+    "URLSearchParams": {
+      "receiver": "Document",
+      "factory": "URLSearchParams::create",
+      "passReceiver": false,
+      "stringInputs": "utf8-lengths"
+    },
+    "URLPattern": {
+      "receiver": "Document",
+      "factory": "URLPattern::create",
+      "passReceiver": false,
+      "stringInputs": "utf8-lengths"
     }
   },
   "dictionaryCppTypes": {
@@ -253,12 +271,16 @@
     "DOMMatrixReadOnly": "DOMMatrix"
   },
   "dictionaryStringInputs": {
-    "DOMCSSCustomPropertyDescriptor": "utf8-lengths-presence"
+    "DOMCSSCustomPropertyDescriptor": "utf8-lengths-presence",
+    "URLPatternInit": "utf8-lengths-presence",
+    "URLPatternResult": "utf8-lengths-presence",
+    "URLPatternComponentResult": "utf8-lengths-presence"
   },
   "stringifiers": [
     "CSSStyleValue",
     "DOMMatrixReadOnly",
-    "CSSTransformComponent"
+    "CSSTransformComponent",
+    "URLSearchParams"
   ],
   "complexStringSpans": [
     "USVStringOrCSSOMVariableReferenceValue",
@@ -266,7 +288,10 @@
     "DOMStringOrSequenceOfUnrestrictedDouble",
     "CSSNumericValueOrDOMStringOrCSSOMKeywordValue",
     "FileOrUSVString",
-    "BufferSourceOrBlobOrUSVString"
+    "BufferSourceOrBlobOrUSVString",
+    "USVStringOrURLPatternInit",
+    "UndefinedOrUSVString",
+    "SequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString"
   ],
   "complexNullableElements": [
     "CSSStyleValue"
@@ -278,22 +303,17 @@
     "StylePropertyMap": "utf8-lengths",
     "DOMMatrix": "utf8-lengths",
     "DOMFormData": "utf8-lengths",
-    "Blob": "utf8-lengths"
+    "Blob": "utf8-lengths",
+    "DOMURL": "utf8-lengths",
+    "URLSearchParams": "utf8-lengths",
+    "URLPattern": "utf8-lengths"
   },
   "objectContexts": {
     "StylePropertyMapReadOnly": "Document",
     "StylePropertyMap": "Document",
     "DOMMatrix": "Document",
-    "DOMFormData": "Document"
-  },
-  "creationGatedInterfaces": {
-    "CaretPosition": "Document.caretPositionFromPoint",
-    "VisualViewport": "DOMWindow.visualViewport"
-  },
-  "eventTargetObjects": {
-    "VisualViewport": {
-      "attached": "impl->frame()"
-    }
+    "DOMFormData": "Document",
+    "URLSearchParams": "Document"
   },
   "finiteNumberInputs": [
     "CSSUnitValue",
@@ -447,7 +467,6 @@
     "Range",
     "DOMSelection",
     "DOMRectReadOnly",
-    "CaretPosition",
     "DOMRect",
     "DOMRectList",
     "DOMPointReadOnly",
@@ -576,6 +595,10 @@
     "Blob",
     "File",
     "FileList",
+    "CaretPosition",
+    "DOMURL",
+    "URLSearchParams",
+    "URLPattern",
     "VisualViewport"
   ],
   "skipDirectories": [
@@ -636,7 +659,8 @@
       "CSSTransitionEvent": "TransitionEvent",
       "CSSOMKeywordValue": "CSSKeywordValue",
       "CSSStyleImageValue": "CSSImageValue",
-      "CSSOMVariableReferenceValue": "CSSVariableReferenceValue"
+      "CSSOMVariableReferenceValue": "CSSVariableReferenceValue",
+      "DOMURL": "URL"
     },
     "mixins": {
       "AriaAttributes": "ARIAMixin",
@@ -862,6 +886,15 @@
       ],
       "feature": "dom-css-style-values",
       "stringInputs": "utf8-lengths"
+    },
+    "DOMURL": {
+      "receiver": "Document",
+      "members": [
+        "parse",
+        "canParse"
+      ],
+      "feature": "dom-url-static",
+      "stringInputs": "utf8-lengths"
     }
   },
   "iterableBindings": {
@@ -870,6 +903,9 @@
     },
     "DOMFormData": {
       "feature": "dom-form-data-entries"
+    },
+    "URLSearchParams": {
+      "feature": "dom-url-search-params-entries"
     }
   },
   "windowBindings": {
@@ -919,5 +955,19 @@
   },
   "byteSpanTypes": [
     "BufferSource"
+  ],
+  "creationGatedInterfaces": {
+    "CaretPosition": "Document.caretPositionFromPoint",
+    "VisualViewport": "DOMWindow.visualViewport"
+  },
+  "eventTargetObjects": {
+    "VisualViewport": {
+      "attached": "impl->frame()"
+    }
+  },
+  "resultDictionaries": [
+    "URLPatternResult",
+    "URLPatternComponentResult",
+    "URLPatternInit"
   ]
 }

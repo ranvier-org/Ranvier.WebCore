@@ -1704,6 +1704,17 @@ interface Matcher {
         self.assertEqual({'struct': 'RvDomMatchResult', 'releaseFunction': 'rv_dom_match_result_release'},
                          model['resultDictionaries']['MatchResult'])
 
+    def test_an_omitted_optional_union_omits_the_later_optional_arguments_in_the_contract(self):
+        generator = self.value_object_generator('''
+dictionary PartInit { USVString name; };
+interface Matcher { boolean test(optional (USVString or PartInit) input = {}, optional USVString baseURL); };
+''', ['Matcher'], resultDictionaries=['PartInit'], dictionaryStringInputs={'PartInit': 'utf8-lengths-presence'})
+        contract = generator.interfaces()
+        self.assertIn('abstract member test: unit -> bool', contract)
+        self.assertIn('abstract member test: input: string * ?baseURL: string -> bool', contract)
+        self.assertNotIn('abstract member test: ?baseURL: string -> bool', contract)
+        self.assertIn('this.__ranvier_test (?input = None, ?baseURL = None)', contract)
+
     def test_unconfigured_dictionary_results_stay_left_out(self):
         generator = self.value_object_generator(self.dictionary_result_idl(), ['Matcher'])
         excluded = dict(generator.excluded)

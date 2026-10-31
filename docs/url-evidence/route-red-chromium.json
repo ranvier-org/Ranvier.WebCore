@@ -1,0 +1,565 @@
+{
+ "browser": "156.0.8078.4",
+ "url": [
+  {
+   "href": "http://example.com/a/c/d",
+   "origin": "http://example.com",
+   "protocol": "http:",
+   "username": "",
+   "password": "",
+   "host": "example.com",
+   "hostname": "example.com",
+   "port": "",
+   "pathname": "/a/c/d",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "http://h.test/a/x?y#z",
+   "origin": "http://h.test",
+   "protocol": "http:",
+   "username": "",
+   "password": "",
+   "host": "h.test",
+   "hostname": "h.test",
+   "port": "",
+   "pathname": "/a/x",
+   "search": "?y",
+   "hash": "#z"
+  },
+  {
+   "href": "https://other.test/p",
+   "origin": "https://other.test",
+   "protocol": "https:",
+   "username": "",
+   "password": "",
+   "host": "other.test",
+   "hostname": "other.test",
+   "port": "",
+   "pathname": "/p",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "http://h.test/a/b?q=1",
+   "origin": "http://h.test",
+   "protocol": "http:",
+   "username": "",
+   "password": "",
+   "host": "h.test",
+   "hostname": "h.test",
+   "port": "",
+   "pathname": "/a/b",
+   "search": "?q=1",
+   "hash": ""
+  },
+  {
+   "href": "http://h.test/a?b#frag",
+   "origin": "http://h.test",
+   "protocol": "http:",
+   "username": "",
+   "password": "",
+   "host": "h.test",
+   "hostname": "h.test",
+   "port": "",
+   "pathname": "/a",
+   "search": "?b",
+   "hash": "#frag"
+  },
+  {
+   "href": "http://example.com/",
+   "origin": "http://example.com",
+   "protocol": "http:",
+   "username": "",
+   "password": "",
+   "host": "example.com",
+   "hostname": "example.com",
+   "port": "",
+   "pathname": "/",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "https://example.com/x",
+   "origin": "https://example.com",
+   "protocol": "https:",
+   "username": "",
+   "password": "",
+   "host": "example.com",
+   "hostname": "example.com",
+   "port": "",
+   "pathname": "/x",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "http://example.com:8080/x",
+   "origin": "http://example.com:8080",
+   "protocol": "http:",
+   "username": "",
+   "password": "",
+   "host": "example.com:8080",
+   "hostname": "example.com",
+   "port": "8080",
+   "pathname": "/x",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "http://[::1]:3000/",
+   "origin": "http://[::1]:3000",
+   "protocol": "http:",
+   "username": "",
+   "password": "",
+   "host": "[::1]:3000",
+   "hostname": "[::1]",
+   "port": "3000",
+   "pathname": "/",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "http://[::1]/",
+   "origin": "http://[::1]",
+   "protocol": "http:",
+   "username": "",
+   "password": "",
+   "host": "[::1]",
+   "hostname": "[::1]",
+   "port": "",
+   "pathname": "/",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "error": "TypeError"
+  },
+  {
+   "href": "http://127.0.0.1/",
+   "origin": "http://127.0.0.1",
+   "protocol": "http:",
+   "username": "",
+   "password": "",
+   "host": "127.0.0.1",
+   "hostname": "127.0.0.1",
+   "port": "",
+   "pathname": "/",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "http://xn--mnchen-3ya.de/",
+   "origin": "http://xn--mnchen-3ya.de",
+   "protocol": "http:",
+   "username": "",
+   "password": "",
+   "host": "xn--mnchen-3ya.de",
+   "hostname": "xn--mnchen-3ya.de",
+   "port": "",
+   "pathname": "/",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "http://xn--mnchen-3ya.de/",
+   "origin": "http://xn--mnchen-3ya.de",
+   "protocol": "http:",
+   "username": "",
+   "password": "",
+   "host": "xn--mnchen-3ya.de",
+   "hostname": "xn--mnchen-3ya.de",
+   "port": "",
+   "pathname": "/",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "http://ex%20ample.com/",
+   "origin": "http://ex%20ample.com",
+   "protocol": "http:",
+   "username": "",
+   "password": "",
+   "host": "ex%20ample.com",
+   "hostname": "ex%20ample.com",
+   "port": "",
+   "pathname": "/",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "http://example.com/a%20b/%C3%BC?q=a%20b&%C3%BC#f%20g",
+   "origin": "http://example.com",
+   "protocol": "http:",
+   "username": "",
+   "password": "",
+   "host": "example.com",
+   "hostname": "example.com",
+   "port": "",
+   "pathname": "/a%20b/%C3%BC",
+   "search": "?q=a%20b&%C3%BC",
+   "hash": "#f%20g"
+  },
+  {
+   "href": "http://user:pa%20ss@host/",
+   "origin": "http://host",
+   "protocol": "http:",
+   "username": "user",
+   "password": "pa%20ss",
+   "host": "host",
+   "hostname": "host",
+   "port": "",
+   "pathname": "/",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "error": "TypeError"
+  },
+  {
+   "href": "file:///C:/x",
+   "origin": "file://",
+   "protocol": "file:",
+   "username": "",
+   "password": "",
+   "host": "",
+   "hostname": "",
+   "port": "",
+   "pathname": "/C:/x",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "file:///C:/foo/bar",
+   "origin": "file://",
+   "protocol": "file:",
+   "username": "",
+   "password": "",
+   "host": "",
+   "hostname": "",
+   "port": "",
+   "pathname": "/C:/foo/bar",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "file://server/share/f",
+   "origin": "file://",
+   "protocol": "file:",
+   "username": "",
+   "password": "",
+   "host": "server",
+   "hostname": "server",
+   "port": "",
+   "pathname": "/share/f",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "mailto:Someone@Example.com",
+   "origin": "null",
+   "protocol": "mailto:",
+   "username": "",
+   "password": "",
+   "host": "",
+   "hostname": "",
+   "port": "",
+   "pathname": "Someone@Example.com",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "data:text/plain,hello world",
+   "origin": "null",
+   "protocol": "data:",
+   "username": "",
+   "password": "",
+   "host": "",
+   "hostname": "",
+   "port": "",
+   "pathname": "text/plain,hello world",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "javascript:alert(1)",
+   "origin": "null",
+   "protocol": "javascript:",
+   "username": "",
+   "password": "",
+   "host": "",
+   "hostname": "",
+   "port": "",
+   "pathname": "alert(1)",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "blob:https://a.test/uuid",
+   "origin": "https://a.test",
+   "protocol": "blob:",
+   "username": "",
+   "password": "",
+   "host": "",
+   "hostname": "",
+   "port": "",
+   "pathname": "https://a.test/uuid",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "urn:isbn:0451450523",
+   "origin": "null",
+   "protocol": "urn:",
+   "username": "",
+   "password": "",
+   "host": "",
+   "hostname": "",
+   "port": "",
+   "pathname": "isbn:0451450523",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "non-special://host/b",
+   "origin": "null",
+   "protocol": "non-special:",
+   "username": "",
+   "password": "",
+   "host": "host",
+   "hostname": "host",
+   "port": "",
+   "pathname": "/b",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "foo://",
+   "origin": "null",
+   "protocol": "foo:",
+   "username": "",
+   "password": "",
+   "host": "",
+   "hostname": "",
+   "port": "",
+   "pathname": "",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "http://trim.test/",
+   "origin": "http://trim.test",
+   "protocol": "http:",
+   "username": "",
+   "password": "",
+   "host": "trim.test",
+   "hostname": "trim.test",
+   "port": "",
+   "pathname": "/",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "http://a.test/b",
+   "origin": "http://a.test",
+   "protocol": "http:",
+   "username": "",
+   "password": "",
+   "host": "a.test",
+   "hostname": "a.test",
+   "port": "",
+   "pathname": "/b",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "http://a.test/b",
+   "origin": "http://a.test",
+   "protocol": "http:",
+   "username": "",
+   "password": "",
+   "host": "a.test",
+   "hostname": "a.test",
+   "port": "",
+   "pathname": "/b",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "http://a.test/c",
+   "origin": "http://a.test",
+   "protocol": "http:",
+   "username": "",
+   "password": "",
+   "host": "a.test",
+   "hostname": "a.test",
+   "port": "",
+   "pathname": "/c",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "http://a.test/%7Euser",
+   "origin": "http://a.test",
+   "protocol": "http:",
+   "username": "",
+   "password": "",
+   "host": "a.test",
+   "hostname": "a.test",
+   "port": "",
+   "pathname": "/%7Euser",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "error": "TypeError"
+  },
+  {
+   "href": "http://h.test/a/b",
+   "origin": "http://h.test",
+   "protocol": "http:",
+   "username": "",
+   "password": "",
+   "host": "h.test",
+   "hostname": "h.test",
+   "port": "",
+   "pathname": "/a/b",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "error": "TypeError"
+  },
+  {
+   "href": "http://a.test/",
+   "origin": "http://a.test",
+   "protocol": "http:",
+   "username": "",
+   "password": "",
+   "host": "a.test",
+   "hostname": "a.test",
+   "port": "",
+   "pathname": "/",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "ws://a.test/",
+   "origin": "ws://a.test",
+   "protocol": "ws:",
+   "username": "",
+   "password": "",
+   "host": "a.test",
+   "hostname": "a.test",
+   "port": "",
+   "pathname": "/",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "wss://a.test/",
+   "origin": "wss://a.test",
+   "protocol": "wss:",
+   "username": "",
+   "password": "",
+   "host": "a.test",
+   "hostname": "a.test",
+   "port": "",
+   "pathname": "/",
+   "search": "",
+   "hash": ""
+  },
+  {
+   "href": "ftp://a.test/",
+   "origin": "ftp://a.test",
+   "protocol": "ftp:",
+   "username": "",
+   "password": "",
+   "host": "a.test",
+   "hostname": "a.test",
+   "port": "",
+   "pathname": "/",
+   "search": "",
+   "hash": ""
+  }
+ ],
+ "params": [
+  {
+   "entries": [
+    [
+     "a",
+     "1"
+    ],
+    [
+     "b",
+     "2"
+    ],
+    [
+     "a",
+     "3"
+    ]
+   ],
+   "string": "a=1&b=2&a=3",
+   "sorted": "a=1&a=3&b=2"
+  },
+  {
+   "entries": [
+    [
+     "a",
+     "b c"
+    ],
+    [
+     "d",
+     "e f"
+    ]
+   ],
+   "string": "a=b+c&d=e+f",
+   "sorted": "a=b+c&d=e+f"
+  },
+  {
+   "entries": [
+    [
+     "x",
+     "%zz"
+    ],
+    [
+     "y",
+     "€"
+    ]
+   ],
+   "string": "x=%25zz&y=%E2%82%AC",
+   "sorted": "x=%25zz&y=%E2%82%AC"
+  },
+  {
+   "entries": [
+    [
+     "",
+     "empty"
+    ],
+    [
+     "novalue",
+     ""
+    ],
+    [
+     "k",
+     ""
+    ]
+   ],
+   "string": "=empty&novalue=&k=",
+   "sorted": "=empty&k=&novalue="
+  },
+  {
+   "entries": [
+    [
+     "ü",
+     "ë"
+    ],
+    [
+     "s p",
+     "a b"
+    ]
+   ],
+   "string": "%C3%BC=%C3%AB&s+p=a+b",
+   "sorted": "s+p=a+b&%C3%BC=%C3%AB"
+  }
+ ]
+}
