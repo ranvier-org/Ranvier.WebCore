@@ -3,118 +3,6 @@
   "missing": [],
   "differences": [
     {
-      "case": "modal dialog top layer and focus",
-      "kind": "queued",
-      "chromium": [
-        {
-          "type": "toggle",
-          "target": "d",
-          "trusted": true,
-          "cancelable": false,
-          "oldState": "open",
-          "newState": "closed",
-          "source": null
-        },
-        {
-          "type": "toggle",
-          "target": "m",
-          "trusted": true,
-          "cancelable": false,
-          "oldState": "open",
-          "newState": "closed",
-          "source": null
-        },
-        {
-          "type": "toggle",
-          "target": "d",
-          "trusted": true,
-          "cancelable": false,
-          "oldState": "closed",
-          "newState": "open",
-          "source": null
-        },
-        {
-          "type": "toggle",
-          "target": "m",
-          "trusted": true,
-          "cancelable": false,
-          "oldState": "closed",
-          "newState": "open",
-          "source": null
-        },
-        {
-          "type": "close",
-          "target": "d",
-          "trusted": true,
-          "cancelable": false
-        },
-        {
-          "type": "close",
-          "target": "m",
-          "trusted": true,
-          "cancelable": false
-        }
-      ],
-      "native": [
-        {
-          "type": "toggle",
-          "target": "d",
-          "trusted": true,
-          "cancelable": false,
-          "oldState": "closed",
-          "newState": "closed",
-          "source": null
-        },
-        {
-          "type": "toggle",
-          "target": "m",
-          "trusted": true,
-          "cancelable": false,
-          "oldState": "closed",
-          "newState": "closed",
-          "source": null
-        },
-        {
-          "type": "close",
-          "target": "d",
-          "trusted": true,
-          "cancelable": false
-        },
-        {
-          "type": "close",
-          "target": "m",
-          "trusted": true,
-          "cancelable": false
-        }
-      ]
-    },
-    {
-      "case": "modal dialog top layer and focus",
-      "kind": "queuedOrder",
-      "chromium": {
-        "d": [
-          "toggle",
-          "toggle",
-          "close"
-        ],
-        "m": [
-          "toggle",
-          "toggle",
-          "close"
-        ]
-      },
-      "native": {
-        "d": [
-          "toggle",
-          "close"
-        ],
-        "m": [
-          "toggle",
-          "close"
-        ]
-      }
-    },
-    {
       "case": "close requests and closedby",
       "kind": "dispatched",
       "chromium": [
@@ -277,16 +165,13 @@
       "native": {
         "cb": [
           "toggle",
-          "toggle",
           "close"
         ],
         "cn": [
           "toggle",
-          "toggle",
           "close"
         ],
         "m": [
-          "toggle",
           "toggle",
           "close"
         ]
@@ -706,157 +591,12 @@
     },
     {
       "case": "close request after user activation",
-      "kind": "queued",
-      "chromium": [
-        {
-          "type": "toggle",
-          "target": "m",
-          "trusted": true,
-          "cancelable": false,
-          "oldState": "closed",
-          "newState": "closed",
-          "source": null
-        },
-        {
-          "type": "toggle",
-          "target": "m",
-          "trusted": true,
-          "cancelable": false,
-          "oldState": "open",
-          "newState": "closed",
-          "source": null
-        },
-        {
-          "type": "toggle",
-          "target": "m",
-          "trusted": true,
-          "cancelable": false,
-          "oldState": "open",
-          "newState": "closed",
-          "source": null
-        },
-        {
-          "type": "toggle",
-          "target": "m",
-          "trusted": true,
-          "cancelable": false,
-          "oldState": "closed",
-          "newState": "open",
-          "source": null
-        },
-        {
-          "type": "toggle",
-          "target": "m",
-          "trusted": true,
-          "cancelable": false,
-          "oldState": "closed",
-          "newState": "open",
-          "source": null
-        },
-        {
-          "type": "close",
-          "target": "m",
-          "trusted": true,
-          "cancelable": false
-        },
-        {
-          "type": "close",
-          "target": "m",
-          "trusted": true,
-          "cancelable": false
-        },
-        {
-          "type": "close",
-          "target": "m",
-          "trusted": true,
-          "cancelable": false
-        }
-      ],
-      "native": [
-        {
-          "type": "toggle",
-          "target": "m",
-          "trusted": true,
-          "cancelable": false,
-          "oldState": "open",
-          "newState": "closed",
-          "source": null
-        },
-        {
-          "type": "toggle",
-          "target": "m",
-          "trusted": true,
-          "cancelable": false,
-          "oldState": "open",
-          "newState": "closed",
-          "source": null
-        },
-        {
-          "type": "toggle",
-          "target": "m",
-          "trusted": true,
-          "cancelable": false,
-          "oldState": "open",
-          "newState": "closed",
-          "source": null
-        },
-        {
-          "type": "toggle",
-          "target": "m",
-          "trusted": true,
-          "cancelable": false,
-          "oldState": "closed",
-          "newState": "open",
-          "source": null
-        },
-        {
-          "type": "toggle",
-          "target": "m",
-          "trusted": true,
-          "cancelable": false,
-          "oldState": "closed",
-          "newState": "open",
-          "source": null
-        },
-        {
-          "type": "toggle",
-          "target": "m",
-          "trusted": true,
-          "cancelable": false,
-          "oldState": "closed",
-          "newState": "open",
-          "source": null
-        },
-        {
-          "type": "close",
-          "target": "m",
-          "trusted": true,
-          "cancelable": false
-        },
-        {
-          "type": "close",
-          "target": "m",
-          "trusted": true,
-          "cancelable": false
-        },
-        {
-          "type": "close",
-          "target": "m",
-          "trusted": true,
-          "cancelable": false
-        }
-      ]
-    },
-    {
-      "case": "close request after user activation",
       "kind": "queuedOrder",
       "chromium": {
         "m": [
           "close",
           "toggle",
-          "toggle",
           "close",
-          "toggle",
           "toggle",
           "close",
           "toggle"
@@ -865,12 +605,9 @@
       "native": {
         "m": [
           "toggle",
-          "toggle",
           "close",
           "toggle",
-          "toggle",
           "close",
-          "toggle",
           "toggle",
           "close"
         ]
@@ -975,22 +712,7 @@
               "oldState": "open",
               "newState": "closed",
               "source": null
-            }
-          ]
-        },
-        {
-          "op": "prop",
-          "id": "d",
-          "name": "returnValue",
-          "status": "ok",
-          "value": "first",
-          "events": []
-        },
-        {
-          "op": "flush",
-          "status": "ok",
-          "value": null,
-          "events": [
+            },
             {
               "type": "toggle",
               "target": "d",
@@ -1007,6 +729,20 @@
               "cancelable": false
             }
           ]
+        },
+        {
+          "op": "prop",
+          "id": "d",
+          "name": "returnValue",
+          "status": "ok",
+          "value": "first",
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
         },
         {
           "op": "close",
@@ -1157,7 +893,17 @@
           "selector": ":modal",
           "status": "ok",
           "value": true,
-          "events": []
+          "events": [
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            }
+          ]
         },
         {
           "op": "active",
@@ -1230,6 +976,15 @@
               "oldState": "closed",
               "newState": "open",
               "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
             }
           ]
         },
@@ -1263,6 +1018,21 @@
               "oldState": "open",
               "newState": "closed",
               "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "close",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false
             }
           ]
         },
@@ -1280,6 +1050,21 @@
               "oldState": "open",
               "newState": "closed",
               "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "close",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false
             }
           ]
         },
@@ -1309,38 +1094,7 @@
           "op": "flush",
           "status": "ok",
           "value": null,
-          "events": [
-            {
-              "type": "toggle",
-              "target": "d",
-              "trusted": true,
-              "cancelable": false,
-              "oldState": "closed",
-              "newState": "closed",
-              "source": null
-            },
-            {
-              "type": "close",
-              "target": "d",
-              "trusted": true,
-              "cancelable": false
-            },
-            {
-              "type": "toggle",
-              "target": "m",
-              "trusted": true,
-              "cancelable": false,
-              "oldState": "closed",
-              "newState": "closed",
-              "source": null
-            },
-            {
-              "type": "close",
-              "target": "m",
-              "trusted": true,
-              "cancelable": false
-            }
-          ]
+          "events": []
         }
       ],
       "assertions": 39
@@ -1411,12 +1165,6 @@
           "name": "returnValue",
           "status": "ok",
           "value": "r1",
-          "events": []
-        },
-        {
-          "op": "flush",
-          "status": "ok",
-          "value": null,
           "events": [
             {
               "type": "toggle",
@@ -1434,6 +1182,12 @@
               "cancelable": false
             }
           ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
         },
         {
           "op": "prevent",
@@ -1730,14 +1484,7 @@
               "oldState": "open",
               "newState": "closed",
               "source": null
-            }
-          ]
-        },
-        {
-          "op": "flush",
-          "status": "ok",
-          "value": null,
-          "events": [
+            },
             {
               "type": "toggle",
               "target": "cn",
@@ -1754,6 +1501,12 @@
               "cancelable": false
             }
           ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
         },
         {
           "op": "show",
@@ -1802,22 +1555,7 @@
               "oldState": "open",
               "newState": "closed",
               "source": null
-            }
-          ]
-        },
-        {
-          "op": "prop",
-          "id": "cb",
-          "name": "open",
-          "status": "ok",
-          "value": false,
-          "events": []
-        },
-        {
-          "op": "flush",
-          "status": "ok",
-          "value": null,
-          "events": [
+            },
             {
               "type": "toggle",
               "target": "cb",
@@ -1834,6 +1572,20 @@
               "cancelable": false
             }
           ]
+        },
+        {
+          "op": "prop",
+          "id": "cb",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
         },
         {
           "op": "set",
@@ -3122,20 +2874,6 @@
           "name": "open",
           "status": "ok",
           "value": false,
-          "events": []
-        },
-        {
-          "op": "prop",
-          "id": "m",
-          "name": "returnValue",
-          "status": "ok",
-          "value": "bycmd",
-          "events": []
-        },
-        {
-          "op": "flush",
-          "status": "ok",
-          "value": null,
           "events": [
             {
               "type": "toggle",
@@ -3153,6 +2891,20 @@
               "cancelable": false
             }
           ]
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "returnValue",
+          "status": "ok",
+          "value": "bycmd",
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
         },
         {
           "op": "click",
@@ -3216,6 +2968,21 @@
               "oldState": "open",
               "newState": "closed",
               "source": "creq"
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": "creq"
+            },
+            {
+              "type": "close",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false
             }
           ]
         },
@@ -3239,23 +3006,7 @@
           "op": "flush",
           "status": "ok",
           "value": null,
-          "events": [
-            {
-              "type": "toggle",
-              "target": "m",
-              "trusted": true,
-              "cancelable": false,
-              "oldState": "open",
-              "newState": "closed",
-              "source": "creq"
-            },
-            {
-              "type": "close",
-              "target": "m",
-              "trusted": true,
-              "cancelable": false
-            }
-          ]
+          "events": []
         },
         {
           "op": "click",
@@ -3962,15 +3713,6 @@
               "oldState": "closed",
               "newState": "open",
               "source": null
-            },
-            {
-              "type": "toggle",
-              "target": "p",
-              "trusted": true,
-              "cancelable": false,
-              "oldState": "closed",
-              "newState": "open",
-              "source": null
             }
           ]
         },
@@ -3985,6 +3727,15 @@
               "target": "ph",
               "trusted": true,
               "cancelable": true,
+              "oldState": "closed",
+              "newState": "open",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
               "oldState": "closed",
               "newState": "open",
               "source": null
@@ -4008,15 +3759,6 @@
           "events": [
             {
               "type": "beforetoggle",
-              "target": "ph",
-              "trusted": true,
-              "cancelable": false,
-              "oldState": "open",
-              "newState": "closed",
-              "source": null
-            },
-            {
-              "type": "toggle",
               "target": "ph",
               "trusted": true,
               "cancelable": false,
@@ -4051,6 +3793,15 @@
             {
               "type": "beforetoggle",
               "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "open",
+              "newState": "closed",
+              "source": null
+            },
+            {
+              "type": "toggle",
+              "target": "ph",
               "trusted": true,
               "cancelable": false,
               "oldState": "open",
@@ -4308,22 +4059,7 @@
               "oldState": "open",
               "newState": "closed",
               "source": null
-            }
-          ]
-        },
-        {
-          "op": "prop",
-          "id": "m",
-          "name": "open",
-          "status": "ok",
-          "value": false,
-          "events": []
-        },
-        {
-          "op": "flush",
-          "status": "ok",
-          "value": null,
-          "events": [
+            },
             {
               "type": "toggle",
               "target": "m",
@@ -4340,6 +4076,20 @@
               "cancelable": false
             }
           ]
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
         }
       ],
       "assertions": 33
@@ -4385,6 +4135,6 @@
     },
     "assertions": 50
   },
-  "qualified": 8,
+  "qualified": 5,
   "assertions": 845
 }

@@ -16,6 +16,7 @@ copies = {
     'runtime-receipt.json': repo / 'artifacts/native30-frozen/runtime-receipt.json',
     'teardown-probes.json': batch / 'teardown/teardown-probes.json',
     'dialog-popover-report.json': repo / 'artifacts/d16-native30-c1-green.json',
+    'repeat-30.log': repo / 'artifacts/repeat-30b.log',
 }
 for name, source in copies.items():
     (evidence / name).write_bytes(source.read_bytes().replace(b'\r\n', b'\n'))
@@ -48,6 +49,9 @@ result = {
     'chromiumOracle': {'browser': oracle['browser'], 'fixture': 'tests/fixtures/dialog-popover-oracle.json',
                        'cases': len(oracle['cases']), 'steps': sum(len(c['steps']) for c in oracle['cases']),
                        'stableOverRuns': 3},
+    'repeats': {'runs': 30, 'native30Candidate1': 'pass 30 fail 0', 'native32Candidate2': 'pass 30 fail 0 (C:/wk/native-caret/artifacts/native32-candidate-2)',
+                'log': 'repeat-30.log', 'determinism': 'the probe drains the run loop after every step; queued toggles compare as per-element close count, final newState and oldState chain'},
+    'unorderedQualifications': qualified.get('unordered', []),
     'valueDifferences': sum(1 for d in report['differences'] if d['kind'] == 'value'),
     'qualifications': [{'qualification': q['qualification'], 'case': q['case'], 'kind': q['kind'], 'reason': q['reason']}
                        for q in qualified['differences']],
