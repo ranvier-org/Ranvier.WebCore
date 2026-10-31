@@ -234,6 +234,11 @@
       "scrolled 0.5, 20.5",
       0.5,
       20.5
+    ],
+    [
+      "scrolled 0, 20",
+      0,
+      20
     ]
   ],
   "cases": [
@@ -5029,6 +5034,1603 @@
       ]
     },
     {
+      "scale": 1,
+      "scroll": "scrolled 0, 20",
+      "devicePixelRatio": 1,
+      "scrollX": 0,
+      "scrollY": 20,
+      "hits": [
+        {
+          "name": "wrap line 1 glyph 0 left half",
+          "x": 5,
+          "y": 10,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap line 1 glyph 0 right half",
+          "x": 15,
+          "y": 10,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 6,
+            "rect": {
+              "x": 20,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 6,
+            "rect": {
+              "x": 20,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 6,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap line 1 glyph 1 boundary",
+          "x": 20,
+          "y": 10,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 6,
+            "rect": {
+              "x": 20,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 6,
+            "rect": {
+              "x": 20,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 6,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap line 1 last glyph right half",
+          "x": 75,
+          "y": 10,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "rect": {
+              "x": 80,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "rect": {
+              "x": 80,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap line 1 past end inside box",
+          "x": 90,
+          "y": 10,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "rect": {
+              "x": 80,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "rect": {
+              "x": 80,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap line 1 past box",
+          "x": 150,
+          "y": 10,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap line 2 start",
+          "x": 2,
+          "y": 30,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 10,
+            "rect": {
+              "x": 0,
+              "y": 20,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 10,
+            "rect": {
+              "x": 0,
+              "y": 20,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 10,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap line 2 middle",
+          "x": 45,
+          "y": 30,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 12,
+            "rect": {
+              "x": 40,
+              "y": 20,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 12,
+            "rect": {
+              "x": 40,
+              "y": 20,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 12,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap line 3 end",
+          "x": 79,
+          "y": 50,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap below last line",
+          "x": 10,
+          "y": 65,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "inline",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 60,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "inline",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 60,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "inline",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap fractional 10.5, 10.25",
+          "x": 10.5,
+          "y": 10.25,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 6,
+            "rect": {
+              "x": 20,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 6,
+            "rect": {
+              "x": 20,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap fractional 9.99",
+          "x": 9.99,
+          "y": 10,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap fractional 10.01",
+          "x": 10.01,
+          "y": 10,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "inline AA|BB left",
+          "x": 39,
+          "y": 90,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "bidi",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 2,
+            "rect": {
+              "x": 40,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "bidi",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 2,
+            "rect": {
+              "x": 40,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "bidi",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 2,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "inline AA|BB right",
+          "x": 41,
+          "y": 90,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 120,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 120,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "inline BB|CC",
+          "x": 81,
+          "y": 90,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 2,
+            "rect": {
+              "x": 80,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 2,
+            "rect": {
+              "x": 80,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 2,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "inline CC|DD",
+          "x": 119,
+          "y": 90,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 4,
+            "rect": {
+              "x": 40,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 4,
+            "rect": {
+              "x": 40,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 4,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "inline end",
+          "x": 159,
+          "y": 90,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "bidi",
+              "index": 2,
+              "scope": "document"
+            },
+            "offset": 2,
+            "rect": {
+              "x": 160,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "bidi",
+              "index": 2,
+              "scope": "document"
+            },
+            "offset": 2,
+            "rect": {
+              "x": 160,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "bidi",
+              "index": 2,
+              "scope": "document"
+            },
+            "offset": 2,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "bidi ltr before bdo",
+          "x": 35,
+          "y": 120,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "bidi bdo visual left",
+          "x": 45,
+          "y": 120,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "bidi bdo visual middle",
+          "x": 80,
+          "y": 120,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "bidi bdo visual right",
+          "x": 115,
+          "y": 120,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "bidi after bdo",
+          "x": 125,
+          "y": 120,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "rtl line 1 right edge",
+          "x": 295,
+          "y": 150,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 220,
+              "y": 140,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 220,
+              "y": 140,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "rtl line 1 left edge",
+          "x": 225,
+          "y": 150,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "rect": {
+              "x": 300,
+              "y": 140,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "rect": {
+              "x": 300,
+              "y": 140,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "rtl line 2 middle",
+          "x": 250,
+          "y": 170,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "t",
+              "index": 0,
+              "scope": "closed"
+            },
+            "offset": 2,
+            "rect": {
+              "x": 240,
+              "y": 170,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "rtl left of line 1",
+          "x": 190,
+          "y": 150,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "rect": {
+              "x": 300,
+              "y": 140,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "rect": {
+              "x": 300,
+              "y": 140,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "open shadow text",
+          "x": 25,
+          "y": 200,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": "field",
+              "name": "INPUT",
+              "scope": "document"
+            },
+            "offset": 1,
+            "rect": {
+              "x": 20,
+              "y": 200,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": "field",
+              "name": "INPUT",
+              "scope": "document"
+            },
+            "offset": 1,
+            "rect": {
+              "x": 20,
+              "y": 200,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 6,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "closed shadow text",
+          "x": 225,
+          "y": 200,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "text control",
+          "x": 25,
+          "y": 230,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "empty box",
+          "x": 220,
+          "y": 20,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": "empty",
+              "name": "DIV",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": "empty",
+              "name": "DIV",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": "empty",
+              "name": "DIV",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "body beside text control",
+          "x": 150,
+          "y": 235,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "negative x",
+          "x": -5,
+          "y": 10,
+          "position": null,
+          "shadowRoots": null,
+          "range": null
+        },
+        {
+          "name": "negative y",
+          "x": 10,
+          "y": -5,
+          "position": null,
+          "shadowRoots": null,
+          "range": null
+        },
+        {
+          "name": "past viewport x",
+          "x": 400,
+          "y": 10,
+          "position": null,
+          "shadowRoots": null,
+          "range": null
+        },
+        {
+          "name": "past viewport y",
+          "x": 10,
+          "y": 260,
+          "position": null,
+          "shadowRoots": null,
+          "range": null
+        },
+        {
+          "name": "viewport last pixel",
+          "x": 319,
+          "y": 239,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "huge",
+          "x": 1000000000,
+          "y": 1000000000,
+          "position": null,
+          "shadowRoots": null,
+          "range": null
+        },
+        {
+          "name": "NaN x",
+          "x": "NaN",
+          "y": 10,
+          "position": {
+            "error": "TypeError"
+          },
+          "shadowRoots": {
+            "error": "TypeError"
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "Infinity y",
+          "x": 10,
+          "y": "Infinity",
+          "position": {
+            "error": "TypeError"
+          },
+          "shadowRoots": {
+            "error": "TypeError"
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "-Infinity x",
+          "x": "-Infinity",
+          "y": 10,
+          "position": {
+            "error": "TypeError"
+          },
+          "shadowRoots": {
+            "error": "TypeError"
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        }
+      ]
+    },
+    {
       "scale": 1.5,
       "scroll": "unscrolled",
       "devicePixelRatio": 1.5,
@@ -9820,6 +11422,1603 @@
       ]
     },
     {
+      "scale": 1.5,
+      "scroll": "scrolled 0, 20",
+      "devicePixelRatio": 1.5,
+      "scrollX": 0,
+      "scrollY": 20,
+      "hits": [
+        {
+          "name": "wrap line 1 glyph 0 left half",
+          "x": 5,
+          "y": 10,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap line 1 glyph 0 right half",
+          "x": 15,
+          "y": 10,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 6,
+            "rect": {
+              "x": 20,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 6,
+            "rect": {
+              "x": 20,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 6,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap line 1 glyph 1 boundary",
+          "x": 20,
+          "y": 10,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 6,
+            "rect": {
+              "x": 20,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 6,
+            "rect": {
+              "x": 20,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 6,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap line 1 last glyph right half",
+          "x": 75,
+          "y": 10,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "rect": {
+              "x": 80,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "rect": {
+              "x": 80,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap line 1 past end inside box",
+          "x": 90,
+          "y": 10,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "rect": {
+              "x": 80,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "rect": {
+              "x": 80,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap line 1 past box",
+          "x": 150,
+          "y": 10,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap line 2 start",
+          "x": 2,
+          "y": 30,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 10,
+            "rect": {
+              "x": 0,
+              "y": 20,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 10,
+            "rect": {
+              "x": 0,
+              "y": 20,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 10,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap line 2 middle",
+          "x": 45,
+          "y": 30,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 12,
+            "rect": {
+              "x": 40,
+              "y": 20,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 12,
+            "rect": {
+              "x": 40,
+              "y": 20,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 12,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap line 3 end",
+          "x": 79,
+          "y": 50,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap below last line",
+          "x": 10,
+          "y": 65,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "inline",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 60,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "inline",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 60,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "inline",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap fractional 10.5, 10.25",
+          "x": 10.5,
+          "y": 10.25,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 6,
+            "rect": {
+              "x": 20,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 6,
+            "rect": {
+              "x": 20,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap fractional 9.99",
+          "x": 9.99,
+          "y": 10,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap fractional 10.01",
+          "x": 10.01,
+          "y": 10,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "inline AA|BB left",
+          "x": 39,
+          "y": 90,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "bidi",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 2,
+            "rect": {
+              "x": 40,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "bidi",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 2,
+            "rect": {
+              "x": 40,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "bidi",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 2,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "inline AA|BB right",
+          "x": 41,
+          "y": 90,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 120,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 120,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "inline BB|CC",
+          "x": 81,
+          "y": 90,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 2,
+            "rect": {
+              "x": 80,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 2,
+            "rect": {
+              "x": 80,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 2,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "inline CC|DD",
+          "x": 119,
+          "y": 90,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 4,
+            "rect": {
+              "x": 40,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 4,
+            "rect": {
+              "x": 40,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 4,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "inline end",
+          "x": 159,
+          "y": 90,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "bidi",
+              "index": 2,
+              "scope": "document"
+            },
+            "offset": 2,
+            "rect": {
+              "x": 160,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "bidi",
+              "index": 2,
+              "scope": "document"
+            },
+            "offset": 2,
+            "rect": {
+              "x": 160,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "bidi",
+              "index": 2,
+              "scope": "document"
+            },
+            "offset": 2,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "bidi ltr before bdo",
+          "x": 35,
+          "y": 120,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "bidi bdo visual left",
+          "x": 45,
+          "y": 120,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "bidi bdo visual middle",
+          "x": 80,
+          "y": 120,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "bidi bdo visual right",
+          "x": 115,
+          "y": 120,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "bidi after bdo",
+          "x": 125,
+          "y": 120,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "rtl line 1 right edge",
+          "x": 295,
+          "y": 150,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 220,
+              "y": 140,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 220,
+              "y": 140,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "rtl line 1 left edge",
+          "x": 225,
+          "y": 150,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "rect": {
+              "x": 300,
+              "y": 140,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "rect": {
+              "x": 300,
+              "y": 140,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "rtl line 2 middle",
+          "x": 250,
+          "y": 170,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "t",
+              "index": 0,
+              "scope": "closed"
+            },
+            "offset": 2,
+            "rect": {
+              "x": 240,
+              "y": 170,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "rtl left of line 1",
+          "x": 190,
+          "y": 150,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "rect": {
+              "x": 300,
+              "y": 140,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "rect": {
+              "x": 300,
+              "y": 140,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "open shadow text",
+          "x": 25,
+          "y": 200,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": "field",
+              "name": "INPUT",
+              "scope": "document"
+            },
+            "offset": 1,
+            "rect": {
+              "x": 20,
+              "y": 200,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": "field",
+              "name": "INPUT",
+              "scope": "document"
+            },
+            "offset": 1,
+            "rect": {
+              "x": 20,
+              "y": 200,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 6,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "closed shadow text",
+          "x": 225,
+          "y": 200,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "text control",
+          "x": 25,
+          "y": 230,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "empty box",
+          "x": 220,
+          "y": 20,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": "empty",
+              "name": "DIV",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": "empty",
+              "name": "DIV",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": "empty",
+              "name": "DIV",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "body beside text control",
+          "x": 150,
+          "y": 235,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "negative x",
+          "x": -5,
+          "y": 10,
+          "position": null,
+          "shadowRoots": null,
+          "range": null
+        },
+        {
+          "name": "negative y",
+          "x": 10,
+          "y": -5,
+          "position": null,
+          "shadowRoots": null,
+          "range": null
+        },
+        {
+          "name": "past viewport x",
+          "x": 400,
+          "y": 10,
+          "position": null,
+          "shadowRoots": null,
+          "range": null
+        },
+        {
+          "name": "past viewport y",
+          "x": 10,
+          "y": 260,
+          "position": null,
+          "shadowRoots": null,
+          "range": null
+        },
+        {
+          "name": "viewport last pixel",
+          "x": 319,
+          "y": 239,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "huge",
+          "x": 1000000000,
+          "y": 1000000000,
+          "position": null,
+          "shadowRoots": null,
+          "range": null
+        },
+        {
+          "name": "NaN x",
+          "x": "NaN",
+          "y": 10,
+          "position": {
+            "error": "TypeError"
+          },
+          "shadowRoots": {
+            "error": "TypeError"
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "Infinity y",
+          "x": 10,
+          "y": "Infinity",
+          "position": {
+            "error": "TypeError"
+          },
+          "shadowRoots": {
+            "error": "TypeError"
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "-Infinity x",
+          "x": "-Infinity",
+          "y": 10,
+          "position": {
+            "error": "TypeError"
+          },
+          "shadowRoots": {
+            "error": "TypeError"
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        }
+      ]
+    },
+    {
       "scale": 2,
       "scroll": "unscrolled",
       "devicePixelRatio": 2,
@@ -14584,6 +17783,1603 @@
               "scope": "document"
             },
             "offset": 6,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "-Infinity x",
+          "x": "-Infinity",
+          "y": 10,
+          "position": {
+            "error": "TypeError"
+          },
+          "shadowRoots": {
+            "error": "TypeError"
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        }
+      ]
+    },
+    {
+      "scale": 2,
+      "scroll": "scrolled 0, 20",
+      "devicePixelRatio": 2,
+      "scrollX": 0,
+      "scrollY": 20,
+      "hits": [
+        {
+          "name": "wrap line 1 glyph 0 left half",
+          "x": 5,
+          "y": 10,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap line 1 glyph 0 right half",
+          "x": 15,
+          "y": 10,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 6,
+            "rect": {
+              "x": 20,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 6,
+            "rect": {
+              "x": 20,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 6,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap line 1 glyph 1 boundary",
+          "x": 20,
+          "y": 10,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 6,
+            "rect": {
+              "x": 20,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 6,
+            "rect": {
+              "x": 20,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 6,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap line 1 last glyph right half",
+          "x": 75,
+          "y": 10,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "rect": {
+              "x": 80,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "rect": {
+              "x": 80,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap line 1 past end inside box",
+          "x": 90,
+          "y": 10,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "rect": {
+              "x": 80,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "rect": {
+              "x": 80,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap line 1 past box",
+          "x": 150,
+          "y": 10,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap line 2 start",
+          "x": 2,
+          "y": 30,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 10,
+            "rect": {
+              "x": 0,
+              "y": 20,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 10,
+            "rect": {
+              "x": 0,
+              "y": 20,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 10,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap line 2 middle",
+          "x": 45,
+          "y": 30,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 12,
+            "rect": {
+              "x": 40,
+              "y": 20,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 12,
+            "rect": {
+              "x": 40,
+              "y": 20,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 12,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap line 3 end",
+          "x": 79,
+          "y": 50,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap below last line",
+          "x": 10,
+          "y": 65,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "inline",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 60,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "inline",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 60,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "inline",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap fractional 10.5, 10.25",
+          "x": 10.5,
+          "y": 10.25,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 6,
+            "rect": {
+              "x": 20,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 6,
+            "rect": {
+              "x": 20,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap fractional 9.99",
+          "x": 9.99,
+          "y": 10,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "wrap fractional 10.01",
+          "x": 10.01,
+          "y": 10,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "inline AA|BB left",
+          "x": 39,
+          "y": 90,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "bidi",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 2,
+            "rect": {
+              "x": 40,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "bidi",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 2,
+            "rect": {
+              "x": 40,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "bidi",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 2,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "inline AA|BB right",
+          "x": 41,
+          "y": 90,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 120,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 120,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "inline BB|CC",
+          "x": 81,
+          "y": 90,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 2,
+            "rect": {
+              "x": 80,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 2,
+            "rect": {
+              "x": 80,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 2,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "inline CC|DD",
+          "x": 119,
+          "y": 90,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 4,
+            "rect": {
+              "x": 40,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 4,
+            "rect": {
+              "x": 40,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "bdo",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 4,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "inline end",
+          "x": 159,
+          "y": 90,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "bidi",
+              "index": 2,
+              "scope": "document"
+            },
+            "offset": 2,
+            "rect": {
+              "x": 160,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "bidi",
+              "index": 2,
+              "scope": "document"
+            },
+            "offset": 2,
+            "rect": {
+              "x": 160,
+              "y": 90,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "bidi",
+              "index": 2,
+              "scope": "document"
+            },
+            "offset": 2,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "bidi ltr before bdo",
+          "x": 35,
+          "y": 120,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "bidi bdo visual left",
+          "x": 45,
+          "y": 120,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "bidi bdo visual middle",
+          "x": 80,
+          "y": 120,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "bidi bdo visual right",
+          "x": 115,
+          "y": 120,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "bidi after bdo",
+          "x": 125,
+          "y": 120,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "rtl line 1 right edge",
+          "x": 295,
+          "y": 150,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 220,
+              "y": 140,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 220,
+              "y": 140,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "rtl line 1 left edge",
+          "x": 225,
+          "y": 150,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "rect": {
+              "x": 300,
+              "y": 140,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "rect": {
+              "x": 300,
+              "y": 140,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "rtl line 2 middle",
+          "x": 250,
+          "y": 170,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 5,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "t",
+              "index": 0,
+              "scope": "closed"
+            },
+            "offset": 2,
+            "rect": {
+              "x": 240,
+              "y": 170,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "rtl left of line 1",
+          "x": 190,
+          "y": 150,
+          "position": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "rect": {
+              "x": 300,
+              "y": 140,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "rect": {
+              "x": 300,
+              "y": 140,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "rtl",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 9,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "open shadow text",
+          "x": 25,
+          "y": 200,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": "field",
+              "name": "INPUT",
+              "scope": "document"
+            },
+            "offset": 1,
+            "rect": {
+              "x": 20,
+              "y": 200,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": "field",
+              "name": "INPUT",
+              "scope": "document"
+            },
+            "offset": 1,
+            "rect": {
+              "x": 20,
+              "y": 200,
+              "width": 0,
+              "height": 20
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 6,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "closed shadow text",
+          "x": 225,
+          "y": 200,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "text control",
+          "x": 25,
+          "y": 230,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "empty box",
+          "x": 220,
+          "y": 20,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": "empty",
+              "name": "DIV",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": "empty",
+              "name": "DIV",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": "empty",
+              "name": "DIV",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "body beside text control",
+          "x": 150,
+          "y": 235,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "negative x",
+          "x": -5,
+          "y": 10,
+          "position": null,
+          "shadowRoots": null,
+          "range": null
+        },
+        {
+          "name": "negative y",
+          "x": 10,
+          "y": -5,
+          "position": null,
+          "shadowRoots": null,
+          "range": null
+        },
+        {
+          "name": "past viewport x",
+          "x": 400,
+          "y": 10,
+          "position": null,
+          "shadowRoots": null,
+          "range": null
+        },
+        {
+          "name": "past viewport y",
+          "x": 10,
+          "y": 260,
+          "position": null,
+          "shadowRoots": null,
+          "range": null
+        },
+        {
+          "name": "viewport last pixel",
+          "x": 319,
+          "y": 239,
+          "position": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "shadowRoots": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          },
+          "range": {
+            "node": {
+              "kind": "element",
+              "id": null,
+              "name": "BODY",
+              "scope": "document"
+            },
+            "offset": 0,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "huge",
+          "x": 1000000000,
+          "y": 1000000000,
+          "position": null,
+          "shadowRoots": null,
+          "range": null
+        },
+        {
+          "name": "NaN x",
+          "x": "NaN",
+          "y": 10,
+          "position": {
+            "error": "TypeError"
+          },
+          "shadowRoots": {
+            "error": "TypeError"
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
+            "collapsed": true
+          }
+        },
+        {
+          "name": "Infinity y",
+          "x": 10,
+          "y": "Infinity",
+          "position": {
+            "error": "TypeError"
+          },
+          "shadowRoots": {
+            "error": "TypeError"
+          },
+          "range": {
+            "node": {
+              "kind": "text",
+              "parent": "wrap",
+              "index": 0,
+              "scope": "document"
+            },
+            "offset": 5,
             "collapsed": true
           }
         },

@@ -27,8 +27,9 @@ export const points = [
   ['past viewport x', 400, 10], ['past viewport y', 10, 260], ['viewport last pixel', 319, 239], ['huge', 1e9, 1e9],
   ['NaN x', 'NaN', 10], ['Infinity y', 10, 'Infinity'], ['-Infinity x', '-Infinity', 10],
 ];
-// [name, scrollX, scrollY]; every point above is replayed after each scroll.
-export const scrolls = [['unscrolled', 0, 0], ['scrolled 50, 590', 50, 590], ['scrolled 0.5, 20.5', 0.5, 20.5]];
+// [name, scrollX, scrollY]; every point above is replayed after each scroll. A runtime checks a scroll against the case
+// whose actual offset equals its own: 'scrolled 0, 20' is the native engine's truncation of 'scrolled 0.5, 20.5'.
+export const scrolls = [['unscrolled', 0, 0], ['scrolled 50, 590', 50, 590], ['scrolled 0.5, 20.5', 0.5, 20.5], ['scrolled 0, 20', 0, 20]];
 export const scales = [1, 1.5, 2];
 
 export function inPage() {
