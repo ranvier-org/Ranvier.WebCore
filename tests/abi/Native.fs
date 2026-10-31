@@ -41,6 +41,10 @@ type EventInit =
 [<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]
 type ResourceHandler = delegate of context: nativeint * load: nativeint * url: nativeint -> unit
 
+/// <summary>The <c>RvResourceCompletion</c> of the header: one terminal outcome with an image's natural size.</summary>
+[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]
+type ResourceCompletion = delegate of context: nativeint * outcome: int * width: int * height: int -> unit
+
 /// <summary>The <c>RvFrameCallback</c> of the header.</summary>
 [<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]
 type FrameCallback = delegate of context: nativeint -> unit
@@ -1079,23 +1083,23 @@ module Raw =
     extern nativeint rv_host_create_event_target(nativeint host)
 
     [<DllImport(Lib)>]
-    extern nativeint rv_event_target_retain(nativeint value)
+    extern nativeint rv_event_target_retain(nativeint target)
 
     [<DllImport(Lib)>]
-    extern void rv_event_target_release(nativeint value)
+    extern void rv_event_target_release(nativeint target)
 
     [<DllImport(Lib)>]
     extern nativeint rv_node_as_event_target(nativeint node)
 
     [<DllImport(Lib)>]
-    extern nativeint rv_event_target_as_node(nativeint value)
+    extern nativeint rv_event_target_as_node(nativeint target)
 
     [<DllImport(Lib)>]
     extern int rv_event_target_equals(nativeint left, nativeint right)
 
     [<DllImport(Lib)>]
     extern nativeint rv_event_target_add_listener(
-        nativeint value,
+        nativeint target,
         [<MarshalAs(UnmanagedType.LPUTF8Str)>] string ``type``,
         int flags,
         nativeint callback,
@@ -1103,7 +1107,7 @@ module Raw =
     )
 
     [<DllImport(Lib)>]
-    extern int rv_event_target_dispatch(nativeint value, nativeint ``event``, int& defaultPrevented)
+    extern int rv_event_target_dispatch(nativeint target, nativeint ``event``, int& defaultPrevented)
 
     [<DllImport(Lib)>]
     extern nativeint rv_event_get_target(nativeint ``event``, int current)
@@ -3580,29 +3584,29 @@ let rv_host_create_event_target (host: nativeint) : nativeint =
     else
         Raw.rv_host_create_event_target (host)
 
-let rv_event_target_retain (value: nativeint) : nativeint =
+let rv_event_target_retain (target: nativeint) : nativeint =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_event_target_retain (value)
+        let result = Raw.rv_event_target_retain (target)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[198] <- Calls.Counts[198] + 1L
         Calls.Ticks[198] <- Calls.Ticks[198] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_event_target_retain (value)
+        Raw.rv_event_target_retain (target)
 
-let rv_event_target_release (value: nativeint) : unit =
+let rv_event_target_release (target: nativeint) : unit =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_event_target_release (value)
+        let result = Raw.rv_event_target_release (target)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[199] <- Calls.Counts[199] + 1L
         Calls.Ticks[199] <- Calls.Ticks[199] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_event_target_release (value)
+        Raw.rv_event_target_release (target)
 
 let rv_node_as_event_target (node: nativeint) : nativeint =
     if Calls.On then
@@ -3616,17 +3620,17 @@ let rv_node_as_event_target (node: nativeint) : nativeint =
     else
         Raw.rv_node_as_event_target (node)
 
-let rv_event_target_as_node (value: nativeint) : nativeint =
+let rv_event_target_as_node (target: nativeint) : nativeint =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_event_target_as_node (value)
+        let result = Raw.rv_event_target_as_node (target)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[201] <- Calls.Counts[201] + 1L
         Calls.Ticks[201] <- Calls.Ticks[201] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_event_target_as_node (value)
+        Raw.rv_event_target_as_node (target)
 
 let rv_event_target_equals (left: nativeint, right: nativeint) : int =
     if Calls.On then
@@ -3641,13 +3645,13 @@ let rv_event_target_equals (left: nativeint, right: nativeint) : int =
         Raw.rv_event_target_equals (left, right)
 
 let rv_event_target_add_listener
-    (value: nativeint, ``type``: string, flags: int, callback: nativeint, context: nativeint)
+    (target: nativeint, ``type``: string, flags: int, callback: nativeint, context: nativeint)
     : nativeint =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
 
         let result =
-            Raw.rv_event_target_add_listener (value, ``type``, flags, callback, context)
+            Raw.rv_event_target_add_listener (target, ``type``, flags, callback, context)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[203] <- Calls.Counts[203] + 1L
@@ -3655,19 +3659,19 @@ let rv_event_target_add_listener
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_event_target_add_listener (value, ``type``, flags, callback, context)
+        Raw.rv_event_target_add_listener (target, ``type``, flags, callback, context)
 
-let rv_event_target_dispatch (value: nativeint, ``event``: nativeint, defaultPrevented: byref<int>) : int =
+let rv_event_target_dispatch (target: nativeint, ``event``: nativeint, defaultPrevented: byref<int>) : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_event_target_dispatch (value, ``event``, &defaultPrevented)
+        let result = Raw.rv_event_target_dispatch (target, ``event``, &defaultPrevented)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[204] <- Calls.Counts[204] + 1L
         Calls.Ticks[204] <- Calls.Ticks[204] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_event_target_dispatch (value, ``event``, &defaultPrevented)
+        Raw.rv_event_target_dispatch (target, ``event``, &defaultPrevented)
 
 let rv_event_get_target (``event``: nativeint, current: int) : nativeint =
     if Calls.On then
