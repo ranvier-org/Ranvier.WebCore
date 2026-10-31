@@ -194,10 +194,10 @@ def check_case(c, case, rows, layer_order):
         lines = [line for line in row['conditions'].split('\n') if line]
         keywords = want.get('conditions', [])
         p.expect(len(lines) == len(keywords) and all(line.startswith(k + ' ') for line, k in zip(lines, keywords)), label + ': conditions ' + repr(row['conditions']))
-    # One winner per level, and the deepest level's winner is the value the element computes.
+    # At most one winner per level, levels ordered from the element outwards.
     depths = sorted({r['depth'] for r in rows})
     p.expect(all(sum(r['winner'] for r in rows if r['depth'] == d) <= 1 for d in depths), name + ': at most one winner per level')
-    p.expect(depths == list(range(len(depths))), name + ': levels are consecutive from the element')
+    p.expect([r['depth'] for r in rows] == sorted(r['depth'] for r in rows), name + ': levels in order from the element')
     return [r for r in rows if r['winner']]
 
 
@@ -246,7 +246,8 @@ def run_once(native_directory, fixture, oracle):
                 p.expect(matches(case['computed'], native), case['name'] + ': native computed ' + repr(native))
                 if winners:
                     effective = max(winners, key=lambda r: r['depth'])
-                    if effective['value'] not in ('inherit', 'unset') and not effective['variable']:
+                    # User-agent values are engine-specific, and inherit, unset and var() resolve elsewhere.
+                    if effective['origin'] != ORIGINS['user-agent'] and effective['value'] not in ('inherit', 'unset') and not effective['variable']:
                         p.expect(matches(case['computed'], effective['value']), case['name'] + ': winner value equals the computed value')
             # The Chromium oracle agrees with the fixture.
             by_name = {entry['name']: entry for entry in oracle['cases']}
@@ -261,14 +262,17 @@ def run_once(native_directory, fixture, oracle):
             p.expect(again == first, 'a second query reports the same entries')
             extra = p.bind('rv_document_create_element', P, [P, ctypes.c_char_p])(p.host, b'section')
             p.retained.append(('rv_node_release', extra))
-            p.expect(p.bind('rv_node_append_child', I, [P, P])(p.bind('rv_document_body', P, [P])(p.host), extra) == OK, 'unrelated insertion')
+            body = p.bind('rv_document_body', P, [P])(p.host)
+            p.retained.append(('rv_node_release', body))
+            p.expect(p.bind('rv_node_append_child', I, [P, P])(body, extra) == OK, 'unrelated insertion')
             p.expect(set_attribute(elements['plain'], b'data-unrelated', b'1') == OK, 'unrelated attribute')
             p.update()
             mutated = {case['name']: c.entries(c.query(p.host, elements[case['element']], case['property'])) for case in fixture['cases']}
             p.expect(mutated == first, 'entries and positions unchanged after an unrelated DOM mutation')
 
             # A pending class change is read as the DOM holds it, and the query starts no style update: a change
-            # reverted before the next update leaves no transition, while a computed-style read in between starts one.
+            # reverted before the next update leaves no transition, while a computed-style read in between starts one
+            # whose jump-start step leaves the reverted value to transition back from.
             pend, probe = elements['pend'], elements['probe']
             p.expect(set_attribute(pend, b'class', b'pb') == OK, 'pending class change')
             pending = c.entries(c.query(p.host, pend, 'opacity'))
@@ -298,6 +302,19 @@ def run_once(native_directory, fixture, oracle):
             p.expect(set_attribute(probe, b'class', b'') == OK, 'control class reverted')
             p.update()
             p.expect(transitions(probe) >= 1, 'control: a computed-style read updates style and starts a transition')
+
+            # A pending style sheet insertion applies to the query; the element's style waits for the next update.
+            sheet = p.bind('rv_document_create_element', P, [P, ctypes.c_char_p])(p.host, b'style')
+            p.retained.append(('rv_node_release', sheet))
+            p.expect(p.bind('rv_node_set_text_content', I, [P, ctypes.c_char_p])(sheet, b'#plain{order:90}') == OK, 'inserted sheet text')
+            head = p.bind('rv_document_head', P, [P])(p.host)
+            p.retained.append(('rv_node_release', head))
+            p.expect(p.bind('rv_node_append_child', I, [P, P])(head, sheet) == OK, 'pending sheet insertion')
+            inserted = c.entries(c.query(p.host, elements['plain'], 'order'))
+            p.expect([(r['value'], r['winner'], r['sheet'], r['rule']) for r in inserted] == [('90', 1, 2, 0)], 'inserted sheet: ' + str(inserted))
+            p.update()
+            p.expect(c.entries(c.query(p.host, elements['plain'], 'order')) == inserted and matches(90, c.style(elements['plain'], 'order')),
+                     'the inserted sheet after the update')
 
             # Errors and fields.
             spec = elements['spec']

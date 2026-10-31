@@ -846,6 +846,46 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
 
                 if rv_diagnostic_live_count () <> live then
                     failwith "diagnostic snapshots leaked"
+        | "cascade diagnostics" ->
+            let live = rv_diagnostic_live_count ()
+            rv_host_set_diagnostics (host, 1) |> check "rv_host_set_diagnostics"
+            let name = Text.Encoding.UTF8.GetBytes "display"
+            let cascade = [| 0n |]
+
+            rv_host_inspect_cascade (host, div, name, name.Length, cascade)
+            |> check "rv_host_inspect_cascade"
+
+            let count = rv_diagnostic_count cascade[0]
+
+            if count < 1 || rv_diagnostic_kind cascade[0] <> 3 || rv_diagnostic_live_count () <> live + 1 then
+                failwith "cascade snapshot before destroy"
+
+            held.Value <- cascade[0]
+
+            fun () ->
+                let buffer = Array.zeroCreate<byte> 16
+                let length = [| 0 |]
+                rv_diagnostic_text (held.Value, buffer, buffer.Length, length) |> check "cascade text after destroy"
+
+                if Text.Encoding.UTF8.GetString(buffer, 0, length[0]) <> "display"
+                   || rv_diagnostic_count held.Value <> count
+                   || rv_diagnostic_kind held.Value <> 3 then
+                    failwith "cascade snapshot changed after destroy"
+
+                let mutable winners = 0.0
+
+                for index in 0 .. count - 1 do
+                    let mutable winner = 0.0
+                    rv_diagnostic_entry_number (held.Value, index, 6, &winner) |> check "cascade winner after destroy"
+                    winners <- winners + winner
+
+                if winners <> 1.0 then
+                    failwithf "cascade winners after destroy %f" winners
+
+                rv_diagnostic_release held.Value
+
+                if rv_diagnostic_live_count () <> live then
+                    failwith "cascade snapshot leaked"
         | "crypto" ->
             let filled = Array.zeroCreate<byte> 16
 
@@ -1037,6 +1077,7 @@ let run (outDir: string) =
                     "caret position"
                     "crypto"
                     "diagnostics"
+                    "cascade diagnostics"
                     "screen"
                     "url values"
                     "url pattern result"

@@ -1523,6 +1523,8 @@ RV_EXPORT int32_t rv_host_set_diagnostics(RvHost*, int32_t enabled);
 enum {
     RV_DIAGNOSTIC_RENDER_TREE = 1,
     RV_DIAGNOSTIC_MATCHED_RULES = 2,
+    /* v54 */
+    RV_DIAGNOSTIC_CASCADE = 3,
 };
 
 /* Flags of rv_host_inspect_render_tree. The layer flags apply to a document dump only. */
@@ -1564,6 +1566,8 @@ enum {
     RV_RULE_ORIGIN_USER = 1,
     RV_RULE_ORIGIN_AUTHOR = 2,
     RV_RULE_ORIGIN_INLINE = 3,
+    /* v54: a presentational attribute, or the direction of dir=auto; rv_host_inspect_cascade only. */
+    RV_RULE_ORIGIN_PRESENTATIONAL_HINT = 4,
 };
 
 /* Number fields of rv_diagnostic_entry_number. Specificity is the engine's (a, b, c) of the most specific selector
@@ -1593,14 +1597,14 @@ enum {
 
 /* The snapshot's RV_DIAGNOSTIC_* kind, or RV_ERR_NULL_ARGUMENT. */
 RV_EXPORT int32_t rv_diagnostic_kind(RvDiagnostic* diagnostic);
-/* Copies a render-tree snapshot's text; a matched-rules snapshot's text is empty. */
+/* Copies a render-tree snapshot's text or a cascade snapshot's property name; a matched-rules snapshot's text is empty. */
 RV_EXPORT int32_t rv_diagnostic_text(RvDiagnostic* diagnostic, char* buffer, int32_t capacity, int32_t* length);
 /* The number of entries: 0 for a render-tree snapshot. */
 RV_EXPORT int32_t rv_diagnostic_count(RvDiagnostic* diagnostic);
-/* Copies a string field of entry index. Returns RV_ERR_UNSUPPORTED for an index or field out of range. */
+/* Copies a string field of entry index. Returns RV_ERR_UNSUPPORTED for an index or field out of range for the snapshot's kind. */
 RV_EXPORT int32_t rv_diagnostic_entry_string(RvDiagnostic* diagnostic, int32_t index, int32_t field, char* buffer, int32_t capacity, int32_t* length);
 /* Writes a number field of entry index. Returns RV_ERR_UNSUPPORTED, leaving *value unchanged, for an index or field
- * out of range. */
+ * out of range for the snapshot's kind. */
 RV_EXPORT int32_t rv_diagnostic_entry_number(RvDiagnostic* diagnostic, int32_t index, int32_t field, double* value);
 RV_EXPORT void rv_diagnostic_release(RvDiagnostic* diagnostic);
 /* The number of snapshots in the process not yet released. */
@@ -1623,6 +1627,77 @@ enum {
  * or contents, an inline box, SVG content) or outside the document, or diagnostics disabled, and leaves values
  * unchanged on every error. */
 RV_EXPORT int32_t rv_host_inspect_box_model(RvHost*, RvNode* element, double* values);
+
+/* v54: "cascade-diagnostics" for rv_abi_has and as a platform facility, enabled with "diagnostics".
+ *
+ * Writes a new RV_DIAGNOSTIC_CASCADE snapshot of a longhand or custom property for an element of the host's document.
+ * property is a CSS property name of property_length UTF-8 bytes; the snapshot text is its canonical name.
+ *
+ * Entries are the declarations of the property in the element's cascade, in the engine's cascade input order: user
+ * agent, user, then author declarations, each ordered by cascade layer, specificity and position, with presentational
+ * hints first and the style attribute after the element's own rules. A logical or physical property also lists the
+ * declarations of its counterpart under the element's writing mode. RV_CASCADE_WINNER marks the declaration the
+ * engine's cascade selects, honouring !important, origin, layer and position; a level with no declaration has no
+ * winner. When the level has no winner and the property inherits, or its winner is inherit (or unset on an inherited
+ * property), the entries continue with the parent element in the composed tree at RV_CASCADE_DEPTH + 1, until a level
+ * whose winner is another value, or a level without a winner whose property does not inherit, or the root. A custom
+ * property inherits unless registered with inherits: false.
+ *
+ * The query reads the current DOM and the current rule sets, applying a pending style sheet change first; it updates
+ * no style and no layout. Container conditions are evaluated against the last layout, and a logical pair against the
+ * element's last computed writing mode. Declared limits: a winning revert or revert-layer is reported as that keyword;
+ * :visited declarations, @starting-style rules and animations are absent; RV_CASCADE_VALUE is the declared value, and
+ * var() resolution is reported by rv_element_computed_style.
+ *
+ * Returns RV_ERR_NULL_ARGUMENT for a NULL property, RV_ERR_NOT_ELEMENT for another node, RV_ERR_UNSUPPORTED for an
+ * unknown or shorthand property, a negative property_length, an element outside the document or diagnostics disabled,
+ * and leaves *diagnostic unchanged on every error. */
+RV_EXPORT int32_t rv_host_inspect_cascade(RvHost*, RvNode* element, const uint8_t* property, int32_t property_length, RvDiagnostic** diagnostic);
+
+/* Number fields of a cascade entry. The origin and specificity fields share the RV_RULE_* indices. */
+enum {
+    RV_CASCADE_ORIGIN = 0,
+    RV_CASCADE_SPECIFICITY_A = 1,
+    RV_CASCADE_SPECIFICITY_B = 2,
+    RV_CASCADE_SPECIFICITY_C = 3,
+    /* 1 for an !important declaration. */
+    RV_CASCADE_IMPORTANT = 4,
+    /* The layer's position in its origin's layer order from 0; -1 for unlayered declarations, hints and inline style. */
+    RV_CASCADE_LAYER_ORDER = 5,
+    /* 1 for the winner of its level. */
+    RV_CASCADE_WINNER = 6,
+    /* 0 for the element, n for its nth ancestor in the composed tree. */
+    RV_CASCADE_DEPTH = 7,
+    /* The rule's style sheet among the active style sheets of the element's tree scope; -1 when no active sheet holds it. */
+    RV_CASCADE_SHEET_INDEX = 8,
+    /* The rule's position among the sheet's style rules in pre-order, an imported sheet's rules in place of its
+     * @import; -1 with no sheet. */
+    RV_CASCADE_RULE_INDEX = 9,
+    /* The declaration's position in its declaration block, a shorthand counting once per longhand. */
+    RV_CASCADE_DECLARATION_INDEX = 10,
+    /* 1 for a value containing var() or another substitution function. */
+    RV_CASCADE_VARIABLE_REFERENCE = 11,
+    RV_CASCADE_NUMBER_FIELDS = 12,
+};
+
+/* String fields of a cascade entry, as the engine serialises them. The selector fields share the RV_RULE_* indices
+ * and are empty for hints and inline style. */
+enum {
+    RV_CASCADE_SELECTOR_TEXT = 0,
+    RV_CASCADE_MATCHED_SELECTOR = 1,
+    /* The declared longhand or custom property: the queried property or its logical counterpart. */
+    RV_CASCADE_PROPERTY = 2,
+    /* The declared value, without !important. */
+    RV_CASCADE_VALUE = 3,
+    /* The shorthand the declaration was expanded from, or empty. */
+    RV_CASCADE_SHORTHAND = 4,
+    /* The dotted cascade layer name, an anonymous layer as an empty segment; empty when unlayered. */
+    RV_CASCADE_LAYER = 5,
+    /* The enclosing @media, @supports and @container conditions, outermost first, one per line as the at-keyword, a
+     * space and the condition text. */
+    RV_CASCADE_CONDITIONS = 6,
+    RV_CASCADE_STRING_FIELDS = 7,
+};
 
 #ifdef __cplusplus
 }

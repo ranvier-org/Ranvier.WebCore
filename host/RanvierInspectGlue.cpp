@@ -1,6 +1,23 @@
 #include "config.h"
 #include "RanvierInspectGlue.h"
+#include "CSSConditionRule.h"
+#include "CSSContainerRule.h"
+#include "CSSCustomPropertyValue.h"
+#include "CSSImportRule.h"
+#include "CSSKeywordValueInlines.h"
+#include "CSSLayerBlockRule.h"
+#include "CSSMediaRule.h"
+#include "CSSProperty.h"
+#include "CSSPropertyNames.h"
+#include "CSSPropertyParser.h"
 #include "CSSSelector.h"
+#include "CSSStyleRule.h"
+#include "CSSStyleSheet.h"
+#include "CSSSupportsRule.h"
+#include "MatchResult.h"
+#include "PropertyCascade.h"
+#include "StyleCustomPropertyRegistry.h"
+#include "StyleScope.h"
 #include "CSSSelectorList.h"
 #include "CSSSerializationContext.h"
 #include "ContainerNodeInlines.h"
@@ -124,6 +141,297 @@ void sendRule(RanvierInspectRuleSink sink, void* context, int32_t origin, const 
 
 }
 
+namespace {
+
+struct RuleSelectors {
+    CString selectorText;
+    CString matchedSelector;
+    std::array<uint8_t, 3> specificity { };
+};
+
+RuleSelectors selectorsOf(const StyleRule& rule, Element& element)
+{
+    RuleSelectors result;
+    SelectorChecker checker(element.document());
+    SelectorChecker::CheckingContext checking(SelectorChecker::Mode::CollectingRules);
+    const CSSSelector* best = nullptr;
+    for (auto& selector : rule.selectorList()) {
+        if (!checker.match(selector, element, checking))
+            continue;
+        auto tuple = selector.computeSpecificityTuple();
+        if (!best || before(result.specificity, tuple)) {
+            best = &selector;
+            result.specificity = tuple;
+        }
+    }
+    result.selectorText = rule.selectorList().selectorsText().utf8();
+    if (best)
+        result.matchedSelector = best->selectorText().utf8();
+    return result;
+}
+
+struct RuleLocation {
+    int32_t sheet { -1 };
+    int32_t rule { -1 };
+    String layer;
+    String conditions;
+};
+
+// Locations of the style rules of a tree scope's active sheets, keyed by declaration block.
+class RuleLocations {
+public:
+    explicit RuleLocations(Style::Scope& scope)
+    {
+        int32_t sheetIndex = 0;
+        for (auto& sheet : scope.activeStyleSheets()) {
+            m_sheet = sheetIndex++;
+            m_rule = 0;
+            visitChildren(sheet.get(), { }, { });
+        }
+    }
+
+    const RuleLocation* find(const StyleRule& rule) const
+    {
+        if (auto iterator = m_locations.find(&rule); iterator != m_locations.end())
+            return &iterator->value;
+        // A rule the rule set copied from its sheet, such as a nested rule, shares its declaration block.
+        auto iterator = m_byProperties.find(&rule.properties());
+        return iterator == m_byProperties.end() || !iterator->value ? nullptr : &m_locations.find(iterator->value)->value;
+    }
+
+private:
+    template<typename Container> void visitChildren(Container& container, const String& layer, const String& conditions)
+    {
+        for (unsigned index = 0; index < container.length(); ++index) {
+            if (RefPtr rule = container.item(index))
+                visit(*rule, layer, conditions);
+        }
+    }
+
+    static String joinLayer(const String& outer, const String& name)
+    {
+        return outer.isNull() ? name : makeString(outer, '.', name);
+    }
+
+    static String joinCondition(const String& outer, ASCIILiteral keyword, const String& text)
+    {
+        auto line = makeString(keyword, ' ', text);
+        return outer.isEmpty() ? line : makeString(outer, '\n', line);
+    }
+
+    void visit(CSSRule& rule, const String& layer, const String& conditions)
+    {
+        if (auto* style = dynamicDowncast<CSSStyleRule>(rule)) {
+            auto& styleRule = style->styleRule();
+            m_locations.add(&styleRule, RuleLocation { m_sheet, m_rule++, layer, conditions });
+            // A declaration block held by several rules locates none of them.
+            auto added = m_byProperties.add(&styleRule.properties(), &styleRule);
+            if (!added.isNewEntry)
+                added.iterator->value = nullptr;
+            visitChildren(*style, layer, conditions);
+        } else if (auto* block = dynamicDowncast<CSSLayerBlockRule>(rule))
+            visitChildren(*block, joinLayer(layer, block->name()), conditions);
+        else if (auto* group = dynamicDowncast<CSSGroupingRule>(rule)) {
+            if (auto* condition = dynamicDowncast<CSSConditionRule>(*group)) {
+                auto keyword = is<CSSMediaRule>(rule) ? "@media"_s : is<CSSSupportsRule>(rule) ? "@supports"_s : "@container"_s;
+                visitChildren(*group, layer, joinCondition(conditions, keyword, condition->conditionText()));
+            } else
+                visitChildren(*group, layer, conditions);
+        }
+        else if (auto* import = dynamicDowncast<CSSImportRule>(rule)) {
+            if (RefPtr imported = import->styleSheet()) {
+                auto name = import->layerName();
+                visitChildren(*imported, name.isNull() ? layer : joinLayer(layer, name), conditions);
+            }
+        }
+    }
+
+    HashMap<const StyleRule*, RuleLocation> m_locations;
+    HashMap<const StyleProperties*, const StyleRule*> m_byProperties;
+    int32_t m_sheet { -1 };
+    int32_t m_rule { 0 };
+};
+
+struct CascadeQuery {
+    CSSPropertyID id { CSSPropertyInvalid };
+    AtomString customName;
+    bool isCustom() const { return id == CSSPropertyCustom; }
+};
+
+struct CascadeLevel {
+    struct Entry {
+        RanvierCascadeEntry fields { };
+        std::array<CString, RV_CASCADE_STRING_FIELDS> strings;
+        const CSSValue* value { nullptr };
+        Style::CascadeLayerPriority layerPriority { 0 };
+    };
+    Vector<Entry> entries;
+    const CSSValue* winner { nullptr };
+};
+
+bool declares(const CascadeQuery& query, const StyleProperties::PropertyReference& property, CSSPropertyID counterpart)
+{
+    if (query.isCustom()) {
+        auto* custom = dynamicDowncast<CSSCustomPropertyValue>(property.value());
+        return property.id() == CSSPropertyCustom && custom && custom->name() == query.customName;
+    }
+    return property.id() == query.id || (counterpart != CSSPropertyInvalid && property.id() == counterpart);
+}
+
+const CSSValue* cascadeWinner(const Style::PropertyCascade& cascade, const CascadeQuery& query, WritingMode writingMode)
+{
+    if (query.isCustom())
+        return cascade.hasCustomProperty(query.customName) ? cascade.customProperty(query.customName).cssValue[0] : nullptr;
+    if (CSSProperty::isInLogicalPropertyGroup(query.id)) {
+        auto* property = cascade.lastPropertyResolvingLogicalPropertyPair(query.id, writingMode);
+        return property ? property->cssValue[0] : nullptr;
+    }
+    return cascade.hasNormalProperty(query.id) ? cascade.normalProperty(query.id).cssValue[0] : nullptr;
+}
+
+CascadeLevel cascadeLevel(Element& element, const CascadeQuery& query, int32_t depth)
+{
+    auto& resolver = element.styleResolver();
+    bool authorAndUser = element.document().settings().authorAndUserStylesEnabled();
+
+    // Declaration blocks of the matching style rules.
+    Style::ElementRuleCollector rulesCollector(element, resolver.ruleSets(), nullptr, SelectorChecker::Mode::CollectingRules);
+    rulesCollector.setMedium(resolver.mediaQueryEvaluator());
+    rulesCollector.matchUARules();
+    size_t userAgentEnd = rulesCollector.matchedRuleList().size();
+    if (authorAndUser)
+        rulesCollector.matchUserRules();
+    size_t userEnd = rulesCollector.matchedRuleList().size();
+    if (authorAndUser)
+        rulesCollector.matchAuthorRules();
+    auto& matchedRules = rulesCollector.matchedRuleList();
+
+    Style::ElementRuleCollector collector(element, resolver.ruleSets(), nullptr);
+    collector.setMedium(resolver.mediaQueryEvaluator());
+    collector.matchAllRules(authorAndUser, true);
+    auto& matchResult = collector.matchResult();
+    RuleLocations locations(Style::Scope::forNode(element));
+
+    WritingMode writingMode;
+    if (auto* style = element.existingComputedStyle())
+        writingMode = style->writingMode();
+    auto counterpart = CSSPropertyInvalid;
+    if (!query.isCustom() && CSSProperty::isInLogicalPropertyGroup(query.id)) {
+        counterpart = CSSProperty::isDirectionAwareProperty(query.id) ? CSSProperty::resolveDirectionAwareProperty(query.id, writingMode)
+            : CSSProperty::unresolvePhysicalProperty(query.id, writingMode);
+        if (counterpart == query.id)
+            counterpart = CSSPropertyInvalid;
+    }
+
+    CascadeLevel level;
+    auto addDeclarations = [&](const Vector<Style::MatchedProperties>& declarations, int32_t baseOrigin, size_t rulesBegin, size_t rulesEnd) {
+        // The rule of each matched declaration block: the collected rules are in the same order, without hints and
+        // inline style.
+        Vector<const StyleRule*> ruleOf(declarations.size(), [](size_t) -> const StyleRule* { return nullptr; });
+        size_t cursor = rulesBegin;
+        for (size_t index = 0; index < declarations.size(); ++index) {
+            if (declarations[index].fromStyleAttribute == Style::FromStyleAttribute::Yes || cursor >= rulesEnd)
+                continue;
+            if (&matchedRules[cursor]->properties() == declarations[index].properties.ptr())
+                ruleOf[index] = matchedRules[cursor++].ptr();
+        }
+        for (size_t index = 0; index < declarations.size(); ++index) {
+            auto& matched = declarations[index];
+            if (matched.isStartingStyle == Style::IsStartingStyle::Yes)
+                continue;
+            auto* rule = ruleOf[index];
+            // A rule matching through several selectors appears once per selector; the last position is the cascade's.
+            bool later = false;
+            for (size_t next = index + 1; rule && next < declarations.size() && !later; ++next)
+                later = ruleOf[next] == rule;
+            if (later)
+                continue;
+            auto& properties = matched.properties.get();
+            int32_t origin = baseOrigin;
+            if (matched.fromStyleAttribute == Style::FromStyleAttribute::Yes)
+                origin = RV_RULE_ORIGIN_INLINE;
+            else if (!rule && baseOrigin == RV_RULE_ORIGIN_AUTHOR)
+                origin = RV_RULE_ORIGIN_PRESENTATIONAL_HINT;
+            std::optional<RuleSelectors> selectors;
+            for (unsigned position = 0; position < properties.propertyCount(); ++position) {
+                auto property = properties.propertyAt(position);
+                if (!declares(query, property, counterpart))
+                    continue;
+                if (rule && !selectors)
+                    selectors = selectorsOf(*rule, element);
+                CascadeLevel::Entry entry;
+                auto& numbers = entry.fields.numbers;
+                numbers[RV_CASCADE_ORIGIN] = origin;
+                if (selectors) {
+                    for (int part = 0; part < 3; ++part)
+                        numbers[RV_CASCADE_SPECIFICITY_A + part] = selectors->specificity[part];
+                    entry.strings[RV_CASCADE_SELECTOR_TEXT] = selectors->selectorText;
+                    entry.strings[RV_CASCADE_MATCHED_SELECTOR] = selectors->matchedSelector;
+                }
+                numbers[RV_CASCADE_IMPORTANT] = property.isImportant();
+                bool layered = origin != RV_RULE_ORIGIN_INLINE && origin != RV_RULE_ORIGIN_PRESENTATIONAL_HINT
+                    && matched.cascadeLayerPriority != Style::RuleSet::cascadeLayerPriorityForUnlayered
+                    && matched.cascadeLayerPriority != Style::RuleSet::cascadeLayerPriorityForPresentationalHints;
+                numbers[RV_CASCADE_LAYER_ORDER] = layered ? matched.cascadeLayerPriority - Style::RuleSet::cascadeLayerPriorityForPresentationalHints - 1 : -1;
+                numbers[RV_CASCADE_DEPTH] = depth;
+                auto* location = rule ? locations.find(*rule) : nullptr;
+                numbers[RV_CASCADE_SHEET_INDEX] = location ? location->sheet : -1;
+                numbers[RV_CASCADE_RULE_INDEX] = location ? location->rule : -1;
+                numbers[RV_CASCADE_DECLARATION_INDEX] = position;
+                auto* value = property.value();
+                bool substitution = value->hasSubstitutionFunctions();
+                if (auto* custom = dynamicDowncast<CSSCustomPropertyValue>(*value))
+                    substitution = custom->isVariableReference();
+                numbers[RV_CASCADE_VARIABLE_REFERENCE] = substitution;
+                entry.strings[RV_CASCADE_PROPERTY] = (property.id() == CSSPropertyCustom ? query.customName.string() : nameString(property.id()).string()).utf8();
+                entry.strings[RV_CASCADE_VALUE] = value->cssText(CSS::defaultSerializationContext()).utf8();
+                if (auto shorthand = property.shorthandID(); shorthand != CSSPropertyInvalid)
+                    entry.strings[RV_CASCADE_SHORTHAND] = nameString(shorthand).string().utf8();
+                if (location && layered)
+                    entry.strings[RV_CASCADE_LAYER] = location->layer.utf8();
+                if (location)
+                    entry.strings[RV_CASCADE_CONDITIONS] = location->conditions.utf8();
+                entry.value = value;
+                entry.layerPriority = matched.cascadeLayerPriority;
+                level.entries.append(WTF::move(entry));
+            }
+        }
+    };
+    addDeclarations(matchResult.userAgentDeclarations, RV_RULE_ORIGIN_USER_AGENT, 0, userAgentEnd);
+    addDeclarations(matchResult.userDeclarations, RV_RULE_ORIGIN_USER, userAgentEnd, userEnd);
+    addDeclarations(matchResult.authorDeclarations, RV_RULE_ORIGIN_AUTHOR, userEnd, matchedRules.size());
+
+    auto cascade = makeUnique<Style::PropertyCascade>(matchResult, Style::PropertyCascade::normalProperties());
+    level.winner = cascadeWinner(*cascade, query, writingMode);
+    // Rules sharing a declaration block share its value: the cascade applies a normal declaration last at its last
+    // position, and an important one last in its earliest layer.
+    CascadeLevel::Entry* winner = nullptr;
+    for (auto& entry : level.entries) {
+        if (!level.winner || entry.value != level.winner)
+            continue;
+        if (!winner || !entry.fields.numbers[RV_CASCADE_IMPORTANT] || entry.layerPriority <= winner->layerPriority)
+            winner = &entry;
+    }
+    if (winner)
+        winner->fields.numbers[RV_CASCADE_WINNER] = 1;
+    return level;
+}
+
+// The level's winner is inherit, or unset on an inherited property; a level without a winner inherits an inherited property.
+bool inheritsFromParent(const CascadeLevel& level, bool inherited)
+{
+    if (!level.winner)
+        return inherited;
+    if (auto* custom = dynamicDowncast<CSSCustomPropertyValue>(*level.winner)) {
+        auto keyword = custom->tryCSSWideKeyword();
+        return keyword == CSSWideKeyword::Inherit || (keyword == CSSWideKeyword::Unset && inherited);
+    }
+    auto keyword = valueID(*level.winner);
+    return keyword == CSSValueInherit || (keyword == CSSValueUnset && inherited);
+}
+
+}
+
 int32_t ranvier_inspect_render_tree(RvNode* documentHandle, RvNode* target, int32_t flags, RanvierInspectTextSink sink, void* context)
 {
     RefPtr document = documentOf(documentHandle);
@@ -221,5 +529,55 @@ int32_t ranvier_inspect_box_model(RvNode* documentHandle, RvNode* elementHandle,
         result[index * 4 + 3] = rect.height();
     }
     std::copy(std::begin(result), std::end(result), values);
+    return RV_OK;
+}
+
+int32_t ranvier_inspect_cascade(RvNode* documentHandle, RvNode* elementHandle, const uint8_t* property, int32_t propertyLength, RanvierInspectTextSink textSink, RanvierCascadeSink sink, void* context)
+{
+    RefPtr document = documentOf(documentHandle);
+    if (!document || !elementHandle || !property || !textSink || !sink)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!is<Element>(*reinterpret_cast<Node*>(elementHandle)))
+        return RV_ERR_NOT_ELEMENT;
+    RefPtr element = elementIn(*document, elementHandle);
+    if (!element || propertyLength < 0)
+        return RV_ERR_UNSUPPORTED;
+    auto name = String::fromUTF8(std::span { reinterpret_cast<const char8_t*>(property), static_cast<size_t>(propertyLength) });
+    if (name.isNull())
+        return RV_ERR_UNSUPPORTED;
+    CascadeQuery query;
+    bool inherited;
+    if (isCustomPropertyName(name)) {
+        query.id = CSSPropertyCustom;
+        query.customName = AtomString { name };
+        inherited = Style::Scope::forNode(*element).customPropertyRegistry().isInherited(query.customName);
+    } else {
+        query.id = cssPropertyID(name);
+        if (query.id == CSSPropertyInvalid || isShorthand(query.id) || !isExposed(query.id, &document->settings()))
+            return RV_ERR_UNSUPPORTED;
+        inherited = CSSProperty::isInheritedProperty(query.id);
+    }
+    // The pending style sheet changes the next style update applies; element styles stay as they are.
+    for (RefPtr<Element> scopeElement = element; scopeElement;) {
+        auto& scope = Style::Scope::forNode(*scopeElement);
+        if (scope.hasPendingUpdate())
+            scope.flushPendingUpdate();
+        RefPtr shadowRoot = scopeElement->containingShadowRoot();
+        scopeElement = shadowRoot ? shadowRoot->host() : nullptr;
+    }
+    sendText(textSink, context, query.isCustom() ? query.customName.string() : nameString(query.id).string());
+    int32_t depth = 0;
+    for (RefPtr current = element; current; current = current->parentElementInComposedTree(), ++depth) {
+        auto level = cascadeLevel(*current, query, depth);
+        for (auto& entry : level.entries) {
+            for (int field = 0; field < RV_CASCADE_STRING_FIELDS; ++field) {
+                entry.fields.strings[field] = entry.strings[field].data();
+                entry.fields.lengths[field] = static_cast<int32_t>(entry.strings[field].length());
+            }
+            sink(context, &entry.fields);
+        }
+        if (!inheritsFromParent(level, inherited))
+            break;
+    }
     return RV_OK;
 }

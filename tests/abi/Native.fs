@@ -357,6 +357,7 @@ module Calls =
             "rv_diagnostic_release"
             "rv_diagnostic_live_count"
             "rv_host_inspect_box_model"
+            "rv_host_inspect_cascade"
         |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
@@ -1260,6 +1261,8 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_host_inspect_box_model(nativeint host, nativeint element, double& values)
+    [<DllImport(Lib)>]
+    extern int rv_host_inspect_cascade(nativeint host, nativeint element, [<In>] byte[] property, int property_length, nativeint[] diagnostic)
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -4190,6 +4193,18 @@ let rv_host_inspect_box_model (host: nativeint, element: nativeint, values: byre
         result
     else
         Raw.rv_host_inspect_box_model (host, element, &values)
+
+let rv_host_inspect_cascade (host: nativeint, element: nativeint, property: byte[], property_length: int, diagnostic: nativeint[]) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_inspect_cascade (host, element, property, property_length, diagnostic)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[236] <- Calls.Counts[236] + 1L
+        Calls.Ticks[236] <- Calls.Ticks[236] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_inspect_cascade (host, element, property, property_length, diagnostic)
 
 // END GENERATED
 
