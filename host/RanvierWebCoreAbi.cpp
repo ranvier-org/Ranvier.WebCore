@@ -1310,7 +1310,10 @@ static_assert(sizeof(void*) != 8 || (sizeof(RvEventInit) == 112 && offsetof(RvEv
     && offsetof(RvEventInit, relatedTarget) == 96 && offsetof(RvEventInit, customDetailJson) == 104));
 static_assert(sizeof(RvScreenMetrics) == 36 && offsetof(RvScreenMetrics, avail_left) == 12 && offsetof(RvScreenMetrics, orientation) == 32);
 
-int32_t rv_abi_version(void) { return 48; }
+
+static_assert(sizeof(RvWindowMetrics) == 32 && offsetof(RvWindowMetrics, outerHeight) == 16 && offsetof(RvWindowMetrics, devicePixelRatio) == 24);
+
+int32_t rv_abi_version(void) { return 49; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -1341,6 +1344,8 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "viewport"))
         return 1;
     if (!std::strcmp(feature, "dom-binary-values"))
+        return 1;
+    if (!std::strcmp(feature, "accessibility-relations"))
         return 1;
     if (!std::strcmp(feature, "page-scale"))
         return 1;
@@ -5283,6 +5288,29 @@ int32_t rv_ax_children(RvAxNode* handle, RvAxNode** nodes, int32_t capacity, int
         return RV_ERR_BUFFER_TOO_SMALL;
     for (size_t i = 0; i < children.size(); ++i)
         nodes[i] = axHandle(children[i].ptr());
+    return RV_OK;
+}
+
+int32_t rv_ax_relations(RvAxNode* handle, int32_t kind, RvAxNode** nodes, int32_t capacity, int32_t* count)
+{
+    if (!count)
+        return RV_ERR_NULL_ARGUMENT;
+    if (auto status = axStatus(handle))
+        return status;
+    static constexpr AXRelation relations[] = { AXRelation::ActiveDescendant, AXRelation::ControllerFor, AXRelation::DescribedBy,
+        AXRelation::Details, AXRelation::ErrorMessage, AXRelation::FlowsTo, AXRelation::LabeledBy, AXRelation::OwnerFor };
+    if (kind < 0 || kind >= static_cast<int32_t>(std::size(relations)))
+        return RV_ERR_UNSUPPORTED;
+    Ref object = *axObject(handle);
+    updatedCache(object->document());
+    if (isGone(object))
+        return RV_ERR_DETACHED;
+    auto targets = object->relatedObjects(relations[kind]);
+    *count = static_cast<int32_t>(targets.size());
+    if (!nodes || capacity < *count)
+        return RV_ERR_BUFFER_TOO_SMALL;
+    for (size_t i = 0; i < targets.size(); ++i)
+        nodes[i] = axHandle(targets[i].ptr());
     return RV_OK;
 }
 

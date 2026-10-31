@@ -16,7 +16,7 @@ from svg_paint_probe import SvgProbe
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, WRONG_THREAD, DOM_EXCEPTION, UNSUPPORTED, WRONG_INTERFACE = 0, -1, -2, -3, -9, -11
 CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_void_p)
-ABI = 48
+ABI = 49
 CAPTURE = 1
 P, I, D = ctypes.c_void_p, ctypes.c_int32, ctypes.c_double
 QUALIFIED = {}

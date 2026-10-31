@@ -1048,6 +1048,45 @@ void clearRvDomUnionBooleanOrImportNodeOptions(RvDomUnionBooleanOrImportNodeOpti
     *value = { };
 }
 
+std::optional<std::optional<Vector<Ref<Element>>>> decodeRvDomSequenceElementNullable(const RvDomSequenceElementNullable* source, int32_t& status)
+{
+    if (!source || !source->present) return std::optional<std::optional<Vector<Ref<Element>>>> { std::in_place, std::nullopt };
+    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    Vector<Ref<Element>> result;
+    result.reserveInitialCapacity(source->count);
+    for (int32_t i = 0; i < source->count; ++i) {
+        if (!source->items[i]) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<Element> item = source->items[i] ? dynamicDowncast<Element>(*reinterpret_cast<Node*>(source->items[i])) : nullptr;
+        if (source->items[i] && !item) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        result.append(Ref { *item });
+    }
+    return std::optional<Vector<Ref<Element>>> { std::move(result) };
+}
+
+void clearRvDomSequenceElementNullable(RvDomSequenceElementNullable* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        if (value->items[i]) reinterpret_cast<Node*>(value->items[i])->deref();
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceElementNullable(V&& input, RvDomSequenceElementNullable* result)
+{
+    *result = { };
+    if (!input) return RV_OK;
+    auto&& value = *input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvNode**>(std::calloc(value.size(), sizeof(RvNode*))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        storeHandle<Node>(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+
 std::optional<Vector<String>> decodeRvDomSequenceDOMString(const RvDomSequenceDOMString* source, int32_t& status)
 {
     if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
@@ -3344,6 +3383,11 @@ void ranvier_dom_union_dom_string_or_element_creation_options_release(RvDomUnion
 void ranvier_dom_union_boolean_or_import_node_options_release(RvDomUnionBooleanOrImportNodeOptions* value)
 {
     if (isMainThread()) clearRvDomUnionBooleanOrImportNodeOptions(value);
+}
+
+void ranvier_dom_sequence_element_nullable_release(RvDomSequenceElementNullable* value)
+{
+    if (isMainThread()) clearRvDomSequenceElementNullable(value);
 }
 
 void ranvier_dom_sequence_dom_string_release(RvDomSequenceDOMString* value)
@@ -6979,6 +7023,41 @@ int32_t ranvier_dom_element_set_aria_active_descendant_element(RvNode* target, R
     return invoke([&]() -> decltype(auto) { return impl->setElementAttribute(HTMLNames::aria_activedescendantAttr, a0.get()); });
 }
 
+// Element.ariaActionsElements getter: attribute FrozenArray<Element>? ariaActionsElements; *result owns its contents; release with the matching rv_dom_*_release; RV_ERR_UNSUPPORTED while the setting ARIAActionsSupportEnabled is off
+int32_t ranvier_dom_element_get_aria_actions_elements(RvNode* target, RvDomSequenceElementNullable* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.aRIAActionsSupportEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->getElementsArrayAttributeForBindings(HTMLNames::aria_actionsAttr); }, [&](auto&& value) { return encodeRvDomSequenceElementNullable(value, result); });
+}
+
+// Element.ariaActionsElements setter: attribute FrozenArray<Element>? ariaActionsElements; RV_ERR_UNSUPPORTED while the setting ARIAActionsSupportEnabled is off
+int32_t ranvier_dom_element_set_aria_actions_elements(RvNode* target, const RvDomSequenceElementNullable* value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.aRIAActionsSupportEnabled))
+        return RV_ERR_UNSUPPORTED;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceElementNullable(value, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->setElementsArrayAttribute(HTMLNames::aria_actionsAttr, std::move(*a0)); });
+}
+
 // Element.ariaAtomic getter: attribute DOMString? ariaAtomic
 int32_t ranvier_dom_element_get_aria_atomic(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
 {
@@ -7249,6 +7328,35 @@ int32_t ranvier_dom_element_set_aria_col_span(RvNode* target, const char* value)
     return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::aria_colspanAttr, AtomString { a0.string() }); });
 }
 
+// Element.ariaControlsElements getter: attribute FrozenArray<Element>? ariaControlsElements; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_element_get_aria_controls_elements(RvNode* target, RvDomSequenceElementNullable* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getElementsArrayAttributeForBindings(HTMLNames::aria_controlsAttr); }, [&](auto&& value) { return encodeRvDomSequenceElementNullable(value, result); });
+}
+
+// Element.ariaControlsElements setter: attribute FrozenArray<Element>? ariaControlsElements
+int32_t ranvier_dom_element_set_aria_controls_elements(RvNode* target, const RvDomSequenceElementNullable* value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceElementNullable(value, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->setElementsArrayAttribute(HTMLNames::aria_controlsAttr, std::move(*a0)); });
+}
+
 // Element.ariaCurrent getter: attribute DOMString? ariaCurrent
 int32_t ranvier_dom_element_get_aria_current(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
 {
@@ -7274,6 +7382,35 @@ int32_t ranvier_dom_element_set_aria_current(RvNode* target, const char* value)
         return RV_ERR_WRONG_INTERFACE;
     StringArg a0 { value };
     return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::aria_currentAttr, AtomString { a0.atom() }); });
+}
+
+// Element.ariaDescribedByElements getter: attribute FrozenArray<Element>? ariaDescribedByElements; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_element_get_aria_described_by_elements(RvNode* target, RvDomSequenceElementNullable* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getElementsArrayAttributeForBindings(HTMLNames::aria_describedbyAttr); }, [&](auto&& value) { return encodeRvDomSequenceElementNullable(value, result); });
+}
+
+// Element.ariaDescribedByElements setter: attribute FrozenArray<Element>? ariaDescribedByElements
+int32_t ranvier_dom_element_set_aria_described_by_elements(RvNode* target, const RvDomSequenceElementNullable* value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceElementNullable(value, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->setElementsArrayAttribute(HTMLNames::aria_describedbyAttr, std::move(*a0)); });
 }
 
 // Element.ariaDescription getter: attribute DOMString? ariaDescription
@@ -7303,6 +7440,35 @@ int32_t ranvier_dom_element_set_aria_description(RvNode* target, const char* val
     return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::aria_descriptionAttr, AtomString { a0.string() }); });
 }
 
+// Element.ariaDetailsElements getter: attribute FrozenArray<Element>? ariaDetailsElements; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_element_get_aria_details_elements(RvNode* target, RvDomSequenceElementNullable* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getElementsArrayAttributeForBindings(HTMLNames::aria_detailsAttr); }, [&](auto&& value) { return encodeRvDomSequenceElementNullable(value, result); });
+}
+
+// Element.ariaDetailsElements setter: attribute FrozenArray<Element>? ariaDetailsElements
+int32_t ranvier_dom_element_set_aria_details_elements(RvNode* target, const RvDomSequenceElementNullable* value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceElementNullable(value, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->setElementsArrayAttribute(HTMLNames::aria_detailsAttr, std::move(*a0)); });
+}
+
 // Element.ariaDisabled getter: attribute DOMString? ariaDisabled
 int32_t ranvier_dom_element_get_aria_disabled(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
 {
@@ -7330,6 +7496,35 @@ int32_t ranvier_dom_element_set_aria_disabled(RvNode* target, const char* value)
     return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::aria_disabledAttr, AtomString { a0.atom() }); });
 }
 
+// Element.ariaErrorMessageElements getter: attribute FrozenArray<Element>? ariaErrorMessageElements; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_element_get_aria_error_message_elements(RvNode* target, RvDomSequenceElementNullable* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getElementsArrayAttributeForBindings(HTMLNames::aria_errormessageAttr); }, [&](auto&& value) { return encodeRvDomSequenceElementNullable(value, result); });
+}
+
+// Element.ariaErrorMessageElements setter: attribute FrozenArray<Element>? ariaErrorMessageElements
+int32_t ranvier_dom_element_set_aria_error_message_elements(RvNode* target, const RvDomSequenceElementNullable* value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceElementNullable(value, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->setElementsArrayAttribute(HTMLNames::aria_errormessageAttr, std::move(*a0)); });
+}
+
 // Element.ariaExpanded getter: attribute DOMString? ariaExpanded
 int32_t ranvier_dom_element_get_aria_expanded(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
 {
@@ -7355,6 +7550,35 @@ int32_t ranvier_dom_element_set_aria_expanded(RvNode* target, const char* value)
         return RV_ERR_WRONG_INTERFACE;
     StringArg a0 { value };
     return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::aria_expandedAttr, AtomString { a0.atom() }); });
+}
+
+// Element.ariaFlowToElements getter: attribute FrozenArray<Element>? ariaFlowToElements; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_element_get_aria_flow_to_elements(RvNode* target, RvDomSequenceElementNullable* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getElementsArrayAttributeForBindings(HTMLNames::aria_flowtoAttr); }, [&](auto&& value) { return encodeRvDomSequenceElementNullable(value, result); });
+}
+
+// Element.ariaFlowToElements setter: attribute FrozenArray<Element>? ariaFlowToElements
+int32_t ranvier_dom_element_set_aria_flow_to_elements(RvNode* target, const RvDomSequenceElementNullable* value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceElementNullable(value, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->setElementsArrayAttribute(HTMLNames::aria_flowtoAttr, std::move(*a0)); });
 }
 
 // Element.ariaHasPopup getter: attribute DOMString? ariaHasPopup
@@ -7490,6 +7714,35 @@ int32_t ranvier_dom_element_set_aria_label(RvNode* target, const char* value)
         return RV_ERR_WRONG_INTERFACE;
     StringArg a0 { value };
     return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::aria_labelAttr, AtomString { a0.string() }); });
+}
+
+// Element.ariaLabelledByElements getter: attribute FrozenArray<Element>? ariaLabelledByElements; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_element_get_aria_labelled_by_elements(RvNode* target, RvDomSequenceElementNullable* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getElementsArrayAttributeForBindings(HTMLNames::aria_labelledbyAttr); }, [&](auto&& value) { return encodeRvDomSequenceElementNullable(value, result); });
+}
+
+// Element.ariaLabelledByElements setter: attribute FrozenArray<Element>? ariaLabelledByElements
+int32_t ranvier_dom_element_set_aria_labelled_by_elements(RvNode* target, const RvDomSequenceElementNullable* value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceElementNullable(value, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->setElementsArrayAttribute(HTMLNames::aria_labelledbyAttr, std::move(*a0)); });
 }
 
 // Element.ariaLevel getter: attribute DOMString? ariaLevel

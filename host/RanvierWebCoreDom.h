@@ -96,6 +96,7 @@ typedef struct RvDomSequenceElement RvDomSequenceElement;
 typedef struct RvDomSequenceShadowRoot RvDomSequenceShadowRoot;
 typedef struct RvDomUnionDOMStringOrElementCreationOptions RvDomUnionDOMStringOrElementCreationOptions;
 typedef struct RvDomUnionBooleanOrImportNodeOptions RvDomUnionBooleanOrImportNodeOptions;
+typedef struct RvDomSequenceElementNullable RvDomSequenceElementNullable;
 typedef struct RvDomSequenceDOMString RvDomSequenceDOMString;
 typedef struct RvDomUnionBooleanOrScrollIntoViewOptions RvDomUnionBooleanOrScrollIntoViewOptions;
 typedef struct RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable;
@@ -914,6 +915,7 @@ typedef struct RvDomSequenceElement RvDomSequenceElement;
 typedef struct RvDomSequenceShadowRoot RvDomSequenceShadowRoot;
 typedef struct RvDomUnionDOMStringOrElementCreationOptions RvDomUnionDOMStringOrElementCreationOptions;
 typedef struct RvDomUnionBooleanOrImportNodeOptions RvDomUnionBooleanOrImportNodeOptions;
+typedef struct RvDomSequenceElementNullable RvDomSequenceElementNullable;
 typedef struct RvDomSequenceDOMString RvDomSequenceDOMString;
 typedef struct RvDomUnionBooleanOrScrollIntoViewOptions RvDomUnionBooleanOrScrollIntoViewOptions;
 typedef struct RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable;
@@ -1035,6 +1037,14 @@ struct RvDomUnionBooleanOrImportNodeOptions {
     int32_t tag;
     int32_t arm0;
     const RvDomImportNodeOptions* arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceElementNullable {
+    int32_t present;
+    int32_t count;
+    RvNode** items;
 };
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
@@ -1574,6 +1584,7 @@ RV_EXPORT void rv_dom_sequence_element_release(RvDomSequenceElement* value);
 RV_EXPORT void rv_dom_sequence_shadow_root_release(RvDomSequenceShadowRoot* value);
 RV_EXPORT void rv_dom_union_dom_string_or_element_creation_options_release(RvDomUnionDOMStringOrElementCreationOptions* value);
 RV_EXPORT void rv_dom_union_boolean_or_import_node_options_release(RvDomUnionBooleanOrImportNodeOptions* value);
+RV_EXPORT void rv_dom_sequence_element_nullable_release(RvDomSequenceElementNullable* value);
 RV_EXPORT void rv_dom_sequence_dom_string_release(RvDomSequenceDOMString* value);
 RV_EXPORT void rv_dom_union_boolean_or_scroll_into_view_options_release(RvDomUnionBooleanOrScrollIntoViewOptions* value);
 RV_EXPORT void rv_dom_union_boolean_or_unrestricted_double_or_dom_string_nullable_release(RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable* value);
@@ -2315,6 +2326,12 @@ RV_EXPORT int32_t rv_dom_element_set_role(RvNode* target, const char* value);
 RV_EXPORT int32_t rv_dom_element_get_aria_active_descendant_element(RvNode* target, RvNode** result);
 /* Element.ariaActiveDescendantElement setter: attribute Element? ariaActiveDescendantElement; value may be NULL */
 RV_EXPORT int32_t rv_dom_element_set_aria_active_descendant_element(RvNode* target, RvNode* value);
+/* Element.ariaActionsElements getter: attribute FrozenArray<Element>? ariaActionsElements; *result owns its contents;
+ * release with the matching rv_dom_*_release; RV_ERR_UNSUPPORTED while the setting ARIAActionsSupportEnabled is off */
+RV_EXPORT int32_t rv_dom_element_get_aria_actions_elements(RvNode* target, RvDomSequenceElementNullable* result);
+/* Element.ariaActionsElements setter: attribute FrozenArray<Element>? ariaActionsElements; RV_ERR_UNSUPPORTED while
+ * the setting ARIAActionsSupportEnabled is off */
+RV_EXPORT int32_t rv_dom_element_set_aria_actions_elements(RvNode* target, const RvDomSequenceElementNullable* value);
 /* Element.ariaAtomic getter: attribute DOMString? ariaAtomic */
 RV_EXPORT int32_t rv_dom_element_get_aria_atomic(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* Element.ariaAtomic setter: attribute DOMString? ariaAtomic; value may be NULL (null) */
@@ -2356,22 +2373,47 @@ RV_EXPORT int32_t rv_dom_element_set_aria_col_index_text(RvNode* target, const c
 RV_EXPORT int32_t rv_dom_element_get_aria_col_span(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* Element.ariaColSpan setter: attribute DOMString? ariaColSpan; value may be NULL (null) */
 RV_EXPORT int32_t rv_dom_element_set_aria_col_span(RvNode* target, const char* value);
+/* Element.ariaControlsElements getter: attribute FrozenArray<Element>? ariaControlsElements; *result owns its
+ * contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_element_get_aria_controls_elements(RvNode* target, RvDomSequenceElementNullable* result);
+/* Element.ariaControlsElements setter: attribute FrozenArray<Element>? ariaControlsElements */
+RV_EXPORT int32_t rv_dom_element_set_aria_controls_elements(RvNode* target, const RvDomSequenceElementNullable* value);
 /* Element.ariaCurrent getter: attribute DOMString? ariaCurrent */
 RV_EXPORT int32_t rv_dom_element_get_aria_current(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* Element.ariaCurrent setter: attribute DOMString? ariaCurrent; value may be NULL (null) */
 RV_EXPORT int32_t rv_dom_element_set_aria_current(RvNode* target, const char* value);
+/* Element.ariaDescribedByElements getter: attribute FrozenArray<Element>? ariaDescribedByElements; *result owns its
+ * contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_element_get_aria_described_by_elements(RvNode* target, RvDomSequenceElementNullable* result);
+/* Element.ariaDescribedByElements setter: attribute FrozenArray<Element>? ariaDescribedByElements */
+RV_EXPORT int32_t rv_dom_element_set_aria_described_by_elements(RvNode* target, const RvDomSequenceElementNullable* value);
 /* Element.ariaDescription getter: attribute DOMString? ariaDescription */
 RV_EXPORT int32_t rv_dom_element_get_aria_description(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* Element.ariaDescription setter: attribute DOMString? ariaDescription; value may be NULL (null) */
 RV_EXPORT int32_t rv_dom_element_set_aria_description(RvNode* target, const char* value);
+/* Element.ariaDetailsElements getter: attribute FrozenArray<Element>? ariaDetailsElements; *result owns its contents;
+ * release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_element_get_aria_details_elements(RvNode* target, RvDomSequenceElementNullable* result);
+/* Element.ariaDetailsElements setter: attribute FrozenArray<Element>? ariaDetailsElements */
+RV_EXPORT int32_t rv_dom_element_set_aria_details_elements(RvNode* target, const RvDomSequenceElementNullable* value);
 /* Element.ariaDisabled getter: attribute DOMString? ariaDisabled */
 RV_EXPORT int32_t rv_dom_element_get_aria_disabled(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* Element.ariaDisabled setter: attribute DOMString? ariaDisabled; value may be NULL (null) */
 RV_EXPORT int32_t rv_dom_element_set_aria_disabled(RvNode* target, const char* value);
+/* Element.ariaErrorMessageElements getter: attribute FrozenArray<Element>? ariaErrorMessageElements; *result owns its
+ * contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_element_get_aria_error_message_elements(RvNode* target, RvDomSequenceElementNullable* result);
+/* Element.ariaErrorMessageElements setter: attribute FrozenArray<Element>? ariaErrorMessageElements */
+RV_EXPORT int32_t rv_dom_element_set_aria_error_message_elements(RvNode* target, const RvDomSequenceElementNullable* value);
 /* Element.ariaExpanded getter: attribute DOMString? ariaExpanded */
 RV_EXPORT int32_t rv_dom_element_get_aria_expanded(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* Element.ariaExpanded setter: attribute DOMString? ariaExpanded; value may be NULL (null) */
 RV_EXPORT int32_t rv_dom_element_set_aria_expanded(RvNode* target, const char* value);
+/* Element.ariaFlowToElements getter: attribute FrozenArray<Element>? ariaFlowToElements; *result owns its contents;
+ * release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_element_get_aria_flow_to_elements(RvNode* target, RvDomSequenceElementNullable* result);
+/* Element.ariaFlowToElements setter: attribute FrozenArray<Element>? ariaFlowToElements */
+RV_EXPORT int32_t rv_dom_element_set_aria_flow_to_elements(RvNode* target, const RvDomSequenceElementNullable* value);
 /* Element.ariaHasPopup getter: attribute DOMString? ariaHasPopup */
 RV_EXPORT int32_t rv_dom_element_get_aria_has_popup(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* Element.ariaHasPopup setter: attribute DOMString? ariaHasPopup; value may be NULL (null) */
@@ -2392,6 +2434,11 @@ RV_EXPORT int32_t rv_dom_element_set_aria_key_shortcuts(RvNode* target, const ch
 RV_EXPORT int32_t rv_dom_element_get_aria_label(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* Element.ariaLabel setter: attribute DOMString? ariaLabel; value may be NULL (null) */
 RV_EXPORT int32_t rv_dom_element_set_aria_label(RvNode* target, const char* value);
+/* Element.ariaLabelledByElements getter: attribute FrozenArray<Element>? ariaLabelledByElements; *result owns its
+ * contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_element_get_aria_labelled_by_elements(RvNode* target, RvDomSequenceElementNullable* result);
+/* Element.ariaLabelledByElements setter: attribute FrozenArray<Element>? ariaLabelledByElements */
+RV_EXPORT int32_t rv_dom_element_set_aria_labelled_by_elements(RvNode* target, const RvDomSequenceElementNullable* value);
 /* Element.ariaLevel getter: attribute DOMString? ariaLevel */
 RV_EXPORT int32_t rv_dom_element_get_aria_level(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* Element.ariaLevel setter: attribute DOMString? ariaLevel; value may be NULL (null) */

@@ -1277,6 +1277,9 @@ class Generator(ComplexGeneratorMixin):
             return f"impl->unsignedIntegralAttribute({attribute})"
         if t == "Element":
             return f"impl->getElementAttributeForBindings({attribute})"
+        if t == "FrozenArray" and f"{interface}.{member.name}" in self.world.config.get("elementArrayReflections", []):
+            # The engine's reflected elements, a snapshot of the explicitly set elements or the attribute's IDs.
+            return f"impl->getElementsArrayAttributeForBindings({attribute})"
         if mapped.kind != "string":
             raise Unsupported(f"[Reflect] of type {t}")
         if attribute == "HTMLNames::idAttr":
@@ -1497,6 +1500,8 @@ class Generator(ComplexGeneratorMixin):
             return f"impl->setUnsignedIntegralAttribute({attribute}, {value})"
         if t == "Element":
             return f"impl->setElementAttribute({attribute}, {value})"
+        if t == "FrozenArray" and f"{interface}.{member.name}" in self.world.config.get("elementArrayReflections", []):
+            return f"impl->setElementsArrayAttribute({attribute}, {value})"
         if mapped.kind != "string":
             raise Unsupported(f"[Reflect] of type {t}")
         return f"impl->setAttributeWithoutSynchronization({attribute}, AtomString {{ {value} }})"
@@ -1521,7 +1526,10 @@ class Generator(ComplexGeneratorMixin):
         base = f"{snake(interface)}_{{}}_{snake(member.name)}{suffix}"
         idl_text = f"{'readonly ' if member.readonly else ''}attribute {member.type} {member.name}"
         # Getter.
-        if "CustomGetter" in member.attrs and f"{interface}.{member.name}" not in self.world.config.get("customGetters", []):
+        element_array = f"{interface}.{member.name}" in self.world.config.get("elementArrayReflections", [])
+        if element_array and not (self.reflect(member, False) and self.world.resolve(member.type).name == "FrozenArray"):
+            raise SystemExit(f"{interface}.{member.name}: element array reflections require [Reflect] FrozenArray<Element>?")
+        if "CustomGetter" in member.attrs and not element_array and f"{interface}.{member.name}" not in self.world.config.get("customGetters", []):
             self.skip(interface, member, "[CustomGetter]")
         else:
             try:

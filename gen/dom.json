@@ -13,7 +13,8 @@
     "byte length; only a [ReturnValue] argument maps. windowObjectBindings binds the operations of the object a readonly",
     "Window attribute (accessor) holds, called through the Window of a checked Document.",
     "eventTargetObjects lists interfaces derived directly from EventTarget whose handles are RvEventTarget references; attached is the C++ condition under which their members answer, else RV_ERR_DETACHED.",
-    "setlikeBindings and maplikeBindings bind an interface's setlike or maplike declaration through the adapter class of host/dom/<adapter>.h: size, has, values or get and entries (snapshot copies), and add or set, delete and clear unless readonly."
+    "setlikeBindings and maplikeBindings bind an interface's setlike or maplike declaration through the adapter class of host/dom/<adapter>.h: size, has, values or get and entries (snapshot copies), and add or set, delete and clear unless readonly.",
+    "elementArrayReflections lists [Reflect] FrozenArray<Element>? attributes bound to the engine's element array reflection: the getter returns a snapshot sequence, or none for null; the setter takes a sequence, or none to clear."
   ],
   "attributeBridges": {
     "Document.adoptedStyleSheets": {
@@ -715,6 +716,15 @@
   ],
   "customGetters": [
     "Node.nodeType"
+  ],
+  "elementArrayReflections": [
+    "Element.ariaActionsElements",
+    "Element.ariaControlsElements",
+    "Element.ariaDescribedByElements",
+    "Element.ariaDetailsElements",
+    "Element.ariaErrorMessageElements",
+    "Element.ariaFlowToElements",
+    "Element.ariaLabelledByElements"
   ],
   "contract": {
     "htmlTags": "html/HTMLTagNames.in",
