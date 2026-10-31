@@ -29,8 +29,11 @@ build = Path('C:/wk/build-win-slim')
 assert arguments.name.startswith('native40-candidate-'), 'Build into artifacts/native40-candidate-N'
 out = repo / 'artifacts' / arguments.name
 assert not out.exists(), 'Build into a new versioned directory'
-for unchanged in ['host/RanvierSvgViewGlue.cpp', 'host/RanvierResourceGlue.cpp', 'host/RanvierEventGlue.cpp', 'host/RanvierEventGlue.h',
-                  'host/RanvierViewportGlue.cpp', 'host/RanvierViewportGlue.h']:
+# The viewport glue changed after b8acc27 (G04) is compiled here; the other glue objects are borrowed.
+viewport_changed = subprocess.run(['git', 'diff', '--quiet', 'b8acc27', '--', 'host/RanvierViewportGlue.cpp', 'host/RanvierViewportGlue.h'],
+                                  cwd=repo).returncode != 0
+for unchanged in ['host/RanvierSvgViewGlue.cpp', 'host/RanvierResourceGlue.cpp', 'host/RanvierEventGlue.cpp', 'host/RanvierEventGlue.h'] + (
+        [] if viewport_changed else ['host/RanvierViewportGlue.cpp', 'host/RanvierViewportGlue.h']):
     diff = subprocess.run(['git', 'diff', '--quiet', 'b8acc27', '--', unchanged], cwd=repo)
     assert diff.returncode == 0, unchanged + ' changed since b8acc27: the borrowed glue object is stale'
 # The borrowed objects postdate the newest change to the patched WebKit source, except Document.cpp (patch 0035),
@@ -138,6 +141,17 @@ target, obj, code = compile_object(0, glue_target)
 if code:
     raise SystemExit('RanvierDomGlue failed')
 replacements[glue_target] = obj
+viewport_obj = None
+if viewport_changed:
+    viewport_target = 'Ranvier/host/RanvierViewportGlue.cpp.obj'
+    command_map[viewport_target] = command_map[glue_target].replace('host/dom/RanvierDomGlue.cpp', 'host/RanvierViewportGlue.cpp').replace(
+        'host\\dom\\RanvierDomGlue.cpp', 'host\\RanvierViewportGlue.cpp')
+    assert command_map[viewport_target] != command_map[glue_target]
+    command_map[viewport_target] = re.sub(r'C:[/\\]wk[/\\]ranvier-webcore[/\\]host[/\\]RanvierViewportGlue.cpp',
+                                          (repo / 'host/RanvierViewportGlue.cpp').as_posix(), command_map[viewport_target])
+    target, viewport_obj, code = compile_object(90, viewport_target)
+    if code:
+        raise SystemExit('RanvierViewportGlue failed')
 objects = {unit: replacements[unit] for unit in patched_units}
 screen_objects = {}
 for index, unit in enumerate(screen_units, start=1):
@@ -151,10 +165,12 @@ for index, unit in enumerate(screen_units, start=1):
 (out / 'replacement-objects.json').write_text(json.dumps(replacements, indent=2))
 
 extra = []
-for name in ['RanvierSvgViewGlue', 'RanvierResourceGlue', 'RanvierEventGlue', 'RanvierViewportGlue']:
+for name in ['RanvierSvgViewGlue', 'RanvierResourceGlue', 'RanvierEventGlue'] + ([] if viewport_obj else ['RanvierViewportGlue']):
     glue = glue_parent / (name + '.cpp.obj')
     borrowed[glue] = glue.stat().st_mtime_ns
     extra.append(glue.as_posix())
+if viewport_obj:
+    extra.append(Path(viewport_obj).as_posix())
 if execute(link_command('WebCore') + ' ' + ' '.join(extra) + ' Dwrite.lib', 'webcore-link'):
     raise SystemExit(1)
 
@@ -183,7 +199,7 @@ assert parent_hashes == {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for 
 hashes = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in runtime.iterdir() if p.is_file()}
 assert hashes['JavaScriptCore.dll'].startswith('95149cdc')
 receipt = {'repoHead': subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=repo, capture_output=True, text=True).stdout.strip(),
-           'parent': str(parent), 'glueParent': str(glue_parent), 'recompiled': ['RanvierDomGlue.cpp'] + [
+           'parent': str(parent), 'glueParent': str(glue_parent), 'recompiled': ['RanvierDomGlue.cpp'] + (['host/RanvierViewportGlue.cpp'] if viewport_obj else []) + [
                'host/RanvierWebCoreAbi.cpp', 'host/RanvierWebCoreDom.cpp', 'host/RanvierWebCoreUia.cpp', 'host/RanvierWebCoreD3D11.cpp'],
            'patchUnits': 'every unit patch 0037 reaches is the parent (B22) compile, newer than the patched files; the units of patch 0038 are compiled here',
            'sourceExemption': {'file': caret_source, 'reason': 'patch 0035 owner G09 object (native32-candidate-3 dom-7) reused',
