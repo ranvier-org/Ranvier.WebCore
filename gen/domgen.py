@@ -659,17 +659,27 @@ class Generator(ComplexGeneratorMixin):
             raise SystemExit(f"generated names collide: {sorted(duplicates)}")
         self.runtime_queries = []
         for root in self.world.config.get("runtimeTypeRoots", []):
-            if root not in self.handles:
+            # An Event root reads an RvEvent handle; every other root is a scoped object handle.
+            if root not in self.handles and root != "Event":
                 raise SystemExit(f"{root}: runtime type query requires a scoped object-handle root")
-            interfaces = sorted((name for name in self.world.scope if root in self.world.chain(name) and name != root),
+            # Extras are interfaces outside the scope that the query still names, such as CustomEvent.
+            extras = self.world.config.get("runtimeTypeExtras", {}).get(root, [])
+            for name in extras:
+                if name in self.world.scope or name not in self.world.interfaces:
+                    raise SystemExit(f"{root}: runtime type extra {name} must be an unscoped IDL interface")
+                self.headers.add(f"{name}.h")
+            interfaces = sorted((name for name in [*self.world.scope, *extras] if root in self.world.chain(name) and name != root),
                                 key=lambda name: (-len(self.world.chain(name)), name))
             for name in interfaces:
                 self.cast_expression(self.world.cpp_class(name), self.world.cpp_class(root), "*impl")
+            public = root in self.world.config.get("runtimeTypePublicNames", [])
             self.runtime_queries.append({
                 "root": root,
                 "function": f"rv_dom_{snake(root)}_get_interface_name",
                 "feature": f"dom-type-query:{root}",
                 "interfaces": interfaces + [root],
+                "names": [self.world.public_name(name) if public else name for name in interfaces + [root]],
+                "extras": extras,
                 "parameters": [{"ctype": f"Rv{root}*", "name": "target"}, {"ctype": "char*", "name": "buffer"},
                                {"ctype": "int32_t", "name": "capacity"}, {"ctype": "int32_t*", "name": "length"}],
             })
@@ -1236,6 +1246,10 @@ class Generator(ComplexGeneratorMixin):
         bridge = self.world.config.get("attributeBridges", {}).get(f"{interface}.{member.name}")
         if bridge:
             return bridge["getter"]
+        # A C++ getter whose type differs from the IDL type, read through the configured conversion.
+        expression = self.world.config.get("getterExpressions", {}).get(f"{interface}.{member.name}")
+        if expression:
+            return expression
         attribute = self.reflect(member, False)
         name = member.attrs.get("ImplementedAs", member.name)
         if mapped.kind == 'object' and self.world.resolve(member.type).name.startswith('SVGAnimated'):
@@ -1540,8 +1554,18 @@ class Generator(ComplexGeneratorMixin):
             if configured.get('passReceiver', True):
                 arguments = f"*impl{', ' if arguments else ''}{arguments}"
             call = f"{configured['factory']}({arguments})"
+            note = ""
+            if configured.get('globalObject'):
+                # [CallWith=CurrentGlobalObject] receives the Document's global object, absent without a frame.
+                if receiver != 'Document':
+                    raise SystemExit(f"{interface}: a globalObject constructor requires a Document receiver")
+                cls = self.world.cpp_class(interface)
+                call = (f"[&]() -> ExceptionOr<Ref<{cls}>> {{ auto* global = impl->globalObject(); if (!global) "
+                        f"return Exception {{ ExceptionCode::InvalidStateError, \"The document has no global object.\"_s }}; "
+                        f"return {configured['factory']}(*global{', ' if arguments else ''}{arguments}); }}()")
+                note = "; RV_ERR_DOM_EXCEPTION (InvalidStateError) for a document without a browsing context"
             function = Function(interface, member, "constructor", f"{snake(interface)}_create", [],
-                                f"{interface}.constructor: target is the {receiver} of the constructed object")
+                                f"{interface}.constructor: target is the {receiver} of the constructed object{note}")
             function.string_spans = configured.get('stringInputs') == 'utf8-lengths'
             self.finish(function, receiver, member, member.arguments, args, returns, call, [])
             if overloaded:
@@ -2158,7 +2182,10 @@ class Generator(ComplexGeneratorMixin):
             lines.append(f"RV_EXPORT Rv{name}* rv_dom_{snake(name)}_retain(Rv{name}*);")
         for query in self.runtime_queries:
             parameters = [(row['ctype'], row['name']) for row in query['parameters']]
-            lines.append(f"/* Concrete scoped interface name of a {query['root']} handle; borrows target. */")
+            if query['names'] != query['interfaces']:
+                lines.append(f"/* The exposed interface name of a {query['root']}, or of its nearest generated base; borrows target. */")
+            else:
+                lines.append(f"/* Concrete scoped interface name of a {query['root']} handle; borrows target. */")
             lines.append(f"RV_EXPORT int32_t {query['function']}({params_text(parameters)});")
         lines.append("")
         current = None
@@ -2338,15 +2365,15 @@ class Generator(ComplexGeneratorMixin):
                       "    if (!target || !length)", "        return RV_ERR_NULL_ARGUMENT;",
                       "    if (!isMainThread())", "        return RV_ERR_WRONG_THREAD;",
                       f"    auto* impl = reinterpret_cast<{self.world.cpp_class(root)}*>(target);"]
-            for interface in query['interfaces'][:-1]:
+            for interface, exposed in zip(query['interfaces'][:-1], query['names']):
                 conditional = self.conditional(self.world.interfaces[interface])
                 if conditional:
                     lines.append(f"#if {conditional}")
                 cast = self.cast_expression(self.world.cpp_class(interface), self.world.cpp_class(root), "*impl")
-                lines += [f"    if ({cast})", f'        return copyString("{interface}"_s, buffer, capacity, length);']
+                lines += [f"    if ({cast})", f'        return copyString("{exposed}"_s, buffer, capacity, length);']
                 if conditional:
                     lines.append("#endif")
-            lines += [f'    return copyString("{root}"_s, buffer, capacity, length);', "}", ""]
+            lines += [f'    return copyString("{query["names"][-1]}"_s, buffer, capacity, length);', "}", ""]
         lines += ["} // extern \"C\"", ""]
         return "\n".join(lines)
 

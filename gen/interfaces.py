@@ -381,6 +381,17 @@ class InterfaceEmitter:
                 if member.kind == 'attribute':
                     getter, setter = self.attribute_access[(owner, self.world.member_key(member))]
                     union_name = label(self.world.resolve(member.type))
+                    if getter and not setter:
+                        # A get-only adapter is a property with a body, as Fantomas formats it.
+                        lines += [f'        member this.{identifier(member.name)}: {result} =',
+                                  f'            let value = this.__ranvier_get_{member.name} ()']
+                        if self.world.resolve(member.type).nullable:
+                            lines += ['', '            if isNull value then', '                None', '            else',
+                                      f'                Some (unbox{union_name} value)']
+                        else:
+                            lines += [f'            unbox{union_name} value']
+                        lines += ['']
+                        continue
                     lines += [f'        member this.{identifier(member.name)}']
                     if getter:
                         lines += [f'            with get (): {result} =',

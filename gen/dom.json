@@ -190,6 +190,74 @@
       "passReceiver": false,
       "stringInputs": "utf8-lengths"
     },
+    "ErrorEvent": {
+      "receiver": "Document",
+      "factory": "ErrorEvent::create",
+      "passReceiver": false,
+      "stringInputs": "utf8-lengths",
+      "globalObject": true
+    },
+    "ProgressEvent": {
+      "receiver": "Document",
+      "factory": "ProgressEvent::create",
+      "passReceiver": false,
+      "stringInputs": "utf8-lengths"
+    },
+    "CSSAnimationEvent": {
+      "receiver": "Document",
+      "factory": "CSSAnimationEvent::create",
+      "passReceiver": false,
+      "stringInputs": "utf8-lengths"
+    },
+    "CSSTransitionEvent": {
+      "receiver": "Document",
+      "factory": "CSSTransitionEvent::create",
+      "passReceiver": false,
+      "stringInputs": "utf8-lengths"
+    },
+    "ContentVisibilityAutoStateChangeEvent": {
+      "receiver": "Document",
+      "factory": "ContentVisibilityAutoStateChangeEvent::create",
+      "passReceiver": false,
+      "stringInputs": "utf8-lengths"
+    },
+    "AnimationPlaybackEvent": {
+      "receiver": "Document",
+      "factory": "AnimationPlaybackEvent::create",
+      "passReceiver": false,
+      "stringInputs": "utf8-lengths"
+    },
+    "PageTransitionEvent": {
+      "receiver": "Document",
+      "factory": "PageTransitionEvent::create",
+      "passReceiver": false,
+      "stringInputs": "utf8-lengths"
+    },
+    "HashChangeEvent": {
+      "receiver": "Document",
+      "factory": "HashChangeEvent::create",
+      "passReceiver": false,
+      "stringInputs": "utf8-lengths"
+    },
+    "MediaQueryListEvent": {
+      "receiver": "Document",
+      "factory": "MediaQueryListEvent::create",
+      "passReceiver": false,
+      "stringInputs": "utf8-lengths"
+    },
+    "PopStateEvent": {
+      "receiver": "Document",
+      "factory": "PopStateEvent::create",
+      "passReceiver": false,
+      "stringInputs": "utf8-lengths",
+      "globalObject": true
+    },
+    "CompositionEvent": {
+      "receiver": "Document",
+      "factory": "CompositionEvent::create",
+      "passReceiver": false,
+      "stringInputs": "utf8-lengths"
+    },
     "Highlight": {
       "receiver": "Document",
       "factory": "RanvierCollectionLike::createHighlight",
@@ -202,7 +270,17 @@
     "FormDataEventInit": "FormDataEvent::Init",
     "ToggleEventInit": "ToggleEvent::Init",
     "CommandEventInit": "CommandEvent::Init",
-    "FilePropertyBag": "File::PropertyBag"
+    "FilePropertyBag": "File::PropertyBag",
+    "ErrorEventInit": "ErrorEvent::Init",
+    "ProgressEventInit": "ProgressEvent::Init",
+    "AnimationEventInit": "CSSAnimationEvent::Init",
+    "TransitionEventInit": "CSSTransitionEvent::Init",
+    "ContentVisibilityAutoStateChangeEventInit": "ContentVisibilityAutoStateChangeEvent::Init",
+    "PageTransitionEventInit": "PageTransitionEvent::Init",
+    "HashChangeEventInit": "HashChangeEvent::Init",
+    "MediaQueryListEventInit": "MediaQueryListEvent::Init",
+    "PopStateEventInit": "PopStateEvent::Init",
+    "CompositionEventInit": "CompositionEvent::Init"
   },
   "dictionaryObjectMembers": [
     "FormDataEventInit.formData"
@@ -609,6 +687,17 @@
     "URLSearchParams",
     "URLPattern",
     "VisualViewport",
+    "ErrorEvent",
+    "ProgressEvent",
+    "CSSAnimationEvent",
+    "CSSTransitionEvent",
+    "ContentVisibilityAutoStateChangeEvent",
+    "AnimationPlaybackEvent",
+    "PageTransitionEvent",
+    "HashChangeEvent",
+    "MediaQueryListEvent",
+    "PopStateEvent",
+    "BeforeUnloadEvent",
     "Highlight",
     "HighlightRegistry"
   ],
@@ -697,7 +786,8 @@
     "DOMRectReadOnly",
     "DOMPointReadOnly",
     "DOMMatrixReadOnly",
-    "CSSTransformComponent"
+    "CSSTransformComponent",
+    "Event"
   ],
   "interfaceHeaders": {
     "SVGAnimatedInteger": "svg/properties/SVGAnimatedPropertyImpl.h",
@@ -728,7 +818,14 @@
     ]
   },
   "eventInterfaceCasts": [
-    "FormDataEvent"
+    "FormDataEvent",
+    "ProgressEvent",
+    "ContentVisibilityAutoStateChangeEvent",
+    "PageTransitionEvent",
+    "HashChangeEvent",
+    "MediaQueryListEvent",
+    "PopStateEvent",
+    "CustomEvent"
   ],
   "castVia": {
     "SVGAnimationElement": "SVGElement",
@@ -815,7 +912,16 @@
     "HTMLImageElement.decode",
     "HTMLInputElement.showPicker",
     "HTMLSelectElement.showPicker",
-    "NodeFilter.acceptNode"
+    "NodeFilter.acceptNode",
+    "ErrorEvent.error",
+    "ErrorEventInit.error",
+    "PopStateEvent.state",
+    "PopStateEventInit.state",
+    "CSSAnimationEvent.animation",
+    "AnimationEventInit.animation",
+    "CSSTransitionEvent.animation",
+    "TransitionEventInit.animation",
+    "UIEventInit.view"
   ],
   "namespaceBindings": {
     "DOMCSSNamespace": {
@@ -1027,6 +1133,18 @@
   "sequenceStringSpans": [
     "URLSearchParams"
   ],
+  "runtimeTypePublicNames": [
+    "Event"
+  ],
+  "runtimeTypeExtras": {
+    "Event": [
+      "CustomEvent"
+    ]
+  },
+  "getterExpressions": {
+    "AnimationPlaybackEvent.currentTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->currentTime()) return CSSNumberish { *time }; return std::nullopt; }()",
+    "AnimationPlaybackEvent.timelineTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->timelineTime()) return CSSNumberish { *time }; return std::nullopt; }()"
+  },
   "setlikeBindings": {
     "Highlight": {
       "adapter": "RanvierCollectionLike"
