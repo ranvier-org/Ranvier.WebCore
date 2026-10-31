@@ -461,6 +461,10 @@ jobs:
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/image_decode.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
+      - name: Verify notifications through an application presenter
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/notifications.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
       - name: Verify font readiness without JavaScript
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/font_load.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native" --webkit-source "${{ env.RANVIER_WORK }}/src"

@@ -493,6 +493,45 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
 
                 if viewportCalls <> 0 then
                     failwith "scroll listener ran after host destroy"
+        | "notification" ->
+            let mutable options = NotificationOptions()
+            options.size <- 64
+            options.dir <- 0
+            options.silent <- -1
+            options.body_length <- -1
+            options.tag_length <- -1
+            options.lang_length <- -1
+            options.icon_length <- -1
+            let title = Text.Encoding.UTF8.GetBytes "kept"
+            let created = [| 0n |]
+
+            rv_notification_create (host, title, title.Length, &options, created)
+            |> check "notification create"
+
+            held.Value <- created[0]
+
+            let listener =
+                rv_event_target_add_listener (held.Value, "click", 0, viewportCallback, 0n)
+
+            if listener = 0n then
+                failwith "no notification listener"
+
+            fun () ->
+                let buffer = Array.zeroCreate<byte> 16
+                let length = [| -1 |]
+
+                rv_notification_string (held.Value, 0, buffer, buffer.Length, length)
+                |> check "notification title after destroy"
+
+                if Text.Encoding.UTF8.GetString (buffer, 0, length[0]) <> "kept" then
+                    failwith "notification title changed after destroy"
+
+                rv_notification_close held.Value |> check "notification close after destroy"
+                rv_listener_remove listener |> check "notification listener removal after destroy"
+                rv_event_target_release held.Value
+
+                if viewportCalls <> 0 then
+                    failwith "notification listener ran after host destroy"
         | "coordinate spaces" ->
             rv_element_set_style (div, "width", "40px", 0) |> check "div width"
             rv_element_set_style (div, "height", "20px", 0) |> check "div height"
@@ -1295,6 +1334,7 @@ let run (outDir: string) =
                     "string results"
                     "aria relations"
                     "coordinate spaces"
+                    "notification"
                 ] do
                 for remove in [ false; true ] do
                     releaseAfterDestroy kind remove
