@@ -252,9 +252,12 @@ int32_t rv_dom_character_data_before(RvNode* target, const RvDomSequenceNodeOrDO
 int32_t rv_dom_character_data_after(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes) { return ranvier_dom_character_data_after(target, nodes); }
 int32_t rv_dom_character_data_replace_with(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes) { return ranvier_dom_character_data_replace_with(target, nodes); }
 int32_t rv_dom_character_data_remove(RvNode* target) { return ranvier_dom_character_data_remove(target); }
+int32_t rv_dom_text_create(RvNode* target, const uint8_t* data, int32_t data_length, RvNode** result) { return ranvier_dom_text_create(target, data, data_length, result); }
 int32_t rv_dom_text_get_whole_text(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_text_get_whole_text(target, buffer, capacity, length); }
 int32_t rv_dom_text_get_assigned_slot(RvNode* target, RvNode** result) { return ranvier_dom_text_get_assigned_slot(target, result); }
 int32_t rv_dom_text_split_text(RvNode* target, uint32_t offset, RvNode** result) { return ranvier_dom_text_split_text(target, offset, result); }
+int32_t rv_dom_comment_create(RvNode* target, const uint8_t* data, int32_t data_length, RvNode** result) { return ranvier_dom_comment_create(target, data, data_length, result); }
+int32_t rv_dom_document_fragment_create(RvNode* target, RvNode** result) { return ranvier_dom_document_fragment_create(target, result); }
 int32_t rv_dom_document_fragment_get_children(RvNode* target, RvHTMLCollection** result) { return ranvier_dom_document_fragment_get_children(target, result); }
 int32_t rv_dom_document_fragment_get_first_element_child(RvNode* target, RvNode** result) { return ranvier_dom_document_fragment_get_first_element_child(target, result); }
 int32_t rv_dom_document_fragment_get_last_element_child(RvNode* target, RvNode** result) { return ranvier_dom_document_fragment_get_last_element_child(target, result); }
@@ -286,6 +289,7 @@ int32_t rv_dom_shadow_root_element_from_point(RvNode* target, double x, double y
 int32_t rv_dom_shadow_root_elements_from_point(RvNode* target, double x, double y, RvDomSequenceElement* result) { return ranvier_dom_shadow_root_elements_from_point(target, x, y, result); }
 int32_t rv_dom_shadow_root_set_html_unsafe(RvNode* target, const uint8_t* html, int32_t html_length) { return ranvier_dom_shadow_root_set_html_unsafe(target, html, html_length); }
 int32_t rv_dom_shadow_root_get_html(RvNode* target, const RvDomGetHTMLOptions* options, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_shadow_root_get_html(target, options, buffer, capacity, length); }
+int32_t rv_dom_document_create(RvNode* target, RvNode** result) { return ranvier_dom_document_create(target, result); }
 int32_t rv_dom_document_get_implementation(RvNode* target, RvDOMImplementation** result) { return ranvier_dom_document_get_implementation(target, result); }
 int32_t rv_dom_document_get_compat_mode(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_document_get_compat_mode(target, buffer, capacity, length); }
 int32_t rv_dom_document_get_character_set(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_document_get_character_set(target, buffer, capacity, length); }
@@ -1847,6 +1851,8 @@ int32_t rv_dom_abstract_range_get_start_offset(RvAbstractRange* target, uint32_t
 int32_t rv_dom_abstract_range_get_end_container(RvAbstractRange* target, RvNode** result) { return ranvier_dom_abstract_range_get_end_container(target, result); }
 int32_t rv_dom_abstract_range_get_end_offset(RvAbstractRange* target, uint32_t* result) { return ranvier_dom_abstract_range_get_end_offset(target, result); }
 int32_t rv_dom_abstract_range_get_collapsed(RvAbstractRange* target, int32_t* result) { return ranvier_dom_abstract_range_get_collapsed(target, result); }
+int32_t rv_dom_static_range_create(RvNode* target, const RvDomStaticRangeInit* init, RvAbstractRange** result) { return ranvier_dom_static_range_create(target, init, result); }
+int32_t rv_dom_range_create(RvNode* target, RvAbstractRange** result) { return ranvier_dom_range_create(target, result); }
 int32_t rv_dom_range_get_common_ancestor_container(RvAbstractRange* target, RvNode** result) { return ranvier_dom_range_get_common_ancestor_container(target, result); }
 int32_t rv_dom_range_set_start(RvAbstractRange* target, RvNode* node, uint32_t offset) { return ranvier_dom_range_set_start(target, node, offset); }
 int32_t rv_dom_range_set_end(RvAbstractRange* target, RvNode* node, uint32_t offset) { return ranvier_dom_range_set_end(target, node, offset); }
@@ -2122,6 +2128,7 @@ int32_t rv_dom_mouse_event_get_y(RvEvent* target, double* result) { return ranvi
 int32_t rv_dom_mouse_event_get_from_element(RvEvent* target, RvNode** result) { return ranvier_dom_mouse_event_get_from_element(target, result); }
 int32_t rv_dom_mouse_event_get_to_element(RvEvent* target, RvNode** result) { return ranvier_dom_mouse_event_get_to_element(target, result); }
 int32_t rv_dom_mouse_event_get_modifier_state(RvEvent* target, const uint8_t* key_arg, int32_t key_arg_length, int32_t* result) { return ranvier_dom_mouse_event_get_modifier_state(target, key_arg, key_arg_length, result); }
+int32_t rv_dom_pointer_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomPointerEventInit* event_init_dict, RvEvent** result) { return ranvier_dom_pointer_event_create(target, type, type_length, event_init_dict, result); }
 int32_t rv_dom_pointer_event_get_pointer_id(RvEvent* target, int32_t* result) { return ranvier_dom_pointer_event_get_pointer_id(target, result); }
 int32_t rv_dom_pointer_event_get_width(RvEvent* target, double* result) { return ranvier_dom_pointer_event_get_width(target, result); }
 int32_t rv_dom_pointer_event_get_height(RvEvent* target, double* result) { return ranvier_dom_pointer_event_get_height(target, result); }
@@ -2136,6 +2143,7 @@ int32_t rv_dom_pointer_event_get_pointer_type(RvEvent* target, char* buffer, int
 int32_t rv_dom_pointer_event_get_is_primary(RvEvent* target, int32_t* result) { return ranvier_dom_pointer_event_get_is_primary(target, result); }
 int32_t rv_dom_pointer_event_get_coalesced_events(RvEvent* target, RvDomSequencePointerEvent* result) { return ranvier_dom_pointer_event_get_coalesced_events(target, result); }
 int32_t rv_dom_pointer_event_get_predicted_events(RvEvent* target, RvDomSequencePointerEvent* result) { return ranvier_dom_pointer_event_get_predicted_events(target, result); }
+int32_t rv_dom_wheel_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomWheelEventInit* event_init_dict, RvEvent** result) { return ranvier_dom_wheel_event_create(target, type, type_length, event_init_dict, result); }
 int32_t rv_dom_wheel_event_get_delta_x(RvEvent* target, double* result) { return ranvier_dom_wheel_event_get_delta_x(target, result); }
 int32_t rv_dom_wheel_event_get_delta_y(RvEvent* target, double* result) { return ranvier_dom_wheel_event_get_delta_y(target, result); }
 int32_t rv_dom_wheel_event_get_delta_z(RvEvent* target, double* result) { return ranvier_dom_wheel_event_get_delta_z(target, result); }
@@ -2157,6 +2165,7 @@ int32_t rv_dom_keyboard_event_get_char_code(RvEvent* target, uint32_t* result) {
 int32_t rv_dom_keyboard_event_get_key_code(RvEvent* target, uint32_t* result) { return ranvier_dom_keyboard_event_get_key_code(target, result); }
 int32_t rv_dom_keyboard_event_get_modifier_state(RvEvent* target, const uint8_t* key_arg, int32_t key_arg_length, int32_t* result) { return ranvier_dom_keyboard_event_get_modifier_state(target, key_arg, key_arg_length, result); }
 int32_t rv_dom_focus_event_get_related_target(RvEvent* target, RvNode** result) { return ranvier_dom_focus_event_get_related_target(target, result); }
+int32_t rv_dom_input_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomInputEventInit* event_init_dict, RvEvent** result) { return ranvier_dom_input_event_create(target, type, type_length, event_init_dict, result); }
 int32_t rv_dom_input_event_get_input_type(RvEvent* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_input_event_get_input_type(target, buffer, capacity, length); }
 int32_t rv_dom_input_event_get_data(RvEvent* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_input_event_get_data(target, buffer, capacity, length); }
 int32_t rv_dom_input_event_get_is_composing(RvEvent* target, int32_t* result) { return ranvier_dom_input_event_get_is_composing(target, result); }
@@ -2868,7 +2877,11 @@ int32_t rv_dom_screen_get_avail_width(RvNode* target, int32_t* result) { return 
 int32_t rv_dom_screen_orientation_get_type(RvNode* target, int32_t* result) { return ranvier_dom_screen_orientation_get_type(target, result); }
 int32_t rv_dom_screen_orientation_get_angle(RvNode* target, uint16_t* result) { return ranvier_dom_screen_orientation_get_angle(target, result); }
 int32_t rv_dom_dom_matrix_read_only_from_matrix(RvNode* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_read_only_from_matrix(target, other, result); }
+int32_t rv_dom_dom_matrix_read_only_from_float32_array(RvNode* target, const float* array32, int32_t array32_count, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_read_only_from_float32_array(target, array32, array32_count, result); }
+int32_t rv_dom_dom_matrix_read_only_from_float64_array(RvNode* target, const double* array64, int32_t array64_count, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_read_only_from_float64_array(target, array64, array64_count, result); }
 int32_t rv_dom_dom_matrix_from_matrix(RvNode* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_from_matrix(target, other, result); }
+int32_t rv_dom_dom_matrix_from_float32_array(RvNode* target, const float* array32, int32_t array32_count, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_from_float32_array(target, array32, array32_count, result); }
+int32_t rv_dom_dom_matrix_from_float64_array(RvNode* target, const double* array64, int32_t array64_count, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_from_float64_array(target, array64, array64_count, result); }
 int32_t rv_dom_dom_rect_read_only_from_rect(RvNode* target, const RvDomDOMRectInit* other, RvDOMRectReadOnly** result) { return ranvier_dom_dom_rect_read_only_from_rect(target, other, result); }
 int32_t rv_dom_dom_rect_from_rect(RvNode* target, const RvDomDOMRectInit* other, RvDOMRectReadOnly** result) { return ranvier_dom_dom_rect_from_rect(target, other, result); }
 int32_t rv_dom_dom_point_read_only_from_point(RvNode* target, const RvDomDOMPointInit* other, RvDOMPointReadOnly** result) { return ranvier_dom_dom_point_read_only_from_point(target, other, result); }
@@ -2881,6 +2894,7 @@ int32_t rv_dom_domurl_parse(RvNode* target, const uint8_t* url, int32_t url_leng
 int32_t rv_dom_domurl_can_parse(RvNode* target, const uint8_t* url, int32_t url_length, const uint8_t* base, int32_t base_length, int32_t* result) { return ranvier_dom_domurl_can_parse(target, url, url_length, base, base_length, result); }
 int32_t rv_dom_domurl_create_object_url(RvNode* target, RvBlob* blob, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_domurl_create_object_url(target, blob, buffer, capacity, length); }
 int32_t rv_dom_domurl_revoke_object_url(RvNode* target, const uint8_t* url, int32_t url_length) { return ranvier_dom_domurl_revoke_object_url(target, url, url_length); }
+int32_t rv_dom_document_parse_html_unsafe(RvNode* target, const uint8_t* html, int32_t html_length, RvNode** result) { return ranvier_dom_document_parse_html_unsafe(target, html, html_length, result); }
 int32_t rv_dom_style_property_map_read_only_entries(RvStylePropertyMapReadOnly* target, RvNode* context, RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* result) { return ranvier_dom_style_property_map_read_only_entries(target, context, result); }
 int32_t rv_dom_dom_form_data_entries(RvDOMFormData* target, RvNode* context, RvDomSequencePairUSVStringAndUnionFileOrUSVString* result) { return ranvier_dom_dom_form_data_entries(target, context, result); }
 int32_t rv_dom_url_search_params_entries(RvURLSearchParams* target, RvNode* context, RvDomSequencePairUSVStringAndUSVString* result) { return ranvier_dom_url_search_params_entries(target, context, result); }

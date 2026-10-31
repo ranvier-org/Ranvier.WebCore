@@ -8798,6 +8798,78 @@
     },
     {
       "interface": "Text",
+      "member": "constructor",
+      "contractOwner": "Text",
+      "kind": "constructor",
+      "function": "rv_dom_text_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "data"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "data_length"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "data",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "\"\"",
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "Text",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "Text",
+        "root": null,
+        "class": "Text",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:Text",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "Text",
       "member": "wholeText",
       "contractOwner": "Text",
       "kind": "getter",
@@ -8940,6 +9012,117 @@
         "atom": false,
         "subtypes": []
       },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "Comment",
+      "member": "constructor",
+      "contractOwner": "Comment",
+      "kind": "constructor",
+      "function": "rv_dom_comment_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "data"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "data_length"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "data",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "\"\"",
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "Comment",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "Comment",
+        "root": null,
+        "class": "Comment",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:Comment",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DocumentFragment",
+      "member": "constructor",
+      "contractOwner": "DocumentFragment",
+      "kind": "constructor",
+      "function": "rv_dom_document_fragment_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DocumentFragment",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "DocumentFragment",
+        "root": null,
+        "class": "DocumentFragment",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:DocumentFragment",
       "stringInputs": "utf8-lengths"
     },
     {
@@ -10820,6 +11003,45 @@
         "atom": false,
         "subtypes": []
       },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "Document",
+      "member": "constructor",
+      "contractOwner": "Document",
+      "kind": "constructor",
+      "function": "rv_dom_document_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "Document",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "Document",
+        "root": null,
+        "class": "Document",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:Document",
       "stringInputs": "utf8-lengths"
     },
     {
@@ -97488,6 +97710,113 @@
       }
     },
     {
+      "interface": "StaticRange",
+      "member": "constructor",
+      "contractOwner": "StaticRange",
+      "kind": "constructor",
+      "function": "rv_dom_static_range_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomStaticRangeInit*",
+          "name": "init"
+        },
+        {
+          "ctype": "RvAbstractRange**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "init",
+          "idlType": "StaticRangeInit",
+          "idl": {
+            "name": "StaticRangeInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "StaticRangeInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "StaticRange",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "StaticRange",
+        "root": "AbstractRange",
+        "class": "StaticRange",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:StaticRange",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "Range",
+      "member": "constructor",
+      "contractOwner": "Range",
+      "kind": "constructor",
+      "function": "rv_dom_range_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvAbstractRange**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "Range",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "Range",
+        "root": "AbstractRange",
+        "class": "Range",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:Range",
+      "stringInputs": "utf8-lengths"
+    },
+    {
       "interface": "Range",
       "member": "commonAncestorContainer",
       "contractOwner": "Range",
@@ -113225,6 +113554,106 @@
     },
     {
       "interface": "PointerEvent",
+      "member": "constructor",
+      "contractOwner": "PointerEvent",
+      "kind": "constructor",
+      "function": "rv_dom_pointer_event_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "type"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "type_length"
+        },
+        {
+          "ctype": "const RvDomPointerEventInit*",
+          "name": "event_init_dict"
+        },
+        {
+          "ctype": "RvEvent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "type",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "eventInitDict",
+          "idlType": "PointerEventInit",
+          "idl": {
+            "name": "PointerEventInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "PointerEventInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "PointerEvent",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "event",
+        "ctype": null,
+        "interface": "PointerEvent",
+        "root": null,
+        "class": "PointerEvent",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:PointerEvent",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "PointerEvent",
       "member": "pointerId",
       "contractOwner": "PointerEvent",
       "kind": "getter",
@@ -113773,6 +114202,106 @@
           }
         ]
       },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "WheelEvent",
+      "member": "constructor",
+      "contractOwner": "WheelEvent",
+      "kind": "constructor",
+      "function": "rv_dom_wheel_event_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "type"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "type_length"
+        },
+        {
+          "ctype": "const RvDomWheelEventInit*",
+          "name": "event_init_dict"
+        },
+        {
+          "ctype": "RvEvent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "type",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "eventInitDict",
+          "idlType": "WheelEventInit",
+          "idl": {
+            "name": "WheelEventInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "WheelEventInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "WheelEvent",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "event",
+        "ctype": null,
+        "interface": "WheelEvent",
+        "root": null,
+        "class": "WheelEvent",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:WheelEvent",
       "stringInputs": "utf8-lengths"
     },
     {
@@ -114588,6 +115117,106 @@
         "atom": false,
         "subtypes": []
       }
+    },
+    {
+      "interface": "InputEvent",
+      "member": "constructor",
+      "contractOwner": "InputEvent",
+      "kind": "constructor",
+      "function": "rv_dom_input_event_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "type"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "type_length"
+        },
+        {
+          "ctype": "const RvDomInputEventInit*",
+          "name": "event_init_dict"
+        },
+        {
+          "ctype": "RvEvent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "type",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "eventInitDict",
+          "idlType": "InputEventInit",
+          "idl": {
+            "name": "InputEventInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "InputEventInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "InputEvent",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "event",
+        "ctype": null,
+        "interface": "InputEvent",
+        "root": null,
+        "class": "InputEvent",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:InputEvent",
+      "stringInputs": "utf8-lengths"
     },
     {
       "interface": "InputEvent",
@@ -148962,6 +149591,152 @@
       "stringInputs": "utf8-lengths"
     },
     {
+      "interface": "DOMMatrixReadOnly",
+      "member": "fromFloat32Array",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "static_operation",
+      "function": "rv_dom_dom_matrix_read_only_from_float32_array",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const float*",
+          "name": "array32"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "array32_count"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "array32",
+          "idlType": "Float32Array",
+          "idl": {
+            "name": "Float32Array",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "typedinput",
+            "ctype": "float",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "Float32Array",
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrixReadOnly",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrixReadOnly",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrixReadOnly",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-geometry-matrix-readonly",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "fromFloat64Array",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "static_operation",
+      "function": "rv_dom_dom_matrix_read_only_from_float64_array",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const double*",
+          "name": "array64"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "array64_count"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "array64",
+          "idlType": "Float64Array",
+          "idl": {
+            "name": "Float64Array",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "typedinput",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "Float64Array",
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrixReadOnly",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrixReadOnly",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrixReadOnly",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-geometry-matrix-readonly",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths"
+    },
+    {
       "interface": "DOMMatrix",
       "member": "fromMatrix",
       "contractOwner": "DOMMatrix",
@@ -149002,6 +149777,152 @@
             "class": null,
             "enum": null,
             "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-geometry-matrix",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "fromFloat32Array",
+      "contractOwner": "DOMMatrix",
+      "kind": "static_operation",
+      "function": "rv_dom_dom_matrix_from_float32_array",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const float*",
+          "name": "array32"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "array32_count"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "array32",
+          "idlType": "Float32Array",
+          "idl": {
+            "name": "Float32Array",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "typedinput",
+            "ctype": "float",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "Float32Array",
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-geometry-matrix",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "fromFloat64Array",
+      "contractOwner": "DOMMatrix",
+      "kind": "static_operation",
+      "function": "rv_dom_dom_matrix_from_float64_array",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const double*",
+          "name": "array64"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "array64_count"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "array64",
+          "idlType": "Float64Array",
+          "idl": {
+            "name": "Float64Array",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "typedinput",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "Float64Array",
             "nullable": false,
             "atom": false,
             "subtypes": []
@@ -150026,6 +150947,90 @@
       },
       "receiver": "Document",
       "feature": "blob-urls",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "Document",
+      "member": "parseHTMLUnsafe",
+      "contractOwner": "Document",
+      "kind": "static_operation",
+      "function": "rv_dom_document_parse_html_unsafe",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "html"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "html_length"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "html",
+          "idlType": "(TrustedHTML or DOMString)",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "TrustedHTML",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "DOMString",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "Document",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "Document",
+        "root": null,
+        "class": "Document",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-document-parse-html",
       "binding": "facade",
       "stringInputs": "utf8-lengths"
     },
@@ -154704,6 +155709,84 @@
         }
       }
     ],
+    "StaticRangeInit": [
+      {
+        "name": "startContainer",
+        "field": "start_container",
+        "ctype": "RvNode*",
+        "required": true,
+        "default": null,
+        "mapping": {
+          "kind": "node",
+          "ctype": null,
+          "interface": "Node",
+          "root": null,
+          "class": "Node",
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "startOffset",
+        "field": "start_offset",
+        "ctype": "uint32_t",
+        "required": true,
+        "default": null,
+        "mapping": {
+          "kind": "number",
+          "ctype": "uint32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "endContainer",
+        "field": "end_container",
+        "ctype": "RvNode*",
+        "required": true,
+        "default": null,
+        "mapping": {
+          "kind": "node",
+          "ctype": null,
+          "interface": "Node",
+          "root": null,
+          "class": "Node",
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "endOffset",
+        "field": "end_offset",
+        "ctype": "uint32_t",
+        "required": true,
+        "default": null,
+        "mapping": {
+          "kind": "number",
+          "ctype": "uint32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
     "GetComposedRangesOptions": [
       {
         "name": "shadowRoots",
@@ -155244,6 +156327,1235 @@
         "mapping": {
           "kind": "number",
           "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "PointerEventInit": [
+      {
+        "name": "bubbles",
+        "field": "bubbles",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "cancelable",
+        "field": "cancelable",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "composed",
+        "field": "composed",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "detail",
+        "field": "detail",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "ctrlKey",
+        "field": "ctrl_key",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "shiftKey",
+        "field": "shift_key",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "altKey",
+        "field": "alt_key",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "metaKey",
+        "field": "meta_key",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "modifierAltGraph",
+        "field": "modifier_alt_graph",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "modifierCapsLock",
+        "field": "modifier_caps_lock",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "screenX",
+        "field": "screen_x",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "screenY",
+        "field": "screen_y",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "clientX",
+        "field": "client_x",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "clientY",
+        "field": "client_y",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "button",
+        "field": "button",
+        "ctype": "int16_t",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "int16_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "buttons",
+        "field": "buttons",
+        "ctype": "uint16_t",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "uint16_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "relatedTarget",
+        "field": "related_target",
+        "ctype": "RvEventTarget*",
+        "required": false,
+        "default": "null",
+        "mapping": {
+          "kind": "node",
+          "ctype": null,
+          "interface": "EventTarget",
+          "root": null,
+          "class": "EventTarget",
+          "enum": null,
+          "label": null,
+          "nullable": true,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "movementX",
+        "field": "movement_x",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "movementY",
+        "field": "movement_y",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "pointerId",
+        "field": "pointer_id",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "width",
+        "field": "width",
+        "ctype": "double",
+        "required": false,
+        "default": "1",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "height",
+        "field": "height",
+        "ctype": "double",
+        "required": false,
+        "default": "1",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "pressure",
+        "field": "pressure",
+        "ctype": "float",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "float",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "tangentialPressure",
+        "field": "tangential_pressure",
+        "ctype": "float",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "float",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "tiltX",
+        "field": "tilt_x",
+        "ctype": "const int32_t*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "number",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "tiltY",
+        "field": "tilt_y",
+        "ctype": "const int32_t*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "number",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "twist",
+        "field": "twist",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "pointerType",
+        "field": "pointer_type",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "\"\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "isPrimary",
+        "field": "is_primary",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "coalescedEvents",
+        "field": "coalesced_events",
+        "ctype": "const RvDomSequencePointerEvent*",
+        "required": false,
+        "default": "[]",
+        "mapping": {
+          "kind": "sequence",
+          "ctype": "RvDomSequencePointerEvent",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": "PointerEvent sequence",
+          "nullable": false,
+          "atom": false,
+          "subtypes": [
+            {
+              "kind": "event",
+              "ctype": null,
+              "interface": "PointerEvent",
+              "root": null,
+              "class": "PointerEvent",
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": []
+            }
+          ]
+        }
+      },
+      {
+        "name": "predictedEvents",
+        "field": "predicted_events",
+        "ctype": "const RvDomSequencePointerEvent*",
+        "required": false,
+        "default": "[]",
+        "mapping": {
+          "kind": "sequence",
+          "ctype": "RvDomSequencePointerEvent",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": "PointerEvent sequence",
+          "nullable": false,
+          "atom": false,
+          "subtypes": [
+            {
+              "kind": "event",
+              "ctype": null,
+              "interface": "PointerEvent",
+              "root": null,
+              "class": "PointerEvent",
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": []
+            }
+          ]
+        }
+      }
+    ],
+    "WheelEventInit": [
+      {
+        "name": "bubbles",
+        "field": "bubbles",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "cancelable",
+        "field": "cancelable",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "composed",
+        "field": "composed",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "detail",
+        "field": "detail",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "ctrlKey",
+        "field": "ctrl_key",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "shiftKey",
+        "field": "shift_key",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "altKey",
+        "field": "alt_key",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "metaKey",
+        "field": "meta_key",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "modifierAltGraph",
+        "field": "modifier_alt_graph",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "modifierCapsLock",
+        "field": "modifier_caps_lock",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "screenX",
+        "field": "screen_x",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "screenY",
+        "field": "screen_y",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "clientX",
+        "field": "client_x",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "clientY",
+        "field": "client_y",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "button",
+        "field": "button",
+        "ctype": "int16_t",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "int16_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "buttons",
+        "field": "buttons",
+        "ctype": "uint16_t",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "uint16_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "relatedTarget",
+        "field": "related_target",
+        "ctype": "RvEventTarget*",
+        "required": false,
+        "default": "null",
+        "mapping": {
+          "kind": "node",
+          "ctype": null,
+          "interface": "EventTarget",
+          "root": null,
+          "class": "EventTarget",
+          "enum": null,
+          "label": null,
+          "nullable": true,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "movementX",
+        "field": "movement_x",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "movementY",
+        "field": "movement_y",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "deltaX",
+        "field": "delta_x",
+        "ctype": "double",
+        "required": false,
+        "default": "0.0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "deltaY",
+        "field": "delta_y",
+        "ctype": "double",
+        "required": false,
+        "default": "0.0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "deltaZ",
+        "field": "delta_z",
+        "ctype": "double",
+        "required": false,
+        "default": "0.0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "deltaMode",
+        "field": "delta_mode",
+        "ctype": "uint32_t",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "uint32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "wheelDeltaX",
+        "field": "wheel_delta_x",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "wheelDeltaY",
+        "field": "wheel_delta_y",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "InputEventInit": [
+      {
+        "name": "bubbles",
+        "field": "bubbles",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "cancelable",
+        "field": "cancelable",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "composed",
+        "field": "composed",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "detail",
+        "field": "detail",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "data",
+        "field": "data",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "null",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": true,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "isComposing",
+        "field": "is_composing",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "inputType",
+        "field": "input_type",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "\"\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
           "interface": null,
           "root": null,
           "class": null,

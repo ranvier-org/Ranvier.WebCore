@@ -1,0 +1,299 @@
+{
+  "browser": "chromium 156.0.8078.4",
+  "values": {
+    "text.default": [
+      3,
+      "",
+      true,
+      false,
+      true
+    ],
+    "text.data": "héllo 😀",
+    "text.mutated": "changed",
+    "comment": [
+      8,
+      "note",
+      true,
+      false
+    ],
+    "comment.default": "",
+    "fragment": [
+      11,
+      0,
+      true,
+      false
+    ],
+    "fragment.appended": [
+      1,
+      "x"
+    ],
+    "range.default": [
+      true,
+      0,
+      true,
+      0,
+      true
+    ],
+    "range.set": [
+      true,
+      1,
+      3,
+      false
+    ],
+    "range.outOfBounds": "IndexSizeError",
+    "document": [
+      9,
+      "application/xml",
+      "UTF-8",
+      "CSS1Compat",
+      0,
+      true,
+      false
+    ],
+    "document.createElement": [
+      null,
+      "root",
+      true
+    ],
+    "document.adopted": [
+      true,
+      true,
+      true
+    ],
+    "parse": [
+      9,
+      "text/html",
+      "CSS1Compat",
+      "UTF-8",
+      false,
+      2,
+      "P",
+      10
+    ],
+    "parse.empty": [
+      0,
+      "BackCompat"
+    ],
+    "static": [
+      true,
+      1,
+      true,
+      9,
+      false
+    ],
+    "static.collapsed": true,
+    "static.attr": "InvalidNodeTypeError",
+    "static.doctype": "InvalidNodeTypeError",
+    "static.missing": "TypeError",
+    "input.default": [
+      "beforeinput",
+      false,
+      false,
+      false,
+      false,
+      0,
+      null,
+      false,
+      "",
+      0
+    ],
+    "input.full": [
+      "beforeinput",
+      true,
+      true,
+      true,
+      false,
+      2,
+      "abé",
+      true,
+      "insertText",
+      0
+    ],
+    "input.emptyData": "",
+    "wheel.default": [
+      "wheel",
+      false,
+      false,
+      false,
+      false,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      false,
+      false,
+      false,
+      false,
+      false
+    ],
+    "wheel.full": [
+      "wheel",
+      true,
+      true,
+      false,
+      false,
+      0,
+      3.5,
+      -120,
+      1,
+      1,
+      3,
+      -120,
+      -120,
+      10,
+      20,
+      1,
+      2,
+      0,
+      1,
+      true,
+      false,
+      false,
+      true,
+      true
+    ],
+    "wheel.legacy": [
+      -240,
+      120,
+      240,
+      -120
+    ],
+    "pointer.default": [
+      "pointerdown",
+      false,
+      false,
+      false,
+      false,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      "",
+      false,
+      0,
+      0,
+      0,
+      0,
+      false,
+      0,
+      0
+    ],
+    "pointer.full": [
+      "pointermove",
+      true,
+      true,
+      true,
+      false,
+      0,
+      7,
+      2.5,
+      3.5,
+      0.5,
+      -0.25,
+      30,
+      -20,
+      90,
+      "pen",
+      true,
+      12.5,
+      7.25,
+      1,
+      4,
+      true,
+      1,
+      2
+    ],
+    "pointer.coalescedIdentity": true,
+    "pointer.pressure": 0.10000000149011612,
+    "dispatch.cancelable": [
+      false,
+      true
+    ],
+    "dispatch.plain": [
+      true,
+      false
+    ],
+    "dispatch.seen": [
+      [
+        2,
+        true,
+        true,
+        false
+      ],
+      [
+        2,
+        true,
+        true,
+        false
+      ]
+    ],
+    "dispatch.redispatch": null,
+    "matrix.f32": [
+      "DOMMatrix",
+      0.10000000149011612,
+      0,
+      0,
+      1,
+      5,
+      6,
+      true,
+      false
+    ],
+    "matrix.f64": [
+      "DOMMatrix",
+      0.1,
+      5,
+      6,
+      true
+    ],
+    "matrix.mutated": 2,
+    "matrix.f64.16": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      1,
+      1,
+      false
+    ],
+    "matrix.nonfinite": [
+      "NaN",
+      "Infinity",
+      true
+    ],
+    "matrix.short": "TypeError",
+    "matrix.empty": "TypeError",
+    "matrix.long": "TypeError",
+    "readonly.f32": [
+      "DOMMatrixReadOnly",
+      0.10000000149011612,
+      true
+    ],
+    "readonly.unchanged": 0.10000000149011612,
+    "readonly.f64": [
+      "DOMMatrixReadOnly",
+      5
+    ],
+    "crossDocument": [
+      true,
+      false
+    ]
+  }
+}

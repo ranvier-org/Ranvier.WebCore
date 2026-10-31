@@ -1,0 +1,64 @@
+3c3
+< interfaces 281, functions 2681 (getters 1432, setters 646, operations 514, constructors 46, namespace operations 4, static operations 14, iterator snapshots 3, context operations 22), handle types 62, constants 206, enumerations 11, dictionaries 44, stubs 0, left out 754
+---
+> interfaces 281, functions 2697 (getters 1432, setters 646, operations 516, constructors 55, namespace operations 4, static operations 19, iterator snapshots 3, context operations 22), handle types 62, constants 206, enumerations 11, dictionaries 48, stubs 0, left out 738
+9,11c9,11
+<   Text: 3
+<   Comment: 0
+<   DocumentFragment: 11
+---
+>   Text: 4
+>   Comment: 1
+>   DocumentFragment: 12
+13c13
+<   Document: 70
+---
+>   Document: 72
+137,138c137,138
+<   StaticRange: 0
+<   Range: 26
+---
+>   StaticRange: 1
+>   Range: 27
+146,147c146,147
+<   DOMMatrixReadOnly: 41
+<   DOMMatrix: 58
+---
+>   DOMMatrixReadOnly: 45
+>   DOMMatrix: 60
+158,159c158,159
+<   PointerEvent: 14
+<   WheelEvent: 7
+---
+>   PointerEvent: 15
+>   WheelEvent: 8
+162c162
+<   InputEvent: 4
+---
+>   InputEvent: 5
+316d315
+<   Comment.constructor: constructor
+385,390d383
+<   DOMMatrix.fromFloat32Array: static
+<   DOMMatrix.fromFloat64Array: static
+<   DOMMatrixReadOnly.fromFloat32Array: static
+<   DOMMatrixReadOnly.fromFloat64Array: static
+<   DOMMatrixReadOnly.toFloat32Array: type Float32Array
+<   DOMMatrixReadOnly.toFloat64Array: type Float64Array
+405d397
+<   Document.constructor: constructor
+559d550
+<   Document.parseHTMLUnsafe: static
+581d571
+<   DocumentFragment.constructor: constructor
+789d778
+<   InputEvent.constructor: constructor
+905d893
+<   PointerEvent.constructor: constructor
+908d895
+<   Range.constructor: constructor
+1047,1048d1033
+<   StaticRange.constructor: constructor
+<   Text.constructor: constructor
+1056d1040
+<   WheelEvent.constructor: constructor
