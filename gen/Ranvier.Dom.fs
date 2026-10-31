@@ -6212,23 +6212,21 @@ module BrowserUnionAdapters =
 
 
     type AnimationPlaybackEvent with
-        member this.currentTime
-            with get (): (DoubleOrCSSNumericValue) option =
-                let value = this.__ranvier_get_currentTime ()
+        member this.currentTime: (DoubleOrCSSNumericValue) option =
+            let value = this.__ranvier_get_currentTime ()
 
-                if isNull value then
-                    None
-                else
-                    Some (unboxDoubleOrCSSNumericValue value)
+            if isNull value then
+                None
+            else
+                Some (unboxDoubleOrCSSNumericValue value)
 
-        member this.timelineTime
-            with get (): (DoubleOrCSSNumericValue) option =
-                let value = this.__ranvier_get_timelineTime ()
+        member this.timelineTime: (DoubleOrCSSNumericValue) option =
+            let value = this.__ranvier_get_timelineTime ()
 
-                if isNull value then
-                    None
-                else
-                    Some (unboxDoubleOrCSSNumericValue value)
+            if isNull value then
+                None
+            else
+                Some (unboxDoubleOrCSSNumericValue value)
 
 
     type URLPattern with
