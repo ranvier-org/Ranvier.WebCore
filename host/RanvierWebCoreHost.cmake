@@ -6,6 +6,7 @@ if (ENABLE_WEBCORE)
         RanvierAbi/RanvierWebCoreDom.cpp
         RanvierAbi/RanvierWebCoreUia.cpp
         RanvierAbi/RanvierWebCoreD3D11.cpp
+        RanvierAbi/RanvierImageEncoding.cpp
     )
     set(RanvierWebCoreHost_LIBRARIES ${TestWebCore_LIBRARIES})
     if (WIN32)

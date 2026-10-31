@@ -2,6 +2,7 @@
 #include "RanvierWebCoreAbi.h"
 #include "dom/RanvierDomGlue.h"
 #include "RanvierSvgViewGlue.h"
+#include "RanvierImageEncoding.h"
 #include "RanvierResourceGlue.h"
 #include "RanvierEventGlue.h"
 #include "RanvierViewportGlue.h"
@@ -61,7 +62,6 @@
 #include <WebCore/Range.h>
 #include <WebCore/Settings.h>
 #include <WebCore/MIMETypeRegistry.h>
-#include <WebCore/ImageUtilities.h>
 #include <WebCore/Text.h>
 #include <WebCore/TrustedHTML.h>
 #include <WebCore/DocumentLoader.h>
@@ -4376,45 +4376,6 @@ int32_t rv_element_snapshot(RvNode* target, uint8_t* rgba, int32_t length, int32
     return RV_OK;
 }
 
-// The image encoder shared by snapshots and canvas export: RV_IMAGE_ENCODING_PNG, JPEG and WEBP through the engine's
-// encodeData. quality applies to JPEG and WEBP; NaN or a value outside [0, 1] selects the encoder's default, as
-// HTMLCanvasElement.toBlob does.
-static std::optional<double> imageEncodingQuality(int32_t encoding, double quality)
-{
-    if ((encoding != RV_IMAGE_ENCODING_JPEG && encoding != RV_IMAGE_ENCODING_WEBP) || !(quality >= 0 && quality <= 1))
-        return std::nullopt;
-    return quality;
-}
-
-static String imageEncodingMIMEType(int32_t encoding)
-{
-    switch (encoding) {
-    case RV_IMAGE_ENCODING_PNG:
-        return "image/png"_s;
-    case RV_IMAGE_ENCODING_JPEG:
-        return "image/jpeg"_s;
-    case RV_IMAGE_ENCODING_WEBP:
-        return "image/webp"_s;
-    default:
-        return { };
-    }
-}
-
-// Whether the engine encodes the encoding on this flavor; RV_IMAGE_ENCODING_RGBA8 always is.
-static bool imageEncodingSupported(int32_t encoding)
-{
-    if (encoding == RV_IMAGE_ENCODING_RGBA8)
-        return true;
-    auto type = imageEncodingMIMEType(encoding);
-    return !type.isNull() && MIMETypeRegistry::isSupportedImageMIMETypeForEncoding(type);
-}
-
-// Encodes the buffer's pixels; empty when the encoder fails.
-static Vector<uint8_t> encodeImage(RefPtr<ImageBuffer>&& buffer, int32_t encoding, double quality)
-{
-    return encodeData(WTF::move(buffer), imageEncodingMIMEType(encoding), imageEncodingQuality(encoding, quality));
-}
-
 // Paints the subject's area, or the viewport's for a null subject, at scale into a new buffer in colorSpace.
 // rect is the painted area in CSS pixels: the element's paint bounds or the viewport, intersected with the crop.
 static RefPtr<ImageBuffer> captureSnapshot(RvHost& host, Node* subject, const RvSnapshotOptions& options, float scale,
@@ -4495,7 +4456,7 @@ int32_t rv_host_snapshot(RvHost* host, RvNode* element, const RvSnapshotOptions*
     else if (options->color_space == RV_SNAPSHOT_DISPLAY_P3)
         colorSpace = &DestinationColorSpace::DisplayP3();
 #endif
-    if (!colorSpace || !imageEncodingSupported(options->encoding))
+    if (!colorSpace || !Ranvier::Internal::imageEncodingSupported(options->encoding))
         return RV_ERR_UNSUPPORTED;
     RefPtr<Node> subject;
     if (element) {
@@ -4518,7 +4479,7 @@ int32_t rv_host_snapshot(RvHost* host, RvNode* element, const RvSnapshotOptions*
         bytes.append(pixels->bytes());
     } else {
         pixelSize = buffer->backendSize();
-        bytes = encodeImage(WTF::move(buffer), options->encoding, options->quality);
+        bytes = Ranvier::Internal::encodeImage(WTF::move(buffer), options->encoding, options->quality);
         if (bytes.isEmpty())
             return RV_ERR_PAINT_FAILED;
     }
