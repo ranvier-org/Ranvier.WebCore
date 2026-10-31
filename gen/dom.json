@@ -17,7 +17,17 @@
     "browserWellFormedUnions and browserWellFormedSetters list the unions and interfaces whose USVString inputs the",
     "Fable browser provider converts to well-formed strings. Every generated string input is UTF-8 with an explicit byte",
     "length; sequenceStringSpans only names the string sequences of its interfaces Utf8.",
-    "elementArrayReflections lists [Reflect] FrozenArray<Element>? attributes bound to the engine's element array reflection: the getter returns a snapshot sequence, or none for null; the setter takes a sequence, or none to clear."
+    "elementArrayReflections lists [Reflect] FrozenArray<Element>? attributes bound to the engine's element array reflection: the getter returns a snapshot sequence, or none for null; the setter takes a sequence, or none to clear.",
+    "syntheticIdl names repository IDL files that define dictionaries only, the native transports of JavaScript object arguments.",
+    "argumentTypes retypes Interface.member.argument (by the declaring interface or mixin), and argumentAdapters converts",
+    "the decoded argument ({value}) to the C++ the member takes, keyed by the generated function's interface.",
+    "globalObjectMembers lists the Interface.member operations whose [CallWith=CurrentGlobalObject] receives the document global object.",
+    "customConstructors replaces a [Custom] constructor with the IDL signature its custom binding implements; presenceArguments",
+    "gives an optional nullable argument a name_present flag, so absent and null stay distinct. constructors overloads gives",
+    "an overload, by argument count, its own factory settings.",
+    "optionalObjectMembers lists optional nullable object dictionary members passed as Rv<Root>* const*: NULL absent, a pointer to NULL null.",
+    "setterExpressions maps Interface.member to the C++ a setter calls with {value}, for a member whose C++ type differs from its IDL type.",
+    "browserArgumentConversions maps Interface.member.argument to the JavaScript function the Fable provider applies to an argument: Keyframe sequences become the browser's keyframe objects."
   ],
   "attributeBridges": {
     "Document.adoptedStyleSheets": {
@@ -248,6 +258,25 @@
     "FileReader": {
       "receiver": "Document",
       "factory": "FileReader::create"
+    },
+    "KeyframeEffect": {
+      "receiver": "Document",
+      "factory": "KeyframeEffect::create",
+      "globalObject": "callWith",
+      "overloads": {
+        "1": {
+          "globalObject": false,
+          "passReceiver": false
+        }
+      }
+    },
+    "DocumentTimeline": {
+      "receiver": "Document",
+      "factory": "DocumentTimeline::create"
+    },
+    "WebAnimation": {
+      "receiver": "Document",
+      "factory": "[](Document& document, AnimationEffect* effect, std::optional<RefPtr<AnimationTimeline>>&& timeline) -> Ref<WebAnimation> { return timeline ? WebAnimation::create(document, effect, timeline->get()) : WebAnimation::create(document, effect); }"
     }
   },
   "dictionaryCppTypes": {
@@ -266,7 +295,9 @@
     "HashChangeEventInit": "HashChangeEvent::Init",
     "MediaQueryListEventInit": "MediaQueryListEvent::Init",
     "PopStateEventInit": "PopStateEvent::Init",
-    "CompositionEventInit": "CompositionEvent::Init"
+    "CompositionEventInit": "CompositionEvent::Init",
+    "Keyframe": "Ranvier::Keyframe",
+    "KeyframeProperty": "Ranvier::KeyframeProperty"
   },
   "dictionaryObjectMembers": [
     "FormDataEventInit.formData"
@@ -380,7 +411,9 @@
     "StylePropertyMap": "Document",
     "DOMMatrix": "Document",
     "DOMFormData": "Document",
-    "URLSearchParams": "Document"
+    "URLSearchParams": "Document",
+    "KeyframeEffect": "Document",
+    "AnimationEffect": "Document"
   },
   "finiteNumberInputs": [
     "CSSUnitValue",
@@ -680,7 +713,12 @@
     "VisualViewport",
     "Highlight",
     "HighlightRegistry",
-    "FileReader"
+    "FileReader",
+    "WebAnimation",
+    "AnimationEffect",
+    "KeyframeEffect",
+    "AnimationTimeline",
+    "DocumentTimeline"
   ],
   "skipDirectories": [
     "Modules/",
@@ -911,7 +949,12 @@
     "AnimationEventInit.animation",
     "CSSTransitionEvent.animation",
     "TransitionEventInit.animation",
-    "UIEventInit.view"
+    "UIEventInit.view",
+    "KeyframeAnimationOptions.rangeStart",
+    "KeyframeAnimationOptions.rangeEnd",
+    "AnimationEffect.getTiming",
+    "AnimationEffect.getComputedTiming",
+    "AnimationEffect.updateTiming"
   ],
   "namespaceBindings": {
     "DOMCSSNamespace": {
@@ -1107,7 +1150,8 @@
     "FileReader": {},
     "VisualViewport": {
       "attached": "impl->frame()"
-    }
+    },
+    "WebAnimation": {}
   },
   "resultDictionaries": [
     "URLPatternResult",
@@ -1127,7 +1171,11 @@
   },
   "getterExpressions": {
     "AnimationPlaybackEvent.currentTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->currentTime()) return CSSNumberish { *time }; return std::nullopt; }()",
-    "AnimationPlaybackEvent.timelineTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->timelineTime()) return CSSNumberish { *time }; return std::nullopt; }()"
+    "AnimationPlaybackEvent.timelineTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->timelineTime()) return CSSNumberish { *time }; return std::nullopt; }()",
+    "WebAnimation.startTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->bindingsStartTime()) return CSSNumberish { *time }; return std::nullopt; }()",
+    "WebAnimation.currentTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->bindingsCurrentTime()) return CSSNumberish { *time }; return std::nullopt; }()",
+    "AnimationTimeline.currentTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->currentTime()) return CSSNumberish { *time }; return std::nullopt; }()",
+    "AnimationTimeline.duration": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->duration()) return CSSNumberish { *time }; return std::nullopt; }()"
   },
   "setlikeBindings": {
     "Highlight": {
@@ -1138,5 +1186,57 @@
     "HighlightRegistry": {
       "adapter": "RanvierCollectionLike"
     }
+  },
+  "syntheticIdl": [
+    "gen/RanvierKeyframes.idl"
+  ],
+  "argumentTypes": {
+    "Animatable.animate.keyframes": "sequence<Keyframe>?",
+    "KeyframeEffect.constructor.keyframes": "sequence<Keyframe>?",
+    "KeyframeEffect.setKeyframes.keyframes": "sequence<Keyframe>?"
+  },
+  "argumentAdapters": {
+    "Element.animate.keyframes": {
+      "wrap": "Ranvier::keyframesCall(*global, {value}, [&](JSC::Strong<JSC::JSObject>&& keyframesObject) { return {call}; })",
+      "argument": "std::move(keyframesObject)",
+      "header": "RanvierKeyframes.h",
+      "note": "keyframes NULL or present 0 is null; WebKit processes the keyframes as a script-built array of objects, and an error it leaves on the VM returns RV_ERR_DOM_EXCEPTION with its WebIDL name"
+    },
+    "KeyframeEffect.constructor.keyframes": {
+      "wrap": "Ranvier::keyframesCall(*global, {value}, [&](JSC::Strong<JSC::JSObject>&& keyframesObject) { return {call}; })",
+      "argument": "std::move(keyframesObject)",
+      "header": "RanvierKeyframes.h",
+      "note": "keyframes NULL or present 0 is null; WebKit processes the keyframes as a script-built array of objects, and an error it leaves on the VM returns RV_ERR_DOM_EXCEPTION with its WebIDL name"
+    },
+    "KeyframeEffect.setKeyframes.keyframes": {
+      "wrap": "Ranvier::keyframesCall(*global, {value}, [&](JSC::Strong<JSC::JSObject>&& keyframesObject) { return {call}; })",
+      "argument": "std::move(keyframesObject)",
+      "header": "RanvierKeyframes.h",
+      "note": "keyframes NULL or present 0 is null; WebKit processes the keyframes as a script-built array of objects, and an error it leaves on the VM returns RV_ERR_DOM_EXCEPTION with its WebIDL name"
+    }
+  },
+  "globalObjectMembers": [
+    "Element.animate",
+    "KeyframeEffect.setKeyframes"
+  ],
+  "customConstructors": {
+    "WebAnimation": {
+      "idl": "constructor(optional AnimationEffect? effect = null, optional AnimationTimeline? timeline);"
+    }
+  },
+  "presenceArguments": [
+    "WebAnimation.constructor.timeline"
+  ],
+  "optionalObjectMembers": [
+    "KeyframeAnimationOptions.timeline"
+  ],
+  "setterExpressions": {
+    "WebAnimation.startTime": "[&](auto&& time) { return impl->setBindingsStartTime(time ? std::optional<WebAnimationTime> { WebAnimationTime { *time } } : std::nullopt); }({value})",
+    "WebAnimation.currentTime": "[&](auto&& time) { return impl->setBindingsCurrentTime(time ? std::optional<WebAnimationTime> { WebAnimationTime { *time } } : std::nullopt); }({value})"
+  },
+  "browserArgumentConversions": {
+    "Animatable.animate.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})",
+    "Element.animate.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})",
+    "KeyframeEffect.setKeyframes.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})"
   }
 }

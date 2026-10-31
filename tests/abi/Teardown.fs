@@ -1019,6 +1019,57 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
 
                 if rv_diagnostic_live_count () <> live then
                     failwith "cascade snapshot leaked"
+        | "web animation" ->
+            // Element.animate builds its keyframes as JavaScript objects in the document's global object; the
+            // animation, its effect and those objects must not keep the document or the div alive.
+            let name, namePin = stringInput "opacity"
+            let value, valuePin = stringInput "0.5"
+            let mutable property = RvDomKeyframeProperty()
+            property.size <- uint32 (Runtime.InteropServices.Marshal.SizeOf<RvDomKeyframeProperty>())
+            property.name <- name
+            property.value <- value
+            let propertyPointer = Runtime.InteropServices.Marshal.AllocHGlobal(Runtime.InteropServices.Marshal.SizeOf<RvDomKeyframeProperty>())
+            Runtime.InteropServices.Marshal.StructureToPtr(property, propertyPointer, false)
+            let propertyItems = Runtime.InteropServices.Marshal.AllocHGlobal IntPtr.Size
+            Runtime.InteropServices.Marshal.WriteIntPtr(propertyItems, propertyPointer)
+            let mutable properties = RvDomSequenceKeyframeProperty()
+            properties.present <- 1
+            properties.count <- 1
+            properties.items <- propertyItems
+            let propertiesPointer = Runtime.InteropServices.Marshal.AllocHGlobal(Runtime.InteropServices.Marshal.SizeOf<RvDomSequenceKeyframeProperty>())
+            Runtime.InteropServices.Marshal.StructureToPtr(properties, propertiesPointer, false)
+            let mutable keyframe = RvDomKeyframe()
+            keyframe.size <- uint32 (Runtime.InteropServices.Marshal.SizeOf<RvDomKeyframe>())
+            keyframe.properties <- propertiesPointer
+            let keyframePointer = Runtime.InteropServices.Marshal.AllocHGlobal(Runtime.InteropServices.Marshal.SizeOf<RvDomKeyframe>())
+            Runtime.InteropServices.Marshal.StructureToPtr(keyframe, keyframePointer, false)
+            let keyframeItems = Runtime.InteropServices.Marshal.AllocHGlobal IntPtr.Size
+            Runtime.InteropServices.Marshal.WriteIntPtr(keyframeItems, keyframePointer)
+            let mutable keyframes = RvDomSequenceKeyframeNullable()
+            keyframes.present <- 1
+            keyframes.count <- 1
+            keyframes.items <- keyframeItems
+            let mutable duration = RvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions()
+            duration.present <- 1
+            duration.tag <- 1
+            duration.arm0 <- 1000.0
+
+            rv_dom_element_animate (div, [| keyframes |], [| duration |], &held.contents)
+            |> check "Element.animate"
+
+            for pointer in [ keyframeItems; keyframePointer; propertiesPointer; propertyItems; propertyPointer ] do
+                Runtime.InteropServices.Marshal.FreeHGlobal pointer
+
+            namePin.Free()
+            valuePin.Free()
+            let mutable effect = 0n
+            rv_dom_web_animation_get_effect (held.Value, &effect) |> check "Animation.effect"
+
+            if effect = 0n then
+                failwith "Element.animate made no effect"
+
+            rv_dom_animation_effect_release effect
+            fun () -> rv_event_target_release held.Value
         | "crypto" ->
             let filled = Array.zeroCreate<byte> 16
 
@@ -1295,6 +1346,7 @@ let run (outDir: string) =
                     "string results"
                     "aria relations"
                     "coordinate spaces"
+                    "web animation"
                 ] do
                 for remove in [ false; true ] do
                     releaseAfterDestroy kind remove

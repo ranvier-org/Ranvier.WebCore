@@ -268,6 +268,41 @@ class World:
                 elif name not in self.dictionaries or not self.skipped(relative):
                     self.dictionaries[name] = dictionary
             self.callbacks |= document.callbacks
+        # syntheticIdl names repository IDL files that define dictionaries only: native transports of a JavaScript
+        # object argument, such as the keyframe sequence of Element.animate. They merge after WebKit's files.
+        for relative in config.get("syntheticIdl", []):
+            document = idl.parse((ROOT / relative).read_text(encoding="utf-8"), pathlib.PurePosixPath(relative).name)
+            if document.interfaces or document.namespaces or document.includes or document.enums or document.callbacks:
+                raise SystemExit(f"{relative}: a synthetic IDL file defines dictionaries only")
+            for name, dictionary in document.dictionaries.items():
+                if name in self.dictionaries:
+                    raise SystemExit(f"{relative}: dictionary {name} already exists in WebKit's IDL")
+                self.dictionaries[name] = dictionary
+            self.typedefs.update(document.typedefs)
+        # customConstructors replaces a [Custom] IDL constructor with the signature its custom binding implements.
+        for name, custom in config.get("customConstructors", {}).items():
+            interface = self.interfaces[name]
+            parser = idl.Parser(custom["idl"], interface.file)
+            replacement = parser.member(name)
+            if replacement is None or replacement.kind != "constructor":
+                raise SystemExit(f"customConstructors: {name} needs a constructor declaration")
+            found = [index for index, member in enumerate(interface.members)
+                     if member.kind == "constructor" and "Custom" in member.attrs]
+            if len(found) != 1:
+                raise SystemExit(f"customConstructors: {name} has no single [Custom] constructor")
+            replacement.file = interface.file
+            interface.members[found[0]] = replacement
+        # argumentTypes retypes an argument, keyed Interface.member.argument by the declaring interface or mixin:
+        # an `object` argument takes the synthetic dictionary transport its argumentAdapters entry converts.
+        retyped = dict(config.get("argumentTypes", {}))
+        for interface in [*self.interfaces.values(), *(p for ps in self.partials.values() for p in ps)]:
+            for member in interface.members:
+                for argument in member.arguments or []:
+                    key = f"{interface.name}.{member.name}.{argument.name}"
+                    if key in retyped:
+                        argument.type = idl.Parser(retyped.pop(key), interface.file).type()
+        if retyped:
+            raise SystemExit(f"argumentTypes names arguments the IDL files do not declare: {sorted(retyped)}")
         # A setlike or maplike declaration is a member only of an interface gen/dom.json binds it for.
         bound = {'setlike': set(config.get('setlikeBindings', {})), 'maplike': set(config.get('maplikeBindings', {}))}
         for interface in [*self.interfaces.values(), *(p for ps in self.partials.values() for p in ps)]:
@@ -458,6 +493,13 @@ class World:
             configured_object = f"{name}.{member.name}" in self.config.get("dictionaryObjectMembers", [])
             if configured_object and (mapped.kind != "object" or not member.required or mapped.nullable):
                 raise SystemExit(f"{name}.{member.name}: dictionary object members must be required nonnullable object handles")
+            optional_object = f"{name}.{member.name}" in self.config.get("optionalObjectMembers", [])
+            if optional_object:
+                # Rv<Root>* const*: NULL for absent, a pointer to NULL for null, else the handle.
+                if mapped.kind != "object" or member.required or member.default is not None or not mapped.nullable:
+                    raise SystemExit(f"{name}.{member.name}: optional object members must be optional nullable object handles without a default")
+                mapped.optional_handle = True
+                configured_object = True
             if (mapped.kind in ("object", "event") and not configured_object) or mapped.interface == "EventTarget":
                 raise Unsupported(f"dictionary {name}: member {member.name} of type {member.type}")
             found.append((member, mapped))
@@ -1191,12 +1233,16 @@ class Generator(ComplexGeneratorMixin):
                 return f"[{key}]"
         return None
 
-    def call_with(self, values):
-        """The C++ expressions CallWith supplies, or raises Unsupported."""
+    def call_with(self, values, key=None):
+        """The C++ expressions CallWith supplies, or raises Unsupported. CurrentGlobalObject is supplied only to the
+        Interface.member operations gen/dom.json's globalObjectMembers lists."""
         found = []
         for value in values:
             if value in DOCUMENT_CALL_WITH:
                 found.append("document")
+            elif value == "CurrentGlobalObject" and key in self.world.config.get("globalObjectMembers", []):
+                # The document's global object: created with its window, never entered for script by the glue.
+                found.append("global")
             else:
                 raise Unsupported(f"[CallWith={value}]")
         return found
@@ -1390,6 +1436,8 @@ class Generator(ComplexGeneratorMixin):
         absent = mapped.nullable or (not member.required and member.default is None)
         if mapped.kind == "string":
             return "RvDomUtf8StringInput"
+        if getattr(mapped, "optional_handle", False):
+            return f"{mapped.handle}* const*"
         if mapped.kind in ("node", "object"):
             return f"{mapped.handle}*"
         if mapped.kind == "dict":
@@ -1423,6 +1471,16 @@ class Generator(ComplexGeneratorMixin):
         covered = f"{pointer}->size >= offsetof({struct}, {field}) + sizeof({pointer}->{field})"
         ctype = self.field_ctype(member, mapped, dictionary)
         lines = []
+        if getattr(mapped, "optional_handle", False):
+            self.headers.add(f"{mapped.cls}.h")
+            root = self.world.cpp_class(mapped.root)
+            source = f"reinterpret_cast<{root}*>(*{pointer}->{field})"
+            cast = source if root == mapped.cls else self.cast_expression(mapped.cls, root, f"*{source}")
+            lines += [f"if ({covered} && {pointer}->{field}) {{",
+                      f"    RefPtr<{mapped.cls}> value = *{pointer}->{field} ? {cast} : nullptr;",
+                      f"    if (*{pointer}->{field} && !value)", "        return RV_ERR_WRONG_INTERFACE;",
+                      f"    {target}.{cpp_field} = std::move(value);", "}"]
+            return lines
         if mapped.kind == "object":
             raise Unsupported(f"dictionary object member {member.name} outside a derived dictionary argument")
         if member.required:
@@ -1483,6 +1541,10 @@ class Generator(ComplexGeneratorMixin):
         bridge = self.world.config.get("attributeBridges", {}).get(f"{interface}.{member.name}")
         if bridge:
             return bridge["setter"].replace("{value}", value)
+        # A C++ setter whose type differs from the IDL type, written through the configured conversion of {value}.
+        expression = self.world.config.get("setterExpressions", {}).get(f"{interface}.{member.name}")
+        if expression:
+            return expression.replace("{value}", value)
         if interface == 'SVGAnimatedString' and member.name == 'baseVal':
             self.headers.add('TrustedScriptURL.h')
         attribute = self.reflect(member, True)
@@ -1566,6 +1628,8 @@ class Generator(ComplexGeneratorMixin):
 
     def constructor(self, interface, member, overloaded=False):
         configured = self.world.config["constructors"][interface]
+        # overloads gives an overload, by its argument count, its own factory settings.
+        configured = {**configured, **configured.get("overloads", {}).get(str(len(member.arguments)), {})}
         receiver = configured["receiver"]
         if receiver not in self.world.scope:
             raise SystemExit(f"{interface}: constructor receiver {receiver} is outside scope")
@@ -1578,7 +1642,14 @@ class Generator(ComplexGeneratorMixin):
                 arguments = f"*impl{', ' if arguments else ''}{arguments}"
             call = f"{configured['factory']}({arguments})"
             note = ""
-            if configured.get('globalObject'):
+            constructor_call_with = []
+            if configured.get('globalObject') == 'callWith':
+                # The receiver Document's global object, as [CallWith=CurrentGlobalObject] supplies it to an operation.
+                if receiver != 'Document':
+                    raise SystemExit(f"{interface}: a globalObject constructor requires a Document receiver")
+                call = f"{configured['factory']}({{call_with_lead}}{arguments})"
+                constructor_call_with = ['global']
+            elif configured.get('globalObject'):
                 # [CallWith=CurrentGlobalObject] receives the Document's global object, absent without a frame.
                 if receiver != 'Document':
                     raise SystemExit(f"{interface}: a globalObject constructor requires a Document receiver")
@@ -1589,7 +1660,7 @@ class Generator(ComplexGeneratorMixin):
                 note = "; RV_ERR_DOM_EXCEPTION (InvalidStateError) for a document without a browsing context"
             function = Function(interface, member, "constructor", f"{snake(interface)}_create", [],
                                 f"{interface}.constructor: target is the {receiver} of the constructed object{note}")
-            self.finish(function, receiver, member, member.arguments, args, returns, call, [])
+            self.finish(function, receiver, member, member.arguments, args, returns, call, constructor_call_with)
             if overloaded:
                 locked = self.lock.get(function.name)
                 if not locked or function.params != [tuple(parameter) for parameter in locked['params']]:
@@ -1599,7 +1670,7 @@ class Generator(ComplexGeneratorMixin):
 
     def operation(self, interface, member, args, returns, suffix):
         try:
-            call_with = self.call_with(attr_list(member.attrs.get("CallWith")))
+            call_with = self.call_with(attr_list(member.attrs.get("CallWith")), f"{interface}.{member.name}")
         except Unsupported as error:
             self.skip(interface, member, str(error))
             return
@@ -1719,14 +1790,15 @@ class Generator(ComplexGeneratorMixin):
                 else:
                     notes.append(f"{name} may be NULL for the IDL default")
                 cpp = self.dictionary_cpp(mapped.interface)
-                objects = [(field_member, field_mapped) for field_member, field_mapped in fields if field_mapped.kind == "object"]
+                objects = [(field_member, field_mapped) for field_member, field_mapped in fields
+                           if field_mapped.kind == "object" and not getattr(field_mapped, "optional_handle", False)]
                 if objects:
                     prepare += self.dictionary_object_prefix(name, struct, cpp, f"a{index}", mapped.interface, objects, argument)
                 else:
                     prepare.append(f"{cpp} a{index} {{ }};")
                 prepare.append(f"if ({name}) {{")
                 for field_member, field_mapped in fields:
-                    if field_mapped.kind == "object":
+                    if field_mapped.kind == "object" and not getattr(field_mapped, "optional_handle", False):
                         continue
                     prepare += ["    " + line for line in self.dictionary_field(name, struct, f"a{index}", field_member, field_mapped, mapped.interface)]
                 prepare.append("}")
@@ -1798,13 +1870,38 @@ class Generator(ComplexGeneratorMixin):
                     prepare.append(f"RefPtr<{mapped.cls}> a{index} = {name} ? {cast} : nullptr;")
                     prepare.append(f"if ({name} && !a{index})")
                     prepare.append("    return RV_ERR_WRONG_INTERFACE;")
-                passed.append(f"a{index}.get()" if maybe_null else f"HandleArg<{mapped.cls}> {{ a{index}.get() }}")
-                if maybe_null:
+                presence = f"{function.interface}.{member.name}.{argument.name}" in self.world.config.get("presenceArguments", [])
+                if presence:
+                    # An optional nullable argument whose absence differs from null: name_present 0 is absent.
+                    if not (optional_no_default and mapped.nullable):
+                        raise SystemExit(f"presenceArguments: {function.interface}.{member.name}.{argument.name} must be optional, nullable and without a default")
+                    params.append(("int32_t", f"{name}_present"))
+                    passed.append(f"{name}_present ? std::optional<RefPtr<{mapped.cls}>> {{ a{index} }} : std::nullopt")
+                    notes.append(f"{name}_present 0 means absent; with {name}_present 1, a NULL {name} means null")
+                else:
+                    passed.append(f"a{index}.get()" if maybe_null else f"HandleArg<{mapped.cls}> {{ a{index}.get() }}")
+                if maybe_null and not presence:
                     notes.append(f"{name} may be NULL")
                 if "ReturnValue" in argument.attrs:
                     return_value = (index, mapped)
             else:
                 raise Unsupported(f"{mapped.kind} argument")
+        # argumentAdapters converts a decoded argument to the C++ type the member takes ({value}), keyed
+        # Interface.member.argument by the function's interface.
+        wraps = []
+        for index, argument in enumerate(arguments):
+            adapter = self.world.config.get("argumentAdapters", {}).get(f"{function.interface}.{member.name}.{argument.name}")
+            if adapter and adapter.get("wrap"):
+                # The adapter wraps the whole call ({call}) and hands the converted argument in as adapter["argument"].
+                wraps.append((adapter["wrap"], passed[index]))
+                passed[index] = adapter["argument"]
+            elif adapter:
+                passed[index] = adapter["cpp"].replace("{value}", passed[index])
+            if adapter:
+                if adapter.get("header"):
+                    self.headers.add(adapter["header"])
+                if adapter.get("note"):
+                    notes.append(adapter["note"])
         prepare += self.setter_value_checks(function, mapped_args)
         # The result.
         sink = None
@@ -1921,21 +2018,29 @@ class Generator(ComplexGeneratorMixin):
                          'Ref document = contextDocument.releaseNonNull();']
             else:
                 body.append("Ref document = impl->document();")
+            if "global" in call_with:
+                body += ["auto* global = document->globalObject();", "if (!global)",
+                         '    return Ranvier::recordException(Exception { ExceptionCode::InvalidStateError, "The document has no global object."_s });']
+                notes.append("RV_ERR_DOM_EXCEPTION (InvalidStateError) for a document without a global object")
         attached = self.world.config.get("eventTargetObjects", {}).get(interface, {}).get("attached")
         if attached:
             body += [f"if (!({attached}))", "    return RV_ERR_DETACHED;"]
             notes.append("RV_ERR_DETACHED once the object's window has no frame")
         body += getattr(function, 'context_checks', [])
 
+        supplied = ["*global" if value == "global" else "document.get()" for value in call_with]
+
         def with_context(text):
-            text = text.replace("{call_with}", "".join(", document.get()" for _ in call_with))
-            text = text.replace("{call_with_bare}", ", ".join("document.get()" for _ in call_with))
-            return text.replace("{call_with_lead}", "".join("document.get(), " for _ in call_with))
+            text = text.replace("{call_with}", "".join(f", {value}" for value in supplied))
+            text = text.replace("{call_with_bare}", ", ".join(supplied))
+            return text.replace("{call_with_lead}", "".join(f"{value}, " for value in supplied))
         # An enumeration setter names its getter's call in a decltype, which takes the same context.
         body += [with_context(line) for line in prepare]
         expression = with_context(call)
         for index, value in enumerate(passed):
             expression = expression.replace(f"{{arg{index}}}", value)
+        for template, value in wraps:
+            expression = with_context(template).replace("{value}", value).replace("{call}", expression)
         if sink is None:
             body.append(f"return invoke([&]() -> decltype(auto) {{ return {expression}; }});")
         elif isinstance(sink, tuple) and sink[0] == 'copyback':
@@ -2175,6 +2280,8 @@ class Generator(ComplexGeneratorMixin):
                     note += ", required"
                 elif member.default is not None:
                     note += f", default {member.default}"
+                elif getattr(mapped, "optional_handle", False):
+                    note += ", NULL for absent, a pointer to NULL for null"
                 elif ctype.endswith("*"):
                     note += ", NULL for absent"
                 if mapped.kind == "enum":
