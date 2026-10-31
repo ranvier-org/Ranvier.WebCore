@@ -1,0 +1,45 @@
+{
+  "candidate": "artifacts/batch2-candidate-2 (built at cf68e82, parent C:/wk/native-cascade-shadow/artifacts/native46-candidate-6)",
+  "abi": 55,
+  "nativeVersion": "0.1.0-preview.47",
+  "raw": 93953,
+  "teardownRecords": 111,
+  "probes": 68,
+  "allExitZero": true,
+  "expected": {
+    "baseline": "batch-1 native46-candidate-6-batch 90743 raw + 104 teardown",
+    "deltas": {
+      "#145 host_string_nul": 309,
+      "G10 resize_observation": 1008,
+      "G11 intersection_observation": 1414,
+      "abi_layouts 15->23 (G10 + G11)": 8,
+      "G01/G15 media_queries": 401,
+      "I01 listener_signal_removal": 70
+    },
+    "teardownDeltas": {
+      "#145": 3,
+      "G10 resize entries": 2,
+      "G11 intersection entries": 2
+    },
+    "raw": 93953,
+    "teardown": 111
+  },
+  "laterPatchExemptions": {
+    "Source/WebCore/dom/Element.cpp": {
+      "unit": "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-9.cpp.obj",
+      "laterPatches": [
+        "C:/wk/native-pointer/patches/0044-pointer-event-pen-geometry.patch"
+      ],
+      "seriesLines": 8,
+      "laterLines": 2
+    }
+  },
+  "touchEventsNote": "0045 changes PointerCaptureController.h (reaches recompiled page-9) only under ENABLE(TOUCH_EVENTS), which build-win-slim sets to 0",
+  "files": {
+    "batch-results.json": "da9e11094699a19c896331ef6ef4670bfcc8c5cf3b13a1d909acc906a109cd37",
+    "batch.log": "8aa389a41a9479878308ff91f5e388ac3994193468b17e7969aa8097b1b72f81",
+    "runtime-receipt.json": "450ee80f6c59d004ed4f0e04e04e1c702315c15c9408221ce1d1ae901ffcbe18",
+    "source-patches.json": "ad2af7327c3e4fc5600722e9b137c0fba893dd0b913df801e300cf358df1438a",
+    "teardown-probes.json": "adf04f7f2ef2b5b694d6745e07157df8d1378dc1c8853be9aa23c492a4abf5bd"
+  }
+}
