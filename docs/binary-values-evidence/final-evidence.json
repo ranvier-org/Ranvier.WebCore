@@ -82,6 +82,12 @@
     "cases": 20
   },
   "valueDifferences": 0,
+  "conventionDivergence": {
+    "case": "invalid UTF-8 in a string BlobPart",
+    "behaviour": "RV_ERR_NULL_ARGUMENT (documented in the rv_dom_blob_create and rv_dom_file_create header comments)",
+    "generatedGlueConvention": "a NUL-terminated const char* string argument converts invalid UTF-8 to a null String without an error"
+  },
+  "commentOnlyAfterBatch": "the header and glue comment that documents it was added after the batch; no code changed and the runtime was not rebuilt",
   "qualifications": [
     {
       "qualification": "platform line endings",
@@ -109,7 +115,7 @@
     "batch-green.json": "3a84b0c0c0e33dd8a6e2677f39a7417638a50d9115fb4b0eb16cb53476efc83e",
     "binary-values-report.json": "c85797a5e5459ecfb4ad66abefce7b3e9626da04c5490d839279ba92c703facd",
     "build_native31_candidate.py": "c7ffd68708d8c453525146a176d03d587425b5ea9f86b8e328644430822c1e2a",
-    "make_native31_evidence.py": "4b03b8594b2a91ee7054e66e4a34fca6dc2d79de0d506c62924964415e7a4122",
+    "make_native31_evidence.py": "af724ec34db0761c79af002661043bb9f8c9f979d1fced0a151987e5c5517a4e",
     "measure_binary_red.py": "1e0a689b8168a1d0b119e2ce7b8cc89a3d8f44ae084ee5b9023c020493668a44",
     "red-native30.json": "a45c2f68ea39301d478b0fc45086304153367f2720e58611d4e064573b4aa3a5",
     "red-probe-native30.log": "55adeefa78e5ae693f2780d7c2ab37dc1cf0674bf777df84b40fa4083d688585",

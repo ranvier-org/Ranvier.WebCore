@@ -48,6 +48,10 @@ result = {
               'probeHeldPastDestroy': report['heldPastDestroy']},
     'chromiumOracle': {'browser': oracle['browser'], 'fixture': 'tests/fixtures/binary-values-oracle.json', 'cases': len(oracle['cases'])},
     'valueDifferences': 0,
+    'conventionDivergence': {'case': 'invalid UTF-8 in a string BlobPart',
+                             'behaviour': 'RV_ERR_NULL_ARGUMENT (documented in the rv_dom_blob_create and rv_dom_file_create header comments)',
+                             'generatedGlueConvention': 'a NUL-terminated const char* string argument converts invalid UTF-8 to a null String without an error'},
+    'commentOnlyAfterBatch': 'the header and glue comment that documents it was added after the batch; no code changed and the runtime was not rebuilt',
     'qualifications': [
         {'qualification': 'platform line endings', 'case': 'endings native',
          'reason': 'expected value depends on the platform: CRLF on Windows (equal to Windows Chromium 610d0a620d0a630d0a64), LF elsewhere; asserted per platform'},

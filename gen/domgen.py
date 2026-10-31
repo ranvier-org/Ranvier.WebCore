@@ -1479,6 +1479,8 @@ class Generator(ComplexGeneratorMixin):
             elif mapped.kind in ("union", "sequence"):
                 self.use_complex(mapped)
                 params.append((f"const {mapped.ctype}*", name))
+                if self.contains_bytes(mapped) and self.contains_string_spans(mapped):
+                    notes.append(f"a string part of {name} is UTF-8, and invalid UTF-8 returns RV_ERR_NULL_ARGUMENT")
                 if not maybe_null and not argument.optional:
                     checks.append(name)
                 if argument.optional and argument.default is None and not mapped.nullable:
