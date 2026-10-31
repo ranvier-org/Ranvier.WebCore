@@ -2289,6 +2289,8 @@ int32_t ranvier_dom_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "dom-computed-style"))
         return 1;
+    if (!std::strcmp(feature, "dom-window-scrolling"))
+        return 1;
     if (!std::strcmp(feature, "dom-geometry-matrix-readonly"))
         return 1;
     if (!std::strcmp(feature, "dom-geometry-matrix"))
@@ -37914,6 +37916,153 @@ int32_t ranvier_dom_window_get_computed_style(RvNode* target, RvNode* element, c
     StringArg a1 { pseudo_element, pseudo_element_length };
     if (pseudo_element_length >= 0 && a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
     return deliver([&]() -> decltype(auto) { return impl->window()->getComputedStyle(HandleArg<Element> { a0.get() }, a1.string()); }, [&](auto&& value) { return storeHandle<CSSStyleDeclaration>(value, result); });
+}
+
+// Window.scrollX getter: checked Document context
+int32_t ranvier_dom_window_get_scroll_x(RvNode* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!impl->window())
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->window()->scrollX(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// Window.scrollY getter: checked Document context
+int32_t ranvier_dom_window_get_scroll_y(RvNode* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!impl->window())
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->window()->scrollY(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// Window.scroll: checked Document context; nullable string byte length -1 means null; options defaults to {} in IDL; options may be NULL for the IDL default
+int32_t ranvier_dom_window_scroll_1(RvNode* target, const RvDomScrollToOptions* options)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!impl->window())
+        return RV_ERR_UNSUPPORTED;
+    ScrollToOptions a0 { };
+    if (options) {
+        if (options->size >= offsetof(RvDomScrollToOptions, behavior) + sizeof(options->behavior) && !assignEnumeration(a0.behavior, options->behavior, enumerationScrollBehavior))
+            return RV_ERR_UNSUPPORTED;
+        if (options->size >= offsetof(RvDomScrollToOptions, left) + sizeof(options->left) && options->left)
+            assignValue(a0.left, *options->left);
+        if (options->size >= offsetof(RvDomScrollToOptions, top) + sizeof(options->top) && options->top)
+            assignValue(a0.top, *options->top);
+    }
+    return invoke([&]() -> decltype(auto) { return impl->window()->scrollTo(std::move(a0)); });
+}
+
+// Window.scroll: checked Document context; nullable string byte length -1 means null
+int32_t ranvier_dom_window_scroll_2(RvNode* target, double x, double y)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!impl->window())
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->window()->scrollTo(x, y); });
+}
+
+// Window.scrollTo: checked Document context; nullable string byte length -1 means null; options defaults to {} in IDL; options may be NULL for the IDL default
+int32_t ranvier_dom_window_scroll_to_1(RvNode* target, const RvDomScrollToOptions* options)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!impl->window())
+        return RV_ERR_UNSUPPORTED;
+    ScrollToOptions a0 { };
+    if (options) {
+        if (options->size >= offsetof(RvDomScrollToOptions, behavior) + sizeof(options->behavior) && !assignEnumeration(a0.behavior, options->behavior, enumerationScrollBehavior))
+            return RV_ERR_UNSUPPORTED;
+        if (options->size >= offsetof(RvDomScrollToOptions, left) + sizeof(options->left) && options->left)
+            assignValue(a0.left, *options->left);
+        if (options->size >= offsetof(RvDomScrollToOptions, top) + sizeof(options->top) && options->top)
+            assignValue(a0.top, *options->top);
+    }
+    return invoke([&]() -> decltype(auto) { return impl->window()->scrollTo(std::move(a0)); });
+}
+
+// Window.scrollTo: checked Document context; nullable string byte length -1 means null
+int32_t ranvier_dom_window_scroll_to_2(RvNode* target, double x, double y)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!impl->window())
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->window()->scrollTo(x, y); });
+}
+
+// Window.scrollBy: checked Document context; nullable string byte length -1 means null; option defaults to {} in IDL; option may be NULL for the IDL default
+int32_t ranvier_dom_window_scroll_by_1(RvNode* target, const RvDomScrollToOptions* option)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!impl->window())
+        return RV_ERR_UNSUPPORTED;
+    ScrollToOptions a0 { };
+    if (option) {
+        if (option->size >= offsetof(RvDomScrollToOptions, behavior) + sizeof(option->behavior) && !assignEnumeration(a0.behavior, option->behavior, enumerationScrollBehavior))
+            return RV_ERR_UNSUPPORTED;
+        if (option->size >= offsetof(RvDomScrollToOptions, left) + sizeof(option->left) && option->left)
+            assignValue(a0.left, *option->left);
+        if (option->size >= offsetof(RvDomScrollToOptions, top) + sizeof(option->top) && option->top)
+            assignValue(a0.top, *option->top);
+    }
+    return invoke([&]() -> decltype(auto) { return impl->window()->scrollBy(std::move(a0)); });
+}
+
+// Window.scrollBy: checked Document context; nullable string byte length -1 means null
+int32_t ranvier_dom_window_scroll_by_2(RvNode* target, double x, double y)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!impl->window())
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->window()->scrollBy(x, y); });
 }
 
 // DOMMatrixReadOnly.fromMatrix: static operation with checked Document context and UTF-8 byte lengths; other defaults to {} in IDL; other may be NULL for the IDL default; *result is a new reference

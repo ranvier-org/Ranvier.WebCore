@@ -1236,6 +1236,46 @@ interface CSSStyleDeclaration { DOMString getPropertyValue(DOMString property); 
         self.assertIn('pseudo_element_length >= 0 && a1.string().isNull()', glue)
         self.assertNotIn('type Window =', generator.interfaces())
 
+    def test_window_bindings_list_reads_readonly_attributes_and_overloads_per_feature(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+typedef USVString CSSOMString;
+interface CSSStyleDeclaration { DOMString getPropertyValue(DOMString property); };
+[InterfaceName=Window, Exposed=Window] interface DOMWindow : EventTarget {};
+partial interface DOMWindow {
+    [NewObject] CSSStyleDeclaration getComputedStyle(Element element, optional CSSOMString? pseudoElement = null);
+    [Replaceable] readonly attribute double scrollX;
+    [Replaceable, ImplementedAs=scrollX] readonly attribute double pageXOffset;
+    undefined scrollTo(unrestricted double x, unrestricted double y);
+    undefined scrollBy(unrestricted double x, unrestricted double y);
+    [ImplementedAs=scrollTo] undefined scroll(unrestricted double x, unrestricted double y);
+    attribute DOMString name;
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleDeclaration']
+        computed = {'receiver': 'Document', 'members': ['getComputedStyle'], 'feature': 'dom-computed-style', 'stringInputs': 'utf8-lengths'}
+        scrolling = {'receiver': 'Document', 'members': ['scrollX', 'pageXOffset', 'scrollTo', 'scroll'], 'feature': 'dom-window-scrolling', 'stringInputs': 'utf8-lengths'}
+        config['windowBindings'] = {'DOMWindow': [computed, scrolling]}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        self.assertEqual(functions['rv_dom_window_get_computed_style']['feature'], 'dom-computed-style')
+        for name in ['rv_dom_window_get_scroll_x', 'rv_dom_window_get_page_x_offset', 'rv_dom_window_scroll_to', 'rv_dom_window_scroll']:
+            self.assertEqual(functions[name]['feature'], 'dom-window-scrolling', name)
+            self.assertEqual(functions[name]['contractOwner'], 'Window', name)
+        self.assertNotIn('rv_dom_window_scroll_by', functions)
+        self.assertEqual(functions['rv_dom_window_get_scroll_x']['parameters'], [{'ctype': 'RvNode*', 'name': 'target'}, {'ctype': 'double*', 'name': 'result'}])
+        glue = generator.glue()
+        self.assertEqual(glue.count('impl->window()->scrollX(); }'), 2)
+        self.assertIn('impl->window()->scrollTo(x, y)', glue)
+        self.assertIn('"dom-window-scrolling"', glue)
+        config['windowBindings'] = {'DOMWindow': {'receiver': 'Document', 'members': ['name'], 'feature': 'f', 'stringInputs': 'utf8-lengths'}}
+        with self.assertRaisesRegex(SystemExit, 'not an operation or a readonly attribute'):
+            domgen.Generator(domgen.World(self.source, config)).run()
+
     def test_namespace_support_queries_use_checked_document_and_complete_input_spans(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

@@ -9270,6 +9270,30 @@ extern int rv_dom_css_register_property(nativeint target, [<In>] RvDomDOMCSSCust
 extern int rv_dom_window_get_computed_style(nativeint target, nativeint element, byte[] pseudo_element, int pseudo_element_length, nativeint& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_window_get_scroll_x(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_window_get_scroll_y(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_window_scroll_1(nativeint target, [<In>] RvDomScrollToOptions[] options)
+
+[<DllImport(Lib)>]
+extern int rv_dom_window_scroll_2(nativeint target, float x, float y)
+
+[<DllImport(Lib)>]
+extern int rv_dom_window_scroll_to_1(nativeint target, [<In>] RvDomScrollToOptions[] options)
+
+[<DllImport(Lib)>]
+extern int rv_dom_window_scroll_to_2(nativeint target, float x, float y)
+
+[<DllImport(Lib)>]
+extern int rv_dom_window_scroll_by_1(nativeint target, [<In>] RvDomScrollToOptions[] option)
+
+[<DllImport(Lib)>]
+extern int rv_dom_window_scroll_by_2(nativeint target, float x, float y)
+
+[<DllImport(Lib)>]
 extern int rv_dom_dom_matrix_read_only_from_matrix(nativeint target, [<In>] RvDomDOMMatrixInit[] other, nativeint& result)
 
 [<DllImport(Lib)>]

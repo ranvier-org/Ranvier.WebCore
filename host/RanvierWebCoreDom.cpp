@@ -2653,6 +2653,14 @@ int32_t rv_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t p
 int32_t rv_dom_css_supports_1(RvNode* target, const uint8_t* condition_text, int32_t condition_text_length, int32_t* result) { return ranvier_dom_css_supports_1(target, condition_text, condition_text_length, result); }
 int32_t rv_dom_css_register_property(RvNode* target, const RvDomDOMCSSCustomPropertyDescriptor* descriptor) { return ranvier_dom_css_register_property(target, descriptor); }
 int32_t rv_dom_window_get_computed_style(RvNode* target, RvNode* element, const uint8_t* pseudo_element, int32_t pseudo_element_length, RvCSSStyleDeclaration** result) { return ranvier_dom_window_get_computed_style(target, element, pseudo_element, pseudo_element_length, result); }
+int32_t rv_dom_window_get_scroll_x(RvNode* target, double* result) { return ranvier_dom_window_get_scroll_x(target, result); }
+int32_t rv_dom_window_get_scroll_y(RvNode* target, double* result) { return ranvier_dom_window_get_scroll_y(target, result); }
+int32_t rv_dom_window_scroll_1(RvNode* target, const RvDomScrollToOptions* options) { return ranvier_dom_window_scroll_1(target, options); }
+int32_t rv_dom_window_scroll_2(RvNode* target, double x, double y) { return ranvier_dom_window_scroll_2(target, x, y); }
+int32_t rv_dom_window_scroll_to_1(RvNode* target, const RvDomScrollToOptions* options) { return ranvier_dom_window_scroll_to_1(target, options); }
+int32_t rv_dom_window_scroll_to_2(RvNode* target, double x, double y) { return ranvier_dom_window_scroll_to_2(target, x, y); }
+int32_t rv_dom_window_scroll_by_1(RvNode* target, const RvDomScrollToOptions* option) { return ranvier_dom_window_scroll_by_1(target, option); }
+int32_t rv_dom_window_scroll_by_2(RvNode* target, double x, double y) { return ranvier_dom_window_scroll_by_2(target, x, y); }
 int32_t rv_dom_dom_matrix_read_only_from_matrix(RvNode* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_read_only_from_matrix(target, other, result); }
 int32_t rv_dom_dom_matrix_from_matrix(RvNode* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_from_matrix(target, other, result); }
 int32_t rv_dom_dom_rect_read_only_from_rect(RvNode* target, const RvDomDOMRectInit* other, RvDOMRectReadOnly** result) { return ranvier_dom_dom_rect_read_only_from_rect(target, other, result); }

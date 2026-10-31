@@ -545,8 +545,10 @@ class Generator(ComplexGeneratorMixin):
             self.interface(name)
         for name, binding in self.world.config.get("namespaceBindings", {}).items():
             self.namespace(name, binding)
-        for name, binding in self.world.config.get("windowBindings", {}).items():
-            self.window_context(name, binding)
+        for name, bindings in self.world.config.get("windowBindings", {}).items():
+            # A list holds one binding per capability feature.
+            for binding in bindings if isinstance(bindings, list) else [bindings]:
+                self.window_context(name, binding)
         for name, binding in self.world.config.get("staticBindings", {}).items():
             self.static_context(name, binding)
         for name, binding in self.world.config.get('iterableBindings', {}).items():
@@ -603,18 +605,36 @@ class Generator(ComplexGeneratorMixin):
         for partial in self.world.partials.get(name, []):
             if not self.world.skipped(partial.file):
                 members += [self.scoped_member(member, partial.attrs, definition.attrs) for member in partial.members]
+        attributes = {}
         for member in members:
             if member.name not in selected:
                 continue
             reason = self.member_reason(name, member)
-            if reason or member.kind != 'operation':
-                raise SystemExit(f'{name}.{member.name}: {reason or "configured member is not an operation"}')
-            if member.attrs.get('CallWith') or member.attrs.get('ImplementedBy'):
-                raise SystemExit(f'{name}.{member.name}: Window context bindings require a direct instance operation')
-            operations.setdefault(member.name, []).append(member)
-        if selected != set(operations):
-            raise SystemExit(f'{name}: missing configured Window operations {sorted(selected - set(operations))}')
+            readonly_attribute = member.kind == 'attribute' and member.readonly
+            if reason or (member.kind != 'operation' and not readonly_attribute):
+                raise SystemExit(f'{name}.{member.name}: {reason or "configured member is not an operation or a readonly attribute"}')
+            if member.attrs.get('CallWith') or member.attrs.get('ImplementedBy') or member.attrs.get('GetterCallWith'):
+                raise SystemExit(f'{name}.{member.name}: Window context bindings require a direct instance member')
+            if readonly_attribute:
+                attributes[member.name] = member
+            else:
+                operations.setdefault(member.name, []).append(member)
+        if selected != set(operations) | set(attributes):
+            raise SystemExit(f'{name}: missing configured Window members {sorted(selected - set(operations) - set(attributes))}')
         generated = []
+        for attribute, member in attributes.items():
+            function = Function(name, member, 'context_operation', f'window_get_{snake(attribute)}', [],
+                                f'Window.{attribute} getter: checked Document context')
+            function.receiver = 'Document'
+            function.feature = binding['feature']
+            function.context_checks = ['if (!impl->window())', '    return RV_ERR_UNSUPPORTED;']
+            try:
+                result = self.world.map(member.type)
+                call = f'impl->window()->{member.attrs.get("ImplementedAs", member.name)}()'
+                self.finish(function, 'Document', member, [], [], result, call, [])
+            except Unsupported as error:
+                raise SystemExit(f'{name}.{member.name}: {error}') from error
+            generated.append(function)
         for operation, overloads in operations.items():
             for member in overloads:
                 suffix = '' if len(overloads) == 1 else f'_{len(member.arguments)}'

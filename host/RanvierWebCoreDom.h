@@ -7308,6 +7308,25 @@ RV_EXPORT int32_t rv_dom_css_register_property(RvNode* target, const RvDomDOMCSS
 /* Window.getComputedStyle: checked Document context; nullable string byte length -1 means null; pseudo_element
  * defaults to null in IDL; pseudo_element may be NULL (null); *result is a new reference */
 RV_EXPORT int32_t rv_dom_window_get_computed_style(RvNode* target, RvNode* element, const uint8_t* pseudo_element, int32_t pseudo_element_length, RvCSSStyleDeclaration** result);
+/* Window.scrollX getter: checked Document context */
+RV_EXPORT int32_t rv_dom_window_get_scroll_x(RvNode* target, double* result);
+/* Window.scrollY getter: checked Document context */
+RV_EXPORT int32_t rv_dom_window_get_scroll_y(RvNode* target, double* result);
+/* Window.scroll: checked Document context; nullable string byte length -1 means null; options defaults to {} in IDL;
+ * options may be NULL for the IDL default */
+RV_EXPORT int32_t rv_dom_window_scroll_1(RvNode* target, const RvDomScrollToOptions* options);
+/* Window.scroll: checked Document context; nullable string byte length -1 means null */
+RV_EXPORT int32_t rv_dom_window_scroll_2(RvNode* target, double x, double y);
+/* Window.scrollTo: checked Document context; nullable string byte length -1 means null; options defaults to {} in
+ * IDL; options may be NULL for the IDL default */
+RV_EXPORT int32_t rv_dom_window_scroll_to_1(RvNode* target, const RvDomScrollToOptions* options);
+/* Window.scrollTo: checked Document context; nullable string byte length -1 means null */
+RV_EXPORT int32_t rv_dom_window_scroll_to_2(RvNode* target, double x, double y);
+/* Window.scrollBy: checked Document context; nullable string byte length -1 means null; option defaults to {} in IDL;
+ * option may be NULL for the IDL default */
+RV_EXPORT int32_t rv_dom_window_scroll_by_1(RvNode* target, const RvDomScrollToOptions* option);
+/* Window.scrollBy: checked Document context; nullable string byte length -1 means null */
+RV_EXPORT int32_t rv_dom_window_scroll_by_2(RvNode* target, double x, double y);
 /* DOMMatrixReadOnly */
 
 /* DOMMatrixReadOnly.fromMatrix: static operation with checked Document context and UTF-8 byte lengths; other defaults
