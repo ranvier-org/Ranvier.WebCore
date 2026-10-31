@@ -55,6 +55,12 @@ def verify(native_directory, webkit_source, evidence_json=None):
         call(name, arguments + [ctypes.POINTER(scalar)], *values, ctypes.byref(result))
         return result.value
 
+    # FreeType scales advances in 16.16 fixed point: each Ahem glyph may lose one unit.
+    quantum = 2 ** -16 if sys.platform.startswith('linux') else 0
+
+    def advance(actual, glyphs, expected, label):
+        expect(abs(actual - expected) <= glyphs * quantum, label + ': ' + repr(actual))
+
     def close(actual, expected, label, tolerance=0.001):
         expect(len(actual) == len(expected) and all(math.isclose(a, b, rel_tol=0, abs_tol=tolerance) for a, b in zip(actual, expected)), label + ': ' + str(actual))
 
@@ -121,7 +127,7 @@ def verify(native_directory, webkit_source, evidence_json=None):
             if bind('rv_run_loop_cycle', integer, [integer])(10) < 0:
                 raise AssertionError('font readiness event loop')
             bind('rv_host_update', integer, [pointer])(host)
-        expect(current.value == 60, 'actual Ahem font readiness')
+        advance(current.value, 3, 60, 'actual Ahem font readiness')
 
         query = handle('rv_dom_svgsvg_element_create_svg_rect', [pointer], [root], 'svg_rect')
         for field, value in zip(['x', 'y', 'width', 'height'], [5, 5, 30, 30]):
@@ -148,9 +154,9 @@ def verify(native_directory, webkit_source, evidence_json=None):
 
         for target, baseline_y in [(plain, 100), (path_text, 150)]:
             expect(number('rv_dom_svg_text_content_element_get_number_of_chars', [pointer], [target], integer) == 3, 'text character count')
-            expect(number('rv_dom_svg_text_content_element_get_computed_text_length', [pointer], [target]) == 60, 'text length')
-            expect(number('rv_dom_svg_text_content_element_get_sub_string_length', [pointer, unsigned, unsigned], [target, 0, 2]) == 40, 'substring length')
-            expect(number('rv_dom_svg_text_content_element_get_sub_string_length', [pointer, unsigned, unsigned], [target, 1, 99]) == 40, 'substring count clamps to remaining characters')
+            advance(number('rv_dom_svg_text_content_element_get_computed_text_length', [pointer], [target]), 3, 60, 'text length')
+            advance(number('rv_dom_svg_text_content_element_get_sub_string_length', [pointer, unsigned, unsigned], [target, 0, 2]), 2, 40, 'substring length')
+            advance(number('rv_dom_svg_text_content_element_get_sub_string_length', [pointer, unsigned, unsigned], [target, 1, 99]), 2, 40, 'substring count clamps to remaining characters')
             for index in range(3):
                 start = handle('rv_dom_svg_text_content_element_get_start_position_of_char', [pointer, unsigned], [target, index], 'svg_point')
                 close(point(start), (10 + index * 20, baseline_y), 'character start position')
@@ -204,19 +210,27 @@ def verify(native_directory, webkit_source, evidence_json=None):
                             row[field].append(point(handle('rv_dom_svg_text_content_element_get_' + operation + '_position_of_char', [pointer, unsigned], [target, index], 'svg_point')))
                         row['extents'].append(rectangle(handle('rv_dom_svg_text_content_element_get_extent_of_char', [pointer, unsigned], [target, index], 'svg_rect')))
                     row['hits'] = []
-                    for x, y in [(15, 95), (45, 95), (85, 95), (95, 95), (-100, -100)]:
+                    hit_points = [(15, 95), (45, 95), (85, 95), (95, 95), (-100, -100)]
+                    for x, y in hit_points:
                         hit = PointInit(ctypes.sizeof(PointInit), x, y, 0, 1)
                         row['hits'].append(number('rv_dom_svg_text_content_element_get_char_num_at_position', [pointer, ctypes.POINTER(PointInit)], [target, ctypes.byref(hit)], integer))
                     row['bbox'] = bounds(target)
-                    expect(row['computed'] == (60 if adjust == 1 else 90), 'adjusted logical text advance ' + kind)
-                    expect(row['substring01'] == row['substring12'] == (40 if adjust == 1 else 60), 'adjusted substring logical advances ' + kind)
+                    advance(row['computed'], 3, 60 if adjust == 1 else 90, 'adjusted logical text advance ' + kind)
+                    expect(row['substring01'] == row['substring12'], 'adjusted substring logical advances agree ' + kind)
+                    advance(row['substring01'], 2, 40 if adjust == 1 else 60, 'adjusted substring logical advances ' + kind)
                     expected_row = next((item for item in expected_rows if (item['kind'], item['rotation'], item['adjust']) == (kind, rotation, adjust)), None)
                     if expected_row:
                         for field in ['starts', 'ends', 'extents']:
                             for actual, expected in zip(row[field], expected_row[field]):
                                 close(actual, expected, kind + ' ' + field + ' independent retained oracle')
                         if rotation == '0 0 0' or adjust == 2:
-                            expect(row['hits'] == expected_row['hits'], kind + ' independent hit oracle')
+                            for (x, y), actual, expected in zip(hit_points, row['hits'], expected_row['hits']):
+                                edges = [edge for left, _, width, _ in row['extents'] for edge in (left, left + width)]
+                                if quantum and any(abs(x - edge) <= 3 * quantum for edge in edges):
+                                    inside = [index for index, (left, top, width, height) in enumerate(row['extents']) if left <= x <= left + width and top <= y <= top + height]
+                                    expect(actual == (inside[0] if inside else -1), kind + ' quantized-edge hit matches actual extents')
+                                else:
+                                    expect(actual == expected, kind + ' independent hit oracle')
                     expect(bind('rv_host_update', integer, [pointer])(host) >= 0, 'adjusted text actual render update')
                     pixels = (ctypes.c_uint8 * (500 * 300 * 4))()
                     call('rv_host_paint_rgba', [pointer, pointer, integer], host, pixels, len(pixels))
