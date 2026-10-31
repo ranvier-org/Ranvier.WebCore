@@ -13,4 +13,6 @@ WEBCORE_EXPORT int32_t ranvier_window_metrics(RvNode* document, RvWindowMetrics*
 WEBCORE_EXPORT RvEventTarget* ranvier_match_media(RvNode* document, const char* query);
 WEBCORE_EXPORT int32_t ranvier_media_query_matches(RvEventTarget*, int32_t* matches);
 WEBCORE_EXPORT int32_t ranvier_media_query_media(RvEventTarget*, char* buffer, int32_t capacity, int32_t* length);
+// Moves the document's page to the display displayID, whose PlatformScreen data its screen reports.
+WEBCORE_EXPORT void ranvier_page_set_display(RvNode* document, uint32_t displayID);
 }

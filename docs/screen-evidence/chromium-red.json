@@ -1,0 +1,172 @@
+{
+  "browser": "156.0.8078.4",
+  "headless": "new",
+  "default": {
+    "width": 800,
+    "height": 600,
+    "availWidth": 800,
+    "availHeight": 600,
+    "availLeft": 0,
+    "availTop": 0,
+    "colorDepth": 24,
+    "pixelDepth": 24,
+    "orientation": {
+      "type": "landscape-primary",
+      "angle": 0
+    },
+    "inner": [
+      800,
+      600
+    ],
+    "dpr": 1,
+    "deviceWidthQuery": true,
+    "orientationQuery": "landscape",
+    "screenIsExtended": false
+  },
+  "lock": {
+    "ok": true
+  },
+  "unlock": {
+    "ok": true
+  },
+  "portraitOverride": {
+    "width": 1080,
+    "height": 1920,
+    "availWidth": 1080,
+    "availHeight": 1920,
+    "availLeft": 0,
+    "availTop": 0,
+    "colorDepth": 24,
+    "pixelDepth": 24,
+    "orientation": {
+      "type": "portrait-primary",
+      "angle": 0
+    },
+    "inner": [
+      400,
+      700
+    ],
+    "dpr": 2,
+    "deviceWidthQuery": true,
+    "orientationQuery": "portrait",
+    "screenIsExtended": false
+  },
+  "eventsAfterPortrait": [
+    [
+      "orientation",
+      "portrait-primary",
+      0
+    ],
+    [
+      "resize",
+      400,
+      700
+    ]
+  ],
+  "landscapeOverride": {
+    "width": 1920,
+    "height": 1080,
+    "availWidth": 1920,
+    "availHeight": 1080,
+    "availLeft": 0,
+    "availTop": 0,
+    "colorDepth": 24,
+    "pixelDepth": 24,
+    "orientation": {
+      "type": "landscape-secondary",
+      "angle": 270
+    },
+    "inner": [
+      700,
+      400
+    ],
+    "dpr": 1,
+    "deviceWidthQuery": true,
+    "orientationQuery": "landscape",
+    "screenIsExtended": false
+  },
+  "eventsAfterLandscape": [
+    [
+      "orientation",
+      "landscape-secondary",
+      270
+    ],
+    [
+      "resize",
+      700,
+      400
+    ]
+  ],
+  "mobileOverride": {
+    "width": 1920,
+    "height": 1080,
+    "availWidth": 1920,
+    "availHeight": 1080,
+    "availLeft": 0,
+    "availTop": 0,
+    "colorDepth": 24,
+    "pixelDepth": 24,
+    "orientation": {
+      "type": "landscape-primary",
+      "angle": 90
+    },
+    "inner": [
+      980,
+      560
+    ],
+    "dpr": 1,
+    "deviceWidthQuery": true,
+    "orientationQuery": "landscape",
+    "screenIsExtended": false
+  },
+  "mobileLock": {
+    "ok": true,
+    "type": "landscape-primary"
+  },
+  "eventsAfterMobile": [
+    [
+      "resize",
+      980,
+      560
+    ],
+    [
+      "orientation",
+      "landscape-primary",
+      90
+    ]
+  ],
+  "cleared": {
+    "width": 600,
+    "height": 800,
+    "availWidth": 800,
+    "availHeight": 600,
+    "availLeft": 0,
+    "availTop": 0,
+    "colorDepth": 24,
+    "pixelDepth": 24,
+    "orientation": {
+      "type": "portrait-primary",
+      "angle": 270
+    },
+    "inner": [
+      800,
+      600
+    ],
+    "dpr": 1,
+    "deviceWidthQuery": true,
+    "orientationQuery": "landscape",
+    "screenIsExtended": false
+  },
+  "eventsAfterClear": [
+    [
+      "resize",
+      800,
+      600
+    ],
+    [
+      "orientation",
+      "portrait-primary",
+      270
+    ]
+  ]
+}

@@ -2802,6 +2802,16 @@ WEBCORE_EXPORT int32_t ranvier_dom_window_scroll_by_2(RvNode* target, double x, 
 WEBCORE_EXPORT int32_t ranvier_dom_window_get_visual_viewport(RvNode* target, RvEventTarget** result);
 WEBCORE_EXPORT int32_t ranvier_dom_crypto_get_random_values(RvNode* target, int32_t array_kind, uint8_t* array, int32_t array_length);
 WEBCORE_EXPORT int32_t ranvier_dom_crypto_random_uuid(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+WEBCORE_EXPORT int32_t ranvier_dom_screen_get_height(RvNode* target, int32_t* result);
+WEBCORE_EXPORT int32_t ranvier_dom_screen_get_width(RvNode* target, int32_t* result);
+WEBCORE_EXPORT int32_t ranvier_dom_screen_get_color_depth(RvNode* target, uint32_t* result);
+WEBCORE_EXPORT int32_t ranvier_dom_screen_get_pixel_depth(RvNode* target, uint32_t* result);
+WEBCORE_EXPORT int32_t ranvier_dom_screen_get_avail_left(RvNode* target, int32_t* result);
+WEBCORE_EXPORT int32_t ranvier_dom_screen_get_avail_top(RvNode* target, int32_t* result);
+WEBCORE_EXPORT int32_t ranvier_dom_screen_get_avail_height(RvNode* target, int32_t* result);
+WEBCORE_EXPORT int32_t ranvier_dom_screen_get_avail_width(RvNode* target, int32_t* result);
+WEBCORE_EXPORT int32_t ranvier_dom_screen_orientation_get_type(RvNode* target, int32_t* result);
+WEBCORE_EXPORT int32_t ranvier_dom_screen_orientation_get_angle(RvNode* target, uint16_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_dom_matrix_read_only_from_matrix(RvNode* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result);
 WEBCORE_EXPORT int32_t ranvier_dom_dom_matrix_from_matrix(RvNode* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result);
 WEBCORE_EXPORT int32_t ranvier_dom_dom_rect_read_only_from_rect(RvNode* target, const RvDomDOMRectInit* other, RvDOMRectReadOnly** result);

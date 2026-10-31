@@ -1,0 +1,109 @@
+{
+  "browser": "156.0.8078.4",
+  "platform": "win32",
+  "default": {
+    "created": {
+      "width": 320,
+      "height": 200,
+      "avail_left": 0,
+      "avail_top": 0,
+      "avail_width": 320,
+      "avail_height": 200,
+      "color_depth": 24,
+      "pixel_depth": 24,
+      "type": "landscape-primary",
+      "angle": 0
+    },
+    "resized": {
+      "width": 300,
+      "height": 500,
+      "avail_left": 0,
+      "avail_top": 0,
+      "avail_width": 300,
+      "avail_height": 500,
+      "color_depth": 24,
+      "pixel_depth": 24,
+      "type": "portrait-primary",
+      "angle": 90
+    }
+  },
+  "set": {
+    "landscape 1920x1080": {
+      "width": 1920,
+      "height": 1080,
+      "avail_left": 0,
+      "avail_top": 0,
+      "avail_width": 1920,
+      "avail_height": 1080,
+      "color_depth": 24,
+      "pixel_depth": 24,
+      "type": "landscape-primary",
+      "angle": 0
+    },
+    "portrait 1080x1920": {
+      "width": 1080,
+      "height": 1920,
+      "avail_left": 0,
+      "avail_top": 0,
+      "avail_width": 1080,
+      "avail_height": 1920,
+      "color_depth": 24,
+      "pixel_depth": 24,
+      "type": "portrait-primary",
+      "angle": 90
+    },
+    "landscape-secondary 2560x1440": {
+      "width": 2560,
+      "height": 1440,
+      "avail_left": 0,
+      "avail_top": 0,
+      "avail_width": 2560,
+      "avail_height": 1440,
+      "color_depth": 24,
+      "pixel_depth": 24,
+      "type": "landscape-secondary",
+      "angle": 180
+    },
+    "portrait-secondary 768x1024": {
+      "width": 768,
+      "height": 1024,
+      "avail_left": 0,
+      "avail_top": 0,
+      "avail_width": 768,
+      "avail_height": 1024,
+      "color_depth": 24,
+      "pixel_depth": 24,
+      "type": "portrait-secondary",
+      "angle": 270
+    }
+  },
+  "errors": "checked",
+  "twoHosts": {
+    "first": {
+      "width": 1920,
+      "height": 1080,
+      "avail_left": 0,
+      "avail_top": 0,
+      "avail_width": 1920,
+      "avail_height": 1040,
+      "color_depth": 24,
+      "pixel_depth": 24,
+      "type": "landscape-primary",
+      "angle": 0
+    },
+    "second": {
+      "width": 1080,
+      "height": 1920,
+      "avail_left": 0,
+      "avail_top": 40,
+      "avail_width": 1080,
+      "avail_height": 1880,
+      "color_depth": 30,
+      "pixel_depth": 30,
+      "type": "portrait-primary",
+      "angle": 90
+    }
+  },
+  "afterDestroy": 0,
+  "assertions": 222
+}

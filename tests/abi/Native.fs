@@ -344,6 +344,7 @@ module Calls =
             "rv_host_set_page_scale"
             "rv_host_page_scale"
             "rv_host_set_obscured_insets"
+            "rv_host_set_screen"
         |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
@@ -1209,6 +1210,9 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_host_set_obscured_insets(nativeint host, float top, float right, float bottom, float left)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_set_screen(nativeint host, nativeint metrics)
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -3983,6 +3987,18 @@ let rv_host_set_obscured_insets (host: nativeint, top: float, right: float, bott
         result
     else
         Raw.rv_host_set_obscured_insets (host, top, right, bottom, left)
+
+let rv_host_set_screen (host: nativeint, metrics: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_set_screen (host, metrics)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[223] <- Calls.Counts[223] + 1L
+        Calls.Ticks[223] <- Calls.Ticks[223] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_set_screen (host, metrics)
 
 // END GENERATED
 
