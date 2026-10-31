@@ -1,0 +1,161 @@
+{
+  "probe": "host_string_nul",
+  "runtime": "artifacts/native47-candidate-4-frozen/runtimes/win-x64/native",
+  "count": 30,
+  "allPassed": true,
+  "distinctPassLines": [
+    "PASS host_string_nul: 309 assertions, 2 qualified"
+  ],
+  "runs": [
+    {
+      "run": 1,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 2,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 3,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 4,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 5,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 6,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 7,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 8,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 9,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 10,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 11,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 12,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 13,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 14,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 15,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 16,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 17,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 18,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 19,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 20,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 21,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 22,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 23,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 24,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 25,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 26,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 27,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 28,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 29,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    },
+    {
+      "run": 30,
+      "exitCode": 0,
+      "pass": "PASS host_string_nul: 309 assertions, 2 qualified"
+    }
+  ]
+}
