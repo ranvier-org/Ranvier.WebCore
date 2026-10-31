@@ -477,6 +477,10 @@ jobs:
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/event_construction.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
+      - name: Verify the window event target, activation, touch capacity and pointer capture
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/focus_input.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
       - name: Verify passive capability catalogue and live host observations
         run: python -I tests/abi/capabilities.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 

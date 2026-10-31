@@ -1,0 +1,26 @@
+diff --git a/host/RanvierWebCoreAbi.h b/host/RanvierWebCoreAbi.h
+index a9ea724..9cf1e04 100644
+--- a/host/RanvierWebCoreAbi.h
++++ b/host/RanvierWebCoreAbi.h
+@@ -1321,6 +1321,21 @@ RV_EXPORT RvEventTarget* rv_event_get_target(RvEvent*, int32_t current);
+ /* The relatedTarget of a mouse or focus event as a new EventTarget reference, or NULL. */
+ RV_EXPORT RvEventTarget* rv_event_get_related_target(RvEvent*);
+ 
++/* Window event target and input state ("input-state", v34). */
++
++/* A new reference to the window of the host's current document, as an EventTarget for the rv_event_target_*
++ * functions; release it with rv_event_target_release. Each call returns a new reference; rv_event_target_equals is 1
++ * for two references to one window. Listeners receive every event type dispatched to the window: window events such
++ * as focus, blur and resize, and the capture and bubble phases of events dispatched to the document's nodes, with
++ * the window as currentTarget. A host has one window for its lifetime: replacing the document (rv_host_load_html,
++ * rv_host_load_svg) keeps the window and its listeners. A reference and its listeners stay valid after rv_host_destroy,
++ * and rv_listener_remove on them returns RV_OK. Returns NULL for a NULL host, a document without a window, or a call
++ * off the owning thread. */
++RV_EXPORT RvEventTarget* rv_host_window_event_target(RvHost* host);
++/* Writes Navigator.maxTouchPoints of the current document's window. RV_ERR_UNSUPPORTED when the document has no
++ * window. */
++RV_EXPORT int32_t rv_host_max_touch_points(RvHost* host, int32_t* value);
++
+ /* "dom-generated" and "dom:<Interface>" for rv_abi_has: the generated functions of RanvierWebCoreDom.h, one per
+  * IDL member of the interfaces gen/dom.json lists, from the same library. */
+ 
