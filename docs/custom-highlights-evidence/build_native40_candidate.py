@@ -44,8 +44,12 @@ caret_mtime = os.stat(Path('C:/wk/src') / caret_source).st_mtime_ns
 patch_0037 = repo / 'patches/0037-frame-loader-client-form-submission-hook.patch'
 if not patch_0037.exists():
     patch_0037 = Path('C:/wk/native-formsubmit/patches/0037-frame-loader-client-form-submission-hook.patch')
-patches = sorted(p.name for p in (repo / 'patches').glob('*.patch')) + [patch_0037.name]
-assert sorted(set(patches))[-1].startswith('0037-'), 'a source patch after 0037 needs its owner objects: ' + patches[-1]
+# Patch 0038 (G04): its unified source and PlatformScreenWin.cpp are compiled here from C:/wk/src.
+patch_0038 = repo / 'patches/0038-platform-screen-win-embedder-screen-data.patch'
+if not patch_0038.exists():
+    patch_0038 = Path('C:/wk/native-screen/patches/0038-platform-screen-win-embedder-screen-data.patch')
+patches = sorted(p.name for p in (repo / 'patches').glob('*.patch')) + [patch_0037.name, patch_0038.name]
+assert sorted(set(patches))[-1].startswith('0038-'), 'a source patch after 0038 needs its owner objects: ' + sorted(set(patches))[-1]
 def hunk_lines(text):
     return [line for line in text.splitlines() if line[:1] in '+-' and not line.startswith(('+++', '---'))]
 def contains(lines, part):
@@ -55,19 +59,26 @@ def contains(lines, part):
             index += 1
     return index == len(part)
 patch_receipt = {}
-recompiled_sources = set()
-text = patch_0037.read_text(encoding='utf-8')
-for section in text.split('\ndiff --git ')[0 if text.startswith('diff --git ') else 1:]:
-    name = re.search(r'a/(\S+) b/', section).group(1)
-    current = subprocess.run(['git', '-C', 'C:/wk/src', 'diff', '--', name], capture_output=True, text=True, check=True).stdout
-    assert contains(hunk_lines(current), hunk_lines(section)), name + ' does not carry ' + patch_0037.name
-    recompiled_sources.add(name)
-    patch_receipt.setdefault(patch_0037.name, {'sha256': hashlib.sha256(patch_0037.read_bytes()).hexdigest(), 'files': {}})['files'][name] = hunk_lines(section)
+def patch_files(patch):
+    files = set()
+    text = patch.read_text(encoding='utf-8')
+    for section in text.split('\ndiff --git ')[0 if text.startswith('diff --git ') else 1:]:
+        name = re.search(r'a/(\S+) b/', section).group(1)
+        current = subprocess.run(['git', '-C', 'C:/wk/src', 'diff', '--', name], capture_output=True, text=True, check=True).stdout
+        assert contains(hunk_lines(current), hunk_lines(section)), name + ' does not carry ' + patch.name
+        files.add(name)
+        patch_receipt.setdefault(patch.name, {'sha256': hashlib.sha256(patch.read_bytes()).hexdigest(), 'files': {}})['files'][name] = hunk_lines(section)
+    return files
+recompiled_sources = patch_files(patch_0037)
+screen_sources = patch_files(patch_0038)
+screen_scan = subprocess.run([sys.executable, '-I', 'C:/wk/t06-artifacts/units_for_headers.py', '--json', *sorted(screen_sources)],
+                             capture_output=True, text=True, check=True)
+screen_units = json.loads(screen_scan.stdout)['all'] + ['Source/WebCore/CMakeFiles/WebCore.dir/platform/win/PlatformScreenWin.cpp.obj']
 scan = subprocess.run([sys.executable, '-I', 'C:/wk/t06-artifacts/units_for_headers.py', '--json', *sorted(recompiled_sources)],
                       capture_output=True, text=True, check=True)
 patched_units = json.loads(scan.stdout)['all']
 newest_source = max(os.stat(Path('C:/wk/src') / path).st_mtime_ns for path in changed_sources
-                    if path != caret_source and path not in recompiled_sources)
+                    if path != caret_source and path not in recompiled_sources | screen_sources)
 runtime = out / 'runtime'
 runtime.mkdir(parents=True)
 shutil.copytree(parent / 'runtime', runtime, dirs_exist_ok=True)
@@ -117,7 +128,8 @@ private_headers.mkdir(parents=True, exist_ok=True)
 for header in ['CSSRule.h', 'CSSFontFaceRule.h', 'PropertySetCSSDescriptors.h']:
     (private_headers / header).write_text('#pragma once\n#include "C:/wk/src/Source/WebCore/css/' + header + '"\n')
 command_map = {}
-for command in commands([glue_target]):
+assert not set(screen_units) & set(patched_units)
+for command in commands([glue_target, *screen_units]):
     if 'clang-cl.exe' in command:
         output = re.search(r'/Fo(?:"([^"]+)"|(\S+))', command)
         if output:
@@ -127,7 +139,14 @@ if code:
     raise SystemExit('RanvierDomGlue failed')
 replacements[glue_target] = obj
 objects = {unit: replacements[unit] for unit in patched_units}
-(out / 'source-patches.json').write_text(json.dumps({'patches': patch_receipt, 'reusedPatchUnits': objects,
+screen_objects = {}
+for index, unit in enumerate(screen_units, start=1):
+    target, obj, code = compile_object(index, unit)
+    if code:
+        raise SystemExit(unit + ' failed')
+    replacements[unit] = obj
+    screen_objects[unit] = obj
+(out / 'source-patches.json').write_text(json.dumps({'patches': patch_receipt, 'reusedPatchUnits': objects, 'recompiledUnits': screen_objects,
                                                       'reusedOwnerObject': {'patch': '0035', 'unit': dom_target, 'object': replacements[dom_target]}}, indent=2))
 (out / 'replacement-objects.json').write_text(json.dumps(replacements, indent=2))
 
@@ -166,7 +185,7 @@ assert hashes['JavaScriptCore.dll'].startswith('95149cdc')
 receipt = {'repoHead': subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=repo, capture_output=True, text=True).stdout.strip(),
            'parent': str(parent), 'glueParent': str(glue_parent), 'recompiled': ['RanvierDomGlue.cpp'] + [
                'host/RanvierWebCoreAbi.cpp', 'host/RanvierWebCoreDom.cpp', 'host/RanvierWebCoreUia.cpp', 'host/RanvierWebCoreD3D11.cpp'],
-           'patchUnits': 'every unit patch 0037 reaches is the parent (B22) compile, newer than the patched files',
+           'patchUnits': 'every unit patch 0037 reaches is the parent (B22) compile, newer than the patched files; the units of patch 0038 are compiled here',
            'sourceExemption': {'file': caret_source, 'reason': 'patch 0035 owner G09 object (native32-candidate-3 dom-7) reused',
                                'objectMtimeNs': Path(replacements[dom_target]).stat().st_mtime_ns, 'sourceMtimeNs': caret_mtime},
            'runtimeSha256': hashes}
