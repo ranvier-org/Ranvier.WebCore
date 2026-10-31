@@ -718,6 +718,75 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
                 rv_dom_file_list_release list[0]
                 rv_dom_blob_release file
                 rv_dom_blob_release held.Value
+        | "blob reads" ->
+            // A FileReader and an engine read in flight, and a revoked object URL, when the host is destroyed.
+            let data = Array.zeroCreate<byte> (1 <<< 20)
+
+            let handle =
+                Runtime.InteropServices.GCHandle.Alloc(data, Runtime.InteropServices.GCHandleType.Pinned)
+
+            let mutable part = RvDomUnionBufferSourceOrBlobOrUSVString()
+            part.present <- 1
+            part.tag <- RV_DOM_UNION_BUFFER_SOURCE_OR_BLOB_OR_USV_STRING_BUFFER_SOURCE
+            let mutable span = RvDomByteSpan()
+            span.data <- handle.AddrOfPinnedObject()
+            span.length <- data.Length
+            part.arm0 <- span
+
+            let parts =
+                Runtime.InteropServices.GCHandle.Alloc([| part |], Runtime.InteropServices.GCHandleType.Pinned)
+
+            let mutable sequence = RvDomSequenceBufferSourceOrBlobOrUSVString()
+            sequence.present <- 1
+            sequence.count <- 1
+            sequence.items <- parts.AddrOfPinnedObject()
+            let mutable blob = 0n
+            rv_dom_blob_create (document, [| sequence |], null, &blob) |> check "Blob"
+            parts.Free()
+            handle.Free()
+            let buffer = Array.zeroCreate<byte> 256
+            let length = [| 0 |]
+
+            rv_dom_domurl_create_object_url (document, blob, buffer, buffer.Length, length)
+            |> check "URL.createObjectURL"
+
+            let url = buffer[0 .. length[0] - 1]
+            rv_dom_domurl_revoke_object_url (document, url, url.Length) |> check "URL.revokeObjectURL"
+            rv_dom_file_reader_create (document, &held.contents) |> check "FileReader"
+            rv_dom_file_reader_read_as_array_buffer (held.Value, blob) |> check "readAsArrayBuffer"
+            let outcomes = Collections.Generic.List<int>()
+            let completion = ResourceCompletion(fun _ outcome _ _ -> outcomes.Add outcome)
+            let pointer = Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate completion
+            let mutable pending = 0UL
+            rv_blob_read (host, blob, 1, pointer, 0n, &pending) |> check "rv_blob_read"
+            let mutable revoked = 0UL
+            rv_blob_url_read (host, url, url.Length, pointer, 0n, &revoked) |> check "rv_blob_url_read"
+
+            fun () ->
+                // INVALIDATED for the read in flight; LOAD_FAILED for the revoked URL, at most once each.
+                if outcomes.Count > 2 || not (outcomes.Contains 4) then
+                    failwithf "reads at destroy: %A" (List.ofSeq outcomes)
+
+                let mutable state = 0us
+                let status = rv_dom_file_reader_get_ready_state (held.Value, &state)
+
+                if status <> 0 && status <> -10 then
+                    failwithf "FileReader.readyState after destroy: %d" status
+
+                let mutable kind = 0
+                let mutable bytes = 0L
+
+                rv_file_reader_result (held.Value, &kind, null, 0L, &bytes)
+                |> check "FileReader.result after destroy"
+
+                if kind <> 0 then
+                    failwithf "FileReader.result after destroy: kind %d" kind
+
+                rv_resource_release pending |> check "release read"
+                rv_resource_release revoked |> check "release URL read"
+                GC.KeepAlive completion
+                rv_event_target_release held.Value
+                rv_dom_blob_release blob
         | "url values" ->
             let text = Text.Encoding.UTF8.GetBytes "https://held.test/a?b=c"
 
@@ -1174,6 +1243,7 @@ let run (outDir: string) =
                     "toggle event"
                     "error event"
                     "blob slice"
+                    "blob reads"
                     "caret position"
                     "crypto"
                     "diagnostics"
