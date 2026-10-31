@@ -1,0 +1,63 @@
+{
+  "status": "focused private unallocated S11 checkpoint on the Native20-merged candidate",
+  "counts": {
+    "interfaces": 248,
+    "functions": 2455,
+    "roots": 50,
+    "dictionaries": 22,
+    "stubs": 0
+  },
+  "nativeAssertions": 454,
+  "regressions": {
+    "svg_paint_servers": 565,
+    "svg_filters": 8941,
+    "svg_clip_mask_marker": 565,
+    "svg_surfaces": 1560
+  },
+  "runtime": {
+    "RanvierWebCoreHost.dll": "3a713c981e98ea0537acc9c4874a33cfa6e680fe0efcd7bc3aab062f38b462bc",
+    "WebCore.dll": "76e80294b02ad41307670139f300ea382bc2def76a3b2c87869995affd64c7c5",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+  },
+  "replacementObjects": 54,
+  "engineObjectsRecompiled": [
+    "UnifiedSource-svg-4",
+    "UnifiedSource-svg-5",
+    "UnifiedSource-svg-13",
+    "UnifiedSource-svg-14",
+    "RanvierDomGlue",
+    "RanvierSvgViewGlue"
+  ],
+  "sourcePatches": {
+    "0027-svg-view-reset-target.patch": "edb081e5545f12e7f1ed922984d9e4c84777ad59e25054d6692a5bc67e5c05f9",
+    "0028-svg-convolve-structural-cache.patch": "dd23ae37ab55083b056427ab54c5ad2b01d0d9d0951c63d63a03133d91e5c009",
+    "0029-svg-feimage-aspect-cache.patch": "110b5e76cf953337246dd322aaa8c35086abc3b5ef19bf84aef1cf609913cd32",
+    "0030-svg-symbol-view-box-instances.patch": "9c42e0a3e6a68c7f8a7b54f3cad81c033388e27a6723041d0c1013f7a5795642"
+  },
+  "symbolViewBox": {
+    "red": "symbol-viewbox-red/native-red.log",
+    "green": "symbol-viewbox-green/native-green.log"
+  },
+  "qualifications": [
+    "Native paints the WebCore broken-image placeholder (161,201,229) for network errors and undecodable bytes; Chromium paints nothing",
+    "SVGStringList.clear leaves systemLanguage=\"\" natively; Chromium removes the attribute; both keep the switch fallback",
+    "Chromium also hides the style after renaming its title (alternate sheet); native matches",
+    "SVGImageElement.decode: Chromium resolves for a loaded image and rejects EncodingError for network errors and undecodable bytes; native has no binding (H05/S11 blocker)",
+    "Native SVG scripts stay disabled: no request and no execution after type/async/href edits; Chromium measured on a disconnected element",
+    "Uses the raw rv_host_set_resource_handler route; H05 shared facade is not delivered by this producer"
+  ],
+  "files": {
+    "build_native21_candidate.py": "3b50f24ed4db982d299b140b58c82d0cf879188be1e3965e91f713c6252fb09b",
+    "native.log": "f1eccecdef7df303b704fbad339efd41756ea8e3250472893aee90f907f04e67",
+    "regression-svg_clip_mask_marker.log": "1e1bc205b04e26a41449b1db78d19ca686f3641e6ed07704b883bc2d7d70884e",
+    "regression-svg_filters.log": "9eb0470fec50cc5b1738a5c868f6ce54c3d5151ed4a865760d8fdbf1d6581aac",
+    "regression-svg_paint_servers.log": "16302b4af60a10d2f07d766e954c9764389043ebc36cab7641f1a3d6ca3d47c3",
+    "regression-svg_surfaces.log": "2f48da458770271090a0cb3954f3c907a80ffe6d78b43c8d8c1439ce9da3dfcb",
+    "svg-resources-browser.json": "d19d245ea9595e37346ca4d913e91b74e6a81139e50fa383dae11bd5fb81b78c",
+    "svg-resources-browser.mjs": "17109b5c5abb1252a98ad83f4af0a0519527b73d674d207e2ca150c41b462687",
+    "svg-resources-oracle.json": "4a78111fb7cd0c72a1e29eac36aa375cad4adab12a0c8a9ea2a822cd59d25c26",
+    "svg-resources.svg": "c2bec6de93282d7eef9da10c31e47590ce52b16c28bcb06824f0630be392f046",
+    "svg_paint_probe.py": "5b1298774d637ce06b7fda73495a703f4a9f682ba821320420290c87f2766da1",
+    "svg_resources.py": "3833d631d08826cf5fc45faff97b46142518ad894258b273c49da1c0362dba76"
+  }
+}

@@ -160,12 +160,14 @@ S10 focused checkpoint: SVGClipPathElement and SVGMaskElement compile into the 2
 
 **Files:** generator selection/output; `tests/abi/svg_resources.py`; `tests/fixtures/svg-resources.svg`; browser/resource oracles; no promise-return stub.
 
-- [ ] Capture missing use/image/foreignObject/link/content type route RED. Select all approved real content classes and URI/test mixin consumers.
-- [ ] Verify use/symbol/defs reference geometry/paint and updates after target changes; metadata/desc/title text and namespace; SVG a rel/relList/target/etc.; style disable/rule effects; real foreignObject HTML layout; switch conditional language/extension behavior.
-- [ ] Serve deterministic PNG/SVG image fixtures using existing native callbacks and a bounded local browser origin. Verify href/crossOrigin/aspect-ratio and actual decoded paint, failed bytes/network errors, old-generation cancellation and late completion after owner removal.
-- [ ] Assert exactly one terminal managed outcome per resource generation and UI-thread delivery where the existing facade supports it. If no shared H05 facade exists, retain that precise required blocker; do not claim this producer closes H05/S11.
-- [ ] Record real browser decode Promise success/rejection and native Unsupported capability. Native scripts and foreignObject scripts remain disabled even when typed SVG script state is edited.
-- [ ] Exercise null/thread/subtype/exception/output-preservation errors, listener removal, pending load teardown, retained values and final weak-owner expiry; run the whole S11 focused producer fixture and commit.
+- [x] Capture missing use/image/foreignObject/link/content type route RED. Select all approved real content classes and URI/test mixin consumers.
+- [x] Verify use/symbol/defs reference geometry/paint and updates after target changes; metadata/desc/title text and namespace; SVG a rel/relList/target/etc.; style disable/rule effects; real foreignObject HTML layout; switch conditional language/extension behavior.
+- [x] Serve deterministic PNG/SVG image fixtures using existing native callbacks and a bounded local browser origin. Verify href/crossOrigin/aspect-ratio and actual decoded paint, failed bytes/network errors, old-generation cancellation and late completion after owner removal.
+- [x] Assert exactly one terminal managed outcome per resource generation and UI-thread delivery where the existing facade supports it. If no shared H05 facade exists, retain that precise required blocker; do not claim this producer closes H05/S11.
+- [x] Record real browser decode Promise success/rejection and native Unsupported capability. Native scripts and foreignObject scripts remain disabled even when typed SVG script state is edited.
+- [x] Exercise null/thread/subtype/exception/output-preservation errors, listener removal, pending load teardown, retained values and final weak-owner expiry; run the whole S11 focused producer fixture and commit.
+
+S11 focused checkpoint (Native20-merged private candidate): the 11 content/reuse/resource classes bring the model to 248 interfaces/2455 functions (50 roots/22 dictionaries/0 stubs). The 454-assertion fixture proves rootElement/owner/viewport state, a/script/style/image/use/foreignObject reflection, use/symbol geometry and target/href edits, switch conditional fallback, foreignObject HTML layout, image load, network error, undecodable bytes, replacement of a pending generation, stale and late completion after owner removal (exactly one completion per load, all on the host thread), disabled scripts, error/output preservation and final owner expiry, compared against a measured Chromium oracle. Root patch 0030 makes symbol viewBox/preserveAspectRatio edits invalidate use instances (RED/GREEN in `svg-paint-evidence/symbol-viewbox-*`). Native paints the broken-image placeholder where Chromium paints nothing, and `SVGStringList.clear` leaves `systemLanguage=""` natively. Native `SVGImageElement.decode` stays unbound; H05 remains a required S11 blocker.
 
 ## Task 6: coherent source freeze, forward merge and reviewable PR
 
