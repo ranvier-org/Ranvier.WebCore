@@ -1,0 +1,4134 @@
+{
+  "browser": "156.0.8078.4",
+  "page": "<!doctype html><style>html,body{margin:0}body{height:2000.5px;width:2000.25px}#box{position:absolute;left:0;top:0;width:100px;height:100px;overflow:auto}#content{width:1000.25px;height:1000.5px}</style><body><div id=\"box\"><div id=\"content\"></div></div>",
+  "viewport": [
+    320,
+    240
+  ],
+  "scales": [
+    1,
+    1.5,
+    2
+  ],
+  "cases": [
+    {
+      "scale": 1,
+      "scroller": "viewport",
+      "devicePixelRatio": 1,
+      "maximum": {
+        "width": 1680,
+        "height": 1761
+      },
+      "steps": [
+        {
+          "name": "scrollTo(10.25, 20.5)",
+          "operation": "scrollTo",
+          "args": [
+            10.25,
+            20.5
+          ],
+          "after": {
+            "scrollX": 10,
+            "scrollY": 21,
+            "pageXOffset": 10,
+            "pageYOffset": 21,
+            "documentLeft": 10,
+            "documentTop": 21,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 10,
+              "scrollY": 21,
+              "pageXOffset": 10,
+              "pageYOffset": 21,
+              "documentLeft": 10,
+              "documentTop": 21,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 10,
+              "scrollY": 21,
+              "pageXOffset": 10,
+              "pageYOffset": 21,
+              "documentLeft": 10,
+              "documentTop": 21,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollTo(10.75, 20.75)",
+          "operation": "scrollTo",
+          "args": [
+            10.75,
+            20.75
+          ],
+          "after": {
+            "scrollX": 11,
+            "scrollY": 21,
+            "pageXOffset": 11,
+            "pageYOffset": 21,
+            "documentLeft": 11,
+            "documentTop": 21,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 11,
+              "scrollY": 21,
+              "pageXOffset": 11,
+              "pageYOffset": 21,
+              "documentLeft": 11,
+              "documentTop": 21,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 11,
+              "scrollY": 21,
+              "pageXOffset": 11,
+              "pageYOffset": 21,
+              "documentLeft": 11,
+              "documentTop": 21,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollTo(10.4, 20.4) from 10.75, 20.75",
+          "operation": "scrollTo",
+          "args": [
+            10.4,
+            20.4
+          ],
+          "after": {
+            "scrollX": 10,
+            "scrollY": 20,
+            "pageXOffset": 10,
+            "pageYOffset": 20,
+            "documentLeft": 10,
+            "documentTop": 20,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 10,
+              "scrollY": 20,
+              "pageXOffset": 10,
+              "pageYOffset": 20,
+              "documentLeft": 10,
+              "documentTop": 20,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 10,
+              "scrollY": 20,
+              "pageXOffset": 10,
+              "pageYOffset": 20,
+              "documentLeft": 10,
+              "documentTop": 20,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollTo({left: 3.3, top: 7.7, behavior: instant})",
+          "operation": "scrollTo",
+          "args": [
+            {
+              "left": 3.3,
+              "top": 7.7,
+              "behavior": "instant"
+            }
+          ],
+          "after": {
+            "scrollX": 3,
+            "scrollY": 8,
+            "pageXOffset": 3,
+            "pageYOffset": 8,
+            "documentLeft": 3,
+            "documentTop": 8,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 3,
+              "scrollY": 8,
+              "pageXOffset": 3,
+              "pageYOffset": 8,
+              "documentLeft": 3,
+              "documentTop": 8,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 3,
+              "scrollY": 8,
+              "pageXOffset": 3,
+              "pageYOffset": 8,
+              "documentLeft": 3,
+              "documentTop": 8,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollTo({top: 9.6}) keeps left",
+          "operation": "scrollTo",
+          "args": [
+            {
+              "top": 9.6
+            }
+          ],
+          "after": {
+            "scrollX": 3,
+            "scrollY": 10,
+            "pageXOffset": 3,
+            "pageYOffset": 10,
+            "documentLeft": 3,
+            "documentTop": 10,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 3,
+              "scrollY": 10,
+              "pageXOffset": 3,
+              "pageYOffset": 10,
+              "documentLeft": 3,
+              "documentTop": 10,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 3,
+              "scrollY": 10,
+              "pageXOffset": 3,
+              "pageYOffset": 10,
+              "documentLeft": 3,
+              "documentTop": 10,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scroll(5.5, 6.5)",
+          "operation": "scroll",
+          "args": [
+            5.5,
+            6.5
+          ],
+          "after": {
+            "scrollX": 6,
+            "scrollY": 7,
+            "pageXOffset": 6,
+            "pageYOffset": 7,
+            "documentLeft": 6,
+            "documentTop": 7,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 6,
+              "scrollY": 7,
+              "pageXOffset": 6,
+              "pageYOffset": 7,
+              "documentLeft": 6,
+              "documentTop": 7,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 6,
+              "scrollY": 7,
+              "pageXOffset": 6,
+              "pageYOffset": 7,
+              "documentLeft": 6,
+              "documentTop": 7,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollBy(0.4, 0.4)",
+          "operation": "scrollBy",
+          "args": [
+            0.4,
+            0.4
+          ],
+          "after": {
+            "scrollX": 6,
+            "scrollY": 7,
+            "pageXOffset": 6,
+            "pageYOffset": 7,
+            "documentLeft": 6,
+            "documentTop": 7,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": []
+        },
+        {
+          "name": "scrollBy(0.4, 0.4) again",
+          "operation": "scrollBy",
+          "args": [
+            0.4,
+            0.4
+          ],
+          "after": {
+            "scrollX": 6,
+            "scrollY": 7,
+            "pageXOffset": 6,
+            "pageYOffset": 7,
+            "documentLeft": 6,
+            "documentTop": 7,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": []
+        },
+        {
+          "name": "scrollBy({top: 0.6})",
+          "operation": "scrollBy",
+          "args": [
+            {
+              "top": 0.6
+            }
+          ],
+          "after": {
+            "scrollX": 6,
+            "scrollY": 8,
+            "pageXOffset": 6,
+            "pageYOffset": 8,
+            "documentLeft": 6,
+            "documentTop": 8,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 6,
+              "scrollY": 8,
+              "pageXOffset": 6,
+              "pageYOffset": 8,
+              "documentLeft": 6,
+              "documentTop": 8,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 6,
+              "scrollY": 8,
+              "pageXOffset": 6,
+              "pageYOffset": 8,
+              "documentLeft": 6,
+              "documentTop": 8,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollBy(-0.3, -0.3)",
+          "operation": "scrollBy",
+          "args": [
+            -0.3,
+            -0.3
+          ],
+          "after": {
+            "scrollX": 6,
+            "scrollY": 8,
+            "pageXOffset": 6,
+            "pageYOffset": 8,
+            "documentLeft": 6,
+            "documentTop": 8,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": []
+        },
+        {
+          "name": "scrollTo(-5.5, -5.5) clamps to 0",
+          "operation": "scrollTo",
+          "args": [
+            -5.5,
+            -5.5
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollTo(1e6, 1e6) clamps to the maximum",
+          "operation": "scrollTo",
+          "args": [
+            1000000,
+            1000000
+          ],
+          "after": {
+            "scrollX": 1680,
+            "scrollY": 1761,
+            "pageXOffset": 1680,
+            "pageYOffset": 1761,
+            "documentLeft": 1680,
+            "documentTop": 1761,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 1680,
+              "scrollY": 1761,
+              "pageXOffset": 1680,
+              "pageYOffset": 1761,
+              "documentLeft": 1680,
+              "documentTop": 1761,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 1680,
+              "scrollY": 1761,
+              "pageXOffset": 1680,
+              "pageYOffset": 1761,
+              "documentLeft": 1680,
+              "documentTop": 1761,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollBy(-0.5, -0.5) from the maximum",
+          "operation": "scrollBy",
+          "args": [
+            -0.5,
+            -0.5
+          ],
+          "after": {
+            "scrollX": 1680,
+            "scrollY": 1761,
+            "pageXOffset": 1680,
+            "pageYOffset": 1761,
+            "documentLeft": 1680,
+            "documentTop": 1761,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": []
+        },
+        {
+          "name": "scrollTop = 33.3, scrollLeft = 11.6",
+          "operation": "set",
+          "args": [
+            11.6,
+            33.3
+          ],
+          "after": {
+            "scrollX": 12,
+            "scrollY": 33,
+            "pageXOffset": 12,
+            "pageYOffset": 33,
+            "documentLeft": 12,
+            "documentTop": 33,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 12,
+              "scrollY": 33,
+              "pageXOffset": 12,
+              "pageYOffset": 33,
+              "documentLeft": 12,
+              "documentTop": 33,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 12,
+              "scrollY": 33,
+              "pageXOffset": 12,
+              "pageYOffset": 33,
+              "documentLeft": 12,
+              "documentTop": 33,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollTo({left: 0.5, top: 50.5, behavior: smooth})",
+          "operation": "scrollTo",
+          "args": [
+            {
+              "left": 0.5,
+              "top": 50.5,
+              "behavior": "smooth"
+            }
+          ],
+          "after": {
+            "scrollX": 1,
+            "scrollY": 51,
+            "pageXOffset": 1,
+            "pageYOffset": 51,
+            "documentLeft": 1,
+            "documentTop": 51,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 8,
+              "scrollY": 39,
+              "pageXOffset": 8,
+              "pageYOffset": 39,
+              "documentLeft": 8,
+              "documentTop": 39,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 3,
+              "scrollY": 48,
+              "pageXOffset": 3,
+              "pageYOffset": 48,
+              "documentLeft": 3,
+              "documentTop": 48,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 1,
+              "scrollY": 50,
+              "pageXOffset": 1,
+              "pageYOffset": 50,
+              "documentLeft": 1,
+              "documentTop": 50,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 1,
+              "scrollY": 51,
+              "pageXOffset": 1,
+              "pageYOffset": 51,
+              "documentLeft": 1,
+              "documentTop": 51,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 1,
+              "scrollY": 51,
+              "pageXOffset": 1,
+              "pageYOffset": 51,
+              "documentLeft": 1,
+              "documentTop": 51,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollTo(0, 0)",
+          "operation": "scrollTo",
+          "args": [
+            0,
+            0
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scale": 1,
+      "scroller": "box",
+      "devicePixelRatio": 1,
+      "maximum": {
+        "width": 900,
+        "height": 901
+      },
+      "steps": [
+        {
+          "name": "scrollTo(10.25, 20.5)",
+          "operation": "scrollTo",
+          "args": [
+            10.25,
+            20.5
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 10,
+            "boxTop": 21
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 10,
+              "boxTop": 21
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 10,
+              "boxTop": 21
+            }
+          ]
+        },
+        {
+          "name": "scrollTo(10.75, 20.75)",
+          "operation": "scrollTo",
+          "args": [
+            10.75,
+            20.75
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 11,
+            "boxTop": 21
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 11,
+              "boxTop": 21
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 11,
+              "boxTop": 21
+            }
+          ]
+        },
+        {
+          "name": "scrollTo(10.4, 20.4) from 10.75, 20.75",
+          "operation": "scrollTo",
+          "args": [
+            10.4,
+            20.4
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 10,
+            "boxTop": 20
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 10,
+              "boxTop": 20
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 10,
+              "boxTop": 20
+            }
+          ]
+        },
+        {
+          "name": "scrollTo({left: 3.3, top: 7.7, behavior: instant})",
+          "operation": "scrollTo",
+          "args": [
+            {
+              "left": 3.3,
+              "top": 7.7,
+              "behavior": "instant"
+            }
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 3,
+            "boxTop": 8
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 3,
+              "boxTop": 8
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 3,
+              "boxTop": 8
+            }
+          ]
+        },
+        {
+          "name": "scrollTo({top: 9.6}) keeps left",
+          "operation": "scrollTo",
+          "args": [
+            {
+              "top": 9.6
+            }
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 3,
+            "boxTop": 10
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 3,
+              "boxTop": 10
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 3,
+              "boxTop": 10
+            }
+          ]
+        },
+        {
+          "name": "scroll(5.5, 6.5)",
+          "operation": "scroll",
+          "args": [
+            5.5,
+            6.5
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 6,
+            "boxTop": 7
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 6,
+              "boxTop": 7
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 6,
+              "boxTop": 7
+            }
+          ]
+        },
+        {
+          "name": "scrollBy(0.4, 0.4)",
+          "operation": "scrollBy",
+          "args": [
+            0.4,
+            0.4
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 6,
+            "boxTop": 7
+          },
+          "events": []
+        },
+        {
+          "name": "scrollBy(0.4, 0.4) again",
+          "operation": "scrollBy",
+          "args": [
+            0.4,
+            0.4
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 6,
+            "boxTop": 7
+          },
+          "events": []
+        },
+        {
+          "name": "scrollBy({top: 0.6})",
+          "operation": "scrollBy",
+          "args": [
+            {
+              "top": 0.6
+            }
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 6,
+            "boxTop": 8
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 6,
+              "boxTop": 8
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 6,
+              "boxTop": 8
+            }
+          ]
+        },
+        {
+          "name": "scrollBy(-0.3, -0.3)",
+          "operation": "scrollBy",
+          "args": [
+            -0.3,
+            -0.3
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 6,
+            "boxTop": 8
+          },
+          "events": []
+        },
+        {
+          "name": "scrollTo(-5.5, -5.5) clamps to 0",
+          "operation": "scrollTo",
+          "args": [
+            -5.5,
+            -5.5
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollTo(1e6, 1e6) clamps to the maximum",
+          "operation": "scrollTo",
+          "args": [
+            1000000,
+            1000000
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 900,
+            "boxTop": 901
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 900,
+              "boxTop": 901
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 900,
+              "boxTop": 901
+            }
+          ]
+        },
+        {
+          "name": "scrollBy(-0.5, -0.5) from the maximum",
+          "operation": "scrollBy",
+          "args": [
+            -0.5,
+            -0.5
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 900,
+            "boxTop": 901
+          },
+          "events": []
+        },
+        {
+          "name": "scrollTop = 33.3, scrollLeft = 11.6",
+          "operation": "set",
+          "args": [
+            11.6,
+            33.3
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 12,
+            "boxTop": 33
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 12,
+              "boxTop": 33
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 12,
+              "boxTop": 33
+            }
+          ]
+        },
+        {
+          "name": "scrollTo({left: 0.5, top: 50.5, behavior: smooth})",
+          "operation": "scrollTo",
+          "args": [
+            {
+              "left": 0.5,
+              "top": 50.5,
+              "behavior": "smooth"
+            }
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 1,
+            "boxTop": 51
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 8,
+              "boxTop": 39
+            },
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 3,
+              "boxTop": 48
+            },
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 1,
+              "boxTop": 50
+            },
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 1,
+              "boxTop": 51
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 1,
+              "boxTop": 51
+            }
+          ]
+        },
+        {
+          "name": "scrollTo(0, 0)",
+          "operation": "scrollTo",
+          "args": [
+            0,
+            0
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scale": 1.5,
+      "scroller": "viewport",
+      "devicePixelRatio": 1.5,
+      "maximum": {
+        "width": 1680,
+        "height": 1761
+      },
+      "steps": [
+        {
+          "name": "scrollTo(10.25, 20.5)",
+          "operation": "scrollTo",
+          "args": [
+            10.25,
+            20.5
+          ],
+          "after": {
+            "scrollX": 10,
+            "scrollY": 21,
+            "pageXOffset": 10,
+            "pageYOffset": 21,
+            "documentLeft": 10,
+            "documentTop": 21,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 10,
+              "scrollY": 21,
+              "pageXOffset": 10,
+              "pageYOffset": 21,
+              "documentLeft": 10,
+              "documentTop": 21,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 10,
+              "scrollY": 21,
+              "pageXOffset": 10,
+              "pageYOffset": 21,
+              "documentLeft": 10,
+              "documentTop": 21,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollTo(10.75, 20.75)",
+          "operation": "scrollTo",
+          "args": [
+            10.75,
+            20.75
+          ],
+          "after": {
+            "scrollX": 11,
+            "scrollY": 21,
+            "pageXOffset": 11,
+            "pageYOffset": 21,
+            "documentLeft": 11,
+            "documentTop": 21,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 11,
+              "scrollY": 21,
+              "pageXOffset": 11,
+              "pageYOffset": 21,
+              "documentLeft": 11,
+              "documentTop": 21,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 11,
+              "scrollY": 21,
+              "pageXOffset": 11,
+              "pageYOffset": 21,
+              "documentLeft": 11,
+              "documentTop": 21,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollTo(10.4, 20.4) from 10.75, 20.75",
+          "operation": "scrollTo",
+          "args": [
+            10.4,
+            20.4
+          ],
+          "after": {
+            "scrollX": 10,
+            "scrollY": 20,
+            "pageXOffset": 10,
+            "pageYOffset": 20,
+            "documentLeft": 10,
+            "documentTop": 20,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 10,
+              "scrollY": 20,
+              "pageXOffset": 10,
+              "pageYOffset": 20,
+              "documentLeft": 10,
+              "documentTop": 20,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 10,
+              "scrollY": 20,
+              "pageXOffset": 10,
+              "pageYOffset": 20,
+              "documentLeft": 10,
+              "documentTop": 20,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollTo({left: 3.3, top: 7.7, behavior: instant})",
+          "operation": "scrollTo",
+          "args": [
+            {
+              "left": 3.3,
+              "top": 7.7,
+              "behavior": "instant"
+            }
+          ],
+          "after": {
+            "scrollX": 3,
+            "scrollY": 8,
+            "pageXOffset": 3,
+            "pageYOffset": 8,
+            "documentLeft": 3,
+            "documentTop": 8,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 3,
+              "scrollY": 8,
+              "pageXOffset": 3,
+              "pageYOffset": 8,
+              "documentLeft": 3,
+              "documentTop": 8,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 3,
+              "scrollY": 8,
+              "pageXOffset": 3,
+              "pageYOffset": 8,
+              "documentLeft": 3,
+              "documentTop": 8,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollTo({top: 9.6}) keeps left",
+          "operation": "scrollTo",
+          "args": [
+            {
+              "top": 9.6
+            }
+          ],
+          "after": {
+            "scrollX": 3,
+            "scrollY": 10,
+            "pageXOffset": 3,
+            "pageYOffset": 10,
+            "documentLeft": 3,
+            "documentTop": 10,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 3,
+              "scrollY": 10,
+              "pageXOffset": 3,
+              "pageYOffset": 10,
+              "documentLeft": 3,
+              "documentTop": 10,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 3,
+              "scrollY": 10,
+              "pageXOffset": 3,
+              "pageYOffset": 10,
+              "documentLeft": 3,
+              "documentTop": 10,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scroll(5.5, 6.5)",
+          "operation": "scroll",
+          "args": [
+            5.5,
+            6.5
+          ],
+          "after": {
+            "scrollX": 6,
+            "scrollY": 7,
+            "pageXOffset": 6,
+            "pageYOffset": 7,
+            "documentLeft": 6,
+            "documentTop": 7,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 6,
+              "scrollY": 7,
+              "pageXOffset": 6,
+              "pageYOffset": 7,
+              "documentLeft": 6,
+              "documentTop": 7,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 6,
+              "scrollY": 7,
+              "pageXOffset": 6,
+              "pageYOffset": 7,
+              "documentLeft": 6,
+              "documentTop": 7,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollBy(0.4, 0.4)",
+          "operation": "scrollBy",
+          "args": [
+            0.4,
+            0.4
+          ],
+          "after": {
+            "scrollX": 6,
+            "scrollY": 7,
+            "pageXOffset": 6,
+            "pageYOffset": 7,
+            "documentLeft": 6,
+            "documentTop": 7,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": []
+        },
+        {
+          "name": "scrollBy(0.4, 0.4) again",
+          "operation": "scrollBy",
+          "args": [
+            0.4,
+            0.4
+          ],
+          "after": {
+            "scrollX": 6,
+            "scrollY": 7,
+            "pageXOffset": 6,
+            "pageYOffset": 7,
+            "documentLeft": 6,
+            "documentTop": 7,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": []
+        },
+        {
+          "name": "scrollBy({top: 0.6})",
+          "operation": "scrollBy",
+          "args": [
+            {
+              "top": 0.6
+            }
+          ],
+          "after": {
+            "scrollX": 6,
+            "scrollY": 8,
+            "pageXOffset": 6,
+            "pageYOffset": 8,
+            "documentLeft": 6,
+            "documentTop": 8,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 6,
+              "scrollY": 8,
+              "pageXOffset": 6,
+              "pageYOffset": 8,
+              "documentLeft": 6,
+              "documentTop": 8,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 6,
+              "scrollY": 8,
+              "pageXOffset": 6,
+              "pageYOffset": 8,
+              "documentLeft": 6,
+              "documentTop": 8,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollBy(-0.3, -0.3)",
+          "operation": "scrollBy",
+          "args": [
+            -0.3,
+            -0.3
+          ],
+          "after": {
+            "scrollX": 6,
+            "scrollY": 8,
+            "pageXOffset": 6,
+            "pageYOffset": 8,
+            "documentLeft": 6,
+            "documentTop": 8,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": []
+        },
+        {
+          "name": "scrollTo(-5.5, -5.5) clamps to 0",
+          "operation": "scrollTo",
+          "args": [
+            -5.5,
+            -5.5
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollTo(1e6, 1e6) clamps to the maximum",
+          "operation": "scrollTo",
+          "args": [
+            1000000,
+            1000000
+          ],
+          "after": {
+            "scrollX": 1680,
+            "scrollY": 1761,
+            "pageXOffset": 1680,
+            "pageYOffset": 1761,
+            "documentLeft": 1680,
+            "documentTop": 1761,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 1680,
+              "scrollY": 1761,
+              "pageXOffset": 1680,
+              "pageYOffset": 1761,
+              "documentLeft": 1680,
+              "documentTop": 1761,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 1680,
+              "scrollY": 1761,
+              "pageXOffset": 1680,
+              "pageYOffset": 1761,
+              "documentLeft": 1680,
+              "documentTop": 1761,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollBy(-0.5, -0.5) from the maximum",
+          "operation": "scrollBy",
+          "args": [
+            -0.5,
+            -0.5
+          ],
+          "after": {
+            "scrollX": 1680,
+            "scrollY": 1761,
+            "pageXOffset": 1680,
+            "pageYOffset": 1761,
+            "documentLeft": 1680,
+            "documentTop": 1761,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": []
+        },
+        {
+          "name": "scrollTop = 33.3, scrollLeft = 11.6",
+          "operation": "set",
+          "args": [
+            11.6,
+            33.3
+          ],
+          "after": {
+            "scrollX": 12,
+            "scrollY": 33,
+            "pageXOffset": 12,
+            "pageYOffset": 33,
+            "documentLeft": 12,
+            "documentTop": 33,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 12,
+              "scrollY": 33,
+              "pageXOffset": 12,
+              "pageYOffset": 33,
+              "documentLeft": 12,
+              "documentTop": 33,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 12,
+              "scrollY": 33,
+              "pageXOffset": 12,
+              "pageYOffset": 33,
+              "documentLeft": 12,
+              "documentTop": 33,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollTo({left: 0.5, top: 50.5, behavior: smooth})",
+          "operation": "scrollTo",
+          "args": [
+            {
+              "left": 0.5,
+              "top": 50.5,
+              "behavior": "smooth"
+            }
+          ],
+          "after": {
+            "scrollX": 1,
+            "scrollY": 51,
+            "pageXOffset": 1,
+            "pageYOffset": 51,
+            "documentLeft": 1,
+            "documentTop": 51,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 8,
+              "scrollY": 39,
+              "pageXOffset": 8,
+              "pageYOffset": 39,
+              "documentLeft": 8,
+              "documentTop": 39,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 3,
+              "scrollY": 48,
+              "pageXOffset": 3,
+              "pageYOffset": 48,
+              "documentLeft": 3,
+              "documentTop": 48,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 1,
+              "scrollY": 50,
+              "pageXOffset": 1,
+              "pageYOffset": 50,
+              "documentLeft": 1,
+              "documentTop": 50,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 1,
+              "scrollY": 51,
+              "pageXOffset": 1,
+              "pageYOffset": 51,
+              "documentLeft": 1,
+              "documentTop": 51,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 1,
+              "scrollY": 51,
+              "pageXOffset": 1,
+              "pageYOffset": 51,
+              "documentLeft": 1,
+              "documentTop": 51,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollTo(0, 0)",
+          "operation": "scrollTo",
+          "args": [
+            0,
+            0
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scale": 1.5,
+      "scroller": "box",
+      "devicePixelRatio": 1.5,
+      "maximum": {
+        "width": 900,
+        "height": 901
+      },
+      "steps": [
+        {
+          "name": "scrollTo(10.25, 20.5)",
+          "operation": "scrollTo",
+          "args": [
+            10.25,
+            20.5
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 10,
+            "boxTop": 21
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 10,
+              "boxTop": 21
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 10,
+              "boxTop": 21
+            }
+          ]
+        },
+        {
+          "name": "scrollTo(10.75, 20.75)",
+          "operation": "scrollTo",
+          "args": [
+            10.75,
+            20.75
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 11,
+            "boxTop": 21
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 11,
+              "boxTop": 21
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 11,
+              "boxTop": 21
+            }
+          ]
+        },
+        {
+          "name": "scrollTo(10.4, 20.4) from 10.75, 20.75",
+          "operation": "scrollTo",
+          "args": [
+            10.4,
+            20.4
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 10,
+            "boxTop": 20
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 10,
+              "boxTop": 20
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 10,
+              "boxTop": 20
+            }
+          ]
+        },
+        {
+          "name": "scrollTo({left: 3.3, top: 7.7, behavior: instant})",
+          "operation": "scrollTo",
+          "args": [
+            {
+              "left": 3.3,
+              "top": 7.7,
+              "behavior": "instant"
+            }
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 3,
+            "boxTop": 8
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 3,
+              "boxTop": 8
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 3,
+              "boxTop": 8
+            }
+          ]
+        },
+        {
+          "name": "scrollTo({top: 9.6}) keeps left",
+          "operation": "scrollTo",
+          "args": [
+            {
+              "top": 9.6
+            }
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 3,
+            "boxTop": 10
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 3,
+              "boxTop": 10
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 3,
+              "boxTop": 10
+            }
+          ]
+        },
+        {
+          "name": "scroll(5.5, 6.5)",
+          "operation": "scroll",
+          "args": [
+            5.5,
+            6.5
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 6,
+            "boxTop": 7
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 6,
+              "boxTop": 7
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 6,
+              "boxTop": 7
+            }
+          ]
+        },
+        {
+          "name": "scrollBy(0.4, 0.4)",
+          "operation": "scrollBy",
+          "args": [
+            0.4,
+            0.4
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 6,
+            "boxTop": 7
+          },
+          "events": []
+        },
+        {
+          "name": "scrollBy(0.4, 0.4) again",
+          "operation": "scrollBy",
+          "args": [
+            0.4,
+            0.4
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 6,
+            "boxTop": 7
+          },
+          "events": []
+        },
+        {
+          "name": "scrollBy({top: 0.6})",
+          "operation": "scrollBy",
+          "args": [
+            {
+              "top": 0.6
+            }
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 6,
+            "boxTop": 8
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 6,
+              "boxTop": 8
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 6,
+              "boxTop": 8
+            }
+          ]
+        },
+        {
+          "name": "scrollBy(-0.3, -0.3)",
+          "operation": "scrollBy",
+          "args": [
+            -0.3,
+            -0.3
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 6,
+            "boxTop": 8
+          },
+          "events": []
+        },
+        {
+          "name": "scrollTo(-5.5, -5.5) clamps to 0",
+          "operation": "scrollTo",
+          "args": [
+            -5.5,
+            -5.5
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollTo(1e6, 1e6) clamps to the maximum",
+          "operation": "scrollTo",
+          "args": [
+            1000000,
+            1000000
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 900,
+            "boxTop": 901
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 900,
+              "boxTop": 901
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 900,
+              "boxTop": 901
+            }
+          ]
+        },
+        {
+          "name": "scrollBy(-0.5, -0.5) from the maximum",
+          "operation": "scrollBy",
+          "args": [
+            -0.5,
+            -0.5
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 900,
+            "boxTop": 901
+          },
+          "events": []
+        },
+        {
+          "name": "scrollTop = 33.3, scrollLeft = 11.6",
+          "operation": "set",
+          "args": [
+            11.6,
+            33.3
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 12,
+            "boxTop": 33
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 12,
+              "boxTop": 33
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 12,
+              "boxTop": 33
+            }
+          ]
+        },
+        {
+          "name": "scrollTo({left: 0.5, top: 50.5, behavior: smooth})",
+          "operation": "scrollTo",
+          "args": [
+            {
+              "left": 0.5,
+              "top": 50.5,
+              "behavior": "smooth"
+            }
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 1,
+            "boxTop": 51
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 8,
+              "boxTop": 39
+            },
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 3,
+              "boxTop": 48
+            },
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 1,
+              "boxTop": 50
+            },
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 1,
+              "boxTop": 51
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 1,
+              "boxTop": 51
+            }
+          ]
+        },
+        {
+          "name": "scrollTo(0, 0)",
+          "operation": "scrollTo",
+          "args": [
+            0,
+            0
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scale": 2,
+      "scroller": "viewport",
+      "devicePixelRatio": 2,
+      "maximum": {
+        "width": 1680,
+        "height": 1761
+      },
+      "steps": [
+        {
+          "name": "scrollTo(10.25, 20.5)",
+          "operation": "scrollTo",
+          "args": [
+            10.25,
+            20.5
+          ],
+          "after": {
+            "scrollX": 10,
+            "scrollY": 21,
+            "pageXOffset": 10,
+            "pageYOffset": 21,
+            "documentLeft": 10,
+            "documentTop": 21,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 10,
+              "scrollY": 21,
+              "pageXOffset": 10,
+              "pageYOffset": 21,
+              "documentLeft": 10,
+              "documentTop": 21,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 10,
+              "scrollY": 21,
+              "pageXOffset": 10,
+              "pageYOffset": 21,
+              "documentLeft": 10,
+              "documentTop": 21,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollTo(10.75, 20.75)",
+          "operation": "scrollTo",
+          "args": [
+            10.75,
+            20.75
+          ],
+          "after": {
+            "scrollX": 11,
+            "scrollY": 21,
+            "pageXOffset": 11,
+            "pageYOffset": 21,
+            "documentLeft": 11,
+            "documentTop": 21,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 11,
+              "scrollY": 21,
+              "pageXOffset": 11,
+              "pageYOffset": 21,
+              "documentLeft": 11,
+              "documentTop": 21,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 11,
+              "scrollY": 21,
+              "pageXOffset": 11,
+              "pageYOffset": 21,
+              "documentLeft": 11,
+              "documentTop": 21,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollTo(10.4, 20.4) from 10.75, 20.75",
+          "operation": "scrollTo",
+          "args": [
+            10.4,
+            20.4
+          ],
+          "after": {
+            "scrollX": 10,
+            "scrollY": 20,
+            "pageXOffset": 10,
+            "pageYOffset": 20,
+            "documentLeft": 10,
+            "documentTop": 20,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 10,
+              "scrollY": 20,
+              "pageXOffset": 10,
+              "pageYOffset": 20,
+              "documentLeft": 10,
+              "documentTop": 20,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 10,
+              "scrollY": 20,
+              "pageXOffset": 10,
+              "pageYOffset": 20,
+              "documentLeft": 10,
+              "documentTop": 20,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollTo({left: 3.3, top: 7.7, behavior: instant})",
+          "operation": "scrollTo",
+          "args": [
+            {
+              "left": 3.3,
+              "top": 7.7,
+              "behavior": "instant"
+            }
+          ],
+          "after": {
+            "scrollX": 3,
+            "scrollY": 8,
+            "pageXOffset": 3,
+            "pageYOffset": 8,
+            "documentLeft": 3,
+            "documentTop": 8,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 3,
+              "scrollY": 8,
+              "pageXOffset": 3,
+              "pageYOffset": 8,
+              "documentLeft": 3,
+              "documentTop": 8,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 3,
+              "scrollY": 8,
+              "pageXOffset": 3,
+              "pageYOffset": 8,
+              "documentLeft": 3,
+              "documentTop": 8,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollTo({top: 9.6}) keeps left",
+          "operation": "scrollTo",
+          "args": [
+            {
+              "top": 9.6
+            }
+          ],
+          "after": {
+            "scrollX": 3,
+            "scrollY": 10,
+            "pageXOffset": 3,
+            "pageYOffset": 10,
+            "documentLeft": 3,
+            "documentTop": 10,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 3,
+              "scrollY": 10,
+              "pageXOffset": 3,
+              "pageYOffset": 10,
+              "documentLeft": 3,
+              "documentTop": 10,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 3,
+              "scrollY": 10,
+              "pageXOffset": 3,
+              "pageYOffset": 10,
+              "documentLeft": 3,
+              "documentTop": 10,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scroll(5.5, 6.5)",
+          "operation": "scroll",
+          "args": [
+            5.5,
+            6.5
+          ],
+          "after": {
+            "scrollX": 6,
+            "scrollY": 7,
+            "pageXOffset": 6,
+            "pageYOffset": 7,
+            "documentLeft": 6,
+            "documentTop": 7,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 6,
+              "scrollY": 7,
+              "pageXOffset": 6,
+              "pageYOffset": 7,
+              "documentLeft": 6,
+              "documentTop": 7,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 6,
+              "scrollY": 7,
+              "pageXOffset": 6,
+              "pageYOffset": 7,
+              "documentLeft": 6,
+              "documentTop": 7,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollBy(0.4, 0.4)",
+          "operation": "scrollBy",
+          "args": [
+            0.4,
+            0.4
+          ],
+          "after": {
+            "scrollX": 6,
+            "scrollY": 7,
+            "pageXOffset": 6,
+            "pageYOffset": 7,
+            "documentLeft": 6,
+            "documentTop": 7,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": []
+        },
+        {
+          "name": "scrollBy(0.4, 0.4) again",
+          "operation": "scrollBy",
+          "args": [
+            0.4,
+            0.4
+          ],
+          "after": {
+            "scrollX": 6,
+            "scrollY": 7,
+            "pageXOffset": 6,
+            "pageYOffset": 7,
+            "documentLeft": 6,
+            "documentTop": 7,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": []
+        },
+        {
+          "name": "scrollBy({top: 0.6})",
+          "operation": "scrollBy",
+          "args": [
+            {
+              "top": 0.6
+            }
+          ],
+          "after": {
+            "scrollX": 6,
+            "scrollY": 8,
+            "pageXOffset": 6,
+            "pageYOffset": 8,
+            "documentLeft": 6,
+            "documentTop": 8,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 6,
+              "scrollY": 8,
+              "pageXOffset": 6,
+              "pageYOffset": 8,
+              "documentLeft": 6,
+              "documentTop": 8,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 6,
+              "scrollY": 8,
+              "pageXOffset": 6,
+              "pageYOffset": 8,
+              "documentLeft": 6,
+              "documentTop": 8,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollBy(-0.3, -0.3)",
+          "operation": "scrollBy",
+          "args": [
+            -0.3,
+            -0.3
+          ],
+          "after": {
+            "scrollX": 6,
+            "scrollY": 8,
+            "pageXOffset": 6,
+            "pageYOffset": 8,
+            "documentLeft": 6,
+            "documentTop": 8,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": []
+        },
+        {
+          "name": "scrollTo(-5.5, -5.5) clamps to 0",
+          "operation": "scrollTo",
+          "args": [
+            -5.5,
+            -5.5
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollTo(1e6, 1e6) clamps to the maximum",
+          "operation": "scrollTo",
+          "args": [
+            1000000,
+            1000000
+          ],
+          "after": {
+            "scrollX": 1680,
+            "scrollY": 1761,
+            "pageXOffset": 1680,
+            "pageYOffset": 1761,
+            "documentLeft": 1680,
+            "documentTop": 1761,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 1680,
+              "scrollY": 1761,
+              "pageXOffset": 1680,
+              "pageYOffset": 1761,
+              "documentLeft": 1680,
+              "documentTop": 1761,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 1680,
+              "scrollY": 1761,
+              "pageXOffset": 1680,
+              "pageYOffset": 1761,
+              "documentLeft": 1680,
+              "documentTop": 1761,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollBy(-0.5, -0.5) from the maximum",
+          "operation": "scrollBy",
+          "args": [
+            -0.5,
+            -0.5
+          ],
+          "after": {
+            "scrollX": 1680,
+            "scrollY": 1761,
+            "pageXOffset": 1680,
+            "pageYOffset": 1761,
+            "documentLeft": 1680,
+            "documentTop": 1761,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": []
+        },
+        {
+          "name": "scrollTop = 33.3, scrollLeft = 11.6",
+          "operation": "set",
+          "args": [
+            11.6,
+            33.3
+          ],
+          "after": {
+            "scrollX": 12,
+            "scrollY": 33,
+            "pageXOffset": 12,
+            "pageYOffset": 33,
+            "documentLeft": 12,
+            "documentTop": 33,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 12,
+              "scrollY": 33,
+              "pageXOffset": 12,
+              "pageYOffset": 33,
+              "documentLeft": 12,
+              "documentTop": 33,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 12,
+              "scrollY": 33,
+              "pageXOffset": 12,
+              "pageYOffset": 33,
+              "documentLeft": 12,
+              "documentTop": 33,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollTo({left: 0.5, top: 50.5, behavior: smooth})",
+          "operation": "scrollTo",
+          "args": [
+            {
+              "left": 0.5,
+              "top": 50.5,
+              "behavior": "smooth"
+            }
+          ],
+          "after": {
+            "scrollX": 1,
+            "scrollY": 51,
+            "pageXOffset": 1,
+            "pageYOffset": 51,
+            "documentLeft": 1,
+            "documentTop": 51,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 8,
+              "scrollY": 39,
+              "pageXOffset": 8,
+              "pageYOffset": 39,
+              "documentLeft": 8,
+              "documentTop": 39,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 3,
+              "scrollY": 48,
+              "pageXOffset": 3,
+              "pageYOffset": 48,
+              "documentLeft": 3,
+              "documentTop": 48,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 1,
+              "scrollY": 50,
+              "pageXOffset": 1,
+              "pageYOffset": 50,
+              "documentLeft": 1,
+              "documentTop": 50,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 1,
+              "scrollY": 51,
+              "pageXOffset": 1,
+              "pageYOffset": 51,
+              "documentLeft": 1,
+              "documentTop": 51,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 1,
+              "scrollY": 51,
+              "pageXOffset": 1,
+              "pageYOffset": 51,
+              "documentLeft": 1,
+              "documentTop": 51,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollTo(0, 0)",
+          "operation": "scrollTo",
+          "args": [
+            0,
+            0
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "window",
+              "type": "scroll",
+              "target": "document",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "window",
+              "type": "scrollend",
+              "target": "document",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scale": 2,
+      "scroller": "box",
+      "devicePixelRatio": 2,
+      "maximum": {
+        "width": 900,
+        "height": 901
+      },
+      "steps": [
+        {
+          "name": "scrollTo(10.25, 20.5)",
+          "operation": "scrollTo",
+          "args": [
+            10.25,
+            20.5
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 10,
+            "boxTop": 21
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 10,
+              "boxTop": 21
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 10,
+              "boxTop": 21
+            }
+          ]
+        },
+        {
+          "name": "scrollTo(10.75, 20.75)",
+          "operation": "scrollTo",
+          "args": [
+            10.75,
+            20.75
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 11,
+            "boxTop": 21
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 11,
+              "boxTop": 21
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 11,
+              "boxTop": 21
+            }
+          ]
+        },
+        {
+          "name": "scrollTo(10.4, 20.4) from 10.75, 20.75",
+          "operation": "scrollTo",
+          "args": [
+            10.4,
+            20.4
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 10,
+            "boxTop": 20
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 10,
+              "boxTop": 20
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 10,
+              "boxTop": 20
+            }
+          ]
+        },
+        {
+          "name": "scrollTo({left: 3.3, top: 7.7, behavior: instant})",
+          "operation": "scrollTo",
+          "args": [
+            {
+              "left": 3.3,
+              "top": 7.7,
+              "behavior": "instant"
+            }
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 3,
+            "boxTop": 8
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 3,
+              "boxTop": 8
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 3,
+              "boxTop": 8
+            }
+          ]
+        },
+        {
+          "name": "scrollTo({top: 9.6}) keeps left",
+          "operation": "scrollTo",
+          "args": [
+            {
+              "top": 9.6
+            }
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 3,
+            "boxTop": 10
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 3,
+              "boxTop": 10
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 3,
+              "boxTop": 10
+            }
+          ]
+        },
+        {
+          "name": "scroll(5.5, 6.5)",
+          "operation": "scroll",
+          "args": [
+            5.5,
+            6.5
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 6,
+            "boxTop": 7
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 6,
+              "boxTop": 7
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 6,
+              "boxTop": 7
+            }
+          ]
+        },
+        {
+          "name": "scrollBy(0.4, 0.4)",
+          "operation": "scrollBy",
+          "args": [
+            0.4,
+            0.4
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 6,
+            "boxTop": 7
+          },
+          "events": []
+        },
+        {
+          "name": "scrollBy(0.4, 0.4) again",
+          "operation": "scrollBy",
+          "args": [
+            0.4,
+            0.4
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 6,
+            "boxTop": 7
+          },
+          "events": []
+        },
+        {
+          "name": "scrollBy({top: 0.6})",
+          "operation": "scrollBy",
+          "args": [
+            {
+              "top": 0.6
+            }
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 6,
+            "boxTop": 8
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 6,
+              "boxTop": 8
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 6,
+              "boxTop": 8
+            }
+          ]
+        },
+        {
+          "name": "scrollBy(-0.3, -0.3)",
+          "operation": "scrollBy",
+          "args": [
+            -0.3,
+            -0.3
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 6,
+            "boxTop": 8
+          },
+          "events": []
+        },
+        {
+          "name": "scrollTo(-5.5, -5.5) clamps to 0",
+          "operation": "scrollTo",
+          "args": [
+            -5.5,
+            -5.5
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        },
+        {
+          "name": "scrollTo(1e6, 1e6) clamps to the maximum",
+          "operation": "scrollTo",
+          "args": [
+            1000000,
+            1000000
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 900,
+            "boxTop": 901
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 900,
+              "boxTop": 901
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 900,
+              "boxTop": 901
+            }
+          ]
+        },
+        {
+          "name": "scrollBy(-0.5, -0.5) from the maximum",
+          "operation": "scrollBy",
+          "args": [
+            -0.5,
+            -0.5
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 900,
+            "boxTop": 901
+          },
+          "events": []
+        },
+        {
+          "name": "scrollTop = 33.3, scrollLeft = 11.6",
+          "operation": "set",
+          "args": [
+            11.6,
+            33.3
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 12,
+            "boxTop": 33
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 12,
+              "boxTop": 33
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 12,
+              "boxTop": 33
+            }
+          ]
+        },
+        {
+          "name": "scrollTo({left: 0.5, top: 50.5, behavior: smooth})",
+          "operation": "scrollTo",
+          "args": [
+            {
+              "left": 0.5,
+              "top": 50.5,
+              "behavior": "smooth"
+            }
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 1,
+            "boxTop": 51
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 8,
+              "boxTop": 39
+            },
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 3,
+              "boxTop": 48
+            },
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 1,
+              "boxTop": 50
+            },
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 1,
+              "boxTop": 51
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 1,
+              "boxTop": 51
+            }
+          ]
+        },
+        {
+          "name": "scrollTo(0, 0)",
+          "operation": "scrollTo",
+          "args": [
+            0,
+            0
+          ],
+          "after": {
+            "scrollX": 0,
+            "scrollY": 0,
+            "pageXOffset": 0,
+            "pageYOffset": 0,
+            "documentLeft": 0,
+            "documentTop": 0,
+            "boxLeft": 0,
+            "boxTop": 0
+          },
+          "events": [
+            {
+              "listener": "box",
+              "type": "scroll",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 0,
+              "boxTop": 0
+            },
+            {
+              "listener": "box",
+              "type": "scrollend",
+              "target": "box",
+              "scrollX": 0,
+              "scrollY": 0,
+              "pageXOffset": 0,
+              "pageYOffset": 0,
+              "documentLeft": 0,
+              "documentTop": 0,
+              "boxLeft": 0,
+              "boxTop": 0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "platformNotes": [
+    "Chromium stores fractional scroll offsets and snaps them to device pixels: at scale s a CSS offset is a multiple of 1/s."
+  ]
+}
