@@ -1336,6 +1336,33 @@ RV_EXPORT RvEventTarget* rv_host_window_event_target(RvHost* host);
  * window. */
 RV_EXPORT int32_t rv_host_max_touch_points(RvHost* host, int32_t* value);
 
+/* v35: "viewport" for rv_abi_has. */
+typedef struct RvWindowMetrics {
+    /* sizeof(RvWindowMetrics), set by the caller. */
+    int32_t size;
+    /* CSS pixels: the viewport including scrollbars, and the window, which for a host is the viewport. */
+    int32_t innerWidth;
+    int32_t innerHeight;
+    int32_t outerWidth;
+    int32_t outerHeight;
+    /* The device scale times the page zoom. */
+    double devicePixelRatio;
+} RvWindowMetrics;
+
+/* Writes the window's Window.innerWidth/innerHeight/outerWidth/outerHeight/devicePixelRatio. Returns
+ * RV_ERR_UNSUPPORTED when metrics->size is smaller than RvWindowMetrics. */
+RV_EXPORT int32_t rv_host_window_metrics(RvHost*, RvWindowMetrics* metrics);
+/* Sets whether the page is visible, as the platform window is shown or minimized, hidden or occluded. A change of
+ * document.visibilityState queues a visibilitychange event at the document; a hidden page defers its resize
+ * event until it is visible. A host starts visible. */
+RV_EXPORT int32_t rv_host_set_visible(RvHost*, int32_t visible);
+/* Window.matchMedia(query) as a new EventTarget reference. Its "change" event fires in rv_host_update, after the
+ * window's resize and scroll events. The handle remains valid after rv_host_destroy. */
+RV_EXPORT RvEventTarget* rv_host_match_media(RvHost*, const char* query);
+/* MediaQueryList.matches and MediaQueryList.media; RV_ERR_WRONG_INTERFACE for another target. */
+RV_EXPORT int32_t rv_media_query_matches(RvEventTarget*, int32_t* matches);
+RV_EXPORT int32_t rv_media_query_media(RvEventTarget*, char* buffer, int32_t capacity, int32_t* length);
+
 /* "dom-generated" and "dom:<Interface>" for rv_abi_has: the generated functions of RanvierWebCoreDom.h, one per
  * IDL member of the interfaces gen/dom.json lists, from the same library. */
 
