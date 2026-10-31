@@ -78,6 +78,8 @@ typedef struct RvSVGStringList RvSVGStringList;
 typedef struct RvSVGViewSpec RvSVGViewSpec;
 typedef struct RvSVGAnimatedAngle RvSVGAnimatedAngle;
 typedef struct RvSVGAnimatedInteger RvSVGAnimatedInteger;
+typedef struct RvNodeIterator RvNodeIterator;
+typedef struct RvTreeWalker RvTreeWalker;
 typedef struct RvDomUnionNodeOrDOMString RvDomUnionNodeOrDOMString;
 typedef struct RvDomSequenceNodeOrDOMString RvDomSequenceNodeOrDOMString;
 typedef struct RvDomSequenceCSSStyleSheet RvDomSequenceCSSStyleSheet;
@@ -292,7 +294,24 @@ enum {
     RV_DOM_SVG_COMPONENT_TRANSFER_FUNCTION_ELEMENT_SVG_FECOMPONENTTRANSFER_TYPE_DISCRETE = 3, /* SVGComponentTransferFunctionElement.SVG_FECOMPONENTTRANSFER_TYPE_DISCRETE */
     RV_DOM_SVG_COMPONENT_TRANSFER_FUNCTION_ELEMENT_SVG_FECOMPONENTTRANSFER_TYPE_LINEAR = 4, /* SVGComponentTransferFunctionElement.SVG_FECOMPONENTTRANSFER_TYPE_LINEAR */
     RV_DOM_SVG_COMPONENT_TRANSFER_FUNCTION_ELEMENT_SVG_FECOMPONENTTRANSFER_TYPE_GAMMA = 5, /* SVGComponentTransferFunctionElement.SVG_FECOMPONENTTRANSFER_TYPE_GAMMA */
+    RV_DOM_NODE_FILTER_FILTER_ACCEPT = 1, /* NodeFilter.FILTER_ACCEPT */
+    RV_DOM_NODE_FILTER_FILTER_REJECT = 2, /* NodeFilter.FILTER_REJECT */
+    RV_DOM_NODE_FILTER_FILTER_SKIP = 3, /* NodeFilter.FILTER_SKIP */
+    RV_DOM_NODE_FILTER_SHOW_ELEMENT = 0x00000001, /* NodeFilter.SHOW_ELEMENT */
+    RV_DOM_NODE_FILTER_SHOW_ATTRIBUTE = 0x00000002, /* NodeFilter.SHOW_ATTRIBUTE */
+    RV_DOM_NODE_FILTER_SHOW_TEXT = 0x00000004, /* NodeFilter.SHOW_TEXT */
+    RV_DOM_NODE_FILTER_SHOW_CDATA_SECTION = 0x00000008, /* NodeFilter.SHOW_CDATA_SECTION */
+    RV_DOM_NODE_FILTER_SHOW_ENTITY_REFERENCE = 0x00000010, /* NodeFilter.SHOW_ENTITY_REFERENCE */
+    RV_DOM_NODE_FILTER_SHOW_ENTITY = 0x00000020, /* NodeFilter.SHOW_ENTITY */
+    RV_DOM_NODE_FILTER_SHOW_PROCESSING_INSTRUCTION = 0x00000040, /* NodeFilter.SHOW_PROCESSING_INSTRUCTION */
+    RV_DOM_NODE_FILTER_SHOW_COMMENT = 0x00000080, /* NodeFilter.SHOW_COMMENT */
+    RV_DOM_NODE_FILTER_SHOW_DOCUMENT = 0x00000100, /* NodeFilter.SHOW_DOCUMENT */
+    RV_DOM_NODE_FILTER_SHOW_DOCUMENT_TYPE = 0x00000200, /* NodeFilter.SHOW_DOCUMENT_TYPE */
+    RV_DOM_NODE_FILTER_SHOW_DOCUMENT_FRAGMENT = 0x00000400, /* NodeFilter.SHOW_DOCUMENT_FRAGMENT */
+    RV_DOM_NODE_FILTER_SHOW_NOTATION = 0x00000800, /* NodeFilter.SHOW_NOTATION */
 };
+
+#define RV_DOM_NODE_FILTER_SHOW_ALL 0xFFFFFFFFu /* NodeFilter.SHOW_ALL */
 
 /* The values of the IDL enumeration AriaNotificationInterrupt. */
 enum {
@@ -1246,6 +1265,18 @@ RV_EXPORT RvSVGAnimatedAngle* rv_dom_svg_animated_angle_retain(RvSVGAnimatedAngl
 RV_EXPORT void rv_dom_svg_animated_integer_release(RvSVGAnimatedInteger*);
 /* Adds a reference to a SVGAnimatedInteger and returns it. */
 RV_EXPORT RvSVGAnimatedInteger* rv_dom_svg_animated_integer_retain(RvSVGAnimatedInteger*);
+/* Releases a handle to a NodeFilter. */
+RV_EXPORT void rv_dom_node_filter_release(RvNodeFilter*);
+/* Adds a reference to a NodeFilter and returns it. */
+RV_EXPORT RvNodeFilter* rv_dom_node_filter_retain(RvNodeFilter*);
+/* Releases a handle to a NodeIterator. */
+RV_EXPORT void rv_dom_node_iterator_release(RvNodeIterator*);
+/* Adds a reference to a NodeIterator and returns it. */
+RV_EXPORT RvNodeIterator* rv_dom_node_iterator_retain(RvNodeIterator*);
+/* Releases a handle to a TreeWalker. */
+RV_EXPORT void rv_dom_tree_walker_release(RvTreeWalker*);
+/* Adds a reference to a TreeWalker and returns it. */
+RV_EXPORT RvTreeWalker* rv_dom_tree_walker_retain(RvTreeWalker*);
 /* Concrete scoped interface name of a CSSRule handle; borrows target. */
 RV_EXPORT int32_t rv_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* Concrete scoped interface name of a StyleSheet handle; borrows target. */
@@ -1549,6 +1580,14 @@ RV_EXPORT int32_t rv_dom_document_create_attribute_ns(RvNode* target, const char
 RV_EXPORT int32_t rv_dom_document_create_event(RvNode* target, const char* type, RvEvent** result);
 /* Document.createRange() -> Range; *result is a new reference */
 RV_EXPORT int32_t rv_dom_document_create_range(RvNode* target, RvAbstractRange** result);
+/* Document.createNodeIterator(Node root, optional unsigned long whatToShow = 0xFFFFFFFF, optional NodeFilter? filter
+ * = null) -> NodeIterator; what_to_show defaults to 0xFFFFFFFF in IDL; filter defaults to null in IDL; filter may be
+ * NULL; *result is a new reference */
+RV_EXPORT int32_t rv_dom_document_create_node_iterator(RvNode* target, RvNode* root, uint32_t what_to_show, RvNodeFilter* filter, RvNodeIterator** result);
+/* Document.createTreeWalker(Node root, optional unsigned long whatToShow = 0xFFFFFFFF, optional NodeFilter? filter =
+ * null) -> TreeWalker; what_to_show defaults to 0xFFFFFFFF in IDL; filter defaults to null in IDL; filter may be
+ * NULL; *result is a new reference */
+RV_EXPORT int32_t rv_dom_document_create_tree_walker(RvNode* target, RvNode* root, uint32_t what_to_show, RvNodeFilter* filter, RvTreeWalker** result);
 /* Document.caretRangeFromPoint(optional long x = 0, optional long y = 0) -> Range?; x defaults to 0 in IDL; y
  * defaults to 0 in IDL; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_document_caret_range_from_point(RvNode* target, int32_t x, int32_t y, RvAbstractRange** result);
@@ -7058,6 +7097,50 @@ RV_EXPORT int32_t rv_dom_svg_use_element_get_width(RvNode* target, RvSVGAnimated
 RV_EXPORT int32_t rv_dom_svg_use_element_get_height(RvNode* target, RvSVGAnimatedLength** result);
 /* SVGUseElement.href getter: readonly attribute SVGAnimatedString href; *result is a new reference */
 RV_EXPORT int32_t rv_dom_svg_use_element_get_href(RvNode* target, RvSVGAnimatedString** result);
+/* NodeIterator */
+
+/* NodeIterator.root getter: readonly attribute Node root; *result is a new reference */
+RV_EXPORT int32_t rv_dom_node_iterator_get_root(RvNodeIterator* target, RvNode** result);
+/* NodeIterator.referenceNode getter: readonly attribute Node? referenceNode; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_node_iterator_get_reference_node(RvNodeIterator* target, RvNode** result);
+/* NodeIterator.pointerBeforeReferenceNode getter: readonly attribute boolean pointerBeforeReferenceNode */
+RV_EXPORT int32_t rv_dom_node_iterator_get_pointer_before_reference_node(RvNodeIterator* target, int32_t* result);
+/* NodeIterator.whatToShow getter: readonly attribute unsigned long whatToShow */
+RV_EXPORT int32_t rv_dom_node_iterator_get_what_to_show(RvNodeIterator* target, uint32_t* result);
+/* NodeIterator.filter getter: readonly attribute NodeFilter? filter; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_node_iterator_get_filter(RvNodeIterator* target, RvNodeFilter** result);
+/* NodeIterator.nextNode() -> Node?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_node_iterator_next_node(RvNodeIterator* target, RvNode** result);
+/* NodeIterator.previousNode() -> Node?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_node_iterator_previous_node(RvNodeIterator* target, RvNode** result);
+/* NodeIterator.detach() -> undefined */
+RV_EXPORT int32_t rv_dom_node_iterator_detach(RvNodeIterator* target);
+/* TreeWalker */
+
+/* TreeWalker.root getter: readonly attribute Node root; *result is a new reference */
+RV_EXPORT int32_t rv_dom_tree_walker_get_root(RvTreeWalker* target, RvNode** result);
+/* TreeWalker.whatToShow getter: readonly attribute unsigned long whatToShow */
+RV_EXPORT int32_t rv_dom_tree_walker_get_what_to_show(RvTreeWalker* target, uint32_t* result);
+/* TreeWalker.filter getter: readonly attribute NodeFilter? filter; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_tree_walker_get_filter(RvTreeWalker* target, RvNodeFilter** result);
+/* TreeWalker.currentNode getter: attribute Node currentNode; *result is a new reference */
+RV_EXPORT int32_t rv_dom_tree_walker_get_current_node(RvTreeWalker* target, RvNode** result);
+/* TreeWalker.currentNode setter: attribute Node currentNode */
+RV_EXPORT int32_t rv_dom_tree_walker_set_current_node(RvTreeWalker* target, RvNode* value);
+/* TreeWalker.parentNode() -> Node?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_tree_walker_parent_node(RvTreeWalker* target, RvNode** result);
+/* TreeWalker.firstChild() -> Node?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_tree_walker_first_child(RvTreeWalker* target, RvNode** result);
+/* TreeWalker.lastChild() -> Node?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_tree_walker_last_child(RvTreeWalker* target, RvNode** result);
+/* TreeWalker.previousSibling() -> Node?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_tree_walker_previous_sibling(RvTreeWalker* target, RvNode** result);
+/* TreeWalker.nextSibling() -> Node?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_tree_walker_next_sibling(RvTreeWalker* target, RvNode** result);
+/* TreeWalker.previousNode() -> Node?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_tree_walker_previous_node(RvTreeWalker* target, RvNode** result);
+/* TreeWalker.nextNode() -> Node?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_tree_walker_next_node(RvTreeWalker* target, RvNode** result);
 /* DOMCSSNamespace */
 
 /* CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths */

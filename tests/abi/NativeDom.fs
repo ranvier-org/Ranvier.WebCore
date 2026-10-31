@@ -534,6 +534,54 @@ let RV_DOM_SVG_COMPONENT_TRANSFER_FUNCTION_ELEMENT_SVG_FECOMPONENTTRANSFER_TYPE_
 let RV_DOM_SVG_COMPONENT_TRANSFER_FUNCTION_ELEMENT_SVG_FECOMPONENTTRANSFER_TYPE_GAMMA = 5
 
 [<Literal>]
+let RV_DOM_NODE_FILTER_FILTER_ACCEPT = 1
+
+[<Literal>]
+let RV_DOM_NODE_FILTER_FILTER_REJECT = 2
+
+[<Literal>]
+let RV_DOM_NODE_FILTER_FILTER_SKIP = 3
+
+[<Literal>]
+let RV_DOM_NODE_FILTER_SHOW_ALL = 4294967295u
+
+[<Literal>]
+let RV_DOM_NODE_FILTER_SHOW_ELEMENT = 1
+
+[<Literal>]
+let RV_DOM_NODE_FILTER_SHOW_ATTRIBUTE = 2
+
+[<Literal>]
+let RV_DOM_NODE_FILTER_SHOW_TEXT = 4
+
+[<Literal>]
+let RV_DOM_NODE_FILTER_SHOW_CDATA_SECTION = 8
+
+[<Literal>]
+let RV_DOM_NODE_FILTER_SHOW_ENTITY_REFERENCE = 16
+
+[<Literal>]
+let RV_DOM_NODE_FILTER_SHOW_ENTITY = 32
+
+[<Literal>]
+let RV_DOM_NODE_FILTER_SHOW_PROCESSING_INSTRUCTION = 64
+
+[<Literal>]
+let RV_DOM_NODE_FILTER_SHOW_COMMENT = 128
+
+[<Literal>]
+let RV_DOM_NODE_FILTER_SHOW_DOCUMENT = 256
+
+[<Literal>]
+let RV_DOM_NODE_FILTER_SHOW_DOCUMENT_TYPE = 512
+
+[<Literal>]
+let RV_DOM_NODE_FILTER_SHOW_DOCUMENT_FRAGMENT = 1024
+
+[<Literal>]
+let RV_DOM_NODE_FILTER_SHOW_NOTATION = 2048
+
+[<Literal>]
 let RV_DOM_ARIA_NOTIFICATION_INTERRUPT_NONE = 0
 
 [<Literal>]
@@ -1619,6 +1667,24 @@ extern void rv_dom_svg_animated_integer_release(nativeint handle)
 extern nativeint rv_dom_svg_animated_integer_retain(nativeint handle)
 
 [<DllImport(Lib)>]
+extern void rv_dom_node_filter_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_node_filter_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_node_iterator_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_node_iterator_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_tree_walker_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_tree_walker_retain(nativeint handle)
+
+[<DllImport(Lib)>]
 extern int rv_dom_css_rule_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
@@ -2019,6 +2085,12 @@ extern int rv_dom_document_create_event(nativeint target, [<MarshalAs(UnmanagedT
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_create_range(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_document_create_node_iterator(nativeint target, nativeint root, uint32 what_to_show, nativeint filter, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_document_create_tree_walker(nativeint target, nativeint root, uint32 what_to_show, nativeint filter, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_caret_range_from_point(nativeint target, int x, int y, nativeint& result)
@@ -8964,6 +9036,66 @@ extern int rv_dom_svg_use_element_get_height(nativeint target, nativeint& result
 
 [<DllImport(Lib)>]
 extern int rv_dom_svg_use_element_get_href(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_node_iterator_get_root(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_node_iterator_get_reference_node(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_node_iterator_get_pointer_before_reference_node(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_node_iterator_get_what_to_show(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_node_iterator_get_filter(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_node_iterator_next_node(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_node_iterator_previous_node(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_node_iterator_detach(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_tree_walker_get_root(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_tree_walker_get_what_to_show(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_tree_walker_get_filter(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_tree_walker_get_current_node(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_tree_walker_set_current_node(nativeint target, nativeint value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_tree_walker_parent_node(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_tree_walker_first_child(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_tree_walker_last_child(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_tree_walker_previous_sibling(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_tree_walker_next_sibling(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_tree_walker_previous_node(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_tree_walker_next_node(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_supports_2(nativeint target, byte[] property, int property_length, byte[] value, int value_length, int& result)

@@ -269,6 +269,13 @@ invented members to the shared DOM interfaces. CSS rule, stylesheet and declarat
 queries because CSSOM's historical `CSSRule.type` returns zero for modern rule types. An unscoped subtype
 reports its nearest scoped ancestor. Query names are reported separately from the IDL member count.
 
+`callbackObjectRoots` makes a callback interface, such as `NodeFilter`, an object handle root. Its arguments and
+attributes pass `Rv<Name>*` handles with the generated `rv_dom_<name>_retain`/`_release`, and its members are
+excluded by name. The host creates the handles (`rv_node_filter_create`), so `RanvierWebCoreAbi.h` declares the
+handle type. `contract` gives the type the shared F# contract declares, and `resultEnum` the integer enumeration it
+returns. A nullable attribute of the type is an F# option there; an optional argument takes the function itself.
+Constants above `INT32_MAX` (`NodeFilter.SHOW_ALL`) are emitted as unsigned `#define`s and F# `u` literals.
+
 `gen/dom-report.txt` records the generated interface/function counts, handle types, constants, enumerations,
 dictionary structs and every member left out, by reason:
 

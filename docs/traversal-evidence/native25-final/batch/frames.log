@@ -1,0 +1,111 @@
+RANVIER_FSHARP_RESOURCES PASS {"beforeCycle":{"box":[0,0,0],"image":[0,0,0],"textBlue":0,"textRight":[0,0,0]},"requested":["https://rv.test/style.css","https://rv.test/green.png","https://rv.test/ahem.ttf"],"served":{"box":[200,20,120],"image":[10,200,30],"textBlue":6400,"textRight":[0,0,255]},"servedMilliseconds":14.5,"servedSteps":1,"unserved":{"box":[255,255,255],"image":[255,255,255],"textBlue":0,"textRight":[255,255,255]}}
+RANVIER_FSHARP_WINDOW {"afterArrow":"xh","afterBackspace":"h","animationColours":5,"animationFrames":11,"animationMilliseconds":81.6,"beforeHover":[200,0,0],"cancelled":"x\u4F60h","committed":"x\u4F60h","composing":"xnih","cursorOverBox":1,"cursorOverField":2,"dirtyAfterLoad":{"Item1":0,"Item2":0,"Item3":200,"Item4":100},"dirtyAfterPaint":null,"dirtyAfterResize":{"Item1":0,"Item2":0,"Item3":240,"Item4":120},"fieldFocused":true,"firstPixelBox":[200,0,0],"fractional":{"Item1":360,"Item2":180},"framesAfterLoad":1,"hiDpiBox":[200,0,0],"hoverDirty":{"Item1":10,"Item2":60,"Item3":80,"Item4":30},"hoverFrames":1,"hovered":[0,200,0],"imeRect":{"Item1":21,"Item2":16,"Item3":13,"Item4":18},"keyLog":["keydown:True:Some(KeyH)","input:Some(h):Some(insertText)","keydown:True:Some(KeyI)","input:Some(i):Some(insertText)","keydown:True:Some(Backspace)","input::Some(deleteContentBackward)","keydown:True:Some(ArrowLeft)","keydown:True:Some(KeyX)","input:Some(x):Some(insertText)","input:Some(ni):Some(insertCompositionText)","input::Some(deleteCompositionText)","input:Some(\u4F60):Some(insertFromComposition)","input:Some(ab):Some(insertCompositionText)","input::Some(deleteCompositionText)"],"mouseLog":["mousedown:True:50,75:b0:d1","mouseup:True:50,75:b0:d1","click:True:50,75:b0:d1"],"resized":{"Item1":240,"Item2":120},"scaled":{"Item1":480,"Item2":240},"scrollToDirty":{"Item1":0,"Item2":0,"Item3":240,"Item4":120},"scrollToPosition":{"Item1":0,"Item2":0},"scrolled":[255,255,255],"scrolledBack":[200,0,0],"typed":"hi","wheelDirty":{"Item1":0,"Item2":0,"Item3":240,"Item4":120},"wheelHandled":true,"wheelPosition":{"Item1":0,"Item2":100}}
+RANVIER_FSHARP_SURFACE {"added":1,"afterInvalid":"150px","afterRemove":"100px","animationCount":1,"blue":[0,0,255],"cancelledState":0,"clientHeight":50,"computedWidth":"150px","contains":1,"documentCount":1,"finishedState":3,"hitA":true,"initialState":1,"inlineWidth":"150px","intoViewTop":250,"leftAtHalf":"50px","name":"slide","pausedState":2,"rect":[20,30,100,50],"rectWidth":150,"removed":0,"rootType":11,"sameRoot":true,"scrollHeight":300,"scrolledTop":120,"secondIsNull":true,"secondStatus":-3,"seekTime":500,"selection":[1,3],"targetIsA":true,"toggled":1,"transitionNames":["opacity"]}
+RANVIER_FSHARP_OBSERVE {"badMarginIsNull":true,"centre":[200,0],"intersections":["True:0:0","True:1:1"],"resizes":["True:100x50","True:150x50"],"snapshot":[120,50],"snapshot2x":[240,100]}
+RANVIER_FSHARP_PAINT {"after1":null,"after2":null,"dirty1":{"Item1":300,"Item2":200,"Item3":40,"Item4":40},"dirty2":{"Item1":300,"Item2":200,"Item3":40,"Item4":40},"equal1":true,"equal2":true,"fullMs":3.74825,"rectMs":0.018795,"size2":[2560,1440]}
+RANVIER_FSHARP_POPUP {"changes":["trusted"],"chosen":"Four","count":5,"items":["0:1:One","2:0:More","0:1:    Two","0:0:    Three","0:1:Four"],"overBody":"","overTip":"A native tooltip","shown":["0:10,10,120,24:0"],"shownWithout":0}
+RANVIER_FSHARP_CLIPBOARD {"afterCancelled":"XYZ\u003Cb\u003Ebold\u003C/b\u003E","afterCut":"world","afterHtml":"XYZ\u003Cb\u003Ebold\u003C/b\u003E","afterText":"XYZ","appCopy":1,"appCut":1,"copied":["1:text/plain:5","0:text/html:85"],"cutWritten":["1:text/plain:6","0:text/html:86"],"domCopy":1,"events":["src:copy:True","src:copy:True","src:cut:True","src:copy:True","ed:paste:True","ed:paste:True","ed:paste:True"],"htmlPaste":1,"keyWritten":["1:text/plain:5","0:text/html:85"],"nativeStatus":0,"textPaste":1}
+RANVIER_FSHARP_DROP {"domEvents":0,"domOp":0,"dropEd":1,"dropZone":1,"edText":"dropped","events":["plain:dragenter","plain:dragover","plain:dragleave","zone:dragenter","zone:dragover","zone:dragover","zone:drop","ed:dragenter","ed:dragover","ed:dragover","ed:drop","plain:dragenter","plain:dragover","plain:dragleave"],"overEd":1,"overPlain":0,"overPlainAgain":0,"overZone":1}
+RANVIER_FSHARP_DRAGOUT {"box":[10,10,7],"dropped":1,"edText":"https://example.test/page","events":["dragstart","dragend"],"image":[-6,100,40,10,10],"linkItems":["text/uri-list=https://example.test/page","text/plain=https://example.test/page"],"startedInDom":0,"starts":2}
+RANVIER_FSHARP_ACCESSIBILITY {"bDomSame":true,"bElementRect":[10,10,100,30],"bParentRole":59,"bRect":[10,10,100,30],"before":{"button":{"Item1":9,"Item2":"Save","Item3":"Writes the file","Item4":1},"checkbox":{"Item1":11,"Item2":"Dark mode","Item3":9},"details":{"Item1":4,"Item2":128},"farStates":2097152,"heading":{"Item1":["7","Settings"],"Item2":1},"link":{"Item1":8,"Item2":"https://example.com/"},"list":{"Item1":31,"Item2":2},"live":{"Item1":"polite","Item2":6291456},"slider":{"Item1":25,"Item2":"Volume","Item3":4,"Item4":0,"Item5":10},"text":{"Item1":15,"Item2":"Name","Item3":"Ann","Item4":"Your name","Item5":4097}},"changeEvents":["3:1","31:1","1:10","15:14","3:8"],"checkboxStateEvent":true,"checkedAfterPress":27,"childrenEvent":true,"detachedRole":-10,"detailsAfterExpand":384,"eventsAfterActions":[0,0,3,2,2,10,1,1,1,1,1,3],"expandResult":1,"focusEvent":true,"focusIsText":true,"focusResult":1,"hasEvents":true,"hiddenIsNull":true,"hitIsButton":true,"increment":1,"input":["input"],"listCountAfter":3,"listItemRoles":[32,32],"liveEvent":true,"liveText":"Saved","notRange":0,"pressChecked":1,"rootAfterOffIsNull":true,"rootBeforeIsNull":true,"rootParentIsNull":true,"rootRect":[0,0,300,200],"rootRole":1,"setNumber":1,"setValue":1,"sliderAfterIncrement":8,"sliderAfterSet":7,"tree":["1:Accessibility"," 59:","  7:Settings","   5:Settings","  9:Save","  5:Writes the file","  11:Dark mode","  70:","   5:Name","  15:Name","  25:Volume","   3:","  3:","  31:","   32:One","    5:","    5:One","   32:Two","    5:","    5:Two","  8:Example","   5:Example","  4:","   9:More","    5:More","  6:","   5:Far"],"valueAfter":"Bob","valueEvent":true}
+RANVIER_FSHARP_ACCESSIBILITY_TEXT {"caretAfterSelect":7,"caretAfterTyping":8,"caretRect":[[25,123,1,15]],"character":{"Item1":0,"Item2":1},"firstLine":{"Item1":0,"Item2":14},"firstRect":[[10,10,12,18]],"hasEvents":true,"lastLine":{"Item1":15,"Item2":29},"lineRects":[[10,10,95,18],[10,28,86,18]],"offsetAtStart":0,"pLength":29,"pSelection":{"Item1":0,"Item2":-1,"Item3":-1},"pText":"One two three. Four five six.","paragraph":{"Item1":0,"Item2":29},"pwText":"\u2022\u2022\u2022\u2022","rootLength":29,"selected":{"Item1":1,"Item2":4,"Item3":7},"selectionBefore":{"Item1":0,"Item2":-1,"Item3":-1},"selectionEvent":true,"sentence":{"Item1":0,"Item2":15},"sentenceText":"One two three. ","tText":"abc def","textEvent":true,"typedText":"abc defx","typingEvents":["15:13","15:10","15:2","15:14","15:4","5:13"],"word":{"Item1":4,"Item2":7},"wordText":"two"}
+RANVIER_FSHARP_DOM PASS
+RANVIER_TRAVERSAL_MANAGED PASS
+RANVIER_FSHARP_ABI PASS {"changed":{"frame0to1":42728,"frame1to2":14835},"events":{"afterRemoval":[],"cancellation":{"cancelable":true,"log":["button:2","panel-sees-prevented:True","button:2","panel-sees-prevented:False"],"notCancelable":false},"changedByReentry":4263,"checkbox":{"cancelledClick":true,"cancelledLog":["checkbox-click:2"],"clicked":true,"clickedAfterRemoval":false,"clickedLog":["checkbox-change:2"],"initial":false},"failure":{"log":["panel-after-throw:3"],"raised":["handler failure from F#"]},"handlerThreads":[2],"nestedFailure":{"log":["outer:3","caught-nested"],"outerSucceeded":true},"offThread":{"dispatchStatus":-2,"guardedLog":["guarded:2"],"removeStatus":-2},"propagation":{"log":["panel-capture:1","button:2","panel-bubble:3","body-bubble:3"],"prevented":false},"reentry":["outer-start:3","inner-body:2","outer-end"],"removalDuringDispatch":{"first":["first:2"],"second":["first:2"]},"stopPropagation":["button:2","button-second:2"],"vmGuardInHandlers":[1]},"frame2GreenPixels":13838,"managedPid":126960,"managedThread":2,"nativePid":126960,"opaque":{"frame0":230400,"frame1":230400,"frame2":230400},"os":"Microsoft Windows 10.0.26200","pixel40_40":{"frame0":[20,60,80],"frame1":[160,40,30]},"runtime":".NET 10.0.14","scriptsEnabled":0,"vmEntryDisallowed":1,"wrongThreadStatus":-2}
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+RANVIER_STEP Accessibility: let hasEvents = rv_abi_has 'accessibility-events' = 1
+RANVIER_STEP Accessibility: host.LoadHtml html
+RANVIER_STEP Accessibility: let rootBefore = rv_host_ax_root host.Handle
+RANVIER_STEP Accessibility: rv_host_set_accessibility (host.Handle, 1, Marshal.GetFunctionPointerForDelegate onEvent, 
+RANVIER_STEP Accessibility: let root = rv_host_ax_root host.Handle
+RANVIER_STEP Accessibility: let rootRole = rv_ax_role root
+RANVIER_STEP Accessibility: let rootParent = rv_ax_parent root
+RANVIER_STEP Accessibility: let h = ax 'h'
+RANVIER_STEP Accessibility: let b = ax 'b'
+RANVIER_STEP Accessibility: let c = ax 'c'
+RANVIER_STEP Accessibility: let t = ax 't'
+RANVIER_STEP Accessibility: let s = ax 's'
+RANVIER_STEP Accessibility: let link = ax 'link'
+RANVIER_STEP Accessibility: let list = ax 'list'
+RANVIER_STEP Accessibility: let live = ax 'live'
+RANVIER_STEP Accessibility: let det = ax 'det'
+RANVIER_STEP Accessibility: let far = ax 'far'
+RANVIER_STEP Accessibility: use hiddenDiv = host.GetElementById 'hidden'
+RANVIER_STEP Accessibility: use hiddenButton = new Node(rv_node_relative (hiddenDiv.Handle, 1))
+RANVIER_STEP Accessibility: let hidden = rv_node_ax hiddenButton.Handle
+RANVIER_STEP Accessibility: use bNode = host.GetElementById 'b'
+RANVIER_STEP Accessibility: let bDom = rv_ax_dom_node b
+RANVIER_STEP Accessibility: rv_node_release bDom
+RANVIER_STEP Accessibility: let bParent = rv_ax_parent b
+RANVIER_STEP Accessibility: let bParentRole = rv_ax_role bParent
+RANVIER_STEP Accessibility: rv_ax_release bParent
+RANVIER_STEP Accessibility: let hit = rv_host_ax_hit_test (host.Handle, 60, 25)
+RANVIER_STEP Accessibility: let hitParent = rv_ax_parent hit
+RANVIER_STEP Accessibility: rv_ax_release hitParent
+RANVIER_STEP Accessibility: rv_ax_release hit
+RANVIER_STEP Accessibility: let listItemRoles = listChildren |> Array.map rv_ax_role |> List.ofArray
+RANVIER_STEP Accessibility: let pressChecked = rv_ax_action (c, 0)
+RANVIER_STEP Accessibility: let checkedAfterPress = rv_ax_states c
+RANVIER_STEP Accessibility: use tNode = host.GetElementById 't'
+RANVIER_STEP Accessibility: let focusResult = rv_ax_action (t, 1)
+RANVIER_STEP Accessibility: let focusNode = rv_host_ax_focus host.Handle
+RANVIER_STEP Accessibility: rv_ax_release focusNode
+RANVIER_STEP Accessibility: let setValue = rv_ax_set_value (t, 'Bob')
+RANVIER_STEP Accessibility: let setNumber = rv_ax_set_number (s, 7.0)
+RANVIER_STEP Accessibility: let increment = rv_ax_action (s, 3)
+RANVIER_STEP Accessibility: let expandResult = rv_ax_action (det, 5)
+RANVIER_STEP Accessibility: let detailsAfterExpand = rv_ax_states det
+RANVIER_STEP Accessibility: let notRange = rv_ax_action (b, 3)
+RANVIER_STEP Accessibility: host.CycleRunLoop 50
+RANVIER_STEP Accessibility: use listNode = host.GetElementById 'list'
+RANVIER_STEP Accessibility: use item = host.CreateElement 'li'
+RANVIER_STEP Accessibility: use liveNode = host.GetElementById 'live'
+RANVIER_STEP Accessibility: host.Update()
+RANVIER_STEP Accessibility: host.CycleRunLoop 50
+RANVIER_STEP Accessibility: rv_node_remove bNode.Handle |> check 'remove button'
+RANVIER_STEP Accessibility: host.CycleRunLoop 50
+RANVIER_STEP Accessibility: let detachedRole = rv_ax_role b
+RANVIER_STEP Accessibility: rv_host_set_accessibility (host.Handle, 0, 0n, 0n) |> check 'accessibility off'
+RANVIER_STEP Accessibility: let rootAfterOff = rv_host_ax_root host.Handle
+RANVIER_STEP AccessibilityText: let hasEvents = rv_abi_has 'accessibility-events' = 1
+RANVIER_STEP AccessibilityText: host.LoadHtml html
+RANVIER_STEP AccessibilityText: let onEvent = AxCallback(fun _ node event -> events.Add(rv_ax_retain node, event))
+RANVIER_STEP AccessibilityText: rv_host_set_accessibility (host.Handle, 1, Marshal.GetFunctionPointerForDelegate onEvent, 
+RANVIER_STEP AccessibilityText: let p = ax 'p'
+RANVIER_STEP AccessibilityText: let t = ax 't'
+RANVIER_STEP AccessibilityText: let pw = ax 'pw'
+RANVIER_STEP AccessibilityText: let pLength = rv_ax_text_length p
+RANVIER_STEP AccessibilityText: let pText = text p 0 pLength
+RANVIER_STEP AccessibilityText: let character = boundary p 0 0
+RANVIER_STEP AccessibilityText: let word = boundary p 4 1
+RANVIER_STEP AccessibilityText: let wordText = text p (fst word) (snd word)
+RANVIER_STEP AccessibilityText: let sentence = boundary p 0 3
+RANVIER_STEP AccessibilityText: let sentenceText = text p (fst sentence) (snd sentence)
+RANVIER_STEP AccessibilityText: let firstLine = boundary p 0 2
+RANVIER_STEP AccessibilityText: let lastLine = boundary p pLength 2
+RANVIER_STEP AccessibilityText: let paragraph = boundary p 5 4
+RANVIER_STEP AccessibilityText: let lineRects = rects p 0 pLength
+RANVIER_STEP AccessibilityText: let firstRect = rects p 0 1
+RANVIER_STEP AccessibilityText: let offsetAtStart = rv_ax_text_offset_at (p, 11, 15)
+RANVIER_STEP AccessibilityText: let badRange = rv_ax_text_length (rv_host_ax_root host.Handle)
+RANVIER_STEP AccessibilityText: let tLength = rv_ax_text_length t
+RANVIER_STEP AccessibilityText: let tText = text t 0 tLength
+RANVIER_STEP AccessibilityText: let pwText = text pw 0 (rv_ax_text_length pw)
+RANVIER_STEP AccessibilityText: let selectionBefore = selection t
+RANVIER_STEP AccessibilityText: rv_ax_action (t, 1) |> ignore
+RANVIER_STEP AccessibilityText: rv_ax_text_set_selection (t, 4, 7) |> check 'ax_text_set_selection'
+RANVIER_STEP AccessibilityText: let selected = selection t
+RANVIER_STEP AccessibilityText: let caretAfterSelect = rv_ax_text_caret t
+RANVIER_STEP AccessibilityText: let caretRect = rects t 2 2
+RANVIER_STEP AccessibilityText: host.Update()
+RANVIER_STEP AccessibilityText: host.CycleRunLoop 50
+RANVIER_STEP AccessibilityText: rv_ax_text_set_selection (t, 7, 7) |> check 'caret at the end'
+RANVIER_STEP AccessibilityText: host.Type('x', 'KeyX', 'x')
+RANVIER_STEP AccessibilityText: host.Update()
+RANVIER_STEP AccessibilityText: host.CycleRunLoop 50
+RANVIER_STEP AccessibilityText: let typedText = text t 0 (rv_ax_text_length t)
+RANVIER_STEP AccessibilityText: let caretAfterTyping = rv_ax_text_caret t
+RANVIER_STEP AccessibilityText: let pSelection = selection p
+RANVIER_STEP AccessibilityText: rv_host_set_accessibility (host.Handle, 0, 0n, 0n) |> check 'accessibility off'
+
+EXIT_CODE=0

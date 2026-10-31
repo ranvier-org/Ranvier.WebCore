@@ -71,11 +71,15 @@ class InterfaceEmitter:
         elif value.name in self.world.enums:
             result = value.name
             self.enums.add(result)
+        elif value.name in self.world.config.get('callbackObjectRoots', {}):
+            result = value.name
+            self.callbacks.add(result)
         elif self.world.public_name(value.name) in self.names:
             result = self.world.public_name(value.name)
         else:
             raise self.generator.unsupported_type(f'interface surface type {value.name} outside scope')
-        if value.nullable and value.name in NUMBERS | {'boolean': ''} or value.nullable and value.name == 'union':
+        if (value.nullable and value.name in NUMBERS | {'boolean': ''} or value.nullable and value.name == 'union'
+                or value.nullable and value.name in self.world.config.get('callbackObjectRoots', {})):
             result = f'({result}) option'
         return result
 
@@ -102,6 +106,8 @@ class InterfaceEmitter:
             if t is None:
                 continue
             ftype = self.type(t)
+            if argument.optional and self.world.resolve(t).name in self.world.config.get('callbackObjectRoots', {}):
+                ftype = self.world.resolve(t).name
             if raw and self.union(argument.type):
                 ftype = 'obj'
             if argument.variadic:
@@ -440,6 +446,8 @@ class InterfaceEmitter:
             source = self.sources[name]
             base = self.world.public_name(self.world.interfaces[source].base)
             mixins = [self.world.public_name(mixin) for mixin in self.world.contract_mixins(source)]
+            if source in self.world.config.get('callbackObjectRoots', {}):
+                continue
             body = ([f'    inherit {base}'] if base in self.names else []) + [f'    inherit {mixin}' for mixin in mixins] + members
             declarations.append((name, '[<AllowNullLiteral>]', body or ['    interface end']))
         for name, children in self.unions.items():
@@ -476,6 +484,12 @@ class InterfaceEmitter:
             if name == 'EventListener':
                 declarations.append((name, '', ['    Event -> unit']))
                 declarations.append(('EventListenerObject', '[<AllowNullLiteral>]', ['    abstract member handleEvent: event: Event -> unit']))
+            elif name in self.world.config.get('callbackObjectRoots', {}):
+                callback = self.world.config['callbackObjectRoots'][name]
+                result = callback['resultEnum']
+                declarations.append((name, '', ['    ' + callback['contract']]))
+                declarations.append((result['name'], '',
+                                     [f'    | {case} = {value}' for case, value in result['cases'].items()]))
         for name, (values, _, _) in self.world.enums.items():
             if name in self.enums:
                 declarations.append((name, '[<RequireQualifiedAccess>]', [f'    | [<CompiledName("{value}")>] {case_name(value)}' for value in values]))
@@ -496,11 +510,11 @@ class InterfaceEmitter:
                         body = []
                     else:
                         lines += [attrs, f'type {name} =']
-                elif body == ['    interface end'] or body == ['    class end'] or attrs == '':
+                elif body == ['    interface end'] or body == ['    class end'] or (attrs == '' and len(body) == 1):
                     lines += [f'{prefix}{" " + attrs if attrs else ""} {name} = {body[0].strip()}']
                     body = []
                 else:
-                    lines += [f'{prefix} {attrs} {name} =']
+                    lines += [f'{prefix}{" " + attrs if attrs else ""} {name} =']
             lines += body + ['']
         lines += self.extensions()
         missing_matrix_adapters = set(self.world.config.get('browserMatrixFlagAdapters', [])) - self.matrix_flag_adapters_used

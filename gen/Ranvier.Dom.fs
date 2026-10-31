@@ -246,6 +246,10 @@ and [<AllowNullLiteral>] Document =
     abstract member createEvent: ``type``: string -> Event
     /// <summary>Document.createRange.</summary>
     abstract member createRange: unit -> Range
+    /// <summary>Document.createNodeIterator.</summary>
+    abstract member createNodeIterator: root: Node * ?whatToShow: uint32 * ?filter: NodeFilter -> NodeIterator
+    /// <summary>Document.createTreeWalker.</summary>
+    abstract member createTreeWalker: root: Node * ?whatToShow: uint32 * ?filter: NodeFilter -> TreeWalker
     /// <summary>Document.caretRangeFromPoint.</summary>
     abstract member caretRangeFromPoint: ?x: int * ?y: int -> Range
     /// <summary>Document.ariaNotify.</summary>
@@ -1727,6 +1731,10 @@ and [<AllowNullLiteral>] MathMLElement =
     inherit GlobalEventHandlers
     inherit HTMLOrSVGElement
     inherit ElementCSSInlineStyle
+
+/// <summary>MathMLMathElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] MathMLMathElement =
+    inherit MathMLElement
 
 /// <summary>HTMLStyleElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLStyleElement =
@@ -4627,6 +4635,50 @@ and [<AllowNullLiteral>] SVGUseElement =
     /// <summary>SVGUseElement.href.</summary>
     abstract member href: SVGAnimatedString with get
 
+/// <summary>NodeIterator in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] NodeIterator =
+    /// <summary>NodeIterator.root.</summary>
+    abstract member root: Node with get
+    /// <summary>NodeIterator.referenceNode.</summary>
+    abstract member referenceNode: Node with get
+    /// <summary>NodeIterator.pointerBeforeReferenceNode.</summary>
+    abstract member pointerBeforeReferenceNode: bool with get
+    /// <summary>NodeIterator.whatToShow.</summary>
+    abstract member whatToShow: uint32 with get
+    /// <summary>NodeIterator.filter.</summary>
+    abstract member filter: (NodeFilter) option with get
+    /// <summary>NodeIterator.nextNode.</summary>
+    abstract member nextNode: unit -> Node
+    /// <summary>NodeIterator.previousNode.</summary>
+    abstract member previousNode: unit -> Node
+    /// <summary>NodeIterator.detach.</summary>
+    abstract member detach: unit -> unit
+
+/// <summary>TreeWalker in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] TreeWalker =
+    /// <summary>TreeWalker.root.</summary>
+    abstract member root: Node with get
+    /// <summary>TreeWalker.whatToShow.</summary>
+    abstract member whatToShow: uint32 with get
+    /// <summary>TreeWalker.filter.</summary>
+    abstract member filter: (NodeFilter) option with get
+    /// <summary>TreeWalker.currentNode.</summary>
+    abstract member currentNode: Node with get, set
+    /// <summary>TreeWalker.parentNode.</summary>
+    abstract member parentNode: unit -> Node
+    /// <summary>TreeWalker.firstChild.</summary>
+    abstract member firstChild: unit -> Node
+    /// <summary>TreeWalker.lastChild.</summary>
+    abstract member lastChild: unit -> Node
+    /// <summary>TreeWalker.previousSibling.</summary>
+    abstract member previousSibling: unit -> Node
+    /// <summary>TreeWalker.nextSibling.</summary>
+    abstract member nextSibling: unit -> Node
+    /// <summary>TreeWalker.previousNode.</summary>
+    abstract member previousNode: unit -> Node
+    /// <summary>TreeWalker.nextNode.</summary>
+    abstract member nextNode: unit -> Node
+
 /// <summary>HTMLUnknownElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLUnknownElement =
     inherit HTMLElement
@@ -5248,6 +5300,15 @@ and EventListener = Event -> unit
 /// <summary>EventListenerObject in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] EventListenerObject =
     abstract member handleEvent: event: Event -> unit
+
+/// <summary>NodeFilter in the scoped DOM interface model.</summary>
+and NodeFilter = Node -> NodeFilterResult
+
+/// <summary>NodeFilterResult in the scoped DOM interface model.</summary>
+and NodeFilterResult =
+    | Accept = 1
+    | Reject = 2
+    | Skip = 3
 
 /// <summary>AriaNotificationPriority in the scoped DOM interface model.</summary>
 and [<DomStringEnum; RequireQualifiedAccess>] AriaNotificationPriority =

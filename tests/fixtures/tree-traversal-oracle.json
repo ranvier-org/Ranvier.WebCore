@@ -1,0 +1,13762 @@
+{
+ "browser": "156.0.8078.4",
+ "cases": [
+  {
+   "name": "walker-all-none",
+   "getters": {
+    "root": "root",
+    "whatToShow": 4294967295,
+    "filterSame": true,
+    "state": [
+     "root"
+    ]
+   },
+   "steps": [
+    {
+     "result": "!c1",
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "#tb",
+     "calls": [],
+     "state": [
+      "#tb"
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [],
+     "state": [
+      "b2"
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "#tz",
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "#tz",
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [],
+     "state": [
+      "b2"
+     ]
+    },
+    {
+     "result": "#tb",
+     "calls": [],
+     "state": [
+      "#tb"
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "walker-all-map",
+   "getters": {
+    "root": "root",
+    "whatToShow": 4294967295,
+    "filterSame": true,
+    "state": [
+     "root"
+    ]
+   },
+   "steps": [
+    {
+     "result": "!c1",
+     "calls": [
+      "!c1"
+     ],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [
+      "#ta"
+     ],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [
+      "!c2"
+     ],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [
+      "b",
+      "?pi mid"
+     ],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c",
+      "c1"
+     ],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [
+      "d"
+     ],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [
+      "d1"
+     ],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "#tz",
+     "calls": [
+      "#tz"
+     ],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [
+      "e"
+     ],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [
+      "!c3"
+     ],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [
+      "e"
+     ],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "#tz",
+     "calls": [
+      "#tz"
+     ],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [
+      "c",
+      "d",
+      "d1"
+     ],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [
+      "d"
+     ],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c1"
+     ],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [
+      "c",
+      "?pi mid"
+     ],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [
+      "a",
+      "b",
+      "!c2"
+     ],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [
+      "#ta"
+     ],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [
+      "!c1"
+     ],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "walker-element-none",
+   "getters": {
+    "root": "root",
+    "whatToShow": 1,
+    "filterSame": true,
+    "state": [
+     "root"
+    ]
+   },
+   "steps": [
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [],
+     "state": [
+      "b2"
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [],
+     "state": [
+      "b2"
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "walker-element-map",
+   "getters": {
+    "root": "root",
+    "whatToShow": 1,
+    "filterSame": true,
+    "state": [
+     "root"
+    ]
+   },
+   "steps": [
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "b",
+      "c",
+      "c1"
+     ],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [
+      "d"
+     ],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [
+      "d1"
+     ],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [
+      "e"
+     ],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [
+      "c",
+      "d",
+      "d1"
+     ],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [
+      "d"
+     ],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c1"
+     ],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "c",
+      "a",
+      "b",
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "walker-text-none",
+   "getters": {
+    "root": "root",
+    "whatToShow": 4,
+    "filterSame": true,
+    "state": [
+     "root"
+    ]
+   },
+   "steps": [
+    {
+     "result": "#ta",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "#tb",
+     "calls": [],
+     "state": [
+      "#tb"
+     ]
+    },
+    {
+     "result": "#tz",
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": "#tb",
+     "calls": [],
+     "state": [
+      "#tb"
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "walker-comment-none",
+   "getters": {
+    "root": "root",
+    "whatToShow": 128,
+    "filterSame": true,
+    "state": [
+     "root"
+    ]
+   },
+   "steps": [
+    {
+     "result": "!c1",
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "walker-pi-none",
+   "getters": {
+    "root": "root",
+    "whatToShow": 64,
+    "filterSame": true,
+    "state": [
+     "root"
+    ]
+   },
+   "steps": [
+    {
+     "result": "?pi mid",
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "walker-elementComment-none",
+   "getters": {
+    "root": "root",
+    "whatToShow": 129,
+    "filterSame": true,
+    "state": [
+     "root"
+    ]
+   },
+   "steps": [
+    {
+     "result": "!c1",
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [],
+     "state": [
+      "b2"
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [],
+     "state": [
+      "b2"
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "walker-elementComment-map",
+   "getters": {
+    "root": "root",
+    "whatToShow": 129,
+    "filterSame": true,
+    "state": [
+     "root"
+    ]
+   },
+   "steps": [
+    {
+     "result": "!c1",
+     "calls": [
+      "!c1"
+     ],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [
+      "!c2"
+     ],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "b",
+      "c",
+      "c1"
+     ],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [
+      "d"
+     ],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [
+      "d1"
+     ],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [
+      "e"
+     ],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [
+      "!c3"
+     ],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [
+      "e"
+     ],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [
+      "c",
+      "d",
+      "d1"
+     ],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [
+      "d"
+     ],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c1"
+     ],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [
+      "c",
+      "a",
+      "b",
+      "!c2"
+     ],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [
+      "!c1"
+     ],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "walker-document-all",
+   "getters": {
+    "root": "#document",
+    "whatToShow": 4294967295,
+    "filterSame": true,
+    "state": [
+     "#document"
+    ]
+   },
+   "steps": [
+    {
+     "result": "svg",
+     "calls": [],
+     "state": [
+      "svg"
+     ]
+    },
+    {
+     "result": "?pi first",
+     "calls": [],
+     "state": [
+      "?pi first"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "#tb",
+     "calls": [],
+     "state": [
+      "#tb"
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [],
+     "state": [
+      "b2"
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "#tz",
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "iterator-all-none",
+   "getters": {
+    "root": "root",
+    "whatToShow": 4294967295,
+    "filterSame": true,
+    "state": [
+     "root",
+     true
+    ]
+   },
+   "steps": [
+    {
+     "result": "root",
+     "calls": [],
+     "state": [
+      "root",
+      false
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [],
+     "state": [
+      "!c1",
+      false
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a",
+      false
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [],
+     "state": [
+      "#ta",
+      false
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1",
+      false
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [],
+     "state": [
+      "!c2",
+      false
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b",
+      false
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [],
+     "state": [
+      "b1",
+      false
+     ]
+    },
+    {
+     "result": "#tb",
+     "calls": [],
+     "state": [
+      "#tb",
+      false
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [],
+     "state": [
+      "b2",
+      false
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c",
+      false
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [],
+     "state": [
+      "c1",
+      false
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [],
+     "state": [
+      "d",
+      false
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [],
+     "state": [
+      "d1",
+      false
+     ]
+    },
+    {
+     "result": "#tz",
+     "calls": [],
+     "state": [
+      "#tz",
+      false
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [],
+     "state": [
+      "!c3",
+      true
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [],
+     "state": [
+      "e",
+      true
+     ]
+    },
+    {
+     "result": "#tz",
+     "calls": [],
+     "state": [
+      "#tz",
+      true
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [],
+     "state": [
+      "d1",
+      true
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [],
+     "state": [
+      "d",
+      true
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [],
+     "state": [
+      "c1",
+      true
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c",
+      true
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [],
+     "state": [
+      "b2",
+      true
+     ]
+    },
+    {
+     "result": "#tb",
+     "calls": [],
+     "state": [
+      "#tb",
+      true
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [],
+     "state": [
+      "b1",
+      true
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b",
+      true
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [],
+     "state": [
+      "!c2",
+      true
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1",
+      true
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [],
+     "state": [
+      "#ta",
+      true
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a",
+      true
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [],
+     "state": [
+      "!c1",
+      true
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    }
+   ]
+  },
+  {
+   "name": "iterator-all-map",
+   "getters": {
+    "root": "root",
+    "whatToShow": 4294967295,
+    "filterSame": true,
+    "state": [
+     "root",
+     true
+    ]
+   },
+   "steps": [
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root",
+      false
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [
+      "!c1"
+     ],
+     "state": [
+      "!c1",
+      false
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a",
+      false
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [
+      "#ta"
+     ],
+     "state": [
+      "#ta",
+      false
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1",
+      false
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [
+      "!c2"
+     ],
+     "state": [
+      "!c2",
+      false
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [
+      "b",
+      "b1"
+     ],
+     "state": [
+      "b1",
+      false
+     ]
+    },
+    {
+     "result": "#tb",
+     "calls": [
+      "#tb"
+     ],
+     "state": [
+      "#tb",
+      false
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [
+      "b2"
+     ],
+     "state": [
+      "b2",
+      false
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [
+      "?pi mid"
+     ],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c",
+      "c1"
+     ],
+     "state": [
+      "c1",
+      false
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [
+      "d"
+     ],
+     "state": [
+      "d",
+      false
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [
+      "d1"
+     ],
+     "state": [
+      "d1",
+      false
+     ]
+    },
+    {
+     "result": "#tz",
+     "calls": [
+      "#tz"
+     ],
+     "state": [
+      "#tz",
+      false
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [
+      "e"
+     ],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [
+      "!c3"
+     ],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [
+      "!c3"
+     ],
+     "state": [
+      "!c3",
+      true
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [
+      "e"
+     ],
+     "state": [
+      "e",
+      true
+     ]
+    },
+    {
+     "result": "#tz",
+     "calls": [
+      "#tz"
+     ],
+     "state": [
+      "#tz",
+      true
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [
+      "d1"
+     ],
+     "state": [
+      "d1",
+      true
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [
+      "d"
+     ],
+     "state": [
+      "d",
+      true
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c1"
+     ],
+     "state": [
+      "c1",
+      true
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [
+      "c",
+      "?pi mid"
+     ],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [
+      "b2"
+     ],
+     "state": [
+      "b2",
+      true
+     ]
+    },
+    {
+     "result": "#tb",
+     "calls": [
+      "#tb"
+     ],
+     "state": [
+      "#tb",
+      true
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [
+      "b1"
+     ],
+     "state": [
+      "b1",
+      true
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [
+      "b",
+      "!c2"
+     ],
+     "state": [
+      "!c2",
+      true
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1",
+      true
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [
+      "#ta"
+     ],
+     "state": [
+      "#ta",
+      true
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a",
+      true
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [
+      "!c1"
+     ],
+     "state": [
+      "!c1",
+      true
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    }
+   ]
+  },
+  {
+   "name": "iterator-element-none",
+   "getters": {
+    "root": "root",
+    "whatToShow": 1,
+    "filterSame": true,
+    "state": [
+     "root",
+     true
+    ]
+   },
+   "steps": [
+    {
+     "result": "root",
+     "calls": [],
+     "state": [
+      "root",
+      false
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a",
+      false
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1",
+      false
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b",
+      false
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [],
+     "state": [
+      "b1",
+      false
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [],
+     "state": [
+      "b2",
+      false
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c",
+      false
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [],
+     "state": [
+      "c1",
+      false
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [],
+     "state": [
+      "d",
+      false
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [],
+     "state": [
+      "d1",
+      false
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [],
+     "state": [
+      "e",
+      true
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [],
+     "state": [
+      "d1",
+      true
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [],
+     "state": [
+      "d",
+      true
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [],
+     "state": [
+      "c1",
+      true
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c",
+      true
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [],
+     "state": [
+      "b2",
+      true
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [],
+     "state": [
+      "b1",
+      true
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b",
+      true
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1",
+      true
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a",
+      true
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    }
+   ]
+  },
+  {
+   "name": "iterator-element-map",
+   "getters": {
+    "root": "root",
+    "whatToShow": 1,
+    "filterSame": true,
+    "state": [
+     "root",
+     true
+    ]
+   },
+   "steps": [
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root",
+      false
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a",
+      false
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1",
+      false
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [
+      "b",
+      "b1"
+     ],
+     "state": [
+      "b1",
+      false
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [
+      "b2"
+     ],
+     "state": [
+      "b2",
+      false
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c",
+      "c1"
+     ],
+     "state": [
+      "c1",
+      false
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [
+      "d"
+     ],
+     "state": [
+      "d",
+      false
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [
+      "d1"
+     ],
+     "state": [
+      "d1",
+      false
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [
+      "e"
+     ],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [
+      "e"
+     ],
+     "state": [
+      "e",
+      true
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [
+      "d1"
+     ],
+     "state": [
+      "d1",
+      true
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [
+      "d"
+     ],
+     "state": [
+      "d",
+      true
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c1"
+     ],
+     "state": [
+      "c1",
+      true
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [
+      "c",
+      "b2"
+     ],
+     "state": [
+      "b2",
+      true
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [
+      "b1"
+     ],
+     "state": [
+      "b1",
+      true
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "b",
+      "a1"
+     ],
+     "state": [
+      "a1",
+      true
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a",
+      true
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    }
+   ]
+  },
+  {
+   "name": "iterator-text-none",
+   "getters": {
+    "root": "root",
+    "whatToShow": 4,
+    "filterSame": true,
+    "state": [
+     "root",
+     true
+    ]
+   },
+   "steps": [
+    {
+     "result": "#ta",
+     "calls": [],
+     "state": [
+      "#ta",
+      false
+     ]
+    },
+    {
+     "result": "#tb",
+     "calls": [],
+     "state": [
+      "#tb",
+      false
+     ]
+    },
+    {
+     "result": "#tz",
+     "calls": [],
+     "state": [
+      "#tz",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#tz",
+      false
+     ]
+    },
+    {
+     "result": "#tz",
+     "calls": [],
+     "state": [
+      "#tz",
+      true
+     ]
+    },
+    {
+     "result": "#tb",
+     "calls": [],
+     "state": [
+      "#tb",
+      true
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [],
+     "state": [
+      "#ta",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta",
+      true
+     ]
+    }
+   ]
+  },
+  {
+   "name": "iterator-comment-none",
+   "getters": {
+    "root": "root",
+    "whatToShow": 128,
+    "filterSame": true,
+    "state": [
+     "root",
+     true
+    ]
+   },
+   "steps": [
+    {
+     "result": "!c1",
+     "calls": [],
+     "state": [
+      "!c1",
+      false
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [],
+     "state": [
+      "!c2",
+      false
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [],
+     "state": [
+      "!c3",
+      true
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [],
+     "state": [
+      "!c2",
+      true
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [],
+     "state": [
+      "!c1",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c1",
+      true
+     ]
+    }
+   ]
+  },
+  {
+   "name": "iterator-pi-none",
+   "getters": {
+    "root": "root",
+    "whatToShow": 64,
+    "filterSame": true,
+    "state": [
+     "root",
+     true
+    ]
+   },
+   "steps": [
+    {
+     "result": "?pi mid",
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    }
+   ]
+  },
+  {
+   "name": "iterator-elementComment-none",
+   "getters": {
+    "root": "root",
+    "whatToShow": 129,
+    "filterSame": true,
+    "state": [
+     "root",
+     true
+    ]
+   },
+   "steps": [
+    {
+     "result": "root",
+     "calls": [],
+     "state": [
+      "root",
+      false
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [],
+     "state": [
+      "!c1",
+      false
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a",
+      false
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1",
+      false
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [],
+     "state": [
+      "!c2",
+      false
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b",
+      false
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [],
+     "state": [
+      "b1",
+      false
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [],
+     "state": [
+      "b2",
+      false
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c",
+      false
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [],
+     "state": [
+      "c1",
+      false
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [],
+     "state": [
+      "d",
+      false
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [],
+     "state": [
+      "d1",
+      false
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [],
+     "state": [
+      "!c3",
+      true
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [],
+     "state": [
+      "e",
+      true
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [],
+     "state": [
+      "d1",
+      true
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [],
+     "state": [
+      "d",
+      true
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [],
+     "state": [
+      "c1",
+      true
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c",
+      true
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [],
+     "state": [
+      "b2",
+      true
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [],
+     "state": [
+      "b1",
+      true
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b",
+      true
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [],
+     "state": [
+      "!c2",
+      true
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1",
+      true
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a",
+      true
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [],
+     "state": [
+      "!c1",
+      true
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    }
+   ]
+  },
+  {
+   "name": "iterator-elementComment-map",
+   "getters": {
+    "root": "root",
+    "whatToShow": 129,
+    "filterSame": true,
+    "state": [
+     "root",
+     true
+    ]
+   },
+   "steps": [
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root",
+      false
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [
+      "!c1"
+     ],
+     "state": [
+      "!c1",
+      false
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a",
+      false
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1",
+      false
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [
+      "!c2"
+     ],
+     "state": [
+      "!c2",
+      false
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [
+      "b",
+      "b1"
+     ],
+     "state": [
+      "b1",
+      false
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [
+      "b2"
+     ],
+     "state": [
+      "b2",
+      false
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c",
+      "c1"
+     ],
+     "state": [
+      "c1",
+      false
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [
+      "d"
+     ],
+     "state": [
+      "d",
+      false
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [
+      "d1"
+     ],
+     "state": [
+      "d1",
+      false
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [
+      "e"
+     ],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [
+      "!c3"
+     ],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [
+      "!c3"
+     ],
+     "state": [
+      "!c3",
+      true
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [
+      "e"
+     ],
+     "state": [
+      "e",
+      true
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [
+      "d1"
+     ],
+     "state": [
+      "d1",
+      true
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [
+      "d"
+     ],
+     "state": [
+      "d",
+      true
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c1"
+     ],
+     "state": [
+      "c1",
+      true
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [
+      "c",
+      "b2"
+     ],
+     "state": [
+      "b2",
+      true
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [
+      "b1"
+     ],
+     "state": [
+      "b1",
+      true
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [
+      "b",
+      "!c2"
+     ],
+     "state": [
+      "!c2",
+      true
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1",
+      true
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a",
+      true
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [
+      "!c1"
+     ],
+     "state": [
+      "!c1",
+      true
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    }
+   ]
+  },
+  {
+   "name": "iterator-document-all",
+   "getters": {
+    "root": "#document",
+    "whatToShow": 4294967295,
+    "filterSame": true,
+    "state": [
+     "#document",
+     true
+    ]
+   },
+   "steps": [
+    {
+     "result": "#document",
+     "calls": [],
+     "state": [
+      "#document",
+      false
+     ]
+    },
+    {
+     "result": "svg",
+     "calls": [],
+     "state": [
+      "svg",
+      false
+     ]
+    },
+    {
+     "result": "?pi first",
+     "calls": [],
+     "state": [
+      "?pi first",
+      false
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [],
+     "state": [
+      "root",
+      false
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [],
+     "state": [
+      "!c1",
+      false
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a",
+      false
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [],
+     "state": [
+      "#ta",
+      false
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1",
+      false
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [],
+     "state": [
+      "!c2",
+      false
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b",
+      false
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [],
+     "state": [
+      "b1",
+      false
+     ]
+    },
+    {
+     "result": "#tb",
+     "calls": [],
+     "state": [
+      "#tb",
+      false
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [],
+     "state": [
+      "b2",
+      false
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c",
+      false
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [],
+     "state": [
+      "c1",
+      false
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [],
+     "state": [
+      "d",
+      false
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [],
+     "state": [
+      "d1",
+      false
+     ]
+    },
+    {
+     "result": "#tz",
+     "calls": [],
+     "state": [
+      "#tz",
+      false
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    }
+   ]
+  },
+  {
+   "name": "walker-steps-all-none",
+   "getters": {
+    "root": "root",
+    "whatToShow": 4294967295,
+    "filterSame": true,
+    "state": [
+     "root"
+    ]
+   },
+   "steps": [
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [],
+     "state": [
+      "b2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "#tb",
+     "calls": [],
+     "state": [
+      "#tb"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "#tb",
+     "calls": [],
+     "state": [
+      "#tb"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "#tz",
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "#tz",
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "#tz",
+     "calls": [],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "walker-steps-element-none",
+   "getters": {
+    "root": "root",
+    "whatToShow": 1,
+    "filterSame": true,
+    "state": [
+     "root"
+    ]
+   },
+   "steps": [
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [],
+     "state": [
+      "b2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [],
+     "state": [
+      "b2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [],
+     "state": [
+      "b2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [],
+     "state": [
+      "b2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "walker-steps-all-map",
+   "getters": {
+    "root": "root",
+    "whatToShow": 4294967295,
+    "filterSame": true,
+    "state": [
+     "root"
+    ]
+   },
+   "steps": [
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [
+      "!c1"
+     ],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [
+      "!c3"
+     ],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [
+      "!c1"
+     ],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [
+      "#ta"
+     ],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [
+      "b",
+      "!c2"
+     ],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [
+      "!c1"
+     ],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [
+      "?pi mid"
+     ],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [
+      "!c1"
+     ],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [
+      "#ta"
+     ],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [
+      "#ta"
+     ],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [
+      "!c2"
+     ],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [
+      "#ta"
+     ],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [
+      "!c2"
+     ],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [
+      "b1"
+     ],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [
+      "b2"
+     ],
+     "state": [
+      "b2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [
+      "!c2"
+     ],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [
+      "!c2"
+     ],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [
+      "b1"
+     ],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "b",
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [
+      "b",
+      "!c2"
+     ],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "#tb",
+     "calls": [
+      "#tb"
+     ],
+     "state": [
+      "#tb"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [
+      "b",
+      "!c2"
+     ],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "#tb",
+     "calls": [
+      "#tb"
+     ],
+     "state": [
+      "#tb"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c1"
+     ],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [
+      "d"
+     ],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [
+      "?pi mid"
+     ],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "#tz",
+     "calls": [
+      "#tz"
+     ],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [
+      "?pi mid"
+     ],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c1"
+     ],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [
+      "c",
+      "root"
+     ],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [
+      "c",
+      "?pi mid"
+     ],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [
+      "d"
+     ],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [
+      "c",
+      "?pi mid"
+     ],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [
+      "d"
+     ],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [
+      "c",
+      "root"
+     ],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [
+      "d1"
+     ],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [
+      "d1"
+     ],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c1"
+     ],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "#tz",
+     "calls": [
+      "c",
+      "#tz"
+     ],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c1"
+     ],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [
+      "d1"
+     ],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "#tz",
+     "calls": [
+      "#tz"
+     ],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [
+      "!c3"
+     ],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "#tz",
+     "calls": [
+      "#tz"
+     ],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [
+      "!c3"
+     ],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [
+      "b",
+      "a"
+     ],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [
+      "b",
+      "?pi mid"
+     ],
+     "state": [
+      "?pi mid"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "walker-steps-element-map",
+   "getters": {
+    "root": "root",
+    "whatToShow": 1,
+    "filterSame": true,
+    "state": [
+     "root"
+    ]
+   },
+   "steps": [
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [
+      "e"
+     ],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "b",
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c",
+      "c1"
+     ],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [
+      "b",
+      "a"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "b",
+      "c",
+      "c1"
+     ],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [
+      "b1"
+     ],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [
+      "b2"
+     ],
+     "state": [
+      "b2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [
+      "b1"
+     ],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "b",
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "b",
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [
+      "b2"
+     ],
+     "state": [
+      "b2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "b",
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [
+      "b2"
+     ],
+     "state": [
+      "b2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c1"
+     ],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [
+      "d"
+     ],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [
+      "e"
+     ],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a",
+      "b",
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c1"
+     ],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [
+      "c",
+      "root"
+     ],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "c",
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [
+      "d"
+     ],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "c",
+      "a",
+      "b",
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [
+      "d"
+     ],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [
+      "c",
+      "root"
+     ],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [
+      "d1"
+     ],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [
+      "d1"
+     ],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c1"
+     ],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [
+      "c",
+      "e"
+     ],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c1"
+     ],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [
+      "d1"
+     ],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [
+      "c",
+      "d"
+     ],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [
+      "c",
+      "d",
+      "d1"
+     ],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [
+      "b",
+      "a"
+     ],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "b",
+      "c",
+      "c1"
+     ],
+     "state": [
+      "c1"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "iterator-remove-reference",
+   "getters": {
+    "root": "root",
+    "whatToShow": 4294967295,
+    "filterSame": true,
+    "state": [
+     "root",
+     true
+    ]
+   },
+   "steps": [
+    {
+     "result": "root",
+     "calls": [],
+     "state": [
+      "root",
+      false
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [],
+     "state": [
+      "!c1",
+      false
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a",
+      false
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [],
+     "state": [
+      "#ta",
+      false
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1",
+      false
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [],
+     "state": [
+      "!c2",
+      false
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b",
+      false
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [],
+     "state": [
+      "b1",
+      false
+     ]
+    },
+    {
+     "result": "#tb",
+     "calls": [],
+     "state": [
+      "#tb",
+      false
+     ]
+    },
+    {
+     "result": "removed",
+     "calls": [],
+     "state": [
+      "#tb",
+      false
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [],
+     "state": [
+      "b2",
+      false
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [],
+     "state": [
+      "b2",
+      true
+     ]
+    },
+    {
+     "result": "removed",
+     "calls": [],
+     "state": [
+      "b2",
+      true
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b",
+      true
+     ]
+    },
+    {
+     "result": "removed",
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [],
+     "state": [
+      "!c2",
+      true
+     ]
+    },
+    {
+     "result": "removed",
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c",
+      false
+     ]
+    }
+   ]
+  },
+  {
+   "name": "iterator-remove-before",
+   "getters": {
+    "root": "root",
+    "whatToShow": 1,
+    "filterSame": true,
+    "state": [
+     "root",
+     true
+    ]
+   },
+   "steps": [
+    {
+     "result": "root",
+     "calls": [],
+     "state": [
+      "root",
+      false
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a",
+      false
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1",
+      false
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [],
+     "state": [
+      "b",
+      false
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [],
+     "state": [
+      "b1",
+      false
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [],
+     "state": [
+      "b1",
+      true
+     ]
+    },
+    {
+     "result": "removed",
+     "calls": [],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c",
+      false
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c",
+      true
+     ]
+    },
+    {
+     "result": "removed",
+     "calls": [],
+     "state": [
+      "#tz",
+      true
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [],
+     "state": [
+      "e",
+      true
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [],
+     "state": [
+      "e",
+      true
+     ]
+    }
+   ]
+  },
+  {
+   "name": "iterator-remove-filtered",
+   "getters": {
+    "root": "root",
+    "whatToShow": 4294967295,
+    "filterSame": true,
+    "state": [
+     "root",
+     true
+    ]
+   },
+   "steps": [
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root",
+      false
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [
+      "!c1"
+     ],
+     "state": [
+      "!c1",
+      false
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a",
+      false
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [
+      "#ta"
+     ],
+     "state": [
+      "#ta",
+      false
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1",
+      false
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [
+      "!c2"
+     ],
+     "state": [
+      "!c2",
+      false
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [
+      "b",
+      "b1"
+     ],
+     "state": [
+      "b1",
+      false
+     ]
+    },
+    {
+     "result": "#tb",
+     "calls": [
+      "#tb"
+     ],
+     "state": [
+      "#tb",
+      false
+     ]
+    },
+    {
+     "result": "removed",
+     "calls": [],
+     "state": [
+      "#tb",
+      false
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [
+      "b2"
+     ],
+     "state": [
+      "b2",
+      false
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [
+      "b2"
+     ],
+     "state": [
+      "b2",
+      true
+     ]
+    },
+    {
+     "result": "removed",
+     "calls": [],
+     "state": [
+      "b2",
+      true
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [
+      "b2"
+     ],
+     "state": [
+      "b2",
+      false
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [
+      "?pi mid"
+     ],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [
+      "?pi mid"
+     ],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    }
+   ]
+  },
+  {
+   "name": "walker-throw",
+   "getters": {
+    "root": "root",
+    "whatToShow": 4294967295,
+    "filterSame": true,
+    "state": [
+     "root"
+    ]
+   },
+   "steps": [
+    {
+     "result": "!c1",
+     "calls": [
+      "!c1"
+     ],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [
+      "#ta"
+     ],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [
+      "!c2"
+     ],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [
+      "b"
+     ],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "throw:Error",
+     "calls": [
+      "b1",
+      "throw"
+     ],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [
+      "b1"
+     ],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "#tb",
+     "calls": [
+      "#tb"
+     ],
+     "state": [
+      "#tb"
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [
+      "b1"
+     ],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "#tb",
+     "calls": [
+      "#tb"
+     ],
+     "state": [
+      "#tb"
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [
+      "b2"
+     ],
+     "state": [
+      "b2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [
+      "c"
+     ],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c1"
+     ],
+     "state": [
+      "c1"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "walker-throw-every-step",
+   "getters": {
+    "root": "root",
+    "whatToShow": 1,
+    "filterSame": true,
+    "state": [
+     "root"
+    ]
+   },
+   "steps": [
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "throw:Error",
+     "calls": [
+      "c",
+      "throw"
+     ],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c1"
+     ],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [
+      "d"
+     ],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "throw:Error",
+     "calls": [
+      "c",
+      "throw"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b2"
+     ]
+    },
+    {
+     "result": "throw:Error",
+     "calls": [
+      "c",
+      "throw"
+     ],
+     "state": [
+      "b2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "throw:Error",
+     "calls": [
+      "c",
+      "throw"
+     ],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "throw:Error",
+     "calls": [
+      "c",
+      "throw"
+     ],
+     "state": [
+      "e"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "iterator-throw",
+   "getters": {
+    "root": "root",
+    "whatToShow": 4294967295,
+    "filterSame": true,
+    "state": [
+     "root",
+     true
+    ]
+   },
+   "steps": [
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root",
+      false
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [
+      "!c1"
+     ],
+     "state": [
+      "!c1",
+      false
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a",
+      false
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [
+      "#ta"
+     ],
+     "state": [
+      "#ta",
+      false
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1",
+      false
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [
+      "!c2"
+     ],
+     "state": [
+      "!c2",
+      false
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [
+      "b"
+     ],
+     "state": [
+      "b",
+      false
+     ]
+    },
+    {
+     "result": "throw:Error",
+     "calls": [
+      "b1",
+      "throw"
+     ],
+     "state": [
+      "b",
+      false
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [
+      "b1"
+     ],
+     "state": [
+      "b1",
+      false
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [
+      "b1"
+     ],
+     "state": [
+      "b1",
+      true
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [
+      "b1"
+     ],
+     "state": [
+      "b1",
+      false
+     ]
+    },
+    {
+     "result": "#tb",
+     "calls": [
+      "#tb"
+     ],
+     "state": [
+      "#tb",
+      false
+     ]
+    },
+    {
+     "result": "#tb",
+     "calls": [
+      "#tb"
+     ],
+     "state": [
+      "#tb",
+      true
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [
+      "b1"
+     ],
+     "state": [
+      "b1",
+      true
+     ]
+    }
+   ]
+  },
+  {
+   "name": "iterator-throw-backward",
+   "getters": {
+    "root": "root",
+    "whatToShow": 1,
+    "filterSame": true,
+    "state": [
+     "root",
+     true
+    ]
+   },
+   "steps": [
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root",
+      false
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a",
+      false
+     ]
+    },
+    {
+     "result": "throw:Error",
+     "calls": [
+      "a1",
+      "throw"
+     ],
+     "state": [
+      "a",
+      false
+     ]
+    },
+    {
+     "result": "throw:Error",
+     "calls": [
+      "a1",
+      "throw"
+     ],
+     "state": [
+      "a",
+      false
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1",
+      false
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [
+      "b"
+     ],
+     "state": [
+      "b",
+      false
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [
+      "b"
+     ],
+     "state": [
+      "b",
+      true
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1",
+      true
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a",
+      true
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    }
+   ]
+  },
+  {
+   "name": "walker-mutate",
+   "getters": {
+    "root": "root",
+    "whatToShow": 4294967295,
+    "filterSame": true,
+    "state": [
+     "root"
+    ]
+   },
+   "steps": [
+    {
+     "result": "!c1",
+     "calls": [
+      "!c1"
+     ],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [
+      "#ta"
+     ],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1",
+      "removed:b"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [
+      "!c2"
+     ],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [
+      "?pi mid"
+     ],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [
+      "c"
+     ],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c1"
+     ],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [
+      "d"
+     ],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [
+      "d1"
+     ],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "#tz",
+     "calls": [
+      "#tz"
+     ],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [
+      "e"
+     ],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [
+      "!c3"
+     ],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3"
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [
+      "e"
+     ],
+     "state": [
+      "e"
+     ]
+    },
+    {
+     "result": "#tz",
+     "calls": [
+      "#tz"
+     ],
+     "state": [
+      "#tz"
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [
+      "c",
+      "d",
+      "d1"
+     ],
+     "state": [
+      "d1"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [
+      "d"
+     ],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c1"
+     ],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [
+      "c"
+     ],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [
+      "?pi mid"
+     ],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [
+      "a",
+      "!c2"
+     ],
+     "state": [
+      "!c2"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [
+      "#ta"
+     ],
+     "state": [
+      "#ta"
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [
+      "!c1"
+     ],
+     "state": [
+      "!c1"
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "iterator-mutate",
+   "getters": {
+    "root": "root",
+    "whatToShow": 4294967295,
+    "filterSame": true,
+    "state": [
+     "root",
+     true
+    ]
+   },
+   "steps": [
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root",
+      false
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [
+      "!c1"
+     ],
+     "state": [
+      "!c1",
+      false
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a",
+      false
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [
+      "#ta"
+     ],
+     "state": [
+      "#ta",
+      false
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1",
+      "removed:b"
+     ],
+     "state": [
+      "a1",
+      false
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [
+      "!c2"
+     ],
+     "state": [
+      "!c2",
+      false
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [
+      "?pi mid"
+     ],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [
+      "c"
+     ],
+     "state": [
+      "c",
+      false
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c1"
+     ],
+     "state": [
+      "c1",
+      false
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [
+      "d"
+     ],
+     "state": [
+      "d",
+      false
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [
+      "d1"
+     ],
+     "state": [
+      "d1",
+      false
+     ]
+    },
+    {
+     "result": "#tz",
+     "calls": [
+      "#tz"
+     ],
+     "state": [
+      "#tz",
+      false
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [
+      "e"
+     ],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [
+      "!c3"
+     ],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "!c3",
+      false
+     ]
+    },
+    {
+     "result": "!c3",
+     "calls": [
+      "!c3"
+     ],
+     "state": [
+      "!c3",
+      true
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [
+      "e"
+     ],
+     "state": [
+      "e",
+      true
+     ]
+    },
+    {
+     "result": "#tz",
+     "calls": [
+      "#tz"
+     ],
+     "state": [
+      "#tz",
+      true
+     ]
+    },
+    {
+     "result": "d1",
+     "calls": [
+      "d1"
+     ],
+     "state": [
+      "d1",
+      true
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [
+      "d"
+     ],
+     "state": [
+      "d",
+      true
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c1"
+     ],
+     "state": [
+      "c1",
+      true
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [
+      "c"
+     ],
+     "state": [
+      "c",
+      true
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [
+      "?pi mid"
+     ],
+     "state": [
+      "?pi mid",
+      true
+     ]
+    },
+    {
+     "result": "!c2",
+     "calls": [
+      "!c2"
+     ],
+     "state": [
+      "!c2",
+      true
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1",
+      true
+     ]
+    },
+    {
+     "result": "#ta",
+     "calls": [
+      "#ta"
+     ],
+     "state": [
+      "#ta",
+      true
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a",
+      true
+     ]
+    },
+    {
+     "result": "!c1",
+     "calls": [
+      "!c1"
+     ],
+     "state": [
+      "!c1",
+      true
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    }
+   ]
+  },
+  {
+   "name": "iterator-mutate-reference",
+   "getters": {
+    "root": "root",
+    "whatToShow": 1,
+    "filterSame": true,
+    "state": [
+     "root",
+     true
+    ]
+   },
+   "steps": [
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root",
+      false
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a",
+      false
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1",
+      false
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [
+      "b"
+     ],
+     "state": [
+      "b",
+      false
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [
+      "b1"
+     ],
+     "state": [
+      "b1",
+      false
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [
+      "b2"
+     ],
+     "state": [
+      "b2",
+      false
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [
+      "c"
+     ],
+     "state": [
+      "c",
+      false
+     ]
+    },
+    {
+     "result": "c1",
+     "calls": [
+      "c1",
+      "removed:c"
+     ],
+     "state": [
+      "?pi mid",
+      false
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [
+      "e"
+     ],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "e",
+      false
+     ]
+    },
+    {
+     "result": "e",
+     "calls": [
+      "e"
+     ],
+     "state": [
+      "e",
+      true
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [
+      "b2"
+     ],
+     "state": [
+      "b2",
+      true
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [
+      "b1"
+     ],
+     "state": [
+      "b1",
+      true
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [
+      "b"
+     ],
+     "state": [
+      "b",
+      true
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1",
+      true
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a",
+      true
+     ]
+    },
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "root",
+      true
+     ]
+    }
+   ]
+  },
+  {
+   "name": "walker-reenter",
+   "getters": {
+    "root": "root",
+    "whatToShow": 1,
+    "filterSame": true,
+    "state": [
+     "root"
+    ]
+   },
+   "steps": [
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1",
+      "reenter:InvalidStateError"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [
+      "b"
+     ],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [
+      "b1"
+     ],
+     "state": [
+      "b1"
+     ]
+    },
+    {
+     "result": "b2",
+     "calls": [
+      "b2"
+     ],
+     "state": [
+      "b2"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": [
+      "a1"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "iterator-reenter",
+   "getters": {
+    "root": "root",
+    "whatToShow": 1,
+    "filterSame": true,
+    "state": [
+     "root",
+     true
+    ]
+   },
+   "steps": [
+    {
+     "result": "root",
+     "calls": [
+      "root"
+     ],
+     "state": [
+      "root",
+      false
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a",
+      false
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1",
+      "reenter:InvalidStateError"
+     ],
+     "state": "unreadable"
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": "unreadable"
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": "unreadable"
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": "unreadable"
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": "unreadable"
+    },
+    {
+     "result": null,
+     "calls": [],
+     "state": "unreadable"
+    }
+   ]
+  },
+  {
+   "name": "walker-reenter-other",
+   "getters": {
+    "root": "root",
+    "whatToShow": 1,
+    "filterSame": true,
+    "state": [
+     "root"
+    ]
+   },
+   "steps": [
+    {
+     "result": "a",
+     "calls": [
+      "a"
+     ],
+     "state": [
+      "a"
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [
+      "a1",
+      "other:b1,b2"
+     ],
+     "state": [
+      "a1"
+     ]
+    },
+    {
+     "result": "b",
+     "calls": [
+      "b"
+     ],
+     "state": [
+      "b"
+     ]
+    },
+    {
+     "result": "b1",
+     "calls": [
+      "b1"
+     ],
+     "state": [
+      "b1"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "iterator-detach",
+   "getters": {
+    "root": "root",
+    "whatToShow": 1,
+    "filterSame": true,
+    "state": [
+     "root",
+     true
+    ]
+   },
+   "steps": [
+    {
+     "result": "root",
+     "calls": [],
+     "state": [
+      "root",
+      false
+     ]
+    },
+    {
+     "result": "a",
+     "calls": [],
+     "state": [
+      "a",
+      false
+     ]
+    },
+    {
+     "result": "undefined",
+     "calls": [],
+     "state": [
+      "a",
+      false
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1",
+      false
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1",
+      true
+     ]
+    },
+    {
+     "result": "undefined",
+     "calls": [],
+     "state": [
+      "a1",
+      true
+     ]
+    },
+    {
+     "result": "a1",
+     "calls": [],
+     "state": [
+      "a1",
+      false
+     ]
+    }
+   ]
+  },
+  {
+   "name": "walker-current-outside",
+   "getters": {
+    "root": "a",
+    "whatToShow": 4294967295,
+    "filterSame": true,
+    "state": [
+     "a"
+    ]
+   },
+   "steps": [
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "d",
+     "calls": [],
+     "state": [
+      "d"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c1"
+     ]
+    },
+    {
+     "result": "c",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "c"
+     ]
+    },
+    {
+     "result": "?pi mid",
+     "calls": [],
+     "state": [
+      "?pi mid"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "svg"
+     ]
+    },
+    {
+     "result": "?pi first",
+     "calls": [],
+     "state": [
+      "?pi first"
+     ]
+    },
+    {
+     "result": "set",
+     "calls": [],
+     "state": [
+      "svg"
+     ]
+    },
+    {
+     "result": "?pi first",
+     "calls": [],
+     "state": [
+      "?pi first"
+     ]
+    }
+   ]
+  }
+ ],
+ "nullCurrent": "TypeError",
+ "objectFormMatchesFunction": true,
+ "nullFilterGetter": null
+}

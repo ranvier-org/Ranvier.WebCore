@@ -6,7 +6,9 @@
     "exclude lists members left out by name, as Interface.member, or member alone for every interface.",
     "atomArguments lists operations whose C++ takes AtomString for string arguments the IDL does not mark [AtomString].",
     "Members whose types or extended attributes the generator does not map are left out on their own and listed",
-    "in gen/dom-report.txt."
+    "in gen/dom-report.txt.",
+    "callbackObjectRoots lists callback interfaces passed as refcounted object handles; contract names the shared",
+    "contract's function type, and resultEnum the integer enumeration it returns."
   ],
   "attributeBridges": {
     "Document.adoptedStyleSheets": {
@@ -318,6 +320,7 @@
     "HTMLTitleElement",
     "SVGElement",
     "MathMLElement",
+    "MathMLMathElement",
     "HTMLStyleElement",
     "SVGStyleElement",
     "HTMLLinkElement",
@@ -493,7 +496,10 @@
     "SVGScriptElement",
     "SVGSwitchElement",
     "SVGTitleElement",
-    "SVGUseElement"
+    "SVGUseElement",
+    "NodeFilter",
+    "NodeIterator",
+    "TreeWalker"
   ],
   "skipDirectories": [
     "Modules/",
@@ -696,7 +702,8 @@
     "HTMLFormElement.requestAutocomplete",
     "HTMLImageElement.decode",
     "HTMLInputElement.showPicker",
-    "HTMLSelectElement.showPicker"
+    "HTMLSelectElement.showPicker",
+    "NodeFilter.acceptNode"
   ],
   "namespaceBindings": {
     "DOMCSSNamespace": {
@@ -793,6 +800,19 @@
       ],
       "feature": "dom-computed-style",
       "stringInputs": "utf8-lengths"
+    }
+  },
+  "callbackObjectRoots": {
+    "NodeFilter": {
+      "contract": "Node -> NodeFilterResult",
+      "resultEnum": {
+        "name": "NodeFilterResult",
+        "cases": {
+          "Accept": 1,
+          "Reject": 2,
+          "Skip": 3
+        }
+      }
     }
   }
 }

@@ -346,7 +346,14 @@ class Parser:
                     self.take()
                     name = self.take()
                     document.callbacks.add(name)
-                    self.skip_to_semicolon()
+                    interface = Interface(name, None, False, partial, callback=True, attrs=attrs, file=self.file)
+                    self.take("{")
+                    while not self.accept("}"):
+                        member = self.member(name)
+                        if member:
+                            interface.members.append(member)
+                    self.take(";")
+                    document.interfaces.append(interface)
                 else:
                     name = self.take()
                     document.callbacks.add(name)

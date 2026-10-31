@@ -399,7 +399,9 @@ class World:
             return Mapped("node", t.nullable, interface="EventTarget", cls="EventTarget")
         if t.name in self.interfaces and not self.interfaces[t.name].mixin:
             if self.interfaces[t.name].callback:
-                raise Unsupported(f"callback interface {t.name}")
+                if t.name not in self.config.get("callbackObjectRoots", []) or t.name not in self.scope:
+                    raise Unsupported(f"callback {t.name}")
+                return Mapped("object", t.nullable, interface=t.name, root=t.name, cls=self.cpp_class(t.name))
             chain = self.chain(t.name)
             if "Node" in chain:
                 if t.name not in self.scope:
@@ -1729,16 +1731,23 @@ class Generator(ComplexGeneratorMixin):
             "",
         ]
         for name in self.handles:
-            lines.append(f"typedef struct Rv{name} Rv{name};")
+            if name not in self.world.config.get('callbackObjectRoots', {}):  # declared by RanvierWebCoreAbi.h
+                lines.append(f"typedef struct Rv{name} Rv{name};")
         lines += [f"typedef struct {name} {name};" for name in self.complex_used]
         lines.append("")
         if self.constants:
             lines.append("/* Constants of the interfaces. */")
             lines.append("enum {")
             for macro, value, comment in self.constants:
-                lines.append(f"    {macro} = {value}, /* {comment} */")
+                if int(value, 0) <= 0x7FFFFFFF:
+                    lines.append(f"    {macro} = {value}, /* {comment} */")
             lines.append("};")
             lines.append("")
+            wide = [(macro, value, comment) for macro, value, comment in self.constants if int(value, 0) > 0x7FFFFFFF]
+            for macro, value, comment in wide:
+                lines.append(f"#define {macro} {value}u /* {comment} */")
+            if wide:
+                lines.append("")
         for enum, (values, _, _) in sorted(self.enums_used.items()):
             lines.append(f"/* The values of the IDL enumeration {enum}. */")
             lines.append("enum {")
@@ -2067,7 +2076,7 @@ template<typename Concrete, typename Root> Concrete* castTrackedHandle(Root& val
             "let WrongInterface = -11",
         ]
         for macro, value, _ in self.constants:
-            lines += ["", "[<Literal>]", f"let {macro} = {int(value, 0)}"]
+            lines += ["", "[<Literal>]", f"let {macro} = {int(value, 0)}{'u' if int(value, 0) > 0x7FFFFFFF else ''}"]
         for enum, (values, _, _) in sorted(self.enums_used.items()):
             for index, value in enumerate(values):
                 macro = f"RV_DOM_{snake(enum).upper()}_{re.sub(r'[^A-Za-z0-9]+', '_', value).upper() or 'EMPTY'}"

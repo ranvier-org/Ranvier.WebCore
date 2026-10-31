@@ -1,0 +1,2791 @@
+{
+ "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"svg\"><?pi first?><g id=\"root\"><!--c1--><g id=\"a\">ta<rect id=\"a1\"/><!--c2--><g id=\"b\"><rect id=\"b1\"/>tb<rect id=\"b2\"/></g></g><?pi mid?><g id=\"c\"><rect id=\"c1\"/><g id=\"d\"><rect id=\"d1\"/></g></g>tz<rect id=\"e\"/><!--c3--></g></svg>",
+ "cases": [
+  {
+   "name": "walker-all-none",
+   "kind": "walker",
+   "root": "root",
+   "mask": 4294967295,
+   "filter": null,
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev"
+   ]
+  },
+  {
+   "name": "walker-all-map",
+   "kind": "walker",
+   "root": "root",
+   "mask": 4294967295,
+   "filter": {
+    "kind": "map",
+    "map": {
+     "b": 2,
+     "c": 3
+    }
+   },
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev"
+   ]
+  },
+  {
+   "name": "walker-element-none",
+   "kind": "walker",
+   "root": "root",
+   "mask": 1,
+   "filter": null,
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev"
+   ]
+  },
+  {
+   "name": "walker-element-map",
+   "kind": "walker",
+   "root": "root",
+   "mask": 1,
+   "filter": {
+    "kind": "map",
+    "map": {
+     "b": 2,
+     "c": 3
+    }
+   },
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev"
+   ]
+  },
+  {
+   "name": "walker-text-none",
+   "kind": "walker",
+   "root": "root",
+   "mask": 4,
+   "filter": null,
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev"
+   ]
+  },
+  {
+   "name": "walker-comment-none",
+   "kind": "walker",
+   "root": "root",
+   "mask": 128,
+   "filter": null,
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev"
+   ]
+  },
+  {
+   "name": "walker-pi-none",
+   "kind": "walker",
+   "root": "root",
+   "mask": 64,
+   "filter": null,
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev"
+   ]
+  },
+  {
+   "name": "walker-elementComment-none",
+   "kind": "walker",
+   "root": "root",
+   "mask": 129,
+   "filter": null,
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev"
+   ]
+  },
+  {
+   "name": "walker-elementComment-map",
+   "kind": "walker",
+   "root": "root",
+   "mask": 129,
+   "filter": {
+    "kind": "map",
+    "map": {
+     "b": 2,
+     "c": 3
+    }
+   },
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev"
+   ]
+  },
+  {
+   "name": "walker-document-all",
+   "kind": "walker",
+   "root": "#document",
+   "mask": 4294967295,
+   "filter": null,
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next"
+   ]
+  },
+  {
+   "name": "iterator-all-none",
+   "kind": "iterator",
+   "root": "root",
+   "mask": 4294967295,
+   "filter": null,
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev"
+   ]
+  },
+  {
+   "name": "iterator-all-map",
+   "kind": "iterator",
+   "root": "root",
+   "mask": 4294967295,
+   "filter": {
+    "kind": "map",
+    "map": {
+     "b": 2,
+     "c": 3
+    }
+   },
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev"
+   ]
+  },
+  {
+   "name": "iterator-element-none",
+   "kind": "iterator",
+   "root": "root",
+   "mask": 1,
+   "filter": null,
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev"
+   ]
+  },
+  {
+   "name": "iterator-element-map",
+   "kind": "iterator",
+   "root": "root",
+   "mask": 1,
+   "filter": {
+    "kind": "map",
+    "map": {
+     "b": 2,
+     "c": 3
+    }
+   },
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev"
+   ]
+  },
+  {
+   "name": "iterator-text-none",
+   "kind": "iterator",
+   "root": "root",
+   "mask": 4,
+   "filter": null,
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev"
+   ]
+  },
+  {
+   "name": "iterator-comment-none",
+   "kind": "iterator",
+   "root": "root",
+   "mask": 128,
+   "filter": null,
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev"
+   ]
+  },
+  {
+   "name": "iterator-pi-none",
+   "kind": "iterator",
+   "root": "root",
+   "mask": 64,
+   "filter": null,
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev"
+   ]
+  },
+  {
+   "name": "iterator-elementComment-none",
+   "kind": "iterator",
+   "root": "root",
+   "mask": 129,
+   "filter": null,
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev"
+   ]
+  },
+  {
+   "name": "iterator-elementComment-map",
+   "kind": "iterator",
+   "root": "root",
+   "mask": 129,
+   "filter": {
+    "kind": "map",
+    "map": {
+     "b": 2,
+     "c": 3
+    }
+   },
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev"
+   ]
+  },
+  {
+   "name": "iterator-document-all",
+   "kind": "iterator",
+   "root": "#document",
+   "mask": 4294967295,
+   "filter": null,
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next"
+   ]
+  },
+  {
+   "name": "walker-steps-all-none",
+   "kind": "walker",
+   "root": "root",
+   "mask": 4294967295,
+   "filter": null,
+   "steps": [
+    {
+     "set": "root"
+    },
+    "parent",
+    {
+     "set": "root"
+    },
+    "first",
+    {
+     "set": "root"
+    },
+    "last",
+    {
+     "set": "root"
+    },
+    "prevSib",
+    {
+     "set": "root"
+    },
+    "nextSib",
+    {
+     "set": "root"
+    },
+    "prev",
+    {
+     "set": "root"
+    },
+    "next",
+    {
+     "set": "a"
+    },
+    "parent",
+    {
+     "set": "a"
+    },
+    "first",
+    {
+     "set": "a"
+    },
+    "last",
+    {
+     "set": "a"
+    },
+    "prevSib",
+    {
+     "set": "a"
+    },
+    "nextSib",
+    {
+     "set": "a"
+    },
+    "prev",
+    {
+     "set": "a"
+    },
+    "next",
+    {
+     "set": "a1"
+    },
+    "parent",
+    {
+     "set": "a1"
+    },
+    "first",
+    {
+     "set": "a1"
+    },
+    "last",
+    {
+     "set": "a1"
+    },
+    "prevSib",
+    {
+     "set": "a1"
+    },
+    "nextSib",
+    {
+     "set": "a1"
+    },
+    "prev",
+    {
+     "set": "a1"
+    },
+    "next",
+    {
+     "set": "b"
+    },
+    "parent",
+    {
+     "set": "b"
+    },
+    "first",
+    {
+     "set": "b"
+    },
+    "last",
+    {
+     "set": "b"
+    },
+    "prevSib",
+    {
+     "set": "b"
+    },
+    "nextSib",
+    {
+     "set": "b"
+    },
+    "prev",
+    {
+     "set": "b"
+    },
+    "next",
+    {
+     "set": "b1"
+    },
+    "parent",
+    {
+     "set": "b1"
+    },
+    "first",
+    {
+     "set": "b1"
+    },
+    "last",
+    {
+     "set": "b1"
+    },
+    "prevSib",
+    {
+     "set": "b1"
+    },
+    "nextSib",
+    {
+     "set": "b1"
+    },
+    "prev",
+    {
+     "set": "b1"
+    },
+    "next",
+    {
+     "set": "c"
+    },
+    "parent",
+    {
+     "set": "c"
+    },
+    "first",
+    {
+     "set": "c"
+    },
+    "last",
+    {
+     "set": "c"
+    },
+    "prevSib",
+    {
+     "set": "c"
+    },
+    "nextSib",
+    {
+     "set": "c"
+    },
+    "prev",
+    {
+     "set": "c"
+    },
+    "next",
+    {
+     "set": "c1"
+    },
+    "parent",
+    {
+     "set": "c1"
+    },
+    "first",
+    {
+     "set": "c1"
+    },
+    "last",
+    {
+     "set": "c1"
+    },
+    "prevSib",
+    {
+     "set": "c1"
+    },
+    "nextSib",
+    {
+     "set": "c1"
+    },
+    "prev",
+    {
+     "set": "c1"
+    },
+    "next",
+    {
+     "set": "d"
+    },
+    "parent",
+    {
+     "set": "d"
+    },
+    "first",
+    {
+     "set": "d"
+    },
+    "last",
+    {
+     "set": "d"
+    },
+    "prevSib",
+    {
+     "set": "d"
+    },
+    "nextSib",
+    {
+     "set": "d"
+    },
+    "prev",
+    {
+     "set": "d"
+    },
+    "next",
+    {
+     "set": "e"
+    },
+    "parent",
+    {
+     "set": "e"
+    },
+    "first",
+    {
+     "set": "e"
+    },
+    "last",
+    {
+     "set": "e"
+    },
+    "prevSib",
+    {
+     "set": "e"
+    },
+    "nextSib",
+    {
+     "set": "e"
+    },
+    "prev",
+    {
+     "set": "e"
+    },
+    "next",
+    {
+     "set": "#ta"
+    },
+    "parent",
+    {
+     "set": "#ta"
+    },
+    "first",
+    {
+     "set": "#ta"
+    },
+    "last",
+    {
+     "set": "#ta"
+    },
+    "prevSib",
+    {
+     "set": "#ta"
+    },
+    "nextSib",
+    {
+     "set": "#ta"
+    },
+    "prev",
+    {
+     "set": "#ta"
+    },
+    "next",
+    {
+     "set": "!c2"
+    },
+    "parent",
+    {
+     "set": "!c2"
+    },
+    "first",
+    {
+     "set": "!c2"
+    },
+    "last",
+    {
+     "set": "!c2"
+    },
+    "prevSib",
+    {
+     "set": "!c2"
+    },
+    "nextSib",
+    {
+     "set": "!c2"
+    },
+    "prev",
+    {
+     "set": "!c2"
+    },
+    "next"
+   ]
+  },
+  {
+   "name": "walker-steps-element-none",
+   "kind": "walker",
+   "root": "root",
+   "mask": 1,
+   "filter": null,
+   "steps": [
+    {
+     "set": "root"
+    },
+    "parent",
+    {
+     "set": "root"
+    },
+    "first",
+    {
+     "set": "root"
+    },
+    "last",
+    {
+     "set": "root"
+    },
+    "prevSib",
+    {
+     "set": "root"
+    },
+    "nextSib",
+    {
+     "set": "root"
+    },
+    "prev",
+    {
+     "set": "root"
+    },
+    "next",
+    {
+     "set": "a"
+    },
+    "parent",
+    {
+     "set": "a"
+    },
+    "first",
+    {
+     "set": "a"
+    },
+    "last",
+    {
+     "set": "a"
+    },
+    "prevSib",
+    {
+     "set": "a"
+    },
+    "nextSib",
+    {
+     "set": "a"
+    },
+    "prev",
+    {
+     "set": "a"
+    },
+    "next",
+    {
+     "set": "a1"
+    },
+    "parent",
+    {
+     "set": "a1"
+    },
+    "first",
+    {
+     "set": "a1"
+    },
+    "last",
+    {
+     "set": "a1"
+    },
+    "prevSib",
+    {
+     "set": "a1"
+    },
+    "nextSib",
+    {
+     "set": "a1"
+    },
+    "prev",
+    {
+     "set": "a1"
+    },
+    "next",
+    {
+     "set": "b"
+    },
+    "parent",
+    {
+     "set": "b"
+    },
+    "first",
+    {
+     "set": "b"
+    },
+    "last",
+    {
+     "set": "b"
+    },
+    "prevSib",
+    {
+     "set": "b"
+    },
+    "nextSib",
+    {
+     "set": "b"
+    },
+    "prev",
+    {
+     "set": "b"
+    },
+    "next",
+    {
+     "set": "b1"
+    },
+    "parent",
+    {
+     "set": "b1"
+    },
+    "first",
+    {
+     "set": "b1"
+    },
+    "last",
+    {
+     "set": "b1"
+    },
+    "prevSib",
+    {
+     "set": "b1"
+    },
+    "nextSib",
+    {
+     "set": "b1"
+    },
+    "prev",
+    {
+     "set": "b1"
+    },
+    "next",
+    {
+     "set": "c"
+    },
+    "parent",
+    {
+     "set": "c"
+    },
+    "first",
+    {
+     "set": "c"
+    },
+    "last",
+    {
+     "set": "c"
+    },
+    "prevSib",
+    {
+     "set": "c"
+    },
+    "nextSib",
+    {
+     "set": "c"
+    },
+    "prev",
+    {
+     "set": "c"
+    },
+    "next",
+    {
+     "set": "c1"
+    },
+    "parent",
+    {
+     "set": "c1"
+    },
+    "first",
+    {
+     "set": "c1"
+    },
+    "last",
+    {
+     "set": "c1"
+    },
+    "prevSib",
+    {
+     "set": "c1"
+    },
+    "nextSib",
+    {
+     "set": "c1"
+    },
+    "prev",
+    {
+     "set": "c1"
+    },
+    "next",
+    {
+     "set": "d"
+    },
+    "parent",
+    {
+     "set": "d"
+    },
+    "first",
+    {
+     "set": "d"
+    },
+    "last",
+    {
+     "set": "d"
+    },
+    "prevSib",
+    {
+     "set": "d"
+    },
+    "nextSib",
+    {
+     "set": "d"
+    },
+    "prev",
+    {
+     "set": "d"
+    },
+    "next",
+    {
+     "set": "e"
+    },
+    "parent",
+    {
+     "set": "e"
+    },
+    "first",
+    {
+     "set": "e"
+    },
+    "last",
+    {
+     "set": "e"
+    },
+    "prevSib",
+    {
+     "set": "e"
+    },
+    "nextSib",
+    {
+     "set": "e"
+    },
+    "prev",
+    {
+     "set": "e"
+    },
+    "next",
+    {
+     "set": "#ta"
+    },
+    "parent",
+    {
+     "set": "#ta"
+    },
+    "first",
+    {
+     "set": "#ta"
+    },
+    "last",
+    {
+     "set": "#ta"
+    },
+    "prevSib",
+    {
+     "set": "#ta"
+    },
+    "nextSib",
+    {
+     "set": "#ta"
+    },
+    "prev",
+    {
+     "set": "#ta"
+    },
+    "next",
+    {
+     "set": "!c2"
+    },
+    "parent",
+    {
+     "set": "!c2"
+    },
+    "first",
+    {
+     "set": "!c2"
+    },
+    "last",
+    {
+     "set": "!c2"
+    },
+    "prevSib",
+    {
+     "set": "!c2"
+    },
+    "nextSib",
+    {
+     "set": "!c2"
+    },
+    "prev",
+    {
+     "set": "!c2"
+    },
+    "next"
+   ]
+  },
+  {
+   "name": "walker-steps-all-map",
+   "kind": "walker",
+   "root": "root",
+   "mask": 4294967295,
+   "filter": {
+    "kind": "map",
+    "map": {
+     "b": 2,
+     "c": 3
+    }
+   },
+   "steps": [
+    {
+     "set": "root"
+    },
+    "parent",
+    {
+     "set": "root"
+    },
+    "first",
+    {
+     "set": "root"
+    },
+    "last",
+    {
+     "set": "root"
+    },
+    "prevSib",
+    {
+     "set": "root"
+    },
+    "nextSib",
+    {
+     "set": "root"
+    },
+    "prev",
+    {
+     "set": "root"
+    },
+    "next",
+    {
+     "set": "a"
+    },
+    "parent",
+    {
+     "set": "a"
+    },
+    "first",
+    {
+     "set": "a"
+    },
+    "last",
+    {
+     "set": "a"
+    },
+    "prevSib",
+    {
+     "set": "a"
+    },
+    "nextSib",
+    {
+     "set": "a"
+    },
+    "prev",
+    {
+     "set": "a"
+    },
+    "next",
+    {
+     "set": "a1"
+    },
+    "parent",
+    {
+     "set": "a1"
+    },
+    "first",
+    {
+     "set": "a1"
+    },
+    "last",
+    {
+     "set": "a1"
+    },
+    "prevSib",
+    {
+     "set": "a1"
+    },
+    "nextSib",
+    {
+     "set": "a1"
+    },
+    "prev",
+    {
+     "set": "a1"
+    },
+    "next",
+    {
+     "set": "b"
+    },
+    "parent",
+    {
+     "set": "b"
+    },
+    "first",
+    {
+     "set": "b"
+    },
+    "last",
+    {
+     "set": "b"
+    },
+    "prevSib",
+    {
+     "set": "b"
+    },
+    "nextSib",
+    {
+     "set": "b"
+    },
+    "prev",
+    {
+     "set": "b"
+    },
+    "next",
+    {
+     "set": "b1"
+    },
+    "parent",
+    {
+     "set": "b1"
+    },
+    "first",
+    {
+     "set": "b1"
+    },
+    "last",
+    {
+     "set": "b1"
+    },
+    "prevSib",
+    {
+     "set": "b1"
+    },
+    "nextSib",
+    {
+     "set": "b1"
+    },
+    "prev",
+    {
+     "set": "b1"
+    },
+    "next",
+    {
+     "set": "c"
+    },
+    "parent",
+    {
+     "set": "c"
+    },
+    "first",
+    {
+     "set": "c"
+    },
+    "last",
+    {
+     "set": "c"
+    },
+    "prevSib",
+    {
+     "set": "c"
+    },
+    "nextSib",
+    {
+     "set": "c"
+    },
+    "prev",
+    {
+     "set": "c"
+    },
+    "next",
+    {
+     "set": "c1"
+    },
+    "parent",
+    {
+     "set": "c1"
+    },
+    "first",
+    {
+     "set": "c1"
+    },
+    "last",
+    {
+     "set": "c1"
+    },
+    "prevSib",
+    {
+     "set": "c1"
+    },
+    "nextSib",
+    {
+     "set": "c1"
+    },
+    "prev",
+    {
+     "set": "c1"
+    },
+    "next",
+    {
+     "set": "d"
+    },
+    "parent",
+    {
+     "set": "d"
+    },
+    "first",
+    {
+     "set": "d"
+    },
+    "last",
+    {
+     "set": "d"
+    },
+    "prevSib",
+    {
+     "set": "d"
+    },
+    "nextSib",
+    {
+     "set": "d"
+    },
+    "prev",
+    {
+     "set": "d"
+    },
+    "next",
+    {
+     "set": "e"
+    },
+    "parent",
+    {
+     "set": "e"
+    },
+    "first",
+    {
+     "set": "e"
+    },
+    "last",
+    {
+     "set": "e"
+    },
+    "prevSib",
+    {
+     "set": "e"
+    },
+    "nextSib",
+    {
+     "set": "e"
+    },
+    "prev",
+    {
+     "set": "e"
+    },
+    "next",
+    {
+     "set": "#ta"
+    },
+    "parent",
+    {
+     "set": "#ta"
+    },
+    "first",
+    {
+     "set": "#ta"
+    },
+    "last",
+    {
+     "set": "#ta"
+    },
+    "prevSib",
+    {
+     "set": "#ta"
+    },
+    "nextSib",
+    {
+     "set": "#ta"
+    },
+    "prev",
+    {
+     "set": "#ta"
+    },
+    "next",
+    {
+     "set": "!c2"
+    },
+    "parent",
+    {
+     "set": "!c2"
+    },
+    "first",
+    {
+     "set": "!c2"
+    },
+    "last",
+    {
+     "set": "!c2"
+    },
+    "prevSib",
+    {
+     "set": "!c2"
+    },
+    "nextSib",
+    {
+     "set": "!c2"
+    },
+    "prev",
+    {
+     "set": "!c2"
+    },
+    "next"
+   ]
+  },
+  {
+   "name": "walker-steps-element-map",
+   "kind": "walker",
+   "root": "root",
+   "mask": 1,
+   "filter": {
+    "kind": "map",
+    "map": {
+     "b": 2,
+     "c": 3
+    }
+   },
+   "steps": [
+    {
+     "set": "root"
+    },
+    "parent",
+    {
+     "set": "root"
+    },
+    "first",
+    {
+     "set": "root"
+    },
+    "last",
+    {
+     "set": "root"
+    },
+    "prevSib",
+    {
+     "set": "root"
+    },
+    "nextSib",
+    {
+     "set": "root"
+    },
+    "prev",
+    {
+     "set": "root"
+    },
+    "next",
+    {
+     "set": "a"
+    },
+    "parent",
+    {
+     "set": "a"
+    },
+    "first",
+    {
+     "set": "a"
+    },
+    "last",
+    {
+     "set": "a"
+    },
+    "prevSib",
+    {
+     "set": "a"
+    },
+    "nextSib",
+    {
+     "set": "a"
+    },
+    "prev",
+    {
+     "set": "a"
+    },
+    "next",
+    {
+     "set": "a1"
+    },
+    "parent",
+    {
+     "set": "a1"
+    },
+    "first",
+    {
+     "set": "a1"
+    },
+    "last",
+    {
+     "set": "a1"
+    },
+    "prevSib",
+    {
+     "set": "a1"
+    },
+    "nextSib",
+    {
+     "set": "a1"
+    },
+    "prev",
+    {
+     "set": "a1"
+    },
+    "next",
+    {
+     "set": "b"
+    },
+    "parent",
+    {
+     "set": "b"
+    },
+    "first",
+    {
+     "set": "b"
+    },
+    "last",
+    {
+     "set": "b"
+    },
+    "prevSib",
+    {
+     "set": "b"
+    },
+    "nextSib",
+    {
+     "set": "b"
+    },
+    "prev",
+    {
+     "set": "b"
+    },
+    "next",
+    {
+     "set": "b1"
+    },
+    "parent",
+    {
+     "set": "b1"
+    },
+    "first",
+    {
+     "set": "b1"
+    },
+    "last",
+    {
+     "set": "b1"
+    },
+    "prevSib",
+    {
+     "set": "b1"
+    },
+    "nextSib",
+    {
+     "set": "b1"
+    },
+    "prev",
+    {
+     "set": "b1"
+    },
+    "next",
+    {
+     "set": "c"
+    },
+    "parent",
+    {
+     "set": "c"
+    },
+    "first",
+    {
+     "set": "c"
+    },
+    "last",
+    {
+     "set": "c"
+    },
+    "prevSib",
+    {
+     "set": "c"
+    },
+    "nextSib",
+    {
+     "set": "c"
+    },
+    "prev",
+    {
+     "set": "c"
+    },
+    "next",
+    {
+     "set": "c1"
+    },
+    "parent",
+    {
+     "set": "c1"
+    },
+    "first",
+    {
+     "set": "c1"
+    },
+    "last",
+    {
+     "set": "c1"
+    },
+    "prevSib",
+    {
+     "set": "c1"
+    },
+    "nextSib",
+    {
+     "set": "c1"
+    },
+    "prev",
+    {
+     "set": "c1"
+    },
+    "next",
+    {
+     "set": "d"
+    },
+    "parent",
+    {
+     "set": "d"
+    },
+    "first",
+    {
+     "set": "d"
+    },
+    "last",
+    {
+     "set": "d"
+    },
+    "prevSib",
+    {
+     "set": "d"
+    },
+    "nextSib",
+    {
+     "set": "d"
+    },
+    "prev",
+    {
+     "set": "d"
+    },
+    "next",
+    {
+     "set": "e"
+    },
+    "parent",
+    {
+     "set": "e"
+    },
+    "first",
+    {
+     "set": "e"
+    },
+    "last",
+    {
+     "set": "e"
+    },
+    "prevSib",
+    {
+     "set": "e"
+    },
+    "nextSib",
+    {
+     "set": "e"
+    },
+    "prev",
+    {
+     "set": "e"
+    },
+    "next",
+    {
+     "set": "#ta"
+    },
+    "parent",
+    {
+     "set": "#ta"
+    },
+    "first",
+    {
+     "set": "#ta"
+    },
+    "last",
+    {
+     "set": "#ta"
+    },
+    "prevSib",
+    {
+     "set": "#ta"
+    },
+    "nextSib",
+    {
+     "set": "#ta"
+    },
+    "prev",
+    {
+     "set": "#ta"
+    },
+    "next",
+    {
+     "set": "!c2"
+    },
+    "parent",
+    {
+     "set": "!c2"
+    },
+    "first",
+    {
+     "set": "!c2"
+    },
+    "last",
+    {
+     "set": "!c2"
+    },
+    "prevSib",
+    {
+     "set": "!c2"
+    },
+    "nextSib",
+    {
+     "set": "!c2"
+    },
+    "prev",
+    {
+     "set": "!c2"
+    },
+    "next"
+   ]
+  },
+  {
+   "name": "iterator-remove-reference",
+   "kind": "iterator",
+   "root": "root",
+   "mask": 4294967295,
+   "filter": null,
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    {
+     "remove": "b1"
+    },
+    "next",
+    "prev",
+    {
+     "remove": "#tb"
+    },
+    "prev",
+    {
+     "remove": "b"
+    },
+    "next",
+    "prev",
+    "prev",
+    {
+     "remove": "a"
+    },
+    "next",
+    "next"
+   ]
+  },
+  {
+   "name": "iterator-remove-before",
+   "kind": "iterator",
+   "root": "root",
+   "mask": 1,
+   "filter": null,
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    {
+     "remove": "b"
+    },
+    "next",
+    "prev",
+    {
+     "remove": "c"
+    },
+    "next",
+    "next",
+    "prev",
+    "next",
+    "prev"
+   ]
+  },
+  {
+   "name": "iterator-remove-filtered",
+   "kind": "iterator",
+   "root": "root",
+   "mask": 4294967295,
+   "filter": {
+    "kind": "map",
+    "map": {
+     "b": 2,
+     "c": 3
+    }
+   },
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    {
+     "remove": "c1"
+    },
+    "next",
+    "prev",
+    {
+     "remove": "d"
+    },
+    "next",
+    "next",
+    "prev"
+   ]
+  },
+  {
+   "name": "walker-throw",
+   "kind": "walker",
+   "root": "root",
+   "mask": 4294967295,
+   "filter": {
+    "kind": "throw",
+    "on": "b1",
+    "times": 1
+   },
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    "next",
+    "next",
+    {
+     "set": "d"
+    },
+    "parent",
+    "first"
+   ]
+  },
+  {
+   "name": "walker-throw-every-step",
+   "kind": "walker",
+   "root": "root",
+   "mask": 1,
+   "filter": {
+    "kind": "throw",
+    "on": "c",
+    "times": 99
+   },
+   "steps": [
+    {
+     "set": "d"
+    },
+    "parent",
+    "prev",
+    "next",
+    {
+     "set": "a"
+    },
+    "nextSib",
+    {
+     "set": "b2"
+    },
+    "next",
+    {
+     "set": "e"
+    },
+    "prevSib",
+    "prev"
+   ]
+  },
+  {
+   "name": "iterator-throw",
+   "kind": "iterator",
+   "root": "root",
+   "mask": 4294967295,
+   "filter": {
+    "kind": "throw",
+    "on": "b1",
+    "times": 1
+   },
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    "next",
+    "next",
+    "prev",
+    "prev"
+   ]
+  },
+  {
+   "name": "iterator-throw-backward",
+   "kind": "iterator",
+   "root": "root",
+   "mask": 1,
+   "filter": {
+    "kind": "throw",
+    "on": "a1",
+    "times": 2
+   },
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev"
+   ]
+  },
+  {
+   "name": "walker-mutate",
+   "kind": "walker",
+   "root": "root",
+   "mask": 4294967295,
+   "filter": {
+    "kind": "mutate",
+    "on": "a1",
+    "remove": "b"
+   },
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev"
+   ]
+  },
+  {
+   "name": "iterator-mutate",
+   "kind": "iterator",
+   "root": "root",
+   "mask": 4294967295,
+   "filter": {
+    "kind": "mutate",
+    "on": "a1",
+    "remove": "b"
+   },
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev"
+   ]
+  },
+  {
+   "name": "iterator-mutate-reference",
+   "kind": "iterator",
+   "root": "root",
+   "mask": 1,
+   "filter": {
+    "kind": "mutate",
+    "on": "c1",
+    "remove": "c"
+   },
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev",
+    "prev"
+   ]
+  },
+  {
+   "name": "walker-reenter",
+   "kind": "walker",
+   "root": "root",
+   "mask": 1,
+   "filter": {
+    "kind": "reenter",
+    "on": "a1"
+   },
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    {
+     "set": "b"
+    },
+    "prev",
+    "first"
+   ]
+  },
+  {
+   "name": "iterator-reenter",
+   "kind": "iterator",
+   "root": "root",
+   "mask": 1,
+   "filter": {
+    "kind": "reenter",
+    "on": "a1"
+   },
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next",
+    "next",
+    "prev",
+    "prev",
+    "prev"
+   ]
+  },
+  {
+   "name": "walker-reenter-other",
+   "kind": "walker",
+   "root": "root",
+   "mask": 1,
+   "filter": {
+    "kind": "reenterOther",
+    "on": "a1"
+   },
+   "steps": [
+    "next",
+    "next",
+    "next",
+    "next"
+   ]
+  },
+  {
+   "name": "iterator-detach",
+   "kind": "iterator",
+   "root": "root",
+   "mask": 1,
+   "filter": null,
+   "steps": [
+    "next",
+    "next",
+    "detach",
+    "next",
+    "prev",
+    "detach",
+    "next"
+   ]
+  },
+  {
+   "name": "walker-current-outside",
+   "kind": "walker",
+   "root": "a",
+   "mask": 4294967295,
+   "filter": null,
+   "steps": [
+    {
+     "set": "c1"
+    },
+    "parent",
+    {
+     "set": "c1"
+    },
+    "next",
+    {
+     "set": "c1"
+    },
+    "prev",
+    {
+     "set": "c"
+    },
+    "prevSib",
+    {
+     "set": "svg"
+    },
+    "first",
+    {
+     "set": "svg"
+    },
+    "next"
+   ]
+  }
+ ]
+}

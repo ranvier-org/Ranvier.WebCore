@@ -1,0 +1,21 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+Traceback (most recent call last):
+  File "C:\wk\native-traversal\tests\abi\svg_paint_probe.py", line 40, in bind
+    function = getattr(self.library, name)
+  File "C:\Python314\Lib\ctypes\__init__.py", line 486, in __getattr__
+    func = self.__getitem__(name)
+  File "C:\Python314\Lib\ctypes\__init__.py", line 491, in __getitem__
+    func = self._FuncPtr((name_or_ordinal, self))
+AttributeError: function 'rv_node_filter_create' not found
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\wk\native-traversal\tests\abi\tree_traversal.py", line 305, in <module>
+    verify(parser.parse_args().native_directory)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-traversal\tests\abi\tree_traversal.py", line 42, in verify
+    create_filter = p.bind('rv_node_filter_create', P, [P, FILTER, P, RELEASE])
+  File "C:\wk\native-traversal\tests\abi\svg_paint_probe.py", line 42, in bind
+    raise AssertionError('required native binding is absent: ' + name) from error
+AssertionError: required native binding is absent: rv_node_filter_create

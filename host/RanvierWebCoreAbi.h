@@ -1,5 +1,5 @@
 /*
- * Ranvier native WebCore C ABI, version 32.
+ * Ranvier native WebCore C ABI, version 33.
  *
  * The boundary consists of C scalars, UTF-8 strings, opaque handles and a caller-owned RGBA8 buffer,
  * and is identical on every WebCore port that compiles RanvierWebCoreAbi.cpp.
@@ -44,6 +44,7 @@ typedef struct RvNode RvNode;
 typedef struct RvListener RvListener;
 typedef struct RvEvent RvEvent;
 typedef struct RvWatch RvWatch;
+typedef struct RvNodeFilter RvNodeFilter;
 typedef struct RvGpuFrame RvGpuFrame;
 
 /* Returns 0 on success. Any other value marks the listener as failed: the dispatch continues with the
@@ -201,6 +202,22 @@ RV_EXPORT RvListener* rv_node_add_event_listener(RvNode* target, const char* typ
  * when the listener is removed by another listener of the dispatch in progress. */
 RV_EXPORT int32_t rv_listener_remove(RvListener*);
 
+/* Returns RV_DOM_NODE_FILTER_FILTER_ACCEPT, _REJECT or _SKIP (1, 2 or 3) for node, which is borrowed for the call.
+ * Any other value marks the filter as failed: the traversal stops as for a throwing NodeFilter, its call returns
+ * RV_ERR_DOM_EXCEPTION, and rv_last_exception names ExistingExceptionError. */
+typedef int32_t (*RvNodeFilterCallback)(void* context, RvNode* node);
+/* Runs once with the filter's context, on the owning thread, when the engine drops its last reference. */
+typedef void (*RvNodeFilterRelease)(void* context);
+
+/* Creates a NodeFilter for rv_dom_document_create_tree_walker and rv_dom_document_create_node_iterator that calls
+ * callback(context, node). The filter belongs to the document of target. The caller owns the returned reference and
+ * drops it with rv_dom_node_filter_release; walkers, iterators and filter getter results hold their own. release, when
+ * not NULL, runs after the last of those references is dropped. Returns NULL on a NULL argument or the wrong thread. */
+RV_EXPORT RvNodeFilter* rv_node_filter_create(RvNode* target, RvNodeFilterCallback callback, void* context,
+    RvNodeFilterRelease release);
+/* Writes the context passed to rv_node_filter_create to *context, or NULL for a filter the host did not create. */
+RV_EXPORT int32_t rv_node_filter_context(RvNodeFilter* filter, void** context);
+
 /* Dispatches a new untrusted Event. *defaultPrevented is set to 1 when a listener cancelled it. */
 RV_EXPORT int32_t rv_node_dispatch_event(RvNode* target, const char* type, int32_t bubbles, int32_t cancelable,
     int32_t* defaultPrevented);
@@ -266,7 +283,8 @@ RV_EXPORT int32_t rv_event_key(RvEvent*, char* buffer, int32_t capacity, int32_t
 RV_EXPORT RvNode* rv_event_target(RvEvent*, int32_t current);
 
 /* Parts of the engine exception behind the latest RV_ERR_DOM_EXCEPTION, for rv_last_exception.
- * Names include the WebIDL TypeError/RangeError/SyntaxError cases as well as DOMException names. */
+ * Names include the WebIDL TypeError/RangeError/SyntaxError cases as well as DOMException names, and
+ * ExistingExceptionError for a failure reported by a host callback such as an RvNodeFilterCallback. */
 enum {
     RV_EXCEPTION_NAME = 0,
     RV_EXCEPTION_MESSAGE = 1,

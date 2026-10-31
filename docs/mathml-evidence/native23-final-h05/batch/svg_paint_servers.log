@@ -1,0 +1,6 @@
+PATTERN_VIEWBOX {'attribute': '0 0 10 10', 'rect': [0.0, 0.0, 10.0, 10.0], 'pixel15_131': [255, 0, 0, 255]}
+PATTERN_UNITS {'values': [0.0, 0.0, 1.0, 1.0], 'samples': {'(2, 122)': [255, 0, 0, 255], '(12, 122)': [255, 255, 255, 255], '(2, 152)': [255, 255, 255, 255], '(12, 152)': [255, 255, 255, 255]}}
+PASS SVG paint servers: 565 assertions
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+
+EXIT_CODE=0

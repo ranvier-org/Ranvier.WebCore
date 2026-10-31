@@ -12,6 +12,7 @@
   <ItemGroup>
     <Compile Include="../../tests/abi/Native.fs" Link="Native.fs" />
     <Compile Include="../../tests/abi/NativeDom.fs" Link="NativeDom.fs" />
+    <Compile Include="../../tests/abi/Traversal.fs" Link="Traversal.fs" />
     <PackageReference Update="FSharp.Core" Version="10.1.401" />
     <None Include="../../NOTICE.md" Pack="true" PackagePath="" />
     <None Include="../../packaging/README.md" Pack="true" PackagePath="README.md" />

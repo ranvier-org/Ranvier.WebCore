@@ -570,6 +570,10 @@
       "base": "Element"
     },
     {
+      "name": "MathMLMathElement",
+      "base": "MathMLElement"
+    },
+    {
       "name": "HTMLStyleElement",
       "base": "HTMLElement"
     },
@@ -1272,6 +1276,18 @@
     {
       "name": "SVGUseElement",
       "base": "SVGGraphicsElement"
+    },
+    {
+      "name": "NodeFilter",
+      "base": null
+    },
+    {
+      "name": "NodeIterator",
+      "base": null
+    },
+    {
+      "name": "TreeWalker",
+      "base": null
     }
   ],
   "contractInterfaces": [
@@ -1977,6 +1993,15 @@
       "mixin": false,
       "contractOnly": false,
       "source": "mathml/MathMLElement.idl"
+    },
+    {
+      "name": "MathMLMathElement",
+      "idlName": "MathMLMathElement",
+      "base": "MathMLElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "mathml/MathMLMathElement.idl"
     },
     {
       "name": "HTMLStyleElement",
@@ -3567,6 +3592,33 @@
       "mixin": false,
       "contractOnly": false,
       "source": "svg/SVGUseElement.idl"
+    },
+    {
+      "name": "NodeFilter",
+      "idlName": "NodeFilter",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/NodeFilter.idl"
+    },
+    {
+      "name": "NodeIterator",
+      "idlName": "NodeIterator",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/NodeIterator.idl"
+    },
+    {
+      "name": "TreeWalker",
+      "idlName": "TreeWalker",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/TreeWalker.idl"
     },
     {
       "name": "HTMLUnknownElement",
@@ -12695,6 +12747,248 @@
         "interface": "Range",
         "root": "AbstractRange",
         "class": "Range",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Document",
+      "member": "createNodeIterator",
+      "contractOwner": "Document",
+      "kind": "operation",
+      "function": "rv_dom_document_create_node_iterator",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "root"
+        },
+        {
+          "ctype": "uint32_t",
+          "name": "what_to_show"
+        },
+        {
+          "ctype": "RvNodeFilter*",
+          "name": "filter"
+        },
+        {
+          "ctype": "RvNodeIterator**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "root",
+          "idlType": "Node",
+          "idl": {
+            "name": "Node",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "node",
+            "ctype": null,
+            "interface": "Node",
+            "root": null,
+            "class": "Node",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "whatToShow",
+          "idlType": "unsigned long",
+          "idl": {
+            "name": "unsigned long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0xFFFFFFFF",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "uint32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "filter",
+          "idlType": "NodeFilter?",
+          "idl": {
+            "name": "NodeFilter",
+            "nullable": true,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "null",
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "NodeFilter",
+            "root": "NodeFilter",
+            "class": "NodeFilter",
+            "enum": null,
+            "label": null,
+            "nullable": true,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "NodeIterator",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "NodeIterator",
+        "root": "NodeIterator",
+        "class": "NodeIterator",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Document",
+      "member": "createTreeWalker",
+      "contractOwner": "Document",
+      "kind": "operation",
+      "function": "rv_dom_document_create_tree_walker",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "root"
+        },
+        {
+          "ctype": "uint32_t",
+          "name": "what_to_show"
+        },
+        {
+          "ctype": "RvNodeFilter*",
+          "name": "filter"
+        },
+        {
+          "ctype": "RvTreeWalker**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "root",
+          "idlType": "Node",
+          "idl": {
+            "name": "Node",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "node",
+            "ctype": null,
+            "interface": "Node",
+            "root": null,
+            "class": "Node",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "whatToShow",
+          "idlType": "unsigned long",
+          "idl": {
+            "name": "unsigned long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0xFFFFFFFF",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "uint32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "filter",
+          "idlType": "NodeFilter?",
+          "idl": {
+            "name": "NodeFilter",
+            "nullable": true,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "null",
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "NodeFilter",
+            "root": "NodeFilter",
+            "class": "NodeFilter",
+            "enum": null,
+            "label": null,
+            "nullable": true,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "TreeWalker",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "TreeWalker",
+        "root": "TreeWalker",
+        "class": "TreeWalker",
         "enum": null,
         "label": null,
         "nullable": false,
@@ -130975,6 +131269,747 @@
         "enum": null,
         "label": null,
         "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "NodeIterator",
+      "member": "root",
+      "contractOwner": "NodeIterator",
+      "kind": "getter",
+      "function": "rv_dom_node_iterator_get_root",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNodeIterator*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "Node",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "Node",
+        "root": null,
+        "class": "Node",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "NodeIterator",
+      "member": "referenceNode",
+      "contractOwner": "NodeIterator",
+      "kind": "getter",
+      "function": "rv_dom_node_iterator_get_reference_node",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNodeIterator*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "Node",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "Node",
+        "root": null,
+        "class": "Node",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "NodeIterator",
+      "member": "pointerBeforeReferenceNode",
+      "contractOwner": "NodeIterator",
+      "kind": "getter",
+      "function": "rv_dom_node_iterator_get_pointer_before_reference_node",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNodeIterator*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "NodeIterator",
+      "member": "whatToShow",
+      "contractOwner": "NodeIterator",
+      "kind": "getter",
+      "function": "rv_dom_node_iterator_get_what_to_show",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNodeIterator*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "NodeIterator",
+      "member": "filter",
+      "contractOwner": "NodeIterator",
+      "kind": "getter",
+      "function": "rv_dom_node_iterator_get_filter",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNodeIterator*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNodeFilter**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "NodeFilter",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "NodeFilter",
+        "root": "NodeFilter",
+        "class": "NodeFilter",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "NodeIterator",
+      "member": "nextNode",
+      "contractOwner": "NodeIterator",
+      "kind": "operation",
+      "function": "rv_dom_node_iterator_next_node",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNodeIterator*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "Node",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "Node",
+        "root": null,
+        "class": "Node",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "NodeIterator",
+      "member": "previousNode",
+      "contractOwner": "NodeIterator",
+      "kind": "operation",
+      "function": "rv_dom_node_iterator_previous_node",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNodeIterator*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "Node",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "Node",
+        "root": null,
+        "class": "Node",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "NodeIterator",
+      "member": "detach",
+      "contractOwner": "NodeIterator",
+      "kind": "operation",
+      "function": "rv_dom_node_iterator_detach",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNodeIterator*",
+          "name": "target"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TreeWalker",
+      "member": "root",
+      "contractOwner": "TreeWalker",
+      "kind": "getter",
+      "function": "rv_dom_tree_walker_get_root",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvTreeWalker*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "Node",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "Node",
+        "root": null,
+        "class": "Node",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TreeWalker",
+      "member": "whatToShow",
+      "contractOwner": "TreeWalker",
+      "kind": "getter",
+      "function": "rv_dom_tree_walker_get_what_to_show",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvTreeWalker*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TreeWalker",
+      "member": "filter",
+      "contractOwner": "TreeWalker",
+      "kind": "getter",
+      "function": "rv_dom_tree_walker_get_filter",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvTreeWalker*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNodeFilter**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "NodeFilter",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "NodeFilter",
+        "root": "NodeFilter",
+        "class": "NodeFilter",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TreeWalker",
+      "member": "currentNode",
+      "contractOwner": "TreeWalker",
+      "kind": "getter",
+      "function": "rv_dom_tree_walker_get_current_node",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvTreeWalker*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "Node",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "Node",
+        "root": null,
+        "class": "Node",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TreeWalker",
+      "member": "currentNode",
+      "contractOwner": "TreeWalker",
+      "kind": "setter",
+      "function": "rv_dom_tree_walker_set_current_node",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvTreeWalker*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "Node",
+          "idl": {
+            "name": "Node",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "node",
+            "ctype": null,
+            "interface": "Node",
+            "root": null,
+            "class": "Node",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TreeWalker",
+      "member": "parentNode",
+      "contractOwner": "TreeWalker",
+      "kind": "operation",
+      "function": "rv_dom_tree_walker_parent_node",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvTreeWalker*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "Node",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "Node",
+        "root": null,
+        "class": "Node",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TreeWalker",
+      "member": "firstChild",
+      "contractOwner": "TreeWalker",
+      "kind": "operation",
+      "function": "rv_dom_tree_walker_first_child",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvTreeWalker*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "Node",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "Node",
+        "root": null,
+        "class": "Node",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TreeWalker",
+      "member": "lastChild",
+      "contractOwner": "TreeWalker",
+      "kind": "operation",
+      "function": "rv_dom_tree_walker_last_child",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvTreeWalker*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "Node",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "Node",
+        "root": null,
+        "class": "Node",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TreeWalker",
+      "member": "previousSibling",
+      "contractOwner": "TreeWalker",
+      "kind": "operation",
+      "function": "rv_dom_tree_walker_previous_sibling",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvTreeWalker*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "Node",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "Node",
+        "root": null,
+        "class": "Node",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TreeWalker",
+      "member": "nextSibling",
+      "contractOwner": "TreeWalker",
+      "kind": "operation",
+      "function": "rv_dom_tree_walker_next_sibling",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvTreeWalker*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "Node",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "Node",
+        "root": null,
+        "class": "Node",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TreeWalker",
+      "member": "previousNode",
+      "contractOwner": "TreeWalker",
+      "kind": "operation",
+      "function": "rv_dom_tree_walker_previous_node",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvTreeWalker*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "Node",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "Node",
+        "root": null,
+        "class": "Node",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TreeWalker",
+      "member": "nextNode",
+      "contractOwner": "TreeWalker",
+      "kind": "operation",
+      "function": "rv_dom_tree_walker_next_node",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvTreeWalker*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "Node",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "Node",
+        "root": null,
+        "class": "Node",
+        "enum": null,
+        "label": null,
+        "nullable": true,
         "atom": false,
         "subtypes": []
       }

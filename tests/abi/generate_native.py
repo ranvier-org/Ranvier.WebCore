@@ -36,7 +36,7 @@ KEYWORDS = set(
 )
 
 # The parameter name for an unnamed handle, by its pointee type.
-HANDLE_NAMES = {"RvHost": "host", "RvNode": "node", "RvEvent": "event", "RvWatch": "watch", "RvListener": "listener", "RvAnimation": "animation", "RvAxNode": "ax", "RvEventTarget": "target"}
+HANDLE_NAMES = {"RvHost": "host", "RvNode": "node", "RvEvent": "event", "RvWatch": "watch", "RvListener": "listener", "RvAnimation": "animation", "RvAxNode": "ax", "RvEventTarget": "target", "RvNodeFilter": "filter"}
 
 
 def strip_comments(text: str) -> str:
@@ -166,6 +166,10 @@ def generated(header: str) -> str:
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
         "type ResourceHandler = delegate of context: nativeint * load: nativeint * url: nativeint -> unit",
         "",
+        "/// <summary>The <c>RvResourceCompletion</c> of the header: one terminal outcome with an image's natural size.</summary>",
+        "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+        "type ResourceCompletion = delegate of context: nativeint * outcome: int * width: int * height: int -> unit",
+        "",
         "/// <summary>The <c>RvFrameCallback</c> of the header.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
         "type FrameCallback = delegate of context: nativeint -> unit",
@@ -197,6 +201,14 @@ def generated(header: str) -> str:
         "/// <summary>The <c>RvAxCallback</c> of the header.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
         "type AxCallback = delegate of context: nativeint * node: nativeint * event: int -> unit",
+        "",
+        "/// <summary>The <c>RvNodeFilterCallback</c> of the header.</summary>",
+        "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+        "type NodeFilterCallback = delegate of context: nativeint * node: nativeint -> int",
+        "",
+        "/// <summary>The <c>RvNodeFilterRelease</c> of the header.</summary>",
+        "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+        "type NodeFilterRelease = delegate of context: nativeint -> unit",
     ]
 
     found = declarations(header)

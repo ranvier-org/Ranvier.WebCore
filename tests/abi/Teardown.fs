@@ -2,6 +2,7 @@
 /// host, destroys the host, and reads the watched nodes before and after a run-loop cycle.
 module RanvierWebCoreAbi.Teardown
 
+open System
 open System.IO
 open System.Text.Json
 open RanvierWebCoreAbi.Native
@@ -273,6 +274,109 @@ let private svgPaintHandles (replace: bool) (host: nativeint) (_: nativeint) (_:
 
     gradient
 
+/// Creates a tree walker or node iterator over target with a host NodeFilter, and returns it with a weak reference
+/// to the filter's managed function. The function lives only in the native filter, outside the caller's frame.
+[<System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)>]
+let private hostFilterTraversal (kind: string) (document: nativeint) (target: nativeint) =
+    let owner = obj ()
+    let filter = fun (_: nativeint) -> (if isNull owner then Traversal.FilterResult.Skip else Traversal.FilterResult.Accept)
+    use handle = Traversal.NodeFilter.Create(target, filter)
+    let mutable traversal = 0n
+
+    if kind = "tree walker" then
+        rv_dom_document_create_tree_walker (document, target, 0xFFFFFFFFu, handle.Handle, &traversal)
+        |> check "create_tree_walker"
+    else
+        rv_dom_document_create_node_iterator (document, target, 0xFFFFFFFFu, handle.Handle, &traversal)
+        |> check "create_node_iterator"
+
+    traversal, WeakReference filter
+
+/// Appends a div with a child span, takes one extra handle of the kind from the div (removing the div first when
+/// <c>remove</c> is set), destroys the host, then releases that handle. The document and the div must be destroyed
+/// after collection whatever the destroy order.
+let private releaseAfterDestroy (kind: string) (remove: bool) =
+    let host = rv_host_create (64, 64)
+    rv_host_load_html (host, html) |> check "load_html"
+    let document = rv_host_document host
+    let body = rv_document_body host
+    let div = rv_document_create_element (host, "div")
+    let span = rv_document_create_element (host, "span")
+    rv_node_append_child (div, span) |> check "append span"
+    rv_node_append_child (body, div) |> check "append div"
+    let held = ref 0n
+
+    let release =
+        match kind with
+        | "node" ->
+            held.Value <- rv_node_retain div
+            fun () -> rv_node_release held.Value
+        | "dataset" ->
+            rv_dom_html_element_get_dataset (div, &held.contents) |> check "dataset"
+            fun () -> rv_dom_dom_string_map_release held.Value
+        | "tree walker"
+        | "node iterator" ->
+            let traversal, weak = hostFilterTraversal kind document div
+            held.Value <- traversal
+
+            fun () ->
+                if kind = "tree walker" then
+                    rv_dom_tree_walker_release held.Value
+                else
+                    rv_dom_node_iterator_release held.Value
+
+                GC.Collect()
+                GC.WaitForPendingFinalizers()
+
+                if weak.IsAlive then
+                    failwithf "%s filter function alive after the traversal was released" kind
+        | _ ->
+            rv_dom_html_element_get_attribute_style_map (div, &held.contents) |> check "attributeStyleMap"
+            fun () -> rv_dom_style_property_map_read_only_release held.Value
+
+    if held.Value = 0n then
+        failwithf "no %s handle" kind
+
+    if remove then
+        rv_node_remove div |> check "remove"
+
+    let documentWatch = rv_node_watch document
+    let divWatch = rv_node_watch div
+    rv_node_release span
+    rv_node_release div
+    rv_node_release body
+    rv_node_release document
+    rv_host_destroy host
+    cycle ()
+    let documentAfterDisposal = refsOf documentWatch
+    let divAfterDisposal = refsOf divWatch
+    release ()
+    cycle ()
+    let documentAfterCycle = refsOf documentWatch
+    let divAfterCycle = refsOf divWatch
+    cycleFor longCycleMilliseconds
+    let documentAfterLongCycle = refsOf documentWatch
+    let divAfterLongCycle = refsOf divWatch
+    rv_collect_garbage ()
+
+    let result =
+        {
+            probe = (if remove then "removed div, " else "div, ") + kind + " released after host destroy"
+            cycleBeforeDisposal = "none"
+            documentRefsAfterDisposal = documentAfterDisposal
+            targetRefsAfterDisposal = divAfterDisposal
+            documentRefsAfterCycle = documentAfterCycle
+            targetRefsAfterCycle = divAfterCycle
+            documentRefsAfterLongCycle = documentAfterLongCycle
+            targetRefsAfterLongCycle = divAfterLongCycle
+            documentRefsAfterCollection = refsOf documentWatch
+            targetRefsAfterCollection = refsOf divWatch
+        }
+
+    rv_watch_release documentWatch
+    rv_watch_release divWatch
+    result
+
 /// Runs each probe without a run-loop cycle before disposal, with a single cycle and with a 20 ms cycle, and writes
 /// teardown-probes.json.
 let run (outDir: string) =
@@ -314,6 +418,10 @@ let run (outDir: string) =
                 probe "image with a missing file source, removed" cycleBefore (image "file:///C:/ranvier-missing.png" true)
                 probe "SVG paint handles retained past host destroy" cycleBefore (svgPaintHandles false)
                 probe "SVG paint handles retained past document replacement" cycleBefore (svgPaintHandles true)
+
+            for kind in [ "node"; "dataset"; "style map"; "tree walker"; "node iterator" ] do
+                for remove in [ false; true ] do
+                    releaseAfterDestroy kind remove
         ]
 
     let json =
