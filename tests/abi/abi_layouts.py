@@ -20,6 +20,9 @@ LAYOUTS = {
                      ('screenX', D), ('screenY', D), ('clientX', D), ('clientY', D), ('button', I), ('buttons', I), ('key', P),
                      ('code', P), ('location', I), ('repeat', I), ('isComposing', I), ('relatedTarget', P), ('customDetailJson', P)],
                     112, [0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 56, 60, 64, 72, 80, 84, 88, 96, 104], 'EventInit'),
+    'RvNotificationOptions': ([('size', I), ('dir', I), ('silent', I), ('body_length', I), ('tag_length', I), ('lang_length', I),
+                               ('icon_length', I), ('reserved', I), ('body', P), ('tag', P), ('lang', P), ('icon', P)], 64,
+                              [0, 4, 8, 12, 16, 20, 24, 28, 32, 40, 48, 56], 'NotificationOptions'),
     # Views mirrors RvWindowMetrics as WindowMetrics in Ranvier.View.WebCore/Viewport.fs; its fixture checks the mirror.
     'RvWindowMetrics': ([('size', I), ('innerWidth', I), ('innerHeight', I), ('outerWidth', I), ('outerHeight', I),
                          ('devicePixelRatio', D)], 32, [0, 4, 8, 12, 16, 24], None),

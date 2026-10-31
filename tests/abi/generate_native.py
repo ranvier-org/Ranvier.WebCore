@@ -120,6 +120,8 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
         return "nativeint", ""
     if ctype == "const RvEventInit*":
         return "EventInit&", ""
+    if ctype == "const RvNotificationOptions*":
+        return "NotificationOptions&", ""
     if ctype == "const uint16_t*":
         return "uint16[]", "[<In>] "
     if ctype == "RvTextSegments*":
@@ -173,6 +175,22 @@ def generated(header: str) -> str:
         "    val mutable isComposing: int",
         "    val mutable relatedTarget: nativeint",
         "    val mutable customDetailJson: nativeint",
+        "",
+        "/// <summary>The <c>RvNotificationOptions</c> of the header; strings are caller-owned UTF-8 bytes with lengths.</summary>",
+        "[<Struct; StructLayout(LayoutKind.Sequential)>]",
+        "type NotificationOptions =",
+        "    val mutable size: int",
+        "    val mutable dir: int",
+        "    val mutable silent: int",
+        "    val mutable body_length: int",
+        "    val mutable tag_length: int",
+        "    val mutable lang_length: int",
+        "    val mutable icon_length: int",
+        "    val mutable reserved: int",
+        "    val mutable body: nativeint",
+        "    val mutable tag: nativeint",
+        "    val mutable lang: nativeint",
+        "    val mutable icon: nativeint",
         "",
         "/// <summary>The <c>RvTextSegments</c> of the header: owned until <c>rv_text_segments_release</c>.</summary>",
         "[<Struct; StructLayout(LayoutKind.Sequential)>]",

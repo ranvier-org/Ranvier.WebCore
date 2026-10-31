@@ -37,6 +37,22 @@ type EventInit =
     val mutable relatedTarget: nativeint
     val mutable customDetailJson: nativeint
 
+/// <summary>The <c>RvNotificationOptions</c> of the header; strings are caller-owned UTF-8 bytes with lengths.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type NotificationOptions =
+    val mutable size: int
+    val mutable dir: int
+    val mutable silent: int
+    val mutable body_length: int
+    val mutable tag_length: int
+    val mutable lang_length: int
+    val mutable icon_length: int
+    val mutable reserved: int
+    val mutable body: nativeint
+    val mutable tag: nativeint
+    val mutable lang: nativeint
+    val mutable icon: nativeint
+
 /// <summary>The <c>RvTextSegments</c> of the header: owned until <c>rv_text_segments_release</c>.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type TextSegments =
@@ -368,6 +384,14 @@ module Calls =
             "rv_node_convert_points"
             "rv_node_box_quad"
             "rv_host_inspect_cascade"
+            "rv_host_set_notification_presenter"
+            "rv_host_set_notification_permission"
+            "rv_host_notification_permission"
+            "rv_notification_create"
+            "rv_notification_close"
+            "rv_notification_report"
+            "rv_notification_string"
+            "rv_notification_flags"
         |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
@@ -1336,8 +1360,51 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_node_box_quad(nativeint node, int box, nativeint ``to``, int toSpace, double& quad)
+
     [<DllImport(Lib)>]
-    extern int rv_host_inspect_cascade(nativeint host, nativeint element, [<In>] byte[] property, int property_length, nativeint[] diagnostic)
+    extern int rv_host_inspect_cascade(
+        nativeint host,
+        nativeint element,
+        [<In>] byte[] property,
+        int property_length,
+        nativeint[] diagnostic
+    )
+
+    [<DllImport(Lib)>]
+    extern int rv_host_set_notification_presenter(nativeint host, nativeint presenter, nativeint context)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_set_notification_permission(nativeint host, int permission)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_notification_permission(nativeint host, int& permission)
+
+    [<DllImport(Lib)>]
+    extern int rv_notification_create(
+        nativeint host,
+        [<In>] byte[] title,
+        int title_length,
+        NotificationOptions& options,
+        nativeint[] notification
+    )
+
+    [<DllImport(Lib)>]
+    extern int rv_notification_close(nativeint notification)
+
+    [<DllImport(Lib)>]
+    extern int rv_notification_report(nativeint notification, int ``event``)
+
+    [<DllImport(Lib)>]
+    extern int rv_notification_string(
+        nativeint notification,
+        int field,
+        [<In; Out>] byte[] buffer,
+        int capacity,
+        int[] length
+    )
+
+    [<DllImport(Lib)>]
+    extern int rv_notification_flags(nativeint notification, int& dir, int& silent)
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -4389,8 +4456,8 @@ let rv_node_convert_points
             Raw.rv_node_convert_points (from, fromSpace, ``to``, toSpace, &xy, count)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[236] <- Calls.Counts[236] + 1L
-        Calls.Ticks[236] <- Calls.Ticks[236] + spent
+        Calls.Counts[244] <- Calls.Counts[244] + 1L
+        Calls.Ticks[244] <- Calls.Ticks[244] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -4401,17 +4468,22 @@ let rv_node_box_quad (node: nativeint, box: int, ``to``: nativeint, toSpace: int
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_node_box_quad (node, box, ``to``, toSpace, &quad)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[237] <- Calls.Counts[237] + 1L
-        Calls.Ticks[237] <- Calls.Ticks[237] + spent
+        Calls.Counts[245] <- Calls.Counts[245] + 1L
+        Calls.Ticks[245] <- Calls.Ticks[245] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
         Raw.rv_node_box_quad (node, box, ``to``, toSpace, &quad)
 
-let rv_host_inspect_cascade (host: nativeint, element: nativeint, property: byte[], property_length: int, diagnostic: nativeint[]) : int =
+let rv_host_inspect_cascade
+    (host: nativeint, element: nativeint, property: byte[], property_length: int, diagnostic: nativeint[])
+    : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_host_inspect_cascade (host, element, property, property_length, diagnostic)
+
+        let result =
+            Raw.rv_host_inspect_cascade (host, element, property, property_length, diagnostic)
+
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[246] <- Calls.Counts[246] + 1L
         Calls.Ticks[246] <- Calls.Ticks[246] + spent
@@ -4419,6 +4491,110 @@ let rv_host_inspect_cascade (host: nativeint, element: nativeint, property: byte
         result
     else
         Raw.rv_host_inspect_cascade (host, element, property, property_length, diagnostic)
+
+let rv_host_set_notification_presenter (host: nativeint, presenter: nativeint, context: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_set_notification_presenter (host, presenter, context)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[247] <- Calls.Counts[247] + 1L
+        Calls.Ticks[247] <- Calls.Ticks[247] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_set_notification_presenter (host, presenter, context)
+
+let rv_host_set_notification_permission (host: nativeint, permission: int) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_set_notification_permission (host, permission)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[248] <- Calls.Counts[248] + 1L
+        Calls.Ticks[248] <- Calls.Ticks[248] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_set_notification_permission (host, permission)
+
+let rv_host_notification_permission (host: nativeint, permission: byref<int>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_notification_permission (host, &permission)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[249] <- Calls.Counts[249] + 1L
+        Calls.Ticks[249] <- Calls.Ticks[249] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_notification_permission (host, &permission)
+
+let rv_notification_create
+    (host: nativeint, title: byte[], title_length: int, options: byref<NotificationOptions>, notification: nativeint[])
+    : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+
+        let result =
+            Raw.rv_notification_create (host, title, title_length, &options, notification)
+
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[250] <- Calls.Counts[250] + 1L
+        Calls.Ticks[250] <- Calls.Ticks[250] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_notification_create (host, title, title_length, &options, notification)
+
+let rv_notification_close (notification: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_notification_close (notification)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[251] <- Calls.Counts[251] + 1L
+        Calls.Ticks[251] <- Calls.Ticks[251] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_notification_close (notification)
+
+let rv_notification_report (notification: nativeint, ``event``: int) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_notification_report (notification, ``event``)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[252] <- Calls.Counts[252] + 1L
+        Calls.Ticks[252] <- Calls.Ticks[252] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_notification_report (notification, ``event``)
+
+let rv_notification_string (notification: nativeint, field: int, buffer: byte[], capacity: int, length: int[]) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+
+        let result =
+            Raw.rv_notification_string (notification, field, buffer, capacity, length)
+
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[253] <- Calls.Counts[253] + 1L
+        Calls.Ticks[253] <- Calls.Ticks[253] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_notification_string (notification, field, buffer, capacity, length)
+
+let rv_notification_flags (notification: nativeint, dir: byref<int>, silent: byref<int>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_notification_flags (notification, &dir, &silent)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[254] <- Calls.Counts[254] + 1L
+        Calls.Ticks[254] <- Calls.Ticks[254] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_notification_flags (notification, &dir, &silent)
 
 // END GENERATED
 

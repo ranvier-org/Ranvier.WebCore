@@ -6,6 +6,7 @@
 #include "RanvierEventGlue.h"
 #include "RanvierViewportGlue.h"
 #include "RanvierInspectGlue.h"
+#include "RanvierNotificationGlue.h"
 #include <atomic>
 #include <string>
 #include <vector>
@@ -713,6 +714,9 @@ struct RvHost {
     void* resourceContext { nullptr };
     RvFormSubmissionHandler formSubmissionHandler { nullptr };
     void* formSubmissionContext { nullptr };
+    RvNotificationPresenter notificationPresenter { nullptr };
+    void* notificationContext { nullptr };
+    int32_t notificationPermission { RV_NOTIFICATION_DEFAULT };
 #if RANVIER_COMPOSITING
     // rv_host_create sets RV_COMPOSITING_WHEN_NEEDED.
     int32_t compositingMode { RV_COMPOSITING_OFF };
@@ -1317,6 +1321,8 @@ static_assert(sizeof(void*) != 8 || (sizeof(RvEventInit) == 112 && offsetof(RvEv
 static_assert(sizeof(RvScreenMetrics) == 36 && offsetof(RvScreenMetrics, avail_left) == 12 && offsetof(RvScreenMetrics, orientation) == 32);
 
 
+static_assert(sizeof(void*) != 8 || (sizeof(RvNotificationOptions) == 64 && offsetof(RvNotificationOptions, reserved) == 28
+    && offsetof(RvNotificationOptions, body) == 32 && offsetof(RvNotificationOptions, icon) == 56));
 static_assert(sizeof(RvWindowMetrics) == 32 && offsetof(RvWindowMetrics, outerHeight) == 16 && offsetof(RvWindowMetrics, devicePixelRatio) == 24);
 
 int32_t rv_abi_version(void) { return 54; }
@@ -1366,6 +1372,8 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "diagnostics"))
         return 1;
     if (!std::strcmp(feature, "cascade-diagnostics"))
+        return 1;
+    if (!std::strcmp(feature, "notifications"))
         return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "accessibility-uia"))
@@ -1679,6 +1687,7 @@ RvHost* rv_host_create(int32_t width, int32_t height)
     static PlatformDisplayID nextDisplayID = 0x52560000;
     host->displayID = ++nextDisplayID;
     ranvier_page_set_display(reinterpret_cast<RvNode*>(&host->document()), host->displayID);
+    ranvier_notifications_attach(reinterpret_cast<RvNode*>(&host->document()));
     host->noScript.emplace(host->document().vm());
 #if RANVIER_COMPOSITING
     applyCompositingMode(*host, RV_COMPOSITING_WHEN_NEEDED);
@@ -1736,6 +1745,7 @@ void rv_host_destroy(RvHost* host)
         return;
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
+    ranvier_notifications_drop(reinterpret_cast<RvNode*>(&host->document()));
     rv_host_detach_uia(host);
     rv_host_set_accelerated_compositing(host, RV_COMPOSITING_OFF);
     host->noScript.reset();
@@ -3027,6 +3037,21 @@ void rv_collect_garbage_eden(void)
         commonVM().heap.collectNow(JSC::Sync, JSC::CollectionScope::Eden);
 }
 
+// Hands each live host's queued notification requests to its presenter; a host without one drops them. A presenter
+// may destroy any host, so each host is looked up again before its next request.
+static void deliverNotificationRequests()
+{
+    for (auto* host : Vector<RvHost*> { liveHosts }) {
+        int32_t request = 0;
+        RvEventTarget* target = nullptr;
+        while (liveHosts.contains(host) && ranvier_notifications_take(reinterpret_cast<RvNode*>(&host->document()), &request, &target)) {
+            if (auto presenter = host->notificationPresenter)
+                presenter(host->notificationContext, host, target, request);
+            rv_event_target_release(target);
+        }
+    }
+}
+
 int32_t rv_run_loop_cycle(int32_t milliseconds)
 {
     if (milliseconds < 0)
@@ -3038,6 +3063,7 @@ int32_t rv_run_loop_cycle(int32_t milliseconds)
     do {
         RunLoop::cycle();
         ++cycles;
+        deliverNotificationRequests();
         if (MonotonicTime::now() < deadline)
             WTF::sleep(1_ms);
     } while (MonotonicTime::now() < deadline);
@@ -3111,6 +3137,85 @@ int32_t rv_host_set_form_submission_handler(RvHost* host, RvFormSubmissionHandle
     host->formSubmissionHandler = handler;
     host->formSubmissionContext = handler ? context : nullptr;
     return RV_OK;
+}
+
+int32_t rv_host_set_notification_presenter(RvHost* host, RvNotificationPresenter presenter, void* context)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    host->notificationPresenter = presenter;
+    host->notificationContext = presenter ? context : nullptr;
+    ranvier_notifications_configure(reinterpret_cast<RvNode*>(&host->document()), host->notificationPermission, !!presenter);
+    return RV_OK;
+}
+
+int32_t rv_host_set_notification_permission(RvHost* host, int32_t permission)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (permission < RV_NOTIFICATION_DEFAULT || permission > RV_NOTIFICATION_GRANTED)
+        return RV_ERR_UNSUPPORTED;
+    host->notificationPermission = permission;
+    ranvier_notifications_configure(reinterpret_cast<RvNode*>(&host->document()), permission, !!host->notificationPresenter);
+    return RV_OK;
+}
+
+int32_t rv_host_notification_permission(RvHost* host, int32_t* permission)
+{
+    if (!host || !permission)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_notifications_permission(reinterpret_cast<RvNode*>(&host->document()), permission);
+}
+
+int32_t rv_notification_create(RvHost* host, const uint8_t* title, int32_t title_length, const RvNotificationOptions* options, RvEventTarget** notification)
+{
+    if (!host || !notification)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_notification_create(reinterpret_cast<RvNode*>(&host->document()), title, title_length, options, notification);
+}
+
+int32_t rv_notification_close(RvEventTarget* notification)
+{
+    if (!notification)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_notification_close(notification);
+}
+
+int32_t rv_notification_report(RvEventTarget* notification, int32_t event)
+{
+    if (!notification)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_notification_report(notification, event);
+}
+
+int32_t rv_notification_string(RvEventTarget* notification, int32_t field, uint8_t* buffer, int32_t capacity, int32_t* length)
+{
+    if (!notification || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_notification_string(notification, field, buffer, capacity, length);
+}
+
+int32_t rv_notification_flags(RvEventTarget* notification, int32_t* dir, int32_t* silent)
+{
+    if (!notification || !dir || !silent)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_notification_flags(notification, dir, silent);
 }
 
 int32_t rv_host_set_resource_handler(RvHost* host, RvResourceHandler handler, void* context)
