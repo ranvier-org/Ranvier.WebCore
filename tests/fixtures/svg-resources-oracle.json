@@ -370,8 +370,5 @@
     "image.networkErrorPaint": "native paints the WebCore broken-image placeholder; Chromium paints nothing",
     "image.brokenBytesPaint": "same placeholder for undecodable bytes",
     "switch.attribute": "SVGStringList.clear leaves systemLanguage=\"\" natively; Chromium removes the attribute; both keep the switch fallback"
-  },
-  "pendingSourceFix": {
-    "use.symbolViewBoxPaint": "SVGSymbolElement viewBox edits do not invalidate use instances (proposed Source 0030)"
   }
 }

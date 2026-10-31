@@ -60,19 +60,19 @@ def verify(native_directory):
             else:
                 base=p.property('svg_animated_preserve_aspect_ratio',target,'base_val','svg_preserve_aspect_ratio')
                 p.call('rv_dom_svg_preserve_aspect_ratio_set_align',[p.pointer,p.short],base,value['align'])
+        def equivalent_serialization(got, want):
+            left,right=re.split(r'[ ,]+',got),re.split(r'[ ,]+',want)
+            try:
+                numbers=[float(x.rstrip('%')) for x in left],[float(x.rstrip('%')) for x in right]
+            except ValueError:
+                return False
+            return (len(left)==len(right) and all(abs(a-b)<=0.001 for a,b in zip(*numbers))
+                    and [x.endswith('%') for x in left]==[x.endswith('%') for x in right])
         def compare_attributes(actual, expected, label):
             p.expect(actual.keys()==expected.keys(),label+' attribute names: '+str((actual,expected)))
             for name,want in expected.items():
                 got=actual[name]
-                if got==want:
-                    p.expect(True,label+' '+name)
-                    continue
-                left,right=re.split(r'[ ,]+',got),re.split(r'[ ,]+',want)
-                try:
-                    p.close([float(x.rstrip('%')) for x in left],[float(x.rstrip('%')) for x in right],label+' '+name,tolerance=0.001)
-                    p.expect([x.endswith('%') for x in left]==[x.endswith('%') for x in right],label+' units '+name)
-                except ValueError:
-                    p.expect(False,label+' '+name+': '+repr((got,want)))
+                p.expect(got==want or equivalent_serialization(got,want),label+' '+name+': '+repr((got,want)))
         for row in oracle['rows']:
             target = node(row['id'])
             root = row['root']
