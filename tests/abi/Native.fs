@@ -312,6 +312,9 @@ module Calls =
             "rv_media_query_media"
             "rv_blob_read_bytes"
             "rv_file_list_create"
+            "rv_host_set_page_scale"
+            "rv_host_page_scale"
+            "rv_host_set_obscured_insets"
         |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
@@ -1150,6 +1153,15 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_file_list_create([<In>] nativeint[] files, int count, nativeint[] result)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_set_page_scale(nativeint host, float scale, int originX, int originY)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_page_scale(nativeint host, double& scale)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_set_obscured_insets(nativeint host, float top, float right, float bottom, float left)
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -3840,6 +3852,42 @@ let rv_file_list_create (files: nativeint[], count: int, result: nativeint[]) : 
         result
     else
         Raw.rv_file_list_create (files, count, result)
+
+let rv_host_set_page_scale (host: nativeint, scale: float, originX: int, originY: int) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_set_page_scale (host, scale, originX, originY)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[216] <- Calls.Counts[216] + 1L
+        Calls.Ticks[216] <- Calls.Ticks[216] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_set_page_scale (host, scale, originX, originY)
+
+let rv_host_page_scale (host: nativeint, scale: byref<double>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_page_scale (host, &scale)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[217] <- Calls.Counts[217] + 1L
+        Calls.Ticks[217] <- Calls.Ticks[217] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_page_scale (host, &scale)
+
+let rv_host_set_obscured_insets (host: nativeint, top: float, right: float, bottom: float, left: float) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_set_obscured_insets (host, top, right, bottom, left)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[218] <- Calls.Counts[218] + 1L
+        Calls.Ticks[218] <- Calls.Ticks[218] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_set_obscured_insets (host, top, right, bottom, left)
 
 // END GENERATED
 
