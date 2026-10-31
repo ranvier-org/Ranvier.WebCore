@@ -38,7 +38,7 @@ class PatternOptions(ctypes.Structure):
 
 
 class Strings(ctypes.Structure):
-    _fields_ = [('present', integer), ('count', integer), ('items', ctypes.POINTER(ctypes.c_char_p))]
+    _fields_ = [('present', integer), ('count', integer), ('items', ctypes.POINTER(Span))]
 
 
 class StringSequences(ctypes.Structure):
@@ -165,7 +165,7 @@ def verify(native_directory, record=None):
     release_pattern = bind('rv_dom_url_pattern_release', [pointer], None)
     release_result = bind('rv_dom_url_pattern_result_release', [ctypes.POINTER(PatternResult)], None)
     release_pairs = bind('rv_dom_sequence_pair_usv_string_and_usv_string_release', [ctypes.POINTER(Pairs)], None)
-    release_strings = bind('rv_dom_sequence_usv_string_release', [ctypes.POINTER(Strings)], None)
+    release_strings = bind('rv_dom_sequence_usv_string_utf8_release', [ctypes.POINTER(Strings)], None)
     url_args = [pointer, pointer, integer, pointer, integer, ctypes.POINTER(pointer)]
     create_url = bind('rv_dom_domurl_create', url_args)
     parse_url = bind('rv_dom_domurl_parse', url_args)
@@ -234,7 +234,7 @@ def verify(native_directory, record=None):
             else:
                 rows = []
                 for row in value:
-                    strings = (ctypes.c_char_p * len(row))(*[item.encode('utf-8') for item in row])
+                    strings = (Span * len(row))(*[span_struct(item) for item in row])
                     keep.append(strings)
                     rows.append(Strings(1, len(row), strings))
                 items = (Strings * len(rows))(*rows)
@@ -261,7 +261,7 @@ def verify(native_directory, record=None):
                 result = Strings()
                 expect(bind('rv_dom_url_search_params_get_all', [pointer, pointer, integer, ctypes.POINTER(Strings)])(
                     params, *span(args[0]), ctypes.byref(result)) == 0, 'getAll status')
-                values = [result.items[i].decode('utf-8') for i in range(result.count)]
+                values = [read_span(result.items[i]) for i in range(result.count)]
                 release_strings(ctypes.byref(result))
                 return values
             if op == 'has':

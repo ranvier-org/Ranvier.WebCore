@@ -4,9 +4,9 @@ CANDIDATE = sys.argv[1]
 
 repo = Path('C:/wk/native-url')
 candidate = repo / 'artifacts' / CANDIDATE / 'runtime'
-freeze = repo / 'artifacts/native33-frozen'
+freeze = repo / 'artifacts' / ('native33-frozen' + (sys.argv[2] if len(sys.argv) > 2 else ''))
 runtime = freeze / 'runtimes/win-x64/native'
-out = repo / 'artifacts/native33-batch'
+out = repo / 'artifacts' / ('native33-batch' + (sys.argv[2] if len(sys.argv) > 2 else ''))
 out.mkdir(parents=True, exist_ok=True)
 names = ['brotlicommon.dll', 'brotlidec.dll', 'harfbuzz-icu.dll', 'harfbuzz.dll', 'icudt77.dll', 'icuin77.dll', 'icuuc77.dll', 'JavaScriptCore.dll',
          'jpeg62.dll', 'libpng16.dll', 'libsharpyuv.dll', 'libwebp.dll', 'libwebpdemux.dll', 'libwebpmux.dll', 'libxml2.dll', 'RanvierWebCoreHost.dll',
@@ -19,6 +19,8 @@ def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+# The capability catalogue must match the header before any probe runs.
+subprocess.run([sys.executable, '-I', str(repo / 'scripts/capability_catalogue.py'), '--check'], cwd=repo, check=True)
 head = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=repo, capture_output=True, text=True, check=True).stdout.strip()
 if not (freeze / 'runtime-receipt.json').exists():
     for name in names:
@@ -92,7 +94,7 @@ for name, expected in probes:
         arguments += ['--abi', '41']
     run(name, arguments, expected)
 
-driver = repo / 'artifacts/native33-driver'
+driver = repo / 'artifacts' / ('native33-driver' + (sys.argv[2] if len(sys.argv) > 2 else ''))
 assert (driver / 'RanvierWebCoreAbi.Driver.dll').exists(), 'build the driver from the merged tree first'
 for entry in receipt['shippingFiles']:
     destination = driver / entry['name']

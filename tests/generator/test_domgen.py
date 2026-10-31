@@ -1715,6 +1715,28 @@ interface Matcher { boolean test(optional (USVString or PartInit) input = {}, op
         self.assertNotIn('abstract member test: ?baseURL: string -> bool', contract)
         self.assertIn('this.__ranvier_test (?input = None, ?baseURL = None)', contract)
 
+    def test_sequence_string_spans_keep_byte_lengths_under_a_distinct_name(self):
+        idl = '''
+interface Params {
+    constructor(optional (sequence<sequence<USVString>> or USVString) init = "");
+    sequence<USVString> getAll(USVString name);
+};
+interface Other { sequence<USVString> names(); };
+'''
+        generator = self.value_object_generator(idl, ['Params', 'Other'], sequenceStringSpans=['Params'],
+            constructors={'Params': {'receiver': 'Document', 'factory': 'Params::create', 'passReceiver': False,
+                                     'stringInputs': 'utf8-lengths'}})
+        get_all = next(item for item in generator.functions if item.name == 'params_get_all')
+        names = next(item for item in generator.functions if item.name == 'other_names')
+        self.assertEqual('RvDomSequenceUSVStringUtf8', get_all.returns.ctype)
+        self.assertTrue(get_all.returns.subtypes[0].string_spans)
+        self.assertEqual('RvDomSequenceUSVString', names.returns.ctype)
+        self.assertFalse(names.returns.subtypes[0].string_spans)
+        create = next(item for item in generator.functions if item.name == 'params_create')
+        self.assertEqual('RvDomSequenceSequenceOfUSVStringUtf8', create.arguments[0][1].subtypes[0].ctype)
+        header = generator.header()
+        self.assertIn('RvDomUtf8StringSpan* items;', header.split('struct RvDomSequenceUSVStringUtf8 {')[1].split('};')[0])
+
     def test_unconfigured_dictionary_results_stay_left_out(self):
         generator = self.value_object_generator(self.dictionary_result_idl(), ['Matcher'])
         excluded = dict(generator.excluded)
