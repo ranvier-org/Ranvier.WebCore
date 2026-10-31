@@ -686,7 +686,8 @@
     "CanvasGradient",
     "CanvasPattern",
     "ImageData",
-    "ImageBitmap"
+    "ImageBitmap",
+    "ImageBitmapRenderingContext"
   ],
   "skipDirectories": [
     "Modules/",
@@ -1162,7 +1163,15 @@
     ],
     "CanvasGradient": [],
     "CanvasPattern": [],
-    "ImageBitmap": [],
+    "ImageBitmap": [
+      "width",
+      "height",
+      "close"
+    ],
+    "ImageBitmapRenderingContext": [
+      "canvas",
+      "transferFromImageBitmap"
+    ],
     "ImageData": [
       "width",
       "height",

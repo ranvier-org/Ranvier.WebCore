@@ -158,6 +158,8 @@ WEBCORE_EXPORT void ranvier_dom_image_data_release(RvImageData*);
 WEBCORE_EXPORT RvImageData* ranvier_dom_image_data_retain(RvImageData*);
 WEBCORE_EXPORT void ranvier_dom_image_bitmap_release(RvImageBitmap*);
 WEBCORE_EXPORT RvImageBitmap* ranvier_dom_image_bitmap_retain(RvImageBitmap*);
+WEBCORE_EXPORT void ranvier_dom_image_bitmap_rendering_context_release(RvImageBitmapRenderingContext*);
+WEBCORE_EXPORT RvImageBitmapRenderingContext* ranvier_dom_image_bitmap_rendering_context_retain(RvImageBitmapRenderingContext*);
 WEBCORE_EXPORT void ranvier_dom_union_node_or_dom_string_release(RvDomUnionNodeOrDOMString* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_node_or_dom_string_release(RvDomSequenceNodeOrDOMString* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_css_style_sheet_release(RvDomSequenceCSSStyleSheet* value);
@@ -212,6 +214,7 @@ WEBCORE_EXPORT void ranvier_dom_sequence_pair_usv_string_and_union_undefined_or_
 WEBCORE_EXPORT void ranvier_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange* value);
 WEBCORE_EXPORT void ranvier_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release(RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* value);
 WEBCORE_EXPORT void ranvier_dom_union_html_image_element_or_html_canvas_element_or_svg_image_element_or_image_bitmap_or_css_style_image_value_release(RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* value);
+WEBCORE_EXPORT void ranvier_dom_union_html_canvas_element_release(RvDomUnionHTMLCanvasElement* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value);
 WEBCORE_EXPORT void ranvier_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* value);
@@ -2876,6 +2879,11 @@ WEBCORE_EXPORT int32_t ranvier_dom_canvas_rendering_context2_d_put_image_data_3(
 WEBCORE_EXPORT int32_t ranvier_dom_canvas_rendering_context2_d_put_image_data_7(RvCanvasRenderingContext2D* target, RvImageData* imagedata, int32_t dx, int32_t dy, int32_t dirty_x, int32_t dirty_y, int32_t dirty_width, int32_t dirty_height);
 WEBCORE_EXPORT int32_t ranvier_dom_image_data_get_width(RvImageData* target, uint32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_image_data_get_height(RvImageData* target, uint32_t* result);
+WEBCORE_EXPORT int32_t ranvier_dom_image_bitmap_get_width(RvImageBitmap* target, uint32_t* result);
+WEBCORE_EXPORT int32_t ranvier_dom_image_bitmap_get_height(RvImageBitmap* target, uint32_t* result);
+WEBCORE_EXPORT int32_t ranvier_dom_image_bitmap_close(RvImageBitmap* target);
+WEBCORE_EXPORT int32_t ranvier_dom_image_bitmap_rendering_context_get_canvas(RvImageBitmapRenderingContext* target, RvDomUnionHTMLCanvasElement* result);
+WEBCORE_EXPORT int32_t ranvier_dom_image_bitmap_rendering_context_transfer_from_image_bitmap(RvImageBitmapRenderingContext* target, RvImageBitmap* bitmap);
 WEBCORE_EXPORT int32_t ranvier_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_css_supports_1(RvNode* target, const uint8_t* condition_text, int32_t condition_text_length, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_css_get_highlights(RvNode* target, RvHighlightRegistry** result);

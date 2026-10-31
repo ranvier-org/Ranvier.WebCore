@@ -1977,6 +1977,92 @@ RV_EXPORT int32_t rv_image_data_read(RvImageData* data, int64_t offset, uint8_t*
  * and returns RV_ERR_DOM_EXCEPTION with a RangeError; detached data returns an InvalidStateError. */
 RV_EXPORT int32_t rv_image_data_write(RvImageData* data, int64_t offset, const uint8_t* bytes, int64_t length);
 
+/* v55: "canvas-export" for rv_abi_has: HTMLCanvasElement.toBlob and toDataURL through the shared RV_IMAGE_ENCODING_*
+ * encoders, and the bitmaprenderer context. RanvierWebCoreDom.h holds the generated ImageBitmapRenderingContext and
+ * ImageBitmap members. encoding is PNG, JPEG or WEBP and quality follows the RV_IMAGE_ENCODING_* contract. An encoding
+ * the engine cannot encode on this flavor, RGBA8 and an unknown value return RV_ERR_UNSUPPORTED: a browser falls back
+ * to PNG instead. A canvas whose origin is not clean returns RV_ERR_DOM_EXCEPTION with a SecurityError, and an encoder
+ * failure an EncodingError. Each returns RV_ERR_WRONG_INTERFACE for a node that is not a <canvas>. */
+typedef struct RvImageBitmap RvImageBitmap;
+typedef struct RvImageBitmapRenderingContext RvImageBitmapRenderingContext;
+
+/* The encoded bytes of the canvas bitmap, the bytes toBlob's Blob holds. A zero-size canvas has none: RV_OK with
+ * *length 0. Capacity, a NULL buffer and RV_ERR_BUFFER_TOO_SMALL follow rv_blob_read_bytes. */
+RV_EXPORT int32_t rv_canvas_encode(RvNode* canvas, int32_t encoding, double quality, uint8_t* buffer, int64_t capacity, int64_t* length);
+/* HTMLCanvasElement.toDataURL: "data:<type>;base64,<bytes>", or "data:," for a zero-size canvas, as ASCII without a
+ * terminating NUL. A capacity below the length copies nothing and returns RV_ERR_BUFFER_TOO_SMALL with the length in
+ * *length; buffer may be NULL for capacity 0. */
+RV_EXPORT int32_t rv_canvas_to_data_url(RvNode* canvas, int32_t encoding, double quality, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLCanvasElement.toBlob, during the call: *blob is a new Blob of the encoded bytes with the encoding's type, or
+ * NULL for a zero-size canvas. */
+RV_EXPORT int32_t rv_canvas_to_blob(RvNode* canvas, int32_t encoding, double quality, RvBlob** blob);
+/* getContext("bitmaprenderer"): *context is a new reference to the canvas's one bitmaprenderer context, created on the
+ * first call. RV_OK with *context NULL means the canvas already has a context of another type. */
+RV_EXPORT int32_t rv_canvas_get_bitmap_context(RvNode* canvas, RvImageBitmapRenderingContext** context);
+
+/* v55: "image-bitmaps" for rv_abi_has: createImageBitmap without JavaScript. */
+enum {
+    RV_IMAGE_BITMAP_SOURCE_NODE = 0, /* RvNode*: an <img>, an SVG <image> or a <canvas> */
+    RV_IMAGE_BITMAP_SOURCE_BITMAP = 1, /* RvImageBitmap* */
+    RV_IMAGE_BITMAP_SOURCE_IMAGE_DATA = 2, /* RvImageData* */
+    RV_IMAGE_BITMAP_SOURCE_BLOB = 3, /* RvBlob* */
+};
+enum {
+    RV_IMAGE_BITMAP_ORIENTATION_FROM_IMAGE = 0,
+    RV_IMAGE_BITMAP_ORIENTATION_FLIP_Y = 1,
+    RV_IMAGE_BITMAP_ORIENTATION_NONE = 2,
+};
+enum {
+    RV_IMAGE_BITMAP_PREMULTIPLY_NONE = 0,
+    RV_IMAGE_BITMAP_PREMULTIPLY_PREMULTIPLY = 1,
+    RV_IMAGE_BITMAP_PREMULTIPLY_DEFAULT = 2,
+};
+enum {
+    RV_IMAGE_BITMAP_COLOR_SPACE_CONVERSION_NONE = 0,
+    RV_IMAGE_BITMAP_COLOR_SPACE_CONVERSION_DEFAULT = 1,
+};
+enum {
+    RV_IMAGE_BITMAP_RESIZE_PIXELATED = 0,
+    RV_IMAGE_BITMAP_RESIZE_LOW = 1,
+    RV_IMAGE_BITMAP_RESIZE_MEDIUM = 2,
+    RV_IMAGE_BITMAP_RESIZE_HIGH = 3,
+};
+
+/* ImageBitmapOptions, and the source rectangle of createImageBitmap(image, sx, sy, sw, sh) when crop is 1. size is
+ * sizeof(RvImageBitmapOptions). resizeWidth and resizeHeight are 0 when absent. The defaults are from-image, default,
+ * default, no resize and low. */
+typedef struct RvImageBitmapOptions {
+    int32_t size;
+    int32_t crop;
+    int32_t sx;
+    int32_t sy;
+    int32_t sw;
+    int32_t sh;
+    int32_t imageOrientation;
+    int32_t premultiplyAlpha;
+    int32_t colorSpaceConversion;
+    uint32_t resizeWidth;
+    uint32_t resizeHeight;
+    int32_t resizeQuality;
+} RvImageBitmapOptions;
+
+/* createImageBitmap(source, options) in the host's current document. kind is an RV_IMAGE_BITMAP_SOURCE_* value and
+ * source the handle of that kind; a handle of another kind, or a node that is no <img>, SVG <image> or <canvas>,
+ * returns RV_ERR_UNSUPPORTED. options may be NULL for the defaults, and an option value outside its enumeration or a
+ * size below sizeof(RvImageBitmapOptions) returns RV_ERR_UNSUPPORTED. The completion runs on a later
+ * rv_run_loop_cycle, or in rv_resource_cancel/rv_resource_release, as for rv_image_decode: SUCCEEDED with the bitmap's
+ * size, the bitmap available from rv_image_bitmap_result, or DECODE_FAILED with the DOMException name from
+ * rv_image_bitmap_error, such as "InvalidStateError" for an undecodable blob or a closed bitmap and "RangeError" for a
+ * crop with a zero sw or sh. */
+RV_EXPORT int32_t rv_image_bitmap_create(RvHost*, int32_t kind, void* source, const RvImageBitmapOptions* options,
+    RvResourceCompletion completion, void* context, uint64_t* operation);
+/* The bitmap of a SUCCEEDED rv_image_bitmap_create as a new reference, until rv_resource_release. RV_ERR_UNSUPPORTED
+ * for another operation or outcome. */
+RV_EXPORT int32_t rv_image_bitmap_result(uint64_t operation, RvImageBitmap** bitmap);
+/* The DOMException name of a DECODE_FAILED rv_image_bitmap_create, until rv_resource_release; capacity follows
+ * rv_last_exception. RV_ERR_UNSUPPORTED for another operation or outcome. */
+RV_EXPORT int32_t rv_image_bitmap_error(uint64_t operation, char* buffer, int32_t capacity, int32_t* length);
+
 #ifdef __cplusplus
 }
 #endif

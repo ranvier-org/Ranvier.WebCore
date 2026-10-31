@@ -1,0 +1,41 @@
+diff --git a/Source/WebCore/html/ImageBitmap.cpp b/Source/WebCore/html/ImageBitmap.cpp
+--- a/Source/WebCore/html/ImageBitmap.cpp
++++ b/Source/WebCore/html/ImageBitmap.cpp
+@@ -226,6 +226,25 @@
+     );
+ }
+ 
++void ImageBitmap::createCompletionHandler(ScriptExecutionContext& scriptExecutionContext, ImageBitmap::Source&& source, ImageBitmapOptions&& options, int sx, int sy, int sw, int sh, ImageBitmapCompletionHandler&& completionHandler)
++{
++    if (!sw || !sh) {
++        completionHandler(Exception { ExceptionCode::RangeError, "Cannot create ImageBitmap with a width or height of 0"_s });
++        return;
++    }
++
++    auto left = sw >= 0 ? sx : sx + sw;
++    auto top = sh >= 0 ? sy : sy + sh;
++    auto width = std::abs(sw);
++    auto height = std::abs(sh);
++
++    WTF::switchOn(WTF::move(source),
++        [&](auto&& specificSource) {
++            createCompletionHandler(scriptExecutionContext, WTF::move(specificSource), WTF::move(options), IntRect { left, top, width, height }, WTF::move(completionHandler));
++        }
++    );
++}
++
+ static bool taintsOrigin(CachedImage& cachedImage)
+ {
+     RefPtr image = cachedImage.image();
+diff --git a/Source/WebCore/html/ImageBitmap.h b/Source/WebCore/html/ImageBitmap.h
+--- a/Source/WebCore/html/ImageBitmap.h
++++ b/Source/WebCore/html/ImageBitmap.h
+@@ -116,6 +116,8 @@
+ 
+     static void createPromise(ScriptExecutionContext&, Source&&, ImageBitmapOptions&&, Promise&&);
+     static void createPromise(ScriptExecutionContext&, Source&&, ImageBitmapOptions&&, int sx, int sy, int sw, int sh, Promise&&);
++    // createImageBitmap(image, sx, sy, sw, sh, options) for an embedder without a JavaScript promise.
++    WEBCORE_EXPORT static void createCompletionHandler(ScriptExecutionContext&, Source&&, ImageBitmapOptions&&, int sx, int sy, int sw, int sh, ImageBitmapCompletionHandler&&);
+ 
+     static RefPtr<ImageBuffer> createImageBuffer(ScriptExecutionContext&, const FloatSize&, RenderingMode, DestinationColorSpace, float resolutionScale = 1);
+     static RefPtr<ImageBuffer> createImageBuffer(ScriptExecutionContext&, const FloatSize&, DestinationColorSpace, float resolutionScale = 1);

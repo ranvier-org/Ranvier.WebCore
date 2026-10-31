@@ -40,3 +40,5 @@
 0039-element-array-attribute-empty-relations.patch
 0042-canvas-renders-embedder-context.patch
 0043-media-capabilities-native-query.patch
+0049-image-bitmap-crop-completion-handler.patch
+0050-image-bitmap-unaccelerated-buffers.patch

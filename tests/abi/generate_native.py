@@ -122,6 +122,8 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
         return "nativeint", ""
     if ctype == "const RvCanvas2DSettings*":
         return "nativeint", ""
+    if ctype == "const RvImageBitmapOptions*":
+        return "nativeint", ""
     if ctype == "const RvEventInit*":
         return "EventInit&", ""
     if ctype == "const uint16_t*":

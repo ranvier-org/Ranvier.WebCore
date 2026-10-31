@@ -1588,6 +1588,10 @@
     {
       "name": "ImageBitmap",
       "base": null
+    },
+    {
+      "name": "ImageBitmapRenderingContext",
+      "base": null
     }
   ],
   "contractInterfaces": [
@@ -4234,6 +4238,15 @@
       "mixin": false,
       "contractOnly": false,
       "source": "html/ImageBitmap.idl"
+    },
+    {
+      "name": "ImageBitmapRenderingContext",
+      "idlName": "ImageBitmapRenderingContext",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/canvas/ImageBitmapRenderingContext.idl"
     },
     {
       "name": "HTMLUnknownElement",
@@ -149019,6 +149032,228 @@
       }
     },
     {
+      "interface": "ImageBitmap",
+      "member": "width",
+      "contractOwner": "ImageBitmap",
+      "kind": "getter",
+      "function": "rv_dom_image_bitmap_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvImageBitmap*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "ImageBitmap",
+      "member": "height",
+      "contractOwner": "ImageBitmap",
+      "kind": "getter",
+      "function": "rv_dom_image_bitmap_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvImageBitmap*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "ImageBitmap",
+      "member": "close",
+      "contractOwner": "ImageBitmap",
+      "kind": "operation",
+      "function": "rv_dom_image_bitmap_close",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvImageBitmap*",
+          "name": "target"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "ImageBitmapRenderingContext",
+      "member": "canvas",
+      "contractOwner": "ImageBitmapRenderingContext",
+      "kind": "getter",
+      "function": "rv_dom_image_bitmap_rendering_context_get_canvas",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvImageBitmapRenderingContext*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomUnionHTMLCanvasElement*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "union",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "HTMLCanvasElement",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "union",
+        "ctype": "RvDomUnionHTMLCanvasElement",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "HTMLCanvasElement",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "node",
+            "ctype": null,
+            "interface": "HTMLCanvasElement",
+            "root": null,
+            "class": "HTMLCanvasElement",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      }
+    },
+    {
+      "interface": "ImageBitmapRenderingContext",
+      "member": "transferFromImageBitmap",
+      "contractOwner": "ImageBitmapRenderingContext",
+      "kind": "operation",
+      "function": "rv_dom_image_bitmap_rendering_context_transfer_from_image_bitmap",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvImageBitmapRenderingContext*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvImageBitmap*",
+          "name": "bitmap"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "bitmap",
+          "idlType": "ImageBitmap?",
+          "idl": {
+            "name": "ImageBitmap",
+            "nullable": true,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "ImageBitmap",
+            "root": "ImageBitmap",
+            "class": "ImageBitmap",
+            "enum": null,
+            "label": null,
+            "nullable": true,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
       "interface": "DOMCSSNamespace",
       "member": "supports",
       "contractOwner": "CSS",
@@ -155329,6 +155564,34 @@
         ]
       },
       "releaseFunction": "rv_dom_union_html_image_element_or_html_canvas_element_or_svg_image_element_or_image_bitmap_or_css_style_image_value_release"
+    },
+    {
+      "mapping": {
+        "kind": "union",
+        "ctype": "RvDomUnionHTMLCanvasElement",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "HTMLCanvasElement",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "node",
+            "ctype": null,
+            "interface": "HTMLCanvasElement",
+            "root": null,
+            "class": "HTMLCanvasElement",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_html_canvas_element_release"
     },
     {
       "mapping": {

@@ -3,10 +3,12 @@
 #include "dom/RanvierDomGlue.h"
 #include "RanvierSvgViewGlue.h"
 #include "RanvierImageEncoding.h"
+#include <wtf/text/Base64.h>
 #include "RanvierResourceGlue.h"
 #include "RanvierEventGlue.h"
 #include "RanvierViewportGlue.h"
 #include "RanvierCanvasGlue.h"
+#include "RanvierCanvasExportGlue.h"
 #include "RanvierCanvasPixelsGlue.h"
 #include "RanvierInspectGlue.h"
 #include <atomic>
@@ -1373,6 +1375,10 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "canvas-context"))
         return 1;
     if (!std::strcmp(feature, "canvas-pixels"))
+        return 1;
+    if (!std::strcmp(feature, "canvas-export"))
+        return 1;
+    if (!std::strcmp(feature, "image-bitmaps"))
         return 1;
     if (!std::strcmp(feature, "cascade-diagnostics"))
         return 1;
@@ -6104,4 +6110,99 @@ int32_t rv_image_data_write(RvImageData* data, int64_t offset, const uint8_t* by
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     return ranvier_image_data_write(data, offset, bytes, length);
+}
+
+// The canvas's encoded bitmap for rv_canvas_encode, rv_canvas_to_data_url and rv_canvas_to_blob: RV_OK with empty bytes
+// for a zero-size canvas.
+static int32_t encodeCanvas(RvNode* canvas, int32_t encoding, double quality, Vector<uint8_t>& bytes)
+{
+    if (encoding == RV_IMAGE_ENCODING_RGBA8 || !Ranvier::Internal::imageEncodingSupported(encoding))
+        return RV_ERR_UNSUPPORTED;
+    RefPtr<ImageBuffer> buffer;
+    if (auto code = Ranvier::canvasExportBuffer(canvas, buffer))
+        return code;
+    if (!buffer)
+        return RV_OK;
+    bytes = Ranvier::Internal::encodeImage(WTF::move(buffer), encoding, quality);
+    if (bytes.isEmpty())
+        return fail(Exception { ExceptionCode::EncodingError });
+    return RV_OK;
+}
+
+int32_t rv_canvas_encode(RvNode* canvas, int32_t encoding, double quality, uint8_t* buffer, int64_t capacity, int64_t* length)
+{
+    if (!canvas || !length || capacity < 0 || (capacity && !buffer))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    Vector<uint8_t> bytes;
+    if (auto code = encodeCanvas(canvas, encoding, quality, bytes))
+        return code;
+    *length = static_cast<int64_t>(bytes.size());
+    if (capacity < *length)
+        return RV_ERR_BUFFER_TOO_SMALL;
+    if (!bytes.isEmpty())
+        std::memcpy(buffer, bytes.span().data(), bytes.size());
+    return RV_OK;
+}
+
+int32_t rv_canvas_to_data_url(RvNode* canvas, int32_t encoding, double quality, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!canvas || !length || capacity < 0 || (capacity && !buffer))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    Vector<uint8_t> bytes;
+    if (auto code = encodeCanvas(canvas, encoding, quality, bytes))
+        return code;
+    if (bytes.isEmpty())
+        return copyString("data:,"_s, buffer, capacity, length);
+    return copyString(makeString("data:"_s, Ranvier::Internal::imageEncodingMIMEType(encoding), ";base64,"_s, base64EncodeToString(bytes.span())), buffer, capacity, length);
+}
+
+int32_t rv_canvas_to_blob(RvNode* canvas, int32_t encoding, double quality, RvBlob** blob)
+{
+    if (!canvas || !blob)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    *blob = nullptr;
+    Vector<uint8_t> bytes;
+    if (auto code = encodeCanvas(canvas, encoding, quality, bytes))
+        return code;
+    if (bytes.isEmpty())
+        return RV_OK;
+    auto type = Ranvier::Internal::imageEncodingMIMEType(encoding).utf8();
+    return ranvier_canvas_create_blob(canvas, bytes.span().data(), static_cast<int64_t>(bytes.size()), type.data(), blob);
+}
+
+int32_t rv_canvas_get_bitmap_context(RvNode* canvas, RvImageBitmapRenderingContext** context)
+{
+    if (!canvas || !context)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_canvas_get_bitmap_context(canvas, context);
+}
+
+int32_t rv_image_bitmap_create(RvHost* host, int32_t kind, void* source, const RvImageBitmapOptions* options,
+    RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !source || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_image_bitmap_create(reinterpret_cast<RvNode*>(&host->document()), kind, source, options, completion, context, operation);
+}
+
+int32_t rv_image_bitmap_result(uint64_t operation, RvImageBitmap** bitmap)
+{
+    return ranvier_image_bitmap_result(operation, bitmap);
+}
+
+int32_t rv_image_bitmap_error(uint64_t operation, char* buffer, int32_t capacity, int32_t* length)
+{
+    return ranvier_image_bitmap_error(operation, buffer, capacity, length);
 }

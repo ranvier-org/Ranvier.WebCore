@@ -138,6 +138,8 @@ void rv_dom_image_data_release(RvImageData* handle) { ranvier_dom_image_data_rel
 RvImageData* rv_dom_image_data_retain(RvImageData* handle) { return ranvier_dom_image_data_retain(handle); }
 void rv_dom_image_bitmap_release(RvImageBitmap* handle) { ranvier_dom_image_bitmap_release(handle); }
 RvImageBitmap* rv_dom_image_bitmap_retain(RvImageBitmap* handle) { return ranvier_dom_image_bitmap_retain(handle); }
+void rv_dom_image_bitmap_rendering_context_release(RvImageBitmapRenderingContext* handle) { ranvier_dom_image_bitmap_rendering_context_release(handle); }
+RvImageBitmapRenderingContext* rv_dom_image_bitmap_rendering_context_retain(RvImageBitmapRenderingContext* handle) { return ranvier_dom_image_bitmap_rendering_context_retain(handle); }
 void rv_dom_union_node_or_dom_string_release(RvDomUnionNodeOrDOMString* value) { ranvier_dom_union_node_or_dom_string_release(value); }
 void rv_dom_sequence_node_or_dom_string_release(RvDomSequenceNodeOrDOMString* value) { ranvier_dom_sequence_node_or_dom_string_release(value); }
 void rv_dom_sequence_css_style_sheet_release(RvDomSequenceCSSStyleSheet* value) { ranvier_dom_sequence_css_style_sheet_release(value); }
@@ -192,6 +194,7 @@ void rv_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string_release(R
 void rv_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange* value) { ranvier_dom_sequence_abstract_range_release(value); }
 void rv_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release(RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* value) { ranvier_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release(value); }
 void rv_dom_union_html_image_element_or_html_canvas_element_or_svg_image_element_or_image_bitmap_or_css_style_image_value_release(RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* value) { ranvier_dom_union_html_image_element_or_html_canvas_element_or_svg_image_element_or_image_bitmap_or_css_style_image_value_release(value); }
+void rv_dom_union_html_canvas_element_release(RvDomUnionHTMLCanvasElement* value) { ranvier_dom_union_html_canvas_element_release(value); }
 void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value) { ranvier_dom_sequence_css_style_value_release(value); }
 void rv_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* value) { ranvier_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(value); }
 void rv_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* value) { ranvier_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(value); }
@@ -2856,6 +2859,11 @@ int32_t rv_dom_canvas_rendering_context2_d_put_image_data_3(RvCanvasRenderingCon
 int32_t rv_dom_canvas_rendering_context2_d_put_image_data_7(RvCanvasRenderingContext2D* target, RvImageData* imagedata, int32_t dx, int32_t dy, int32_t dirty_x, int32_t dirty_y, int32_t dirty_width, int32_t dirty_height) { return ranvier_dom_canvas_rendering_context2_d_put_image_data_7(target, imagedata, dx, dy, dirty_x, dirty_y, dirty_width, dirty_height); }
 int32_t rv_dom_image_data_get_width(RvImageData* target, uint32_t* result) { return ranvier_dom_image_data_get_width(target, result); }
 int32_t rv_dom_image_data_get_height(RvImageData* target, uint32_t* result) { return ranvier_dom_image_data_get_height(target, result); }
+int32_t rv_dom_image_bitmap_get_width(RvImageBitmap* target, uint32_t* result) { return ranvier_dom_image_bitmap_get_width(target, result); }
+int32_t rv_dom_image_bitmap_get_height(RvImageBitmap* target, uint32_t* result) { return ranvier_dom_image_bitmap_get_height(target, result); }
+int32_t rv_dom_image_bitmap_close(RvImageBitmap* target) { return ranvier_dom_image_bitmap_close(target); }
+int32_t rv_dom_image_bitmap_rendering_context_get_canvas(RvImageBitmapRenderingContext* target, RvDomUnionHTMLCanvasElement* result) { return ranvier_dom_image_bitmap_rendering_context_get_canvas(target, result); }
+int32_t rv_dom_image_bitmap_rendering_context_transfer_from_image_bitmap(RvImageBitmapRenderingContext* target, RvImageBitmap* bitmap) { return ranvier_dom_image_bitmap_rendering_context_transfer_from_image_bitmap(target, bitmap); }
 int32_t rv_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, int32_t* result) { return ranvier_dom_css_supports_2(target, property, property_length, value, value_length, result); }
 int32_t rv_dom_css_supports_1(RvNode* target, const uint8_t* condition_text, int32_t condition_text_length, int32_t* result) { return ranvier_dom_css_supports_1(target, condition_text, condition_text_length, result); }
 int32_t rv_dom_css_get_highlights(RvNode* target, RvHighlightRegistry** result) { return ranvier_dom_css_get_highlights(target, result); }
