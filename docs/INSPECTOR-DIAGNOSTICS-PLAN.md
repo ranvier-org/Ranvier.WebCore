@@ -1,4 +1,4 @@
-# Native inspector diagnostics (H08, ABI50)
+# Native inspector diagnostics (H08 ABI50, C25 cascade ABI54)
 
 The host inspects a page's document natively: no developer-tools frontend, inspector protocol or script evaluation.
 `rv_abi_has("diagnostics")` reports the group; `host/RanvierWebCoreAbi.h` (v50) holds the contract.
@@ -9,6 +9,7 @@ The host inspects a page's document natively: no developer-tools frontend, inspe
 | --- | --- | --- | --- |
 | `diagnostics` | 1 | the host's opt-in | unknown |
 | `inspector-frontend` | 0 | unknown | 0 |
+| `cascade-diagnostics` (v54) | 1 | the host's opt-in | unknown |
 | `inspector`, `jsc-inspector` | 0 on slim (`USE_INSPECTOR_STUB`, `USE_JSC_INSPECTOR_STUB`) | | |
 | `remote-inspector` | 0 on slim (`ENABLE_REMOTE_INSPECTOR=OFF`) | | |
 
@@ -34,6 +35,17 @@ instrumentation or agent; the candidate builder checks the glue object's undefin
   layer, specificity and position), then the inline style. Each entry carries the origin, the selector list, the most
   specific matching selector, its specificity (`:where()` adds (0, 0, 0), `:is()` its most specific argument), the
   selector counts and the engine-serialised declarations.
+- Cascade (v54, C25): `rv_host_inspect_cascade` lists the declarations of a longhand or custom property in the
+  element's cascade input order (user agent, user, author with presentational hints first and the style attribute
+  after the element's rules), with the property's logical counterpart under the element's writing mode. Each entry
+  carries origin, specificity, `!important`, layer order and dotted name, the enclosing `@media`, `@supports` and
+  `@container` conditions, sheet, rule and declaration indices, the shorthand it expanded from and a `var()` flag.
+  `RV_CASCADE_WINNER` marks the declaration `Style::PropertyCascade` selects; it is never derived from the computed
+  value. With no winner on an inherited property, or a winning `inherit` (or `unset` on an inherited property), entries
+  continue with the composed-tree parent at the next `RV_CASCADE_DEPTH`. The query reads the current DOM and rule
+  sets, applying only a pending style sheet change, and updates no element style or layout. Declared limits: a winning
+  `revert` or `revert-layer` is reported as that keyword; `:visited`, `@starting-style` and animations are absent; the
+  value is the declared value, and `var()` resolution is `rv_element_computed_style`'s.
 - Box model: content, padding, border and margin boxes in `getBoundingClientRect` space. The border box equals
   `rv_element_rect`; untransformed values are LayoutUnit multiples of 1/64 px.
 
@@ -41,5 +53,6 @@ instrumentation or agent; the candidate builder checks the glue object's undefin
 
 Only the box model has one: `getBoundingClientRect` plus the computed border, padding and margin widths. The Chromium
 oracle `tests/fixtures/inspector-diagnostics-oracle.json` records it unscrolled, scrolled and at page scale 2. The
-render tree, matched rules and a developer-tools frontend have no web API; managed browser providers report them
-`Unsupported`.
+render tree, matched rules, cascade provenance and a developer-tools frontend have no web API; managed browser
+providers report them `Unsupported`. The C25 Chromium oracle `tests/fixtures/cascade-diagnostics-oracle.json` records
+only computed values, each compared with the shared fixture `tests/fixtures/cascade-diagnostics.json`.

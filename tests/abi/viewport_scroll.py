@@ -18,7 +18,7 @@ from utf8_inputs import Utf8
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, WRONG_THREAD, UNSUPPORTED, WRONG_INTERFACE = 0, -1, -2, -9, -11
 CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_void_p)
-ABI = 53
+ABI = 54
 BEHAVIOR = {None: 0, 'auto': 0, 'instant': 1, 'smooth': 2}
 # Steps where the engine's truncation toward zero gives another whole pixel than Chromium's rounding to nearest, at
 # every scale and on every scroller (the qualification in docs/viewport-scroll-evidence).

@@ -22,7 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
 
 OK, NULL_ARGUMENT, WRONG_THREAD, NOT_ELEMENT, BUFFER_TOO_SMALL, UNSUPPORTED = 0, -1, -2, -4, -6, -9
-ABI = 53
+ABI = 54
 AHEM_SHA256 = '63d2abd0041c3e3b4b52ad8d382353b53c51c6785e76ce56ed9dacad2d2e31c4'
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 RENDER_TREE, MATCHED_RULES = 1, 2
