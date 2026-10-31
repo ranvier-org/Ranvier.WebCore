@@ -421,8 +421,8 @@ class InterfaceEmitter:
             for field, union in fields:
                 union_name = label(union)
                 plain = f'unbox{union_name} (rawField raw "{field.name}")'
-                if union.nullable:
-                    # Fantomas's layout: a multi-line if expression between blank lines.
+                if union.nullable or (not field.required and field.default is None):
+                    # An optional field: absent or null is None. Fantomas's layout: a multi-line if between blank lines.
                     raw_name = identifier(field.name) + 'Field'
                     lines += [f'        let {raw_name} = rawField raw "{field.name}"', '',
                               f'        value.{identifier(field.name)} <-',

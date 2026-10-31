@@ -6368,8 +6368,22 @@ module BrowserUnionAdapters =
     let private resultDictComputedEffectTiming (raw: obj) : ComputedEffectTiming =
         let value = unbox<ComputedEffectTiming> raw
         value.duration <- unboxUnrestrictedDoubleOrCSSNumericValueOrDOMString (rawField raw "duration")
-        value.endTime <- unboxDoubleOrCSSNumericValue (rawField raw "endTime")
-        value.activeDuration <- unboxDoubleOrCSSNumericValue (rawField raw "activeDuration")
+        let endTimeField = rawField raw "endTime"
+
+        value.endTime <-
+            (if isNull endTimeField then
+                 None
+             else
+                 Some (unboxDoubleOrCSSNumericValue endTimeField))
+
+        let activeDurationField = rawField raw "activeDuration"
+
+        value.activeDuration <-
+            (if isNull activeDurationField then
+                 None
+             else
+                 Some (unboxDoubleOrCSSNumericValue activeDurationField))
+
         let localTimeField = rawField raw "localTime"
 
         value.localTime <-
