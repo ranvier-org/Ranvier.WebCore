@@ -127,6 +127,8 @@ F# contract quotes names such as ``font-family`` with double backticks.
   `scrollTo(options)` is `rv_dom_element_scroll_to_1`).
 - An unnamed getter, setter or deleter takes the C++ name WebKit's bindings call: `item` and `setItem` for an
   index, `namedItem`, `setNamedItem` and `deleteNamedProperty` for a name (`rv_dom_dom_string_map_named_item`).
+  `browserIndexedGetters` names getters WebKit's IDL names but browsers expose only as an indexed property, such
+  as `DataTransferItemList.item`: the Fable binding reads `list[index]`, null when absent.
 - Constants are `RV_DOM_<INTERFACE>_<NAME>` (`RV_DOM_NODE_ELEMENT_NODE`); enumeration values
   `RV_DOM_<ENUM>_<VALUE>` (`RV_DOM_SHADOW_ROOT_MODE_OPEN`).
 

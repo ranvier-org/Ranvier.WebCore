@@ -1,7 +1,8 @@
 {
  "comment": [
   "I07/T09/T04 DataTransfer cases: tests/abi/data_transfer.py replays them natively and tests/abi/data_transfer_browser.mjs",
-  "in Chromium (tests/fixtures/data-transfer-oracle.json). File contents are UTF-8 text, except the paste image's hex bytes."
+  "in Chromium (tests/fixtures/data-transfer-oracle.json). File contents are UTF-8 text, except the paste image's hex bytes.",
+  "The copy text carries U+0000, which only page-supplied clipboardData can put into RvClipboardWrite data (#145)."
  ],
  "viewport": [
   320,
@@ -55,7 +56,7 @@
   ]
  },
  "copy": {
-  "text": "C1",
+  "text": "C\u00001",
   "file": [
    "c.txt",
    "text/plain",

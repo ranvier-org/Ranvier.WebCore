@@ -17,7 +17,8 @@
     "browserWellFormedUnions and browserWellFormedSetters list the unions and interfaces whose USVString inputs the",
     "Fable browser provider converts to well-formed strings. Every generated string input is UTF-8 with an explicit byte",
     "length; sequenceStringSpans only names the string sequences of its interfaces Utf8.",
-    "elementArrayReflections lists [Reflect] FrozenArray<Element>? attributes bound to the engine's element array reflection: the getter returns a snapshot sequence, or none for null; the setter takes a sequence, or none to clear."
+    "elementArrayReflections lists [Reflect] FrozenArray<Element>? attributes bound to the engine's element array reflection: the getter returns a snapshot sequence, or none for null; the setter takes a sequence, or none to clear.",
+    "browserIndexedGetters lists named IDL getters that browsers expose only as an indexed property; the Fable binding reads $0[index], null when absent."
   ],
   "attributeBridges": {
     "Document.adoptedStyleSheets": {
@@ -1160,5 +1161,8 @@
     "HighlightRegistry": {
       "adapter": "RanvierCollectionLike"
     }
-  }
+  },
+  "browserIndexedGetters": [
+    "DataTransferItemList.item"
+  ]
 }

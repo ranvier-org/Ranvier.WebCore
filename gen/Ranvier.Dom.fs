@@ -5154,7 +5154,11 @@ and [<AllowNullLiteral>] DataTransferItemList =
     /// <summary>DataTransferItemList.length.</summary>
     abstract member length: int with get
     /// <summary>DataTransferItemList.item.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("($0[$1] ?? null)")>]
+#endif
     abstract member item: index: uint32 -> DataTransferItem
+
     /// <summary>DataTransferItemList.add.</summary>
     abstract member add: data: string * ``type``: string -> DataTransferItem
     /// <summary>DataTransferItemList.add.</summary>

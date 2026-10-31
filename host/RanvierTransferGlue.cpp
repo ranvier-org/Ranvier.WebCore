@@ -10,6 +10,7 @@
 #include "Editor.h"
 #include "Element.h"
 #include "File.h"
+#include "FrameSelection.h"
 #include "FrameDestructionObserverInlines.h"
 #include "IntPoint.h"
 #include "LocalFrame.h"
@@ -18,6 +19,7 @@
 #include "ReplaceRangeWithTextCommand.h"
 #include "SharedBuffer.h"
 #include "SimpleRange.h"
+#include "VisibleSelection.h"
 
 using namespace WebCore;
 
@@ -150,6 +152,9 @@ int32_t ranvier_replace_range(RvAbstractRange* handle, const uint8_t* text, int3
     RefPtr frame = document->frame();
     if (!frame)
         return 0;
+    // The edit's root editable element, which receives beforeinput and input, is the selection's: select the range first,
+    // as a spelling correction does.
+    frame->selection().setSelection(VisibleSelection { simple });
     Ref command = ReplaceRangeWithTextCommand::create(simple, String::fromUTF8(std::span { text, static_cast<size_t>(length) }));
     command->apply();
     // The editor records the command as its last edit only when the edit applied, after an uncancelled beforeinput.

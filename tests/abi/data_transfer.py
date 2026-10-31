@@ -596,6 +596,8 @@ def run(directory, evidence):
     for file in files_handle + sources + [image_file, copy_file, z]:
         release_blob(file)
 
+    if os.environ.get('DATA_TRANSFER_DUMP'):
+        Path(os.environ['DATA_TRANSFER_DUMP']).write_text(json.dumps(results, indent=1), encoding='utf-8')
     compare(n, results, spec, oracle, qualified)
     if evidence:
         Path(evidence).write_text(json.dumps({'results': results, 'assertions': n.assertions}, indent=1), encoding='utf-8')
