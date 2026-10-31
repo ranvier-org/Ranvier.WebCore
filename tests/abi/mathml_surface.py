@@ -30,7 +30,7 @@ class FocusOptions(ctypes.Structure):
 
 def verify(native_directory):
     with SvgProbe(native_directory, 320, 240) as p:
-        oracle = json.loads((FIXTURES / 'mathml-surface-oracle.json').read_text())
+        oracle = json.loads((FIXTURES / 'mathml-surface-oracle.json').read_text(encoding='utf-8'))
         has = p.bind('rv_abi_has', p.integer, [ctypes.c_char_p])
         for feature in [b'dom:MathMLElement', b'dom:MathMLMathElement']:
             p.expect(has(feature) == 1, 'compiled typed MathML capability ' + feature.decode())
