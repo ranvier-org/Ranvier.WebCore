@@ -572,6 +572,10 @@ jobs:
         if: env.FLAVOR == 'slim'
         run: python -I -X utf8 tests/abi/inspector_diagnostics.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native" --webkit-source "${{ env.RANVIER_WORK }}/src"
 
+      - name: Verify the native cascade diagnostics against the shared conformance fixture
+        if: env.FLAVOR == 'slim'
+        run: python -I -X utf8 tests/abi/cascade_diagnostics.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
       - name: Verify passive capability catalogue and live host observations
         run: python -I tests/abi/capabilities.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 

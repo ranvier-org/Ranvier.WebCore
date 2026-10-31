@@ -1389,6 +1389,8 @@ int32_t rv_abi_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "diagnostics"))
         return 1;
+    if (!std::strcmp(feature, "cascade-diagnostics"))
+        return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "accessibility-uia"))
         return 1;
@@ -1483,8 +1485,8 @@ int32_t rv_host_set_screen(RvHost* host, const RvScreenMetrics* metrics)
 }
 
 struct RvDiagnosticEntry {
-    double numbers[6] { };
-    std::string strings[3];
+    double numbers[RV_CASCADE_NUMBER_FIELDS] { };
+    std::string strings[RV_CASCADE_STRING_FIELDS];
 };
 
 struct RvDiagnostic {
@@ -1588,6 +1590,36 @@ int32_t rv_host_inspect_matched_rules(RvHost* host, RvNode* element, RvDiagnosti
     return RV_OK;
 }
 
+int32_t rv_host_inspect_cascade(RvHost* host, RvNode* element, const uint8_t* property, int32_t property_length, RvDiagnostic** diagnostic)
+{
+    if (!host || !element || !property || !diagnostic)
+        return RV_ERR_NULL_ARGUMENT;
+    if (auto allowed = diagnosticsAllowed(host))
+        return allowed;
+    struct Collected {
+        std::string text;
+        std::vector<RvDiagnosticEntry> entries;
+    } collected;
+    auto status = ranvier_inspect_cascade(reinterpret_cast<RvNode*>(&host->document()), element, property, property_length,
+        [](void* context, const char* bytes, int32_t length) {
+            static_cast<Collected*>(context)->text.assign(bytes, length);
+        },
+        [](void* context, const RanvierCascadeEntry* source) {
+            RvDiagnosticEntry entry;
+            std::copy(std::begin(source->numbers), std::end(source->numbers), entry.numbers);
+            for (int field = 0; field < RV_CASCADE_STRING_FIELDS; ++field)
+                entry.strings[field].assign(source->strings[field] ? source->strings[field] : "", source->lengths[field]);
+            static_cast<Collected*>(context)->entries.push_back(WTF::move(entry));
+        }, &collected);
+    if (status)
+        return status;
+    auto* result = newDiagnostic(RV_DIAGNOSTIC_CASCADE);
+    result->text = WTF::move(collected.text);
+    result->entries = WTF::move(collected.entries);
+    *diagnostic = result;
+    return RV_OK;
+}
+
 int32_t rv_host_inspect_box_model(RvHost* host, RvNode* element, double* values)
 {
     if (!host || !element || !values)
@@ -1618,7 +1650,8 @@ int32_t rv_diagnostic_entry_string(RvDiagnostic* diagnostic, int32_t index, int3
 {
     if (!diagnostic || !length)
         return RV_ERR_NULL_ARGUMENT;
-    if (index < 0 || static_cast<size_t>(index) >= diagnostic->entries.size() || field < RV_RULE_SELECTOR_TEXT || field > RV_RULE_DECLARATIONS)
+    int32_t fields = diagnostic->kind == RV_DIAGNOSTIC_CASCADE ? RV_CASCADE_STRING_FIELDS : RV_RULE_DECLARATIONS + 1;
+    if (index < 0 || static_cast<size_t>(index) >= diagnostic->entries.size() || field < 0 || field >= fields)
         return RV_ERR_UNSUPPORTED;
     return copyBytes(diagnostic->entries[index].strings[field], buffer, capacity, length);
 }
@@ -1627,7 +1660,8 @@ int32_t rv_diagnostic_entry_number(RvDiagnostic* diagnostic, int32_t index, int3
 {
     if (!diagnostic || !value)
         return RV_ERR_NULL_ARGUMENT;
-    if (index < 0 || static_cast<size_t>(index) >= diagnostic->entries.size() || field < RV_RULE_ORIGIN || field > RV_RULE_MATCHED_SELECTOR_COUNT)
+    int32_t fields = diagnostic->kind == RV_DIAGNOSTIC_CASCADE ? RV_CASCADE_NUMBER_FIELDS : RV_RULE_MATCHED_SELECTOR_COUNT + 1;
+    if (index < 0 || static_cast<size_t>(index) >= diagnostic->entries.size() || field < 0 || field >= fields)
         return RV_ERR_UNSUPPORTED;
     *value = diagnostic->entries[index].numbers[field];
     return RV_OK;

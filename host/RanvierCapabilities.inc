@@ -20,7 +20,7 @@ static constexpr const char* capabilityFacilityNames[] = {
     "accessibility", "accessibility-uia", "accessibility-events", "clipboard", "clipboard-read-callback",
     "clipboard-write-callback", "drop", "drag-out", "popups", "tooltip", "input", "ime", "frame", "scroll",
     "speech-synthesis", "gamepad", "spellcheck", "pdfjs", "wk-web-extensions", "notifications", "diagnostics",
-    "inspector-frontend"
+    "inspector-frontend", "cascade-diagnostics"
 };
 
 static constexpr const char* capabilityHostFacilityNames[] = { "clipboard", "drop", "tooltip", "input", "ime", "scroll" };
@@ -234,6 +234,7 @@ static CapabilityResult capabilityQuery(RvHost& host, int category, const char* 
     else if (!std::strcmp(name, "accessibility-events")) { result.facts[1] = rv_abi_has(name); result.boolean(!!host.axCallback); }
     else if (!std::strcmp(name, "accessibility-uia")) result.facts[1] = rv_abi_has(name);
     else if (!std::strcmp(name, "diagnostics")) { result.facts[1] = 1; result.boolean(host.diagnostics); }
+    else if (!std::strcmp(name, "cascade-diagnostics")) { result.facts[1] = 1; result.boolean(host.diagnostics); }
     // No flavor ships a developer-tools frontend (WebInspectorUI) or connects one to the page's inspector controller.
     else if (!std::strcmp(name, "inspector-frontend")) { result.facts[1] = 0; result.facts[4] = 0; }
     else if (capabilityContains(capabilityHostFacilityNames, name)) result.facts[1] = 1;
