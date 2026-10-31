@@ -19,7 +19,7 @@ from caret_hit_support import CaretPage, FIXTURES, coordinate, same_rect
 from utf8_inputs import Utf8
 
 OK, NULL_ARGUMENT, WRONG_THREAD, DOM_EXCEPTION, WRONG_INTERFACE = 0, -1, -2, -3, -11
-ABI = 52
+ABI = 53
 # FreeType scales each 20px Ahem advance in 16.16 fixed point on Linux; four glyphs may lose 4/65536 px.
 RECT_TOLERANCE = 0.01
 

@@ -1,5 +1,5 @@
 /*
- * Ranvier native WebCore C ABI, version 52.
+ * Ranvier native WebCore C ABI, version 53.
  *
  * The boundary consists of C scalars, UTF-8 strings, opaque handles and a caller-owned RGBA8 buffer,
  * and is identical on every WebCore port that compiles RanvierWebCoreAbi.cpp.
@@ -1727,6 +1727,59 @@ enum {
  * or contents, an inline box, SVG content) or outside the document, or diagnostics disabled, and leaves values
  * unchanged on every error. */
 RV_EXPORT int32_t rv_host_inspect_box_model(RvHost*, RvNode* element, double* values);
+
+/* v53: "coordinate-spaces" for rv_abi_has: points and box quads converted between named coordinate spaces of one
+ * host's document, through every CSS transform, perspective included, and the current scroll, page scale and device
+ * scale, with layout updated first and without running script. Spaces:
+ *   RV_SPACE_NODE   the local space of a node's CSS box: the border box's top-left corner is 0, 0, before the node's
+ *                   own transform. The document node's local space is its page space.
+ *   RV_SPACE_PAGE   CSS pixels of the document from its top-left corner, independent of scroll and page scale.
+ *   RV_SPACE_CLIENT CSS pixels of Element.getBoundingClientRect, Document.elementFromPoint, rv_host_element_at and
+ *                   MouseEvent.clientX and clientY.
+ *   RV_SPACE_HOST   CSS pixels of the host surface: the space of rv_host_mouse, rv_host_wheel and rv_host_dirty_rect.
+ *                   It equals CLIENT at page scale 1. While page-scaled, HOST is CLIENT times the page scale: the
+ *                   client point x, y is reached by rv_host_mouse at x * scale, y * scale.
+ *   RV_SPACE_DEVICE device pixels of the image rv_host_paint_rgba paints: HOST times the device scale.
+ * The app's window position on the screen is the windowing system's: a screen point is a DEVICE point plus the
+ * origin the app's windowing system reports for the host's surface. Points are double precision; WebCore maps them
+ * in single precision and LayoutUnits of 1/64 CSS pixel. Conversions agree with what the host paints and hit-tests.
+ * The slim software path paints without 3D compositing: the perspective property and transform-style: preserve-3d
+ * have no effect, and a perspective() function maps as the software paint draws it, so points of such chains lie up
+ * to 26.5 CSS pixels from where a 3D-compositing browser such as Chromium places them. */
+enum {
+    RV_SPACE_NODE = 0,
+    RV_SPACE_PAGE = 1,
+    RV_SPACE_CLIENT = 2,
+    RV_SPACE_HOST = 3,
+    RV_SPACE_DEVICE = 4,
+};
+/* Boxes of rv_node_box_quad, as CSS box edges. */
+enum {
+    RV_QUAD_BORDER_BOX = 0,
+    RV_QUAD_PADDING_BOX = 1,
+    RV_QUAD_CONTENT_BOX = 2,
+    RV_QUAD_MARGIN_BOX = 3,
+};
+enum {
+    /* The anchors of a conversion belong to different hosts. */
+    RV_ERR_WRONG_HOST = -12,
+};
+/* Converts count points of xy, as x0, y0, x1, y1 and so on, from fromSpace anchored at from to toSpace anchored at to,
+ * in place. RV_SPACE_NODE is the anchor node's own space; for the other spaces the anchor is any node of the
+ * document, the document node included. A NULL to anchors toSpace at from's document. xy changes only on RV_OK.
+ * Returns RV_ERR_NULL_ARGUMENT for a NULL from, or a NULL xy with count above 0; RV_ERR_DETACHED for an anchor
+ * outside the document a live host shows: a node removed from its document, one in a document that a later
+ * rv_host_load_html or rv_host_load_svg replaced, or one held past rv_host_destroy; RV_ERR_WRONG_HOST for anchors of
+ * two hosts; RV_ERR_UNSUPPORTED for an unknown space, a negative count, a non-finite coordinate, an anchor in a
+ * subframe document (a host's frame loader creates no subframes), an RV_SPACE_NODE anchor without a CSS box
+ * (display: none or contents, inline boxes, text and SVG shapes), or a point mapped into an RV_SPACE_NODE whose
+ * transforms are singular there, such as scale(0) or rotateY(90deg). */
+RV_EXPORT int32_t rv_node_convert_points(RvNode* from, int32_t fromSpace, RvNode* to, int32_t toSpace, double* xy, int32_t count);
+/* Writes the four corners of a node's box in toSpace anchored at to, as x, y pairs in the order of DOMQuad's p1 to
+ * p4: top-left, top-right, bottom-right, bottom-left. box is an RV_QUAD_* value; a NULL to is node's document. The
+ * statuses are those of rv_node_convert_points with node as the RV_SPACE_NODE anchor, and RV_ERR_UNSUPPORTED for an
+ * unknown box. */
+RV_EXPORT int32_t rv_node_box_quad(RvNode* node, int32_t box, RvNode* to, int32_t toSpace, double* quad);
 
 #ifdef __cplusplus
 }

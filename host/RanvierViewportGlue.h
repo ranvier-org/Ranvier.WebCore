@@ -17,6 +17,9 @@ WEBCORE_EXPORT int32_t ranvier_media_query_matches(RvEventTarget*, int32_t* matc
 WEBCORE_EXPORT int32_t ranvier_media_query_media(RvEventTarget*, char* buffer, int32_t capacity, int32_t* length);
 // Moves the document's page to the display displayID, whose PlatformScreen data its screen reports.
 WEBCORE_EXPORT void ranvier_page_set_display(RvNode* document, uint32_t displayID);
+// rv_node_convert_points and rv_node_box_quad after the thread check, with their contracts.
+WEBCORE_EXPORT int32_t ranvier_convert_points(RvNode* from, int32_t fromSpace, RvNode* to, int32_t toSpace, double* xy, int32_t count);
+WEBCORE_EXPORT int32_t ranvier_box_quad(RvNode* node, int32_t box, RvNode* to, int32_t toSpace, double* quad);
 }
 
 namespace WebCore {

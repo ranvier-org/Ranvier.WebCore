@@ -1,0 +1,321 @@
+{
+ "browser": "156.0.8078.4",
+ "states": [
+  {
+   "name": "initial",
+   "pageOffset": [
+    0.0,
+    0.0
+   ],
+   "scale": 1.0,
+   "deviceRatio": 1.0,
+   "overlay": {
+    "client": [
+     158.19039916992188,
+     46.416351318359375
+    ],
+    "host": [
+     158.19039916992188,
+     46.416351318359375
+    ],
+    "mouse": [
+     158.0,
+     46.0,
+     "i"
+    ]
+   }
+  },
+  {
+   "name": "scroll 10,20",
+   "pageOffset": [
+    10.0,
+    20.0
+   ],
+   "scale": 1.0,
+   "deviceRatio": 1.0,
+   "overlay": {
+    "client": [
+     148.19039916992188,
+     26.416351318359375
+    ],
+    "host": [
+     148.19039916992188,
+     26.416351318359375
+    ],
+    "mouse": [
+     148.0,
+     26.0,
+     "i"
+    ]
+   }
+  },
+  {
+   "name": "device scale 2",
+   "pageOffset": [
+    0.0,
+    0.0
+   ],
+   "scale": 1.0,
+   "deviceRatio": 2.0,
+   "overlay": {
+    "client": [
+     158.19039916992188,
+     46.416351318359375
+    ],
+    "host": [
+     158.19039916992188,
+     46.416351318359375
+    ],
+    "mouse": [
+     158.0,
+     46.0,
+     "i"
+    ]
+   }
+  },
+  {
+   "name": "page scale 2 at 40,60",
+   "pageOffset": [
+    20.0,
+    30.0
+   ],
+   "scale": 2.0,
+   "deviceRatio": 1.0,
+   "clientToHost": [
+    20.0,
+    40.0
+   ],
+   "hostToClient": [
+    5.0,
+    10.0
+   ],
+   "overlay": {
+    "client": [
+     138.19039916992188,
+     16.416351318359375
+    ],
+    "host": [
+     276.38079833984375,
+     32.83270263671875
+    ],
+    "mouse": [
+     138.0,
+     16.0,
+     "i"
+    ]
+   }
+  },
+  {
+   "name": "page scale 2 at 40,60, device scale 2",
+   "pageOffset": [
+    20.0,
+    30.0
+   ],
+   "scale": 2.0,
+   "deviceRatio": 2.0,
+   "clientToHost": [
+    20.0,
+    40.0
+   ],
+   "hostToClient": [
+    5.0,
+    10.0
+   ],
+   "overlay": {
+    "client": [
+     138.19039916992188,
+     16.416351318359375
+    ],
+    "host": [
+     276.38079833984375,
+     32.83270263671875
+    ],
+    "mouse": [
+     138.0,
+     16.0,
+     "i"
+    ]
+   }
+  },
+  {
+   "name": "page scale 1.5 at 30,90, scroll",
+   "pageOffset": [
+    40.0,
+    100.0
+   ],
+   "scale": 1.5,
+   "deviceRatio": 1.0,
+   "clientToHost": [
+    15.0,
+    30.0
+   ],
+   "hostToClient": [
+    6.666667938232422,
+    13.333335876464844
+   ],
+   "overlay": {
+    "client": [
+     118.19039916992188,
+     -53.583648681640625
+    ],
+    "host": [
+     177.2855987548828,
+     -80.37547302246094
+    ],
+    "outside": true
+   }
+  }
+ ],
+ "maxError": {
+  "nodeToPageVsChromium": 0.00021399869315509218,
+  "documentNodeIsPage": 0.0,
+  "projectiveDistanceFromChromium": 26.53908838448,
+  "pageToClient": 0.0,
+  "clientToPage": 0.0,
+  "pageToHost": 0.0,
+  "hostToPage": 0.0,
+  "pageToDevice": 0.0,
+  "deviceToPage": 0.0,
+  "nodeToClientVsRect": 0.0,
+  "roundTrip": 8.392333984375e-05,
+  "boxQuad": 0.0
+ },
+ "teardown": {
+  "node removed from its document": [
+   -10,
+   -10,
+   -10,
+   -10
+  ],
+  "nodes of two hosts": [
+   -12,
+   -12,
+   -12,
+   -12
+  ],
+  "node held past rv_host_destroy": [
+   -10,
+   -10,
+   -10,
+   -10
+  ],
+  "node of a replaced document": [
+   -10,
+   -10,
+   -10,
+   -10
+  ],
+  "replaced document node": [
+   -10,
+   -10,
+   -10,
+   -10
+  ]
+ },
+ "qualified": {
+  "q": {
+   "reason": "a perspective() function, the perspective property or preserve-3d in the chain: the slim software path paints without 3D compositing, so the property and preserve-3d have no effect and perspective() maps as the software paint draws it; the conversion follows that paint and hit testing (both asserted below), and the distance from the Chromium composition is recorded, not asserted",
+   "distanceFromChromium": 11.655499882891581
+  },
+  "r": {
+   "reason": "a perspective() function, the perspective property or preserve-3d in the chain: the slim software path paints without 3D compositing, so the property and preserve-3d have no effect and perspective() maps as the software paint draws it; the conversion follows that paint and hit testing (both asserted below), and the distance from the Chromium composition is recorded, not asserted",
+   "distanceFromChromium": 8.198937137403666
+  },
+  "v": {
+   "reason": "a perspective() function, the perspective property or preserve-3d in the chain: the slim software path paints without 3D compositing, so the property and preserve-3d have no effect and perspective() maps as the software paint draws it; the conversion follows that paint and hit testing (both asserted below), and the distance from the Chromium composition is recorded, not asserted",
+   "distanceFromChromium": 26.53908838448
+  },
+  "w": {
+   "reason": "a perspective() function, the perspective property or preserve-3d in the chain: the slim software path paints without 3D compositing, so the property and preserve-3d have no effect and perspective() maps as the software paint draws it; the conversion follows that paint and hit testing (both asserted below), and the distance from the Chromium composition is recorded, not asserted",
+   "distanceFromChromium": 22.51384867221989
+  },
+  "e": {
+   "reason": "a perspective() function, the perspective property or preserve-3d in the chain: the slim software path paints without 3D compositing, so the property and preserve-3d have no effect and perspective() maps as the software paint draws it; the conversion follows that paint and hit testing (both asserted below), and the distance from the Chromium composition is recorded, not asserted",
+   "distanceFromChromium": 11.81359818556325
+  },
+  "g": {
+   "reason": "a perspective() function, the perspective property or preserve-3d in the chain: the slim software path paints without 3D compositing, so the property and preserve-3d have no effect and perspective() maps as the software paint draws it; the conversion follows that paint and hit testing (both asserted below), and the distance from the Chromium composition is recorded, not asserted",
+   "distanceFromChromium": 2.260675699577246
+  }
+ },
+ "singular": {
+  "z": "node to page OK; page to node UNSUPPORTED",
+  "y": "node to page OK; page to node UNSUPPORTED"
+ },
+ "arguments": {
+  "NULL from": -1,
+  "NULL xy with count 1": -1,
+  "NULL xy with count 0": 0,
+  "count -1": -9,
+  "from space 5": -9,
+  "to space -1": -9,
+  "NaN": -9,
+  "infinity": -9,
+  "display none as NODE": -9,
+  "display none as PAGE anchor": 0,
+  "inline span as NODE": -9,
+  "inline span text as NODE": -9,
+  "box quad NULL node": -1,
+  "box quad NULL quad": -1,
+  "box quad box 4": -9,
+  "box quad display none": -9,
+  "box quad to space 9": -9
+ },
+ "perspectivePaint": {
+  "convertedLeftEdge": 61.697776794433594,
+  "firstRedColumn": 62,
+  "chromiumLeftEdge": 54.0,
+  "hits": {
+   "(3.0, 50.0)": "q",
+   "(97.0, 50.0)": "q",
+   "(50.0, 3.0)": "q",
+   "(50.0, 97.0)": "q",
+   "chromium-only 56,100": "p"
+  }
+ },
+ "perspectiveFunctionPaint": {
+  "corners": [
+   [
+    110.9048080444336,
+    62.75316619873047
+   ],
+   [
+    169.09519958496094,
+    57.24683380126953
+   ],
+   [
+    169.09519958496094,
+    117.24683380126953
+   ],
+   [
+    110.9048080444336,
+    122.75316619873047
+   ]
+  ],
+  "edges": {
+   "left": [
+    111,
+    111
+   ],
+   "right": [
+    168,
+    168
+   ],
+   "top": [
+    60,
+    60
+   ],
+   "bottom": [
+    119,
+    119
+   ]
+  },
+  "hits": {
+   "(3.0, 30.0)": "e",
+   "(77.0, 30.0)": "e",
+   "(40.0, 3.0)": "e",
+   "(40.0, 57.0)": "e"
+  }
+ },
+ "assertions": 6803
+}

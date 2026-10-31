@@ -19,7 +19,7 @@ OK, NULL_ARGUMENT, WRONG_THREAD, UNSUPPORTED, WRONG_INTERFACE = 0, -1, -2, -9, -
 CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_void_p)
 TYPES = ['resize', 'scroll', 'scrollend', 'visibilitychange', 'focus', 'blur']
 PAGE = '<!doctype html><style>html,body{margin:0}body{height:2000px;width:2000px}</style><body>'
-ABI = 52
+ABI = 53
 HIDDEN, VISIBLE = 0, 1
 
 
