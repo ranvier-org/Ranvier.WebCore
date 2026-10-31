@@ -4,6 +4,10 @@
   "width": 300,
   "height": 150
  },
+ "blockCanvasWithoutContext": [
+  300,
+  150
+ ],
  "members": {
   "getContext": "function",
   "isContextLost": true,

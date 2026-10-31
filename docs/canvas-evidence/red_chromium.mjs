@@ -13,6 +13,9 @@ try {
     const r = {};
     const c = document.getElementById('c'), d = document.getElementById('d'), e = document.getElementById('e'), f = document.getElementById('f');
     r.defaults = {width: d.width, height: d.height};
+    // With script enabled a canvas is a replaced element with or without a context (WebKit without script: fallback, 320x160).
+    const g = document.createElement('canvas'); g.style.display = 'block'; g.innerHTML = '<div style="width:10px;height:10px"></div>'; document.body.append(g);
+    const gr = g.getBoundingClientRect(); r.blockCanvasWithoutContext = [gr.width, gr.height]; g.remove();
     r.members = {getContext: typeof c.getContext, isContextLost: 'isContextLost' in CanvasRenderingContext2D.prototype,
       reset: 'reset' in CanvasRenderingContext2D.prototype, getContextAttributes: 'getContextAttributes' in CanvasRenderingContext2D.prototype};
     const ctx = c.getContext('2d');
