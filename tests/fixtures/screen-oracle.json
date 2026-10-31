@@ -1,0 +1,115 @@
+{
+  "browser": "156.0.8078.4",
+  "headless": "new",
+  "origin": "http://localhost",
+  "cases": {
+    "landscape 1920x1080": {
+      "metrics": {
+        "width": 1920,
+        "height": 1080,
+        "availLeft": 0,
+        "availTop": 0,
+        "availWidth": 1920,
+        "availHeight": 1080,
+        "colorDepth": 24,
+        "type": "landscape-primary"
+      },
+      "chromium": {
+        "width": 1920,
+        "height": 1080,
+        "availLeft": 0,
+        "availTop": 0,
+        "availWidth": 1920,
+        "availHeight": 1080,
+        "colorDepth": 24,
+        "pixelDepth": 24,
+        "type": "landscape-primary",
+        "angle": 0,
+        "deviceWidth": true,
+        "deviceHeight": true
+      }
+    },
+    "portrait 1080x1920": {
+      "metrics": {
+        "width": 1080,
+        "height": 1920,
+        "availLeft": 0,
+        "availTop": 0,
+        "availWidth": 1080,
+        "availHeight": 1920,
+        "colorDepth": 24,
+        "type": "portrait-primary"
+      },
+      "chromium": {
+        "width": 1080,
+        "height": 1920,
+        "availLeft": 0,
+        "availTop": 0,
+        "availWidth": 1080,
+        "availHeight": 1920,
+        "colorDepth": 24,
+        "pixelDepth": 24,
+        "type": "portrait-primary",
+        "angle": 90,
+        "deviceWidth": true,
+        "deviceHeight": true
+      }
+    },
+    "landscape-secondary 2560x1440": {
+      "metrics": {
+        "width": 2560,
+        "height": 1440,
+        "availLeft": 0,
+        "availTop": 0,
+        "availWidth": 2560,
+        "availHeight": 1440,
+        "colorDepth": 24,
+        "type": "landscape-secondary"
+      },
+      "chromium": {
+        "width": 2560,
+        "height": 1440,
+        "availLeft": 0,
+        "availTop": 0,
+        "availWidth": 2560,
+        "availHeight": 1440,
+        "colorDepth": 24,
+        "pixelDepth": 24,
+        "type": "landscape-secondary",
+        "angle": 180,
+        "deviceWidth": true,
+        "deviceHeight": true
+      }
+    },
+    "portrait-secondary 768x1024": {
+      "metrics": {
+        "width": 768,
+        "height": 1024,
+        "availLeft": 0,
+        "availTop": 0,
+        "availWidth": 768,
+        "availHeight": 1024,
+        "colorDepth": 24,
+        "type": "portrait-secondary"
+      },
+      "chromium": {
+        "width": 768,
+        "height": 1024,
+        "availLeft": 0,
+        "availTop": 0,
+        "availWidth": 768,
+        "availHeight": 1024,
+        "colorDepth": 24,
+        "pixelDepth": 24,
+        "type": "portrait-secondary",
+        "angle": 270,
+        "deviceWidth": true,
+        "deviceHeight": true
+      }
+    }
+  },
+  "lock": {
+    "resolved": true,
+    "type": "portrait-secondary"
+  }
+}
