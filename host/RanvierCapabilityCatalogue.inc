@@ -378,6 +378,7 @@ static constexpr const char* capabilityAbiNames[] = {
     "svg-view-selection",
     "image-decode",
     "font-load",
+    "font-readiness",
     "event-construction",
     "input-state",
     "viewport",

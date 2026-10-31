@@ -1418,6 +1418,50 @@ RV_EXPORT int32_t rv_resource_cancel(uint64_t operation);
  * registered until released and holds no document. */
 RV_EXPORT int32_t rv_resource_release(uint64_t operation);
 
+/* Font readiness ("font-readiness"): the CSS Font Loading API's FontFaceSet (document.fonts) of the host's current
+ * document, without JavaScript or a promise. font is font_length bytes of UTF-8 holding a CSS font shorthand; text is
+ * text_length bytes of UTF-8, and NULL with length 0 means " ". A font value that is not a valid shorthand returns
+ * RV_ERR_DOM_EXCEPTION with SyntaxError in rv_last_exception. Non-UTF-8 input, a destroyed host and a document without
+ * a window return RV_ERR_UNSUPPORTED. */
+enum {
+    RV_FONTS_LOADED = 0,
+    RV_FONTS_LOADING = 1,
+};
+/* FontFaceSet.status after a style update: RV_FONTS_LOADING while any face is loading. */
+RV_EXPORT int32_t rv_fonts_status(RvHost*, int32_t* status);
+/* FontFaceSet.check: writes 1 when no face matching font for text is pending or loading, including when none matches,
+ * else 0. Starts no load. */
+RV_EXPORT int32_t rv_fonts_check(RvHost*, const uint8_t* font, int32_t font_length, const uint8_t* text, int32_t text_length, int32_t* loaded);
+/* FontFaceSet.load: starts the loads of the faces matching font for text and writes an operation token. SUCCEEDED once
+ * every matching face has loaded, with width the number of matching faces (0 when none matches); LOAD_FAILED when a
+ * matching face fails, the engine's NetworkError. height is 0. A syntax error creates no operation. Delivery, cancel,
+ * release and invalidation follow rv_image_decode. */
+RV_EXPORT int32_t rv_fonts_load(RvHost*, const uint8_t* font, int32_t font_length, const uint8_t* text, int32_t text_length, RvResourceCompletion completion, void* context, uint64_t* operation);
+/* FontFaceSet.ready: updates layout, so the faces the layout uses start loading, and writes an operation token.
+ * SUCCEEDED once the document's load event has finished and no face is loading, including loads started after the
+ * call; width and height are 0. A ready set at the call is delivered on a later rv_run_loop_cycle. Delivery, cancel,
+ * release and invalidation follow rv_image_decode. */
+RV_EXPORT int32_t rv_fonts_ready(RvHost*, RvResourceCompletion completion, void* context, uint64_t* operation);
+enum {
+    RV_FONTS_EVENT_LOADING = 0,
+    RV_FONTS_EVENT_LOADINGDONE = 1,
+    RV_FONTS_EVENT_LOADINGERROR = 2,
+};
+/* One font set event. families holds count UTF-8 family names of family_lengths bytes, one per face, valid only during
+ * the call; LOADING has none. */
+typedef void (*RvFontsEventCallback)(void* context, int32_t kind, const uint8_t* const* families, const int32_t* family_lengths, int32_t count);
+typedef struct RvFontsWatch RvFontsWatch;
+/* Watches the CSS Font Loading events of the current document's font set: LOADING when a face starts loading while
+ * none is; when none is left loading, LOADINGDONE with the faces that loaded since, then LOADINGERROR with the faces
+ * that failed, when any did. A watch created while faces are loading first receives LOADING, and its LOADINGDONE and
+ * LOADINGERROR list the faces that finished after it was created. The engine dispatches only the loading event to DOM
+ * listeners; the watch reports all three. Events are delivered in order from rv_run_loop_cycle, never inside another rv_* call. A new document or
+ * rv_host_destroy ends the watch without an event. */
+RV_EXPORT int32_t rv_fonts_watch(RvHost*, RvFontsEventCallback callback, void* context, RvFontsWatch** watch);
+/* Ends the watch and frees it, also after its document ended; the callback and context are not used afterwards. NULL
+ * and a watch already removed are ignored. */
+RV_EXPORT void rv_fonts_unwatch(RvFontsWatch*);
+
 /* Event construction and standalone targets ("event-construction", v32). */
 typedef struct RvEventTarget RvEventTarget;
 

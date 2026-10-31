@@ -1,0 +1,474 @@
+{
+  "patches": {
+    "0035-caret-position-text-control-shadow-roots.patch": {
+      "sha256": "756fdb4ef5c6511670ddd8d9144bcb6f5bc0b222d4dc1c74143536736377e5e4",
+      "files": [
+        "Source/WebCore/dom/Document.cpp"
+      ]
+    },
+    "0037-frame-loader-client-form-submission-hook.patch": {
+      "sha256": "b00a1b8d2a74385ea38153c75c828f4df89c37f8fc52b2a268738665e58c1bba",
+      "files": [
+        "Source/WebCore/loader/FrameLoader.cpp",
+        "Source/WebCore/loader/LocalFrameLoaderClient.h"
+      ]
+    },
+    "0038-platform-screen-win-embedder-screen-data.patch": {
+      "sha256": "a69004c7217489eb71e898c4ae737d1de99c855b2ec9ddfdcf99a1835ee4432e",
+      "files": [
+        "Source/WebCore/platform/PlatformScreen.cpp",
+        "Source/WebCore/platform/win/PlatformScreenWin.cpp"
+      ]
+    },
+    "0039-element-array-attribute-empty-relations.patch": {
+      "sha256": "ed11bc63b28fa9fecfacab5b6d058d8300e766bfae86377eb0772e171c89fe60",
+      "files": [
+        "Source/WebCore/dom/Element.cpp"
+      ]
+    }
+  },
+  "parent": "C:\\wk\\native-cascade\\artifacts\\native46-candidate-5",
+  "parentReceipt": {
+    "patches": {
+      "0035-caret-position-text-control-shadow-roots.patch": {
+        "sha256": "756fdb4ef5c6511670ddd8d9144bcb6f5bc0b222d4dc1c74143536736377e5e4",
+        "files": [
+          "Source/WebCore/dom/Document.cpp"
+        ]
+      },
+      "0037-frame-loader-client-form-submission-hook.patch": {
+        "sha256": "b00a1b8d2a74385ea38153c75c828f4df89c37f8fc52b2a268738665e58c1bba",
+        "files": [
+          "Source/WebCore/loader/FrameLoader.cpp",
+          "Source/WebCore/loader/LocalFrameLoaderClient.h"
+        ]
+      },
+      "0038-platform-screen-win-embedder-screen-data.patch": {
+        "sha256": "a69004c7217489eb71e898c4ae737d1de99c855b2ec9ddfdcf99a1835ee4432e",
+        "files": [
+          "Source/WebCore/platform/PlatformScreen.cpp",
+          "Source/WebCore/platform/win/PlatformScreenWin.cpp"
+        ]
+      },
+      "0039-element-array-attribute-empty-relations.patch": {
+        "sha256": "ed11bc63b28fa9fecfacab5b6d058d8300e766bfae86377eb0772e171c89fe60",
+        "files": [
+          "Source/WebCore/dom/Element.cpp"
+        ]
+      }
+    },
+    "parent": "C:\\wk\\native-coords\\artifacts\\coords-candidate-5",
+    "parentReceipt": {
+      "patches": {
+        "0035-caret-position-text-control-shadow-roots.patch": {
+          "sha256": "756fdb4ef5c6511670ddd8d9144bcb6f5bc0b222d4dc1c74143536736377e5e4",
+          "files": [
+            "Source/WebCore/dom/Document.cpp"
+          ]
+        },
+        "0037-frame-loader-client-form-submission-hook.patch": {
+          "sha256": "b00a1b8d2a74385ea38153c75c828f4df89c37f8fc52b2a268738665e58c1bba",
+          "files": [
+            "Source/WebCore/loader/FrameLoader.cpp",
+            "Source/WebCore/loader/LocalFrameLoaderClient.h"
+          ]
+        },
+        "0038-platform-screen-win-embedder-screen-data.patch": {
+          "sha256": "a69004c7217489eb71e898c4ae737d1de99c855b2ec9ddfdcf99a1835ee4432e",
+          "files": [
+            "Source/WebCore/platform/PlatformScreen.cpp",
+            "Source/WebCore/platform/win/PlatformScreenWin.cpp"
+          ]
+        },
+        "0039-element-array-attribute-empty-relations.patch": {
+          "sha256": "ed11bc63b28fa9fecfacab5b6d058d8300e766bfae86377eb0772e171c89fe60",
+          "files": [
+            "Source/WebCore/dom/Element.cpp"
+          ]
+        }
+      },
+      "parent": "C:\\wk\\native-strings\\artifacts\\native43-candidate-3",
+      "parentReceipt": {
+        "patches": {
+          "0035-caret-position-text-control-shadow-roots.patch": {
+            "sha256": "756fdb4ef5c6511670ddd8d9144bcb6f5bc0b222d4dc1c74143536736377e5e4",
+            "files": [
+              "Source/WebCore/dom/Document.cpp"
+            ]
+          },
+          "0037-frame-loader-client-form-submission-hook.patch": {
+            "sha256": "b00a1b8d2a74385ea38153c75c828f4df89c37f8fc52b2a268738665e58c1bba",
+            "files": [
+              "Source/WebCore/loader/FrameLoader.cpp",
+              "Source/WebCore/loader/LocalFrameLoaderClient.h"
+            ]
+          },
+          "0038-platform-screen-win-embedder-screen-data.patch": {
+            "sha256": "a69004c7217489eb71e898c4ae737d1de99c855b2ec9ddfdcf99a1835ee4432e",
+            "files": [
+              "Source/WebCore/platform/PlatformScreen.cpp",
+              "Source/WebCore/platform/win/PlatformScreenWin.cpp"
+            ]
+          },
+          "0039-element-array-attribute-empty-relations.patch": {
+            "sha256": "ed11bc63b28fa9fecfacab5b6d058d8300e766bfae86377eb0772e171c89fe60",
+            "files": [
+              "Source/WebCore/dom/Element.cpp"
+            ]
+          }
+        },
+        "parent": "C:\\wk\\native-inspect\\artifacts\\native42-candidate-3",
+        "parentReceipt": {
+          "patches": {
+            "0035-caret-position-text-control-shadow-roots.patch": {
+              "sha256": "756fdb4ef5c6511670ddd8d9144bcb6f5bc0b222d4dc1c74143536736377e5e4",
+              "files": [
+                "Source/WebCore/dom/Document.cpp"
+              ]
+            },
+            "0037-frame-loader-client-form-submission-hook.patch": {
+              "sha256": "b00a1b8d2a74385ea38153c75c828f4df89c37f8fc52b2a268738665e58c1bba",
+              "files": [
+                "Source/WebCore/loader/FrameLoader.cpp",
+                "Source/WebCore/loader/LocalFrameLoaderClient.h"
+              ]
+            },
+            "0038-platform-screen-win-embedder-screen-data.patch": {
+              "sha256": "a69004c7217489eb71e898c4ae737d1de99c855b2ec9ddfdcf99a1835ee4432e",
+              "files": [
+                "Source/WebCore/platform/PlatformScreen.cpp",
+                "Source/WebCore/platform/win/PlatformScreenWin.cpp"
+              ]
+            },
+            "0039-element-array-attribute-empty-relations.patch": {
+              "sha256": "ed11bc63b28fa9fecfacab5b6d058d8300e766bfae86377eb0772e171c89fe60",
+              "files": [
+                "Source/WebCore/dom/Element.cpp"
+              ]
+            }
+          },
+          "parent": "C:\\wk\\native-elinternals\\artifacts\\ei-candidate-4",
+          "parentReceipt": {
+            "patches": {
+              "0037-frame-loader-client-form-submission-hook.patch": {
+                "sha256": "b00a1b8d2a74385ea38153c75c828f4df89c37f8fc52b2a268738665e58c1bba",
+                "files": {
+                  "Source/WebCore/loader/FrameLoader.cpp": [
+                    "+    if (!m_client->shouldScheduleFormSubmission(submission.get()))",
+                    "+        return;",
+                    "+"
+                  ],
+                  "Source/WebCore/loader/LocalFrameLoaderClient.h": [
+                    "+class FormSubmission;",
+                    "+    // Returning false hands the submission to the client, and the frame loader skips scheduling it. The submit and formdata",
+                    "+    // events and interactive validation have already run.",
+                    "+    virtual bool shouldScheduleFormSubmission(FormSubmission&) { return true; }",
+                    "+"
+                  ]
+                }
+              },
+              "0038-platform-screen-win-embedder-screen-data.patch": {
+                "sha256": "a69004c7217489eb71e898c4ae737d1de99c855b2ec9ddfdcf99a1835ee4432e",
+                "files": {
+                  "Source/WebCore/platform/PlatformScreen.cpp": [
+                    "-#if PLATFORM(COCOA) || PLATFORM(GTK) || (PLATFORM(WPE) && ENABLE(WPE_PLATFORM))",
+                    "+#if PLATFORM(COCOA) || PLATFORM(GTK) || (PLATFORM(WPE) && ENABLE(WPE_PLATFORM)) || PLATFORM(WIN)",
+                    "-#endif // PLATFORM(COCOA) || PLATFORM(GTK) || (PLATFORM(WPE) && ENABLE(WPE_PLATFORM))",
+                    "+#endif // PLATFORM(COCOA) || PLATFORM(GTK) || (PLATFORM(WPE) && ENABLE(WPE_PLATFORM)) || PLATFORM(WIN)"
+                  ],
+                  "Source/WebCore/platform/win/PlatformScreenWin.cpp": [
+                    "+#include \"ScreenProperties.h\"",
+                    "+// The screen an embedder set for the widget's display through PlatformScreen::updateSingletonProperties, as WPE and",
+                    "+// Mac read it, or null.",
+                    "+static const ScreenData* embedderScreenData(Widget* widget)",
+                    "+{",
+                    "+    if (!widget || !widget->root())",
+                    "+        return nullptr;",
+                    "+    auto* hostWindow = widget->root()->hostWindow();",
+                    "+    if (!hostWindow || !hostWindow->displayID())",
+                    "+        return nullptr;",
+                    "+    return PlatformScreen::singleton()->screenData(hostWindow->displayID());",
+                    "+}",
+                    "+",
+                    "+    if (auto* data = embedderScreenData(widget))",
+                    "+        return data->screenDepth;",
+                    "+    if (auto* data = embedderScreenData(widget))",
+                    "+        return data->screenRect;",
+                    "+    if (auto* data = embedderScreenData(widget))",
+                    "+        return data->screenAvailableRect;"
+                  ]
+                }
+              },
+              "0039-element-array-attribute-empty-relations.patch": {
+                "sha256": "ed11bc63b28fa9fecfacab5b6d058d8300e766bfae86377eb0772e171c89fe60",
+                "files": {
+                  "Source/WebCore/dom/Element.cpp": [
+                    "-    if (CheckedPtr cache = protect(document())->existingAXObjectCache()) {",
+                    "-        for (auto element : elements.value()) {",
+                    "-            // FIXME: Should this pass `element` instead of `*this`?",
+                    "-            cache->updateRelations(*this, attributeName);",
+                    "-        }",
+                    "-    }",
+                    "+    if (CheckedPtr cache = protect(document())->existingAXObjectCache())",
+                    "+        cache->updateRelations(*this, attributeName);"
+                  ]
+                }
+              }
+            },
+            "recompiledUnits": {
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-JSBindings-23.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/001-UnifiedSource-JSBindings-23.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-5.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/002-UnifiedSource-dom-5.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-history-1.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/004-UnifiedSource-history-1.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-10.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/005-UnifiedSource-html-10.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-12.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/006-UnifiedSource-html-12.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-16.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/007-UnifiedSource-html-16.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-19.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/008-UnifiedSource-html-19.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-35.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/009-UnifiedSource-html-35.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-4.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/010-UnifiedSource-html-4.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-6.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/011-UnifiedSource-html-6.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-8.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/012-UnifiedSource-html-8.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-1.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/013-UnifiedSource-loader-1.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-11.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/014-UnifiedSource-loader-11.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-13.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/015-UnifiedSource-loader-13.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-2.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/016-UnifiedSource-loader-2.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-3.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/017-UnifiedSource-loader-3.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-4.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/018-UnifiedSource-loader-4.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-5.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/019-UnifiedSource-loader-5.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-6.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/020-UnifiedSource-loader-6.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-7.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/021-UnifiedSource-loader-7.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-9.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/022-UnifiedSource-loader-9.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-1.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/023-UnifiedSource-page-1.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-10.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/024-UnifiedSource-page-10.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-18.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/025-UnifiedSource-page-18.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-2.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/026-UnifiedSource-page-2.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-5.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/027-UnifiedSource-page-5.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-6.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/028-UnifiedSource-page-6.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-8.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/029-UnifiedSource-page-8.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-style-6.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/031-UnifiedSource-style-6.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/page/WebKitNamespace.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/032-WebKitNamespace.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-9.cpp.obj": "C:/wk/native-elinternals/artifacts/ei-candidate-4/001-UnifiedSource-dom-9.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-platform-5.cpp.obj": "C:/wk/native-elinternals/artifacts/ei-candidate-4/002-UnifiedSource-platform-5.cpp.obj",
+              "Source/WebCore/CMakeFiles/WebCore.dir/platform/win/PlatformScreenWin.cpp.obj": "C:/wk/native-elinternals/artifacts/ei-candidate-4/003-PlatformScreenWin.cpp.obj"
+            },
+            "overlay0038": null,
+            "reusedOwnerObject": {
+              "patch": "0035",
+              "unit": "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-7.cpp.obj",
+              "object": "C:/wk/native-caret/artifacts/native32-candidate-3/001-UnifiedSource-dom-7.cpp.obj"
+            }
+          },
+          "hostGlueObjects": [
+            "C:/wk/native-elinternals/artifacts/ei-candidate-4/090-RanvierViewportGlue.cpp.obj",
+            "C:/wk/native-forms/artifacts/forms-candidate-4/RanvierEventGlue.cpp.obj",
+            "C:/wk/native-forms/artifacts/forms-candidate-4/RanvierResourceGlue.cpp.obj",
+            "C:/wk/native-forms/artifacts/forms-candidate-4/RanvierSvgViewGlue.cpp.obj"
+          ],
+          "recompiledUnits": {
+            "Source/WebCore/CMakeFiles/WebCore.dir/C_/wk/ranvier-webcore/host/dom/RanvierDomGlue.cpp.obj": "C:/wk/native-inspect/artifacts/native42-candidate-3/000-RanvierDomGlue.cpp.obj"
+          },
+          "patchUnitsBorrowed": {
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-7.cpp.obj": "C:/wk/native-caret/artifacts/native32-candidate-3/001-UnifiedSource-dom-7.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-9.cpp.obj": "C:/wk/native-elinternals/artifacts/ei-candidate-4/001-UnifiedSource-dom-9.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-3.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/017-UnifiedSource-loader-3.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-JSBindings-23.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/001-UnifiedSource-JSBindings-23.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-5.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/002-UnifiedSource-dom-5.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-history-1.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/004-UnifiedSource-history-1.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-10.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/005-UnifiedSource-html-10.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-12.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/006-UnifiedSource-html-12.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-16.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/007-UnifiedSource-html-16.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-19.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/008-UnifiedSource-html-19.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-35.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/009-UnifiedSource-html-35.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-4.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/010-UnifiedSource-html-4.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-6.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/011-UnifiedSource-html-6.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-8.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/012-UnifiedSource-html-8.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-1.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/013-UnifiedSource-loader-1.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-11.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/014-UnifiedSource-loader-11.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-13.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/015-UnifiedSource-loader-13.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-2.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/016-UnifiedSource-loader-2.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-4.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/018-UnifiedSource-loader-4.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-5.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/019-UnifiedSource-loader-5.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-6.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/020-UnifiedSource-loader-6.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-7.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/021-UnifiedSource-loader-7.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-9.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/022-UnifiedSource-loader-9.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-1.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/023-UnifiedSource-page-1.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-10.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/024-UnifiedSource-page-10.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-18.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/025-UnifiedSource-page-18.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-2.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/026-UnifiedSource-page-2.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-5.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/027-UnifiedSource-page-5.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-6.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/028-UnifiedSource-page-6.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-8.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/029-UnifiedSource-page-8.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-style-6.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/031-UnifiedSource-style-6.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/page/WebKitNamespace.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/032-WebKitNamespace.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-platform-5.cpp.obj": "C:/wk/native-elinternals/artifacts/ei-candidate-4/002-UnifiedSource-platform-5.cpp.obj",
+            "Source/WebCore/CMakeFiles/WebCore.dir/platform/win/PlatformScreenWin.cpp.obj": "C:/wk/native-elinternals/artifacts/ei-candidate-4/003-PlatformScreenWin.cpp.obj"
+          },
+          "inspectGlue": {
+            "object": "C:/wk/native-inspect/artifacts/native42-candidate-3/090-RanvierInspectGlue.cpp.obj",
+            "undefinedSymbols": 52,
+            "inspectorSymbols": []
+          }
+        },
+        "hostGlueObjects": [
+          "C:/wk/native-elinternals/artifacts/ei-candidate-4/090-RanvierViewportGlue.cpp.obj",
+          "C:/wk/native-forms/artifacts/forms-candidate-4/RanvierEventGlue.cpp.obj",
+          "C:/wk/native-forms/artifacts/forms-candidate-4/RanvierResourceGlue.cpp.obj",
+          "C:/wk/native-forms/artifacts/forms-candidate-4/RanvierSvgViewGlue.cpp.obj",
+          "C:/wk/native-inspect/artifacts/native42-candidate-3/090-RanvierInspectGlue.cpp.obj"
+        ],
+        "recompiledUnits": {
+          "Source/WebCore/CMakeFiles/WebCore.dir/C_/wk/ranvier-webcore/host/dom/RanvierDomGlue.cpp.obj": "C:/wk/native-strings/artifacts/native43-candidate-3/000-RanvierDomGlue.cpp.obj"
+        }
+      },
+      "hostGlueObjects": [
+        "C:/wk/native-elinternals/artifacts/ei-candidate-4/090-RanvierViewportGlue.cpp.obj",
+        "C:/wk/native-forms/artifacts/forms-candidate-4/RanvierEventGlue.cpp.obj",
+        "C:/wk/native-forms/artifacts/forms-candidate-4/RanvierSvgViewGlue.cpp.obj"
+      ],
+      "recompiledUnits": {
+        "Source/WebCore/CMakeFiles/WebCore.dir/C_/wk/ranvier-webcore/host/dom/RanvierDomGlue.cpp.obj": "C:/wk/native-blob/artifacts/native44-candidate-6/000-RanvierDomGlue.cpp.obj"
+      },
+      "patchUnitsBorrowed": {
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-7.cpp.obj": "C:/wk/native-caret/artifacts/native32-candidate-3/001-UnifiedSource-dom-7.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-9.cpp.obj": "C:/wk/native-elinternals/artifacts/ei-candidate-4/001-UnifiedSource-dom-9.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-3.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/017-UnifiedSource-loader-3.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-JSBindings-23.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/001-UnifiedSource-JSBindings-23.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-5.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/002-UnifiedSource-dom-5.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-history-1.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/004-UnifiedSource-history-1.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-10.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/005-UnifiedSource-html-10.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-12.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/006-UnifiedSource-html-12.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-16.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/007-UnifiedSource-html-16.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-19.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/008-UnifiedSource-html-19.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-35.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/009-UnifiedSource-html-35.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-4.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/010-UnifiedSource-html-4.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-6.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/011-UnifiedSource-html-6.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-8.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/012-UnifiedSource-html-8.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-1.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/013-UnifiedSource-loader-1.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-11.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/014-UnifiedSource-loader-11.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-13.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/015-UnifiedSource-loader-13.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-2.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/016-UnifiedSource-loader-2.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-4.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/018-UnifiedSource-loader-4.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-5.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/019-UnifiedSource-loader-5.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-6.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/020-UnifiedSource-loader-6.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-7.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/021-UnifiedSource-loader-7.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-9.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/022-UnifiedSource-loader-9.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-1.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/023-UnifiedSource-page-1.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-10.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/024-UnifiedSource-page-10.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-18.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/025-UnifiedSource-page-18.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-2.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/026-UnifiedSource-page-2.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-5.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/027-UnifiedSource-page-5.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-6.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/028-UnifiedSource-page-6.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-8.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/029-UnifiedSource-page-8.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-style-6.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/031-UnifiedSource-style-6.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/page/WebKitNamespace.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/032-WebKitNamespace.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-platform-5.cpp.obj": "C:/wk/native-elinternals/artifacts/ei-candidate-4/002-UnifiedSource-platform-5.cpp.obj",
+        "Source/WebCore/CMakeFiles/WebCore.dir/platform/win/PlatformScreenWin.cpp.obj": "C:/wk/native-elinternals/artifacts/ei-candidate-4/003-PlatformScreenWin.cpp.obj"
+      },
+      "inspectGlue": {
+        "object": "C:/wk/native-blob/artifacts/native44-candidate-6/090-RanvierInspectGlue.cpp.obj",
+        "undefinedSymbols": 52,
+        "inspectorSymbols": []
+      },
+      "resourceGlue": "C:/wk/native-blob/artifacts/native44-candidate-6/091-RanvierResourceGlue.cpp.obj"
+    },
+    "hostGlueObjects": [
+      "C:/wk/native-blob/artifacts/native44-candidate-6/091-RanvierResourceGlue.cpp.obj",
+      "C:/wk/native-coords/artifacts/coords-candidate-5/090-RanvierViewportGlue.cpp.obj",
+      "C:/wk/native-forms/artifacts/forms-candidate-4/RanvierEventGlue.cpp.obj",
+      "C:/wk/native-forms/artifacts/forms-candidate-4/RanvierSvgViewGlue.cpp.obj"
+    ],
+    "recompiledUnits": {
+      "Source/WebCore/CMakeFiles/WebCore.dir/C_/wk/ranvier-webcore/host/dom/RanvierDomGlue.cpp.obj": "C:/wk/native-cascade/artifacts/native46-candidate-5/000-RanvierDomGlue.cpp.obj"
+    },
+    "patchUnitsBorrowed": {
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-7.cpp.obj": "C:/wk/native-caret/artifacts/native32-candidate-3/001-UnifiedSource-dom-7.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-9.cpp.obj": "C:/wk/native-elinternals/artifacts/ei-candidate-4/001-UnifiedSource-dom-9.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-3.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/017-UnifiedSource-loader-3.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-JSBindings-23.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/001-UnifiedSource-JSBindings-23.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-5.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/002-UnifiedSource-dom-5.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-history-1.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/004-UnifiedSource-history-1.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-10.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/005-UnifiedSource-html-10.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-12.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/006-UnifiedSource-html-12.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-16.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/007-UnifiedSource-html-16.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-19.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/008-UnifiedSource-html-19.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-35.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/009-UnifiedSource-html-35.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-4.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/010-UnifiedSource-html-4.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-6.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/011-UnifiedSource-html-6.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-8.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/012-UnifiedSource-html-8.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-1.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/013-UnifiedSource-loader-1.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-11.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/014-UnifiedSource-loader-11.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-13.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/015-UnifiedSource-loader-13.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-2.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/016-UnifiedSource-loader-2.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-4.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/018-UnifiedSource-loader-4.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-5.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/019-UnifiedSource-loader-5.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-6.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/020-UnifiedSource-loader-6.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-7.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/021-UnifiedSource-loader-7.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-9.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/022-UnifiedSource-loader-9.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-1.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/023-UnifiedSource-page-1.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-10.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/024-UnifiedSource-page-10.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-18.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/025-UnifiedSource-page-18.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-2.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/026-UnifiedSource-page-2.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-5.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/027-UnifiedSource-page-5.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-6.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/028-UnifiedSource-page-6.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-8.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/029-UnifiedSource-page-8.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-style-6.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/031-UnifiedSource-style-6.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/page/WebKitNamespace.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/032-WebKitNamespace.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-platform-5.cpp.obj": "C:/wk/native-elinternals/artifacts/ei-candidate-4/002-UnifiedSource-platform-5.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/platform/win/PlatformScreenWin.cpp.obj": "C:/wk/native-elinternals/artifacts/ei-candidate-4/003-PlatformScreenWin.cpp.obj"
+    },
+    "inspectGlue": {
+      "object": "C:/wk/native-cascade/artifacts/native46-candidate-5/090-RanvierInspectGlue.cpp.obj",
+      "undefinedSymbols": 92,
+      "inspectorSymbols": []
+    }
+  },
+  "hostGlueObjects": [
+    "C:/wk/native-blob/artifacts/native44-candidate-6/091-RanvierResourceGlue.cpp.obj",
+    "C:/wk/native-coords/artifacts/coords-candidate-5/090-RanvierViewportGlue.cpp.obj",
+    "C:/wk/native-forms/artifacts/forms-candidate-4/RanvierEventGlue.cpp.obj",
+    "C:/wk/native-forms/artifacts/forms-candidate-4/RanvierSvgViewGlue.cpp.obj"
+  ],
+  "recompiledUnits": {
+    "Source/WebCore/CMakeFiles/WebCore.dir/C_/wk/ranvier-webcore/host/dom/RanvierDomGlue.cpp.obj": "C:/wk/native-cascade-shadow/artifacts/native46-candidate-6/000-RanvierDomGlue.cpp.obj"
+  },
+  "patchUnitsBorrowed": {
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-7.cpp.obj": "C:/wk/native-caret/artifacts/native32-candidate-3/001-UnifiedSource-dom-7.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-9.cpp.obj": "C:/wk/native-elinternals/artifacts/ei-candidate-4/001-UnifiedSource-dom-9.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-3.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/017-UnifiedSource-loader-3.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-JSBindings-23.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/001-UnifiedSource-JSBindings-23.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-5.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/002-UnifiedSource-dom-5.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-history-1.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/004-UnifiedSource-history-1.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-10.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/005-UnifiedSource-html-10.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-12.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/006-UnifiedSource-html-12.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-16.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/007-UnifiedSource-html-16.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-19.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/008-UnifiedSource-html-19.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-35.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/009-UnifiedSource-html-35.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-4.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/010-UnifiedSource-html-4.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-6.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/011-UnifiedSource-html-6.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-8.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/012-UnifiedSource-html-8.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-1.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/013-UnifiedSource-loader-1.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-11.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/014-UnifiedSource-loader-11.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-13.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/015-UnifiedSource-loader-13.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-2.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/016-UnifiedSource-loader-2.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-4.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/018-UnifiedSource-loader-4.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-5.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/019-UnifiedSource-loader-5.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-6.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/020-UnifiedSource-loader-6.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-7.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/021-UnifiedSource-loader-7.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-9.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/022-UnifiedSource-loader-9.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-1.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/023-UnifiedSource-page-1.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-10.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/024-UnifiedSource-page-10.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-18.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/025-UnifiedSource-page-18.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-2.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/026-UnifiedSource-page-2.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-5.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/027-UnifiedSource-page-5.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-6.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/028-UnifiedSource-page-6.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-8.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/029-UnifiedSource-page-8.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-style-6.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/031-UnifiedSource-style-6.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/page/WebKitNamespace.cpp.obj": "C:/wk/native-screen/artifacts/native38-candidate-7/032-WebKitNamespace.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-platform-5.cpp.obj": "C:/wk/native-elinternals/artifacts/ei-candidate-4/002-UnifiedSource-platform-5.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/platform/win/PlatformScreenWin.cpp.obj": "C:/wk/native-elinternals/artifacts/ei-candidate-4/003-PlatformScreenWin.cpp.obj"
+  },
+  "inspectGlue": {
+    "object": "C:/wk/native-cascade-shadow/artifacts/native46-candidate-6/090-RanvierInspectGlue.cpp.obj",
+    "undefinedSymbols": 93,
+    "inspectorSymbols": []
+  }
+}
