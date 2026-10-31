@@ -1,0 +1,190 @@
+{
+  "group": "I01",
+  "issue": "ranvier-org/Ranvier.WebCore#99",
+  "kind": "evidence-only probe; no ABI change",
+  "runtime": "Ranvier.WebCore.Native.win-x64 0.1.0-preview.22 (official, native main c7bb35d)",
+  "runtimeHashes": {
+    "brotlicommon.dll": "2515a7612973a19cf1074ff218140001d8765a66b635cc00f201c3b38d73f771",
+    "brotlidec.dll": "40e4b428ee8483b1914198fbfe3a59b2d8108bf26f20cf00248f28b580e52c04",
+    "harfbuzz-icu.dll": "677a9d701fcb08bef43cb8aca736d6df76eb510c7b936f146a91ca48711d1122",
+    "harfbuzz.dll": "fa24912250647e93da03db3716df84b802057316a7d371c7b014cec73e39b6ab",
+    "icudt77.dll": "da9258abba94b64153003bb771b896ed9f9a7eed054901c6812c2545812dfa9f",
+    "icuin77.dll": "0b01b8c9150a87321e283d25ab8cdaed3897dc83c9de04ab173dc41e314c4c1b",
+    "icuuc77.dll": "d2df68a703717fe3af5cf2fb0ff65b3f4feaeaa4c5109aeec6931dee569a831d",
+    "JavaScriptCore.dll": "32a841a88114d68dc281500c73cb9a4c1219bb94cf4555c93ddecc9c9a99d4ec",
+    "jpeg62.dll": "124016a9aceba970f0cc9075394c6d033f28d71a7be10c6e493fc531e385afd1",
+    "libpng16.dll": "070c7c70312bba5bfe670f5856ad1b295ab7d10f712639df2321bcda98981ddb",
+    "libsharpyuv.dll": "0d4329ba36e1bcea03277786223a55492f47710c839b7ddabacfeab7e6a4c5f6",
+    "libwebp.dll": "f720a31dcf00ebbdc007ab43ba9de209c48d8711829eb8a1cc023c5fd59b9e76",
+    "libwebpdemux.dll": "89a44916ba93f16433b3e6905f0ccc4a688554e3be7111a8e7e41575e45cbcf5",
+    "libwebpmux.dll": "6636567b1a35beca35d7ddf85b90976a853fd196c7f1292bd98a66a4327dc1c7",
+    "libxml2.dll": "e4baf20044d69ed15fb7fa4e634d827fa2e7337b3031e4539487e5e4f282a48d",
+    "RanvierWebCoreHost.dll": "48a5602df23c7ea7785f61ddf12bb142437cffa722697713740e96a2aa620e77",
+    "WebCore.dll": "d59ad88fb8cec5afc4790ea17493d2a1c071485280c0d1023323645c1abf613d",
+    "zlib1.dll": "8e22e39684fa33d6d59a6be3125b45bda79786bf1e1d0394361283bcd8f50ff0"
+  },
+  "native": {
+    "assertions": 70,
+    "cases": {
+      "remove-later-during-dispatch": [
+        [
+          "A"
+        ],
+        [
+          "A"
+        ]
+      ],
+      "remove-self-during-dispatch": [
+        [
+          "A",
+          "B"
+        ],
+        [
+          "B"
+        ]
+      ],
+      "remove-earlier-during-dispatch": [
+        [
+          "A",
+          "B"
+        ],
+        [
+          "B"
+        ]
+      ],
+      "add-during-dispatch": [
+        [
+          "A"
+        ],
+        [
+          "A",
+          "C"
+        ]
+      ],
+      "capture-and-bubble-are-separate": [
+        [
+          "P",
+          "P"
+        ],
+        [
+          "P"
+        ],
+        []
+      ],
+      "duplicate-registration": [
+        [
+          "D",
+          "D"
+        ],
+        [
+          "D"
+        ],
+        []
+      ],
+      "group-removal-across-targets": [
+        [
+          "Y",
+          "Z",
+          "X"
+        ],
+        [
+          "Z"
+        ]
+      ],
+      "capture-removes-bubble-on-ancestor": [
+        [
+          "Pc"
+        ],
+        [
+          "Pc"
+        ]
+      ]
+    },
+    "qualified": [
+      "duplicate-registration"
+    ]
+  },
+  "chromium": {
+    "browser": "156.0.8078.4",
+    "casesSha256": "baa25cee2b9a4e2cbb3d0e34f73bc1c9757eeae18c99b8163c833b5b30411e9a",
+    "assertions": 8,
+    "cases": {
+      "remove-later-during-dispatch": [
+        [
+          "A"
+        ],
+        [
+          "A"
+        ]
+      ],
+      "remove-self-during-dispatch": [
+        [
+          "A",
+          "B"
+        ],
+        [
+          "B"
+        ]
+      ],
+      "remove-earlier-during-dispatch": [
+        [
+          "A",
+          "B"
+        ],
+        [
+          "B"
+        ]
+      ],
+      "add-during-dispatch": [
+        [
+          "A"
+        ],
+        [
+          "A",
+          "C"
+        ]
+      ],
+      "capture-and-bubble-are-separate": [
+        [
+          "P",
+          "P"
+        ],
+        [
+          "P"
+        ],
+        []
+      ],
+      "duplicate-registration": [
+        [
+          "D"
+        ],
+        [
+          "D"
+        ],
+        []
+      ],
+      "group-removal-across-targets": [
+        [
+          "Y",
+          "Z",
+          "X"
+        ],
+        [
+          "Z"
+        ]
+      ],
+      "capture-removes-bubble-on-ancestor": [
+        [
+          "Pc"
+        ],
+        [
+          "Pc"
+        ]
+      ]
+    }
+  },
+  "repeat": {
+    "native": "30/30",
+    "chromium": "30/30"
+  }
+}
