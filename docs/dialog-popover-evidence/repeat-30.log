@@ -1,0 +1,3 @@
+REPEAT runtime=C:/wk/native-dialog/artifacts/native30-frozen/runtimes/win-x64/native runs=30 pass=30 fail=0
+REPEAT runtime=C:/wk/native-caret/artifacts/native32-candidate-2/runtime runs=30 pass=30 fail=0
+DONE

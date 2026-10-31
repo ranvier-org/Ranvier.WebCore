@@ -530,19 +530,6 @@
     "assertions": 3232
   },
   {
-    "name": "dialog_popover",
-    "exitCode": 0,
-    "log": "C:\\wk\\native-dialog\\artifacts\\native30-batch\\dialog_popover.log",
-    "logSha256": "7ab81866f47edd71900eefe5774c3884dfd9f6fc9c880266dd339c87ba10e3a8",
-    "executedSources": {
-      "C:\\wk\\native-dialog\\tests\\abi\\dialog_popover.py": "5bd82f4fb66cb8530d8bdb5579c636dc4088dda1d190630025a6a59a11ada7b6",
-      "C:\\wk\\native-dialog\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
-    },
-    "executedAssets": {},
-    "runtimeReceipt": "C:\\wk\\native-dialog\\artifacts\\native30-frozen\\runtime-receipt.json",
-    "assertions": 845
-  },
-  {
     "name": "frames",
     "exitCode": 0,
     "log": "C:\\wk\\native-dialog\\artifacts\\native30-batch\\frames.log",
@@ -637,5 +624,18 @@
       "C:\\wk\\native-dialog\\artifacts\\native30-driver\\zh-Hant\\FSharp.Core.resources.dll": "c2716349d7309a76e208205c24ee893e59fc6b23b6e4547098a554b77d099212"
     },
     "runtimeReceipt": "C:\\wk\\native-dialog\\artifacts\\native30-frozen\\runtime-receipt.json"
+  },
+  {
+    "name": "dialog_popover",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-dialog\\artifacts\\native30-batch\\dialog_popover.log",
+    "logSha256": "01a52aa2686cbbdb7e821a1fc24486d8eea81e52e491bf224ca6bda41ad805b1",
+    "executedSources": {
+      "C:\\wk\\native-dialog\\tests\\abi\\dialog_popover.py": "c6560f747c393313740b9e21929d4289d551c844dac2530358e583d04897cb53",
+      "C:\\wk\\native-dialog\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-dialog\\artifacts\\native30-frozen\\runtime-receipt.json",
+    "assertions": 845
   }
 ]
