@@ -1,0 +1,10 @@
+--- a/Source/WebCore/dom/Document.cpp
++++ b/Source/WebCore/dom/Document.cpp
+@@ -2333,6 +2333,6 @@ RefPtr<CaretPosition> Document::caretPositionFromPoint(double x, double y, CaretPositionFromPointOptions options)
+     RefPtr anchorNode = position.anchorNode();
+     if (CheckedPtr textFormControl = dynamicDowncast<HTMLTextFormControlElement>(anchorNode->shadowHost())) {
+         anchorNode = textFormControl.get();
+-        if ((!anchorNode->isInShadowTree() && !options.shadowRoots.size()) || (anchorNode->isInShadowTree() && options.shadowRoots.contains(Ref(anchorNode->treeScope().rootNode()))))
++        if (!anchorNode->isInShadowTree() || options.shadowRoots.contains(Ref(anchorNode->treeScope().rootNode())))
+             return CaretPosition::create(WTF::move(anchorNode), position.offsetInContainerNode());
+     }

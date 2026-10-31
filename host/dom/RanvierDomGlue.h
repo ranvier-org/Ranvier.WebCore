@@ -58,6 +58,8 @@ WEBCORE_EXPORT void ranvier_dom_dom_selection_release(RvDOMSelection*);
 WEBCORE_EXPORT RvDOMSelection* ranvier_dom_dom_selection_retain(RvDOMSelection*);
 WEBCORE_EXPORT void ranvier_dom_dom_rect_read_only_release(RvDOMRectReadOnly*);
 WEBCORE_EXPORT RvDOMRectReadOnly* ranvier_dom_dom_rect_read_only_retain(RvDOMRectReadOnly*);
+WEBCORE_EXPORT void ranvier_dom_caret_position_release(RvCaretPosition*);
+WEBCORE_EXPORT RvCaretPosition* ranvier_dom_caret_position_retain(RvCaretPosition*);
 WEBCORE_EXPORT void ranvier_dom_dom_rect_list_release(RvDOMRectList*);
 WEBCORE_EXPORT RvDOMRectList* ranvier_dom_dom_rect_list_retain(RvDOMRectList*);
 WEBCORE_EXPORT void ranvier_dom_dom_point_read_only_release(RvDOMPointReadOnly*);
@@ -319,6 +321,7 @@ WEBCORE_EXPORT int32_t ranvier_dom_document_create_tree_walker(RvNode* target, R
 WEBCORE_EXPORT int32_t ranvier_dom_document_caret_range_from_point(RvNode* target, int32_t x, int32_t y, RvAbstractRange** result);
 WEBCORE_EXPORT int32_t ranvier_dom_document_aria_notify(RvNode* target, const char* announcement);
 WEBCORE_EXPORT int32_t ranvier_dom_document_aria_notify_2(RvNode* target, const char* announcement, const RvDomAriaNotifyOptions* options);
+WEBCORE_EXPORT int32_t ranvier_dom_document_caret_position_from_point(RvNode* target, double x, double y, const RvDomCaretPositionFromPointOptions* options, RvCaretPosition** result);
 WEBCORE_EXPORT int32_t ranvier_dom_document_get_elements_by_name(RvNode* target, const char* element_name, RvNodeList** result);
 WEBCORE_EXPORT int32_t ranvier_dom_document_has_focus(RvNode* target, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_document_exec_command(RvNode* target, const char* command_id, int32_t show_ui, const char* value, int32_t* result);
@@ -1878,6 +1881,9 @@ WEBCORE_EXPORT int32_t ranvier_dom_dom_rect_read_only_get_top(RvDOMRectReadOnly*
 WEBCORE_EXPORT int32_t ranvier_dom_dom_rect_read_only_get_right(RvDOMRectReadOnly* target, double* result);
 WEBCORE_EXPORT int32_t ranvier_dom_dom_rect_read_only_get_bottom(RvDOMRectReadOnly* target, double* result);
 WEBCORE_EXPORT int32_t ranvier_dom_dom_rect_read_only_get_left(RvDOMRectReadOnly* target, double* result);
+WEBCORE_EXPORT int32_t ranvier_dom_caret_position_get_offset_node(RvCaretPosition* target, RvNode** result);
+WEBCORE_EXPORT int32_t ranvier_dom_caret_position_get_offset(RvCaretPosition* target, uint32_t* result);
+WEBCORE_EXPORT int32_t ranvier_dom_caret_position_get_client_rect(RvCaretPosition* target, RvDOMRectReadOnly** result);
 WEBCORE_EXPORT int32_t ranvier_dom_dom_rect_create(RvNode* target, double x, double y, double width, double height, RvDOMRectReadOnly** result);
 WEBCORE_EXPORT int32_t ranvier_dom_dom_rect_get_x(RvDOMRectReadOnly* target, double* result);
 WEBCORE_EXPORT int32_t ranvier_dom_dom_rect_set_x(RvDOMRectReadOnly* target, double value);

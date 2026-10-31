@@ -348,6 +348,15 @@ Removing `requiredExtensions` or `systemLanguage` empties the element's SVGStrin
 
 `tests/abi/svg_tests_lists.py` compares removal, empty, restore, clear and append steps with the Chromium 156 oracle `tests/fixtures/svg-tests-lists-oracle.json` (`tests/abi/svg_tests_lists_browser.mjs`). Measured differences that remain: `clear()` leaves the attribute `""` where Chromium removes it, `systemLanguage` serialises with `", "`, and `requiredExtensions=""` holds one empty item. Evidence: `docs/mathml-evidence/source-0034/evidence.json`.
 
+## 0035-caret-position-text-control-shadow-roots
+
+`Document::caretPositionFromPoint` returns the text control element for a hit inside an `<input>` or `<textarea>`
+that is outside any shadow tree, whatever `CaretPositionFromPointOptions.shadowRoots` lists, as Chromium does. Before
+the patch a non-empty `shadowRoots` list returned a text node of the control's user-agent shadow root.
+
+`tests/abi/caret_hit.py` replays the Chromium 156 oracle `tests/fixtures/caret-hit-oracle.json` with and without
+`shadowRoots`; its text-control points give `INPUT@1` both ways at device scales 1, 1.5 and 2.
+
 ## Working on the series
 
 ```

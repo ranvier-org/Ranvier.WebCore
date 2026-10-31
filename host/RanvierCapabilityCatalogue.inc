@@ -135,6 +135,7 @@ static constexpr const char* capabilityAbiNames[] = {
     "dom:Range",
     "dom:DOMSelection",
     "dom:DOMRectReadOnly",
+    "dom:CaretPosition",
     "dom:DOMRect",
     "dom:DOMRectList",
     "dom:DOMPointReadOnly",

@@ -256,6 +256,8 @@ and [<AllowNullLiteral>] Document =
     abstract member ariaNotify: announcement: string -> unit
     /// <summary>Document.ariaNotify.</summary>
     abstract member ariaNotify: announcement: string * options: AriaNotifyOptions -> unit
+    /// <summary>Document.caretPositionFromPoint.</summary>
+    abstract member caretPositionFromPoint: x: float * y: float * ?options: CaretPositionFromPointOptions -> CaretPosition
     /// <summary>Document.scrollingElement.</summary>
     abstract member scrollingElement: Element with get
     /// <summary>Document.readyState.</summary>
@@ -2813,6 +2815,15 @@ and [<AllowNullLiteral>] DOMRectReadOnly =
     /// <summary>DOMRectReadOnly.left.</summary>
     abstract member left: float with get
 
+/// <summary>CaretPosition in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CaretPosition =
+    /// <summary>CaretPosition.offsetNode.</summary>
+    abstract member offsetNode: Node with get
+    /// <summary>CaretPosition.offset.</summary>
+    abstract member offset: uint32 with get
+    /// <summary>CaretPosition.getClientRect.</summary>
+    abstract member getClientRect: unit -> DOMRect
+
 /// <summary>DOMRect in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] DOMRect =
     inherit DOMRectReadOnly
@@ -5336,6 +5347,10 @@ and [<AllowNullLiteral; DomDictionary>] ImportNodeOptions() =
 and [<AllowNullLiteral; DomDictionary>] AriaNotifyOptions() =
     member val priority: (AriaNotificationPriority) option = None with get, set
     member val interrupt: (AriaNotificationInterrupt) option = None with get, set
+
+/// <summary>CaretPositionFromPointOptions in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] CaretPositionFromPointOptions() =
+    member val shadowRoots: (ShadowRoot) array = [||] with get, set
 
 /// <summary>ShadowRootInit in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] ShadowRootInit() =

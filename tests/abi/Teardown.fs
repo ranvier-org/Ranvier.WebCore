@@ -568,6 +568,42 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
                     failwith "ToggleEvent.newState changed after destroy"
 
                 rv_event_release held.Value
+        | "caret position" ->
+            rv_dom_node_set_text_content (span, "AAAA") |> check "caret text"
+            rv_dom_document_caret_position_from_point (document, 2.0, 2.0, null, &held.contents)
+            |> check "caretPositionFromPoint"
+            let mutable node = 0n
+            rv_dom_caret_position_get_offset_node (held.Value, &node) |> check "CaretPosition.offsetNode"
+
+            if node = 0n then
+                failwith "no CaretPosition.offsetNode"
+
+            rv_node_release node
+
+            fun () ->
+                let mutable offset = 99u
+                rv_dom_caret_position_get_offset (held.Value, &offset) |> check "CaretPosition.offset after destroy"
+
+                if offset > 4u then
+                    failwithf "CaretPosition.offset %d after destroy" offset
+
+                rv_dom_caret_position_get_offset_node (held.Value, &node)
+                |> check "CaretPosition.offsetNode after destroy"
+
+                if node = 0n then
+                    failwith "CaretPosition.offsetNode lost after destroy"
+
+                rv_node_release node
+                let mutable rect = 0n
+                let status = rv_dom_caret_position_get_client_rect (held.Value, &rect)
+
+                if status <> 0 && status <> -9 then
+                    failwithf "CaretPosition.getClientRect after destroy: %d" status
+
+                if rect <> 0n then
+                    rv_dom_dom_rect_read_only_release rect
+
+                rv_dom_caret_position_release held.Value
         | _ ->
             rv_dom_html_element_get_attribute_style_map (div, &held.contents)
             |> check "attributeStyleMap"
@@ -682,6 +718,7 @@ let run (outDir: string) =
                     "open modal dialog"
                     "toggle event"
                     "blob slice"
+                    "caret position"
                 ] do
                 for remove in [ false; true ] do
                     releaseAfterDestroy kind remove

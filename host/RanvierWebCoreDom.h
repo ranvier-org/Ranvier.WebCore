@@ -45,6 +45,7 @@ typedef struct RvDOMStringMap RvDOMStringMap;
 typedef struct RvAbstractRange RvAbstractRange;
 typedef struct RvDOMSelection RvDOMSelection;
 typedef struct RvDOMRectReadOnly RvDOMRectReadOnly;
+typedef struct RvCaretPosition RvCaretPosition;
 typedef struct RvDOMRectList RvDOMRectList;
 typedef struct RvDOMPointReadOnly RvDOMPointReadOnly;
 typedef struct RvDOMQuad RvDOMQuad;
@@ -438,6 +439,13 @@ typedef struct RvDomAriaNotifyOptions {
     const int32_t* priority; /* AriaNotificationPriority, NULL for absent, RV_DOM_ARIA_NOTIFICATION_PRIORITY_* */
     const int32_t* interrupt; /* AriaNotificationInterrupt, NULL for absent, RV_DOM_ARIA_NOTIFICATION_INTERRUPT_* */
 } RvDomAriaNotifyOptions;
+
+/* The IDL dictionary CaretPositionFromPointOptions. size is sizeof(RvDomCaretPositionFromPointOptions) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomCaretPositionFromPointOptions {
+    uint32_t size;
+    const RvDomSequenceShadowRoot* shadow_roots; /* sequence<ShadowRoot>, default [] */
+} RvDomCaretPositionFromPointOptions;
 
 /* The IDL dictionary ShadowRootInit. size is sizeof(RvDomShadowRootInit) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
@@ -1315,6 +1323,10 @@ RV_EXPORT RvDOMSelection* rv_dom_dom_selection_retain(RvDOMSelection*);
 RV_EXPORT void rv_dom_dom_rect_read_only_release(RvDOMRectReadOnly*);
 /* Adds a reference to a DOMRectReadOnly and returns it. */
 RV_EXPORT RvDOMRectReadOnly* rv_dom_dom_rect_read_only_retain(RvDOMRectReadOnly*);
+/* Releases a handle to a CaretPosition. */
+RV_EXPORT void rv_dom_caret_position_release(RvCaretPosition*);
+/* Adds a reference to a CaretPosition and returns it. */
+RV_EXPORT RvCaretPosition* rv_dom_caret_position_retain(RvCaretPosition*);
 /* Releases a handle to a DOMRectList. */
 RV_EXPORT void rv_dom_dom_rect_list_release(RvDOMRectList*);
 /* Adds a reference to a DOMRectList and returns it. */
@@ -1791,6 +1803,10 @@ RV_EXPORT int32_t rv_dom_document_aria_notify(RvNode* target, const char* announ
 /* Document.ariaNotify(DOMString announcement, AriaNotifyOptions options) -> undefined; RV_ERR_UNSUPPORTED while the
  * setting IsARIANotifyEnabled is off */
 RV_EXPORT int32_t rv_dom_document_aria_notify_2(RvNode* target, const char* announcement, const RvDomAriaNotifyOptions* options);
+/* Document.caretPositionFromPoint(double x, double y, optional CaretPositionFromPointOptions options = {}) ->
+ * CaretPosition?; options defaults to {} in IDL; options may be NULL for the IDL default; *result is a new reference,
+ * or NULL; RV_ERR_UNSUPPORTED while the setting CaretPositionFromPointEnabled is off */
+RV_EXPORT int32_t rv_dom_document_caret_position_from_point(RvNode* target, double x, double y, const RvDomCaretPositionFromPointOptions* options, RvCaretPosition** result);
 /* Document.getElementsByName(DOMString elementName) -> NodeList; *result is a new reference */
 RV_EXPORT int32_t rv_dom_document_get_elements_by_name(RvNode* target, const char* element_name, RvNodeList** result);
 /* Document.hasFocus() -> boolean */
@@ -5451,6 +5467,14 @@ RV_EXPORT int32_t rv_dom_dom_rect_read_only_get_right(RvDOMRectReadOnly* target,
 RV_EXPORT int32_t rv_dom_dom_rect_read_only_get_bottom(RvDOMRectReadOnly* target, double* result);
 /* DOMRectReadOnly.left getter: readonly attribute unrestricted double left */
 RV_EXPORT int32_t rv_dom_dom_rect_read_only_get_left(RvDOMRectReadOnly* target, double* result);
+/* CaretPosition */
+
+/* CaretPosition.offsetNode getter: readonly attribute Node? offsetNode; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_caret_position_get_offset_node(RvCaretPosition* target, RvNode** result);
+/* CaretPosition.offset getter: readonly attribute unsigned long offset */
+RV_EXPORT int32_t rv_dom_caret_position_get_offset(RvCaretPosition* target, uint32_t* result);
+/* CaretPosition.getClientRect() -> DOMRect?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_caret_position_get_client_rect(RvCaretPosition* target, RvDOMRectReadOnly** result);
 /* DOMRect */
 
 /* DOMRect.constructor: target is the Document of the constructed object; x defaults to 0 in IDL; y defaults to 0 in
