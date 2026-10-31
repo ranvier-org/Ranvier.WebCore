@@ -51,7 +51,7 @@ def verify(native_directory):
     host = bind('rv_host_create', pointer, [integer, integer])(320, 240)
     expect(bool(host), 'host creation')
     try:
-        expect(bind('rv_abi_version', unsigned, [])() == 54, 'Native46 ABI54 registration transport')
+        expect(bind('rv_abi_version', unsigned, [])() == 55, 'Native47 ABI55 registration transport')
         expect(bind('rv_abi_has', integer, [string])(b'dom-css-register-property') == 1, 'registration capability')
         body = bind('rv_document_body', pointer, [pointer])(host)
         retained.append(('rv_node_release', body))
@@ -140,7 +140,7 @@ def verify(native_directory):
             <div id="registered-priority"></div><div id="plain-priority"></div>
             <div id="registered-cascade"></div><div id="plain-cascade"></div>'''
         call('rv_dom_element_set_inner_html', [pointer, Utf8], body, markup)
-        find = bind('rv_document_get_element_by_id', pointer, [pointer, string])
+        find = bind('rv_document_get_element_by_id', pointer, [pointer, Utf8])
 
         def node(name):
             result = find(host, name)

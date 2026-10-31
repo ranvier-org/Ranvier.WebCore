@@ -49,7 +49,7 @@ def verify(native_directory):
             #probe::after { content:'after'; width:22px; opacity:.75; }
             </style><div id="probe">probe</div><div id="plain">plain</div>'''
         expect(bind('rv_dom_element_set_inner_html', integer, [pointer, Utf8])(body, markup) == 0, 'fixture markup')
-        find = bind('rv_document_get_element_by_id', pointer, [pointer, ctypes.c_char_p])
+        find = bind('rv_document_get_element_by_id', pointer, [pointer, Utf8])
         element, plain = find(host, b'probe'), find(host, b'plain')
         nodes.extend([element, plain])
         expect(bool(element) and bool(plain), 'fixture elements')
@@ -88,7 +88,7 @@ def verify(native_directory):
         absent = get('::before', plain)
         for name, expected in [('content', 'none'), ('opacity', '1'), ('width', 'auto')]:
             expect(read(absent, name) == expected, 'absent pseudo ' + name)
-        expect(bind('rv_element_set_style', integer, [pointer, ctypes.c_char_p, ctypes.c_char_p, integer])(
+        expect(bind('rv_element_set_style', integer, [pointer, ctypes.c_char_p, Utf8, integer])(
             element, b'color', b'rgb(9,8,7)', 0) == 0, 'mutate inline style')
         expect(read(base, 'color') == 'rgb(9, 8, 7)', 'computed declaration is live')
         expect(bind('rv_dom_css_style_declaration_set_property', integer, [pointer, Utf8, Utf8, Utf8])(

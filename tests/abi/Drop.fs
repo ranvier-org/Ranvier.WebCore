@@ -36,7 +36,7 @@ let run (outDir: string) =
     zone.Listen("drop", false, (fun e -> e.PreventDefault())) |> ignore
 
     let data = rv_drag_data_create ()
-    rv_drag_data_add (data, "text/plain", "dropped") |> check "drag_data_add"
+    rv_drag_data_add (data, "text/plain", utf8 "dropped", utf8Length "dropped") |> check "drag_data_add"
     let all = 1 ||| 2 ||| 4
 
     let drag action x y =

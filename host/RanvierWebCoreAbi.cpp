@@ -1282,6 +1282,30 @@ static RvNode* handle(Ref<Node>&& node) { return reinterpret_cast<RvNode*>(&node
 
 static String utf8(const char* text) { return String::fromUTF8(text); }
 
+// A hand-written UTF-8 input and its byte count; -1 is the null string. Returns std::nullopt for a length below -1,
+// NULL data with a positive length, or invalid UTF-8.
+static std::optional<String> utf8Input(const uint8_t* data, int32_t length)
+{
+    if (length == -1)
+        return String();
+    if (length < -1 || (!data && length > 0))
+        return std::nullopt;
+    if (!length)
+        return emptyString();
+    String value = String::fromUTF8(std::span<const uint8_t> { data, static_cast<size_t>(length) });
+    if (value.isNull())
+        return std::nullopt;
+    return value;
+}
+
+// A hand-written UTF-8 input that cannot be null: -1 also returns std::nullopt.
+static std::optional<String> requiredUtf8(const uint8_t* data, int32_t length)
+{
+    if (length == -1)
+        return std::nullopt;
+    return utf8Input(data, length);
+}
+
 static RvNode* handleOrNull(Node* node) { return node ? handle(Ref { *node }) : nullptr; }
 
 static RvEvent* eventHandle(Ref<Event>&& event) { return reinterpret_cast<RvEvent*>(&event.leakRef()); }
@@ -1319,7 +1343,7 @@ static_assert(sizeof(RvScreenMetrics) == 36 && offsetof(RvScreenMetrics, avail_l
 
 static_assert(sizeof(RvWindowMetrics) == 32 && offsetof(RvWindowMetrics, outerHeight) == 16 && offsetof(RvWindowMetrics, devicePixelRatio) == 24);
 
-int32_t rv_abi_version(void) { return 54; }
+int32_t rv_abi_version(void) { return 55; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -1746,30 +1770,32 @@ void rv_host_destroy(RvHost* host)
     publishScreens();
 }
 
-int32_t rv_host_load_html(RvHost* host, const char* html)
+int32_t rv_host_load_html(RvHost* host, const uint8_t* html, int32_t html_length)
 {
-    if (!host || !html)
+    auto markup = requiredUtf8(html, html_length);
+    if (!host || !markup)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
-    loadHTML(host->frame(), utf8(html));
+    loadHTML(host->frame(), *markup);
     // The new document posts accessibility notifications once its cache exists.
     if (host->accessibility)
         host->document().axObjectCache();
     return RV_OK;
 }
 
-int32_t rv_host_load_svg(RvHost* host, const char* svg)
+int32_t rv_host_load_svg(RvHost* host, const uint8_t* svg, int32_t svg_length)
 {
-    if (!host || !svg)
+    auto markup = requiredUtf8(svg, svg_length);
+    if (!host || !markup)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
-    loadDocument(host->frame(), utf8(svg), "image/svg+xml"_s);
+    loadDocument(host->frame(), *markup, "image/svg+xml"_s);
     if (host->accessibility)
         host->document().axObjectCache();
     return RV_OK;
@@ -1860,11 +1886,12 @@ RvNode* rv_document_head(RvHost* host)
     return head ? handle(head.releaseNonNull()) : nullptr;
 }
 
-RvNode* rv_document_get_element_by_id(RvHost* host, const char* elementId)
+RvNode* rv_document_get_element_by_id(RvHost* host, const uint8_t* elementId, int32_t elementId_length)
 {
-    if (!host || !elementId || !onOwningThread())
+    auto identifier = requiredUtf8(elementId, elementId_length);
+    if (!host || !identifier || !onOwningThread())
         return nullptr;
-    RefPtr element = host->document().getElementById(utf8(elementId));
+    RefPtr element = host->document().getElementById(*identifier);
     return element ? handle(element.releaseNonNull()) : nullptr;
 }
 
@@ -1878,11 +1905,12 @@ RvNode* rv_document_create_element(RvHost* host, const char* tagName)
     return handle(element.releaseReturnValue());
 }
 
-RvNode* rv_document_create_text(RvHost* host, const char* data)
+RvNode* rv_document_create_text(RvHost* host, const uint8_t* data, int32_t data_length)
 {
-    if (!host || !data || !onOwningThread())
+    auto text = requiredUtf8(data, data_length);
+    if (!host || !text || !onOwningThread())
         return nullptr;
-    return handle(host->document().createTextNode(utf8(data)));
+    return handle(host->document().createTextNode(WTF::move(*text)));
 }
 
 int32_t rv_node_append_child(RvNode* parent, RvNode* child)
@@ -1894,25 +1922,27 @@ int32_t rv_node_append_child(RvNode* parent, RvNode* child)
     return status(node(parent)->appendChild(*node(child)));
 }
 
-int32_t rv_node_set_text_content(RvNode* target, const char* text)
+int32_t rv_node_set_text_content(RvNode* target, const uint8_t* text, int32_t text_length)
 {
-    if (!target || !text)
+    auto value = requiredUtf8(text, text_length);
+    if (!target || !value)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
-    return status(node(target)->setTextContent(utf8(text)));
+    return status(node(target)->setTextContent(WTF::move(*value)));
 }
 
-int32_t rv_element_set_attribute(RvNode* target, const char* name, const char* value)
+int32_t rv_element_set_attribute(RvNode* target, const char* name, const uint8_t* value, int32_t value_length)
 {
-    if (!target || !name || !value)
+    auto attributeValue = requiredUtf8(value, value_length);
+    if (!target || !name || !attributeValue)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     RefPtr element = dynamicDowncast<Element>(*node(target));
     if (!element)
         return RV_ERR_NOT_ELEMENT;
-    auto result = element->setAttribute(AtomString::fromUTF8(name), AtomString::fromUTF8(value));
+    auto result = element->setAttribute(AtomString::fromUTF8(name), AtomString { *attributeValue });
     return status(result);
 }
 
@@ -2181,13 +2211,14 @@ int32_t rv_host_paint_rgba_rect(RvHost* host, uint8_t* rgba, int32_t length, int
     return paintArea(*host, rgba, length, { x, y, width, height });
 }
 
-RvListener* rv_node_add_event_listener(RvNode* target, const char* type, int32_t capture,
+RvListener* rv_node_add_event_listener(RvNode* target, const uint8_t* type, int32_t type_length, int32_t capture,
     RvEventCallback callback, void* context)
 {
-    if (!target || !type || !callback || !onOwningThread())
+    auto eventType = requiredUtf8(type, type_length);
+    if (!target || !eventType || !callback || !onOwningThread())
         return nullptr;
     auto* listener = new RvListener { RvEventListener::create(callback, context), *node(target),
-        AtomString::fromUTF8(type), !!(capture & RV_LISTENER_CAPTURE) };
+        AtomString { *eventType }, !!(capture & RV_LISTENER_CAPTURE) };
     AddEventListenerOptions options;
     options.capture = listener->capture;
     if (capture & RV_LISTENER_PASSIVE_SPECIFIED)
@@ -2227,15 +2258,16 @@ int32_t rv_listener_remove(RvListener* listener)
     return RV_OK;
 }
 
-int32_t rv_node_dispatch_event(RvNode* target, const char* type, int32_t bubbles, int32_t cancelable,
+int32_t rv_node_dispatch_event(RvNode* target, const uint8_t* type, int32_t type_length, int32_t bubbles, int32_t cancelable,
     int32_t* defaultPrevented)
 {
-    if (!target || !type)
+    auto eventType = requiredUtf8(type, type_length);
+    if (!target || !eventType)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     Ref protectedTarget = *node(target);
-    Ref dispatched = Event::create(AtomString::fromUTF8(type), bubbles ? Event::CanBubble::Yes : Event::CanBubble::No,
+    Ref dispatched = Event::create(AtomString { *eventType }, bubbles ? Event::CanBubble::Yes : Event::CanBubble::No,
         cancelable ? Event::IsCancelable::Yes : Event::IsCancelable::No);
     auto status = dispatchCountingFailures([&] { protectedTarget->dispatchEvent(dispatched); });
     if (defaultPrevented)
@@ -2304,11 +2336,12 @@ RvNode* rv_host_document(RvHost* host)
     return handleOrNull(&host->document());
 }
 
-RvNode* rv_document_create_comment(RvHost* host, const char* data)
+RvNode* rv_document_create_comment(RvHost* host, const uint8_t* data, int32_t data_length)
 {
-    if (!host || !data || !onOwningThread())
+    auto text = requiredUtf8(data, data_length);
+    if (!host || !text || !onOwningThread())
         return nullptr;
-    return handle(host->document().createComment(utf8(data)));
+    return handle(host->document().createComment(WTF::move(*text)));
 }
 
 RvNode* rv_document_create_fragment(RvHost* host)
@@ -2326,14 +2359,15 @@ RvNode* rv_document_import_node(RvHost* host, RvNode* source, int32_t deep)
     return imported.hasException() ? nullptr : handle(imported.releaseReturnValue());
 }
 
-RvNode* rv_node_parse_fragment(RvNode* context, const char* markup)
+RvNode* rv_node_parse_fragment(RvNode* context, const uint8_t* markup, int32_t markup_length)
 {
-    if (!context || !markup || !onOwningThread())
+    auto source = requiredUtf8(markup, markup_length);
+    if (!context || !source || !onOwningThread())
         return nullptr;
     Ref range = WebCore::Range::create(node(context)->document());
     if (range->selectNodeContents(*node(context)).hasException())
         return nullptr;
-    auto fragment = range->createContextualFragment(Variant<Ref<TrustedHTML>, String> { utf8(markup) });
+    auto fragment = range->createContextualFragment(Variant<Ref<TrustedHTML>, String> { WTF::move(*source) });
     return fragment.hasException() ? nullptr : handle(fragment.releaseReturnValue());
 }
 
@@ -2416,45 +2450,47 @@ int32_t rv_node_get_string(RvNode* target, int32_t property, char* buffer, int32
     return RV_ERR_UNSUPPORTED;
 }
 
-int32_t rv_node_set_string(RvNode* target, int32_t property, const char* value)
+int32_t rv_node_set_string(RvNode* target, int32_t property, const uint8_t* value, int32_t value_length)
 {
-    if (!target || !value)
+    auto parsed = requiredUtf8(value, value_length);
+    if (!target || !parsed)
         return RV_ERR_NULL_ARGUMENT;
+    auto& text = *parsed;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     auto& subject = *node(target);
     switch (property) {
     case RV_STRING_TEXT_CONTENT:
-        return status(subject.setTextContent(utf8(value)));
+        return status(subject.setTextContent(String { text }));
     case RV_STRING_INNER_HTML:
         if (RefPtr element = dynamicDowncast<Element>(subject))
-            return status(element->setInnerHTML(Variant<Ref<TrustedHTML>, String> { utf8(value) }));
+            return status(element->setInnerHTML(Variant<Ref<TrustedHTML>, String> { text }));
         return RV_ERR_NOT_ELEMENT;
     case RV_STRING_DATA:
         if (RefPtr data = dynamicDowncast<CharacterData>(subject)) {
-            data->setData(utf8(value));
+            data->setData(text);
             return RV_OK;
         }
         return RV_ERR_UNSUPPORTED;
     case RV_STRING_VALUE:
         if (RefPtr input = dynamicDowncast<HTMLInputElement>(subject))
-            return status(input->setValue(utf8(value)));
+            return status(input->setValue(text));
         if (RefPtr area = dynamicDowncast<HTMLTextAreaElement>(subject))
-            return status(area->setValue(utf8(value)));
+            return status(area->setValue(text));
         if (RefPtr select = dynamicDowncast<HTMLSelectElement>(subject)) {
-            select->setValue(utf8(value));
+            select->setValue(text);
             return RV_OK;
         }
         if (RefPtr option = dynamicDowncast<HTMLOptionElement>(subject))
-            return status(option->setAttribute(AtomString::fromUTF8("value"), AtomString::fromUTF8(value)));
+            return status(option->setAttribute(AtomString::fromUTF8("value"), AtomString { text }));
         return RV_ERR_NOT_INPUT;
     case RV_STRING_TITLE:
         if (RefPtr document = dynamicDowncast<Document>(subject)) {
-            document->setTitle(utf8(value));
+            document->setTitle(String { text });
             return RV_OK;
         }
         if (RefPtr element = dynamicDowncast<Element>(subject))
-            return status(element->setAttribute(AtomString::fromUTF8("title"), AtomString::fromUTF8(value)));
+            return status(element->setAttribute(AtomString::fromUTF8("title"), AtomString { text }));
         return RV_ERR_NOT_ELEMENT;
     }
     return RV_ERR_UNSUPPORTED;
@@ -2584,11 +2620,11 @@ static RvEventTarget* targetHandleOrNull(EventTarget* target)
     return reinterpret_cast<RvEventTarget*>(target);
 }
 
-RvEvent* rv_host_construct_event(RvHost* host, int32_t kind, const char* type, const RvEventInit* init)
+RvEvent* rv_host_construct_event(RvHost* host, int32_t kind, const uint8_t* type, int32_t type_length, const RvEventInit* init)
 {
-    if (!host || !type || !init || !onOwningThread())
+    if (!host || !init || !onOwningThread())
         return nullptr;
-    return ranvier_event_construct(reinterpret_cast<RvNode*>(&host->document()), kind, type, init);
+    return ranvier_event_construct(reinterpret_cast<RvNode*>(&host->document()), kind, type, type_length, init);
 }
 
 int32_t rv_custom_event_detail_json(RvEvent* handle, char* buffer, int32_t capacity, int32_t* length)
@@ -2652,12 +2688,13 @@ int32_t rv_event_target_equals(RvEventTarget* left, RvEventTarget* right)
     return left && right && eventTarget(left) == eventTarget(right) ? 1 : 0;
 }
 
-RvListener* rv_event_target_add_listener(RvEventTarget* target, const char* type, int32_t flags, RvEventCallback callback, void* context)
+RvListener* rv_event_target_add_listener(RvEventTarget* target, const uint8_t* type, int32_t type_length, int32_t flags, RvEventCallback callback, void* context)
 {
-    if (!target || !type || !callback || !onOwningThread())
+    auto eventType = requiredUtf8(type, type_length);
+    if (!target || !eventType || !callback || !onOwningThread())
         return nullptr;
     auto* listener = new RvListener { RvEventListener::create(callback, context), *eventTarget(target),
-        AtomString::fromUTF8(type), !!(flags & RV_LISTENER_CAPTURE) };
+        AtomString { *eventType }, !!(flags & RV_LISTENER_CAPTURE) };
     AddEventListenerOptions options;
     options.capture = listener->capture;
     if (flags & RV_LISTENER_PASSIVE_SPECIFIED)
@@ -2746,9 +2783,10 @@ int32_t rv_media_query_media(RvEventTarget* target, char* buffer, int32_t capaci
     return ranvier_media_query_media(target, buffer, capacity, length);
 }
 
-RvEvent* rv_host_create_event(RvHost* host, int32_t eventInterface, const char* type, int32_t bubbles, int32_t cancelable)
+RvEvent* rv_host_create_event(RvHost* host, int32_t eventInterface, const uint8_t* type, int32_t type_length, int32_t bubbles, int32_t cancelable)
 {
-    if (!host || !type || !onOwningThread())
+    auto eventType = requiredUtf8(type, type_length);
+    if (!host || !eventType || !onOwningThread())
         return nullptr;
     String name;
     switch (eventInterface) {
@@ -2776,7 +2814,7 @@ RvEvent* rv_host_create_event(RvHost* host, int32_t eventInterface, const char* 
     if (created.hasException())
         return nullptr;
     Ref result = created.releaseReturnValue();
-    result->initEvent(AtomString::fromUTF8(type), !!bubbles, !!cancelable);
+    result->initEvent(AtomString { *eventType }, !!bubbles, !!cancelable);
     return eventHandle(WTF::move(result));
 }
 
@@ -3327,9 +3365,10 @@ static std::pair<String, int> legacyKey(const String& key, const String& code)
     return { key, virtualKey };
 }
 
-int32_t rv_host_key(RvHost* host, int32_t action, const char* key, const char* code, const char* text, int32_t modifiers, int32_t repeat)
+int32_t rv_host_key(RvHost* host, int32_t action, const char* key, const char* code, const uint8_t* text, int32_t text_length, int32_t modifiers, int32_t repeat)
 {
-    if (!host || !key || !code)
+    auto keyText = utf8Input(text, text_length);
+    if (!host || !key || !code || !keyText)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
@@ -3338,7 +3377,7 @@ int32_t rv_host_key(RvHost* host, int32_t action, const char* key, const char* c
     static constexpr PlatformEvent::Type types[] = { PlatformEvent::Type::RawKeyDown, PlatformEvent::Type::KeyUp, PlatformEvent::Type::Char };
     auto keyValue = utf8(key);
     auto codeValue = utf8(code);
-    auto characters = action == RV_KEY_CHAR && text ? utf8(text) : String { emptyString() };
+    auto characters = action == RV_KEY_CHAR && !keyText->isNull() ? *keyText : String { emptyString() };
     auto [identifier, virtualKey] = legacyKey(keyValue, codeValue);
     PlatformKeyboardEvent keyboard(types[action], characters, characters, keyValue, codeValue, identifier, virtualKey,
         !!repeat, false, modifiers & RV_MODIFIER_ALT, platformModifiers(modifiers), MonotonicTime::now());
@@ -3671,13 +3710,14 @@ template<typename Edit> static int32_t compose(RvHost& host, Edit&& edit)
     }) < 0 ? RV_ERR_LISTENER_FAILED : RV_OK;
 }
 
-int32_t rv_host_ime_set_composition(RvHost* host, const char* text, int32_t selectionStart, int32_t selectionEnd)
+int32_t rv_host_ime_set_composition(RvHost* host, const uint8_t* text, int32_t text_length, int32_t selectionStart, int32_t selectionEnd)
 {
-    if (!host || !text)
+    auto input = requiredUtf8(text, text_length);
+    if (!host || !input)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
-    auto composition = utf8(text);
+    auto composition = WTF::move(*input);
     if (selectionStart < 0 || selectionEnd < selectionStart || static_cast<unsigned>(selectionEnd) > composition.length())
         return RV_ERR_UNSUPPORTED;
     Vector<CompositionUnderline> underlines;
@@ -3688,13 +3728,14 @@ int32_t rv_host_ime_set_composition(RvHost* host, const char* text, int32_t sele
     });
 }
 
-int32_t rv_host_ime_commit(RvHost* host, const char* text)
+int32_t rv_host_ime_commit(RvHost* host, const uint8_t* text, int32_t text_length)
 {
-    if (!host || !text)
+    auto input = requiredUtf8(text, text_length);
+    if (!host || !input)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
-    auto committed = utf8(text);
+    auto committed = WTF::move(*input);
     return compose(*host, [&](Editor& editor) { editor.confirmComposition(committed); });
 }
 
@@ -3739,16 +3780,17 @@ int32_t rv_host_ime_rect(RvHost* host, int32_t* x, int32_t* y, int32_t* width, i
 
 static Element* elementOf(RvNode* handle) { return handle ? dynamicDowncast<Element>(*node(handle)) : nullptr; }
 
-int32_t rv_element_class(RvNode* target, const char* token, int32_t operation)
+int32_t rv_element_class(RvNode* target, const uint8_t* token, int32_t token_length, int32_t operation)
 {
-    if (!target || !token)
+    auto input = requiredUtf8(token, token_length);
+    if (!target || !input)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     RefPtr element = elementOf(target);
     if (!element)
         return RV_ERR_NOT_ELEMENT;
-    auto name = AtomString::fromUTF8(token);
+    auto name = AtomString { *input };
     Ref classes = element->classList();
     std::optional<bool> force;
     switch (operation) {
@@ -3771,9 +3813,10 @@ int32_t rv_element_class(RvNode* target, const char* token, int32_t operation)
     return result.returnValue() ? 1 : 0;
 }
 
-int32_t rv_element_set_style(RvNode* target, const char* property, const char* value, int32_t important)
+int32_t rv_element_set_style(RvNode* target, const char* property, const uint8_t* value, int32_t value_length, int32_t important)
 {
-    if (!target || !property || !value)
+    auto input = requiredUtf8(value, value_length);
+    if (!target || !property || !input)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
@@ -3781,7 +3824,7 @@ int32_t rv_element_set_style(RvNode* target, const char* property, const char* v
     if (!element)
         return RV_ERR_NOT_ELEMENT;
     Ref<CSSStyleDeclaration> style = element->cssomStyle();
-    return status(style->setProperty(utf8(property), utf8(value), important ? "important"_s : emptyString()));
+    return status(style->setProperty(utf8(property), *input, important ? "important"_s : emptyString()));
 }
 
 int32_t rv_element_get_style(RvNode* target, const char* property, char* buffer, int32_t capacity, int32_t* length)
@@ -4423,13 +4466,14 @@ int32_t rv_host_set_clipboard(RvHost* host, int32_t style, RvClipboardWrite writ
     return RV_OK;
 }
 
-int32_t rv_clipboard_offer(RvClipboardRequest* request, const char* type, const char* data)
+int32_t rv_clipboard_offer(RvClipboardRequest* request, const char* type, const uint8_t* data, int32_t data_length)
 {
-    if (!request || !type || !data)
+    auto input = requiredUtf8(data, data_length);
+    if (!request || !type || !input)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
-    request->items.append({ utf8(type), utf8(data) });
+    request->items.append({ utf8(type), WTF::move(*input) });
     return RV_OK;
 }
 
@@ -4469,7 +4513,9 @@ static int32_t copyOrCut(RvHost& host, bool cut)
     if (host.clipboardStyle == RV_CLIPBOARD_APP && host.clipboardWrite) {
         bool first = true;
         for (auto& [type, data] : items) {
-            host.clipboardWrite(host.clipboardContext, type.utf8().data(), data.utf8().data(), first ? 1 : 0);
+            auto bytes = data.utf8();
+            host.clipboardWrite(host.clipboardContext, type.utf8().data(), reinterpret_cast<const uint8_t*>(bytes.data()),
+                static_cast<int32_t>(bytes.length()), first ? 1 : 0);
             first = false;
         }
     }
@@ -4590,11 +4636,12 @@ RvDragData* rv_drag_data_create(void)
     return new RvDragData;
 }
 
-int32_t rv_drag_data_add(RvDragData* data, const char* type, const char* value)
+int32_t rv_drag_data_add(RvDragData* data, const char* type, const uint8_t* value, int32_t value_length)
 {
-    if (!data || !type || !value)
+    auto input = requiredUtf8(value, value_length);
+    if (!data || !type || !input)
         return RV_ERR_NULL_ARGUMENT;
-    data->items.append({ utf8(type), utf8(value) });
+    data->items.append({ utf8(type), WTF::move(*input) });
     return RV_OK;
 }
 
@@ -5586,10 +5633,12 @@ int32_t rv_ax_action(RvAxNode* handle, int32_t action)
     return RV_ERR_UNSUPPORTED;
 }
 
-int32_t rv_ax_set_value(RvAxNode* handle, const char* value)
+int32_t rv_ax_set_value(RvAxNode* handle, const uint8_t* value, int32_t value_length)
 {
-    if (!value)
+    auto parsed = requiredUtf8(value, value_length);
+    if (!parsed)
         return RV_ERR_NULL_ARGUMENT;
+    auto& text = *parsed;
     if (auto status = axStatus(handle))
         return status;
     Ref object = *axObject(handle);
@@ -5597,14 +5646,14 @@ int32_t rv_ax_set_value(RvAxNode* handle, const char* value)
         return 0;
     // A form field's value changes as a user's edit does, with input and change.
     if (RefPtr input = dynamicDowncast<HTMLInputElement>(object->node())) {
-        auto result = input->setValue(utf8(value), DispatchInputAndChangeEvent);
+        auto result = input->setValue(text, DispatchInputAndChangeEvent);
         return result.hasException() ? fail(result.exception()) : 1;
     }
     if (RefPtr area = dynamicDowncast<HTMLTextAreaElement>(object->node())) {
-        area->setValue(utf8(value), DispatchInputAndChangeEvent);
+        area->setValue(text, DispatchInputAndChangeEvent);
         return 1;
     }
-    return object->setValue(utf8(value)) ? 1 : 0;
+    return object->setValue(text) ? 1 : 0;
 }
 
 int32_t rv_ax_set_number(RvAxNode* handle, double value)

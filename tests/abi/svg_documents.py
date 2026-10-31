@@ -50,12 +50,12 @@ def verify(native_directory):
         return result
 
     def node(identifier):
-        result = bind('rv_document_get_element_by_id', pointer, [pointer, ctypes.c_char_p])(host, identifier.encode())
+        result = bind('rv_document_get_element_by_id', pointer, [pointer, Utf8])(host, identifier.encode())
         expect(bool(result), 'find ' + identifier)
         retained.append(('rv_node_release', result))
         return result
 
-    load_svg = bind('rv_host_load_svg', integer, [pointer, ctypes.c_char_p])
+    load_svg = bind('rv_host_load_svg', integer, [pointer, Utf8])
     host = bind('rv_host_create', pointer, [integer, integer])(200, 120)
     expect(bool(host), 'SVG document host')
     svg = '''<svg xmlns="http://www.w3.org/2000/svg" id="svg-root" width="200" height="120" viewBox="0 0 200 120">
@@ -68,7 +68,7 @@ def verify(native_directory):
         expect(bind('rv_abi_has', integer, [ctypes.c_char_p])(b'svg-document') == 1, 'SVG document MIME capability')
         expect(load_svg(None, svg) == -1, 'null SVG host rejected')
         expect(load_svg(host, None) == -1, 'null SVG markup rejected')
-        call('rv_host_load_svg', [pointer, ctypes.c_char_p], host, svg)
+        call('rv_host_load_svg', [pointer, Utf8], host, svg)
         first_document, root, guard = document(), node('svg-root'), node('guard')
         expect(text('rv_dom_document_get_content_type', [pointer], first_document) == 'image/svg+xml', 'actual SVG document MIME')
         expect(text('rv_dom_element_get_namespace_uri', [pointer], root) == 'http://www.w3.org/2000/svg', 'actual SVG root namespace')
@@ -98,14 +98,14 @@ def verify(native_directory):
             watch = bind('rv_node_watch', pointer, [pointer])(target)
             expect(bool(watch), 'SVG transition weak owner watch')
             watches.append(watch)
-        call('rv_host_load_html', [pointer, ctypes.c_char_p], host, b'<div id="html">HTML after SVG</div>')
+        call('rv_host_load_html', [pointer, Utf8], host, b'<div id="html">HTML after SVG</div>')
         html_document = document()
         expect(text('rv_dom_document_get_content_type', [pointer], html_document) == 'text/html', 'HTML MIME path preserved after SVG')
         expect(text('rv_dom_node_get_text_content', [pointer], node('html')) == 'HTML after SVG', 'HTML parser path preserved')
         current = single()
         call('rv_dom_svg_length_get_value', [pointer, ctypes.POINTER(single)], base, ctypes.byref(current))
         expect(current.value == 10, 'retained SVG value survives document replacement')
-        call('rv_host_load_svg', [pointer, ctypes.c_char_p], host, svg)
+        call('rv_host_load_svg', [pointer, Utf8], host, svg)
         expect(document() != first_document, 'SVG reload produces a new document')
         expect(text('rv_dom_element_get_attribute', [pointer, Utf8], node('guard'), b'x') == '10', 'SVG after HTML uses XML parser again')
         for release, value in list(reversed(retained)):
@@ -123,14 +123,14 @@ def verify(native_directory):
         call('rv_dom_svg_point_set_y', [pointer, single], translate, 83)
         call('rv_dom_svg_point_get_x', [pointer, ctypes.POINTER(single)], translate, ctypes.byref(current))
         expect(current.value == 71, 'survivor currentTranslate remains mutable after root/document collection')
-        call('rv_host_load_svg', [pointer, ctypes.c_char_p], host, b'<svg xmlns="http://www.w3.org/2000/svg"><g></svg>')
+        call('rv_host_load_svg', [pointer, Utf8], host, b'<svg xmlns="http://www.w3.org/2000/svg"><g></svg>')
         malformed_document = document()
         malformed_root = handle('rv_dom_document_get_document_element', [pointer], [malformed_document])
         expect(text('rv_dom_document_get_content_type', [pointer], malformed_document) == 'image/svg+xml', 'malformed XML keeps SVG MIME')
         expect(text('rv_dom_node_get_node_name', [pointer], malformed_root) == 'html', 'engine XML parser produces its actual error document')
         expect('Opening and ending tag mismatch' in text('rv_dom_node_get_text_content', [pointer], malformed_root), 'malformed XML exposes actual engine parser error')
         expect(bind('rv_host_scripts_enabled', integer, [pointer])(host) == 0 and bind('rv_host_vm_entry_disallowed', integer, [pointer])(host) == 1, 'parser-error document preserves script and VM guards')
-        call('rv_host_load_html', [pointer, ctypes.c_char_p], host, b'<div id="recovered">recovered after XML error</div>')
+        call('rv_host_load_html', [pointer, Utf8], host, b'<div id="recovered">recovered after XML error</div>')
         expect(text('rv_dom_node_get_text_content', [pointer], node('recovered')) == 'recovered after XML error', 'HTML load recovers after XML parser error')
     finally:
         for release, value in reversed(retained):

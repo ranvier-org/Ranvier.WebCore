@@ -8,6 +8,9 @@ from pathlib import Path
 import sys
 import threading
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
+
 OK, NULL_ARGUMENT, WRONG_THREAD, BUFFER_TOO_SMALL, UNSUPPORTED = 0, -1, -2, -6, -9
 CONSTRUCT_EVENT, CONSTRUCT_CUSTOM, CONSTRUCT_UI, CONSTRUCT_MOUSE, CONSTRUCT_KEYBOARD, CONSTRUCT_FOCUS = range(6)
 EVENT_EVENT, EVENT_UI, EVENT_MOUSE, EVENT_KEYBOARD, EVENT_FOCUS, EVENT_CUSTOM = 0, 1, 2, 4, 6, 8
@@ -52,16 +55,14 @@ def verify(directory, evidence):
     callback_type = ctypes.CFUNCTYPE(i32, p, p)
 
     def bind(name, returns, arguments):
-        function = getattr(library, name)
-        function.restype, function.argtypes = returns, arguments
-        return function
+        return bind_utf8(library, name, returns, arguments)
 
-    expect(bind('rv_abi_version', i32, [])() == 54, 'ABI version 54')
+    expect(bind('rv_abi_version', i32, [])() == 55, 'ABI version 55')
     has = bind('rv_abi_has', i32, [ctypes.c_char_p])
     expect(has(b'event-construction') == 1, 'event-construction advertised')
     host_create = bind('rv_host_create', p, [i32, i32])
     host_destroy = bind('rv_host_destroy', None, [p])
-    construct = bind('rv_host_construct_event', p, [p, i32, ctypes.c_char_p, ctypes.POINTER(EventInit)])
+    construct = bind('rv_host_construct_event', p, [p, i32, Utf8, ctypes.POINTER(EventInit)])
     detail_json = bind('rv_custom_event_detail_json', i32, [p, p, i32, ctypes.POINTER(i32)])
     target_create = bind('rv_host_create_event_target', p, [p])
     target_retain = bind('rv_event_target_retain', p, [p])
@@ -69,7 +70,7 @@ def verify(directory, evidence):
     node_as_target = bind('rv_node_as_event_target', p, [p])
     target_as_node = bind('rv_event_target_as_node', p, [p])
     equals = bind('rv_event_target_equals', i32, [p, p])
-    add_listener = bind('rv_event_target_add_listener', p, [p, ctypes.c_char_p, i32, callback_type, p])
+    add_listener = bind('rv_event_target_add_listener', p, [p, Utf8, i32, callback_type, p])
     listener_remove = bind('rv_listener_remove', i32, [p])
     dispatch = bind('rv_event_target_dispatch', i32, [p, p, ctypes.POINTER(i32)])
     node_dispatch = bind('rv_node_dispatch', i32, [p, p, ctypes.POINTER(i32)])

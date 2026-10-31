@@ -19,7 +19,7 @@ from utf8_inputs import Utf8
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, WRONG_THREAD, UNSUPPORTED, DETACHED, WRONG_INTERFACE = 0, -1, -2, -9, -10, -11
 CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_void_p)
-ABI = 54
+ABI = 55
 MEMBERS = {'offsetLeft': 'offset_left', 'offsetTop': 'offset_top', 'pageLeft': 'page_left', 'pageTop': 'page_top',
            'width': 'width', 'height': 'height', 'scale': 'scale'}
 # Steps where the engine differs from Chromium (docs/visual-viewport-evidence). While page-scaled, WebKit's layout
@@ -59,10 +59,10 @@ def verify(native_directory):
         metrics = p.bind('rv_host_window_metrics', I, [P, ctypes.POINTER(WindowMetrics)])
         element_at = p.bind('rv_host_element_at', P, [P, I, I])
         element_rect = p.bind('rv_element_rect', I, [P] + [ctypes.POINTER(D)] * 4)
-        by_id = p.bind('rv_document_get_element_by_id', P, [P, ctypes.c_char_p])
+        by_id = p.bind('rv_document_get_element_by_id', P, [P, Utf8])
         same_node = p.bind('rv_dom_node_is_same_node', I, [P, P, ctypes.POINTER(I)])
         cycle = p.bind('rv_run_loop_cycle', I, [I])
-        add = p.bind('rv_event_target_add_listener', P, [P, ctypes.c_char_p, I, CALLBACK, P])
+        add = p.bind('rv_event_target_add_listener', P, [P, Utf8, I, CALLBACK, P])
         remove = p.bind('rv_listener_remove', I, [P])
         event_type = p.bind('rv_event_type', I, [P, P, I, ctypes.POINTER(I)])
         get_target = p.bind('rv_event_get_target', P, [P, I])

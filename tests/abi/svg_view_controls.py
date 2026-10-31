@@ -5,6 +5,9 @@ import os
 from pathlib import Path
 import sys
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
+
 
 def verify(native_directory):
     directory = Path(native_directory).resolve()
@@ -16,9 +19,7 @@ def verify(native_directory):
     retained = []
 
     def bind(name, result, arguments):
-        function = getattr(library, name)
-        function.restype, function.argtypes = result, arguments
-        return function
+        return bind_utf8(library, name, result, arguments)
 
     def expect(condition, label):
         nonlocal assertions
@@ -62,9 +63,9 @@ def verify(native_directory):
             size = 'width="500" height="300"' if standalone else 'width="240" height="160"'
             svg = '<svg xmlns="http://www.w3.org/2000/svg" id="root" ' + size + ' viewBox="' + view_box + '" style="' + style + '"><rect id="box" x="10" y="20" width="20" height="10" fill="red"/></svg>'
             markup = svg if standalone else '<body style="margin:40px">' + svg + '</body>'
-            call('rv_host_load_svg' if standalone else 'rv_host_load_html', [pointer, ctypes.c_char_p], host, markup.encode())
+            call('rv_host_load_svg' if standalone else 'rv_host_load_html', [pointer, Utf8], host, markup.encode())
             def node(identifier):
-                result = bind('rv_document_get_element_by_id', pointer, [pointer, ctypes.c_char_p])(host, identifier.encode())
+                result = bind('rv_document_get_element_by_id', pointer, [pointer, Utf8])(host, identifier.encode())
                 expect(bool(result), 'view-controls node ' + identifier)
                 retained.append(('rv_node_release', result))
                 return result

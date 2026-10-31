@@ -1,0 +1,191 @@
+{
+  "group": [
+    "WebCore #145 length-delimited hand-written string inputs"
+  ],
+  "native": "0.1.0-preview.47",
+  "abi": 55,
+  "abiBreaking": "21 hand-written exports take each free-text input as const uint8_t* plus int32_t byte length; RvClipboardWrite delivers data with data_length",
+  "changedExports": [
+    "rv_host_load_html",
+    "rv_host_load_svg",
+    "rv_node_parse_fragment",
+    "rv_node_set_text_content",
+    "rv_document_create_text",
+    "rv_document_create_comment",
+    "rv_node_set_string",
+    "rv_element_set_attribute",
+    "rv_document_get_element_by_id",
+    "rv_element_class",
+    "rv_host_ime_set_composition",
+    "rv_host_ime_commit",
+    "rv_ax_set_value",
+    "rv_clipboard_offer",
+    "rv_drag_data_add",
+    "rv_element_set_style",
+    "rv_host_key",
+    "rv_node_add_event_listener",
+    "rv_node_dispatch_event",
+    "rv_host_create_event",
+    "rv_host_construct_event",
+    "rv_event_target_add_listener"
+  ],
+  "changedCallbacks": [
+    "RvClipboardWrite"
+  ],
+  "nulTerminatedByDesign": "element and attribute names, selectors, MIME and data types, style property names, RvEventInit strings, URLs, capability names",
+  "qualified": {
+    "T8": {
+      "webkit": "a\u0000b",
+      "reason": "Document.title strips and collapses ASCII whitespace, which excludes U+0000: WebKit keeps it; Chromium reads 'a b'."
+    },
+    "L1": {
+      "webkit": "a\ufffdb",
+      "reason": "CSS Syntax input preprocessing replaces U+0000 with U+FFFD, which WebKit applies to the custom property value; Chromium keeps U+0000."
+    }
+  },
+  "outboundClipboard": "No ABI path can put U+0000 into RvClipboardWrite data: WebKit drops it from editor.selectedText() and from the copied markup (measured: 'a\\u0000b' copies as 'ab' in text/plain and text/html), and page-supplied data needs ClipboardEvent.clipboardData and DataTransfer, which belong to the clipboard and drag groups. host_string_nul C2 checks multi-byte delivery with data_length.",
+  "sourceHeadOfBatch": "6bc72058153f749f291ec19b6c5a04f40e49e335",
+  "stackedOn": "C25 f13cdbb (Native46/ABI54) on G14 0d36787, #144 f0eb376 and #142 3e6639d; parent C:/wk/native-cascade/artifacts/native46-candidate-5",
+  "baseline": {
+    "batch": "C:\\wk\\native-cascade\\artifacts\\native46-candidate-5-batch",
+    "head": "f13cdbb",
+    "rawAssertions": 89337,
+    "teardownCases": 104
+  },
+  "red": {
+    "file": "red/host-string-nul-red.json",
+    "script": "host_string_nul_red.py",
+    "abi": 51,
+    "cases": 37,
+    "differ": 36,
+    "byFamily": {
+      "attribute": {
+        "cases": 5,
+        "differ": 5
+      },
+      "ax": {
+        "cases": 2,
+        "differ": 2
+      },
+      "clipboard": {
+        "cases": 3,
+        "differ": 2
+      },
+      "ime": {
+        "cases": 2,
+        "differ": 2
+      },
+      "low": {
+        "cases": 7,
+        "differ": 7
+      },
+      "markup": {
+        "cases": 8,
+        "differ": 8
+      },
+      "text": {
+        "cases": 10,
+        "differ": 10
+      }
+    }
+  },
+  "green": {
+    "hostStringNulAssertions": 309,
+    "hostStringNulRepeats": 30,
+    "hostStringNulRepeatsDistinct": [
+      "PASS host_string_nul: 309 assertions, 2 qualified"
+    ],
+    "teardownHostStringRepeats": "30/30 (teardown-u0000-repeat30.json, RANVIER_TEARDOWN_ONLY=U+0000 inputs, 3 records each)",
+    "probes": 62,
+    "allExitZero": true,
+    "rawAssertions": 89646,
+    "baselineProbesSameCount": true,
+    "baselineProbesSameOutput": [
+      "css_supports",
+      "computed_style",
+      "fragment_rectangles",
+      "table_surface",
+      "element_reflection",
+      "area_surface",
+      "cssom_surface",
+      "keyframe_rules",
+      "counter_style_rules",
+      "detached_cssom_context",
+      "svg_mathml_surface",
+      "style_property_maps",
+      "declared_style_maps",
+      "style_map_entries",
+      "typed_style_values",
+      "custom_properties",
+      "geometry_values",
+      "matrix_values",
+      "css_transforms",
+      "svg_geometry",
+      "svg_surfaces",
+      "svg_documents",
+      "svg_view_controls",
+      "svg_animation_variants",
+      "capabilities",
+      "svg_view_selection",
+      "svg_paint_servers",
+      "svg_filters",
+      "svg_clip_mask_marker",
+      "svg_resources",
+      "mathml_surface",
+      "svg_tests_lists",
+      "image_decode",
+      "font_load",
+      "event_construction",
+      "tree_traversal",
+      "focus_input",
+      "viewport_events",
+      "form_collections",
+      "form_navigation",
+      "viewport_scroll",
+      "dialog_popover",
+      "binary_values",
+      "caret_hit",
+      "url_values",
+      "url_wpt",
+      "form_submission",
+      "text_segmentation",
+      "crypto_random",
+      "visual_viewport",
+      "screen_metrics",
+      "custom_highlights",
+      "abi_layouts",
+      "event_details",
+      "aria_relations",
+      "inspector_diagnostics",
+      "string_nul",
+      "native_types",
+      "blob_urls",
+      "coordinate_spaces",
+      "cascade_diagnostics"
+    ],
+    "baselineProbesOtherOutput": {
+      "frames": "timing values only",
+      "teardown": "three added U+0000 input records"
+    },
+    "teardownCases": 107,
+    "teardownAllCollected": true
+  },
+  "files": {
+    "allocation-absence.json": "073c348e905dab1fb5738a8c86d7037f55bace2f829ee3f7cbe09c9c8b14e1f1",
+    "baseline-comparison.json": "1ad4ff4e1148f96afc2c5140fbf474ce589df01aa131818455f81ac574099f26",
+    "batch-green.json": "59dde0070ead4ea48989e183e048a1bf977c990cd9d2e9be83825ae5be0bf354",
+    "build_native47_candidate.py": "8119369ba0cae466355cf20cb9f689aea5a2c74f26f373dcb91d88bc79f2e8f7",
+    "host-string-nul-probe.log": "f6c93c05a7cde7644573486e63db73a9660e4409c5a93df76f6c2919708db3b1",
+    "host-string-nul-repeat30.json": "11d2a94b2c9d0fbe6469d7b9384b37869099af0ecabd5fd33ffab30b2e70f866",
+    "host_string_nul_red.py": "3bd11f3698b4664fd7e63040ea7c24313e95c70a0c32b19e3fa046180b4be7a1",
+    "make_native47_evidence.py": "016dac8ecff6118acec77f6e78b7de84c4734a4fcf98c39117a05657bfffaaea",
+    "oracle-repeat30.txt": "b82c7f1a108f4b34ad5c441d499a2eef0cd74bdb52d0086a50257239d5bc8e4e",
+    "red/host-string-nul-red.json": "9f3124a3d9f906a43d0bf03a442ded8ea292c416fd96ddf7c3ef29558db4e242",
+    "repeat_teardown.py": "442d789abd2a38c7b5c26f74d30fb7486f5ec537d9d89ac936ce29f3341e3ec2",
+    "run_native47_full_batch.py": "172b2bf3ae04f72c4ecbf9ee9fb5cec4c604185534f9c03dc146dd79999a586f",
+    "runtime-receipt.json": "c2dcde854ac431f6dc4a216f7c90511b0ca8b1588b74fbedb7f9f19fd76f9eb9",
+    "source-patches.json": "49ca03794d8e4e57f5d05a5499f2287f034a7fab192bf8156f26f6e479bb15d6",
+    "teardown-probes.json": "2136c837679e9086b1865470d520ee4755dba0a786aece4e880128dbdb60a4a2",
+    "teardown-u0000-repeat30.json": "98caf6b15c3198e39c828dcfb4b3debc74945abcc905604174f083846fee54e0"
+  }
+}

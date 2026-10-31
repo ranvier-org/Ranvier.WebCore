@@ -17,9 +17,10 @@ import time
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
+from utf8_inputs import Utf8
 
 OK, NULL_ARGUMENT, WRONG_THREAD, NOT_ELEMENT, BUFFER_TOO_SMALL, UNSUPPORTED = 0, -1, -2, -4, -6, -9
-ABI = 54
+ABI = 55
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 MATCHED_RULES, CASCADE = 2, 3
 ORIGINS = {'user-agent': 0, 'user': 1, 'author': 2, 'inline': 3, 'presentational-hint': 4}
@@ -229,7 +230,7 @@ def run_once(native_directory, fixture, oracle):
             for identifier in list(elements) + ['pend', 'probe']:
                 elements[identifier] = resolve(p, identifier)
             text_node = p.object('rv_dom_node_get_first_child', [P], [elements['vt']], 'node')
-            set_attribute = p.bind('rv_element_set_attribute', I, [P, ctypes.c_char_p, ctypes.c_char_p])
+            set_attribute = p.bind('rv_element_set_attribute', I, [P, ctypes.c_char_p, Utf8])
 
             # Capability facts and the opt-in.
             p.expect(c.fact(p.host, 'cascade-diagnostics', 1) == 1 and c.fact(p.host, 'cascade-diagnostics', 2) == 0, 'implemented, not enabled')
@@ -320,7 +321,7 @@ def run_once(native_directory, fixture, oracle):
             # A pending style sheet insertion applies to the query; the element's style waits for the next update.
             sheet = p.bind('rv_document_create_element', P, [P, ctypes.c_char_p])(p.host, b'style')
             p.retained.append(('rv_node_release', sheet))
-            p.expect(p.bind('rv_node_set_text_content', I, [P, ctypes.c_char_p])(sheet, b"#plain{order:90}@property --late{syntax:'<integer>';inherits:false;initial-value:0}#rn{--late:7}") == OK,
+            p.expect(p.bind('rv_node_set_text_content', I, [P, Utf8])(sheet, b"#plain{order:90}@property --late{syntax:'<integer>';inherits:false;initial-value:0}#rn{--late:7}") == OK,
                      'inserted sheet text')
             head = p.bind('rv_document_head', P, [P])(p.host)
             p.retained.append(('rv_node_release', head))

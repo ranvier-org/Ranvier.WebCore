@@ -13,13 +13,14 @@ import threading
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
+from utf8_inputs import Utf8
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, WRONG_THREAD, UNSUPPORTED, WRONG_INTERFACE = 0, -1, -2, -9, -11
 CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_void_p)
 TYPES = ['resize', 'scroll', 'scrollend', 'visibilitychange', 'focus', 'blur']
 PAGE = '<!doctype html><style>html,body{margin:0}body{height:2000px;width:2000px}</style><body>'
-ABI = 54
+ABI = 55
 HIDDEN, VISIBLE = 0, 1
 
 
@@ -46,7 +47,7 @@ def verify(native_directory):
         match_media = p.bind('rv_host_match_media', P, [P, ctypes.c_char_p])
         query_matches = p.bind('rv_media_query_matches', I, [P, ctypes.POINTER(I)])
         query_media = p.bind('rv_media_query_media', I, [P, P, I, ctypes.POINTER(I)])
-        add_listener = p.bind('rv_event_target_add_listener', P, [P, ctypes.c_char_p, I, CALLBACK, P])
+        add_listener = p.bind('rv_event_target_add_listener', P, [P, Utf8, I, CALLBACK, P])
         remove_listener = p.bind('rv_listener_remove', I, [P])
         target_release = p.bind('rv_event_target_release', None, [P])
         target_equals = p.bind('rv_event_target_equals', I, [P, P])
