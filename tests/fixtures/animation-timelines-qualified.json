@@ -1,0 +1,15 @@
+{
+ "comment": "WebKit animation timeline results that differ from the Chromium oracle by engine behaviour. The probe asserts the native value here and that the oracle still records the Chromium value, so either engine changing is caught.",
+ "checks": {
+  "a06.synchronized.ownStartOffsetClose": {
+   "reason": "The pinned WebKit gives every pending animation on a monotonic timeline the document timeline time as its start time (AnimationTimelinesController::processPendingAnimations), so an animation on DocumentTimeline({originTime}) starts at the document time, not at the document time minus originTime as Chromium and the specification give.",
+   "webkit": false,
+   "chromium": true
+  },
+  "a06.synchronized.currentClose": {
+   "reason": "Follows from the start time above: the animation on the later-origin timeline reads a current time smaller by originTime.",
+   "webkit": false,
+   "chromium": true
+  }
+ }
+}

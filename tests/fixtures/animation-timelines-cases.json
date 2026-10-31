@@ -1,0 +1,14 @@
+{
+ "markup": "<!doctype html><html><head><title>timelines</title><style>body{margin:0}</style></head><body><div id=a style=\"width:40px;height:40px;background:red\"></div><script>document.title = \"script ran\"</script></body></html>",
+ "a06": {
+  "origins": [
+   100,
+   0,
+   -50,
+   1000000000.0
+  ],
+  "duration": 10000,
+  "syncOrigin": 100,
+  "futureOrigin": 1000000000.0
+ }
+}

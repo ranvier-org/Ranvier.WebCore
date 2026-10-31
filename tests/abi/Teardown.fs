@@ -1019,6 +1019,32 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
 
                 if rv_diagnostic_live_count () <> live then
                     failwith "cascade snapshot leaked"
+        | "document timeline" ->
+            // A DocumentTimeline and an idle animation on it must not keep the document alive; past host destroy the
+            // timeline's current time reads as null.
+            let mutable options = RvDomDocumentTimelineOptions()
+            options.size <- uint32 (Runtime.InteropServices.Marshal.SizeOf<RvDomDocumentTimelineOptions>())
+            options.origin_time <- 100.0
+
+            rv_dom_document_timeline_create (document, [| options |], &held.contents)
+            |> check "DocumentTimeline"
+
+            let mutable animation = 0n
+
+            rv_dom_web_animation_create (document, 0n, held.Value, 1, &animation)
+            |> check "Animation on a DocumentTimeline"
+
+            fun () ->
+                let mutable time = RvDomUnionDoubleOrCSSNumericValueNullable()
+
+                rv_dom_animation_timeline_get_current_time (held.Value, &time)
+                |> check "DocumentTimeline.currentTime after destroy"
+
+                if time.present <> 0 then
+                    failwith "DocumentTimeline.currentTime resolved after host destroy"
+
+                rv_event_target_release animation
+                rv_dom_animation_timeline_release held.Value
         | "web animation" ->
             // Element.animate builds its keyframes as JavaScript objects in the document's global object; the
             // animation, its effect and those objects must not keep the document or the div alive.
@@ -1347,6 +1373,7 @@ let run (outDir: string) =
                     "aria relations"
                     "coordinate spaces"
                     "web animation"
+                    "document timeline"
                 ] do
                 for remove in [ false; true ] do
                     releaseAfterDestroy kind remove
