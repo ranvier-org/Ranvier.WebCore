@@ -699,6 +699,42 @@ interface FormDataEvent : Event {
         generator.run()
         return generator
 
+    def canvas_generator(self, selection, overloads=()):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface Gradient {};
+interface Pattern {};
+interface Surface {
+    attribute (DOMString or Gradient or Pattern) paint;
+    undefined fill(unrestricted double x);
+    undefined clear(unrestricted double x);
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['Surface', 'Gradient', 'Pattern']
+        config['memberSelections'] = {'Surface': selection, 'Gradient': [], 'Pattern': []}
+        config['unionSetterOverloads'] = list(overloads)
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        return generator
+
+    def test_member_selections_generate_only_the_selected_members(self):
+        generator = self.canvas_generator(['paint', 'fill'])
+        names = {function.name for function in generator.functions}
+        self.assertTrue({'surface_get_paint', 'surface_set_paint', 'surface_fill'} <= names)
+        self.assertNotIn('surface_clear', names)
+        self.assertEqual('outside the gen/dom.json memberSelections', dict(generator.excluded)['Surface.clear'])
+        self.assertIn('typedef struct RvGradient RvGradient;', generator.header())
+
+    def test_union_setter_overloads_call_the_held_arm_overload(self):
+        glue = self.canvas_generator(['paint'], ['Surface.paint']).glue()
+        self.assertIn('WTF::switchOn(std::move(*a0), [&](auto&& arm) { if constexpr (std::is_same_v<std::remove_cvref_t<decltype(arm)>, String>) '
+                      'impl->setPaint(std::move(arm)); else impl->setPaint(RefPtr { std::move(arm) }); });', glue)
+        plain = self.canvas_generator(['paint']).glue()
+        self.assertNotIn('WTF::switchOn(std::move(*a0)', plain)
+
     def test_opaque_union_arm_returns_a_tag_with_a_null_payload_and_no_decoder(self):
         generator = self.form_data_generator()
         names = {function.name for function in generator.functions}

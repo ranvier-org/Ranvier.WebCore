@@ -1,0 +1,44 @@
+--- a/Source/WebCore/html/HTMLCanvasElement.cpp
++++ b/Source/WebCore/html/HTMLCanvasElement.cpp
+@@ -172,18 +172,26 @@
+     HTMLElement::attributeChanged(name, oldValue, newValue, attributeModificationReason);
+ }
+ 
++// A canvas renders its bitmap when script can run, or when it has a rendering context, which without script only an
++// embedder creates (Ranvier patch 00NN). Otherwise it renders its fallback content.
++static bool rendersBitmap(const HTMLCanvasElement& canvas)
++{
++    RefPtr frame = canvas.document().frame();
++    if (!frame)
++        return false;
++    return canvas.renderingContext() || protect(frame->script())->canExecuteScripts(ReasonForCallingCanExecuteScripts::NotAboutToExecuteScript);
++}
++
+ RenderPtr<RenderElement> HTMLCanvasElement::createElementRenderer(Style::ComputedStyle&& style, const RenderTreePosition& insertionPosition)
+ {
+-    RefPtr frame = document().frame();
+-    if (frame && protect(frame->script())->canExecuteScripts(ReasonForCallingCanExecuteScripts::NotAboutToExecuteScript))
++    if (rendersBitmap(*this))
+         return createRenderer<RenderHTMLCanvas>(*this, WTF::move(style));
+     return HTMLElement::createElementRenderer(WTF::move(style), insertionPosition);
+ }
+ 
+ bool HTMLCanvasElement::isReplaced(const Style::ComputedStyle*) const
+ {
+-    RefPtr frame = document().frame();
+-    return frame && protect(frame->script())->canExecuteScripts(ReasonForCallingCanExecuteScripts::NotAboutToExecuteScript);
++    return rendersBitmap(*this);
+ }
+ 
+ bool HTMLCanvasElement::canContainRangeEndPoint() const
+@@ -376,6 +384,10 @@
+     if (!m_context)
+         return nullptr;
+ 
++    // A canvas that rendered its fallback content renders its bitmap from now on.
++    if (renderer() && !is<RenderHTMLCanvas>(*renderer()))
++        invalidateStyleAndRenderersForSubtree();
++
+ #if ENABLE(PIXEL_FORMAT_RGBA16F) && HAVE(SUPPORT_HDR_DISPLAY)
+     if (m_context->pixelFormat() == PixelFormat::RGBA16F)
+         protect(document())->setHasHDRContent();

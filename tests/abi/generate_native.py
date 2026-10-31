@@ -118,6 +118,8 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
         return ("int[]", "") if name == "length" else ("int&", "")
     if ctype in ("const RvScreenMetrics*", "const RvMediaPreferences*"):
         return "nativeint", ""
+    if ctype == "const RvCanvas2DSettings*":
+        return "nativeint", ""
     if ctype == "const RvEventInit*":
         return "EventInit&", ""
     if ctype == "const uint16_t*":
@@ -126,7 +128,7 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
         return "TextSegments&", ""
     if ctype == "void**":
         return "nativeint&", ""
-    if ctype == "RvGpuFrame**":
+    if ctype in ("RvGpuFrame**", "RvCanvasRenderingContext2D**"):
         return "nativeint&", ""
     if re.fullmatch(r"Rv\w+\*\*", ctype):
         return "nativeint[]", ""

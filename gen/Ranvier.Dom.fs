@@ -5126,6 +5126,40 @@ and [<AllowNullLiteral>] FileReader =
     /// <summary>FileReader.abort.</summary>
     abstract member abort: unit -> unit
 
+/// <summary>HTMLCanvasElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLCanvasElement =
+    inherit HTMLElement
+    /// <summary>HTMLCanvasElement.width.</summary>
+    abstract member width: uint32 with get, set
+    /// <summary>HTMLCanvasElement.height.</summary>
+    abstract member height: uint32 with get, set
+
+/// <summary>CanvasRenderingContext2D in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CanvasRenderingContext2D =
+    /// <summary>CanvasRenderingContext2D.canvas.</summary>
+    abstract member canvas: HTMLCanvasElement with get
+
+    /// <summary>CanvasRenderingContext2D.fillStyle.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.fillStyle")>]
+    abstract member __ranvier_get_fillStyle: unit -> obj
+
+    [<Fable.Core.Emit("$0.fillStyle = $1")>]
+    abstract member __ranvier_set_fillStyle: value: obj -> unit
+#else
+    abstract member fillStyle: DOMStringOrCanvasGradientOrCanvasPattern with get, set
+#endif
+    /// <summary>CanvasRenderingContext2D.clearRect.</summary>
+    abstract member clearRect: x: float * y: float * w: float * h: float -> unit
+    /// <summary>CanvasRenderingContext2D.fillRect.</summary>
+    abstract member fillRect: x: float * y: float * w: float * h: float -> unit
+
+/// <summary>CanvasGradient in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CanvasGradient = interface end
+
+/// <summary>CanvasPattern in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CanvasPattern = interface end
+
 /// <summary>HTMLUnknownElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLUnknownElement =
     inherit HTMLElement
@@ -5137,10 +5171,6 @@ and [<AllowNullLiteral>] HTMLAttachmentElement =
 /// <summary>HTMLAudioElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLAudioElement =
     inherit HTMLMediaElement
-
-/// <summary>HTMLCanvasElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLCanvasElement =
-    inherit HTMLElement
 
 /// <summary>HTMLEmbedElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLEmbedElement =
@@ -5575,6 +5605,12 @@ and [<RequireQualifiedAccess>] USVStringOrURLPatternInit =
     | USVString of string
     | URLPatternInit of URLPatternInit
 
+/// <summary>DOMStringOrCanvasGradientOrCanvasPattern in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] DOMStringOrCanvasGradientOrCanvasPattern =
+    | DOMString of string
+    | CanvasGradient of CanvasGradient
+    | CanvasPattern of CanvasPattern
+
 /// <summary>NodeOrDOMString in the scoped DOM interface model.</summary>
 and [<RequireQualifiedAccess>] NodeOrDOMString =
     | Node of Node
@@ -5822,6 +5858,14 @@ module BrowserUnionAdapters =
     let private isCSSStyleValue (_: obj) : bool =
         Fable.Core.Util.jsNative
 
+    [<Fable.Core.Emit("Object.prototype.toString.call($0) === '[object CanvasGradient]'")>]
+    let private isCanvasGradient (_: obj) : bool =
+        Fable.Core.Util.jsNative
+
+    [<Fable.Core.Emit("Object.prototype.toString.call($0) === '[object CanvasPattern]'")>]
+    let private isCanvasPattern (_: obj) : bool =
+        Fable.Core.Util.jsNative
+
     [<Fable.Core.Emit("$0 != null && $0.nodeType === 1")>]
     let private isElement (_: obj) : bool =
         Fable.Core.Util.jsNative
@@ -6026,6 +6070,19 @@ module BrowserUnionAdapters =
         match value with
         | USVStringOrURLPatternInit.USVString value -> box (normalizeUSVString value)
         | USVStringOrURLPatternInit.URLPatternInit value -> box value
+
+    let private boxDOMStringOrCanvasGradientOrCanvasPattern (value: DOMStringOrCanvasGradientOrCanvasPattern) : obj =
+        match value with
+        | DOMStringOrCanvasGradientOrCanvasPattern.DOMString value -> box value
+        | DOMStringOrCanvasGradientOrCanvasPattern.CanvasGradient value -> box value
+        | DOMStringOrCanvasGradientOrCanvasPattern.CanvasPattern value -> box value
+
+    let private unboxDOMStringOrCanvasGradientOrCanvasPattern (value: obj) : DOMStringOrCanvasGradientOrCanvasPattern =
+        match value with
+        | :? string as arm -> DOMStringOrCanvasGradientOrCanvasPattern.DOMString arm
+        | arm when isCanvasGradient arm -> DOMStringOrCanvasGradientOrCanvasPattern.CanvasGradient (unbox<CanvasGradient> arm)
+        | arm when isCanvasPattern arm -> DOMStringOrCanvasGradientOrCanvasPattern.CanvasPattern (unbox<CanvasPattern> arm)
+        | _ -> failwith "Unexpected DOM union result"
 
     let private boxNodeOrDOMString (value: NodeOrDOMString) : obj =
         match value with
@@ -6302,6 +6359,15 @@ module BrowserUnionAdapters =
 
         member this.test(input: URLPatternInit, ?baseURL: string) : bool =
             this.__ranvier_test (?input = Some (box input), ?baseURL = baseURL)
+
+
+    type CanvasRenderingContext2D with
+        member this.fillStyle
+            with get (): DOMStringOrCanvasGradientOrCanvasPattern =
+                let value = this.__ranvier_get_fillStyle ()
+                unboxDOMStringOrCanvasGradientOrCanvasPattern value
+            and set (value: DOMStringOrCanvasGradientOrCanvasPattern) =
+                this.__ranvier_set_fillStyle (boxDOMStringOrCanvasGradientOrCanvasPattern value)
 
 
     type ChildNode with

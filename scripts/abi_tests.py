@@ -151,4 +151,5 @@ with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
     run([sys.executable, '-I', '-X', 'utf8', tests / 'inspector_diagnostics.py', '--native-directory', out, '--webkit-source', args.source])
     run([sys.executable, '-I', '-X', 'utf8', tests / 'cascade_diagnostics.py', '--native-directory', out])
     run([sys.executable, '-I', '-X', 'utf8', tests / 'media_queries.py', '--native-directory', out])
+    run([sys.executable, '-I', '-X', 'utf8', tests / 'canvas_context.py', '--native-directory', out])
 print('abi tests passed', flush=True)

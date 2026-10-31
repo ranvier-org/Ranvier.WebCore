@@ -1,0 +1,105 @@
+{
+ "fallback": {
+  "rect": [
+   0.0,
+   60.0,
+   10.0,
+   10.0
+  ],
+  "pixel": [
+   0,
+   0,
+   255,
+   255
+  ]
+ },
+ "defaults": [
+  300,
+  150
+ ],
+ "attributes": {
+  "alpha": 1,
+  "desynchronized": 0,
+  "willReadFrequently": 0,
+  "colorSpace": 0,
+  "colorType": 0
+ },
+ "requestedAttributes": {
+  "alpha": 1,
+  "desynchronized": 1,
+  "willReadFrequently": 1,
+  "colorSpace": 0,
+  "colorType": 0
+ },
+ "fillStyle": {
+  "initial": "#000000",
+  "#ff0000": "#ff0000",
+  "not a colour": "#ff0000",
+  "rgba(0, 0, 255, 0.5)": "rgba(0, 0, 255, 0.5)",
+  "lime": "#00ff00"
+ },
+ "drawn": [
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   0,
+   0,
+   255,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ]
+ ],
+ "cleared": [
+  [
+   255,
+   255,
+   255,
+   255
+  ],
+  [
+   255,
+   0,
+   0,
+   255
+  ]
+ ],
+ "halfAlpha": [
+  [
+   127,
+   128,
+   0,
+   255
+  ],
+  [
+   0,
+   128,
+   127,
+   255
+  ]
+ ],
+ "switched": {
+  "rect": [
+   0.0,
+   60.0,
+   300.0,
+   150.0
+  ],
+  "pixel": [
+   255,
+   255,
+   255,
+   255
+  ]
+ },
+ "hugeWidth": 300,
+ "assertions": 205
+}

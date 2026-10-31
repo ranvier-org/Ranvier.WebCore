@@ -1710,6 +1710,24 @@ type RvDomSequenceAbstractRange =
     val mutable count: int
     val mutable items: nativeint
 
+[<Literal>]
+let RV_DOM_UNION_DOM_STRING_OR_CANVAS_GRADIENT_OR_CANVAS_PATTERN_STRING = 1
+
+[<Literal>]
+let RV_DOM_UNION_DOM_STRING_OR_CANVAS_GRADIENT_OR_CANVAS_PATTERN_CANVAS_GRADIENT = 2
+
+[<Literal>]
+let RV_DOM_UNION_DOM_STRING_OR_CANVAS_GRADIENT_OR_CANVAS_PATTERN_CANVAS_PATTERN = 3
+
+/// <summary>ABI transport for DOMStringOrCanvasGradientOrCanvasPattern; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: RvDomUtf8StringSpan
+    val mutable arm1: nativeint
+    val mutable arm2: nativeint
+
 /// <summary>ABI transport for CSSStyleValue sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomSequenceCSSStyleValue =
@@ -1914,6 +1932,9 @@ extern void rv_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string_re
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release(RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue& value)
@@ -2316,6 +2337,24 @@ extern void rv_dom_highlight_registry_release(nativeint handle)
 
 [<DllImport(Lib)>]
 extern nativeint rv_dom_highlight_registry_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_canvas_rendering_context2_d_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_canvas_rendering_context2_d_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_canvas_gradient_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_canvas_gradient_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_canvas_pattern_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_canvas_pattern_retain(nativeint handle)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_rule_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -10221,6 +10260,33 @@ extern int rv_dom_file_reader_read_as_data_url(nativeint target, nativeint blob)
 
 [<DllImport(Lib)>]
 extern int rv_dom_file_reader_abort(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_canvas_element_get_width(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_canvas_element_set_width(nativeint target, uint32 value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_canvas_element_get_height(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_canvas_element_set_height(nativeint target, uint32 value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_canvas(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_fill_style(nativeint target, RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_fill_style(nativeint target, [<In>] RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern[] value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_clear_rect(nativeint target, float x, float y, float w, float h)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_fill_rect(nativeint target, float x, float y, float w, float h)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_supports_2(nativeint target, byte[] property, int property_length, byte[] value, int value_length, int& result)

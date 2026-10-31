@@ -1173,6 +1173,9 @@ class Generator(ComplexGeneratorMixin):
         label = f"{interface}.{member.name}"
         if label in self.exclude or member.name in self.exclude:
             return "excluded by gen/dom.json"
+        selection = self.world.config.get("memberSelections", {}).get(interface)
+        if selection is not None and member.name not in selection:
+            return "outside the gen/dom.json memberSelections"
         if member.kind == 'operation' and member.special == 'stringifier' and interface not in self.world.config.get('stringifiers', []):
             return 'stringifier outside configured binding'
         if not member.name:
@@ -1495,6 +1498,10 @@ class Generator(ComplexGeneratorMixin):
             if implemented_by:
                 self.headers.add(f"{implemented_by}.h")
                 return f"WebCore::{implemented_by}::{name}(*impl{{call_with}}, {value})"
+            if f"{interface}.{member.name}" in self.world.config.get("unionSetterOverloads", []):
+                # The C++ setter is overloaded per union arm, String&& or RefPtr<T>&&: call the overload of the held arm.
+                return (f"WTF::switchOn({value}, [&](auto&& arm) {{ if constexpr (std::is_same_v<std::remove_cvref_t<decltype(arm)>, String>) "
+                        f"impl->{name}(std::move(arm)); else impl->{name}(RefPtr {{ std::move(arm) }}); }})")
             return f"impl->{name}({{call_with_lead}}{value})"
         t = self.world.resolve(member.type).name
         if t == "boolean":

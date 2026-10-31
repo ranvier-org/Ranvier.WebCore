@@ -5,6 +5,7 @@
 #include "RanvierResourceGlue.h"
 #include "RanvierEventGlue.h"
 #include "RanvierViewportGlue.h"
+#include "RanvierCanvasGlue.h"
 #include "RanvierInspectGlue.h"
 #include <atomic>
 #include <string>
@@ -1399,6 +1400,8 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "text-segmentation"))
         return 1;
     if (!std::strcmp(feature, "diagnostics"))
+        return 1;
+    if (!std::strcmp(feature, "canvas-context"))
         return 1;
     if (!std::strcmp(feature, "cascade-diagnostics"))
         return 1;
@@ -6351,4 +6354,22 @@ void rv_text_segments_release(RvTextSegments* segments)
     std::free(segments->word_like);
     std::free(segments->locale);
     *segments = { };
+}
+
+int32_t rv_canvas_get_context(RvNode* canvas, int32_t type, const RvCanvas2DSettings* settings, RvCanvasRenderingContext2D** context)
+{
+    if (!canvas || !context)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_canvas_get_context(canvas, type, settings, context);
+}
+
+int32_t rv_canvas_context_2d_attributes(RvCanvasRenderingContext2D* context, RvCanvas2DSettings* settings)
+{
+    if (!context || !settings)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_canvas_context_2d_attributes(context, settings);
 }
