@@ -1363,6 +1363,20 @@ RV_EXPORT RvEventTarget* rv_host_match_media(RvHost*, const char* query);
 RV_EXPORT int32_t rv_media_query_matches(RvEventTarget*, int32_t* matches);
 RV_EXPORT int32_t rv_media_query_media(RvEventTarget*, char* buffer, int32_t capacity, int32_t* length);
 
+/* v39: "dom-binary-values" for rv_abi_has. RvBlob is the generated handle of Blob and File, and RvFileList of
+ * FileList (RanvierWebCoreDom.h). The host's blob registry holds the bytes of every Blob and File it creates in
+ * memory, so reading them completes during the call. */
+typedef struct RvBlob RvBlob;
+typedef struct RvFileList RvFileList;
+
+/* Copies the bytes of blob into buffer and writes their count to *length. A capacity below the count copies
+ * nothing and returns RV_ERR_BUFFER_TOO_SMALL with the count in *length; buffer may be NULL for capacity 0.
+ * Returns RV_ERR_UNSUPPORTED for a blob whose bytes are not held in memory, such as a file-backed one. */
+RV_EXPORT int32_t rv_blob_read_bytes(RvBlob* blob, uint8_t* buffer, int64_t capacity, int64_t* length);
+/* A new FileList holding count files in order, as a new reference. files may be NULL for count 0.
+ * Returns RV_ERR_WRONG_INTERFACE for an item that is a Blob and not a File. */
+RV_EXPORT int32_t rv_file_list_create(RvBlob* const* files, int32_t count, RvFileList** result);
+
 /* "dom-generated" and "dom:<Interface>" for rv_abi_has: the generated functions of RanvierWebCoreDom.h, one per
  * IDL member of the interfaces gen/dom.json lists, from the same library. */
 

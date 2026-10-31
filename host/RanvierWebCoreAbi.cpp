@@ -67,7 +67,12 @@
 #include <WebCore/LocalFrameInlines.h>
 #include <WebCore/PageConfiguration.h>
 #include <WebCore/ProcessWarming.h>
+#include <WebCore/Blob.h>
+#include <WebCore/BlobData.h>
 #include <WebCore/BlobRegistry.h>
+#include <WebCore/BlobRegistryImpl.h>
+#include <WebCore/File.h>
+#include <WebCore/FileList.h>
 #include <WebCore/CachedResource.h>
 #include <WebCore/HTTPHeaderNames.h>
 #include <WebCore/HTTPParsers.h>
@@ -991,20 +996,31 @@ public:
 #endif
 };
 
+// The blob registry follows WebKitLegacy's WebBlobRegistry (Source/WebKitLegacy/mac/WebCoreSupport/
+// WebPlatformStrategies.mm, Copyright (C) 2010-2026 Apple Inc., BSD-2-Clause): the in-process BlobRegistryImpl
+// holds every blob's data on the main thread.
 class RvBlobRegistry final : public BlobRegistry {
+    WTF_MAKE_TZONE_ALLOCATED(RvBlobRegistry);
+    WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(RvBlobRegistry);
 public:
-    void registerInternalFileBlobURL(const URL&, Ref<BlobDataFileReference>&&, const String&, const String&) final { }
-    void registerInternalBlobURL(const URL&, Vector<BlobPart>&&, const String&) final { }
-    void registerBlobURL(const URL&, const URL&, const PolicyContainer&, const std::optional<SecurityOriginData>&) final { }
-    void registerInternalBlobURLOptionallyFileBacked(const URL&, const URL&, RefPtr<BlobDataFileReference>&&, const String&) final { }
-    void registerInternalBlobURLForSlice(const URL&, const URL&, long long, long long, const String&) final { }
-    void unregisterBlobURL(const URL&, const std::optional<SecurityOriginData>&) final { }
-    void registerBlobURLHandle(const URL&, const std::optional<SecurityOriginData>&) final { }
-    void unregisterBlobURLHandle(const URL&, const std::optional<SecurityOriginData>&) final { }
-    String blobType(const URL&) final { return emptyString(); }
-    unsigned long long blobSize(const URL&) final { return 0; }
-    void writeBlobsToTemporaryFilesForIndexedDB(const Vector<String>&, CompletionHandler<void(Vector<String>&&)>&&) final { }
+    void registerInternalFileBlobURL(const URL& url, Ref<BlobDataFileReference>&& reference, const String&, const String& contentType) final { m_registry.registerInternalFileBlobURL(url, WTF::move(reference), contentType); }
+    void registerInternalBlobURL(const URL& url, Vector<BlobPart>&& parts, const String& contentType) final { m_registry.registerInternalBlobURL(url, WTF::move(parts), contentType); }
+    void registerBlobURL(const URL& url, const URL& source, const PolicyContainer& policy, const std::optional<SecurityOriginData>& topOrigin) final { m_registry.registerBlobURL(url, source, policy, topOrigin); }
+    void registerInternalBlobURLOptionallyFileBacked(const URL& url, const URL& source, RefPtr<BlobDataFileReference>&& reference, const String& contentType) final { m_registry.registerInternalBlobURLOptionallyFileBacked(url, source, WTF::move(reference), contentType, { }); }
+    void registerInternalBlobURLForSlice(const URL& url, const URL& source, long long start, long long end, const String& contentType) final { m_registry.registerInternalBlobURLForSlice(url, source, start, end, contentType); }
+    void unregisterBlobURL(const URL& url, const std::optional<SecurityOriginData>& topOrigin) final { m_registry.unregisterBlobURL(url, topOrigin); }
+    void registerBlobURLHandle(const URL& url, const std::optional<SecurityOriginData>& topOrigin) final { m_registry.registerBlobURLHandle(url, topOrigin); }
+    void unregisterBlobURLHandle(const URL& url, const std::optional<SecurityOriginData>& topOrigin) final { m_registry.unregisterBlobURLHandle(url, topOrigin); }
+    String blobType(const URL& url) final { return m_registry.blobType(url); }
+    unsigned long long blobSize(const URL& url) final { return m_registry.blobSize(url); }
+    void writeBlobsToTemporaryFilesForIndexedDB(const Vector<String>& urls, CompletionHandler<void(Vector<String>&&)>&& completion) final { m_registry.writeBlobsToTemporaryFilesForIndexedDB(urls, WTF::move(completion)); }
+    BlobRegistryImpl* blobRegistryImpl() final { return &m_registry; }
+
+private:
+    BlobRegistryImpl m_registry;
 };
+
+WTF_MAKE_TZONE_ALLOCATED_IMPL(RvBlobRegistry);
 
 class RvMediaStrategy final : public MediaStrategy {
 public:
@@ -1188,6 +1204,8 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "input-state"))
         return 1;
     if (!std::strcmp(feature, "viewport"))
+        return 1;
+    if (!std::strcmp(feature, "dom-binary-values"))
         return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "accessibility-uia"))
@@ -3015,6 +3033,68 @@ int32_t rv_host_cursor(RvHost* host)
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     return host->cursor;
+}
+
+int32_t rv_blob_read_bytes(RvBlob* handle, uint8_t* buffer, int64_t capacity, int64_t* length)
+{
+    if (!handle || !length || capacity < 0 || (capacity && !buffer))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    auto& blob = *reinterpret_cast<Blob*>(handle);
+    auto* registry = blobRegistry()->blobRegistryImpl();
+    RefPtr data = registry ? registry->blobDataFromURL(blob.url()) : nullptr;
+    if (!data)
+        return RV_ERR_UNSUPPORTED;
+    Vector<std::pair<const uint8_t*, size_t>> spans;
+    uint64_t total = 0;
+    for (auto& item : data->items()) {
+        auto span = item.switchOn([&](const DataSegment& segment) -> std::optional<std::span<const uint8_t>> {
+            auto bytes = segment.span();
+            auto offset = item.offset();
+            auto count = item.length();
+            if (offset < 0 || count < 0 || static_cast<uint64_t>(offset) > bytes.size() || static_cast<uint64_t>(count) > bytes.size() - offset)
+                return std::nullopt;
+            return bytes.subspan(offset, count);
+        }, [](const BlobDataFileReference&) -> std::optional<std::span<const uint8_t>> {
+            return std::nullopt;
+        });
+        if (!span)
+            return RV_ERR_UNSUPPORTED;
+        total += span->size();
+        spans.append({ span->data(), span->size() });
+    }
+    if (total > static_cast<uint64_t>(std::numeric_limits<int64_t>::max()))
+        return RV_ERR_UNSUPPORTED;
+    *length = static_cast<int64_t>(total);
+    if (static_cast<uint64_t>(capacity) < total)
+        return RV_ERR_BUFFER_TOO_SMALL;
+    for (auto& [bytes, count] : spans) {
+        if (count)
+            std::memcpy(buffer, bytes, count);
+        buffer += count;
+    }
+    return RV_OK;
+}
+
+int32_t rv_file_list_create(RvBlob* const* files, int32_t count, RvFileList** result)
+{
+    if (!result || count < 0 || (count && !files))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    Vector<Ref<File>> list;
+    list.reserveInitialCapacity(count);
+    for (int32_t i = 0; i < count; ++i) {
+        if (!files[i])
+            return RV_ERR_NULL_ARGUMENT;
+        RefPtr file = dynamicDowncast<File>(*reinterpret_cast<Blob*>(files[i]));
+        if (!file)
+            return RV_ERR_WRONG_INTERFACE;
+        list.append(file.releaseNonNull());
+    }
+    *result = reinterpret_cast<RvFileList*>(&FileList::create(WTF::move(list)).leakRef());
+    return RV_OK;
 }
 
 int32_t rv_host_scroll_position(RvHost* host, int32_t* x, int32_t* y)
