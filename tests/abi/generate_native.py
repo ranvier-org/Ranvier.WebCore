@@ -186,6 +186,23 @@ def generated(header: str) -> str:
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
         "type ResourceHandler = delegate of context: nativeint * load: nativeint * url: nativeint -> unit",
         "",
+        "/// <summary>The <c>RvFormSubmission</c> of the header; every pointer is valid only during the handler call.</summary>",
+        "[<Struct; StructLayout(LayoutKind.Sequential)>]",
+        "type FormSubmission =",
+        "    val mutable size: uint32",
+        "    val mutable method: nativeint",
+        "    val mutable url: nativeint",
+        "    val mutable target: nativeint",
+        "    val mutable contentType: nativeint",
+        "    val mutable body: nativeint",
+        "    val mutable bodyLength: int",
+        "    val mutable form: nativeint",
+        "    val mutable submitter: nativeint",
+        "",
+        "/// <summary>The <c>RvFormSubmissionHandler</c> of the header; <c>submission</c> points to a <c>FormSubmission</c>.</summary>",
+        "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+        "type FormSubmissionHandler = delegate of context: nativeint * submission: nativeint -> unit",
+        "",
         "/// <summary>The <c>RvResourceCompletion</c> of the header: one terminal outcome with an image's natural size.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
         "type ResourceCompletion = delegate of context: nativeint * outcome: int * width: int * height: int -> unit",
@@ -311,6 +328,17 @@ def externs(fsharp: str):
     return found
 
 
+def preamble_types(fsharp: str):
+    """Each type declared before the Calls module, with its struct fields, in order."""
+    head = fsharp.split("module Calls", 1)[0]
+    found = []
+    for match in re.finditer(r"^type (\w+) =(.*?)(?=^(?:///|\[<|type |module )|\Z)", head, flags=re.M | re.S):
+        fields = re.findall(r"val mutable (\w+): (\S+)", match.group(2))
+        delegate = " ".join(match.group(2).split()) if "delegate of" in match.group(2) else None
+        found.append((match.group(1), fields, delegate))
+    return found
+
+
 def compare(native: str, header: str) -> int:
     expected = {
         name: (return_type(r), [parameter(c, n)[1] + parameter(c, n)[0] for c, n in params])
@@ -362,7 +390,12 @@ def main() -> int:
         if not ordered:
             print("the generated section's externs are out of the header's order; run write")
 
-        return 1 if status or not ordered or BEGIN not in native else 0
+        # The types before the externs must be the generator's: a type added to Native.fs by hand is lost on write.
+        expected_types, actual_types = preamble_types(section), preamble_types(current)
+        if expected_types != actual_types:
+            print(f"the generated section's types differ from the generator's; add them to generated(): generator {expected_types}, Native.fs {actual_types}")
+
+        return 1 if status or not ordered or BEGIN not in native or expected_types != actual_types else 0
 
     if mode == "write":
         tail = native[stop:]
