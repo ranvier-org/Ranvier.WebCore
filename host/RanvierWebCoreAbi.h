@@ -1807,6 +1807,54 @@ enum {
     RV_CASCADE_STRING_FIELDS = 7,
 };
 
+/* v55: "canvas-context" for rv_abi_has: HTMLCanvasElement.getContext and CanvasRenderingContext2D.getContextAttributes
+ * without JavaScript. RanvierWebCoreDom.h holds the context's generated members and its release and retain. */
+typedef struct RvCanvasRenderingContext2D RvCanvasRenderingContext2D;
+
+/* Context types of rv_canvas_get_context. */
+enum {
+    RV_CANVAS_CONTEXT_NONE = 0,
+    RV_CANVAS_CONTEXT_2D = 1,
+    RV_CANVAS_CONTEXT_BITMAP_RENDERER = 2,
+    RV_CANVAS_CONTEXT_WEBGL = 3,
+    RV_CANVAS_CONTEXT_WEBGL2 = 4,
+    RV_CANVAS_CONTEXT_WEBGPU = 5,
+};
+
+/* PredefinedColorSpace and CanvasColorType of RvCanvas2DSettings. */
+enum {
+    RV_CANVAS_COLOR_SPACE_SRGB = 0,
+    RV_CANVAS_COLOR_SPACE_DISPLAY_P3 = 1,
+};
+enum {
+    RV_CANVAS_COLOR_TYPE_UNORM8 = 0,
+    RV_CANVAS_COLOR_TYPE_FLOAT16 = 1,
+};
+
+/* CanvasRenderingContext2DSettings. size is sizeof(RvCanvas2DSettings); the flags are 0 or 1. The defaults are alpha 1,
+ * desynchronized 0, willReadFrequently 0, sRGB and unorm8. */
+typedef struct RvCanvas2DSettings {
+    int32_t size;
+    int32_t alpha;
+    int32_t desynchronized;
+    int32_t willReadFrequently;
+    int32_t colorSpace;
+    int32_t colorType;
+} RvCanvas2DSettings;
+
+/* HTMLCanvasElement.getContext for a context type. For RV_CANVAS_CONTEXT_2D, *context is a new reference to the canvas's
+ * one 2D context: the first call creates it with settings (NULL for the defaults), and every later call returns the same
+ * object and ignores settings. The context keeps its canvas alive. RV_OK with *context NULL means the canvas already has
+ * a context of another type.
+ * Every other type returns RV_ERR_UNSUPPORTED: this ABI creates 2D contexts only. A 2D request the engine cannot honour
+ * also returns RV_ERR_UNSUPPORTED: alpha 0, display-p3, float16, a flag other than 0 or 1, or size below
+ * sizeof(RvCanvas2DSettings). An unsupported call leaves *context NULL and the canvas without a context.
+ * Returns RV_ERR_WRONG_INTERFACE for a node that is not a <canvas>. */
+RV_EXPORT int32_t rv_canvas_get_context(RvNode* canvas, int32_t type, const RvCanvas2DSettings* settings, RvCanvasRenderingContext2D** context);
+/* CanvasRenderingContext2D.getContextAttributes: the settings the context applies. Returns RV_ERR_UNSUPPORTED, with
+ * settings unchanged, when settings->size is below sizeof(RvCanvas2DSettings). */
+RV_EXPORT int32_t rv_canvas_context_2d_attributes(RvCanvasRenderingContext2D* context, RvCanvas2DSettings* settings);
+
 #ifdef __cplusplus
 }
 #endif

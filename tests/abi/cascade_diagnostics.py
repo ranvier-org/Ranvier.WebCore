@@ -19,7 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
 
 OK, NULL_ARGUMENT, WRONG_THREAD, NOT_ELEMENT, BUFFER_TOO_SMALL, UNSUPPORTED = 0, -1, -2, -4, -6, -9
-ABI = 54
+ABI = 55
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 MATCHED_RULES, CASCADE = 2, 3
 ORIGINS = {'user-agent': 0, 'user': 1, 'author': 2, 'inline': 3, 'presentational-hint': 4}

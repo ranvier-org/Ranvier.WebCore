@@ -1172,6 +1172,9 @@ class Generator(ComplexGeneratorMixin):
         label = f"{interface}.{member.name}"
         if label in self.exclude or member.name in self.exclude:
             return "excluded by gen/dom.json"
+        selection = self.world.config.get("memberSelections", {}).get(interface)
+        if selection is not None and member.name not in selection:
+            return "outside the gen/dom.json memberSelections"
         if member.kind == 'operation' and member.special == 'stringifier' and interface not in self.world.config.get('stringifiers', []):
             return 'stringifier outside configured binding'
         if not member.name:

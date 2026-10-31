@@ -90,6 +90,9 @@ typedef struct RvURLSearchParams RvURLSearchParams;
 typedef struct RvURLPattern RvURLPattern;
 typedef struct RvHighlight RvHighlight;
 typedef struct RvHighlightRegistry RvHighlightRegistry;
+typedef struct RvCanvasRenderingContext2D RvCanvasRenderingContext2D;
+typedef struct RvCanvasGradient RvCanvasGradient;
+typedef struct RvCanvasPattern RvCanvasPattern;
 typedef struct RvDomUnionNodeOrDOMString RvDomUnionNodeOrDOMString;
 typedef struct RvDomSequenceNodeOrDOMString RvDomSequenceNodeOrDOMString;
 typedef struct RvDomSequenceCSSStyleSheet RvDomSequenceCSSStyleSheet;
@@ -142,6 +145,7 @@ typedef struct RvDomUnionUndefinedOrUSVString RvDomUnionUndefinedOrUSVString;
 typedef struct RvDomPairUSVStringAndUnionUndefinedOrUSVString RvDomPairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequenceAbstractRange RvDomSequenceAbstractRange;
+typedef struct RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
@@ -961,6 +965,7 @@ typedef struct RvDomUnionUndefinedOrUSVString RvDomUnionUndefinedOrUSVString;
 typedef struct RvDomPairUSVStringAndUnionUndefinedOrUSVString RvDomPairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequenceAbstractRange RvDomSequenceAbstractRange;
+typedef struct RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
@@ -1525,6 +1530,21 @@ struct RvDomSequenceAbstractRange {
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_DOM_STRING_OR_CANVAS_GRADIENT_OR_CANVAS_PATTERN_STRING = 1,
+    RV_DOM_UNION_DOM_STRING_OR_CANVAS_GRADIENT_OR_CANVAS_PATTERN_CANVAS_GRADIENT = 2,
+    RV_DOM_UNION_DOM_STRING_OR_CANVAS_GRADIENT_OR_CANVAS_PATTERN_CANVAS_PATTERN = 3,
+};
+struct RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern {
+    int32_t present;
+    int32_t tag;
+    RvDomUtf8StringSpan arm0;
+    RvCanvasGradient* arm1;
+    RvCanvasPattern* arm2;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
 struct RvDomSequenceCSSStyleValue {
     int32_t present;
     int32_t count;
@@ -1630,6 +1650,7 @@ RV_EXPORT void rv_dom_union_undefined_or_usv_string_release(RvDomUnionUndefinedO
 RV_EXPORT void rv_dom_pair_usv_string_and_union_undefined_or_usv_string_release(RvDomPairUSVStringAndUnionUndefinedOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string_release(RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange* value);
+RV_EXPORT void rv_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release(RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* value);
 RV_EXPORT void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value);
 RV_EXPORT void rv_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* value);
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* value);
@@ -1891,6 +1912,18 @@ RV_EXPORT RvHighlight* rv_dom_highlight_retain(RvHighlight*);
 RV_EXPORT void rv_dom_highlight_registry_release(RvHighlightRegistry*);
 /* Adds a reference to a HighlightRegistry and returns it. */
 RV_EXPORT RvHighlightRegistry* rv_dom_highlight_registry_retain(RvHighlightRegistry*);
+/* Releases a handle to a CanvasRenderingContext2D. */
+RV_EXPORT void rv_dom_canvas_rendering_context2_d_release(RvCanvasRenderingContext2D*);
+/* Adds a reference to a CanvasRenderingContext2D and returns it. */
+RV_EXPORT RvCanvasRenderingContext2D* rv_dom_canvas_rendering_context2_d_retain(RvCanvasRenderingContext2D*);
+/* Releases a handle to a CanvasGradient. */
+RV_EXPORT void rv_dom_canvas_gradient_release(RvCanvasGradient*);
+/* Adds a reference to a CanvasGradient and returns it. */
+RV_EXPORT RvCanvasGradient* rv_dom_canvas_gradient_retain(RvCanvasGradient*);
+/* Releases a handle to a CanvasPattern. */
+RV_EXPORT void rv_dom_canvas_pattern_release(RvCanvasPattern*);
+/* Adds a reference to a CanvasPattern and returns it. */
+RV_EXPORT RvCanvasPattern* rv_dom_canvas_pattern_retain(RvCanvasPattern*);
 /* Concrete scoped interface name of a CSSRule handle; borrows target. */
 RV_EXPORT int32_t rv_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* Concrete scoped interface name of a StyleSheet handle; borrows target. */
@@ -8199,6 +8232,31 @@ RV_EXPORT int32_t rv_dom_file_reader_read_as_text(RvEventTarget* target, RvBlob*
 RV_EXPORT int32_t rv_dom_file_reader_read_as_data_url(RvEventTarget* target, RvBlob* blob);
 /* FileReader.abort() -> undefined; RV_ERR_UNSUPPORTED while the setting FileReaderAPIEnabled is off */
 RV_EXPORT int32_t rv_dom_file_reader_abort(RvEventTarget* target);
+/* HTMLCanvasElement */
+
+/* HTMLCanvasElement.width getter: attribute unsigned long width */
+RV_EXPORT int32_t rv_dom_html_canvas_element_get_width(RvNode* target, uint32_t* result);
+/* HTMLCanvasElement.width setter: attribute unsigned long width */
+RV_EXPORT int32_t rv_dom_html_canvas_element_set_width(RvNode* target, uint32_t value);
+/* HTMLCanvasElement.height getter: attribute unsigned long height */
+RV_EXPORT int32_t rv_dom_html_canvas_element_get_height(RvNode* target, uint32_t* result);
+/* HTMLCanvasElement.height setter: attribute unsigned long height */
+RV_EXPORT int32_t rv_dom_html_canvas_element_set_height(RvNode* target, uint32_t value);
+/* CanvasRenderingContext2D */
+
+/* CanvasRenderingContext2D.canvas getter: readonly attribute HTMLCanvasElement canvas; *result is a new reference */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_canvas(RvCanvasRenderingContext2D* target, RvNode** result);
+/* CanvasRenderingContext2D.fillStyle getter: attribute (DOMString or CanvasGradient or CanvasPattern) fillStyle;
+ * *result owns its contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_fill_style(RvCanvasRenderingContext2D* target, RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* result);
+/* CanvasRenderingContext2D.fillStyle setter: attribute (DOMString or CanvasGradient or CanvasPattern) fillStyle */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_fill_style(RvCanvasRenderingContext2D* target, const RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* value);
+/* CanvasRenderingContext2D.clearRect(unrestricted double x, unrestricted double y, unrestricted double w,
+ * unrestricted double h) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_clear_rect(RvCanvasRenderingContext2D* target, double x, double y, double w, double h);
+/* CanvasRenderingContext2D.fillRect(unrestricted double x, unrestricted double y, unrestricted double w, unrestricted
+ * double h) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_fill_rect(RvCanvasRenderingContext2D* target, double x, double y, double w, double h);
 /* DOMCSSNamespace */
 
 /* CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths */

@@ -680,7 +680,11 @@
     "VisualViewport",
     "Highlight",
     "HighlightRegistry",
-    "FileReader"
+    "FileReader",
+    "HTMLCanvasElement",
+    "CanvasRenderingContext2D",
+    "CanvasGradient",
+    "CanvasPattern"
   ],
   "skipDirectories": [
     "Modules/",
@@ -1138,5 +1142,19 @@
     "HighlightRegistry": {
       "adapter": "RanvierCollectionLike"
     }
+  },
+  "memberSelections": {
+    "HTMLCanvasElement": [
+      "width",
+      "height"
+    ],
+    "CanvasRenderingContext2D": [
+      "canvas",
+      "fillStyle",
+      "fillRect",
+      "clearRect"
+    ],
+    "CanvasGradient": [],
+    "CanvasPattern": []
   }
 }
