@@ -127,14 +127,28 @@ def verify(directory, evidence_json=None):
     # Bitmap success: decoder completion, natural size.
     page(host, '<img id="ok" src="https://h05.test/ok.png">')
     node = by_id(host, b'ok')
-    baseline = ref_count(node)
     status, op = start(host, node, 1)
     expect(status == 0 and op != 0, 'Decode starts')
     got = wait(1)
     expect(got == [(1, 0, 3, 2)], 'Bitmap SUCCEEDED 3x2: ' + repr(got))
     cases['bitmap'] = got
-    expect(ref_count(node) == baseline, 'Terminal operation holds no element reference')
+
+    # The image loader protects its element while its load event is pending, so references are compared only after
+    # the engine's own timers have drained, with the terminal operation still registered and then released.
+    def settled_count():
+        counts = []
+        for _ in range(20):
+            cycle(10)
+            counts.append(ref_count(node))
+            if len(counts) >= 3 and counts[-1] == counts[-2] == counts[-3]:
+                break
+        return counts
+
+    held = settled_count()
     expect(release(op) == 0 and release(op) == 0, 'Release is idempotent')
+    unregistered = settled_count()
+    cases['bitmapReferenceCounts'] = dict(registered=held, released=unregistered)
+    expect(held[-1] == unregistered[-1], 'Terminal operation holds no element reference: registered %r, released %r' % (held, unregistered))
     cycle(5)
     expect(len([r for r in results if r[0] == 1]) == 1, 'One terminal after release')
     release_node(node)
@@ -265,7 +279,7 @@ def verify(directory, evidence_json=None):
     expect(not state['reentered'], 'No re-entry')
     after = {str(p.relative_to(directory)): hashlib.sha256(p.read_bytes()).hexdigest() for p in directory.rglob('*') if p.is_file()}
     expect(before == after, 'Runtime unchanged')
-    summary = dict(assertions=assertions, requests=len(requests), cases={k: [list(r) for r in v] for k, v in cases.items()})
+    summary = dict(assertions=assertions, requests=len(requests), cases={k: (v if isinstance(v, dict) else [list(r) for r in v]) for k, v in cases.items()})
     if evidence_json:
         Path(evidence_json).write_text(json.dumps(summary, indent=2))
     print('PASS image decode: %d assertions' % assertions, flush=True)
