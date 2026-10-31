@@ -94,7 +94,7 @@ for name, expected in probes:
         arguments = arguments[:5]
     if name == 'native_types':
         arguments = arguments[:4] + [str(repo / 'tests/generator/native_types.py'), '--native-dir', str(runtime)]
-    if name in ('svg_surfaces', 'font_load', 'caret_hit', 'custom_highlights'):
+    if name in ('svg_surfaces', 'font_load', 'caret_hit', 'custom_highlights', 'inspector_diagnostics'):
         arguments += ['--webkit-source', 'C:/wk/src']
     if name == 'dialog_popover':
         arguments += ['--abi', str(ABI)]
