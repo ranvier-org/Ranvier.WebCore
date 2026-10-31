@@ -1236,6 +1236,37 @@ interface CSSStyleDeclaration { DOMString getPropertyValue(DOMString property); 
         self.assertIn('pseudo_element_length >= 0 && a1.string().isNull()', glue)
         self.assertNotIn('type Window =', generator.interfaces())
 
+    def test_event_target_objects_use_event_target_handles_and_report_detached(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+[EnabledBySetting=ViewportApi] interface Viewport : EventTarget {
+    readonly attribute double width;
+    attribute EventHandler onresize;
+};
+[InterfaceName=Window, Exposed=Window] interface DOMWindow : EventTarget {};
+[EnabledBySetting=ViewportApi] partial interface DOMWindow {
+    [SameObject] readonly attribute Viewport viewport;
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['Viewport']
+        config['creationGatedInterfaces'] = {'Viewport': 'DOMWindow.viewport'}
+        config['eventTargetObjects'] = {'Viewport': {'attached': 'impl->frame()'}}
+        config['windowBindings'] = {'DOMWindow': [{'receiver': 'Document', 'members': ['viewport'], 'feature': 'viewport-object', 'stringInputs': 'utf8-lengths'}]}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        self.assertEqual(functions['rv_dom_viewport_get_width']['parameters'], [{'ctype': 'RvEventTarget*', 'name': 'target'}, {'ctype': 'double*', 'name': 'result'}])
+        self.assertEqual(functions['rv_dom_window_get_viewport']['parameters'][-1], {'ctype': 'RvEventTarget**', 'name': 'result'})
+        self.assertNotIn('Viewport', generator.handles)
+        glue = generator.glue()
+        self.assertIn('dynamicDowncast<Viewport>(*reinterpret_cast<EventTarget*>(target))', glue)
+        self.assertIn('if (!(impl->frame()))' + chr(10) + '        return RV_ERR_DETACHED;', glue)
+        self.assertIn('storeHandle<EventTarget>(value, result)', glue)
+        self.assertNotIn('settings.viewportApi', glue.split('ranvier_dom_viewport_get_width', 1)[1].split(chr(10) + '}', 1)[0])
+
     def test_window_bindings_list_reads_readonly_attributes_and_overloads_per_feature(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''
