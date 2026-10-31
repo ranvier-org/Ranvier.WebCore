@@ -1,0 +1,2 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+PASS event construction: 82 assertions; teardown 2 cases

@@ -1,0 +1,49 @@
+{
+  "checks": 82,
+  "teardown": [
+    {
+      "case": "release-before-destroy",
+      "target": "released",
+      "event": "released",
+      "listener": "removed"
+    },
+    {
+      "case": "release-after-destroy",
+      "target": "released after destroy",
+      "event": "released after destroy",
+      "listener": "removed after destroy",
+      "dispatchAfterDestroy": 0,
+      "detailAfterDestroy": -9
+    }
+  ],
+  "runtime": {
+    "brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
+    "brotlidec.dll": "d42e2160f76f29a91f8be01b009b585c45496219794e16eab90b3599b6f70a7f",
+    "harfbuzz-icu.dll": "27662b477f7cb0c20cee64543a06296a48a00a17b6c7b57629bb166a30d5b164",
+    "harfbuzz.dll": "b519b2abc7f446ca45bff77aae1708f45afc9f557698bcd7295837cce0f12bfa",
+    "icudt77.dll": "b00d2fb856f548608c137e771257a70d0722654535c6c00b371c0fab3e2b802c",
+    "icuin77.dll": "e3785739e1fcf2e38053bbb85ef5f0f5dab63f865cbda762da5258566085a240",
+    "icuuc77.dll": "189c623f996c41488c262867bae04a5bb33dd485bd423e0a8bec05c455a90902",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+    "jpeg62.dll": "394811c1b1bf1fd914248a145ba3fcad1f5f27c7009754ce08e48ccb0266b785",
+    "libpng16.dll": "8b46592c5ea338dd6b23ca380d6db64a7849c2a534fc465a006ec668645d8185",
+    "libsharpyuv.dll": "df165de83480692f494c23061ef9c40c10abe19a89b1fa9fae2f1cd5152c07a7",
+    "libwebp.dll": "550c5a4860f61d32a274fdd7b5c8cbe266eee28b3a3ca888195248ea1d5e0f71",
+    "libwebpdemux.dll": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163",
+    "libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
+    "libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
+    "RanvierWebCoreHost.dll": "4100f42319044946cadd7f3630ed5b6200eaab0285938a6a7154adce1f18b065",
+    "RanvierWebCoreHost.lib": "7d0c4b7f5e64932f23c30529517535d238f09145c11f113496e75734b2d441cb",
+    "RanvierWebCoreHost.pdb": "ad0d0b3f5bd0ce7225346877b877b8319d23e786383d96eaa919f061a91c8cf0",
+    "WebCore.dll": "8ea733a3ac0a565d31a034ea4c821f0c8f377c3d8bb188f743b8e0191f124dd1",
+    "WebCore.lib": "604d9f45802d3a9cfffdd7d7dda37cd66e74d81e478ee168aa545743b5689271",
+    "WebCore.pdb": "86af0749e1a3eac3d62c6dc807dd0af7c0926ff8aa4878ac8810b69e3c75c7c3",
+    "zlib1.dll": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93",
+    "WebKit.resources\\icons\\missingImage.png": "c13b9dcf2f6a41033e540d85de3d1e30054bd3b54c0b35229b5a77bd403a7229",
+    "WebKit.resources\\icons\\missingImage@2x.png": "40b23dc2728d8499608654a4b89cfd5ad4bd04a09b5b27e4927004e167d41bf7",
+    "WebKit.resources\\icons\\missingImage@3x.png": "99e0c1a9d026c61ea3ed12a7ad14087b0ceeac04b08caba7ab648c0ae8be5ed4",
+    "WebKit.resources\\icons\\panIcon.png": "1f0018318f073a57aa89ae175bec415a2aef08404c72e535b8fefeb428590329",
+    "WebKit.resources\\icons\\textAreaResizeCorner.png": "16d9c626d3faf3907a10819493d53d43ab4a09a0eeafec92e1492afbb03c4c8b",
+    "WebKit.resources\\icons\\textAreaResizeCorner@2x.png": "4557192b829da5e271abf02024cc0a7e1ae2153b79b98682a330bfa48c1e57bf"
+  }
+}
