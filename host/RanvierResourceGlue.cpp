@@ -66,6 +66,7 @@ int32_t outcomeFor(ImageDecodeResult result)
 
 class BlobReadOperation;
 class MediaQueryOperation;
+class BytesOperation;
 
 // One terminal outcome per operation, delivered on the owning thread; see RanvierResourceGlue.h.
 class Operation : public RefCounted<Operation>, public CanMakeSingleThreadWeakPtr<Operation> {
@@ -131,6 +132,7 @@ public:
     virtual bool belongsTo(const Document& candidate) const { return document == &candidate; }
     virtual BlobReadOperation* asBlobRead() { return nullptr; }
     virtual MediaQueryOperation* asMediaQuery() { return nullptr; }
+    virtual BytesOperation* asBytes() { return nullptr; }
 
 protected:
     Operation(Document& document, RvResourceCompletion callback, void* context)
@@ -453,6 +455,38 @@ private:
 };
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(MediaQueryOperation);
+
+// Bytes the host produced during the starting call, such as an encoded snapshot. The operation is SUCCEEDED as it
+// starts, so finish() delivers it on a later run-loop turn.
+class BytesOperation final : public Operation {
+    WTF_MAKE_TZONE_ALLOCATED(BytesOperation);
+
+public:
+    static Ref<BytesOperation> create(Document& document, RvResourceCompletion callback, void* context)
+    {
+        return adoptRef(*new BytesOperation(document, callback, context));
+    }
+
+    Vector<uint8_t> bytes;
+    int32_t width { 0 };
+    int32_t height { 0 };
+
+    BytesOperation* asBytes() final { return this; }
+
+    void measure(int32_t& outWidth, int32_t& outHeight) final
+    {
+        outWidth = width;
+        outHeight = height;
+    }
+
+private:
+    BytesOperation(Document& document, RvResourceCompletion callback, void* context)
+        : Operation(document, callback, context)
+    {
+    }
+};
+
+WTF_MAKE_TZONE_ALLOCATED_IMPL(BytesOperation);
 
 std::unordered_map<uint64_t, Ref<Operation>>& operations()
 {
@@ -864,4 +898,40 @@ int32_t ranvier_media_capabilities_provider(int32_t encoding)
     if (encoding)
         return PlatformMediaEngineConfigurationFactory::hasEncodingConfigurationFactory() ? 1 : 0;
     return PlatformMediaEngineConfigurationFactory::hasDecodingConfigurationFactory() ? 1 : 0;
+}
+
+int32_t ranvier_resource_settled_bytes(RvNode* documentHandle, const uint8_t* bytes, int64_t length, int32_t width, int32_t height,
+    RvResourceCompletion callback, void* context, uint64_t* operation)
+{
+    if (!documentHandle || (!bytes && length) || length < 0 || !callback || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* document = documentFromHandle(documentHandle);
+    if (!document || !document->window() || !nextOperation)
+        return RV_ERR_UNSUPPORTED;
+    Ref value = BytesOperation::create(*document, callback, context);
+    value->bytes.append(std::span<const uint8_t> { bytes, static_cast<size_t>(length) });
+    value->width = width;
+    value->height = height;
+    value->starting = true;
+    value->finish(RV_RESOURCE_SUCCEEDED);
+    value->starting = false;
+    *operation = nextOperation++;
+    operations().emplace(*operation, WTF::move(value));
+    return RV_OK;
+}
+
+int32_t ranvier_resource_bytes(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length)
+{
+    if (!length || capacity < 0 || (capacity && !buffer))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto found = operations().find(operation);
+    auto* value = found == operations().end() ? nullptr : found->second->asBytes();
+    // The bytes are readable once SUCCEEDED is delivered.
+    if (!value || value->pending)
+        return RV_ERR_UNSUPPORTED;
+    return copyBytes(value->bytes.span(), buffer, capacity, length);
 }

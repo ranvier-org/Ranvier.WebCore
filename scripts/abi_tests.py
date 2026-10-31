@@ -138,6 +138,7 @@ with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
     run([sys.executable, '-I', '-X', 'utf8', tests / 'custom_highlights.py', '--native-directory', out, '--webkit-source', args.source])
     run([sys.executable, '-I', '-X', 'utf8', tests / 'blob_urls.py', '--native-directory', out])
     run([sys.executable, '-I', '-X', 'utf8', tests / 'media_capabilities.py', '--native-directory', out])
+    run([sys.executable, '-I', '-X', 'utf8', tests / 'snapshot_options.py', '--native-directory', out])
     run([sys.executable, '-I', tests / 'abi_layouts.py'])
     run([sys.executable, '-I', '-X', 'utf8', tests / 'aria_relations.py', '--native-directory', out])
     run([sys.executable, '-I', '-X', 'utf8', tests / 'coordinate_spaces.py', '--native-directory', out])

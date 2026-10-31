@@ -1533,6 +1533,53 @@ RV_EXPORT int32_t rv_media_encoding_info(RvHost*, int32_t type, const RvMediaVid
  * for another operation or outcome, with the outputs untouched. */
 RV_EXPORT int32_t rv_media_capabilities_info(uint64_t operation, int32_t* supported, int32_t* smooth, int32_t* power_efficient);
 
+/* Image encodings, shared by snapshots and canvas export. RGBA8 is unpremultiplied RGBA8 rows, width * 4 bytes each,
+ * in the image's color space. PNG ignores quality. JPEG and WEBP take quality from 0 to 1; NaN or a value outside
+ * [0, 1] selects the engine encoder's default, as HTMLCanvasElement.toBlob does, and WEBP at exactly 1 is lossless.
+ * The facilities "image-encoding-png", "image-encoding-jpeg" and "image-encoding-webp" report the engine's encoders. */
+enum {
+    RV_IMAGE_ENCODING_RGBA8 = 0,
+    RV_IMAGE_ENCODING_PNG = 1,
+    RV_IMAGE_ENCODING_JPEG = 2,
+    RV_IMAGE_ENCODING_WEBP = 3,
+};
+/* "snapshot-options" for rv_abi_has: snapshots of the viewport or an element with scale, crop, color space and encoding,
+ * delivered as an operation. */
+enum {
+    RV_SNAPSHOT_SRGB = 0,
+    /* Only where the "snapshot-display-p3" facility is implemented; RV_ERR_UNSUPPORTED elsewhere. */
+    RV_SNAPSHOT_DISPLAY_P3 = 1,
+};
+/* size is sizeof(RvSnapshotOptions). scale is device pixels per CSS pixel, from 0.25 to 8, or 0 for the host's device
+ * scale. crop 1 paints only x, y, width, height, in CSS pixels from the subject's top left, expanded to whole CSS
+ * pixels and intersected with the subject; width and height are positive. encoding is RV_IMAGE_ENCODING_*. */
+typedef struct RvSnapshotOptions {
+    int32_t size;
+    int32_t color_space;
+    double scale;
+    int32_t crop;
+    int32_t encoding;
+    double x;
+    double y;
+    double width;
+    double height;
+    double quality;
+} RvSnapshotOptions;
+/* Paints element, which must be in the host's current document, as rv_element_snapshot does (its subtree alone over a
+ * transparent background), or the viewport as rv_host_paint_rgba's CPU path does when element is NULL, then reads or
+ * encodes the image, all during the call, and writes an operation token. The operation follows rv_image_decode's
+ * delivery, rv_resource_cancel and rv_resource_release: it is SUCCEEDED with the image's size in pixels as width and
+ * height, delivered on a later rv_run_loop_cycle and never inside the call, and a new document or rv_host_destroy keeps
+ * it. RV_ERR_UNSUPPORTED for an option out of range, an encoding or color space this flavor lacks (never a substitute)
+ * or a crop outside the subject; RV_ERR_WRONG_HOST for an element of another document; RV_ERR_PAINT_FAILED for an
+ * element without a box. */
+RV_EXPORT int32_t rv_host_snapshot(RvHost*, RvNode* element, const RvSnapshotOptions* options, RvResourceCompletion completion,
+    void* context, uint64_t* operation);
+/* Copies a delivered snapshot's bytes and writes their count to *length, until rv_resource_release. A capacity below
+ * the count returns RV_ERR_BUFFER_TOO_SMALL with *length written and buffer untouched; capacity 0 with a NULL buffer
+ * queries the count. RV_ERR_UNSUPPORTED before delivery and for another operation. */
+RV_EXPORT int32_t rv_snapshot_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length);
+
 enum {
     RV_FILE_READER_RESULT_NULL = 0,
     RV_FILE_READER_RESULT_STRING = 1,

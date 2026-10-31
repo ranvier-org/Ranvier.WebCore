@@ -29,6 +29,8 @@ LAYOUTS = {
     'RvMediaAudioConfiguration': ([('size', I), ('content_type', P), ('content_type_length', I), ('channels', P), ('channels_length', I),
                                    ('bitrate', ctypes.c_int64), ('samplerate', ctypes.c_int64), ('spatial_rendering', I)], 64,
                                   [0, 8, 16, 24, 32, 40, 48, 56], None),
+    'RvSnapshotOptions': ([('size', I), ('color_space', I), ('scale', D), ('crop', I), ('encoding', I), ('x', D), ('y', D),
+                           ('width', D), ('height', D), ('quality', D)], 64, [0, 4, 8, 16, 20, 24, 32, 40, 48, 56], None),
 }
 
 

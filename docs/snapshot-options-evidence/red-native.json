@@ -1,0 +1,81 @@
+{
+ "abi": 54,
+ "advertised": {
+  "snapshot": 1,
+  "partial-paint": 1,
+  "snapshot-options": 0,
+  "snapshot-encoding": 0,
+  "image-encode": 0
+ },
+ "exports": {
+  "rv_host_snapshot": false,
+  "rv_element_snapshot_options": false,
+  "rv_snapshot_encode": false,
+  "rv_host_snapshot_encode": false,
+  "rv_element_snapshot_encode": false,
+  "rv_snapshot_read": false,
+  "rv_host_paint_rgba_scaled": false,
+  "rv_image_encode": false,
+  "rv_snapshot_release": false
+ },
+ "elementSnapshot": [
+  {
+   "deviceScale": 1.0,
+   "sizeQuery": -6,
+   "status": 0,
+   "size": [
+    20,
+    10
+   ],
+   "firstPixel": [
+    255,
+    0,
+    0,
+    255
+   ],
+   "paintSize": [
+    40,
+    30
+   ]
+  },
+  {
+   "deviceScale": 1.5,
+   "sizeQuery": -6,
+   "status": 0,
+   "size": [
+    30,
+    15
+   ],
+   "firstPixel": [
+    255,
+    0,
+    0,
+    255
+   ],
+   "paintSize": [
+    60,
+    45
+   ]
+  },
+  {
+   "deviceScale": 2.0,
+   "sizeQuery": -6,
+   "status": 0,
+   "size": [
+    40,
+    20
+   ],
+   "firstPixel": [
+    255,
+    0,
+    0,
+    255
+   ],
+   "paintSize": [
+    80,
+    60
+   ]
+  }
+ ],
+ "note": "scale is the host device scale only; no crop/encode/color-space/async options; output is unpremultiplied sRGB RGBA8"
+}
