@@ -484,7 +484,7 @@ and [<AllowNullLiteral>] Element =
 
     /// <summary>Element.animate.</summary>
 #if FABLE_COMPILER
-    [<Fable.Core.Emit("$0.animate(((k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;}))($1), ((o)=>{if(o==null||typeof o!=='object')return o;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing', 'iterationComposite', 'composite', 'pseudoElement', 'id', 'timeline'])if(o[k]!==undefined)r[k]=o[k];const d=o.duration;r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;return r;})($2))")>]
+    [<Fable.Core.Emit("$0.animate(((k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;}))($1), ((o)=>{if(o==null||typeof o!=='object')return o;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing', 'iterationComposite', 'composite', 'pseudoElement', 'id', 'timeline'])if(o[k]!==undefined)r[k]=o[k];const d=o.duration;r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;for(const k of ['rangeStart','rangeEnd']){const u=o[k];if(u!==undefined)r[k]=u!=null&&typeof u==='object'&&Array.isArray(u.fields)?u.fields[0]:u;}return r;})($2))")>]
     abstract member __ranvier_animate: keyframes: (Keyframe) array * ?options: obj -> WebAnimation
 #else
     abstract member animate: keyframes: (Keyframe) array -> WebAnimation
