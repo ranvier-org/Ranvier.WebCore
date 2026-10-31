@@ -2297,6 +2297,21 @@ template<typename V> int32_t encodeRvDomSequenceFileOrUSVString(V&& input, RvDom
     return RV_OK;
 }
 
+std::optional<Vector<Ref<PointerEvent>>> decodeRvDomSequencePointerEvent(const RvDomSequencePointerEvent* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    Vector<Ref<PointerEvent>> result;
+    result.reserveInitialCapacity(source->count);
+    for (int32_t i = 0; i < source->count; ++i) {
+        if (!source->items[i]) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<PointerEvent> item = source->items[i] ? dynamicDowncast<PointerEvent>(*reinterpret_cast<Event*>(source->items[i])) : nullptr;
+        if (source->items[i] && !item) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        result.append(Ref { *item });
+    }
+    return Vector<Ref<PointerEvent>> { std::move(result) };
+}
+
 void clearRvDomSequencePointerEvent(RvDomSequencePointerEvent* value)
 {
     if (!value) return;
@@ -3292,7 +3307,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:ErrorEvent", "dom:ProgressEvent", "dom:CSSAnimationEvent", "dom:CSSTransitionEvent", "dom:ContentVisibilityAutoStateChangeEvent", "dom:AnimationPlaybackEvent", "dom:PageTransitionEvent", "dom:HashChangeEvent", "dom:MediaQueryListEvent", "dom:PopStateEvent", "dom:BeforeUnloadEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom:Blob", "dom:File", "dom:FileList", "dom:CaretPosition", "dom:DOMURL", "dom:URLSearchParams", "dom:URLPattern", "dom:VisualViewport", "dom:Highlight", "dom:HighlightRegistry", "dom:FileReader", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-type-query:Event", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:CompositionEvent", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-constructor:ErrorEvent", "dom-constructor:ProgressEvent", "dom-constructor:CSSAnimationEvent", "dom-constructor:CSSTransitionEvent", "dom-constructor:ContentVisibilityAutoStateChangeEvent", "dom-constructor:AnimationPlaybackEvent", "dom-constructor:PageTransitionEvent", "dom-constructor:HashChangeEvent", "dom-constructor:MediaQueryListEvent", "dom-constructor:PopStateEvent", "dom-constructor:Blob", "dom-constructor:File", "dom-constructor:DOMURL", "dom-constructor:URLSearchParams", "dom-constructor:URLPattern", "dom-constructor:URLPattern", "dom-constructor:Highlight", "dom-constructor:FileReader", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:ErrorEvent", "dom:ProgressEvent", "dom:CSSAnimationEvent", "dom:CSSTransitionEvent", "dom:ContentVisibilityAutoStateChangeEvent", "dom:AnimationPlaybackEvent", "dom:PageTransitionEvent", "dom:HashChangeEvent", "dom:MediaQueryListEvent", "dom:PopStateEvent", "dom:BeforeUnloadEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom:Blob", "dom:File", "dom:FileList", "dom:CaretPosition", "dom:DOMURL", "dom:URLSearchParams", "dom:URLPattern", "dom:VisualViewport", "dom:Highlight", "dom:HighlightRegistry", "dom:FileReader", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-type-query:Event", "dom-constructor:Text", "dom-constructor:Comment", "dom-constructor:DocumentFragment", "dom-constructor:Document", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:StaticRange", "dom-constructor:Range", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:PointerEvent", "dom-constructor:WheelEvent", "dom-constructor:InputEvent", "dom-constructor:CompositionEvent", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-constructor:ErrorEvent", "dom-constructor:ProgressEvent", "dom-constructor:CSSAnimationEvent", "dom-constructor:CSSTransitionEvent", "dom-constructor:ContentVisibilityAutoStateChangeEvent", "dom-constructor:AnimationPlaybackEvent", "dom-constructor:PageTransitionEvent", "dom-constructor:HashChangeEvent", "dom-constructor:MediaQueryListEvent", "dom-constructor:PopStateEvent", "dom-constructor:Blob", "dom-constructor:File", "dom-constructor:DOMURL", "dom-constructor:URLSearchParams", "dom-constructor:URLPattern", "dom-constructor:URLPattern", "dom-constructor:Highlight", "dom-constructor:FileReader", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -3333,6 +3348,8 @@ int32_t ranvier_dom_has(const char* feature)
     if (!std::strcmp(feature, "dom-url-static"))
         return 1;
     if (!std::strcmp(feature, "blob-urls"))
+        return 1;
+    if (!std::strcmp(feature, "dom-document-parse-html"))
         return 1;
     if (!std::strcmp(feature, "dom-css-style-map-entries"))
         return 1;
@@ -5098,6 +5115,21 @@ int32_t ranvier_dom_character_data_remove(RvNode* target)
     return invoke([&]() -> decltype(auto) { return impl->remove(); });
 }
 
+// Text.constructor: target is the Document of the constructed object; data defaults to "" in IDL; *result is a new reference
+int32_t ranvier_dom_text_create(RvNode* target, const uint8_t* data, int32_t data_length, RvNode** result)
+{
+    if (!target || !(data_length >= 0 && (data_length <= 0 || data)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { data, data_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return Text::create(*impl, a0.string()); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
 // Text.wholeText getter: readonly attribute DOMString wholeText
 int32_t ranvier_dom_text_get_whole_text(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
 {
@@ -5135,6 +5167,34 @@ int32_t ranvier_dom_text_split_text(RvNode* target, uint32_t offset, RvNode** re
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return deliver([&]() -> decltype(auto) { return impl->splitText(offset); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// Comment.constructor: target is the Document of the constructed object; data defaults to "" in IDL; *result is a new reference
+int32_t ranvier_dom_comment_create(RvNode* target, const uint8_t* data, int32_t data_length, RvNode** result)
+{
+    if (!target || !(data_length >= 0 && (data_length <= 0 || data)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { data, data_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return Comment::create(*impl, a0.string()); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// DocumentFragment.constructor: target is the Document of the constructed object; *result is a new reference
+int32_t ranvier_dom_document_fragment_create(RvNode* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return DocumentFragment::create(*impl); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
 }
 
 // DocumentFragment.children getter: readonly attribute HTMLCollection children; *result is a new reference
@@ -5599,6 +5659,19 @@ int32_t ranvier_dom_shadow_root_get_html(RvNode* target, const RvDomGetHTMLOptio
         }
     }
     return deliver([&]() -> decltype(auto) { return impl->getHTML(std::move(a0)); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// Document.constructor: target is the Document of the constructed object; *result is a new reference
+int32_t ranvier_dom_document_create(RvNode* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return Document::create(*impl); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
 }
 
 // Document.implementation getter: readonly attribute DOMImplementation implementation; *result is a new reference
@@ -28573,6 +28646,63 @@ int32_t ranvier_dom_abstract_range_get_collapsed(RvAbstractRange* target, int32_
     return deliver([&]() -> decltype(auto) { return impl->collapsed(); }, [&](auto&& value) { return store<int32_t>(value, result); });
 }
 
+// StaticRange.constructor: target is the Document of the constructed object; *result is a new reference
+int32_t ranvier_dom_static_range_create(RvNode* target, const RvDomStaticRangeInit* init, RvAbstractRange** result)
+{
+    if (!target || !init || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    struct {
+        RefPtr<Node> startContainer;
+        std::remove_cvref_t<decltype(std::declval<StaticRange::Init&>().startOffset)> startOffset { };
+        RefPtr<Node> endContainer;
+        std::remove_cvref_t<decltype(std::declval<StaticRange::Init&>().endOffset)> endOffset { };
+    } stage0;
+    if (init) {
+        if (!(init->size >= offsetof(RvDomStaticRangeInit, start_container) + sizeof(init->start_container)))
+            return RV_ERR_NULL_ARGUMENT;
+        if (true && init->start_container) {
+            stage0.startContainer = nodeOf(init->start_container);
+        }
+        if (!(init->size >= offsetof(RvDomStaticRangeInit, start_offset) + sizeof(init->start_offset)))
+            return RV_ERR_NULL_ARGUMENT;
+        if (true)
+            assignValue(stage0.startOffset, init->start_offset);
+        if (!(init->size >= offsetof(RvDomStaticRangeInit, end_container) + sizeof(init->end_container)))
+            return RV_ERR_NULL_ARGUMENT;
+        if (true && init->end_container) {
+            stage0.endContainer = nodeOf(init->end_container);
+        }
+        if (!(init->size >= offsetof(RvDomStaticRangeInit, end_offset) + sizeof(init->end_offset)))
+            return RV_ERR_NULL_ARGUMENT;
+        if (true)
+            assignValue(stage0.endOffset, init->end_offset);
+    }
+    if (!stage0.startContainer)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!stage0.endContainer)
+        return RV_ERR_NULL_ARGUMENT;
+    StaticRange::Init a0 { .startContainer = stage0.startContainer.releaseNonNull(), .startOffset = std::move(stage0.startOffset), .endContainer = stage0.endContainer.releaseNonNull(), .endOffset = std::move(stage0.endOffset) };
+    return deliver([&]() -> decltype(auto) { return StaticRange::create(std::move(a0)); }, [&](auto&& value) { return storeHandle<AbstractRange>(value, result); });
+}
+
+// Range.constructor: target is the Document of the constructed object; *result is a new reference
+int32_t ranvier_dom_range_create(RvNode* target, RvAbstractRange** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return Range::create(*impl); }, [&](auto&& value) { return storeHandle<AbstractRange>(value, result); });
+}
+
 // Range.commonAncestorContainer getter: readonly attribute Node? commonAncestorContainer; *result is a new reference, or NULL
 int32_t ranvier_dom_range_get_common_ancestor_container(RvAbstractRange* target, RvNode** result)
 {
@@ -32257,6 +32387,111 @@ int32_t ranvier_dom_mouse_event_get_modifier_state(RvEvent* target, const uint8_
     return deliver([&]() -> decltype(auto) { return impl->getModifierState(a0.string()); }, [&](auto&& value) { return store<int32_t>(value, result); });
 }
 
+// PointerEvent.constructor: target is the Document of the constructed object; event_init_dict defaults to {} in IDL; event_init_dict may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_pointer_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomPointerEventInit* event_init_dict, RvEvent** result)
+{
+    if (!target || !(type_length >= 0 && (type_length <= 0 || type)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { type, type_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    PointerEvent::Init a1 { };
+    a1.pointerId = 0;
+    a1.width = 1;
+    a1.height = 1;
+    a1.pressure = 0;
+    a1.tangentialPressure = 0;
+    a1.twist = 0;
+    a1.pointerType = emptyString();
+    a1.isPrimary = false;
+    if (event_init_dict) {
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, bubbles) + sizeof(event_init_dict->bubbles))
+            assignValue(a1.bubbles, !!event_init_dict->bubbles);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, cancelable) + sizeof(event_init_dict->cancelable))
+            assignValue(a1.cancelable, !!event_init_dict->cancelable);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, composed) + sizeof(event_init_dict->composed))
+            assignValue(a1.composed, !!event_init_dict->composed);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, detail) + sizeof(event_init_dict->detail))
+            assignValue(a1.detail, event_init_dict->detail);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, ctrl_key) + sizeof(event_init_dict->ctrl_key))
+            assignValue(a1.ctrlKey, !!event_init_dict->ctrl_key);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, shift_key) + sizeof(event_init_dict->shift_key))
+            assignValue(a1.shiftKey, !!event_init_dict->shift_key);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, alt_key) + sizeof(event_init_dict->alt_key))
+            assignValue(a1.altKey, !!event_init_dict->alt_key);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, meta_key) + sizeof(event_init_dict->meta_key))
+            assignValue(a1.metaKey, !!event_init_dict->meta_key);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, modifier_alt_graph) + sizeof(event_init_dict->modifier_alt_graph))
+            assignValue(a1.modifierAltGraph, !!event_init_dict->modifier_alt_graph);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, modifier_caps_lock) + sizeof(event_init_dict->modifier_caps_lock))
+            assignValue(a1.modifierCapsLock, !!event_init_dict->modifier_caps_lock);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, screen_x) + sizeof(event_init_dict->screen_x))
+            assignValue(a1.screenX, event_init_dict->screen_x);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, screen_y) + sizeof(event_init_dict->screen_y))
+            assignValue(a1.screenY, event_init_dict->screen_y);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, client_x) + sizeof(event_init_dict->client_x))
+            assignValue(a1.clientX, event_init_dict->client_x);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, client_y) + sizeof(event_init_dict->client_y))
+            assignValue(a1.clientY, event_init_dict->client_y);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, button) + sizeof(event_init_dict->button))
+            assignValue(a1.button, event_init_dict->button);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, buttons) + sizeof(event_init_dict->buttons))
+            assignValue(a1.buttons, event_init_dict->buttons);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, related_target) + sizeof(event_init_dict->related_target) && event_init_dict->related_target) {
+            a1.relatedTarget = reinterpret_cast<EventTarget*>(event_init_dict->related_target);
+        }
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, movement_x) + sizeof(event_init_dict->movement_x))
+            assignValue(a1.movementX, event_init_dict->movement_x);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, movement_y) + sizeof(event_init_dict->movement_y))
+            assignValue(a1.movementY, event_init_dict->movement_y);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, pointer_id) + sizeof(event_init_dict->pointer_id))
+            assignValue(a1.pointerId, event_init_dict->pointer_id);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, width) + sizeof(event_init_dict->width))
+            assignValue(a1.width, event_init_dict->width);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, height) + sizeof(event_init_dict->height))
+            assignValue(a1.height, event_init_dict->height);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, pressure) + sizeof(event_init_dict->pressure))
+            assignValue(a1.pressure, event_init_dict->pressure);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, tangential_pressure) + sizeof(event_init_dict->tangential_pressure))
+            assignValue(a1.tangentialPressure, event_init_dict->tangential_pressure);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, tilt_x) + sizeof(event_init_dict->tilt_x) && event_init_dict->tilt_x)
+            assignValue(a1.tiltX, *event_init_dict->tilt_x);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, tilt_y) + sizeof(event_init_dict->tilt_y) && event_init_dict->tilt_y)
+            assignValue(a1.tiltY, *event_init_dict->tilt_y);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, twist) + sizeof(event_init_dict->twist))
+            assignValue(a1.twist, event_init_dict->twist);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, pointer_type) + sizeof(event_init_dict->pointer_type)) {
+            if (event_init_dict->pointer_type.present != 0 && event_init_dict->pointer_type.present != 1)
+                return RV_ERR_NULL_ARGUMENT;
+            if (event_init_dict->pointer_type.present) {
+                if (event_init_dict->pointer_type.length < 0 || (event_init_dict->pointer_type.length > 0 && !event_init_dict->pointer_type.data))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (!assignString(a1.pointerType, event_init_dict->pointer_type.data, event_init_dict->pointer_type.length))
+                    return RV_ERR_NULL_ARGUMENT;
+            }
+        }
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, is_primary) + sizeof(event_init_dict->is_primary))
+            assignValue(a1.isPrimary, !!event_init_dict->is_primary);
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, coalesced_events) + sizeof(event_init_dict->coalesced_events) && event_init_dict->coalesced_events) {
+            int32_t status = RV_OK;
+            auto value = decodeRvDomSequencePointerEvent(event_init_dict->coalesced_events, status);
+            if (status != RV_OK) return status;
+            a1.coalescedEvents = std::move(*value);
+        }
+        if (event_init_dict->size >= offsetof(RvDomPointerEventInit, predicted_events) + sizeof(event_init_dict->predicted_events) && event_init_dict->predicted_events) {
+            int32_t status = RV_OK;
+            auto value = decodeRvDomSequencePointerEvent(event_init_dict->predicted_events, status);
+            if (status != RV_OK) return status;
+            a1.predictedEvents = std::move(*value);
+        }
+    }
+    return deliver([&]() -> decltype(auto) { return PointerEvent::create(a0.atom(), std::move(a1)); }, [&](auto&& value) { return storeHandle<Event>(value, result); });
+}
+
 // PointerEvent.pointerId getter: readonly attribute long pointerId
 int32_t ranvier_dom_pointer_event_get_pointer_id(RvEvent* target, int32_t* result)
 {
@@ -32449,6 +32684,75 @@ int32_t ranvier_dom_pointer_event_get_predicted_events(RvEvent* target, RvDomSeq
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return deliver([&]() -> decltype(auto) { return impl->getPredictedEvents(); }, [&](auto&& value) { return encodeRvDomSequencePointerEvent(value, result); });
+}
+
+// WheelEvent.constructor: target is the Document of the constructed object; event_init_dict defaults to {} in IDL; event_init_dict may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_wheel_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomWheelEventInit* event_init_dict, RvEvent** result)
+{
+    if (!target || !(type_length >= 0 && (type_length <= 0 || type)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { type, type_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    WheelEvent::Init a1 { };
+    if (event_init_dict) {
+        if (event_init_dict->size >= offsetof(RvDomWheelEventInit, bubbles) + sizeof(event_init_dict->bubbles))
+            assignValue(a1.bubbles, !!event_init_dict->bubbles);
+        if (event_init_dict->size >= offsetof(RvDomWheelEventInit, cancelable) + sizeof(event_init_dict->cancelable))
+            assignValue(a1.cancelable, !!event_init_dict->cancelable);
+        if (event_init_dict->size >= offsetof(RvDomWheelEventInit, composed) + sizeof(event_init_dict->composed))
+            assignValue(a1.composed, !!event_init_dict->composed);
+        if (event_init_dict->size >= offsetof(RvDomWheelEventInit, detail) + sizeof(event_init_dict->detail))
+            assignValue(a1.detail, event_init_dict->detail);
+        if (event_init_dict->size >= offsetof(RvDomWheelEventInit, ctrl_key) + sizeof(event_init_dict->ctrl_key))
+            assignValue(a1.ctrlKey, !!event_init_dict->ctrl_key);
+        if (event_init_dict->size >= offsetof(RvDomWheelEventInit, shift_key) + sizeof(event_init_dict->shift_key))
+            assignValue(a1.shiftKey, !!event_init_dict->shift_key);
+        if (event_init_dict->size >= offsetof(RvDomWheelEventInit, alt_key) + sizeof(event_init_dict->alt_key))
+            assignValue(a1.altKey, !!event_init_dict->alt_key);
+        if (event_init_dict->size >= offsetof(RvDomWheelEventInit, meta_key) + sizeof(event_init_dict->meta_key))
+            assignValue(a1.metaKey, !!event_init_dict->meta_key);
+        if (event_init_dict->size >= offsetof(RvDomWheelEventInit, modifier_alt_graph) + sizeof(event_init_dict->modifier_alt_graph))
+            assignValue(a1.modifierAltGraph, !!event_init_dict->modifier_alt_graph);
+        if (event_init_dict->size >= offsetof(RvDomWheelEventInit, modifier_caps_lock) + sizeof(event_init_dict->modifier_caps_lock))
+            assignValue(a1.modifierCapsLock, !!event_init_dict->modifier_caps_lock);
+        if (event_init_dict->size >= offsetof(RvDomWheelEventInit, screen_x) + sizeof(event_init_dict->screen_x))
+            assignValue(a1.screenX, event_init_dict->screen_x);
+        if (event_init_dict->size >= offsetof(RvDomWheelEventInit, screen_y) + sizeof(event_init_dict->screen_y))
+            assignValue(a1.screenY, event_init_dict->screen_y);
+        if (event_init_dict->size >= offsetof(RvDomWheelEventInit, client_x) + sizeof(event_init_dict->client_x))
+            assignValue(a1.clientX, event_init_dict->client_x);
+        if (event_init_dict->size >= offsetof(RvDomWheelEventInit, client_y) + sizeof(event_init_dict->client_y))
+            assignValue(a1.clientY, event_init_dict->client_y);
+        if (event_init_dict->size >= offsetof(RvDomWheelEventInit, button) + sizeof(event_init_dict->button))
+            assignValue(a1.button, event_init_dict->button);
+        if (event_init_dict->size >= offsetof(RvDomWheelEventInit, buttons) + sizeof(event_init_dict->buttons))
+            assignValue(a1.buttons, event_init_dict->buttons);
+        if (event_init_dict->size >= offsetof(RvDomWheelEventInit, related_target) + sizeof(event_init_dict->related_target) && event_init_dict->related_target) {
+            a1.relatedTarget = reinterpret_cast<EventTarget*>(event_init_dict->related_target);
+        }
+        if (event_init_dict->size >= offsetof(RvDomWheelEventInit, movement_x) + sizeof(event_init_dict->movement_x))
+            assignValue(a1.movementX, event_init_dict->movement_x);
+        if (event_init_dict->size >= offsetof(RvDomWheelEventInit, movement_y) + sizeof(event_init_dict->movement_y))
+            assignValue(a1.movementY, event_init_dict->movement_y);
+        if (event_init_dict->size >= offsetof(RvDomWheelEventInit, delta_x) + sizeof(event_init_dict->delta_x))
+            assignValue(a1.deltaX, event_init_dict->delta_x);
+        if (event_init_dict->size >= offsetof(RvDomWheelEventInit, delta_y) + sizeof(event_init_dict->delta_y))
+            assignValue(a1.deltaY, event_init_dict->delta_y);
+        if (event_init_dict->size >= offsetof(RvDomWheelEventInit, delta_z) + sizeof(event_init_dict->delta_z))
+            assignValue(a1.deltaZ, event_init_dict->delta_z);
+        if (event_init_dict->size >= offsetof(RvDomWheelEventInit, delta_mode) + sizeof(event_init_dict->delta_mode))
+            assignValue(a1.deltaMode, event_init_dict->delta_mode);
+        if (event_init_dict->size >= offsetof(RvDomWheelEventInit, wheel_delta_x) + sizeof(event_init_dict->wheel_delta_x))
+            assignValue(a1.wheelDeltaX, event_init_dict->wheel_delta_x);
+        if (event_init_dict->size >= offsetof(RvDomWheelEventInit, wheel_delta_y) + sizeof(event_init_dict->wheel_delta_y))
+            assignValue(a1.wheelDeltaY, event_init_dict->wheel_delta_y);
+    }
+    return deliver([&]() -> decltype(auto) { return WheelEvent::create(a0.atom(), std::move(a1)); }, [&](auto&& value) { return storeHandle<Event>(value, result); });
 }
 
 // WheelEvent.deltaX getter: readonly attribute double deltaX
@@ -32724,6 +33028,54 @@ int32_t ranvier_dom_focus_event_get_related_target(RvEvent* target, RvNode** res
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return deliver([&]() -> decltype(auto) { return impl->relatedTarget(); }, [&](auto&& value) { return storeNode(dynamicDowncast<Node>(rawPointer<EventTarget>(value)), result); });
+}
+
+// InputEvent.constructor: target is the Document of the constructed object; event_init_dict defaults to {} in IDL; event_init_dict may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_input_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomInputEventInit* event_init_dict, RvEvent** result)
+{
+    if (!target || !(type_length >= 0 && (type_length <= 0 || type)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { type, type_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    InputEvent::Init a1 { };
+    if (event_init_dict) {
+        if (event_init_dict->size >= offsetof(RvDomInputEventInit, bubbles) + sizeof(event_init_dict->bubbles))
+            assignValue(a1.bubbles, !!event_init_dict->bubbles);
+        if (event_init_dict->size >= offsetof(RvDomInputEventInit, cancelable) + sizeof(event_init_dict->cancelable))
+            assignValue(a1.cancelable, !!event_init_dict->cancelable);
+        if (event_init_dict->size >= offsetof(RvDomInputEventInit, composed) + sizeof(event_init_dict->composed))
+            assignValue(a1.composed, !!event_init_dict->composed);
+        if (event_init_dict->size >= offsetof(RvDomInputEventInit, detail) + sizeof(event_init_dict->detail))
+            assignValue(a1.detail, event_init_dict->detail);
+        if (event_init_dict->size >= offsetof(RvDomInputEventInit, data) + sizeof(event_init_dict->data)) {
+            if (event_init_dict->data.present != 0 && event_init_dict->data.present != 1)
+                return RV_ERR_NULL_ARGUMENT;
+            if (event_init_dict->data.present) {
+                if (event_init_dict->data.length < 0 || (event_init_dict->data.length > 0 && !event_init_dict->data.data))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (!assignString(a1.data, event_init_dict->data.data, event_init_dict->data.length))
+                    return RV_ERR_NULL_ARGUMENT;
+            }
+        }
+        if (event_init_dict->size >= offsetof(RvDomInputEventInit, is_composing) + sizeof(event_init_dict->is_composing))
+            assignValue(a1.isComposing, !!event_init_dict->is_composing);
+        if (event_init_dict->size >= offsetof(RvDomInputEventInit, input_type) + sizeof(event_init_dict->input_type)) {
+            if (event_init_dict->input_type.present != 0 && event_init_dict->input_type.present != 1)
+                return RV_ERR_NULL_ARGUMENT;
+            if (event_init_dict->input_type.present) {
+                if (event_init_dict->input_type.length < 0 || (event_init_dict->input_type.length > 0 && !event_init_dict->input_type.data))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (!assignString(a1.inputType, event_init_dict->input_type.data, event_init_dict->input_type.length))
+                    return RV_ERR_NULL_ARGUMENT;
+            }
+        }
+    }
+    return deliver([&]() -> decltype(auto) { return InputEvent::create(a0.atom(), std::move(a1)); }, [&](auto&& value) { return storeHandle<Event>(value, result); });
 }
 
 // InputEvent.inputType getter: readonly attribute DOMString inputType
@@ -42433,6 +42785,38 @@ int32_t ranvier_dom_dom_matrix_read_only_from_matrix(RvNode* target, const RvDom
     return deliver([&]() -> decltype(auto) { return DOMMatrixReadOnly::fromMatrix(std::move(a0)); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrixReadOnly>(value, result); });
 }
 
+// DOMMatrixReadOnly.fromFloat32Array: static operation with checked Document context and UTF-8 byte lengths; array32 holds array32_count elements, copied into a new Float32Array; *result is a new reference
+int32_t ranvier_dom_dom_matrix_read_only_from_float32_array(RvNode* target, const float* array32, int32_t array32_count, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !(array32_count >= 0 && (array32_count == 0 || array32)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr a0 = JSC::Float32Array::tryCreate(std::span<const float> { array32, static_cast<size_t>(array32_count) });
+    if (!a0)
+        return Ranvier::recordException(Exception { ExceptionCode::RangeError, "The array could not be allocated."_s });
+    return deliver([&]() -> decltype(auto) { return DOMMatrixReadOnly::fromFloat32Array(a0.releaseNonNull()); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrixReadOnly>(value, result); });
+}
+
+// DOMMatrixReadOnly.fromFloat64Array: static operation with checked Document context and UTF-8 byte lengths; array64 holds array64_count elements, copied into a new Float64Array; *result is a new reference
+int32_t ranvier_dom_dom_matrix_read_only_from_float64_array(RvNode* target, const double* array64, int32_t array64_count, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !(array64_count >= 0 && (array64_count == 0 || array64)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr a0 = JSC::Float64Array::tryCreate(std::span<const double> { array64, static_cast<size_t>(array64_count) });
+    if (!a0)
+        return Ranvier::recordException(Exception { ExceptionCode::RangeError, "The array could not be allocated."_s });
+    return deliver([&]() -> decltype(auto) { return DOMMatrixReadOnly::fromFloat64Array(a0.releaseNonNull()); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrixReadOnly>(value, result); });
+}
+
 // DOMMatrix.fromMatrix: static operation with checked Document context and UTF-8 byte lengths; other defaults to {} in IDL; other may be NULL for the IDL default; *result is a new reference
 int32_t ranvier_dom_dom_matrix_from_matrix(RvNode* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result)
 {
@@ -42493,6 +42877,38 @@ int32_t ranvier_dom_dom_matrix_from_matrix(RvNode* target, const RvDomDOMMatrixI
             assignValue(a0.is2D, !!*other->is2_d);
     }
     return deliver([&]() -> decltype(auto) { return DOMMatrix::fromMatrix(std::move(a0)); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrix.fromFloat32Array: static operation with checked Document context and UTF-8 byte lengths; array32 holds array32_count elements, copied into a new Float32Array; *result is a new reference
+int32_t ranvier_dom_dom_matrix_from_float32_array(RvNode* target, const float* array32, int32_t array32_count, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !(array32_count >= 0 && (array32_count == 0 || array32)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr a0 = JSC::Float32Array::tryCreate(std::span<const float> { array32, static_cast<size_t>(array32_count) });
+    if (!a0)
+        return Ranvier::recordException(Exception { ExceptionCode::RangeError, "The array could not be allocated."_s });
+    return deliver([&]() -> decltype(auto) { return DOMMatrix::fromFloat32Array(a0.releaseNonNull()); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrix.fromFloat64Array: static operation with checked Document context and UTF-8 byte lengths; array64 holds array64_count elements, copied into a new Float64Array; *result is a new reference
+int32_t ranvier_dom_dom_matrix_from_float64_array(RvNode* target, const double* array64, int32_t array64_count, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !(array64_count >= 0 && (array64_count == 0 || array64)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr a0 = JSC::Float64Array::tryCreate(std::span<const double> { array64, static_cast<size_t>(array64_count) });
+    if (!a0)
+        return Ranvier::recordException(Exception { ExceptionCode::RangeError, "The array could not be allocated."_s });
+    return deliver([&]() -> decltype(auto) { return DOMMatrix::fromFloat64Array(a0.releaseNonNull()); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
 }
 
 // DOMRectReadOnly.fromRect: static operation with checked Document context and UTF-8 byte lengths; other defaults to {} in IDL; other may be NULL for the IDL default; *result is a new reference
@@ -42774,6 +43190,22 @@ int32_t ranvier_dom_domurl_revoke_object_url(RvNode* target, const uint8_t* url,
     StringArg a0 { url, url_length };
     if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
     return invoke([&]() -> decltype(auto) { return DOMURL::revokeObjectURL(document.get(), a0.string()); });
+}
+
+// Document.parseHTMLUnsafe: static operation with checked Document context and UTF-8 byte lengths; *result is a new reference
+int32_t ranvier_dom_document_parse_html_unsafe(RvNode* target, const uint8_t* html, int32_t html_length, RvNode** result)
+{
+    if (!target || !(html_length >= 0 && (html_length <= 0 || html)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = impl->document();
+    StringArg a0 { html, html_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return Document::parseHTMLUnsafe(document.get(), a0.string()); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
 }
 
 // StylePropertyMapReadOnly.entries: owned snapshot of the engine key/value iterable; context is an explicit checked Document for the operation; *result owns its contents; release with the matching rv_dom_*_release

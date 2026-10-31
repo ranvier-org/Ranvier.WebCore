@@ -248,6 +248,46 @@
     "FileReader": {
       "receiver": "Document",
       "factory": "FileReader::create"
+    },
+    "Text": {
+      "receiver": "Document",
+      "factory": "Text::create"
+    },
+    "Comment": {
+      "receiver": "Document",
+      "factory": "Comment::create"
+    },
+    "DocumentFragment": {
+      "receiver": "Document",
+      "factory": "DocumentFragment::create"
+    },
+    "Range": {
+      "receiver": "Document",
+      "factory": "Range::create"
+    },
+    "Document": {
+      "receiver": "Document",
+      "factory": "Document::create"
+    },
+    "StaticRange": {
+      "receiver": "Document",
+      "factory": "StaticRange::create",
+      "passReceiver": false
+    },
+    "InputEvent": {
+      "receiver": "Document",
+      "factory": "InputEvent::create",
+      "passReceiver": false
+    },
+    "WheelEvent": {
+      "receiver": "Document",
+      "factory": "WheelEvent::create",
+      "passReceiver": false
+    },
+    "PointerEvent": {
+      "receiver": "Document",
+      "factory": "PointerEvent::create",
+      "passReceiver": false
     }
   },
   "dictionaryCppTypes": {
@@ -266,7 +306,11 @@
     "HashChangeEventInit": "HashChangeEvent::Init",
     "MediaQueryListEventInit": "MediaQueryListEvent::Init",
     "PopStateEventInit": "PopStateEvent::Init",
-    "CompositionEventInit": "CompositionEvent::Init"
+    "CompositionEventInit": "CompositionEvent::Init",
+    "InputEventInit": "InputEvent::Init",
+    "WheelEventInit": "WheelEvent::Init",
+    "PointerEventInit": "PointerEvent::Init",
+    "StaticRangeInit": "StaticRange::Init"
   },
   "dictionaryObjectMembers": [
     "FormDataEventInit.formData"
@@ -932,14 +976,18 @@
     "DOMMatrixReadOnly": {
       "receiver": "Document",
       "members": [
-        "fromMatrix"
+        "fromMatrix",
+        "fromFloat32Array",
+        "fromFloat64Array"
       ],
       "feature": "dom-geometry-matrix-readonly"
     },
     "DOMMatrix": {
       "receiver": "Document",
       "members": [
-        "fromMatrix"
+        "fromMatrix",
+        "fromFloat32Array",
+        "fromFloat64Array"
       ],
       "feature": "dom-geometry-matrix"
     },
@@ -1000,6 +1048,13 @@
         "createObjectURL": "blob-urls",
         "revokeObjectURL": "blob-urls"
       }
+    },
+    "Document": {
+      "receiver": "Document",
+      "members": [
+        "parseHTMLUnsafe"
+      ],
+      "feature": "dom-document-parse-html"
     }
   },
   "iterableBindings": {
@@ -1138,5 +1193,18 @@
     "HighlightRegistry": {
       "adapter": "RanvierCollectionLike"
     }
-  }
+  },
+  "dictionaryEventTargetMembers": [
+    "MouseEventInit.relatedTarget"
+  ],
+  "referenceDictionaries": [
+    "StaticRangeInit"
+  ],
+  "typedArrayInputTypes": [
+    "Float32Array",
+    "Float64Array"
+  ],
+  "idlDefaultDictionaries": [
+    "PointerEventInit"
+  ]
 }

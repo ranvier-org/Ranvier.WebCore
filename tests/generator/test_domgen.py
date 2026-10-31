@@ -2584,5 +2584,77 @@ SVGStyleElement includes LinkStyle;
         self.assertEqual([], shadowed)
         self.assertIn('namedItem', extensions['HTMLFormControlsCollection'])
 
+    def factory_generator(self, extra, interfaces, update):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + extra)
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + interfaces
+        config.update(update)
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        return generator
+
+    def test_reference_dictionary_stages_required_nodes_and_builds_the_init_with_references(self):
+        generator = self.factory_generator('''
+dictionary RangeProbeInit { required Node startContainer; required unsigned long startOffset; };
+interface RangeProbe { constructor(RangeProbeInit init); };
+''', ['RangeProbe'], {'constructors': {'RangeProbe': {'receiver': 'Document', 'factory': 'RangeProbe::create', 'passReceiver': False}},
+                      'dictionaryCppTypes': {'RangeProbeInit': 'RangeProbe::Init'}, 'referenceDictionaries': ['RangeProbeInit']})
+        glue = generator.glue()
+        self.assertIn('    RefPtr<Node> startContainer;', glue)
+        self.assertIn('std::remove_cvref_t<decltype(std::declval<RangeProbe::Init&>().startOffset)> startOffset { };', glue)
+        self.assertIn('if (!stage0.startContainer)' + chr(10) + '        return RV_ERR_NULL_ARGUMENT;', glue)
+        self.assertIn('RangeProbe::Init a0 { .startContainer = stage0.startContainer.releaseNonNull(), .startOffset = std::move(stage0.startOffset) };', glue)
+
+    def test_reference_dictionary_rejects_an_optional_argument(self):
+        with self.assertRaises(SystemExit):
+            self.factory_generator('''
+dictionary RangeProbeInit { required Node startContainer; };
+interface RangeProbe { constructor(optional RangeProbeInit init = {}); };
+''', ['RangeProbe'], {'constructors': {'RangeProbe': {'receiver': 'Document', 'factory': 'RangeProbe::create', 'passReceiver': False}},
+                      'referenceDictionaries': ['RangeProbeInit']})
+
+    def test_selected_event_target_dictionary_member_is_an_event_target_handle(self):
+        extra = '''
+dictionary ProbeEventInit { EventTarget? relatedTarget = null; };
+interface ProbeEvent : Event { constructor(DOMString type, optional ProbeEventInit init = {}); };
+'''
+        update = {'constructors': {'ProbeEvent': {'receiver': 'Document', 'factory': 'ProbeEvent::create', 'passReceiver': False}},
+                  'dictionaryCppTypes': {'ProbeEventInit': 'ProbeEvent::Init'}}
+        unselected = self.factory_generator(extra, ['ProbeEvent'], update)
+        self.assertNotIn('dom_probe_event_create', {function.name for function in unselected.functions})
+        generator = self.factory_generator(extra, ['ProbeEvent'], {**update, 'dictionaryEventTargetMembers': ['ProbeEventInit.relatedTarget']})
+        self.assertIn('    RvEventTarget* related_target; /* EventTarget?, default null */', generator.header())
+        self.assertIn('a1.relatedTarget = reinterpret_cast<EventTarget*>(init->related_target);', generator.glue())
+
+    def test_typed_array_inputs_copy_counted_elements_and_typed_array_results_stay_left_out(self):
+        extra = '''
+interface MatrixProbe { static MatrixProbe fromFloat32Array(Float32Array array32); Float64Array toFloat64Array(); };
+'''
+        update = {'staticBindings': {'MatrixProbe': {'receiver': 'Document', 'members': ['fromFloat32Array'], 'feature': 'matrix-probe'}}}
+        with self.assertRaises(SystemExit):
+            self.factory_generator(extra, ['MatrixProbe'], update)
+        generator = self.factory_generator(extra, ['MatrixProbe'], {**update, 'typedArrayInputTypes': ['Float32Array', 'Float64Array']})
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        self.assertEqual(functions['rv_dom_matrix_probe_from_float32_array']['parameters'][1:3],
+                         [{'ctype': 'const float*', 'name': 'array32'}, {'ctype': 'int32_t', 'name': 'array32_count'}])
+        self.assertNotIn('rv_dom_matrix_probe_to_float64_array', functions)
+        self.assertIn('RefPtr a0 = JSC::Float32Array::tryCreate(std::span<const float> { array32, static_cast<size_t>(array32_count) });', generator.glue())
+
+    def test_idl_default_dictionary_assigns_own_literal_defaults_before_reading_fields(self):
+        extra = '''
+dictionary PointerProbeInit { long pointerId = 0; DOMString pointerType = ""; boolean isPrimary = false; long tilt; };
+interface PointerProbe : Event { constructor(DOMString type, optional PointerProbeInit init = {}); };
+'''
+        update = {'constructors': {'PointerProbe': {'receiver': 'Document', 'factory': 'PointerProbe::create', 'passReceiver': False}},
+                  'dictionaryCppTypes': {'PointerProbeInit': 'PointerProbe::Init'}}
+        plain = self.factory_generator(extra, ['PointerProbe'], update).glue()
+        self.assertNotIn('a1.pointerId = 0;', plain)
+        glue = self.factory_generator(extra, ['PointerProbe'], {**update, 'idlDefaultDictionaries': ['PointerProbeInit']}).glue()
+        self.assertIn('PointerProbe::Init a1 { };' + chr(10) + '    a1.pointerId = 0;' + chr(10) + '    a1.pointerType = emptyString();'
+                      + chr(10) + '    a1.isPrimary = false;' + chr(10) + '    if (init) {', glue)
+
 if __name__ == '__main__':
     unittest.main()
