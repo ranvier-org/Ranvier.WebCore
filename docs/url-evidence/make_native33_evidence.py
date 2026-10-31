@@ -10,14 +10,15 @@ sys.path.insert(0, str(repo / 'tests/abi'))
 from url_wpt_score import score  # noqa: E402
 
 evidence = repo / 'docs/url-evidence'
-batch = repo / 'artifacts/native33-batch'
+batch = repo / 'artifacts/native33-batch-2'
 copies = {
     'build_native33_candidate.py': repo / 'artifacts/build_native33_candidate.py',
     'run_native33_full_batch.py': repo / 'artifacts/run_native33_full_batch.py',
+    'url-values-repeat30.txt': Path('C:/wk/h13-artifacts/url-values-repeat30-2.txt'),
     'make_native33_evidence.py': repo / 'artifacts/make_native33_evidence.py',
     'batch-green.json': batch / 'results.json',
-    'runtime-receipt.json': repo / 'artifacts/native33-frozen/runtime-receipt.json',
-    'source-patches.json': repo / 'artifacts/native33-candidate-5/source-patches.json',
+    'runtime-receipt.json': repo / 'artifacts/native33-frozen-2/runtime-receipt.json',
+    'source-patches.json': repo / 'artifacts/native33-candidate-6/source-patches.json',
     'teardown-probes.json': batch / 'teardown/teardown-probes.json',
     'url-values-probe.log': batch / 'url_values.log',
     'url-wpt-probe.log': batch / 'url_wpt.log',
@@ -51,14 +52,16 @@ result = {
               'systemUriHrefAgreement': f"{system_uri['agree']}/{system_uri['total']}", 'files': ['route-red-cases.json', 'route-red-chromium.json',
                                                                                                     'route-red-system-uri.json']},
     'red': {'runtime': 'native-caret/artifacts/native32-frozen (Native32/ABI40)', 'files': ['red-url-values-native32.log', 'red-url-wpt-native32.log'],
+            'nul': {'runtime': 'native-url/artifacts/native33-frozen (previous H13 head)', 'files': ['red-nul-old-head.log', 'red-nul-old-head-differences.json'],
+                    'case': 'getAll of a=x%00y&a=%00 returned [x, ""]; a sequence init lost the text after U+0000'},
             'earlier': 'native-dialog native30-candidate-1: url_values.py fails at the missing rv_dom_domurl_release'},
     'green': {'urlValuesAssertions': assertions, 'ownCases': {k: len(cases[k]) for k in ['parse', 'setters', 'params', 'linked', 'patterns']},
               'qualifiedDifferences': len(qualified['differences']), 'wpt': wpt_qualified['counts'],
               'wptDisagreements': len(wpt_qualified['disagree']), 'wptBothFail': len(wpt_qualified['bothFail']),
               'probes': len(records) - 2, 'allExitZero': all(item['exitCode'] == 0 for item in records),
               'batchParsedAssertions': sum(item.get('assertions', 0) for item in records),
-              'batchParsedNote': 'the batch runner parses only "PASS ... N assertions" lines; url_values and url_wpt print their own counts',
-              'rawAssertions': sum(item.get('assertions', 0) for item in records) + assertions,
+              'batchParsedNote': 'the batch runner parses "PASS ... N assertions" and "<probe>: N assertions" lines; url_wpt reports engine calls',
+              'rawAssertions': sum(item.get('assertions', 0) for item in records),
               'urlWptCalls': int((batch / 'url_wpt.log').read_text(encoding='utf-8').split('url_wpt: ')[1].split(' calls')[0]),
               'newProbes': ['url_values', 'url_wpt'],
               'probesRun': [{'name': item['name'], 'exitCode': item['exitCode'], 'assertions': item.get('assertions'),
@@ -69,8 +72,7 @@ result = {
     'qualifications': [{'case': key, 'note': value['note']} for key, value in qualified['differences'].items()] + [
         {'name': 'WPT disagreements', 'count': len(wpt_qualified['disagree']),
          'reason': '149 cases the engine passes and Chromium fails; urlpattern[347] is a JavaScript overload-conversion TypeError with no C ABI call'},
-        {'name': 'NUL-terminated sequences', 'count': None,
-         'reason': 'URLSearchParams.getAll and the sequence<sequence<USVString>> init arm cut a value at U+0000; get, entries and the record and string arms keep it'}],
+        ],
     'packaging': {'wptUnderSrc': [str(p) for p in packed], 'packedManagedPackage': json.loads((evidence / 'package-wpt-check.json').read_text()),
                   'note': 'Ranvier.WebCore packed from this head carries no tests/fixtures or WPT entry; the native flavor packages carry only runtimes'},
     'files': {},

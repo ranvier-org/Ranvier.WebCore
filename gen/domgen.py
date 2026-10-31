@@ -168,6 +168,8 @@ class World:
         self.namespace_partials = {}
         self.dictionary_partials = {}
         self.dictionary_exclusions = set()
+        # True while the members of an interface in sequenceStringSpans are mapped.
+        self.span_sequences = False
         for path in sorted(self.webcore.rglob("*.idl")):
             relative = path.relative_to(self.webcore).as_posix()
             if relative.startswith("bindings/scripts/test/"):
@@ -451,6 +453,11 @@ class World:
                 label = child.ctype.removeprefix('RvDom')
             if element.nullable and element.name in self.config.get('complexNullableElements', []):
                 label += 'NullableElement'
+            if self.span_sequences and (child.kind == 'string' or (child.kind == 'sequence' and child.ctype.endswith('Utf8'))):
+                # A string that may hold U+0000 keeps its byte length; the distinct name keeps other sequences' layout.
+                if child.kind == 'string':
+                    child.string_spans = True
+                label += 'Utf8'
             return Mapped("sequence", t.nullable, "RvDomSequence" + label + ("Nullable" if t.nullable else ""),
                           subtypes=[child], label=label + " sequence")
         if t.name == 'pair' and len(t.subtypes) == 2:
@@ -807,6 +814,13 @@ class Generator(ComplexGeneratorMixin):
                                                        if function.feature == feature and function.conditional]))
 
     def interface(self, name):
+        self.world.span_sequences = name in self.world.config.get('sequenceStringSpans', [])
+        try:
+            self.interface_members(name)
+        finally:
+            self.world.span_sequences = False
+
+    def interface_members(self, name):
         members = self.world.members(name)
         overloaded_constructor = sum(member.kind == 'constructor' for member in members) > 1
         seen_constants = set()

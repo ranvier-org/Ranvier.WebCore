@@ -137135,23 +137135,23 @@
             "subtypes": [
               {
                 "kind": "sequence",
-                "ctype": "RvDomSequenceSequenceOfUSVString",
+                "ctype": "RvDomSequenceSequenceOfUSVStringUtf8",
                 "interface": null,
                 "root": null,
                 "class": null,
                 "enum": null,
-                "label": "SequenceOfUSVString sequence",
+                "label": "SequenceOfUSVStringUtf8 sequence",
                 "nullable": false,
                 "atom": false,
                 "subtypes": [
                   {
                     "kind": "sequence",
-                    "ctype": "RvDomSequenceUSVString",
+                    "ctype": "RvDomSequenceUSVStringUtf8",
                     "interface": null,
                     "root": null,
                     "class": null,
                     "enum": null,
-                    "label": "USVString sequence",
+                    "label": "USVStringUtf8 sequence",
                     "nullable": false,
                     "atom": false,
                     "subtypes": [
@@ -137165,7 +137165,8 @@
                         "label": null,
                         "nullable": false,
                         "atom": false,
-                        "subtypes": []
+                        "subtypes": [],
+                        "stringTransport": "utf8-lengths"
                       }
                     ]
                   }
@@ -137592,7 +137593,7 @@
           "name": "name_length"
         },
         {
-          "ctype": "RvDomSequenceUSVString*",
+          "ctype": "RvDomSequenceUSVStringUtf8*",
           "name": "result"
         }
       ],
@@ -137635,12 +137636,12 @@
       },
       "returns": {
         "kind": "sequence",
-        "ctype": "RvDomSequenceUSVString",
+        "ctype": "RvDomSequenceUSVStringUtf8",
         "interface": null,
         "root": null,
         "class": null,
         "enum": null,
-        "label": "USVString sequence",
+        "label": "USVStringUtf8 sequence",
         "nullable": false,
         "atom": false,
         "subtypes": [
@@ -137654,7 +137655,8 @@
             "label": null,
             "nullable": false,
             "atom": false,
-            "subtypes": []
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
           }
         ]
       },
@@ -143113,23 +143115,52 @@
     {
       "mapping": {
         "kind": "sequence",
-        "ctype": "RvDomSequenceSequenceOfUSVString",
+        "ctype": "RvDomSequenceUSVStringUtf8",
         "interface": null,
         "root": null,
         "class": null,
         "enum": null,
-        "label": "SequenceOfUSVString sequence",
+        "label": "USVStringUtf8 sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_usv_string_utf8_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceSequenceOfUSVStringUtf8",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "SequenceOfUSVStringUtf8 sequence",
         "nullable": false,
         "atom": false,
         "subtypes": [
           {
             "kind": "sequence",
-            "ctype": "RvDomSequenceUSVString",
+            "ctype": "RvDomSequenceUSVStringUtf8",
             "interface": null,
             "root": null,
             "class": null,
             "enum": null,
-            "label": "USVString sequence",
+            "label": "USVStringUtf8 sequence",
             "nullable": false,
             "atom": false,
             "subtypes": [
@@ -143143,13 +143174,14 @@
                 "label": null,
                 "nullable": false,
                 "atom": false,
-                "subtypes": []
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
               }
             ]
           }
         ]
       },
-      "releaseFunction": "rv_dom_sequence_sequence_of_usv_string_release"
+      "releaseFunction": "rv_dom_sequence_sequence_of_usv_string_utf8_release"
     },
     {
       "mapping": {
@@ -143262,23 +143294,23 @@
         "subtypes": [
           {
             "kind": "sequence",
-            "ctype": "RvDomSequenceSequenceOfUSVString",
+            "ctype": "RvDomSequenceSequenceOfUSVStringUtf8",
             "interface": null,
             "root": null,
             "class": null,
             "enum": null,
-            "label": "SequenceOfUSVString sequence",
+            "label": "SequenceOfUSVStringUtf8 sequence",
             "nullable": false,
             "atom": false,
             "subtypes": [
               {
                 "kind": "sequence",
-                "ctype": "RvDomSequenceUSVString",
+                "ctype": "RvDomSequenceUSVStringUtf8",
                 "interface": null,
                 "root": null,
                 "class": null,
                 "enum": null,
-                "label": "USVString sequence",
+                "label": "USVStringUtf8 sequence",
                 "nullable": false,
                 "atom": false,
                 "subtypes": [
@@ -143292,7 +143324,8 @@
                     "label": null,
                     "nullable": false,
                     "atom": false,
-                    "subtypes": []
+                    "subtypes": [],
+                    "stringTransport": "utf8-lengths"
                   }
                 ]
               }
