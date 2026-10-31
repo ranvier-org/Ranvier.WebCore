@@ -2496,6 +2496,24 @@ partial interface Element {
         with self.assertRaises(SystemExit):
             generator.run()
 
+    def test_sequence_of_a_union_with_a_typedef_union_uses_the_registered_flat_transport(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+typedef (DOMString or Mode) Modish;
+partial interface Element {
+    undefined flat((Node or DOMString or Mode) value);
+    undefined nested(sequence<(Node or Modish)> values);
+};
+''')
+        generator = domgen.Generator(domgen.World(self.source, dict(self.world.config)))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        glue = generator.glue()
+        # One C transport for both spellings, and one C++ alternative list: the decoder's.
+        self.assertIn('Vector<Variant<Ref<Node>, String, Mode>>', glue)
+        self.assertNotIn('Variant<Ref<Node>, Variant<String, Mode>>', glue)
+
     def test_configured_svg_mathml_shared_style_and_focus_members(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

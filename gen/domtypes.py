@@ -191,7 +191,9 @@ class ComplexGeneratorMixin:
         if kind == 'pair':
             return 'KeyValuePair<' + ', '.join(self.transport_cpp(child) for child in mapped.subtypes) + '>'
         if kind == 'union':
-            value = 'Variant<' + ', '.join(self.union_alternatives(mapped)[0]) + '>'
+            # The registered union of this transport name: its decoder and encoder define the C++ alternatives.
+            registered = self.complex_used.get(mapped.ctype, mapped)
+            value = 'Variant<' + ', '.join(self.union_alternatives(registered)[0]) + '>'
         else:
             value = f'Vector<{self.transport_cpp(mapped.subtypes[0])}>'
         return f'std::optional<{value}>' if mapped.nullable else value

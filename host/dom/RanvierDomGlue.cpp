@@ -3575,19 +3575,19 @@ void clearRvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions(RvDomUnionUnrestri
     *value = { };
 }
 
-std::optional<Vector<Variant<Ref<CSSNumericValue>, Variant<String, Ref<CSSOMKeywordValue>>>>> decodeRvDomSequenceCSSNumericValueOrCSSOMKeywordish(const RvDomSequenceCSSNumericValueOrCSSOMKeywordish* source, int32_t& status)
+std::optional<Vector<Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>>>> decodeRvDomSequenceCSSNumericValueOrCSSOMKeywordish(const RvDomSequenceCSSNumericValueOrCSSOMKeywordish* source, int32_t& status)
 {
     if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
     if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
     if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
-    Vector<Variant<Ref<CSSNumericValue>, Variant<String, Ref<CSSOMKeywordValue>>>> result;
+    Vector<Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>>> result;
     result.reserveInitialCapacity(source->count);
     for (int32_t i = 0; i < source->count; ++i) {
         auto item = decodeRvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue(&source->items[i], status);
         if (status != RV_OK) return std::nullopt;
         result.append(std::move(*item));
     }
-    return Vector<Variant<Ref<CSSNumericValue>, Variant<String, Ref<CSSOMKeywordValue>>>> { std::move(result) };
+    return Vector<Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>>> { std::move(result) };
 }
 
 void clearRvDomSequenceCSSNumericValueOrCSSOMKeywordish(RvDomSequenceCSSNumericValueOrCSSOMKeywordish* value)
@@ -3613,7 +3613,7 @@ template<typename V> int32_t encodeRvDomSequenceCSSNumericValueOrCSSOMKeywordish
     return RV_OK;
 }
 
-std::optional<Variant<String, Vector<Variant<Ref<CSSNumericValue>, Variant<String, Ref<CSSOMKeywordValue>>>>>> decodeRvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish(const RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish* source, int32_t& status)
+std::optional<Variant<String, Vector<Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>>>>> decodeRvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish(const RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish* source, int32_t& status)
 {
     if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
     if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
@@ -3622,12 +3622,12 @@ std::optional<Variant<String, Vector<Variant<Ref<CSSNumericValue>, Variant<Strin
         if (source->arm0.length < 0 || (source->arm0.length > 0 && !source->arm0.data)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
         String arm0 = source->arm0.length < 0 ? String() : source->arm0.length ? String::fromUTF8(std::span<const uint8_t> { source->arm0.data, static_cast<size_t>(source->arm0.length) }) : emptyString();
         if (source->arm0.length >= 0 && arm0.isNull()) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
-        return Variant<String, Vector<Variant<Ref<CSSNumericValue>, Variant<String, Ref<CSSOMKeywordValue>>>>> { Variant<String, Vector<Variant<Ref<CSSNumericValue>, Variant<String, Ref<CSSOMKeywordValue>>>>> { WTF::InPlaceIndex<0>, arm0 } };
+        return Variant<String, Vector<Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>>>> { Variant<String, Vector<Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>>>> { WTF::InPlaceIndex<0>, arm0 } };
     }
     case 2: {
         auto arm1 = decodeRvDomSequenceCSSNumericValueOrCSSOMKeywordish(&source->arm1, status);
         if (status != RV_OK) return std::nullopt;
-        return Variant<String, Vector<Variant<Ref<CSSNumericValue>, Variant<String, Ref<CSSOMKeywordValue>>>>> { Variant<String, Vector<Variant<Ref<CSSNumericValue>, Variant<String, Ref<CSSOMKeywordValue>>>>> { WTF::InPlaceIndex<1>, std::move(*arm1) } };
+        return Variant<String, Vector<Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>>>> { Variant<String, Vector<Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>>>> { WTF::InPlaceIndex<1>, std::move(*arm1) } };
     }
     default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
     }
@@ -43445,7 +43445,7 @@ int32_t ranvier_dom_view_timeline_get_subject(RvAnimationTimeline* target, RvNod
     RefPtr impl = dynamicDowncast<ViewTimeline>(*reinterpret_cast<AnimationTimeline*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->subject(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+    return deliver([&]() -> decltype(auto) { return RefPtr<Element> { const_cast<Element*>(impl->subject()) }; }, [&](auto&& value) { return storeHandle<Node>(value, result); });
 }
 
 // ViewTimeline.startOffset getter: readonly attribute CSSNumericValue startOffset; *result is a new reference

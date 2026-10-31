@@ -1189,7 +1189,8 @@
     "WebAnimation.startTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->bindingsStartTime()) return CSSNumberish { *time }; return std::nullopt; }()",
     "WebAnimation.currentTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->bindingsCurrentTime()) return CSSNumberish { *time }; return std::nullopt; }()",
     "AnimationTimeline.currentTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->currentTime()) return CSSNumberish { *time }; return std::nullopt; }()",
-    "AnimationTimeline.duration": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->duration()) return CSSNumberish { *time }; return std::nullopt; }()"
+    "AnimationTimeline.duration": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->duration()) return CSSNumberish { *time }; return std::nullopt; }()",
+    "ViewTimeline.subject": "RefPtr<Element> { const_cast<Element*>(impl->subject()) }"
   },
   "setlikeBindings": {
     "Highlight": {
