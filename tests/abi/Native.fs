@@ -304,6 +304,7 @@ module Calls =
             "rv_event_get_target"
             "rv_event_get_related_target"
             "rv_host_window_event_target"
+            "rv_host_max_touch_points"
             "rv_host_window_metrics"
             "rv_host_set_visible"
             "rv_host_match_media"
@@ -1123,6 +1124,9 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern nativeint rv_host_window_event_target(nativeint host)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_max_touch_points(nativeint host, int& value)
 
     [<DllImport(Lib)>]
     extern int rv_host_window_metrics(nativeint host, nativeint metrics)
@@ -3733,13 +3737,25 @@ let rv_host_window_event_target (host: nativeint) : nativeint =
     else
         Raw.rv_host_window_event_target (host)
 
+let rv_host_max_touch_points (host: nativeint, value: byref<int>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_max_touch_points (host, &value)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[208] <- Calls.Counts[208] + 1L
+        Calls.Ticks[208] <- Calls.Ticks[208] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_max_touch_points (host, &value)
+
 let rv_host_window_metrics (host: nativeint, metrics: nativeint) : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_window_metrics (host, metrics)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[208] <- Calls.Counts[208] + 1L
-        Calls.Ticks[208] <- Calls.Ticks[208] + spent
+        Calls.Counts[209] <- Calls.Counts[209] + 1L
+        Calls.Ticks[209] <- Calls.Ticks[209] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3750,8 +3766,8 @@ let rv_host_set_visible (host: nativeint, visible: int) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_set_visible (host, visible)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[209] <- Calls.Counts[209] + 1L
-        Calls.Ticks[209] <- Calls.Ticks[209] + spent
+        Calls.Counts[210] <- Calls.Counts[210] + 1L
+        Calls.Ticks[210] <- Calls.Ticks[210] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3762,8 +3778,8 @@ let rv_host_match_media (host: nativeint, query: string) : nativeint =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_match_media (host, query)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[210] <- Calls.Counts[210] + 1L
-        Calls.Ticks[210] <- Calls.Ticks[210] + spent
+        Calls.Counts[211] <- Calls.Counts[211] + 1L
+        Calls.Ticks[211] <- Calls.Ticks[211] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3774,8 +3790,8 @@ let rv_media_query_matches (target: nativeint, matches: byref<int>) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_media_query_matches (target, &matches)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[211] <- Calls.Counts[211] + 1L
-        Calls.Ticks[211] <- Calls.Ticks[211] + spent
+        Calls.Counts[212] <- Calls.Counts[212] + 1L
+        Calls.Ticks[212] <- Calls.Ticks[212] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3786,8 +3802,8 @@ let rv_media_query_media (target: nativeint, buffer: byte[], capacity: int, leng
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_media_query_media (target, buffer, capacity, length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[212] <- Calls.Counts[212] + 1L
-        Calls.Ticks[212] <- Calls.Ticks[212] + spent
+        Calls.Counts[213] <- Calls.Counts[213] + 1L
+        Calls.Ticks[213] <- Calls.Ticks[213] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else

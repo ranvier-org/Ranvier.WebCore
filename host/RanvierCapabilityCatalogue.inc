@@ -301,6 +301,7 @@ static constexpr const char* capabilityAbiNames[] = {
     "image-decode",
     "font-load",
     "event-construction",
+    "input-state",
     "viewport",
     "accessibility-uia",
     "resize",

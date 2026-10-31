@@ -1321,9 +1321,20 @@ RV_EXPORT RvEventTarget* rv_event_get_target(RvEvent*, int32_t current);
 /* The relatedTarget of a mouse or focus event as a new EventTarget reference, or NULL. */
 RV_EXPORT RvEventTarget* rv_event_get_related_target(RvEvent*);
 
-/* The current document's window as a new EventTarget reference, released with rv_event_target_release. The handle
- * and listeners added through it remain valid after rv_host_destroy. (I12, ABI34 "input-state".) */
-RV_EXPORT RvEventTarget* rv_host_window_event_target(RvHost*);
+/* Window event target and input state ("input-state", v34). */
+
+/* A new reference to the window of the host's current document, as an EventTarget for the rv_event_target_*
+ * functions; release it with rv_event_target_release. Each call returns a new reference; rv_event_target_equals is 1
+ * for two references to one window. Listeners receive every event type dispatched to the window: window events such
+ * as focus, blur and resize, and the capture and bubble phases of events dispatched to the document's nodes, with
+ * the window as currentTarget. A host has one window for its lifetime: replacing the document (rv_host_load_html,
+ * rv_host_load_svg) keeps the window and its listeners. A reference and its listeners stay valid after rv_host_destroy,
+ * and rv_listener_remove on them returns RV_OK. Returns NULL for a NULL host, a document without a window, or a call
+ * off the owning thread. */
+RV_EXPORT RvEventTarget* rv_host_window_event_target(RvHost* host);
+/* Writes Navigator.maxTouchPoints of the current document's window. RV_ERR_UNSUPPORTED when the document has no
+ * window. */
+RV_EXPORT int32_t rv_host_max_touch_points(RvHost* host, int32_t* value);
 
 /* v35: "viewport" for rv_abi_has. */
 typedef struct RvWindowMetrics {
