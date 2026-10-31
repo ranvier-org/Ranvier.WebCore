@@ -1,0 +1,967 @@
+{
+  "group": [
+    "R06 #95"
+  ],
+  "status": "green (private Windows x64 slim; not accepted)",
+  "native": "0.1.0-preview.46",
+  "abi": 55,
+  "abiNote": "placeholder ABI55 on the R01 base; root assigns NativeNN/ABI at integration",
+  "features": [
+    "canvas-pixels",
+    "dom:ImageData",
+    "dom:ImageBitmap"
+  ],
+  "members": [
+    "rv_image_data_create",
+    "rv_image_data_layout",
+    "rv_image_data_read",
+    "rv_image_data_write",
+    "RvImageDataLayout",
+    "rv_dom_image_data_get_width/height",
+    "rv_dom_image_data_release/retain",
+    "rv_dom_image_bitmap_release/retain",
+    "rv_dom_canvas_rendering_context2_d_create_image_data_3/_1",
+    "rv_dom_canvas_rendering_context2_d_get_image_data",
+    "rv_dom_canvas_rendering_context2_d_put_image_data_3/_7",
+    "rv_dom_canvas_rendering_context2_d_draw_image_3/_5/_9",
+    "RvDomImageDataSettings",
+    "RV_DOM_IMAGE_DATA_PIXEL_FORMAT_*",
+    "rv_dom_union_html_image_element_or_html_canvas_element_or_svg_image_element_or_image_bitmap_or_css_style_image_value_release"
+  ],
+  "engine": "ImageData and CanvasRenderingContext2DBase from host/RanvierCanvasPixelsGlue.cpp (compiled into WebCore) and the generated members (gen/dom.json memberSelections; unionArgumentConversions converts CanvasImageSource into the engine's Variant)",
+  "hostGlue": {
+    "RanvierResourceGlue": {
+      "parentObject": "C:/wk/native-blob/artifacts/native44-candidate-6/091-RanvierResourceGlue.cpp.obj",
+      "recompiled": false
+    },
+    "RanvierCanvasGlue": {
+      "parentObject": "C:/wk/native-canvas/artifacts/canvas-candidate-5/090-RanvierCanvasGlue.cpp.obj",
+      "recompiled": false
+    },
+    "RanvierInspectGlue": {
+      "parentObject": "C:/wk/native-cascade-shadow/artifacts/native46-candidate-6/090-RanvierInspectGlue.cpp.obj",
+      "recompiled": true,
+      "reason": "batch-1 merge cae4da8 qualifies WebCore::Style"
+    },
+    "RanvierViewportGlue": {
+      "parentObject": "C:/wk/native-coords/artifacts/coords-candidate-5/090-RanvierViewportGlue.cpp.obj",
+      "recompiled": false
+    },
+    "RanvierEventGlue": {
+      "parentObject": "C:/wk/native-forms/artifacts/forms-candidate-4/RanvierEventGlue.cpp.obj",
+      "recompiled": false
+    },
+    "RanvierSvgViewGlue": {
+      "parentObject": "C:/wk/native-forms/artifacts/forms-candidate-4/RanvierSvgViewGlue.cpp.obj",
+      "recompiled": false
+    }
+  },
+  "sourceHeadOfBatch": "96dd132ec4dc10842085a551bb538b975ea8d3da",
+  "batchRunHead": "96dd132",
+  "red": {
+    "exports": {
+      "rv_image_data_create": false,
+      "rv_image_data_layout": false,
+      "rv_image_data_read": false,
+      "rv_image_data_write": false,
+      "rv_dom_image_data_get_width": false,
+      "rv_dom_image_data_get_height": false,
+      "rv_dom_image_data_release": false,
+      "rv_dom_image_data_retain": false,
+      "rv_dom_image_bitmap_release": false,
+      "rv_dom_image_bitmap_retain": false,
+      "rv_dom_canvas_rendering_context2_d_create_image_data_3": false,
+      "rv_dom_canvas_rendering_context2_d_create_image_data_1": false,
+      "rv_dom_canvas_rendering_context2_d_get_image_data": false,
+      "rv_dom_canvas_rendering_context2_d_put_image_data_3": false,
+      "rv_dom_canvas_rendering_context2_d_put_image_data_7": false,
+      "rv_dom_canvas_rendering_context2_d_draw_image_3": false,
+      "rv_dom_canvas_rendering_context2_d_draw_image_5": false,
+      "rv_dom_canvas_rendering_context2_d_draw_image_9": false
+    },
+    "abiHas": {
+      "canvas-context": 1,
+      "canvas-pixels": 0,
+      "dom:ImageData": 0,
+      "dom:ImageBitmap": 0,
+      "dom:CanvasRenderingContext2D": 1
+    },
+    "abi": 55
+  },
+  "green": {
+    "canvasPixelsAssertions": 297,
+    "repeats": 30,
+    "repeatsDistinct": [
+      "canvas_pixels: 297 assertions PASS"
+    ],
+    "probes": 63,
+    "allExitZero": true,
+    "rawAssertions": 91245,
+    "baselineRawAssertions": 90948,
+    "baselineProbesChanged": {},
+    "teardownCases": 104,
+    "teardownAllCollected": true
+  },
+  "measured": {
+    "construct": {
+      "size": [
+        2,
+        3
+      ],
+      "layout": {
+        "width": 2,
+        "height": 3,
+        "colorSpace": 0,
+        "pixelFormat": 0,
+        "bytesPerPixel": 4,
+        "rowBytes": 8,
+        "byteLength": 24
+      }
+    },
+    "constructErrors": {
+      "zeroWidth": "IndexSizeError",
+      "zeroHeight": "IndexSizeError",
+      "notMultipleOf4": "InvalidStateError",
+      "notMultipleOfRow": "IndexSizeError",
+      "heightMismatch": "IndexSizeError",
+      "emptyData": "InvalidStateError",
+      "huge": "RangeError",
+      "displayP3": "unsupported",
+      "float16": "unsupported",
+      "unknownColorSpace": "unsupported",
+      "unknownPixelFormat": "unsupported"
+    },
+    "constructFromData": {
+      "size": [
+        1,
+        2
+      ],
+      "data": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "createImageData": {
+      "negative": [
+        3,
+        2
+      ],
+      "colorSpace": 0,
+      "zero": "IndexSizeError",
+      "copyOf": [
+        1,
+        2,
+        true
+      ]
+    },
+    "roundTrip": [
+      255,
+      0,
+      0,
+      255,
+      0,
+      255,
+      0,
+      255,
+      0,
+      0,
+      255,
+      255,
+      0,
+      0,
+      0,
+      0,
+      255,
+      255,
+      255,
+      128,
+      0,
+      0,
+      0,
+      255,
+      200,
+      100,
+      50,
+      255,
+      1,
+      2,
+      3,
+      255
+    ],
+    "outside": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "negativeRect": [
+      255,
+      0,
+      0,
+      255,
+      0,
+      255,
+      0,
+      255
+    ],
+    "getErrors": {
+      "zeroWidth": "IndexSizeError",
+      "zeroHeight": "IndexSizeError"
+    },
+    "getColorSpace": 0,
+    "painted": [
+      [
+        255,
+        0,
+        0,
+        255
+      ],
+      [
+        0,
+        255,
+        0,
+        255
+      ],
+      [
+        255,
+        255,
+        255,
+        255
+      ],
+      [
+        255,
+        255,
+        255,
+        255
+      ]
+    ],
+    "dirty": {
+      "inside": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "corner": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "dirtyNegative": {
+      "at5": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "at6": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "at4": [
+        0,
+        0,
+        255,
+        255
+      ]
+    },
+    "partlyOutsidePixel": [
+      0,
+      0,
+      255,
+      255
+    ],
+    "willReadFrequently": [
+      255,
+      0,
+      0,
+      255,
+      0,
+      0,
+      255,
+      255
+    ],
+    "drawCanvas": {
+      "left": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "right": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "beyond": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "drawCanvasScaled": {
+      "left": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "right": [
+        0,
+        0,
+        255,
+        255
+      ]
+    },
+    "drawCanvasSubRect": {
+      "left": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "right": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "beyond": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "drawErrors": {
+      "zeroSizeCanvas": "InvalidStateError",
+      "zeroSourceRect": "ok",
+      "nonFinite": "ok",
+      "emptyImage": "ok"
+    },
+    "drawImage": [
+      255,
+      0,
+      0,
+      255,
+      0,
+      255,
+      0,
+      255,
+      0,
+      0,
+      255,
+      255,
+      0,
+      0,
+      0,
+      0
+    ],
+    "drawBroken": "InvalidStateError",
+    "drawSvgImage": [
+      255,
+      0,
+      0,
+      255,
+      0,
+      255,
+      0,
+      255,
+      0,
+      0,
+      255,
+      255,
+      0,
+      0,
+      0,
+      0
+    ],
+    "taint": {
+      "crossOrigin": "SecurityError",
+      "cors": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "requests": [
+        "https://pixels.test/tile.png",
+        "https://pixels.test/tile.png?cors"
+      ]
+    },
+    "assertions": 297
+  },
+  "chromiumOracle": {
+    "browser": "156.0.8078.4",
+    "file": "red-chromium.json",
+    "compared": {
+      "construct": {
+        "native": {
+          "size": [
+            2,
+            3
+          ],
+          "layout": {
+            "width": 2,
+            "height": 3,
+            "colorSpace": 0,
+            "pixelFormat": 0,
+            "bytesPerPixel": 4,
+            "rowBytes": 8,
+            "byteLength": 24
+          }
+        },
+        "chromium": {
+          "width": 2,
+          "height": 3,
+          "length": 24,
+          "colorSpace": "srgb",
+          "pixelFormat": "rgba-unorm8",
+          "zero": true,
+          "dataType": "Uint8ClampedArray"
+        }
+      },
+      "constructErrors": {
+        "native": {
+          "zeroWidth": "IndexSizeError",
+          "zeroHeight": "IndexSizeError",
+          "notMultipleOf4": "InvalidStateError",
+          "notMultipleOfRow": "IndexSizeError",
+          "heightMismatch": "IndexSizeError",
+          "emptyData": "InvalidStateError",
+          "huge": "RangeError",
+          "displayP3": "unsupported",
+          "float16": "unsupported",
+          "unknownColorSpace": "unsupported",
+          "unknownPixelFormat": "unsupported"
+        },
+        "chromium": {
+          "zeroWidth": "IndexSizeError",
+          "zeroHeight": "IndexSizeError",
+          "huge": "IndexSizeError",
+          "notMultipleOf4": "InvalidStateError",
+          "notMultipleOfRow": "IndexSizeError",
+          "heightMismatch": "IndexSizeError",
+          "emptyData": "InvalidStateError",
+          "p3": "display-p3",
+          "badColorSpace": "TypeError"
+        }
+      },
+      "constructFromData": {
+        "native": {
+          "size": [
+            1,
+            2
+          ],
+          "data": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ]
+        },
+        "chromium": {
+          "width": 1,
+          "height": 2,
+          "data": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ]
+        }
+      },
+      "createImageData": {
+        "native": {
+          "negative": [
+            3,
+            2
+          ],
+          "colorSpace": 0,
+          "zero": "IndexSizeError",
+          "copyOf": [
+            1,
+            2,
+            true
+          ]
+        },
+        "chromium": {
+          "negative": [
+            3,
+            2
+          ],
+          "zero": "IndexSizeError",
+          "copyOf": [
+            1,
+            2,
+            true
+          ],
+          "colorSpace": "srgb"
+        }
+      },
+      "roundTrip": {
+        "native": [
+          255,
+          0,
+          0,
+          255,
+          0,
+          255,
+          0,
+          255,
+          0,
+          0,
+          255,
+          255,
+          0,
+          0,
+          0,
+          0,
+          255,
+          255,
+          255,
+          128,
+          0,
+          0,
+          0,
+          255,
+          200,
+          100,
+          50,
+          255,
+          1,
+          2,
+          3,
+          255
+        ],
+        "chromium": [
+          255,
+          0,
+          0,
+          255,
+          0,
+          255,
+          0,
+          255,
+          0,
+          0,
+          255,
+          255,
+          0,
+          0,
+          0,
+          0,
+          255,
+          255,
+          255,
+          128,
+          0,
+          0,
+          0,
+          255,
+          200,
+          100,
+          50,
+          255,
+          1,
+          2,
+          3,
+          255
+        ]
+      },
+      "outside": {
+        "native": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "chromium": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "negativeRect": {
+        "native": [
+          255,
+          0,
+          0,
+          255,
+          0,
+          255,
+          0,
+          255
+        ],
+        "chromium": [
+          255,
+          0,
+          0,
+          255,
+          0,
+          255,
+          0,
+          255
+        ]
+      },
+      "getErrors": {
+        "native": {
+          "zeroWidth": "IndexSizeError",
+          "zeroHeight": "IndexSizeError"
+        },
+        "chromium": {
+          "zeroWidth": "IndexSizeError",
+          "zeroHeight": "IndexSizeError"
+        }
+      },
+      "getColorSpace": {
+        "native": 0,
+        "chromium": "srgb"
+      },
+      "dirty": {
+        "native": {
+          "inside": [
+            0,
+            0,
+            255,
+            255
+          ],
+          "corner": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "chromium": {
+          "inside": [
+            0,
+            0,
+            255,
+            255
+          ],
+          "corner": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "dirtyNegative": {
+        "native": {
+          "at5": [
+            0,
+            0,
+            255,
+            255
+          ],
+          "at6": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "at4": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        "chromium": {
+          "at5": [
+            0,
+            0,
+            255,
+            255
+          ],
+          "at6": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "at4": [
+            0,
+            0,
+            255,
+            255
+          ]
+        }
+      },
+      "partlyOutsidePixel": {
+        "native": [
+          0,
+          0,
+          255,
+          255
+        ],
+        "chromium": [
+          0,
+          0,
+          255,
+          255
+        ]
+      },
+      "drawCanvas": {
+        "native": {
+          "left": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "right": [
+            0,
+            0,
+            255,
+            255
+          ],
+          "beyond": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "chromium": {
+          "left": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "right": [
+            0,
+            0,
+            255,
+            255
+          ],
+          "beyond": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "drawCanvasScaled": {
+        "native": {
+          "left": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "right": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        "chromium": {
+          "left": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "right": [
+            0,
+            0,
+            255,
+            255
+          ]
+        }
+      },
+      "drawCanvasSubRect": {
+        "native": {
+          "left": [
+            0,
+            0,
+            255,
+            255
+          ],
+          "right": [
+            0,
+            0,
+            255,
+            255
+          ],
+          "beyond": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "chromium": {
+          "left": [
+            0,
+            0,
+            255,
+            255
+          ],
+          "right": [
+            0,
+            0,
+            255,
+            255
+          ],
+          "beyond": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "drawErrors": {
+        "native": {
+          "zeroSizeCanvas": "InvalidStateError",
+          "zeroSourceRect": "ok",
+          "nonFinite": "ok",
+          "emptyImage": "ok"
+        },
+        "chromium": {
+          "zeroSizeCanvas": "InvalidStateError",
+          "zeroSourceRect": "ok",
+          "nonFinite": "ok",
+          "emptyImage": "ok"
+        }
+      },
+      "drawImage": {
+        "native": [
+          255,
+          0,
+          0,
+          255,
+          0,
+          255,
+          0,
+          255,
+          0,
+          0,
+          255,
+          255,
+          0,
+          0,
+          0,
+          0
+        ],
+        "chromium": {
+          "natural": [
+            2,
+            2
+          ],
+          "pixels": [
+            255,
+            0,
+            0,
+            255,
+            0,
+            255,
+            0,
+            255,
+            0,
+            0,
+            255,
+            255,
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "drawBroken": {
+        "native": "InvalidStateError",
+        "chromium": "InvalidStateError"
+      }
+    }
+  },
+  "qualifications": [
+    "Profile: sRGB ImageData in rgba-unorm8 only; display-p3 and rgba-float16 return RV_ERR_UNSUPPORTED (CanvasColorSpaceEnabled and CanvasColorTypeEnabled are off in WebCore on Windows and Linux), so RvDomImageDataSettings carries no fields.",
+    "new ImageData(65536, 65536) raises RangeError in WebKit and IndexSizeError in Chromium 156.",
+    "The ImageBitmap arm of drawImage is exercised in R07, which creates ImageBitmaps; HTMLVideoElement is outside the union (ENABLE_VIDEO OFF on slim) and CSSStyleImageValue is accepted but not drawn here.",
+    "putImageData ignoring globalAlpha and globalCompositeOperation is in the Chromium oracle only: those setters belong to R03.",
+    "Tainting is measured with a cross-origin <img> served by rv_host_set_resource_handler; crossorigin=anonymous stays readable."
+  ],
+  "files": {
+    "baseline-r01-results.json": "30dca2dd3509fcf21a6571c60ad06ccf1022d2edc9ad93c3bd706192e0bac2a8",
+    "batch-green.json": "4b692ba8050b8be0543dc0dc2ab52d7b002a501db89211fd53946582db0ba41f",
+    "build_pixels_candidate.py": "bff103af1fe99975ff7fbc9b9fefb95578928a202a8f31ddfe567c098b5a96f7",
+    "canvas-pixels-probe.log": "b65a7a74ed67369acd3a284c316f445964945e6b28a882295a41689b9011d186",
+    "canvas-pixels-repeat30.txt": "639909f9f82da86a328e115189d22c8ffa48765bb45fa6b508d34f939984bd54",
+    "canvas-pixels-report.json": "89f145140b04fba7184f0c4c38aeb3bcaa852f945ff9005edd5c6b31f8a13f9c",
+    "make_pixels_evidence.py": "baa621979568cf2d1c14fffcfa45aebeb24cd58777c3ccb924ab7e7fb79ee4bf",
+    "red-chromium.json": "9b981545681a81f32efe6b54f98eaa32492e9585bf266336d0e80e4767c20f8f",
+    "red-native.json": "4c2bb327fb8bc1b6918c15ed22d9a3c6381835ff803454c177aa011d1fc4d0e6",
+    "red_chromium.mjs": "589f24fa66d3f94d888162c9999cbbccbcd03469abd01cee8563f5e7e4ab0693",
+    "red_native.py": "f1f4e82a26678027eb81160cb3b88866c0e7535cff4881183d89fa534c07bf5a",
+    "repeat30.sh": "d04e99bc5ba78531270da33205dc71aa9b3251e7513cbb1e9ea099d861717d05",
+    "run_pixels_full_batch.py": "edf83b20b08343362d28ce85674eda72385dd94edd395b1a759f9f11069c5cfa",
+    "runtime-receipt.json": "8b86251bc9315e419b968ca42451ffb5750fb03f063a77c9d09dcf7b1ca8aacf",
+    "source-patches.json": "e647584ce2d220f0a14e0df8665dc1311d9301f03b26a88ef7e2f415210430af",
+    "teardown-probes.json": "5483c939d925c8cc0f30c1cba7ddaad63258da92a314e64be68ea35fcde86432"
+  }
+}
