@@ -306,12 +306,15 @@ def run_once(native_directory, fixture, oracle):
             # A pending style sheet insertion applies to the query; the element's style waits for the next update.
             sheet = p.bind('rv_document_create_element', P, [P, ctypes.c_char_p])(p.host, b'style')
             p.retained.append(('rv_node_release', sheet))
-            p.expect(p.bind('rv_node_set_text_content', I, [P, ctypes.c_char_p])(sheet, b'#plain{order:90}') == OK, 'inserted sheet text')
+            p.expect(p.bind('rv_node_set_text_content', I, [P, ctypes.c_char_p])(sheet, b"#plain{order:90}@property --late{syntax:'<integer>';inherits:false;initial-value:0}#rn{--late:7}") == OK,
+                     'inserted sheet text')
             head = p.bind('rv_document_head', P, [P])(p.host)
             p.retained.append(('rv_node_release', head))
             p.expect(p.bind('rv_node_append_child', I, [P, P])(head, sheet) == OK, 'pending sheet insertion')
             inserted = c.entries(c.query(p.host, elements['plain'], 'order'))
             p.expect([(r['value'], r['winner'], r['sheet'], r['rule']) for r in inserted] == [('90', 1, 2, 0)], 'inserted sheet: ' + str(inserted))
+            late = c.entries(c.query(p.host, elements['rnkid'], '--late'))
+            p.expect(late == [], 'a pending @property registration applies to the query: ' + str(late))
             p.update()
             p.expect(c.entries(c.query(p.host, elements['plain'], 'order')) == inserted and matches(90, c.style(elements['plain'], 'order')),
                      'the inserted sheet after the update')

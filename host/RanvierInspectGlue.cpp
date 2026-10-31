@@ -545,6 +545,14 @@ int32_t ranvier_inspect_cascade(RvNode* documentHandle, RvNode* elementHandle, c
     auto name = String::fromUTF8(std::span { reinterpret_cast<const char8_t*>(property), static_cast<size_t>(propertyLength) });
     if (name.isNull())
         return RV_ERR_UNSUPPORTED;
+    // The pending style sheet changes the next style update applies, @property registrations included; element styles stay as they are.
+    for (RefPtr<Element> scopeElement = element; scopeElement;) {
+        auto& scope = Style::Scope::forNode(*scopeElement);
+        if (scope.hasPendingUpdate())
+            scope.flushPendingUpdate();
+        RefPtr shadowRoot = scopeElement->containingShadowRoot();
+        scopeElement = shadowRoot ? shadowRoot->host() : nullptr;
+    }
     CascadeQuery query;
     bool inherited;
     if (isCustomPropertyName(name)) {
@@ -556,14 +564,6 @@ int32_t ranvier_inspect_cascade(RvNode* documentHandle, RvNode* elementHandle, c
         if (query.id == CSSPropertyInvalid || isShorthand(query.id) || !isExposed(query.id, &document->settings()))
             return RV_ERR_UNSUPPORTED;
         inherited = CSSProperty::isInheritedProperty(query.id);
-    }
-    // The pending style sheet changes the next style update applies; element styles stay as they are.
-    for (RefPtr<Element> scopeElement = element; scopeElement;) {
-        auto& scope = Style::Scope::forNode(*scopeElement);
-        if (scope.hasPendingUpdate())
-            scope.flushPendingUpdate();
-        RefPtr shadowRoot = scopeElement->containingShadowRoot();
-        scopeElement = shadowRoot ? shadowRoot->host() : nullptr;
     }
     sendText(textSink, context, query.isCustom() ? query.customName.string() : nameString(query.id).string());
     int32_t depth = 0;
