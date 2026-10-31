@@ -11,6 +11,7 @@
     <ItemGroup>
         <Compile Include="Native.fs" />
         <Compile Include="NativeDom.fs" />
+        <Compile Include="Traversal.fs" />
         <Compile Include="Teardown.fs" />
         <Compile Include="Resources.fs" />
         <Compile Include="Window.fs" />
@@ -24,6 +25,7 @@
         <Compile Include="Accessibility.fs" />
         <Compile Include="AccessibilityText.fs" />
         <Compile Include="Dom.fs" />
+        <Compile Include="TraversalProbe.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 

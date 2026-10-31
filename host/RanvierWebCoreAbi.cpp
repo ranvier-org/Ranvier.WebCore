@@ -46,6 +46,7 @@
 #include <WebCore/MemoryRelease.h>
 #include <WebCore/ScriptWrappableInlines.h>
 #include <WebCore/NodeDocument.h>
+#include <WebCore/NodeFilter.h>
 #include <WebCore/NodeInlines.h>
 #include <WebCore/NodeList.h>
 #include <WebCore/Page.h>
@@ -1052,6 +1053,59 @@ struct RvWatch {
     WeakPtr<Node, WeakPtrImplWithEventTargetData> node;
 };
 
+// The NodeFilters rv_node_filter_create made that are still alive.
+static HashSet<const NodeFilter*>& hostNodeFilters()
+{
+    static NeverDestroyed<HashSet<const NodeFilter*>> filters;
+    return filters;
+}
+
+class RvHostNodeFilter final : public NodeFilter {
+public:
+    static Ref<RvHostNodeFilter> create(Document& document, RvNodeFilterCallback callback, void* context, RvNodeFilterRelease release)
+    {
+        return adoptRef(*new RvHostNodeFilter(document, callback, context, release));
+    }
+
+    ~RvHostNodeFilter()
+    {
+        hostNodeFilters().remove(this);
+        if (m_release)
+            m_release(m_context);
+    }
+
+    void* context() const { return m_context; }
+
+private:
+    RvHostNodeFilter(Document& document, RvNodeFilterCallback callback, void* context, RvNodeFilterRelease release)
+        : NodeFilter(&document)
+        , m_callback(callback)
+        , m_context(context)
+        , m_release(release)
+    {
+        hostNodeFilters().add(this);
+    }
+
+    CallbackResult<unsigned short> acceptNode(Node& node) final { return acceptNodeRethrowingException(node); }
+
+    CallbackResult<unsigned short> acceptNodeRethrowingException(Node& node) final
+    {
+        if (!canInvokeCallback())
+            return CallbackResultType::ExceptionThrown;
+        Ref protectedNode { node };
+        auto result = m_callback(m_context, reinterpret_cast<RvNode*>(&node));
+        if (result < FILTER_ACCEPT || result > FILTER_SKIP)
+            return CallbackResultType::ExceptionThrown;
+        return static_cast<unsigned short>(result);
+    }
+
+    bool hasCallback() const final { return true; }
+
+    RvNodeFilterCallback m_callback;
+    void* m_context;
+    RvNodeFilterRelease m_release;
+};
+
 struct RvListener {
     Ref<RvEventListener> listener;
     Ref<Node> target;
@@ -1656,6 +1710,25 @@ RvListener* rv_node_add_event_listener(RvNode* target, const char* type, int32_t
     return listener;
 }
 
+RvNodeFilter* rv_node_filter_create(RvNode* target, RvNodeFilterCallback callback, void* context, RvNodeFilterRelease release)
+{
+    if (!target || !callback || !onOwningThread())
+        return nullptr;
+    NodeFilter* filter = &RvHostNodeFilter::create(node(target)->document(), callback, context, release).leakRef();
+    return reinterpret_cast<RvNodeFilter*>(filter);
+}
+
+int32_t rv_node_filter_context(RvNodeFilter* filter, void** context)
+{
+    if (!filter || !context)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* engine = reinterpret_cast<NodeFilter*>(filter);
+    *context = hostNodeFilters().contains(engine) ? static_cast<RvHostNodeFilter*>(engine)->context() : nullptr;
+    return RV_OK;
+}
+
 int32_t rv_listener_remove(RvListener* listener)
 {
     if (!listener)
@@ -2148,6 +2221,9 @@ int32_t rv_last_exception(int32_t part, char* buffer, int32_t capacity, int32_t*
             return copyString("TypeError"_s, buffer, capacity, length);
         case ExceptionCode::JSSyntaxError:
             return copyString("SyntaxError"_s, buffer, capacity, length);
+        case ExceptionCode::ExistingExceptionError:
+            // A host callback, such as an RvNodeFilterCallback, reported a failure.
+            return copyString("ExistingExceptionError"_s, buffer, capacity, length);
         default:
             break;
         }

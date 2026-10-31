@@ -466,5 +466,6 @@ let main _ =
     Accessibility.run outDir
     AccessibilityText.run outDir
     Dom.run outDir
+    TraversalProbe.run outDir
     printfn "RANVIER_FSHARP_ABI PASS %s" (JsonSerializer.Serialize summary)
     0

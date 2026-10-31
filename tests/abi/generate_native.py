@@ -36,7 +36,7 @@ KEYWORDS = set(
 )
 
 # The parameter name for an unnamed handle, by its pointee type.
-HANDLE_NAMES = {"RvHost": "host", "RvNode": "node", "RvEvent": "event", "RvWatch": "watch", "RvListener": "listener", "RvAnimation": "animation", "RvAxNode": "ax"}
+HANDLE_NAMES = {"RvHost": "host", "RvNode": "node", "RvEvent": "event", "RvWatch": "watch", "RvListener": "listener", "RvAnimation": "animation", "RvAxNode": "ax", "RvNodeFilter": "filter"}
 
 
 def strip_comments(text: str) -> str:
@@ -168,6 +168,14 @@ def generated(header: str) -> str:
         "/// <summary>The <c>RvAxCallback</c> of the header.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
         "type AxCallback = delegate of context: nativeint * node: nativeint * event: int -> unit",
+        "",
+        "/// <summary>The <c>RvNodeFilterCallback</c> of the header.</summary>",
+        "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+        "type NodeFilterCallback = delegate of context: nativeint * node: nativeint -> int",
+        "",
+        "/// <summary>The <c>RvNodeFilterRelease</c> of the header.</summary>",
+        "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+        "type NodeFilterRelease = delegate of context: nativeint -> unit",
     ]
 
     found = declarations(header)

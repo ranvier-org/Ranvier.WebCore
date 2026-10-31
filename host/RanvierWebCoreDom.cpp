@@ -104,6 +104,12 @@ void rv_dom_svg_animated_angle_release(RvSVGAnimatedAngle* handle) { ranvier_dom
 RvSVGAnimatedAngle* rv_dom_svg_animated_angle_retain(RvSVGAnimatedAngle* handle) { return ranvier_dom_svg_animated_angle_retain(handle); }
 void rv_dom_svg_animated_integer_release(RvSVGAnimatedInteger* handle) { ranvier_dom_svg_animated_integer_release(handle); }
 RvSVGAnimatedInteger* rv_dom_svg_animated_integer_retain(RvSVGAnimatedInteger* handle) { return ranvier_dom_svg_animated_integer_retain(handle); }
+void rv_dom_node_filter_release(RvNodeFilter* handle) { ranvier_dom_node_filter_release(handle); }
+RvNodeFilter* rv_dom_node_filter_retain(RvNodeFilter* handle) { return ranvier_dom_node_filter_retain(handle); }
+void rv_dom_node_iterator_release(RvNodeIterator* handle) { ranvier_dom_node_iterator_release(handle); }
+RvNodeIterator* rv_dom_node_iterator_retain(RvNodeIterator* handle) { return ranvier_dom_node_iterator_retain(handle); }
+void rv_dom_tree_walker_release(RvTreeWalker* handle) { ranvier_dom_tree_walker_release(handle); }
+RvTreeWalker* rv_dom_tree_walker_retain(RvTreeWalker* handle) { return ranvier_dom_tree_walker_retain(handle); }
 void rv_dom_union_node_or_dom_string_release(RvDomUnionNodeOrDOMString* value) { ranvier_dom_union_node_or_dom_string_release(value); }
 void rv_dom_sequence_node_or_dom_string_release(RvDomSequenceNodeOrDOMString* value) { ranvier_dom_sequence_node_or_dom_string_release(value); }
 void rv_dom_sequence_css_style_sheet_release(RvDomSequenceCSSStyleSheet* value) { ranvier_dom_sequence_css_style_sheet_release(value); }
@@ -275,6 +281,8 @@ int32_t rv_dom_document_create_attribute(RvNode* target, const char* local_name,
 int32_t rv_dom_document_create_attribute_ns(RvNode* target, const char* namespace_uri, const char* qualified_name, RvNode** result) { return ranvier_dom_document_create_attribute_ns(target, namespace_uri, qualified_name, result); }
 int32_t rv_dom_document_create_event(RvNode* target, const char* type, RvEvent** result) { return ranvier_dom_document_create_event(target, type, result); }
 int32_t rv_dom_document_create_range(RvNode* target, RvAbstractRange** result) { return ranvier_dom_document_create_range(target, result); }
+int32_t rv_dom_document_create_node_iterator(RvNode* target, RvNode* root, uint32_t what_to_show, RvNodeFilter* filter, RvNodeIterator** result) { return ranvier_dom_document_create_node_iterator(target, root, what_to_show, filter, result); }
+int32_t rv_dom_document_create_tree_walker(RvNode* target, RvNode* root, uint32_t what_to_show, RvNodeFilter* filter, RvTreeWalker** result) { return ranvier_dom_document_create_tree_walker(target, root, what_to_show, filter, result); }
 int32_t rv_dom_document_caret_range_from_point(RvNode* target, int32_t x, int32_t y, RvAbstractRange** result) { return ranvier_dom_document_caret_range_from_point(target, x, y, result); }
 int32_t rv_dom_document_aria_notify(RvNode* target, const char* announcement) { return ranvier_dom_document_aria_notify(target, announcement); }
 int32_t rv_dom_document_aria_notify_2(RvNode* target, const char* announcement, const RvDomAriaNotifyOptions* options) { return ranvier_dom_document_aria_notify_2(target, announcement, options); }
@@ -2590,6 +2598,26 @@ int32_t rv_dom_svg_use_element_get_y(RvNode* target, RvSVGAnimatedLength** resul
 int32_t rv_dom_svg_use_element_get_width(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_use_element_get_width(target, result); }
 int32_t rv_dom_svg_use_element_get_height(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_use_element_get_height(target, result); }
 int32_t rv_dom_svg_use_element_get_href(RvNode* target, RvSVGAnimatedString** result) { return ranvier_dom_svg_use_element_get_href(target, result); }
+int32_t rv_dom_node_iterator_get_root(RvNodeIterator* target, RvNode** result) { return ranvier_dom_node_iterator_get_root(target, result); }
+int32_t rv_dom_node_iterator_get_reference_node(RvNodeIterator* target, RvNode** result) { return ranvier_dom_node_iterator_get_reference_node(target, result); }
+int32_t rv_dom_node_iterator_get_pointer_before_reference_node(RvNodeIterator* target, int32_t* result) { return ranvier_dom_node_iterator_get_pointer_before_reference_node(target, result); }
+int32_t rv_dom_node_iterator_get_what_to_show(RvNodeIterator* target, uint32_t* result) { return ranvier_dom_node_iterator_get_what_to_show(target, result); }
+int32_t rv_dom_node_iterator_get_filter(RvNodeIterator* target, RvNodeFilter** result) { return ranvier_dom_node_iterator_get_filter(target, result); }
+int32_t rv_dom_node_iterator_next_node(RvNodeIterator* target, RvNode** result) { return ranvier_dom_node_iterator_next_node(target, result); }
+int32_t rv_dom_node_iterator_previous_node(RvNodeIterator* target, RvNode** result) { return ranvier_dom_node_iterator_previous_node(target, result); }
+int32_t rv_dom_node_iterator_detach(RvNodeIterator* target) { return ranvier_dom_node_iterator_detach(target); }
+int32_t rv_dom_tree_walker_get_root(RvTreeWalker* target, RvNode** result) { return ranvier_dom_tree_walker_get_root(target, result); }
+int32_t rv_dom_tree_walker_get_what_to_show(RvTreeWalker* target, uint32_t* result) { return ranvier_dom_tree_walker_get_what_to_show(target, result); }
+int32_t rv_dom_tree_walker_get_filter(RvTreeWalker* target, RvNodeFilter** result) { return ranvier_dom_tree_walker_get_filter(target, result); }
+int32_t rv_dom_tree_walker_get_current_node(RvTreeWalker* target, RvNode** result) { return ranvier_dom_tree_walker_get_current_node(target, result); }
+int32_t rv_dom_tree_walker_set_current_node(RvTreeWalker* target, RvNode* value) { return ranvier_dom_tree_walker_set_current_node(target, value); }
+int32_t rv_dom_tree_walker_parent_node(RvTreeWalker* target, RvNode** result) { return ranvier_dom_tree_walker_parent_node(target, result); }
+int32_t rv_dom_tree_walker_first_child(RvTreeWalker* target, RvNode** result) { return ranvier_dom_tree_walker_first_child(target, result); }
+int32_t rv_dom_tree_walker_last_child(RvTreeWalker* target, RvNode** result) { return ranvier_dom_tree_walker_last_child(target, result); }
+int32_t rv_dom_tree_walker_previous_sibling(RvTreeWalker* target, RvNode** result) { return ranvier_dom_tree_walker_previous_sibling(target, result); }
+int32_t rv_dom_tree_walker_next_sibling(RvTreeWalker* target, RvNode** result) { return ranvier_dom_tree_walker_next_sibling(target, result); }
+int32_t rv_dom_tree_walker_previous_node(RvTreeWalker* target, RvNode** result) { return ranvier_dom_tree_walker_previous_node(target, result); }
+int32_t rv_dom_tree_walker_next_node(RvTreeWalker* target, RvNode** result) { return ranvier_dom_tree_walker_next_node(target, result); }
 int32_t rv_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, int32_t* result) { return ranvier_dom_css_supports_2(target, property, property_length, value, value_length, result); }
 int32_t rv_dom_css_supports_1(RvNode* target, const uint8_t* condition_text, int32_t condition_text_length, int32_t* result) { return ranvier_dom_css_supports_1(target, condition_text, condition_text_length, result); }
 int32_t rv_dom_css_register_property(RvNode* target, const RvDomDOMCSSCustomPropertyDescriptor* descriptor) { return ranvier_dom_css_register_property(target, descriptor); }

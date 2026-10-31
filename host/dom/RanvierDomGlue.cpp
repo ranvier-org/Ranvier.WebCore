@@ -170,7 +170,9 @@
 #include "MouseEvent.h"
 #include "NamedNodeMap.h"
 #include "Node.h"
+#include "NodeFilter.h"
 #include "NodeInlines.h"
+#include "NodeIterator.h"
 #include "NodeList.h"
 #include "PointerEvent.h"
 #include "RadioNodeList.h"
@@ -273,6 +275,7 @@
 #include "StyleSheet.h"
 #include "StyleSheetList.h"
 #include "Text.h"
+#include "TreeWalker.h"
 #include "TrustedScriptURL.h"
 #include "UIEvent.h"
 #include "ValidityState.h"
@@ -2138,7 +2141,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -3051,6 +3054,48 @@ RvSVGAnimatedInteger* ranvier_dom_svg_animated_integer_retain(RvSVGAnimatedInteg
     if (!handle || !isMainThread())
         return nullptr;
     reinterpret_cast<SVGAnimatedInteger*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_node_filter_release(RvNodeFilter* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<NodeFilter*>(handle)->deref();
+}
+
+RvNodeFilter* ranvier_dom_node_filter_retain(RvNodeFilter* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<NodeFilter*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_node_iterator_release(RvNodeIterator* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<NodeIterator*>(handle)->deref();
+}
+
+RvNodeIterator* ranvier_dom_node_iterator_retain(RvNodeIterator* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<NodeIterator*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_tree_walker_release(RvTreeWalker* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<TreeWalker*>(handle)->deref();
+}
+
+RvTreeWalker* ranvier_dom_tree_walker_retain(RvTreeWalker* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<TreeWalker*>(handle)->ref();
     return handle;
 }
 
@@ -4751,6 +4796,36 @@ int32_t ranvier_dom_document_create_range(RvNode* target, RvAbstractRange** resu
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return deliver([&]() -> decltype(auto) { return impl->createRange(); }, [&](auto&& value) { return storeHandle<AbstractRange>(value, result); });
+}
+
+// Document.createNodeIterator(Node root, optional unsigned long whatToShow = 0xFFFFFFFF, optional NodeFilter? filter = null) -> NodeIterator; what_to_show defaults to 0xFFFFFFFF in IDL; filter defaults to null in IDL; filter may be NULL; *result is a new reference
+int32_t ranvier_dom_document_create_node_iterator(RvNode* target, RvNode* root, uint32_t what_to_show, RvNodeFilter* filter, RvNodeIterator** result)
+{
+    if (!target || !root || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<Node> a0 = nodeOf(root);
+    RefPtr<NodeFilter> a2 = reinterpret_cast<NodeFilter*>(filter);
+    return deliver([&]() -> decltype(auto) { return impl->createNodeIterator(HandleArg<Node> { a0.get() }, what_to_show, a2.get()); }, [&](auto&& value) { return storeHandle<NodeIterator>(value, result); });
+}
+
+// Document.createTreeWalker(Node root, optional unsigned long whatToShow = 0xFFFFFFFF, optional NodeFilter? filter = null) -> TreeWalker; what_to_show defaults to 0xFFFFFFFF in IDL; filter defaults to null in IDL; filter may be NULL; *result is a new reference
+int32_t ranvier_dom_document_create_tree_walker(RvNode* target, RvNode* root, uint32_t what_to_show, RvNodeFilter* filter, RvTreeWalker** result)
+{
+    if (!target || !root || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<Node> a0 = nodeOf(root);
+    RefPtr<NodeFilter> a2 = reinterpret_cast<NodeFilter*>(filter);
+    return deliver([&]() -> decltype(auto) { return impl->createTreeWalker(HandleArg<Node> { a0.get() }, what_to_show, a2.get()); }, [&](auto&& value) { return storeHandle<TreeWalker>(value, result); });
 }
 
 // Document.caretRangeFromPoint(optional long x = 0, optional long y = 0) -> Range?; x defaults to 0 in IDL; y defaults to 0 in IDL; *result is a new reference, or NULL
@@ -36961,6 +37036,227 @@ int32_t ranvier_dom_svg_use_element_get_href(RvNode* target, RvSVGAnimatedString
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return deliver([&]() -> decltype(auto) { return impl->hrefAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// NodeIterator.root getter: readonly attribute Node root; *result is a new reference
+int32_t ranvier_dom_node_iterator_get_root(RvNodeIterator* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<NodeIterator> impl = reinterpret_cast<NodeIterator*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->root(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// NodeIterator.referenceNode getter: readonly attribute Node? referenceNode; *result is a new reference, or NULL
+int32_t ranvier_dom_node_iterator_get_reference_node(RvNodeIterator* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<NodeIterator> impl = reinterpret_cast<NodeIterator*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->referenceNode(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// NodeIterator.pointerBeforeReferenceNode getter: readonly attribute boolean pointerBeforeReferenceNode
+int32_t ranvier_dom_node_iterator_get_pointer_before_reference_node(RvNodeIterator* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<NodeIterator> impl = reinterpret_cast<NodeIterator*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->pointerBeforeReferenceNode(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// NodeIterator.whatToShow getter: readonly attribute unsigned long whatToShow
+int32_t ranvier_dom_node_iterator_get_what_to_show(RvNodeIterator* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<NodeIterator> impl = reinterpret_cast<NodeIterator*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->whatToShow(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// NodeIterator.filter getter: readonly attribute NodeFilter? filter; *result is a new reference, or NULL
+int32_t ranvier_dom_node_iterator_get_filter(RvNodeIterator* target, RvNodeFilter** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<NodeIterator> impl = reinterpret_cast<NodeIterator*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->filter(); }, [&](auto&& value) { return storeHandle<NodeFilter>(value, result); });
+}
+
+// NodeIterator.nextNode() -> Node?; *result is a new reference, or NULL
+int32_t ranvier_dom_node_iterator_next_node(RvNodeIterator* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<NodeIterator> impl = reinterpret_cast<NodeIterator*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->nextNode(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// NodeIterator.previousNode() -> Node?; *result is a new reference, or NULL
+int32_t ranvier_dom_node_iterator_previous_node(RvNodeIterator* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<NodeIterator> impl = reinterpret_cast<NodeIterator*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->previousNode(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// NodeIterator.detach() -> undefined
+int32_t ranvier_dom_node_iterator_detach(RvNodeIterator* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<NodeIterator> impl = reinterpret_cast<NodeIterator*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->detach(); });
+}
+
+// TreeWalker.root getter: readonly attribute Node root; *result is a new reference
+int32_t ranvier_dom_tree_walker_get_root(RvTreeWalker* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TreeWalker> impl = reinterpret_cast<TreeWalker*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->root(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// TreeWalker.whatToShow getter: readonly attribute unsigned long whatToShow
+int32_t ranvier_dom_tree_walker_get_what_to_show(RvTreeWalker* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TreeWalker> impl = reinterpret_cast<TreeWalker*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->whatToShow(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// TreeWalker.filter getter: readonly attribute NodeFilter? filter; *result is a new reference, or NULL
+int32_t ranvier_dom_tree_walker_get_filter(RvTreeWalker* target, RvNodeFilter** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TreeWalker> impl = reinterpret_cast<TreeWalker*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->filter(); }, [&](auto&& value) { return storeHandle<NodeFilter>(value, result); });
+}
+
+// TreeWalker.currentNode getter: attribute Node currentNode; *result is a new reference
+int32_t ranvier_dom_tree_walker_get_current_node(RvTreeWalker* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TreeWalker> impl = reinterpret_cast<TreeWalker*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->currentNode(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// TreeWalker.currentNode setter: attribute Node currentNode
+int32_t ranvier_dom_tree_walker_set_current_node(RvTreeWalker* target, RvNode* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TreeWalker> impl = reinterpret_cast<TreeWalker*>(target);
+    RefPtr<Node> a0 = nodeOf(value);
+    return invoke([&]() -> decltype(auto) { return impl->setCurrentNode(HandleArg<Node> { a0.get() }); });
+}
+
+// TreeWalker.parentNode() -> Node?; *result is a new reference, or NULL
+int32_t ranvier_dom_tree_walker_parent_node(RvTreeWalker* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TreeWalker> impl = reinterpret_cast<TreeWalker*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->parentNode(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// TreeWalker.firstChild() -> Node?; *result is a new reference, or NULL
+int32_t ranvier_dom_tree_walker_first_child(RvTreeWalker* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TreeWalker> impl = reinterpret_cast<TreeWalker*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->firstChild(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// TreeWalker.lastChild() -> Node?; *result is a new reference, or NULL
+int32_t ranvier_dom_tree_walker_last_child(RvTreeWalker* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TreeWalker> impl = reinterpret_cast<TreeWalker*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->lastChild(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// TreeWalker.previousSibling() -> Node?; *result is a new reference, or NULL
+int32_t ranvier_dom_tree_walker_previous_sibling(RvTreeWalker* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TreeWalker> impl = reinterpret_cast<TreeWalker*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->previousSibling(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// TreeWalker.nextSibling() -> Node?; *result is a new reference, or NULL
+int32_t ranvier_dom_tree_walker_next_sibling(RvTreeWalker* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TreeWalker> impl = reinterpret_cast<TreeWalker*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->nextSibling(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// TreeWalker.previousNode() -> Node?; *result is a new reference, or NULL
+int32_t ranvier_dom_tree_walker_previous_node(RvTreeWalker* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TreeWalker> impl = reinterpret_cast<TreeWalker*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->previousNode(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// TreeWalker.nextNode() -> Node?; *result is a new reference, or NULL
+int32_t ranvier_dom_tree_walker_next_node(RvTreeWalker* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TreeWalker> impl = reinterpret_cast<TreeWalker*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->nextNode(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
 }
 
 // CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths

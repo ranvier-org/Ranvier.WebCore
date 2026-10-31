@@ -2,6 +2,7 @@
 /// host, destroys the host, and reads the watched nodes before and after a run-loop cycle.
 module RanvierWebCoreAbi.Teardown
 
+open System
 open System.IO
 open System.Text.Json
 open RanvierWebCoreAbi.Native
@@ -295,6 +296,31 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
         | "dataset" ->
             rv_dom_html_element_get_dataset (div, &held.contents) |> check "dataset"
             fun () -> rv_dom_dom_string_map_release held.Value
+        | "tree walker"
+        | "node iterator" ->
+            // A host NodeFilter whose managed function must be released with the traversal, after host destroy.
+            let filter = fun (_: nativeint) -> Traversal.FilterResult.Accept
+            let weak = WeakReference filter
+            use handle = Traversal.NodeFilter.Create(div, filter)
+
+            if kind = "tree walker" then
+                rv_dom_document_create_tree_walker (document, div, 0xFFFFFFFFu, handle.Handle, &held.contents)
+                |> check "create_tree_walker"
+            else
+                rv_dom_document_create_node_iterator (document, div, 0xFFFFFFFFu, handle.Handle, &held.contents)
+                |> check "create_node_iterator"
+
+            fun () ->
+                if kind = "tree walker" then
+                    rv_dom_tree_walker_release held.Value
+                else
+                    rv_dom_node_iterator_release held.Value
+
+                GC.Collect()
+                GC.WaitForPendingFinalizers()
+
+                if weak.IsAlive then
+                    failwithf "%s filter function alive after the traversal was released" kind
         | _ ->
             rv_dom_html_element_get_attribute_style_map (div, &held.contents) |> check "attributeStyleMap"
             fun () -> rv_dom_style_property_map_read_only_release held.Value
@@ -384,7 +410,7 @@ let run (outDir: string) =
                 probe "SVG paint handles retained past host destroy" cycleBefore (svgPaintHandles false)
                 probe "SVG paint handles retained past document replacement" cycleBefore (svgPaintHandles true)
 
-            for kind in [ "node"; "dataset"; "style map" ] do
+            for kind in [ "node"; "dataset"; "style map"; "tree walker"; "node iterator" ] do
                 for remove in [ false; true ] do
                     releaseAfterDestroy kind remove
         ]
