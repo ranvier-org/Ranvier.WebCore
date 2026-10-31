@@ -779,7 +779,7 @@ typedef struct RvIntersectionEntry {
     int32_t hasRootBounds;
     int32_t reserved;
     /* rootBounds, boundingClientRect and intersectionRect in CSS pixels of the client space (RV_SPACE_CLIENT). The
-     * root bounds include the root margin. A target outside the root's containing block chain, a disconnected
+     * root bounds include the root margin and the scroll margin; Chromium's exclude the scroll margin. A target outside the root's containing block chain, a disconnected
      * target and a target of a disconnected root report all three as 0, 0, 0, 0. */
     double rootX;
     double rootY;
@@ -807,8 +807,9 @@ typedef void (*RvIntersectionEntriesCallback)(void* context, RvObserver* observe
 /* new IntersectionObserver(callback, { root, rootMargin, scrollMargin, threshold }), written to *observer and freed
  * with rv_observer_release. root is NULL for the implicit root (the host's viewport), the host's document node, or
  * an element of the host's document, connected or not. rootMargin and scrollMargin are UTF-8 CSS margins, such as
- * "10px" or "10% 0px"; a NULL margin with length 0 is "0px". scrollMargin grows the scrollports of the scroll
- * containers between a target and the root. thresholds holds count ratios from 0 to 1, in any order, or is NULL
+ * "10px" or "10% 0px"; a NULL margin with length 0 is "0px". With the implicit root, scrollMargin grows the
+ * scrollports of the scroll containers between a target and the root; with an explicit root the engine clips by
+ * those scrollports unchanged (Chromium grows them too). thresholds holds count ratios from 0 to 1, in any order, or is NULL
  * with count 0 for 0 alone. Returns RV_ERR_NULL_ARGUMENT for a NULL host, callback or observer, a negative length
  * or count, or a NULL margin or thresholds with a length or count above 0; RV_ERR_DOM_EXCEPTION for an invalid
  * margin (rv_last_exception names SyntaxError) or a threshold outside 0 to 1 (RangeError); RV_ERR_NOT_ELEMENT for a
@@ -824,8 +825,8 @@ RV_EXPORT int32_t rv_host_observe_intersection_entries(RvHost*, RvIntersectionEn
  * observer of rv_host_observe_intersection passes its entries to sink in the same form. Returns RV_ERR_UNSUPPORTED
  * for a resize observer, without calling sink. */
 RV_EXPORT int32_t rv_observer_take_records(RvObserver*, RvIntersectionEntriesCallback sink, void* context);
-/* Writes the host's document's performance.now() in milliseconds: the clock of RvIntersectionEntry.time, from the
- * document's time origin. A document rv_host_load_html loads starts a new origin. */
+/* Writes the host's document's performance.now(): the clock of RvIntersectionEntry.time, in whole milliseconds from the
+ * time origin of the host's window. A document rv_host_load_html loads keeps that origin. */
 RV_EXPORT int32_t rv_host_now(RvHost*, double* milliseconds);
 
 /* Paints the element and its descendants alone, without what lies behind or over them, at the host's device

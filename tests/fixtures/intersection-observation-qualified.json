@@ -1,0 +1,138 @@
+{
+ "comment": "Engine differences the probe records instead of failing; each still holds its WebKit value. observerOrder: the order between observers in one update. WebKit (Document::updateIntersectionObservers) delivers in the order observers gained their first target and moves an observer that lost all its targets to the end when it observes again; Chromium 156's order varies between updates. rootBounds: with a scrollMargin, WebKit reports the root bounds of a document or implicit root grown by the scroll margin, while Chromium reports them without it; both clip by the grown scrollport, so isIntersecting, the intersection rectangle and the ratio agree. elementRootScrollMargin: with an explicit root (the document here), WebKit clips targets by the scroll containers between target and root without the scroll margin (IntersectionObserver::computeIntersectionState passes no scrollMargin when root() is set), so #v, clipped 10px below #c, is not intersecting; Chromium grows those scrollports and reports it at 0.2. The recorded WebKit entries are asserted.",
+ "observerOrder": {
+  "webkit": [
+   [
+    "o2",
+    "o3",
+    "o1"
+   ],
+   [
+    "o2",
+    "o3",
+    "o1"
+   ],
+   [
+    "o3",
+    "o1",
+    "o2"
+   ],
+   []
+  ]
+ },
+ "rootBounds": {
+  "scrollMargin": {
+   "a": [
+    -20,
+    -20,
+    360,
+    280
+   ],
+   "p": [
+    -48,
+    -36,
+    416,
+    312
+   ]
+  },
+  "scrollMarginViewportEdge": {
+   "z": [
+    -20,
+    -20,
+    360,
+    280
+   ]
+  }
+ },
+ "elementRootScrollMargin": {
+  "statuses": [
+   "ok"
+  ],
+  "segments": [
+   [
+    {
+     "o": "m",
+     "entries": [
+      {
+       "t": "v",
+       "intersecting": false,
+       "ratio": 0,
+       "root": [
+        -20,
+        -20,
+        360,
+        280
+       ],
+       "bounds": [
+        10,
+        120,
+        50,
+        50
+       ],
+       "intersection": [
+        0,
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "t": "u",
+       "intersecting": false,
+       "ratio": 0,
+       "root": [
+        -20,
+        -20,
+        360,
+        280
+       ],
+       "bounds": [
+        110,
+        170,
+        50,
+        50
+       ],
+       "intersection": [
+        0,
+        0,
+        0,
+        0
+       ]
+      }
+     ]
+    }
+   ],
+   [
+    {
+     "o": "m",
+     "entries": [
+      {
+       "t": "u",
+       "intersecting": true,
+       "ratio": 0.20000000298023224,
+       "root": [
+        -20,
+        -20,
+        360,
+        280
+       ],
+       "bounds": [
+        110,
+        110,
+        50,
+        50
+       ],
+       "intersection": [
+        110,
+        110,
+        50,
+        10
+       ]
+      }
+     ]
+    }
+   ],
+   []
+  ]
+ }
+}

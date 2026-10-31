@@ -742,6 +742,48 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
 
                 GC.KeepAlive callback
                 rv_node_release held.Value
+        | "intersection entries" ->
+            // An intersection observer whose callback retains its target, with records taken and the target removed
+            // before release: the held target outlives rv_host_destroy, and nothing is delivered after release.
+            let delivered = ref 0
+            let taken = ref -1
+
+            let callback =
+                IntersectionEntriesCallback(fun _ _ entries count ->
+                    delivered.Value <- delivered.Value + count
+
+                    if count > 0 && held.Value = 0n then
+                        held.Value <- rv_node_retain (Runtime.InteropServices.Marshal.ReadIntPtr(entries, 8)))
+
+            let sink = IntersectionEntriesCallback(fun _ _ _ count -> taken.Value <- count)
+            let pointer = Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate callback
+            let observer = [| 0n |]
+
+            rv_host_observe_intersection_entries (host, pointer, 0n, document, null, 0, null, 0, null, 0, observer)
+            |> check "observe intersection entries"
+
+            rv_observer_observe (observer[0], div) |> check "observe target"
+            rv_host_update host |> check "update"
+
+            rv_observer_take_records (observer[0], Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate sink, 0n)
+            |> check "take records"
+
+            rv_node_remove div |> check "remove target"
+            rv_observer_release observer[0]
+            rv_host_update host |> check "update after release"
+
+            fun () ->
+                if delivered.Value <> 1 || taken.Value <> 0 || held.Value = 0n then
+                    failwith (
+                        "intersection entries delivered "
+                        + string delivered.Value
+                        + ", taken "
+                        + string taken.Value
+                    )
+
+                GC.KeepAlive callback
+                GC.KeepAlive sink
+                rv_node_release held.Value
         | "blob reads" ->
             // A FileReader and an engine read in flight, and a revoked object URL, when the host is destroyed.
             let data = Array.zeroCreate<byte> (1 <<< 20)
@@ -1309,6 +1351,7 @@ let run (outDir: string) =
                     "blob slice"
                     "blob reads"
                     "resize entries"
+                    "intersection entries"
                     "caret position"
                     "crypto"
                     "diagnostics"
