@@ -16,7 +16,7 @@ from svg_paint_probe import SvgProbe
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, WRONG_THREAD, BUFFER_TOO_SMALL, UNSUPPORTED, DETACHED, WRONG_INTERFACE = 0, -1, -2, -6, -9, -10, -11
-ABI = 49
+ABI = 53
 KINDS = ['activedescendant', 'controls', 'describedby', 'details', 'errormessage', 'flowto', 'labelledby', 'owns']
 NAME, DESCRIPTION = 0, 1
 # Steps where WebKit differs from Chromium (docs/element-internals-evidence), keyed by step, with the measured
