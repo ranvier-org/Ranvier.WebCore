@@ -10,6 +10,7 @@ NUMBERS = {'byte': 'sbyte', 'octet': 'byte', 'short': 'int16', 'unsigned short':
            'float': 'float32', 'unrestricted float': 'float32', 'double': 'float', 'unrestricted double': 'float'}
 KEYWORDS = set('abstract and as assert base begin class default delegate do done downcast downto elif else end exception extern false finally fixed for fun function global if in inherit inline interface internal lazy let match member module mutable namespace new not null of open or override private public rec return select sig static struct then to true try type upcast use val void when while with yield break checked component const constraint continue event external include mixin parallel process protected pure sealed tailcall trait virtual is'.split())
 STRINGS = {'DOMString', 'USVString', 'ByteString'}
+WIDE_INTEGERS = {'long long', 'unsigned long long'}
 
 
 def identifier(name):
@@ -194,6 +195,9 @@ class InterfaceEmitter:
                 if setter and self.world.resolve(member.type).name == 'USVString' and self.world.config.get('interfaceStringInputs', {}).get(source) == 'utf8-lengths':
                     expression = '$0.' + member.name + "{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}"
                     return [''] + lines + ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif', signature, '']
+                if getter and not setter and self.world.resolve(member.type).name in WIDE_INTEGERS:
+                    # A browser returns a JavaScript number; Fable represents int64 and uint64 as BigInt.
+                    return lines + ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("BigInt($0.{member.name})")>]', '#endif', signature]
                 if owner in ('Document', 'ShadowRoot', 'DocumentOrShadowRoot') and member.name == 'styleSheets' and getter:
                     expression = ("((r)=>{const s=r.styleSheets;if(r.nodeType===9){"
                                   "const k=Symbol.for('Ranvier.Dom.StyleSheetList.documents.v1');"
@@ -233,6 +237,14 @@ class InterfaceEmitter:
                           f'new m.constructor([{fields}]):m;}})($0)')
             lines += ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif']
             self.matrix_flag_adapters_used.add(matrix_adapter)
+        wide = [i for i, a in enumerate(member.arguments) if self.world.resolve(a.type).name in WIDE_INTEGERS]
+        if wide and not needs_adapter and not anonymous_property and not member.arguments[-1].variadic:
+            # Fable passes int64 arguments as BigInt, which a browser's number conversion rejects.
+            names = [f'a{i}' for i in range(len(member.arguments))]
+            passed = [f"{n}===void 0?void 0:Number({n})" if i in wide else n for i, n in enumerate(names)]
+            expression = (f"((o,{','.join(names)})=>o.{member.name}({','.join(passed)}))"
+                          f"($0,{','.join(f'${i + 1}' for i in range(len(member.arguments)))})")
+            lines += ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif']
         if needs_adapter:
             raw_params = self.parameters(member.arguments, [a.type for a in member.arguments], raw=True)
             raw_result = 'obj' if self.union(member.type) else result
