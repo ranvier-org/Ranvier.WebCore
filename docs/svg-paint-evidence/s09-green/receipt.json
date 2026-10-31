@@ -1,0 +1,95 @@
+{
+  "status": "focused private unallocated S09 checkpoint",
+  "counts": {
+    "interfaces": 235,
+    "functions": 2414,
+    "roots": 50,
+    "dictionaries": 22,
+    "stubs": 0
+  },
+  "nativeAssertions": 8941,
+  "memberRoutes": 201,
+  "browserAvailableMemberRoutes": 200,
+  "restrictedMethodErrorCases": 12,
+  "browserPaintPhases": 27,
+  "browserPaintAssertions": 36,
+  "runtime": {
+    "RanvierWebCoreHost.dll": "f1e15de7e742ea6e1b56ab70eeebdad7e781d8ec85a497fc388861cd37ba041a",
+    "WebCore.dll": "4d01f755c26a4f053a6201ab75d6115451aadaba23bca2f3be17db0b2128df21",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+  },
+  "probes": [
+    {
+      "probe": "native",
+      "exitCode": 0,
+      "log": "native.log"
+    },
+    {
+      "probe": "browser",
+      "exitCode": 0,
+      "log": "browser.log"
+    },
+    {
+      "probe": "browser-pixels",
+      "exitCode": 0,
+      "log": "browser-pixels.log"
+    }
+  ],
+  "sourcePatches": {
+    "0028-svg-convolve-structural-cache.patch": "dd23ae37ab55083b056427ab54c5ad2b01d0d9d0951c63d63a03133d91e5c009",
+    "0029-svg-feimage-aspect-cache.patch": "110b5e76cf953337246dd322aaa8c35086abc3b5ef19bf84aef1cf609913cd32"
+  },
+  "files": {
+    "browser-pixels.log": "3ee6914d51d4e2741f9f836eeecfc63158bd64ebfb4802f12ab2157be707e153",
+    "browser.log": "032a6222b266305fe99e90a340b048e02130dfc9d9035dccd3735247374a0f6f",
+    "check_svg_filter_browser_pixels.py": "f51c3794a74538fe43c6ff5aa12ea3ef1e037a11a5492f39e85cf81fdda3d366",
+    "native.log": "26d12b778ad460305bf5a6d61fc102e7902cfdf388267d247bf84485fba5d26c",
+    "svg-convolve-cache-native-green.json": "b7831dc277e180ea4f90ba1476dd1f621a3ddf9a5b3823f983cce618f8aab9f6",
+    "svg-convolve-native-oracle.json": "dd377ce1414bdc81fcb0d53cd93a3f9ea0d9d71dff8820ce27d1995e495d42af",
+    "svg-feimage-native-oracle.json": "0da752f9e276bc20e828e36aff1480cc2c8980653490aff72d55ddbf4803ae4b",
+    "svg-filter-browser-pixels.json": "a6a175267647513a19fe5bb831ab527277106cbbe3192e6b8446c1f2ac982f4f",
+    "svg-filter-member-oracle.json": "83c3b3b07d84035e99621b1ec0dfb5f475f2dfe82bbb9570c9c5896fb744cd7a",
+    "svg-filter-member-oracle.mjs": "1ff94f4ab95880f2ae4d6e67086f0d7199a8bc7a107a7d61887a937f7cea7fa3",
+    "svg-filter-paint-blend.png": "88956d6b039af82e8d64b8c3d55c4d9b52be998b23eb0c95fe6b4b200cecf302",
+    "svg-filter-paint-blur.png": "1b9a7373af1d3f3432bcaca0cc2e7bc2ef3b210523b2ff3d55642a09022361e5",
+    "svg-filter-paint-browser.json": "9820ea06b055a533fb952af34b6d5f832461abb271ff28002c4f4c3d001bf696",
+    "svg-filter-paint-browser.mjs": "72cf0563b87d26debb58f32e43793b7abd2b14360f8c5557630964b500296aee",
+    "svg-filter-paint-composite.png": "facca7f08453f398ed5b1977cfa45aa33dc214d5459ffa7f719979158ac2ffcd",
+    "svg-filter-paint-convolve.png": "aab1b164d07f87875b54bab789c666e0369f7abd1e929e92e48cc4ef4c92fe1f",
+    "svg-filter-paint-diffuse.png": "19a972de036391d65e96fa00f885b11a6a4c9cb2252fee621c5dec38126a98b2",
+    "svg-filter-paint-displacement.png": "b2f38ca4538c465851160fb0fb7e1c97780135b06758bfa663d4e5470dc2056b",
+    "svg-filter-paint-distant.png": "8a613849245e32753d61eaae5d90e38a476f9f8f67640b01a4b3addd793acb98",
+    "svg-filter-paint-flood.png": "3499e9d81a2a73f4a6e95d1b58a2faab43c636d5497ea650719f3ba100a11e32",
+    "svg-filter-paint-funcA.png": "a7d14090f8933d836c0ff1ed7c13af65d0800720a941e694deda3d55cf87d278",
+    "svg-filter-paint-funcB.png": "4fac0dc1d71203350f2434135b67765c9dc0b8975ee43892a75928563d19fc62",
+    "svg-filter-paint-funcG.png": "8e4cf1363b872cc09a859ec12eaa2042c1738cbe832813f9e2b730073784ca94",
+    "svg-filter-paint-funcR.png": "afbaedc36e63c3765fd02e82bda5cf20df0cf1a660cc1186211b78176b19a7e3",
+    "svg-filter-paint-imageAspect.png": "f57e92b38e05da91d46a03a9e4b66dd6b6ae78cf3d26176cf4f6fad1c16b337b",
+    "svg-filter-paint-imageBlue.png": "398d88f06b7b8a1a04973e133dd20358f9ece5d11596c7b8696caf4964ef031e",
+    "svg-filter-paint-initial.png": "34aaa6a4f867dab64444f5321a2b1d34eb494bafb8129e04c2790e3ef10f61de",
+    "svg-filter-paint-matrix.png": "f861923010c477536f4348f315b7275c81d20de5d302eeb7ea1892007ba8a054",
+    "svg-filter-paint-merge.png": "bdd29953ed33f40390149af6f8dc915d157673adbb92a55d19ffabd5d8e8ceed",
+    "svg-filter-paint-morphDilate.png": "cebfe44b9362f3226d9f890e181f929acdbdfff80848e30d92bd15744c408b1c",
+    "svg-filter-paint-morphErode.png": "e11dd3ca4dc4b281e879b6d77037cfa2dd18c62d85553dd2559b823e1e65b60c",
+    "svg-filter-paint-offset.png": "9a875113011d346c8db2a3c6d6c64b4aef783edfc4251202863dedcf8db61d83",
+    "svg-filter-paint-point.png": "24055cb9916177bce1a0c90cdfba669be98ac82c84d6ae550a904fbb5be24a7e",
+    "svg-filter-paint-shadow.png": "6c4d9b1477ae03d38826a3ee236264bed695ed1213bd3d376f8b3a25501dbacd",
+    "svg-filter-paint-specularZero.png": "4fa98d054f1b8eca115da63e0e08f98f754f2ee0f4e7c3d15012daa58d8f4b8e",
+    "svg-filter-paint-spotCone.png": "ed7661d6c769edaba9fb0a0ad390e75285d5244f6c19938fef92c048059bb59d",
+    "svg-filter-paint-tile.png": "4501bc34b048bc8ed5d8ff49baf4a79f97bd4ace452c5704b7147e7512fe9d14",
+    "svg-filter-paint-turbSeed0.png": "4501bc34b048bc8ed5d8ff49baf4a79f97bd4ace452c5704b7147e7512fe9d14",
+    "svg-filter-paint-turbSeed7.png": "6699c3c5bc1abba0aedd04374af812b3f60e909f01c18f6f3005b29209f384b7",
+    "svg-filters.svg": "417e201a62124fc6fe1f0d11d69dac83957043ff905a2a29d1cc90214cf768da",
+    "svg_filters.py": "d92d12d86050f9edb5be2ddf56954ccf341c3ba223de21b8e361a75931e6c796",
+    "svg_paint_probe.py": "5b1298774d637ce06b7fda73495a703f4a9f682ba821320420290c87f2766da1"
+  },
+  "qualifications": [
+    "Inherited Native19 ABI27, no new allocation; final Native20 forward merge and coherent integrated proof pending",
+    "Private SVG4/5 objects include root-applied28/29; borrowed Native19 root object does not include Native20 patch27",
+    "Blur edgeMode is native-only in measured Chromium; native Source default None=3 and actual enum mutation/error proven",
+    "Specular constant zero produces transparent-over-white native output versus measured Chromium opaque black; both nonzero baseline spot/specular outputs blue",
+    "Convolve half-bias differs by one color quantization unit (native127/Chrome128)",
+    "Historical pre-fix probes after lease expiry explicitly disclosed; this final focused run uses fresh owned reservation",
+    "Shared consumer, platform, official and group acceptance remain pending"
+  ]
+}

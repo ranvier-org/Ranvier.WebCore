@@ -1,0 +1,37 @@
+{
+  "cause": "FreeType scales Ahem advances in 16.16 fixed point on Linux: each 20px glyph measures 1310719/65536 = 19.999984741210938, so three glyphs give 59.99995422363281 (60 - 3/65536). The font is loaded; the readiness loop already exited on its 0.001 window, then the exact == 60 check failed.",
+  "measured": {
+    "computedTextLength": 59.99995422363281,
+    "float32Hex": "f4ff6f42",
+    "perGlyphSubstringLength": 19.999984741210938,
+    "spacingAdjustGlyph1Left": 45.00000762939453,
+    "hitProbe": [
+      45,
+      95
+    ],
+    "linuxHit": -1,
+    "chromeOracleHit": 1
+  },
+  "fix": "advance(actual, glyphs, expected) allows glyphs * 2^-16 on Linux only, exact elsewhere; a hit probe within 3 * 2^-16 of a measured glyph edge on Linux is checked against the actual extents instead of the Chrome oracle. Windows and macOS keep exact equality and the exact oracle.",
+  "runs": {
+    "ci": "41016958045 linux-x64 and linux-arm64 RED at d5471ced",
+    "wslLinuxX64Red": "wsl-linux-x64-red.log (test at d5471ce)",
+    "wslLinuxX64Green": "wsl-linux-x64-green.log PASS 1594",
+    "winX64Green": "win-x64-green.log PASS 1594 (artifacts/svg-surfaces-candidate/runtime)"
+  },
+  "linuxRuntime": {
+    "package": "Ranvier.WebCore.Native.linux-x64.0.1.0-preview.19.nupkg",
+    "packageSha256": "3f9a39807270da4f7ca1dd7fd1b598818264f4c171ea6704f4d7417623cb37ac",
+    "libRanvierWebCoreHost.so": "49a2ebca849983146a981c75d4143c05ce724d1ab7a1305a71d8c67e151c0e34",
+    "source": "gh run download 41016958045 -n package-linux-x64-slim"
+  },
+  "files": {
+    "ci-41016958045-linux-arm64-red.log": "b92e551b7c5f84d27234a0fd341f325927f51ccedf4feac72afad135a1112978",
+    "ci-41016958045-linux-x64-red.log": "612992109f3a24f00a60bbef63ac855e1c06eda91aec0960f5b5e787e8bbfd25",
+    "red-svg_surfaces.py": "c242d45e9df2f87547bfbcc70dcffd4e6004b39b2cbf2f8ac19adbed6dd81914",
+    "win-x64-green.log": "a6a789808c3ce2d2fa7e543a1ff6758618f9260ba41e4e8a9b2b1aa47c031f77",
+    "wsl-linux-x64-green.log": "718991f45fad62dde8f651d007569104d6eafbc543a477f13087ea206d0b61aa",
+    "wsl-linux-x64-red.log": "92bc34e9ac3c1ca8952b4ce86298391c60d2ecdb9dd0a992e43cf810bfacc7ea",
+    "tests/abi/svg_surfaces.py (LF, as committed)": "55b205b6aed085a4578b9eb7bf5460a57824071b803bd8a627e1f1a95acaf4d4"
+  }
+}

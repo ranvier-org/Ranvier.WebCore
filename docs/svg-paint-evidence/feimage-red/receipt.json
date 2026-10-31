@@ -1,0 +1,18 @@
+{
+  "runtime": {
+    "RanvierWebCoreHost.dll": "8af39b22c57377305f405844f89ae4d44ba8ec255b5d3dc0ab4a78fcbfed13bc",
+    "WebCore.dll": "a4477901ca664b3c86a95d0a4bcb1ece6920fed2d1d6779d69b3ee5019da24c7",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+  },
+  "qualification": "unallocated235/2414 candidate includes0028Convolve privateSVG4, stillborrowsNative19root; Native20forwardmerge pending",
+  "files": {
+    "browser-pixels.json": "c9f10aacd8c2cdf9d146947135f001b5dd7a602e7ca747dfec195be714ef2f6e",
+    "feimage-authoredNone.png": "250bc200ac4c93f1168c13450d81600ab5dd055adea906780c6e65121b532007",
+    "feimage-initial.png": "923514e1e7e7694bed742b821380dbad84a2cb9884be98628282d035e78c4b8a",
+    "feimage-typedNone.png": "250bc200ac4c93f1168c13450d81600ab5dd055adea906780c6e65121b532007",
+    "svg-feimage-browser-oracle.json": "d69262dee99e267f4d66fb9b1bbbe016c97a5341439f040136656f1de584990d",
+    "svg-feimage-native-oracle.json": "94a579268923f412832d0b61ad9359a0d55fb1b9e2ea8cb3a5a6aeccd489b96f",
+    "svg-feimage-oracle.mjs": "ad9fedb1d621b59a905f1f40c69ecb3bb9420fd0423eed26a2d429bbe9f44610",
+    "svg-feimage-oracle.py": "45f99728369957c988dc9ffbd4a0f5f2db2d7ff8b8140f6c49fab45b9df4467a"
+  }
+}

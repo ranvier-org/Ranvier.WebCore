@@ -1,0 +1,4 @@
+interfaces 205, functions 2234 (getters 1131, setters 616, operations 450, constructors 22, namespace operations 3, static operations 10, iterator snapshots 1, context operations 1), handle types 50, constants 116, enumerations 8, dictionaries 22, stubs 0, left out 755
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+
+EXIT_CODE=0

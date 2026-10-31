@@ -1,0 +1,51 @@
+[
+  {
+    "phase": "initial",
+    "extensions": 0,
+    "language": 0,
+    "requiredExtensions": null,
+    "systemLanguage": null
+  },
+  {
+    "phase": "extensionList",
+    "extensions": 1,
+    "language": 0,
+    "requiredExtensions": "urn:unsupported-svg-extension",
+    "systemLanguage": null
+  },
+  {
+    "phase": "extensionAuthored",
+    "extensions": 1,
+    "language": 0,
+    "requiredExtensions": "urn:unsupported-svg-extension",
+    "systemLanguage": null
+  },
+  {
+    "phase": "extensionClear",
+    "extensions": 0,
+    "language": 0,
+    "requiredExtensions": null,
+    "systemLanguage": null
+  },
+  {
+    "phase": "languageList",
+    "extensions": 0,
+    "language": 1,
+    "requiredExtensions": null,
+    "systemLanguage": "zz"
+  },
+  {
+    "phase": "languageAuthored",
+    "extensions": 0,
+    "language": 1,
+    "requiredExtensions": null,
+    "systemLanguage": "zz"
+  },
+  {
+    "phase": "languageClear",
+    "extensions": 0,
+    "language": 0,
+    "requiredExtensions": null,
+    "systemLanguage": null
+  }
+]

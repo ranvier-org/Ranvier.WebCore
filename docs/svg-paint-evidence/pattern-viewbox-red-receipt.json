@@ -1,0 +1,21 @@
+{
+  "exitCode": 1,
+  "runtime": {
+    "RanvierWebCoreHost.dll": "5487cebeaa63ce19b8ed7ecffe60d498d2b56f92573d95e83430b8ea21d90acb",
+    "WebCore.dll": "681b7cafd108731b1c74ab1f55a61c3c58c232863753a69bf40409c65352edb1",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+  },
+  "qualification": "unallocated209interface/2249function paint candidate borrows Native19 ABI27",
+  "files": {
+    "pattern-authoredViewBox.png": "39dd8b295e96ab06d51464ae2db9db375477e8153758cde9a497f1da31a80164",
+    "pattern-translated.png": "48434998cf59ccaaf00396ab4c48d0dfa565d67a4c1f1b65619534e51b078e34",
+    "pattern-typedViewBox.png": "48434998cf59ccaaf00396ab4c48d0dfa565d67a4c1f1b65619534e51b078e34",
+    "pattern-viewbox-native-red.log": "ed32f94bb928f1e15b7910542a4912f9e2092469bcf3ff3f2dda8a0dc3fed9eb",
+    "pattern-viewbox-red-svg-paint-servers.svg": "6be6a8b340b8753dc0044a4d993020e89ff6bd2803f7063b891e484286b81ba4",
+    "pattern-viewbox-red-svg_paint_probe.py": "ebd5951ece251a425cf49aeeed9ee33f93acac778aeb5e2931a014e02db5d52e",
+    "pattern-viewbox-red-svg_paint_servers.py": "3ddd167c0de149e9b5799e7ed77b2b355719ff89d5d812d4689fa0e818f34507",
+    "svg-pattern-viewbox-oracle.json": "b140ffe7beabd5bcbb8a4c3229d5caa4e54371db5cd58e140151a15cd708ba2e",
+    "svg-pattern-viewbox-oracle.mjs": "193545ab62ddc44c02d22218f7203165395657958f497f5958f300e861413334",
+    "svg-pattern-viewbox-pixels.json": "eb7997c8a28ae22cca9ed05439db0d4277d14f86263c16bfb43adc08a90571f7"
+  }
+}

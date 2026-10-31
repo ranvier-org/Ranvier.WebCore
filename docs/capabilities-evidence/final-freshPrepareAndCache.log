@@ -1,0 +1,10 @@
+CMAKE=C:/Program Files (x86)/Microsoft Visual Studio/18/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe
+host installed into C:\Users\shaya\AppData\Local\Temp\tmp4syqjr9k\Tools\TestWebKitAPI
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.107s
+
+OK
+
+EXIT_CODE=0

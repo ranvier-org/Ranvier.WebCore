@@ -1,0 +1,82 @@
+{
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.8078.4 Safari/537.36",
+  "assertions": 82,
+  "records": [
+    {
+      "phase": "initial",
+      "assertions": 69
+    },
+    {
+      "phase": "linear50",
+      "assertions": 0
+    },
+    {
+      "phase": "gradientTranslate",
+      "assertions": 1
+    },
+    {
+      "phase": "spreadRepeat",
+      "assertions": 0
+    },
+    {
+      "phase": "gradientObjectUnits",
+      "assertions": 0
+    },
+    {
+      "phase": "missingGradient",
+      "assertions": 0
+    },
+    {
+      "phase": "radialMoved",
+      "assertions": 0
+    },
+    {
+      "phase": "radialFocal",
+      "assertions": 0
+    },
+    {
+      "phase": "stopGreen",
+      "assertions": 1
+    },
+    {
+      "phase": "stopOpacity",
+      "assertions": 0
+    },
+    {
+      "phase": "patternMoved",
+      "assertions": 0
+    },
+    {
+      "phase": "patternMovedY",
+      "assertions": 0
+    },
+    {
+      "phase": "patternTransform",
+      "assertions": 1
+    },
+    {
+      "phase": "patternViewBox",
+      "assertions": 1
+    },
+    {
+      "phase": "patternObjectUnits",
+      "assertions": 0
+    },
+    {
+      "phase": "patternContentUnits",
+      "assertions": 0
+    },
+    {
+      "phase": "patternTests",
+      "assertions": 6
+    },
+    {
+      "phase": "patternMissing",
+      "assertions": 1
+    }
+  ],
+  "retained": {
+    "before": 50,
+    "after": 88
+  }
+}

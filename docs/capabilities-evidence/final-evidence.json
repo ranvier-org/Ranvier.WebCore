@@ -1,0 +1,868 @@
+{
+  "status": "private-win-x64-producer-verified",
+  "nativeVersion": "0.1.0-preview.20",
+  "abiVersion": 28,
+  "sourceCheckpoint": "5237e49abd8975ff2c7f9f10f5ab284e62dced7c",
+  "productionBodyCheckpoint": "25715baf04449503182eb6b06bfc5bad11373ae4",
+  "integrationParent": "d5471ced80c72a32e39eba210f89312703a2161a",
+  "canonical": {
+    "interfaces": 205,
+    "functions": 2234,
+    "unchanged": true,
+    "retainedHostDeclarations": 182,
+    "additiveHostDeclarations": 7
+  },
+  "counts": {
+    "capabilityAssertions": 6332,
+    "selectorAssertions": 157,
+    "parentRawAssertions": 9049,
+    "parentRuns": 26,
+    "teardownCases": 42
+  },
+  "sourceHashes": {
+    "host/RanvierWebCoreAbi.cpp": "573813c5a75053b1df8885092ea8ecf6bdc99223b0acdee16d8c46deea6aedaf",
+    "host/RanvierWebCoreAbi.h": "63bdbcb9e58cb9c36e80372c5e2c958209c75a4896b2606a0a2426595ee4b100",
+    "host/RanvierWebCoreHost.cmake": "7810acb9cac27fb4d44bb69a065b208ae65febf53786c2a27d29e8e11e263392",
+    "host/RanvierCapabilities.inc": "26c6b4c9ece67d47e4334b5b685768718d510f45a953b44dd9d34e69b3fd6c40",
+    "host/RanvierCapabilityCatalogue.inc": "2cee8545abff481157dbf76d94fd0f8530e993281b00679475f875aeef33b25d",
+    "host/RanvierSvgViewGlue.cpp": "e97636302681a3834b6e9b5490f672fa5d3417f85593d4d943903ed048023cc9",
+    "host/RanvierSvgViewGlue.h": "29dee8efce1fb6e2d865f3e83e1c51f5703944251c7076a8d45cc4ff5315e0c2",
+    "config/common.cmake": "9878b0ffd7072037dc8a031e789fa502500d0c2aeb7682e84e0fabea79b066fe",
+    "scripts/build.py": "911b6b1aead4c951fdde2c186d9b775259a1c15600e51ddf0bda177b648df3ea",
+    "scripts/capability_catalogue.py": "2c168a25f8c3a8b5c8e2f6c8ce17b95b613be4e0893708e46ae416aa2339a57b",
+    "tests/abi/Native.fs": "12e6f1af62a99c74c370812805fb8732a69962363d2a104e1d8c59a30704395c",
+    "tests/abi/NativeDom.fs": "2e14abbe143aff1148385c1c2b93ed1adeb32b82e75ec701a06aae4d51f05973",
+    "tests/abi/Program.fs": "dac773fb5325275ea04e9d5ec95e1446eca9e82ffea76c2ca20727edc4f03b82",
+    "tests/abi/capabilities.py": "fbedeb0d3d2f3eec4d6a5de8c835f1e75c0d1e5b91f782022c7430203c8a3aed",
+    "tests/abi/svg_view_selection.py": "afba67967d4e549d5bf05a84821c9a760b79d65489ad4b652d373ab7658b2aba",
+    "tests/abi/svg_view_selection_browser.mjs": "74371236709eb31ddff6428f25afc74bca1de18c5dacc67d9d630c880b689b1d",
+    "tests/test_host_prepare.py": "3f954a24c7a9dcd66bddba1e2dc31ffe8baa6e93636ad76b9aeb7d58a2405c54",
+    "tests/fixtures/svg-view-selection.svg": "edbf228a9aca1e9423816dcd886c904ad8ad3ecf05815535fcc3869b9dd2b683",
+    "gen/dom-api.json": "8bf79fc95d67d1a05faf7ed7229f80ade8ee8abf18f8093b9d6d87630ffe9acd",
+    "gen/dom.json": "8d83d5feef4e95a5a36ed6e18cbba81fe3c6a5482b930f8169ac790d3c926251",
+    "gen/Ranvier.Dom.fs": "419e740286d121e8e3b25edcfd7b59cec5e22dd8eb768a4c59f7a2f3220a9c93",
+    "host/dom/RanvierDomGlue.cpp": "49238c8d900ce959c0e376270e7629607ba4de1b67ce41b0d7261a0827280417",
+    "host/dom/RanvierDomGlue.h": "68e85dd38dc2d8faa7f30bf811cf6ba7f7b13f6fcd15f6c8c0b0a9559ed4e3db",
+    "host/RanvierWebCoreDom.cpp": "cd9b9597c5826c62d6c83603529117bc41ab3a2a34c524edc7f3bc5567655510",
+    "host/RanvierWebCoreDom.h": "8ee2d9555c086e2e198ff6b0eaf8ce66976334cbb6eff800da9fc8d6166cad03",
+    "patches/series": "a68c0e086bdc65b91bc89e8e67f725fc892d5e8041c807115d25807d47e759d6",
+    "patches/0027-svg-view-reset-target.patch": "edb081e5545f12e7f1ed922984d9e4c84777ad59e25054d6692a5bc67e5c05f9",
+    ".github/workflows/build.yml": "75c9611074823dd43e18f871aae5fefa1f1183c01baf2d040ad64e0a1d8d9904",
+    "docs/H07-CAPABILITIES.md": "36c89913e19a0612cb7e61e4aaa468f45d7440a2e5d063b18e1297aca6111425"
+  },
+  "runtime": {
+    "sourceHead": "25715baf04449503182eb6b06bfc5bad11373ae4",
+    "nativeVersion": "0.1.0-preview.20",
+    "abiVersion": 28,
+    "parent": "d5471ced80c72a32e39eba210f89312703a2161a",
+    "platform": "private win-x64 slim",
+    "shippingFiles": [
+      {
+        "name": "brotlicommon.dll",
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtimes\\win-x64\\native\\brotlicommon.dll",
+        "bytes": 137728,
+        "sha256": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8"
+      },
+      {
+        "name": "brotlidec.dll",
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtimes\\win-x64\\native\\brotlidec.dll",
+        "bytes": 52224,
+        "sha256": "d42e2160f76f29a91f8be01b009b585c45496219794e16eab90b3599b6f70a7f"
+      },
+      {
+        "name": "harfbuzz-icu.dll",
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtimes\\win-x64\\native\\harfbuzz-icu.dll",
+        "bytes": 13824,
+        "sha256": "27662b477f7cb0c20cee64543a06296a48a00a17b6c7b57629bb166a30d5b164"
+      },
+      {
+        "name": "harfbuzz.dll",
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtimes\\win-x64\\native\\harfbuzz.dll",
+        "bytes": 1185280,
+        "sha256": "b519b2abc7f446ca45bff77aae1708f45afc9f557698bcd7295837cce0f12bfa"
+      },
+      {
+        "name": "icudt77.dll",
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtimes\\win-x64\\native\\icudt77.dll",
+        "bytes": 7195136,
+        "sha256": "b00d2fb856f548608c137e771257a70d0722654535c6c00b371c0fab3e2b802c"
+      },
+      {
+        "name": "icuin77.dll",
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtimes\\win-x64\\native\\icuin77.dll",
+        "bytes": 2997760,
+        "sha256": "e3785739e1fcf2e38053bbb85ef5f0f5dab63f865cbda762da5258566085a240"
+      },
+      {
+        "name": "icuuc77.dll",
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtimes\\win-x64\\native\\icuuc77.dll",
+        "bytes": 1834496,
+        "sha256": "189c623f996c41488c262867bae04a5bb33dd485bd423e0a8bec05c455a90902"
+      },
+      {
+        "name": "JavaScriptCore.dll",
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtimes\\win-x64\\native\\JavaScriptCore.dll",
+        "bytes": 15795712,
+        "sha256": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+      },
+      {
+        "name": "jpeg62.dll",
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtimes\\win-x64\\native\\jpeg62.dll",
+        "bytes": 718336,
+        "sha256": "394811c1b1bf1fd914248a145ba3fcad1f5f27c7009754ce08e48ccb0266b785"
+      },
+      {
+        "name": "libpng16.dll",
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtimes\\win-x64\\native\\libpng16.dll",
+        "bytes": 196096,
+        "sha256": "8b46592c5ea338dd6b23ca380d6db64a7849c2a534fc465a006ec668645d8185"
+      },
+      {
+        "name": "libsharpyuv.dll",
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtimes\\win-x64\\native\\libsharpyuv.dll",
+        "bytes": 24576,
+        "sha256": "df165de83480692f494c23061ef9c40c10abe19a89b1fa9fae2f1cd5152c07a7"
+      },
+      {
+        "name": "libwebp.dll",
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtimes\\win-x64\\native\\libwebp.dll",
+        "bytes": 381440,
+        "sha256": "550c5a4860f61d32a274fdd7b5c8cbe266eee28b3a3ca888195248ea1d5e0f71"
+      },
+      {
+        "name": "libwebpdemux.dll",
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtimes\\win-x64\\native\\libwebpdemux.dll",
+        "bytes": 19968,
+        "sha256": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163"
+      },
+      {
+        "name": "libwebpmux.dll",
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtimes\\win-x64\\native\\libwebpmux.dll",
+        "bytes": 41472,
+        "sha256": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29"
+      },
+      {
+        "name": "libxml2.dll",
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtimes\\win-x64\\native\\libxml2.dll",
+        "bytes": 1216000,
+        "sha256": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5"
+      },
+      {
+        "name": "RanvierWebCoreHost.dll",
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtimes\\win-x64\\native\\RanvierWebCoreHost.dll",
+        "bytes": 623104,
+        "sha256": "933d6a8b06fb561607d5f516ca453d64a7d6a251d37c94271a1408e25c7e5474"
+      },
+      {
+        "name": "WebCore.dll",
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtimes\\win-x64\\native\\WebCore.dll",
+        "bytes": 46610432,
+        "sha256": "4270d30971208ae1d5fc50dfb75010883a46ea0942b724cbd0f0381ce42704ed"
+      },
+      {
+        "name": "zlib1.dll",
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtimes\\win-x64\\native\\zlib1.dll",
+        "bytes": 333312,
+        "sha256": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93"
+      },
+      {
+        "name": "WebKit.resources/icons/missingImage.png",
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtimes\\win-x64\\native\\WebKit.resources\\icons\\missingImage.png",
+        "bytes": 449,
+        "sha256": "c13b9dcf2f6a41033e540d85de3d1e30054bd3b54c0b35229b5a77bd403a7229"
+      },
+      {
+        "name": "WebKit.resources/icons/missingImage@2x.png",
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtimes\\win-x64\\native\\WebKit.resources\\icons\\missingImage@2x.png",
+        "bytes": 755,
+        "sha256": "40b23dc2728d8499608654a4b89cfd5ad4bd04a09b5b27e4927004e167d41bf7"
+      },
+      {
+        "name": "WebKit.resources/icons/missingImage@3x.png",
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtimes\\win-x64\\native\\WebKit.resources\\icons\\missingImage@3x.png",
+        "bytes": 1172,
+        "sha256": "99e0c1a9d026c61ea3ed12a7ad14087b0ceeac04b08caba7ab648c0ae8be5ed4"
+      },
+      {
+        "name": "WebKit.resources/icons/panIcon.png",
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtimes\\win-x64\\native\\WebKit.resources\\icons\\panIcon.png",
+        "bytes": 140,
+        "sha256": "1f0018318f073a57aa89ae175bec415a2aef08404c72e535b8fefeb428590329"
+      },
+      {
+        "name": "WebKit.resources/icons/textAreaResizeCorner.png",
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtimes\\win-x64\\native\\WebKit.resources\\icons\\textAreaResizeCorner.png",
+        "bytes": 86,
+        "sha256": "16d9c626d3faf3907a10819493d53d43ab4a09a0eeafec92e1492afbb03c4c8b"
+      },
+      {
+        "name": "WebKit.resources/icons/textAreaResizeCorner@2x.png",
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtimes\\win-x64\\native\\WebKit.resources\\icons\\textAreaResizeCorner@2x.png",
+        "bytes": 167,
+        "sha256": "4557192b829da5e271abf02024cc0a7e1ae2153b79b98682a330bfa48c1e57bf"
+      }
+    ],
+    "sourceSnapshots": {
+      "tests/abi/Native.fs": {
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\source\\tests\\abi\\Native.fs",
+        "sha256": "12e6f1af62a99c74c370812805fb8732a69962363d2a104e1d8c59a30704395c"
+      },
+      "tests/abi/NativeDom.fs": {
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\source\\tests\\abi\\NativeDom.fs",
+        "sha256": "2e14abbe143aff1148385c1c2b93ed1adeb32b82e75ec701a06aae4d51f05973"
+      },
+      "host/RanvierWebCoreAbi.h": {
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\source\\host\\RanvierWebCoreAbi.h",
+        "sha256": "63bdbcb9e58cb9c36e80372c5e2c958209c75a4896b2606a0a2426595ee4b100"
+      },
+      "gen/dom-api.json": {
+        "path": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\source\\gen\\dom-api.json",
+        "sha256": "8bf79fc95d67d1a05faf7ed7229f80ade8ee8abf18f8093b9d6d87630ffe9acd"
+      }
+    },
+    "selector": "rv_host_select_svg_view(RvHost*, const char* fragment, int32_t* selected)",
+    "feature": "svg-view-selection",
+    "scope": "Current main SVG document; no URL/history/:target; error outputs untouched; empty/missing/malformed clears with actual selected=false.",
+    "patchSeriesLast": "0027-svg-view-reset-target.patch",
+    "paintPatch0028Included": false,
+    "canonicalDomChanged": false,
+    "focusedProof": {
+      "capabilityAssertions": 6332,
+      "selectorAssertions": 157,
+      "selectorLog": "C:\\wk\\native-capabilities\\artifacts\\h07\\svg-view-marker27-expiry.log",
+      "selectorMetrics": "C:\\wk\\native-capabilities\\artifacts\\h07\\svg-view-marker27-expiry.metrics.json"
+    },
+    "qualifications": [
+      "Native live active-view edit CTM/BCR/paint updates; Chromium156 retains selected snapshot until reselect",
+      "Full producer regression/official builds/packages pending"
+    ]
+  },
+  "runtimePerRunMethod": "Before and after every producer child, SHA256 of every frozen shipping file was calculated and asserted equal to the immutable24-file receipt. Managed driver runs also record exact executed-asset hashes.",
+  "compiledEngineScope": {
+    "lastPatch": "0027-svg-view-reset-target.patch",
+    "svgUnifiedObject": "UnifiedSource-svg-13.cpp",
+    "paintPatch0028Included": false
+  },
+  "qualifications": [
+    "Private Windows slim producer proof only; five-RID official pipeline and aggregate packages remain separate.",
+    "Image/font facts describe engine support queries, not successful arbitrary decode/render.",
+    "External policy/hardware/callback readiness remains unknown; host allowlist meanings are documented.",
+    "SVG selection is current main document only; no URL navigation/history/:target promise.",
+    "Pinned native active-view edits update applied CTM/BCR/pixels; Chromium156 keeps the selected view snapshot until reselect.",
+    "Earlier uniform-red pixel assertions could not distinguish transforms and are retained as fixture-assumption corrections.",
+    "SharedH07 managed22 JIT/NativeAOT/browser/package/repository integration is delivered separately."
+  ],
+  "proofFiles": {
+    "runtimeReceipt": {
+      "path": "docs/capabilities-evidence/final-runtimeReceipt.json",
+      "sha256": "9d01f3f96d452102a910a521474608a4e6192d7e6889e33dd3e979320e2827fe"
+    },
+    "privatePackages": {
+      "path": "docs/capabilities-evidence/final-privatePackages.json",
+      "sha256": "58d654e9c91e0597784d7b959c6d20fa791efe4007eada78a905e21ecaccf751"
+    },
+    "capabilities": {
+      "path": "docs/capabilities-evidence/final-capabilities.log",
+      "sha256": "7698317a948dd3cb4bfdc0792a22d394c5a6601e7b2880a050749cbb75b694b1"
+    },
+    "selector": {
+      "path": "docs/capabilities-evidence/final-selector.log",
+      "sha256": "84434f3290882472713ae59f9a542a2ac276b9d2b75089f40539f9e84899da7a"
+    },
+    "selectorMetrics": {
+      "path": "docs/capabilities-evidence/final-selectorMetrics.json",
+      "sha256": "21acc4e07b6d5d2f948a3228d4ed5d35f4105c2ed6d83c919ffb78996c90a444"
+    },
+    "browserOracle": {
+      "path": "docs/capabilities-evidence/final-browserOracle.json",
+      "sha256": "2874c8f61637a7fd79d1f3d94cfca3f4633a5c9fb7b54eebfd82b02e1b044abb"
+    },
+    "hostInteropParity": {
+      "path": "docs/capabilities-evidence/final-hostInteropParity.json",
+      "sha256": "1284ec7e805e487ccf59bcb545f95b9a498eca79e49da65561d11199f528cad5"
+    },
+    "missingFeatureRed": {
+      "path": "docs/capabilities-evidence/final-missingFeatureRed.log",
+      "sha256": "2a74d445ddb9083bce98608ab6851bf907b166a3d0f84cdfb435853659749989"
+    },
+    "linkerRed": {
+      "path": "docs/capabilities-evidence/final-linkerRed.log",
+      "sha256": "19628b9614091bc82d2997cfeb14f1148e2b7baa5a2e3262943dbe9b0d982ab6"
+    },
+    "clearFormerEditRed": {
+      "path": "docs/capabilities-evidence/final-clearFormerEditRed.log",
+      "sha256": "638a72c31063cc1c1441f5186179019f49bb2c82c5780bfcfb001c4189303f27"
+    },
+    "uniformPaintAssumption": {
+      "path": "docs/capabilities-evidence/final-uniformPaintAssumption.log",
+      "sha256": "3cadc73991100ab9b9596bb522147906637437e2b1809da4efc7f58161258b69"
+    },
+    "freshPrepareAndCache": {
+      "path": "docs/capabilities-evidence/final-freshPrepareAndCache.log",
+      "sha256": "7fc1741dbbaea4157cf44240685e6fdf95dc7ed1196997a735a5631b6b38ba4c"
+    },
+    "nativeFcs": {
+      "path": "docs/capabilities-evidence/final-nativeFcs.json",
+      "sha256": "d67751416baaffafc6bf03594a57482ad995f293bd32b4dfab26dfd76bdc0ab1"
+    },
+    "driverFcs": {
+      "path": "docs/capabilities-evidence/final-driverFcs.json",
+      "sha256": "8c559dff76d3fabee9df78a9477acbbe4a1bbbddb125a726a05737f3ed187a00"
+    }
+  },
+  "parentRegressions": [
+    {
+      "name": "css_supports",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-css_supports.log",
+        "sha256": "05fd7ee5d224db2bdda49560178074bf6224c29dfed768643c846465a3ab3934"
+      },
+      "logSha256": "05fd7ee5d224db2bdda49560178074bf6224c29dfed768643c846465a3ab3934",
+      "executedAssets": {},
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json",
+      "assertions": 72
+    },
+    {
+      "name": "computed_style",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-computed_style.log",
+        "sha256": "70ebb4d87e4cd0001182e37a9082c86ea0337184fdf093a1af5135b7f903c4a7"
+      },
+      "logSha256": "70ebb4d87e4cd0001182e37a9082c86ea0337184fdf093a1af5135b7f903c4a7",
+      "executedAssets": {},
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json",
+      "assertions": 93
+    },
+    {
+      "name": "fragment_rectangles",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-fragment_rectangles.log",
+        "sha256": "57a9638643ef3082abeb95f7b9f252efe211cab6677aca91510c564b52b97d40"
+      },
+      "logSha256": "57a9638643ef3082abeb95f7b9f252efe211cab6677aca91510c564b52b97d40",
+      "executedAssets": {},
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json",
+      "assertions": 140
+    },
+    {
+      "name": "table_surface",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-table_surface.log",
+        "sha256": "8bae3582a7fb2f662138794d8f64ab15bda8da5b98a4d71e7afab8e74c70b312"
+      },
+      "logSha256": "8bae3582a7fb2f662138794d8f64ab15bda8da5b98a4d71e7afab8e74c70b312",
+      "executedAssets": {},
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json",
+      "assertions": 44
+    },
+    {
+      "name": "element_reflection",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-element_reflection.log",
+        "sha256": "58175ae7a9e94642aaa3480e343152e27b64eac99c977e48f6c6ec7963e93bd4"
+      },
+      "logSha256": "58175ae7a9e94642aaa3480e343152e27b64eac99c977e48f6c6ec7963e93bd4",
+      "executedAssets": {},
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json",
+      "assertions": 269
+    },
+    {
+      "name": "area_surface",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-area_surface.log",
+        "sha256": "968d2113dff8c257fdbe03256fa57d16913f6043213f4b0af43d768c0b17d49a"
+      },
+      "logSha256": "968d2113dff8c257fdbe03256fa57d16913f6043213f4b0af43d768c0b17d49a",
+      "executedAssets": {},
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json",
+      "assertions": 117
+    },
+    {
+      "name": "cssom_surface",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-cssom_surface.log",
+        "sha256": "6fedf047a7e46989b2d1590a07e9b8e42c6399a07c0bb7fb1ddf72f7c7bda910"
+      },
+      "logSha256": "6fedf047a7e46989b2d1590a07e9b8e42c6399a07c0bb7fb1ddf72f7c7bda910",
+      "executedAssets": {},
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json",
+      "assertions": 407
+    },
+    {
+      "name": "keyframe_rules",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-keyframe_rules.log",
+        "sha256": "f6bee323788d263ad2cbf2f40d7e14126ae0953bf2756be2b5bb445abb427733"
+      },
+      "logSha256": "f6bee323788d263ad2cbf2f40d7e14126ae0953bf2756be2b5bb445abb427733",
+      "executedAssets": {},
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json",
+      "assertions": 93
+    },
+    {
+      "name": "counter_style_rules",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-counter_style_rules.log",
+        "sha256": "b2bc8e2d39c7a86523d540ceb732205aadfb4f3fef3d88f51f0c57ec6ab26584"
+      },
+      "logSha256": "b2bc8e2d39c7a86523d540ceb732205aadfb4f3fef3d88f51f0c57ec6ab26584",
+      "executedAssets": {},
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json",
+      "assertions": 86
+    },
+    {
+      "name": "detached_cssom_context",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-detached_cssom_context.log",
+        "sha256": "848ae3d09d5a9e63440a50d7af89f95236d133df48399209146c792944017c0d"
+      },
+      "logSha256": "848ae3d09d5a9e63440a50d7af89f95236d133df48399209146c792944017c0d",
+      "executedAssets": {},
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json",
+      "assertions": 389
+    },
+    {
+      "name": "svg_mathml_surface",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-svg_mathml_surface.log",
+        "sha256": "6221d6c18fff05c9aa0010b9b3c6edc3a4752fa82b16782d2182769e16c7e036"
+      },
+      "logSha256": "6221d6c18fff05c9aa0010b9b3c6edc3a4752fa82b16782d2182769e16c7e036",
+      "executedAssets": {},
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json",
+      "assertions": 95
+    },
+    {
+      "name": "style_property_maps",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-style_property_maps.log",
+        "sha256": "93d43c1f4e7a811536d7dae8186ad03f818049107c5a612eeb1767a257f8faa6"
+      },
+      "logSha256": "93d43c1f4e7a811536d7dae8186ad03f818049107c5a612eeb1767a257f8faa6",
+      "executedAssets": {},
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json",
+      "assertions": 189
+    },
+    {
+      "name": "declared_style_maps",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-declared_style_maps.log",
+        "sha256": "17c73785458969864abeae85d5f935572174e29b1eecff1a771fa90978c23b7b"
+      },
+      "logSha256": "17c73785458969864abeae85d5f935572174e29b1eecff1a771fa90978c23b7b",
+      "executedAssets": {},
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json",
+      "assertions": 2069
+    },
+    {
+      "name": "style_map_entries",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-style_map_entries.log",
+        "sha256": "a301369b66f47a650587c8bb2ac3011aa9be133a4675428c8d8d96dc271c343d"
+      },
+      "logSha256": "a301369b66f47a650587c8bb2ac3011aa9be133a4675428c8d8d96dc271c343d",
+      "executedAssets": {},
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json",
+      "assertions": 144
+    },
+    {
+      "name": "typed_style_values",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-typed_style_values.log",
+        "sha256": "4e691d16e784408ffec8a6f48c76916dab3c05c1053eeb73ae1e70c51e3718d1"
+      },
+      "logSha256": "4e691d16e784408ffec8a6f48c76916dab3c05c1053eeb73ae1e70c51e3718d1",
+      "executedAssets": {},
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json",
+      "assertions": 190
+    },
+    {
+      "name": "custom_properties",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-custom_properties.log",
+        "sha256": "96880645c1fc2da5221bba93ca4b419fc04154cdc2e74a40837edfa45cebbe72"
+      },
+      "logSha256": "96880645c1fc2da5221bba93ca4b419fc04154cdc2e74a40837edfa45cebbe72",
+      "executedAssets": {},
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json",
+      "assertions": 231
+    },
+    {
+      "name": "geometry_values",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-geometry_values.log",
+        "sha256": "29be327c4ca69a4a3daa3125018c3fd6bf49b541073fb1200180fb70117e8ad5"
+      },
+      "logSha256": "29be327c4ca69a4a3daa3125018c3fd6bf49b541073fb1200180fb70117e8ad5",
+      "executedAssets": {},
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json",
+      "assertions": 260
+    },
+    {
+      "name": "matrix_values",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-matrix_values.log",
+        "sha256": "072aefb0eecf088e70d410235077a7bc5efeeffa1d27a5af9dc62145229d150e"
+      },
+      "logSha256": "072aefb0eecf088e70d410235077a7bc5efeeffa1d27a5af9dc62145229d150e",
+      "executedAssets": {},
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json",
+      "assertions": 1091
+    },
+    {
+      "name": "css_transforms",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-css_transforms.log",
+        "sha256": "5890f78ca29b51c5d29d09139f3d93d92de5346d724bdd72119c2d52b6a278ba"
+      },
+      "logSha256": "5890f78ca29b51c5d29d09139f3d93d92de5346d724bdd72119c2d52b6a278ba",
+      "executedAssets": {},
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json",
+      "assertions": 405
+    },
+    {
+      "name": "svg_geometry",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-svg_geometry.log",
+        "sha256": "2fe8049b46ffce2bd4b349dfdd7066caeda689ee3ec0dcdb9f86861c58ed76cb"
+      },
+      "logSha256": "2fe8049b46ffce2bd4b349dfdd7066caeda689ee3ec0dcdb9f86861c58ed76cb",
+      "executedAssets": {},
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json",
+      "assertions": 639
+    },
+    {
+      "name": "svg_surfaces",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-svg_surfaces.log",
+        "sha256": "c46bca24585fe6a42b8ca3b08267904c6807d5b52c46ba7f8f8ac33107e9626f"
+      },
+      "logSha256": "c46bca24585fe6a42b8ca3b08267904c6807d5b52c46ba7f8f8ac33107e9626f",
+      "executedAssets": {},
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json",
+      "assertions": 1560
+    },
+    {
+      "name": "svg_documents",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-svg_documents.log",
+        "sha256": "70715fb4da194d2073a68d432087ae0b316e1b35fcd23c300fe24b150ecfa702"
+      },
+      "logSha256": "70715fb4da194d2073a68d432087ae0b316e1b35fcd23c300fe24b150ecfa702",
+      "executedAssets": {},
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json",
+      "assertions": 78
+    },
+    {
+      "name": "svg_view_controls",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-svg_view_controls.log",
+        "sha256": "2dbdea20c9425e470f860ad8f303fbc8053ce0674e59f96ac24b28853324f6ca"
+      },
+      "logSha256": "2dbdea20c9425e470f860ad8f303fbc8053ce0674e59f96ac24b28853324f6ca",
+      "executedAssets": {},
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json",
+      "assertions": 318
+    },
+    {
+      "name": "svg_animation_variants",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-svg_animation_variants.log",
+        "sha256": "f1bfd6a2fac87ec95676243aaa313b97d3d9ecdbfbbeb172885a8d6eeb76daaf"
+      },
+      "logSha256": "f1bfd6a2fac87ec95676243aaa313b97d3d9ecdbfbbeb172885a8d6eeb76daaf",
+      "executedAssets": {},
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json",
+      "assertions": 70
+    },
+    {
+      "name": "frames",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-frames.log",
+        "sha256": "56b429c1d3555f4d30594185317b23729262498580f368aa65a1ac43cc28eaf6"
+      },
+      "logSha256": "56b429c1d3555f4d30594185317b23729262498580f368aa65a1ac43cc28eaf6",
+      "executedAssets": {
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\brotlidec.dll": "d42e2160f76f29a91f8be01b009b585c45496219794e16eab90b3599b6f70a7f",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\FSharp.Core.dll": "ee7306b40cb17e9029f585150d9315eeb25a8affd3faa502c5a3afcd7323fa29",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\harfbuzz-icu.dll": "27662b477f7cb0c20cee64543a06296a48a00a17b6c7b57629bb166a30d5b164",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\harfbuzz.dll": "b519b2abc7f446ca45bff77aae1708f45afc9f557698bcd7295837cce0f12bfa",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\icudt77.dll": "b00d2fb856f548608c137e771257a70d0722654535c6c00b371c0fab3e2b802c",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\icuin77.dll": "e3785739e1fcf2e38053bbb85ef5f0f5dab63f865cbda762da5258566085a240",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\icuuc77.dll": "189c623f996c41488c262867bae04a5bb33dd485bd423e0a8bec05c455a90902",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\jpeg62.dll": "394811c1b1bf1fd914248a145ba3fcad1f5f27c7009754ce08e48ccb0266b785",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\libpng16.dll": "8b46592c5ea338dd6b23ca380d6db64a7849c2a534fc465a006ec668645d8185",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\libsharpyuv.dll": "df165de83480692f494c23061ef9c40c10abe19a89b1fa9fae2f1cd5152c07a7",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\libwebp.dll": "550c5a4860f61d32a274fdd7b5c8cbe266eee28b3a3ca888195248ea1d5e0f71",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\libwebpdemux.dll": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\RanvierWebCoreAbi.Driver.deps.json": "1b2da1874f8d9b4ea635288e1377669d23fbc90bf0e787c6dee97eee1a9d80da",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\RanvierWebCoreAbi.Driver.dll": "f2df90a037fd329f4b12adf552221e7abb429a6784396cea88f37c5ec2aaab6e",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\RanvierWebCoreAbi.Driver.exe": "5c8122016dc752d1c1c59f11097e89e573019c0779f593e108678d4e29574497",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\RanvierWebCoreAbi.Driver.runtimeconfig.json": "2ca90a18bac3b48286c20acd3c1ae4f83fa38de5acf4b2f8cdd277bf90dc9bd7",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\RanvierWebCoreHost.dll": "933d6a8b06fb561607d5f516ca453d64a7d6a251d37c94271a1408e25c7e5474",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\WebCore.dll": "4270d30971208ae1d5fc50dfb75010883a46ea0942b724cbd0f0381ce42704ed",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\zlib1.dll": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\cs\\FSharp.Core.resources.dll": "d60fd53c1cea9881c27c5bf2cbd231df14102a44f67a619aef35bf57176a0803",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\de\\FSharp.Core.resources.dll": "6e6b1dbc98b06451bc0bc2673645a7929e9f105f306b7b8051e810ff9a7e60a0",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\es\\FSharp.Core.resources.dll": "c9bd49064f294616dc522bcef4046285ba64cb0be9a437a698d2a4b0f351a9e7",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\fr\\FSharp.Core.resources.dll": "769595b2af6d5feee6d40fe3321b55594cbe37306f6243811d2f285ec5804972",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\it\\FSharp.Core.resources.dll": "de7d66263fea31dcb048daaaa9c4549073373ea2c103afa7321b6ce2e4678406",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\ja\\FSharp.Core.resources.dll": "59429ddee0f65cce4c9af9cd92863905471076a5553ddb3c983e6fc4bb8aad48",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\ko\\FSharp.Core.resources.dll": "3347fe51d2e88e96bdc7b6dc400b5f98d41991e08603e87facc39e9765a06129",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\pl\\FSharp.Core.resources.dll": "92c3fd960167d6646c626a935e2e10489961db48d383a943520cbecde1fe9827",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\pt-BR\\FSharp.Core.resources.dll": "03a2ed48e3f093b96641f9bfac1da98b4e30e17fcca661fcb0cc58b1eb904da4",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\ru\\FSharp.Core.resources.dll": "ac6002f1c9ec3d2c5bda13fea14cc9611354ac86a9a51330b2ce97cdffd177ce",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\tr\\FSharp.Core.resources.dll": "4c939f5cd182dbaf17662cd6fae054a7ff60561a308a2cce50a876cec73896d4",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\zh-Hans\\FSharp.Core.resources.dll": "4441e2945dcccbb12a12381d84a17b9cc7a28b63cf54059f77efe774b4d50e49",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\zh-Hant\\FSharp.Core.resources.dll": "c2716349d7309a76e208205c24ee893e59fc6b23b6e4547098a554b77d099212"
+      },
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json"
+    },
+    {
+      "name": "teardown",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/parent-teardown.log",
+        "sha256": "2ab35ca3a3e4ff67146f55bebd25f115424c51dbea2b71b8c7e126f53d826aaa"
+      },
+      "logSha256": "2ab35ca3a3e4ff67146f55bebd25f115424c51dbea2b71b8c7e126f53d826aaa",
+      "executedAssets": {
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\brotlidec.dll": "d42e2160f76f29a91f8be01b009b585c45496219794e16eab90b3599b6f70a7f",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\FSharp.Core.dll": "ee7306b40cb17e9029f585150d9315eeb25a8affd3faa502c5a3afcd7323fa29",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\harfbuzz-icu.dll": "27662b477f7cb0c20cee64543a06296a48a00a17b6c7b57629bb166a30d5b164",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\harfbuzz.dll": "b519b2abc7f446ca45bff77aae1708f45afc9f557698bcd7295837cce0f12bfa",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\icudt77.dll": "b00d2fb856f548608c137e771257a70d0722654535c6c00b371c0fab3e2b802c",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\icuin77.dll": "e3785739e1fcf2e38053bbb85ef5f0f5dab63f865cbda762da5258566085a240",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\icuuc77.dll": "189c623f996c41488c262867bae04a5bb33dd485bd423e0a8bec05c455a90902",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\jpeg62.dll": "394811c1b1bf1fd914248a145ba3fcad1f5f27c7009754ce08e48ccb0266b785",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\libpng16.dll": "8b46592c5ea338dd6b23ca380d6db64a7849c2a534fc465a006ec668645d8185",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\libsharpyuv.dll": "df165de83480692f494c23061ef9c40c10abe19a89b1fa9fae2f1cd5152c07a7",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\libwebp.dll": "550c5a4860f61d32a274fdd7b5c8cbe266eee28b3a3ca888195248ea1d5e0f71",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\libwebpdemux.dll": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\RanvierWebCoreAbi.Driver.deps.json": "1b2da1874f8d9b4ea635288e1377669d23fbc90bf0e787c6dee97eee1a9d80da",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\RanvierWebCoreAbi.Driver.dll": "f2df90a037fd329f4b12adf552221e7abb429a6784396cea88f37c5ec2aaab6e",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\RanvierWebCoreAbi.Driver.exe": "5c8122016dc752d1c1c59f11097e89e573019c0779f593e108678d4e29574497",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\RanvierWebCoreAbi.Driver.runtimeconfig.json": "2ca90a18bac3b48286c20acd3c1ae4f83fa38de5acf4b2f8cdd277bf90dc9bd7",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\RanvierWebCoreHost.dll": "933d6a8b06fb561607d5f516ca453d64a7d6a251d37c94271a1408e25c7e5474",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\WebCore.dll": "4270d30971208ae1d5fc50dfb75010883a46ea0942b724cbd0f0381ce42704ed",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\zlib1.dll": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\cs\\FSharp.Core.resources.dll": "d60fd53c1cea9881c27c5bf2cbd231df14102a44f67a619aef35bf57176a0803",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\de\\FSharp.Core.resources.dll": "6e6b1dbc98b06451bc0bc2673645a7929e9f105f306b7b8051e810ff9a7e60a0",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\es\\FSharp.Core.resources.dll": "c9bd49064f294616dc522bcef4046285ba64cb0be9a437a698d2a4b0f351a9e7",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\fr\\FSharp.Core.resources.dll": "769595b2af6d5feee6d40fe3321b55594cbe37306f6243811d2f285ec5804972",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\it\\FSharp.Core.resources.dll": "de7d66263fea31dcb048daaaa9c4549073373ea2c103afa7321b6ce2e4678406",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\ja\\FSharp.Core.resources.dll": "59429ddee0f65cce4c9af9cd92863905471076a5553ddb3c983e6fc4bb8aad48",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\ko\\FSharp.Core.resources.dll": "3347fe51d2e88e96bdc7b6dc400b5f98d41991e08603e87facc39e9765a06129",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\pl\\FSharp.Core.resources.dll": "92c3fd960167d6646c626a935e2e10489961db48d383a943520cbecde1fe9827",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\pt-BR\\FSharp.Core.resources.dll": "03a2ed48e3f093b96641f9bfac1da98b4e30e17fcca661fcb0cc58b1eb904da4",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\ru\\FSharp.Core.resources.dll": "ac6002f1c9ec3d2c5bda13fea14cc9611354ac86a9a51330b2ce97cdffd177ce",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\tr\\FSharp.Core.resources.dll": "4c939f5cd182dbaf17662cd6fae054a7ff60561a308a2cce50a876cec73896d4",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\zh-Hans\\FSharp.Core.resources.dll": "4441e2945dcccbb12a12381d84a17b9cc7a28b63cf54059f77efe774b4d50e49",
+        "C:\\wk\\native-capabilities\\artifacts\\h07\\abi-driver\\zh-Hant\\FSharp.Core.resources.dll": "c2716349d7309a76e208205c24ee893e59fc6b23b6e4547098a554b77d099212"
+      },
+      "runtimeReceipt": "C:\\wk\\native-capabilities\\artifacts\\h07\\native20-frozen\\runtime-receipt.json"
+    }
+  ],
+  "repositoryGates": [
+    {
+      "name": "package-contract",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/gate-package-contract.log",
+        "sha256": "7a549d9de132a75892195f1fd7950e81d4403c65eb0ed87697acbe0045d276af"
+      }
+    },
+    {
+      "name": "release-contract",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/gate-release-contract.log",
+        "sha256": "75cdaa5eb51f9bee810a8a815e502bff5dd6fb1c6b24ab2c6ec60c6903e5a853"
+      }
+    },
+    {
+      "name": "publish-gate",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/gate-publish-gate.log",
+        "sha256": "d6854c28b7a12c0c53177fe738200b28c78f00091d987052c20067ee2093f3fd"
+      }
+    },
+    {
+      "name": "resource-layout",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/gate-resource-layout.log",
+        "sha256": "bc54a10f8b5af626008c992162e6c615a625d3730dc960da8e813824d143b536"
+      }
+    },
+    {
+      "name": "host-prepare",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/gate-host-prepare.log",
+        "sha256": "53aa515be8f8a25784a0ea46d71973e345a81c87174c2198ab50da8efed6c52e"
+      }
+    },
+    {
+      "name": "generator",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/gate-generator.log",
+        "sha256": "e9e770c519ae2fa49750e04b8002d181948d56a24991973bccebb4289dd34777"
+      }
+    },
+    {
+      "name": "catalogue",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/gate-catalogue.log",
+        "sha256": "1b08159f76a4cb8be9222c40b863dde8cac3f46201b7745f0d6e4fdf433649b6"
+      }
+    },
+    {
+      "name": "interop-parity",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/gate-interop-parity.log",
+        "sha256": "3fe9d4df62bce519223d77aa1e96e13cc91975f6c4007d4847b352a5a85d84ed"
+      }
+    },
+    {
+      "name": "canonical-dom",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/gate-canonical-dom.log",
+        "sha256": "54afb33d574e7d633336ac308a7a52d36a93d398d4e2abb01788b8f6d59a4b22"
+      }
+    },
+    {
+      "name": "patch-chain",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/capabilities-evidence/gate-patch-chain.log",
+        "sha256": "0bbee66d3c41bdfe7617988f340d86433d3f0e9dd0c2c2c9c462dc8afde7ce6b"
+      }
+    }
+  ],
+  "frozenRuntimeReceiptPhase": "The immutable nested runtime receipt was captured at focused handoff. Its pending full-batch qualification is historical; the final parentRegressions/repositoryGates below supersede it.",
+  "compileAndRunProvenance": [
+    {
+      "path": "docs/capabilities-evidence/commands/host-link.rsp",
+      "sha256": "7e9b5c9832a21245e883195b99965bc64096f65d1ddb045c8e456b626c9468d8"
+    },
+    {
+      "path": "docs/capabilities-evidence/commands/RanvierWebCoreAbi.cpp.rsp",
+      "sha256": "de4f812ed2d14d7c8ffaa9cde2c80d8dbfdaabacd41c2933fae8c248eb6e2b34"
+    },
+    {
+      "path": "docs/capabilities-evidence/commands/RanvierWebCoreD3D11.cpp.rsp",
+      "sha256": "0ffb6b7724c34165d8ef6c8962ee11ee44c9cba9914e36d1b2a7e2d5c543cc79"
+    },
+    {
+      "path": "docs/capabilities-evidence/commands/RanvierWebCoreDom.cpp.rsp",
+      "sha256": "3b3bbf90b0424725ef90e4f4a7057942f95c4f214daf3aa81799ffe6cd04c69f"
+    },
+    {
+      "path": "docs/capabilities-evidence/commands/RanvierWebCoreUia.cpp.rsp",
+      "sha256": "bacb88a1ffb59689be654ca0e1a840b6df84549225bfb0eb31dcb5e51282076a"
+    },
+    {
+      "path": "docs/capabilities-evidence/commands/svg-view-helper.rsp",
+      "sha256": "3e16df41e12d1c0462a1518ab5e1aa0e1c3a9e9abee0d8d193d1101c202b6bb6"
+    },
+    {
+      "path": "docs/capabilities-evidence/commands/svg-view-reset-engine.rsp",
+      "sha256": "2447d9961e1cfc7ad4f16e4960ac87d434a22eb10760ea75ab5e292e16e92781"
+    },
+    {
+      "path": "docs/capabilities-evidence/commands/webcore-link-svg-view-helper.rsp",
+      "sha256": "b3dddca5b7cb9d0b57df20955acc2c92950aa9867d19ee0e6ae99e8922204552"
+    },
+    {
+      "path": "docs/capabilities-evidence/compile/configured-flags.json",
+      "sha256": "0530cf6b7b40da54683fdb11f2d48efc1a95542630ccfd08bb3f8c1d81b85452"
+    },
+    {
+      "path": "docs/capabilities-evidence/compile/host-link.log",
+      "sha256": "7733b6142e2f93dec6fe6ef649de3cfb5cbee292381f1f844e33ef19e6b91f81"
+    },
+    {
+      "path": "docs/capabilities-evidence/compile/RanvierWebCoreAbi.cpp.log",
+      "sha256": "d118698870487f418bc6a7afcb29a9ee6d4fb0ca865c6430a15ca6aa95a7ace2"
+    },
+    {
+      "path": "docs/capabilities-evidence/compile/RanvierWebCoreD3D11.cpp.log",
+      "sha256": "f94b80eb41e0bb9e85bd6d320caabdad06bea1eed689a147344478eaf2d856c6"
+    },
+    {
+      "path": "docs/capabilities-evidence/compile/RanvierWebCoreDom.cpp.log",
+      "sha256": "76c624fd2e49cf28f7931b3111ca5bc4faca0eb870bf35b0fc7b52cc8966f092"
+    },
+    {
+      "path": "docs/capabilities-evidence/compile/RanvierWebCoreUia.cpp.log",
+      "sha256": "b52b5e0c515823e2026a1e1665ff20871fe2316f57d2fa63edfc684769e6759c"
+    },
+    {
+      "path": "docs/capabilities-evidence/compile/runtime-sha256.json",
+      "sha256": "9eed9b7ed9d0fac5c15b36e43ce3eb32bf064af7231f228bfd2335f8ddd5450f"
+    },
+    {
+      "path": "docs/capabilities-evidence/compile/svg-view-helper.log",
+      "sha256": "6bcb686d1ff162dc9308cd6e13209d478e8d5a62129200a484cd164402d2edee"
+    },
+    {
+      "path": "docs/capabilities-evidence/compile/svg-view-reset-engine.log",
+      "sha256": "a8f02431943fcec298f09a3a33792bc0ea6522da144efa7dc9283ac9ecbea0d1"
+    },
+    {
+      "path": "docs/capabilities-evidence/compile/webcore-link-svg-view-helper.log",
+      "sha256": "7733b6142e2f93dec6fe6ef649de3cfb5cbee292381f1f844e33ef19e6b91f81"
+    },
+    {
+      "path": "docs/capabilities-evidence/reproduce-build-private.py",
+      "sha256": "7ed893b0726236e57e8e3c9fcd18cf1aec6a3f7604798d7001bc6d4f6a1e4cd2"
+    },
+    {
+      "path": "docs/capabilities-evidence/reproduce-run-producer-regression.py",
+      "sha256": "3c370bf8a662060261e7563a96f102dfce64cc01ed34b123c07e42c3a544431d"
+    },
+    {
+      "path": "docs/capabilities-evidence/reproduce-svg-export-link-probe.py",
+      "sha256": "40990618a17738b102ecd25ed269c6f986152417055bd47f542db9a056cf40f2"
+    }
+  ]
+}

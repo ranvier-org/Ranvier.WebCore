@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300" id="root">
+<title id="title">Resources</title>
+<desc id="desc">S11 reuse, content and resource fixture</desc>
+<metadata id="metadata"><item xmlns="urn:ranvier:fixture">m</item></metadata>
+<style id="style" type="text/css" media="all" title="paint">#styled{fill:blue}</style>
+<defs id="defs">
+<symbol id="symbol" viewBox="0 0 10 10" preserveAspectRatio="none"><rect width="10" height="10" fill="red"/></symbol>
+<rect id="green" width="20" height="20" fill="lime"/>
+<rect id="blueTarget" width="20" height="20" fill="blue"/>
+</defs>
+<use id="useSymbol" href="#symbol" x="0" y="0" width="40" height="40"/>
+<use id="useRect" href="#green" x="50" y="0"/>
+<g id="group"><rect id="styled" x="100" y="0" width="20" height="20" fill="black"/></g>
+<switch id="switch"><rect id="langRect" systemLanguage="xx" x="150" y="0" width="20" height="20" fill="red"/><rect id="fallback" x="150" y="0" width="20" height="20" fill="lime"/></switch>
+<foreignObject id="foreign" x="200" y="0" width="40" height="40"><div xmlns="http://www.w3.org/1999/xhtml" id="html" style="width:40px;height:20px;background:blue"></div></foreignObject>
+<a id="link" href="https://fixture.test/next" target="_blank" hreflang="en" rel="noopener next" type="text/html"><rect x="250" y="0" width="20" height="20" fill="lime"/></a>
+<image id="image" href="https://fixture.test/blue.png" x="0" y="100" width="40" height="20" preserveAspectRatio="none"/>
+<script id="script" type="text/ecmascript">document.documentElement.setAttribute('data-ran','yes')</script>
+</svg>

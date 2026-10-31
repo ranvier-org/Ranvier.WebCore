@@ -1,0 +1,4 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+typed 0 0 20 10 [255, 0, 0, 255] [255, 255, 255, 255]
+attribute 0 0 20 10 [255, 0, 0, 255] [255, 255, 255, 255]
+typed-then-other-edit 0 0 20 10 [255, 0, 0, 255] [255, 255, 255, 255]

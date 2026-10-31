@@ -1,0 +1,353 @@
+{
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.8078.4 Safari/537.36",
+  "requests": [
+    "https://fixture.test/blue.png",
+    "https://fixture.test/blue.png",
+    "https://fixture.test/blue.png",
+    "https://fixture.test/missing.png",
+    "https://fixture.test/broken.png",
+    "https://fixture.test/green.png",
+    "https://fixture.test/slow-red.png",
+    "https://fixture.test/slow-late.png"
+  ],
+  "pixels": {
+    "initial": [
+      [
+        20,
+        20,
+        [
+          255,
+          0,
+          0,
+          255
+        ]
+      ],
+      [
+        60,
+        10,
+        [
+          0,
+          255,
+          0,
+          255
+        ]
+      ],
+      [
+        110,
+        10,
+        [
+          0,
+          0,
+          255,
+          255
+        ]
+      ],
+      [
+        160,
+        10,
+        [
+          0,
+          255,
+          0,
+          255
+        ]
+      ],
+      [
+        210,
+        10,
+        [
+          0,
+          0,
+          255,
+          255
+        ]
+      ],
+      [
+        210,
+        30,
+        [
+          255,
+          255,
+          255,
+          255
+        ]
+      ],
+      [
+        260,
+        10,
+        [
+          0,
+          255,
+          0,
+          255
+        ]
+      ],
+      [
+        20,
+        110,
+        [
+          0,
+          0,
+          255,
+          255
+        ]
+      ],
+      [
+        50,
+        110,
+        [
+          255,
+          255,
+          255,
+          255
+        ]
+      ]
+    ]
+  },
+  "state": {
+    "a": {
+      "target": "_blank",
+      "href": "https://fixture.test/next",
+      "hreflang": "en",
+      "rel": "noopener next",
+      "type": "text/html",
+      "relListLength": 2,
+      "relListContainsNext": true,
+      "changedTarget": "_self",
+      "changedHreflang": "fr",
+      "changedType": "image/svg+xml",
+      "changedRel": "noopener next help",
+      "changedHref": "https://fixture.test/other"
+    },
+    "script": {
+      "type": "text/ecmascript",
+      "href": "",
+      "async_": false,
+      "changedType": "module",
+      "changedAsync": false,
+      "changedHref": "https://fixture.test/script.js"
+    },
+    "style": {
+      "type": "text/css",
+      "media": "all",
+      "title": "paint",
+      "disabledPaint": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "printMediaPaint": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "restoredPaint": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "changedTitle": "renamed"
+    },
+    "image": {
+      "crossOrigin": null,
+      "href": "https://fixture.test/blue.png",
+      "anonymous": "anonymous",
+      "invalidKeyword": "anonymous",
+      "cleared": null,
+      "geometry": [
+        0,
+        100,
+        40,
+        20
+      ],
+      "align": 1,
+      "readonlyAlign": "NoModificationAllowedError",
+      "meetPaint": [
+        [
+          255,
+          255,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          255,
+          255
+        ]
+      ],
+      "movedPaint": [
+        [
+          255,
+          255,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          255,
+          255
+        ]
+      ],
+      "networkErrorPaint": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "brokenBytesPaint": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "greenPaint": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "pendingPaint": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "replacementPaint": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "staleCompletionPaint": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "removedLatePaint": [
+        255,
+        255,
+        255,
+        255
+      ]
+    },
+    "use": {
+      "href": "#green",
+      "geometry": [
+        50,
+        0,
+        0,
+        0
+      ],
+      "movedPaint": [
+        [
+          255,
+          255,
+          255,
+          255
+        ],
+        [
+          0,
+          255,
+          0,
+          255
+        ]
+      ],
+      "targetEditPaint": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "hrefPaint": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "symbolWidthPaint": [
+        [
+          255,
+          0,
+          0,
+          255
+        ],
+        [
+          255,
+          255,
+          255,
+          255
+        ]
+      ],
+      "symbolViewBoxPaint": [
+        [
+          255,
+          0,
+          0,
+          255
+        ],
+        [
+          255,
+          255,
+          255,
+          255
+        ]
+      ]
+    },
+    "switch": {
+      "clearedPaint": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "attribute": null
+    },
+    "foreignObject": {
+      "geometry": [
+        200,
+        0,
+        40,
+        40
+      ],
+      "clippedPaint": [
+        [
+          0,
+          0,
+          255,
+          255
+        ],
+        [
+          255,
+          255,
+          255,
+          255
+        ]
+      ],
+      "movedPaint": [
+        [
+          255,
+          255,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          255,
+          255
+        ]
+      ]
+    }
+  },
+  "browserOnly": {
+    "decodeLoaded": "resolved",
+    "decodeNetworkError": "rejected:EncodingError",
+    "decodeBrokenBytes": "rejected:EncodingError"
+  }
+}

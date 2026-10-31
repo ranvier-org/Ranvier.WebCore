@@ -1,0 +1,38 @@
+[
+  {
+    "phase": "initial",
+    "pixel": [
+      255,
+      0,
+      0,
+      255
+    ]
+  },
+  {
+    "phase": "typedKernel",
+    "pixel": [
+      0,
+      0,
+      0,
+      255
+    ]
+  },
+  {
+    "phase": "bias",
+    "pixel": [
+      128,
+      128,
+      128,
+      255
+    ]
+  },
+  {
+    "phase": "authoredKernel",
+    "pixel": [
+      128,
+      128,
+      128,
+      255
+    ]
+  }
+]

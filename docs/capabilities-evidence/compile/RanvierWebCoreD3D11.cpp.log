@@ -1,0 +1,267 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+Note: including file: C:/wk/native-capabilities/host\RanvierWebCoreD3D11.h
+Note: including file:  C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\memory
+Note: including file:   C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:    C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\yvals_core.h
+Note: including file:     C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\vcruntime.h
+Note: including file:      C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\sal.h
+Note: including file:       C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\concurrencysal.h
+Note: including file:      C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\vadefs.h
+Note: including file:       C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\vadefs.h
+Note: including file:     C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\xkeycheck.h
+Note: including file:   C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\exception
+Note: including file:    C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\yvals.h
+Note: including file:     C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\crtdbg.h
+Note: including file:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h
+Note: including file:      C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\vcruntime_new_debug.h
+Note: including file:       C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\vcruntime_new.h
+Note: including file:     C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\crtdefs.h
+Note: including file:     C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\use_ansi.h
+Note: including file:    C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\cstdlib
+Note: including file:     C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\math.h
+Note: including file:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_math.h
+Note: including file:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\stdlib.h
+Note: including file:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_malloc.h
+Note: including file:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_search.h
+Note: including file:       C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\stddef.h
+Note: including file:        C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\__stddef_header_macro.h
+Note: including file:        C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\__stddef_ptrdiff_t.h
+Note: including file:        C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\__stddef_size_t.h
+Note: including file:        C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\__stddef_wchar_t.h
+Note: including file:        C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\__stddef_null.h
+Note: including file:        C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\__stddef_nullptr_t.h
+Note: including file:        C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\__stddef_max_align_t.h
+Note: including file:        C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\__stddef_offsetof.h
+Note: including file:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wstdlib.h
+Note: including file:      C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\limits.h
+Note: including file:       C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\limits.h
+Note: including file:    C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\type_traits
+Note: including file:     C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:     C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\cstddef
+Note: including file:      C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:      C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\stddef.h
+Note: including file:       C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\__stddef_ptrdiff_t.h
+Note: including file:       C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\__stddef_size_t.h
+Note: including file:       C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\__stddef_wchar_t.h
+Note: including file:       C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\__stddef_nullptr_t.h
+Note: including file:       C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\__stddef_offsetof.h
+Note: including file:      C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\xtr1common
+Note: including file:       C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:     C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\cstdint
+Note: including file:      C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:      C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\stdint.h
+Note: including file:       C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\stdint.h
+Note: including file:   C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\iosfwd
+Note: including file:    C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\cstdio
+Note: including file:     C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\stdio.h
+Note: including file:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wstdio.h
+Note: including file:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_stdio_config.h
+Note: including file:    C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\cstring
+Note: including file:     C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h
+Note: including file:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_memory.h
+Note: including file:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_memcpy_s.h
+Note: including file:        C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\errno.h
+Note: including file:        C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\vcruntime_string.h
+Note: including file:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wstring.h
+Note: including file:    C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\cwchar
+Note: including file:     C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:     C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\wchar.h
+Note: including file:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wconio.h
+Note: including file:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wctype.h
+Note: including file:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wdirect.h
+Note: including file:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wio.h
+Note: including file:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_share.h
+Note: including file:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wprocess.h
+Note: including file:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wtime.h
+Note: including file:      C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\sys/stat.h
+Note: including file:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\sys/types.h
+Note: including file:      C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\intrin.h
+Note: including file:       C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\intrin0.h
+Note: including file:        C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\adcintrin.h
+Note: including file:       C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\x86intrin.h
+Note: including file:        C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\ia32intrin.h
+Note: including file:        C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\immintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\x86gprintrin.h
+Note: including file:          C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\hresetintrin.h
+Note: including file:          C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\uintrintrin.h
+Note: including file:          C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\usermsrintrin.h
+Note: including file:          C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\crc32intrin.h
+Note: including file:          C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\prfchiintrin.h
+Note: including file:          C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\raointintrin.h
+Note: including file:          C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\cmpccxaddintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\mmintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\xmmintrin.h
+Note: including file:          C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\mm_malloc.h
+Note: including file:           C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\malloc.h
+Note: including file:          C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\emmintrin.h
+Note: including file:           C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\xmmintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\pmmintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\tmmintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\smmintrin.h
+Note: including file:          C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\popcntintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\wmmintrin.h
+Note: including file:          C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\__wmmintrin_aes.h
+Note: including file:          C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\__wmmintrin_pclmul.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\clflushoptintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\clwbintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avxintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx2intrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\f16cintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\bmiintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\bmi2intrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\lzcntintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\fmaintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512fintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512vlintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512bwintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512bitalgintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512bmmintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512bmmvlintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512cdintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512vpopcntdqintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512vpopcntdqvlintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512vnniintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512vlvnniintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avxvnniintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512dqintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512vlbitalgintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512vlbwintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512vlcdintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512vldqintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512ifmaintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512ifmavlintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avxifmaintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512vbmiintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512vbmivlintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512vbmi2intrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512vlvbmi2intrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512fp16intrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512vlfp16intrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512bf16intrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512vlbf16intrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\pkuintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\vpclmulqdqintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\vaesintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\gfniintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avxvnniint8intrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avxneconvertintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\sha512intrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\sm3intrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\sm4intrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avxvnniint16intrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\rtmintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\xtestintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\shaintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\fxsrintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\xsaveintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\xsaveoptintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\xsavecintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\xsavesintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\cetintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\adxintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\rdseedintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\wbnoinvdintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\cldemoteintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\waitpkgintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\movdirintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\movrsintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\movrs_avx10_2intrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\movrs_avx10_2_512intrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\pconfigintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\sgxintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\ptwriteintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\invpcidintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\keylockerintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\amxintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\amxfp16intrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\amxcomplexintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\amxfp8intrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\amxmovrsintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\amxavx512intrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512vp2intersectintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx512vlvp2intersectintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx10_2bf16intrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx10_2convertintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx10_2copyintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx10_2minmaxintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx10_2niintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx10_2satcvtdsintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx10_2satcvtintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx10_2_512bf16intrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx10_2_512convertintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx10_2_512minmaxintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx10_2_512niintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx10_2_512satcvtdsintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\avx10_2_512satcvtintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\sm4evexintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\enqcmdintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\serializeintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\tsxldtrkintrin.h
+Note: including file:        C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\prfchwintrin.h
+Note: including file:        C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\ammintrin.h
+Note: including file:        C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\fma4intrin.h
+Note: including file:        C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\xopintrin.h
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\fma4intrin.h
+Note: including file:        C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\tbmintrin.h
+Note: including file:        C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\lwpintrin.h
+Note: including file:        C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\mwaitxintrin.h
+Note: including file:        C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\clzerointrin.h
+Note: including file:        C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\rdpruintrin.h
+Note: including file:       C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\setjmp.h
+Note: including file:   C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\typeinfo
+Note: including file:    C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:    C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\vcruntime_typeinfo.h
+Note: including file:     C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\vcruntime_exception.h
+Note: including file:      C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\eh.h
+Note: including file:       C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\vadefs.h
+Note: including file:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_terminate.h
+Note: including file:   C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\xmemory
+Note: including file:    C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:    C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\limits
+Note: including file:     C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:     C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\cfloat
+Note: including file:      C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:      C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\float.h
+Note: including file:       C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\__float_header_macro.h
+Note: including file:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\float.h
+Note: including file:       C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\__float_float.h
+Note: including file:       C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\__float_infinity_nan.h
+Note: including file:     C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\climits
+Note: including file:      C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:     C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\intrin0.h
+Note: including file:    C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\new
+Note: including file:     C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:    C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\xatomic.h
+Note: including file:     C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:     C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\intrin0.h
+Note: including file:    C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\xutility
+Note: including file:     C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\__msvc_iter_core.hpp
+Note: including file:      C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:      C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\utility
+Note: including file:       C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:       C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\initializer_list
+Note: including file:        C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:       C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\compare
+Note: including file:        C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:        C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\concepts
+Note: including file:         C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:    C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\tuple
+Note: including file:     C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:   C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\atomic
+Note: including file:    C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\xatomic_wait.h
+Note: including file:    C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\xthreads.h
+Note: including file:     C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:     C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\__msvc_threads_core.hpp
+Note: including file:      C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:     C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\xtimec.h
+Note: including file:      C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.50.35717\include\ctime
+Note: including file:       C:\wk\tools\clang+llvm-23.1.4-x86_64-pc-windows-msvc\lib\clang\23\include\yvals_core.h
+Note: including file:       C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\time.h
+C:/wk/native-capabilities/host/RanvierWebCoreD3D11.cpp(2,24): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+    2 | #if defined(_WIN32) && RANVIER_COMPOSITING
+      |                        ^
+1 warning generated.

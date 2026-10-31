@@ -1,0 +1,17 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+Traceback (most recent call last):
+  File "C:\wk\native-svg-paint\tests\abi\svg_filters.py", line 265, in <module>
+    verify(parser.parse_args().native_directory)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-svg-paint\tests\abi\svg_filters.py", line 142, in verify
+    assertions += paint_effects(native_directory)
+                  ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-svg-paint\tests\abi\svg_filters.py", line 209, in paint_effects
+    p.close(p.pixel(p.paint(),430,30),[128,128,128,255],'convolve kernel/bias change actual paint',tolerance=1)
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-svg-paint\tests\abi\svg_paint_probe.py", line 52, in close
+    self.expect(len(actual) == len(expected) and all(math.isclose(a, b, rel_tol=0, abs_tol=tolerance) for a, b in zip(actual, expected)), label + ': ' + str(actual))
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-svg-paint\tests\abi\svg_paint_probe.py", line 49, in expect
+    raise AssertionError(label)
+AssertionError: convolve kernel/bias change actual paint: [255, 127, 127, 255]

@@ -1,0 +1,6 @@
+* whitespace=cr-at-eol
+*.log -text -whitespace
+*.py -text
+*.json -text
+*.svg -text
+*.mjs text eol=lf

@@ -1,0 +1,35 @@
+[
+  {
+    "phase": "translated",
+    "viewBox": null,
+    "rect": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "align": 6
+  },
+  {
+    "phase": "typedViewBox",
+    "viewBox": "0 0 10 10",
+    "rect": [
+      0,
+      0,
+      10,
+      10
+    ],
+    "align": 1
+  },
+  {
+    "phase": "authoredViewBox",
+    "viewBox": "0 0 10 10",
+    "rect": [
+      0,
+      0,
+      10,
+      10
+    ],
+    "align": 1
+  }
+]
