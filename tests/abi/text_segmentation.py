@@ -15,7 +15,7 @@ import sys
 import threading
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
-ABI = 43
+ABI = 48
 GRANULARITIES = ['grapheme', 'word', 'sentence', 'line']
 pointer, integer = ctypes.c_void_p, ctypes.c_int32
 

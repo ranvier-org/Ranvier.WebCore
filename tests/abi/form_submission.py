@@ -16,7 +16,7 @@ from dialog_popover import Runner, OK, UNSUPPORTED, P, I, CALLBACK
 from form_collections import Entries, span_text
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
-ABI = 43
+ABI = 48
 FILE_ARM, STRING_ARM = 1, 2
 
 
