@@ -15,7 +15,7 @@ FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 P, I, U = ctypes.c_void_p, ctypes.c_int32, ctypes.c_uint32
 CALLBACK = ctypes.CFUNCTYPE(I, P, P)
 OK, NULL_ARGUMENT, WRONG_THREAD, DOM_EXCEPTION, WRONG_INTERFACE = 0, -1, -2, -3, -11
-ABI = 38
+ABI = 39
 FILE_ARM, STRING_ARM = 1, 2
 
 
@@ -181,7 +181,7 @@ class Case:
     def entry_value(self, value):
         self.n.expect(value.tag in (FILE_ARM, STRING_ARM), 'entry tag')
         if value.tag == FILE_ARM:
-            self.n.expect(value.arm0 is None, 'File arm payload is NULL')
+            self.n.expect(value.arm0 is not None, 'File arm carries a handle')
             return {'file': True}
         return span_text(value.arm1)
 

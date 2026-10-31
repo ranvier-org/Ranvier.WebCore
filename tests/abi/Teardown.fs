@@ -490,6 +490,58 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
                     failwithf "HTMLDialogElement.close after destroy: %d" closed
 
                 rv_node_release held.Value
+        | "blob slice" ->
+            let data = Text.Encoding.UTF8.GetBytes "kept"
+            let handle = Runtime.InteropServices.GCHandle.Alloc(data, Runtime.InteropServices.GCHandleType.Pinned)
+            let mutable part = RvDomUnionBufferSourceOrBlobOrUSVString()
+            part.present <- 1
+            part.tag <- RV_DOM_UNION_BUFFER_SOURCE_OR_BLOB_OR_USV_STRING_BUFFER_SOURCE
+            let mutable span = RvDomByteSpan()
+            span.data <- handle.AddrOfPinnedObject()
+            span.length <- data.Length
+            part.arm0 <- span
+            let parts = Runtime.InteropServices.GCHandle.Alloc([| part |], Runtime.InteropServices.GCHandleType.Pinned)
+            let mutable sequence = RvDomSequenceBufferSourceOrBlobOrUSVString()
+            sequence.present <- 1
+            sequence.count <- 1
+            sequence.items <- parts.AddrOfPinnedObject()
+            let mutable options = RvDomFilePropertyBag()
+            options.size <- uint32 (Runtime.InteropServices.Marshal.SizeOf<RvDomFilePropertyBag>())
+            let name = Text.Encoding.UTF8.GetBytes "kept.txt"
+            let mutable file = 0n
+
+            rv_dom_file_create (document, [| sequence |], name, name.Length, [| options |], &file)
+            |> check "File"
+
+            parts.Free()
+            handle.Free()
+            let empty = [||]: byte array
+            rv_dom_blob_slice (file, 1L, 3L, empty, 0, &held.contents) |> check "Blob.slice"
+            let input = rv_document_create_element (host, "input")
+            rv_element_set_attribute (input, "type", "file") |> check "type=file"
+            rv_node_append_child (div, input) |> check "append input"
+            let list = [| 0n |]
+            rv_file_list_create ([| file |], 1, list) |> check "FileList"
+            rv_dom_html_input_element_set_files (input, list[0]) |> check "input.files"
+            rv_node_release input
+
+            fun () ->
+                let bytes = Array.zeroCreate<byte> 4
+                let mutable length = 0L
+                rv_blob_read_bytes (held.Value, bytes, 4L, &length) |> check "slice bytes after destroy"
+
+                if Text.Encoding.UTF8.GetString(bytes, 0, int length) <> "ep" then
+                    failwith "Blob.slice bytes changed after destroy"
+
+                let mutable count = 0u
+                rv_dom_file_list_get_length (list[0], &count) |> check "FileList.length after destroy"
+
+                if count <> 1u then
+                    failwith "FileList.length changed after destroy"
+
+                rv_dom_file_list_release list[0]
+                rv_dom_blob_release file
+                rv_dom_blob_release held.Value
         | "toggle event" ->
             let button = rv_document_create_element (host, "button")
             rv_node_append_child (div, button) |> check "append button"
@@ -665,6 +717,7 @@ let run (outDir: string) =
                     "submit event"
                     "open modal dialog"
                     "toggle event"
+                    "blob slice"
                     "caret position"
                 ] do
                 for remove in [ false; true ] do

@@ -1,0 +1,277 @@
+{
+  "browser": "156.0.8078.4",
+  "headless": "new",
+  "cases": {
+    "parts": {
+      "size": 15,
+      "type": "text/plain",
+      "bytes": "68c3a96c6c6f0001ff6162efbfbd78"
+    },
+    "empty": {
+      "size": 0,
+      "type": "",
+      "bytes": ""
+    },
+    "emptyParts": {
+      "size": 0,
+      "type": "a/b",
+      "bytes": ""
+    },
+    "view": {
+      "size": 3,
+      "type": "",
+      "bytes": "020304"
+    },
+    "types": {
+      "\"Text/Plain\"": "text/plain",
+      "\"text/é\"": "",
+      "\"ab\"": "",
+      "\"  \"": "  ",
+      "\"text/plain;charset=UTF-8\"": "text/plain;charset=utf-8",
+      "\"\"": ""
+    },
+    "endings": {
+      "transparent": "610a620d0a630d64",
+      "native": "610d0a620d0a630d0a64"
+    },
+    "slices": [
+      {
+        "args": [],
+        "size": 10,
+        "type": "",
+        "bytes": "30313233343536373839"
+      },
+      {
+        "args": [
+          1,
+          3
+        ],
+        "size": 2,
+        "type": "",
+        "bytes": "3132"
+      },
+      {
+        "args": [
+          -2
+        ],
+        "size": 2,
+        "type": "",
+        "bytes": "3839"
+      },
+      {
+        "args": [
+          0,
+          -1
+        ],
+        "size": 9,
+        "type": "",
+        "bytes": "303132333435363738"
+      },
+      {
+        "args": [
+          3,
+          1
+        ],
+        "size": 0,
+        "type": "",
+        "bytes": ""
+      },
+      {
+        "args": [
+          null,
+          null,
+          "X/Y"
+        ],
+        "size": 10,
+        "type": "x/y",
+        "bytes": "30313233343536373839"
+      },
+      {
+        "args": [
+          100,
+          200
+        ],
+        "size": 0,
+        "type": "",
+        "bytes": ""
+      },
+      {
+        "args": [
+          -100
+        ],
+        "size": 10,
+        "type": "",
+        "bytes": "30313233343536373839"
+      },
+      {
+        "args": [
+          2,
+          8,
+          "text/é"
+        ],
+        "size": 6,
+        "type": "",
+        "bytes": "323334353637"
+      },
+      {
+        "args": [
+          1.9,
+          4.2
+        ],
+        "size": 2,
+        "type": "",
+        "bytes": "3233"
+      }
+    ],
+    "sliceOfSlice": {
+      "size": 4,
+      "type": "",
+      "bytes": "33343536"
+    },
+    "file": {
+      "size": 3,
+      "type": "text/x",
+      "bytes": "616263",
+      "name": "a/b.txt",
+      "lastModified": 1234
+    },
+    "fileNegative": {
+      "size": 0,
+      "type": "",
+      "bytes": "",
+      "name": "n",
+      "lastModified": -5
+    },
+    "fileDefaultLastModifiedNow": true,
+    "fileOfFile": {
+      "size": 2,
+      "type": "",
+      "bytes": "7879",
+      "name": "outer",
+      "lastModified": 2
+    },
+    "text": {
+      "bom": "A",
+      "invalid": "�A",
+      "truncated": "�",
+      "surrogate": "���",
+      "ascii": "hi"
+    },
+    "dataUrl": {
+      "typed": "data:text/plain;base64,aGk=",
+      "untyped": "data:application/octet-stream;base64,aGk=",
+      "empty": "data:application/octet-stream;base64,",
+      "params": "data:text/plain;charset=utf-8;base64,aGk="
+    },
+    "abort": {
+      "during": 1,
+      "after": 2,
+      "result": null,
+      "error": "AbortError",
+      "events": [
+        "abort",
+        "loadend"
+      ]
+    },
+    "big": {
+      "size": 1048576,
+      "checksum": 3271032832
+    },
+    "emptyFileInput": {
+      "files": 0,
+      "entry": {
+        "size": 0,
+        "type": "application/octet-stream",
+        "bytes": "",
+        "name": ""
+      },
+      "isFile": true,
+      "lastModifiedNow": true
+    },
+    "fileList": {
+      "length": 2,
+      "item0": {
+        "size": 3,
+        "type": "text/plain",
+        "bytes": "6f6e65",
+        "name": "one.txt",
+        "lastModified": 10
+      },
+      "item1": {
+        "size": 2,
+        "type": "",
+        "bytes": "0908",
+        "name": "two.bin",
+        "lastModified": 20
+      },
+      "item2": null,
+      "same": true
+    },
+    "formFromInput": [
+      {
+        "name": "upload",
+        "value": {
+          "size": 3,
+          "type": "text/plain",
+          "bytes": "6f6e65",
+          "name": "one.txt",
+          "lastModified": 10
+        }
+      },
+      {
+        "name": "upload",
+        "value": {
+          "size": 2,
+          "type": "",
+          "bytes": "0908",
+          "name": "two.bin",
+          "lastModified": 20
+        }
+      }
+    ],
+    "formData": {
+      "a": {
+        "size": 1,
+        "type": "text/p",
+        "bytes": "70",
+        "name": "blob",
+        "isFile": true,
+        "sameAsInput": false
+      },
+      "b": {
+        "size": 1,
+        "type": "text/p",
+        "bytes": "70",
+        "name": "named.txt",
+        "isFile": true,
+        "sameAsInput": false
+      },
+      "c": {
+        "size": 3,
+        "type": "text/plain",
+        "bytes": "6f6e65",
+        "name": "one.txt",
+        "isFile": true,
+        "sameAsInput": true
+      },
+      "d": {
+        "size": 3,
+        "type": "text/plain",
+        "bytes": "6f6e65",
+        "name": "renamed",
+        "isFile": true,
+        "sameAsInput": false
+      },
+      "e": {
+        "size": 0,
+        "type": "",
+        "bytes": "",
+        "name": "blob",
+        "isFile": true,
+        "sameAsInput": false
+      },
+      "convertedLastModifiedNow": true,
+      "copiedLastModified": 10
+    }
+  }
+}

@@ -88,6 +88,12 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
         return "int", ""
     if ctype == "uint64_t":
         return "uint64", ""
+    if ctype == "int64_t":
+        return "int64", ""
+    if ctype == "int64_t*":
+        return "int64&", ""
+    if ctype == "RvBlob* const*":
+        return "nativeint[]", "[<In>] "
     if ctype == "uint64_t*":
         return "uint64&", ""
     if ctype == "float":

@@ -1,0 +1,39 @@
+{
+  "runtime": "C:/wk/native-dialog/artifacts/native30-frozen/runtimes/win-x64/native",
+  "abiVersion": 38,
+  "exports": {
+    "rv_dom_blob_create": false,
+    "rv_dom_blob_get_size": false,
+    "rv_dom_blob_get_type": false,
+    "rv_dom_blob_slice": false,
+    "rv_dom_blob_release": false,
+    "rv_dom_file_create": false,
+    "rv_dom_file_get_name": false,
+    "rv_dom_file_get_last_modified": false,
+    "rv_dom_file_list_get_length": false,
+    "rv_dom_file_list_item": false,
+    "rv_dom_html_input_element_get_files": false,
+    "rv_dom_html_input_element_set_files": false,
+    "rv_blob_read_bytes": false,
+    "rv_file_list_create": false,
+    "rv_dom_file_reader_create": false,
+    "rv_dom_dom_form_data_append_1": false,
+    "rv_dom_dom_form_data_set_1": false
+  },
+  "features": {
+    "dom-binary-values": 0,
+    "dom:Blob": 0,
+    "dom:File": 0,
+    "dom:FileList": 0,
+    "dom:FileReader": 0,
+    "dom:DOMFormData": 1
+  },
+  "emptyFileInputEntry": {
+    "present": 1,
+    "tag": 1,
+    "fileTag": true,
+    "arm0IsNull": true
+  },
+  "hostBlobRegistry": "host/RanvierWebCoreAbi.cpp RvBlobRegistry is a stub: registers nothing, blobSize 0, blobType empty",
+  "assertions": 6
+}

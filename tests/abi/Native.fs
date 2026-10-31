@@ -310,6 +310,8 @@ module Calls =
             "rv_host_match_media"
             "rv_media_query_matches"
             "rv_media_query_media"
+            "rv_blob_read_bytes"
+            "rv_file_list_create"
         |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
@@ -1142,6 +1144,12 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_media_query_media(nativeint target, byte[] buffer, int capacity, int[] length)
+
+    [<DllImport(Lib)>]
+    extern int rv_blob_read_bytes(nativeint blob, [<In; Out>] byte[] buffer, int64 capacity, int64& length)
+
+    [<DllImport(Lib)>]
+    extern int rv_file_list_create([<In>] nativeint[] files, int count, nativeint[] result)
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -3808,6 +3816,30 @@ let rv_media_query_media (target: nativeint, buffer: byte[], capacity: int, leng
         result
     else
         Raw.rv_media_query_media (target, buffer, capacity, length)
+
+let rv_blob_read_bytes (blob: nativeint, buffer: byte[], capacity: int64, length: byref<int64>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_blob_read_bytes (blob, buffer, capacity, &length)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[214] <- Calls.Counts[214] + 1L
+        Calls.Ticks[214] <- Calls.Ticks[214] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_blob_read_bytes (blob, buffer, capacity, &length)
+
+let rv_file_list_create (files: nativeint[], count: int, result: nativeint[]) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_file_list_create (files, count, result)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[215] <- Calls.Counts[215] + 1L
+        Calls.Ticks[215] <- Calls.Ticks[215] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_file_list_create (files, count, result)
 
 // END GENERATED
 

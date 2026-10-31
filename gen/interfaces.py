@@ -52,6 +52,8 @@ class InterfaceEmitter:
             result = NUMBERS[value.name]
         elif value.name == 'boolean':
             result = 'bool'
+        elif value.name in self.world.config.get('byteSpanTypes', []):
+            result = 'byte array'
         elif value.name == 'undefined':
             result = 'unit'
         elif value.name in ('sequence', 'FrozenArray'):
@@ -64,8 +66,13 @@ class InterfaceEmitter:
         elif value.name in self.world.dictionaries:
             result = value.name
             if result not in self.dictionaries:
+                # The placeholder ends a recursive reference; a member type outside the contract removes the dictionary.
                 self.dictionaries[result] = []
-                self.dictionaries[result] = [(member, self.type(member.type)) for member, _ in self.world.dictionary_fields(result)]
+                try:
+                    self.dictionaries[result] = [(member, self.type(member.type)) for member, _ in self.world.dictionary_fields(result)]
+                except self.generator.unsupported_type:
+                    del self.dictionaries[result]
+                    raise
         elif value.name == 'EventListener':
             result = value.name
             self.callbacks.add(result)
