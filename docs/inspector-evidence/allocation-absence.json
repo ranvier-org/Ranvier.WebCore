@@ -1,10 +1,10 @@
 {
-  "checkedAtUtc": "2026-10-31T11:03:03.359927+00:00",
+  "checkedAtUtc": "2026-10-31T11:58:42.736910+00:00",
   "purpose": "H08 inspector diagnostics Native42/ABI50 (preview.42), DOM alpha.45, Views 0.1.35, WebCore backend alpha.35 reservation",
   "abi": 50,
-  "nativeHead": "15e1bc9213a728722a83eef5533b17d67101c9ba",
-  "stackedOn": "rehearsal on G04 final 15e1bc9; I08/T03/I11 finals pending",
-  "abiNumberInUse": "host/RanvierWebCoreAbi.cpp:1311:int32_t rv_abi_version(void) { return 46; }",
+  "nativeHead": "d774256c8b5de90cfb058abe6ce587178b9d3a4f",
+  "stackedOn": "final on I11 5eee88a (stack G04 15e1bc9, I08 2a9cf7d, T03 828fb2b, I11 5eee88a)",
+  "abiNumberInUse": "host/RanvierWebCoreAbi.cpp:1320:int32_t rv_abi_version(void) { return 50; }",
   "packages": [
     {
       "package": "Ranvier.WebCore",
@@ -221,12 +221,6 @@
           "number": 135,
           "title": "feat(mathml): expose typed MathML elements (Native23/ABI31)",
           "url": "https://github.com/ranvier-org/Ranvier.WebCore/pull/135"
-        },
-        {
-          "headRefName": "codex/native-api-resource-completion",
-          "number": 133,
-          "title": "feat(resources): add image decode and font readiness without JavaScript (Native22/ABI30)",
-          "url": "https://github.com/ranvier-org/Ranvier.WebCore/pull/133"
         }
       ]
     },
