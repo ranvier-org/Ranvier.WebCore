@@ -1,0 +1,309 @@
+{
+  "checkedAtUtc": "2026-10-31T15:48:45.343423+00:00",
+  "checkedBy": "int3 (batch-3 integration)",
+  "purpose": "batch 3 (R01, D17, T01+R09, B10, B09, I07+T09+T04): ABI56, Native 0.1.0-preview.48, DOM 0.1.0-alpha.51, Views 0.1.41, WebCore backend 0.1.0-alpha.41",
+  "abi": 56,
+  "stackedOn": {
+    "native": "codex/batch-2 7e2ffa06 (ABI55, preview.47)",
+    "core": "codex/batch-2 a3171913 (alpha.50)",
+    "views": "codex/batch-2 81a42e0c (0.1.40)"
+  },
+  "packages": [
+    {
+      "package": "Ranvier.WebCore",
+      "version": "0.1.0-preview.48",
+      "published": false,
+      "latestListed": "0.1.0-preview.22",
+      "httpStatus": 200,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native",
+      "version": "0.1.0-preview.48",
+      "published": false,
+      "latestListed": "0.1.0-preview.22",
+      "httpStatus": 200,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.win-x64",
+      "version": "0.1.0-preview.48",
+      "published": false,
+      "latestListed": "0.1.0-preview.22",
+      "httpStatus": 200,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.win-x64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.win-arm64",
+      "version": "0.1.0-preview.48",
+      "published": false,
+      "latestListed": "0.1.0-preview.22",
+      "httpStatus": 200,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.win-arm64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.linux-x64",
+      "version": "0.1.0-preview.48",
+      "published": false,
+      "latestListed": "0.1.0-preview.22",
+      "httpStatus": 200,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.linux-x64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.linux-arm64",
+      "version": "0.1.0-preview.48",
+      "published": false,
+      "latestListed": "0.1.0-preview.22",
+      "httpStatus": 200,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.linux-arm64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.osx-arm64",
+      "version": "0.1.0-preview.48",
+      "published": false,
+      "latestListed": "0.1.0-preview.22",
+      "httpStatus": 200,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.osx-arm64/index.json"
+    },
+    {
+      "package": "Ranvier.Dom",
+      "version": "0.1.0-alpha.51",
+      "published": false,
+      "latestListed": "0.1.0-alpha.19",
+      "httpStatus": 200,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.dom/index.json"
+    },
+    {
+      "package": "Fable.Ranvier.Dom",
+      "version": "0.1.0-alpha.51",
+      "published": false,
+      "latestListed": "0.1.0-alpha.19",
+      "httpStatus": 200,
+      "source": "https://api.nuget.org/v3-flatcontainer/fable.ranvier.dom/index.json"
+    },
+    {
+      "package": "Ranvier.Dom.Traced",
+      "version": "0.1.0-alpha.51",
+      "published": false,
+      "latestListed": "0.1.0-alpha.19",
+      "httpStatus": 200,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.dom.traced/index.json"
+    },
+    {
+      "package": "Fable.Ranvier.Dom.Traced",
+      "version": "0.1.0-alpha.51",
+      "published": false,
+      "latestListed": "0.1.0-alpha.19",
+      "httpStatus": 200,
+      "source": "https://api.nuget.org/v3-flatcontainer/fable.ranvier.dom.traced/index.json"
+    },
+    {
+      "package": "Ranvier.View",
+      "version": "0.1.41",
+      "published": false,
+      "latestListed": "0.1.8",
+      "httpStatus": 200,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view/index.json"
+    },
+    {
+      "package": "Ranvier.View.Dom",
+      "version": "0.1.41",
+      "published": false,
+      "latestListed": "0.1.8",
+      "httpStatus": 200,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view.dom/index.json"
+    },
+    {
+      "package": "Ranvier.View.WebCore",
+      "version": "0.1.0-alpha.41",
+      "published": false,
+      "latestListed": "0.1.0-alpha.8",
+      "httpStatus": 200,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view.webcore/index.json"
+    },
+    {
+      "package": "Ranvier.View.WebCore.Sdl",
+      "version": "0.1.0-alpha.41",
+      "published": false,
+      "latestListed": "0.1.0-alpha.8",
+      "httpStatus": 200,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view.webcore.sdl/index.json"
+    }
+  ],
+  "github": [
+    {
+      "repository": "ranvier-org/Ranvier.WebCore",
+      "tagCount": 21,
+      "matchingTags": [],
+      "claimingPullRequests": [],
+      "openPullRequests": [
+        {
+          "number": 149,
+          "title": "feat: batch 2 native APIs (Native47/ABI55)",
+          "headRefName": "codex/batch-2"
+        },
+        {
+          "number": 148,
+          "title": "feat: batch 1 native APIs (Native46/ABI54)",
+          "headRefName": "codex/batch-1"
+        },
+        {
+          "number": 147,
+          "title": "ci: build win-x64 only on pull requests outside batch branches",
+          "headRefName": "codex/ci-light-pr-matrix"
+        },
+        {
+          "number": 141,
+          "title": "feat(dom): expose window scroll offsets and scrolling (Native29)",
+          "headRefName": "codex/native-api-viewport-scroll"
+        },
+        {
+          "number": 140,
+          "title": "feat(dom): expose form collections, FormData and submission events (Native28)",
+          "headRefName": "codex/native-api-forms"
+        },
+        {
+          "number": 139,
+          "title": "feat(host): expose viewport metrics, visibility and media queries (Native27)",
+          "headRefName": "codex/native-api-viewport"
+        },
+        {
+          "number": 138,
+          "title": "feat(host): expose the window event target and touch points (Native26)",
+          "headRefName": "codex/native-api-focus-input"
+        },
+        {
+          "number": 137,
+          "title": "feat(dom): expose filtered tree traversal with host NodeFilters (Native25/ABI33)",
+          "headRefName": "codex/native-api-traversal"
+        },
+        {
+          "number": 136,
+          "title": "feat(events): construct typed and custom events and standalone targets (I02, Native24/ABI32)",
+          "headRefName": "codex/native-api-custom-events"
+        },
+        {
+          "number": 135,
+          "title": "feat(mathml): expose typed MathML elements (Native23/ABI31)",
+          "headRefName": "codex/native-api-mathml"
+        }
+      ]
+    },
+    {
+      "repository": "ranvier-org/Ranvier",
+      "tagCount": 0,
+      "matchingTags": [],
+      "claimingPullRequests": [],
+      "openPullRequests": [
+        {
+          "number": 279,
+          "title": "feat(dom): batch 2 shared DOM contracts (alpha.50)",
+          "headRefName": "codex/batch-2"
+        },
+        {
+          "number": 278,
+          "title": "feat(dom): batch 1 shared DOM contracts (alpha.49)",
+          "headRefName": "codex/batch-1"
+        },
+        {
+          "number": 277,
+          "title": "feat(dom): add shared event construction and standalone targets (Core26)",
+          "headRefName": "codex/native-api-custom-events"
+        },
+        {
+          "number": 276,
+          "title": "feat(dom): add shared resource services (H05, Core alpha.25)",
+          "headRefName": "codex/native-api-resource-completion"
+        },
+        {
+          "number": 275,
+          "title": "feat(svg): paint servers, filters, clipping and resources (Core alpha.24)",
+          "headRefName": "codex/native-api-svg-paint"
+        },
+        {
+          "number": 274,
+          "title": "feat(dom): add shared event cancellation signals (Core23)",
+          "headRefName": "codex/native-api-event-cancellation"
+        },
+        {
+          "number": 273,
+          "title": "feat(dom): add truthful capability observations (Core22)",
+          "headRefName": "codex/native-api-capabilities"
+        },
+        {
+          "number": 272,
+          "title": "feat(svg): shapes, text, views and SMIL contracts (Core alpha.21)",
+          "headRefName": "codex/native-api-svg-surfaces"
+        },
+        {
+          "number": 270,
+          "title": "feat(dom): add qualified locale preference services",
+          "headRefName": "codex/native-api-locale"
+        }
+      ]
+    },
+    {
+      "repository": "ranvier-org/Ranvier.View",
+      "tagCount": 0,
+      "matchingTags": [],
+      "claimingPullRequests": [],
+      "openPullRequests": [
+        {
+          "number": 41,
+          "title": "feat(webcore): batch 2 native API bindings (0.1.40)",
+          "headRefName": "codex/batch-2"
+        },
+        {
+          "number": 40,
+          "title": "feat(webcore): batch 1 native API bindings (0.1.39)",
+          "headRefName": "codex/batch-1"
+        },
+        {
+          "number": 33,
+          "title": "feat(webcore): construct custom events and standalone targets on native hosts (Views 0.1.16)",
+          "headRefName": "codex/native-api-custom-events"
+        },
+        {
+          "number": 32,
+          "title": "feat(webcore): provide native and browser resource services (H05, Views 0.1.15)",
+          "headRefName": "codex/native-api-resource-completion"
+        },
+        {
+          "number": 31,
+          "title": "feat(webcore): SVG paint servers, filters, clipping and resources on Native21 (Views 0.1.14)",
+          "headRefName": "codex/native-api-svg-paint"
+        },
+        {
+          "number": 29,
+          "title": "chore: release multiple projects",
+          "headRefName": "release/main"
+        },
+        {
+          "number": 28,
+          "title": "feat(webcore): provide event cancellation signals on native hosts (Views13)",
+          "headRefName": "codex/native-api-event-cancellation"
+        },
+        {
+          "number": 27,
+          "title": "feat(webcore): bind capability observations to native hosts (Views12)",
+          "headRefName": "codex/native-api-capabilities"
+        },
+        {
+          "number": 26,
+          "title": "feat(webcore): SVG shapes, text, views and SMIL on Native20 (Views 0.1.11)",
+          "headRefName": "codex/native-api-svg-surfaces"
+        },
+        {
+          "number": 22,
+          "title": "feat(webcore): add guarded locale preference services",
+          "headRefName": "codex/native-api-locale"
+        },
+        {
+          "number": 21,
+          "title": "feat(webcore): add shared SVG geometry and live values (Views 0.1.9)",
+          "headRefName": "codex/native-api-svg-values"
+        }
+      ]
+    }
+  ]
+}

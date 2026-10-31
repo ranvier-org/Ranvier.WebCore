@@ -2066,7 +2066,7 @@ enum {
     RV_CASCADE_STRING_FIELDS = 7,
 };
 
-/* v55: "canvas-context" for rv_abi_has: HTMLCanvasElement.getContext and CanvasRenderingContext2D.getContextAttributes
+/* v56: "canvas-context" for rv_abi_has: HTMLCanvasElement.getContext and CanvasRenderingContext2D.getContextAttributes
  * without JavaScript. RanvierWebCoreDom.h holds the context's generated members and its release and retain. */
 typedef struct RvCanvasRenderingContext2D RvCanvasRenderingContext2D;
 

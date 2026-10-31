@@ -1401,7 +1401,7 @@ static_assert(sizeof(void*) != 8 || (sizeof(RvNotificationOptions) == 64 && offs
     && offsetof(RvNotificationOptions, body) == 32 && offsetof(RvNotificationOptions, icon) == 56));
 static_assert(sizeof(RvWindowMetrics) == 32 && offsetof(RvWindowMetrics, outerHeight) == 16 && offsetof(RvWindowMetrics, devicePixelRatio) == 24);
 
-int32_t rv_abi_version(void) { return 55; }
+int32_t rv_abi_version(void) { return 56; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
