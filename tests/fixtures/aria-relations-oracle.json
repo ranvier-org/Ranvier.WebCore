@@ -1,0 +1,1310 @@
+{
+ "browser": "156.0.8078.4",
+ "page": "<!doctype html><body><span id=l1>First</span><span id=l2>Second</span><p id=d1>Describe</p><p id=d2>More</p><p id=e1>Error</p><p id=x1>Detail</p><p id=f1>Next</p><button id=b>Plain</button><div id=list role=listbox aria-label=Choices tabindex=0><div id=o1 role=option>One</div><div id=o2 role=option>Two</div></div><input id=i aria-invalid=true><div id=host></div>",
+ "members": [
+  "ariaActionsElements",
+  "ariaControlsElements",
+  "ariaDescribedByElements",
+  "ariaDetailsElements",
+  "ariaErrorMessageElements",
+  "ariaFlowToElements",
+  "ariaLabelledByElements"
+ ],
+ "relations": {
+  "activedescendant": "aria-activedescendant",
+  "controls": "aria-controls",
+  "describedby": "aria-describedby",
+  "details": "aria-details",
+  "errormessage": "aria-errormessage",
+  "flowto": "aria-flowto",
+  "labelledby": "aria-labelledby",
+  "owns": "aria-owns"
+ },
+ "steps": [
+  {
+   "name": "attribute labelledby l2 l1",
+   "subject": "b",
+   "operation": "attr",
+   "key": "aria-labelledby",
+   "argument": "l2 l1",
+   "reflected": {
+    "ariaActionsElements": null,
+    "ariaControlsElements": null,
+    "ariaDescribedByElements": null,
+    "ariaDetailsElements": null,
+    "ariaErrorMessageElements": null,
+    "ariaFlowToElements": null,
+    "ariaLabelledByElements": [
+     "l2",
+     "l1"
+    ],
+    "ariaActiveDescendantElement": null
+   },
+   "attributes": {
+    "aria-activedescendant": null,
+    "aria-controls": null,
+    "aria-describedby": null,
+    "aria-details": null,
+    "aria-errormessage": null,
+    "aria-flowto": null,
+    "aria-labelledby": "l2 l1",
+    "aria-owns": null
+   },
+   "sameArray": true,
+   "ax": {
+    "name": "Second First",
+    "description": "",
+    "relations": {
+     "activedescendant": [],
+     "controls": [],
+     "describedby": [],
+     "details": [],
+     "errormessage": [],
+     "flowto": [],
+     "labelledby": [
+      "l2",
+      "l1"
+     ],
+     "owns": []
+    }
+   }
+  },
+  {
+   "name": "attribute describedby d1",
+   "subject": "b",
+   "operation": "attr",
+   "key": "aria-describedby",
+   "argument": "d1",
+   "reflected": {
+    "ariaActionsElements": null,
+    "ariaControlsElements": null,
+    "ariaDescribedByElements": [
+     "d1"
+    ],
+    "ariaDetailsElements": null,
+    "ariaErrorMessageElements": null,
+    "ariaFlowToElements": null,
+    "ariaLabelledByElements": [
+     "l2",
+     "l1"
+    ],
+    "ariaActiveDescendantElement": null
+   },
+   "attributes": {
+    "aria-activedescendant": null,
+    "aria-controls": null,
+    "aria-describedby": "d1",
+    "aria-details": null,
+    "aria-errormessage": null,
+    "aria-flowto": null,
+    "aria-labelledby": "l2 l1",
+    "aria-owns": null
+   },
+   "sameArray": true,
+   "ax": {
+    "name": "Second First",
+    "description": "Describe",
+    "relations": {
+     "activedescendant": [],
+     "controls": [],
+     "describedby": [
+      "d1"
+     ],
+     "details": [],
+     "errormessage": [],
+     "flowto": [],
+     "labelledby": [
+      "l2",
+      "l1"
+     ],
+     "owns": []
+    }
+   }
+  },
+  {
+   "name": "attribute controls list",
+   "subject": "i",
+   "operation": "attr",
+   "key": "aria-controls",
+   "argument": "list",
+   "reflected": {
+    "ariaActionsElements": null,
+    "ariaControlsElements": [
+     "list"
+    ],
+    "ariaDescribedByElements": null,
+    "ariaDetailsElements": null,
+    "ariaErrorMessageElements": null,
+    "ariaFlowToElements": null,
+    "ariaLabelledByElements": null,
+    "ariaActiveDescendantElement": null
+   },
+   "attributes": {
+    "aria-activedescendant": null,
+    "aria-controls": "list",
+    "aria-describedby": null,
+    "aria-details": null,
+    "aria-errormessage": null,
+    "aria-flowto": null,
+    "aria-labelledby": null,
+    "aria-owns": null
+   },
+   "sameArray": true,
+   "ax": {
+    "name": "",
+    "description": "",
+    "relations": {
+     "activedescendant": [],
+     "controls": [
+      "list"
+     ],
+     "describedby": [],
+     "details": [],
+     "errormessage": [],
+     "flowto": [],
+     "labelledby": [],
+     "owns": []
+    }
+   }
+  },
+  {
+   "name": "attribute errormessage e1",
+   "subject": "i",
+   "operation": "attr",
+   "key": "aria-errormessage",
+   "argument": "e1",
+   "reflected": {
+    "ariaActionsElements": null,
+    "ariaControlsElements": [
+     "list"
+    ],
+    "ariaDescribedByElements": null,
+    "ariaDetailsElements": null,
+    "ariaErrorMessageElements": [
+     "e1"
+    ],
+    "ariaFlowToElements": null,
+    "ariaLabelledByElements": null,
+    "ariaActiveDescendantElement": null
+   },
+   "attributes": {
+    "aria-activedescendant": null,
+    "aria-controls": "list",
+    "aria-describedby": null,
+    "aria-details": null,
+    "aria-errormessage": "e1",
+    "aria-flowto": null,
+    "aria-labelledby": null,
+    "aria-owns": null
+   },
+   "sameArray": true,
+   "ax": {
+    "name": "",
+    "description": "",
+    "relations": {
+     "activedescendant": [],
+     "controls": [
+      "list"
+     ],
+     "describedby": [],
+     "details": [],
+     "errormessage": [
+      "e1"
+     ],
+     "flowto": [],
+     "labelledby": [],
+     "owns": []
+    }
+   }
+  },
+  {
+   "name": "attribute details x1",
+   "subject": "b",
+   "operation": "attr",
+   "key": "aria-details",
+   "argument": "x1",
+   "reflected": {
+    "ariaActionsElements": null,
+    "ariaControlsElements": null,
+    "ariaDescribedByElements": [
+     "d1"
+    ],
+    "ariaDetailsElements": [
+     "x1"
+    ],
+    "ariaErrorMessageElements": null,
+    "ariaFlowToElements": null,
+    "ariaLabelledByElements": [
+     "l2",
+     "l1"
+    ],
+    "ariaActiveDescendantElement": null
+   },
+   "attributes": {
+    "aria-activedescendant": null,
+    "aria-controls": null,
+    "aria-describedby": "d1",
+    "aria-details": "x1",
+    "aria-errormessage": null,
+    "aria-flowto": null,
+    "aria-labelledby": "l2 l1",
+    "aria-owns": null
+   },
+   "sameArray": true,
+   "ax": {
+    "name": "Second First",
+    "description": "Describe",
+    "relations": {
+     "activedescendant": [],
+     "controls": [],
+     "describedby": [
+      "d1"
+     ],
+     "details": [
+      "x1"
+     ],
+     "errormessage": [],
+     "flowto": [],
+     "labelledby": [
+      "l2",
+      "l1"
+     ],
+     "owns": []
+    }
+   }
+  },
+  {
+   "name": "attribute flowto f1",
+   "subject": "b",
+   "operation": "attr",
+   "key": "aria-flowto",
+   "argument": "f1",
+   "reflected": {
+    "ariaActionsElements": null,
+    "ariaControlsElements": null,
+    "ariaDescribedByElements": [
+     "d1"
+    ],
+    "ariaDetailsElements": [
+     "x1"
+    ],
+    "ariaErrorMessageElements": null,
+    "ariaFlowToElements": [
+     "f1"
+    ],
+    "ariaLabelledByElements": [
+     "l2",
+     "l1"
+    ],
+    "ariaActiveDescendantElement": null
+   },
+   "attributes": {
+    "aria-activedescendant": null,
+    "aria-controls": null,
+    "aria-describedby": "d1",
+    "aria-details": "x1",
+    "aria-errormessage": null,
+    "aria-flowto": "f1",
+    "aria-labelledby": "l2 l1",
+    "aria-owns": null
+   },
+   "sameArray": true,
+   "ax": {
+    "name": "Second First",
+    "description": "Describe",
+    "relations": {
+     "activedescendant": [],
+     "controls": [],
+     "describedby": [
+      "d1"
+     ],
+     "details": [
+      "x1"
+     ],
+     "errormessage": [],
+     "flowto": [
+      "f1"
+     ],
+     "labelledby": [
+      "l2",
+      "l1"
+     ],
+     "owns": []
+    }
+   }
+  },
+  {
+   "name": "attribute owns o1",
+   "subject": "list",
+   "operation": "attr",
+   "key": "aria-owns",
+   "argument": "o1",
+   "reflected": {
+    "ariaActionsElements": null,
+    "ariaControlsElements": null,
+    "ariaDescribedByElements": null,
+    "ariaDetailsElements": null,
+    "ariaErrorMessageElements": null,
+    "ariaFlowToElements": null,
+    "ariaLabelledByElements": null,
+    "ariaActiveDescendantElement": null
+   },
+   "attributes": {
+    "aria-activedescendant": null,
+    "aria-controls": null,
+    "aria-describedby": null,
+    "aria-details": null,
+    "aria-errormessage": null,
+    "aria-flowto": null,
+    "aria-labelledby": null,
+    "aria-owns": "o1"
+   },
+   "sameArray": true,
+   "ax": {
+    "name": "Choices",
+    "description": "",
+    "relations": {
+     "activedescendant": [],
+     "controls": [],
+     "describedby": [],
+     "details": [],
+     "errormessage": [],
+     "flowto": [],
+     "labelledby": [],
+     "owns": [
+      "o1"
+     ]
+    }
+   }
+  },
+  {
+   "name": "attribute activedescendant o2",
+   "subject": "list",
+   "operation": "attr",
+   "key": "aria-activedescendant",
+   "argument": "o2",
+   "reflected": {
+    "ariaActionsElements": null,
+    "ariaControlsElements": null,
+    "ariaDescribedByElements": null,
+    "ariaDetailsElements": null,
+    "ariaErrorMessageElements": null,
+    "ariaFlowToElements": null,
+    "ariaLabelledByElements": null,
+    "ariaActiveDescendantElement": "o2"
+   },
+   "attributes": {
+    "aria-activedescendant": "o2",
+    "aria-controls": null,
+    "aria-describedby": null,
+    "aria-details": null,
+    "aria-errormessage": null,
+    "aria-flowto": null,
+    "aria-labelledby": null,
+    "aria-owns": "o1"
+   },
+   "sameArray": true,
+   "ax": {
+    "name": "Choices",
+    "description": "",
+    "relations": {
+     "activedescendant": [
+      "o2"
+     ],
+     "controls": [],
+     "describedby": [],
+     "details": [],
+     "errormessage": [],
+     "flowto": [],
+     "labelledby": [],
+     "owns": [
+      "o1"
+     ]
+    }
+   }
+  },
+  {
+   "name": "reset b and i",
+   "subject": "b",
+   "operation": "reset",
+   "key": null,
+   "argument": null,
+   "reflected": {
+    "ariaActionsElements": null,
+    "ariaControlsElements": null,
+    "ariaDescribedByElements": null,
+    "ariaDetailsElements": null,
+    "ariaErrorMessageElements": null,
+    "ariaFlowToElements": null,
+    "ariaLabelledByElements": null,
+    "ariaActiveDescendantElement": null
+   },
+   "attributes": {
+    "aria-activedescendant": null,
+    "aria-controls": null,
+    "aria-describedby": null,
+    "aria-details": null,
+    "aria-errormessage": null,
+    "aria-flowto": null,
+    "aria-labelledby": null,
+    "aria-owns": null
+   },
+   "sameArray": true,
+   "ax": {
+    "name": "Plain",
+    "description": "",
+    "relations": {
+     "activedescendant": [],
+     "controls": [],
+     "describedby": [],
+     "details": [],
+     "errormessage": [],
+     "flowto": [],
+     "labelledby": [],
+     "owns": []
+    }
+   }
+  },
+  {
+   "name": "elements labelledby [l1, l2]",
+   "subject": "b",
+   "operation": "elements",
+   "key": "ariaLabelledByElements",
+   "argument": [
+    "l1",
+    "l2"
+   ],
+   "reflected": {
+    "ariaActionsElements": null,
+    "ariaControlsElements": null,
+    "ariaDescribedByElements": null,
+    "ariaDetailsElements": null,
+    "ariaErrorMessageElements": null,
+    "ariaFlowToElements": null,
+    "ariaLabelledByElements": [
+     "l1",
+     "l2"
+    ],
+    "ariaActiveDescendantElement": null
+   },
+   "attributes": {
+    "aria-activedescendant": null,
+    "aria-controls": null,
+    "aria-describedby": null,
+    "aria-details": null,
+    "aria-errormessage": null,
+    "aria-flowto": null,
+    "aria-labelledby": "",
+    "aria-owns": null
+   },
+   "sameArray": true,
+   "ax": {
+    "name": "First Second",
+    "description": "",
+    "relations": {
+     "activedescendant": [],
+     "controls": [],
+     "describedby": [],
+     "details": [],
+     "errormessage": [],
+     "flowto": [],
+     "labelledby": [
+      "l1",
+      "l2"
+     ],
+     "owns": []
+    }
+   }
+  },
+  {
+   "name": "elements labelledby [l2, l1, l2]",
+   "subject": "b",
+   "operation": "elements",
+   "key": "ariaLabelledByElements",
+   "argument": [
+    "l2",
+    "l1",
+    "l2"
+   ],
+   "reflected": {
+    "ariaActionsElements": null,
+    "ariaControlsElements": null,
+    "ariaDescribedByElements": null,
+    "ariaDetailsElements": null,
+    "ariaErrorMessageElements": null,
+    "ariaFlowToElements": null,
+    "ariaLabelledByElements": [
+     "l2",
+     "l1"
+    ],
+    "ariaActiveDescendantElement": null
+   },
+   "attributes": {
+    "aria-activedescendant": null,
+    "aria-controls": null,
+    "aria-describedby": null,
+    "aria-details": null,
+    "aria-errormessage": null,
+    "aria-flowto": null,
+    "aria-labelledby": "",
+    "aria-owns": null
+   },
+   "sameArray": true,
+   "ax": {
+    "name": "Second First",
+    "description": "",
+    "relations": {
+     "activedescendant": [],
+     "controls": [],
+     "describedby": [],
+     "details": [],
+     "errormessage": [],
+     "flowto": [],
+     "labelledby": [
+      "l2",
+      "l1"
+     ],
+     "owns": []
+    }
+   }
+  },
+  {
+   "name": "elements labelledby [l2, l1]",
+   "subject": "b",
+   "operation": "elements",
+   "key": "ariaLabelledByElements",
+   "argument": [
+    "l2",
+    "l1"
+   ],
+   "reflected": {
+    "ariaActionsElements": null,
+    "ariaControlsElements": null,
+    "ariaDescribedByElements": null,
+    "ariaDetailsElements": null,
+    "ariaErrorMessageElements": null,
+    "ariaFlowToElements": null,
+    "ariaLabelledByElements": [
+     "l2",
+     "l1"
+    ],
+    "ariaActiveDescendantElement": null
+   },
+   "attributes": {
+    "aria-activedescendant": null,
+    "aria-controls": null,
+    "aria-describedby": null,
+    "aria-details": null,
+    "aria-errormessage": null,
+    "aria-flowto": null,
+    "aria-labelledby": "",
+    "aria-owns": null
+   },
+   "sameArray": true,
+   "ax": {
+    "name": "Second First",
+    "description": "",
+    "relations": {
+     "activedescendant": [],
+     "controls": [],
+     "describedby": [],
+     "details": [],
+     "errormessage": [],
+     "flowto": [],
+     "labelledby": [
+      "l2",
+      "l1"
+     ],
+     "owns": []
+    }
+   }
+  },
+  {
+   "name": "elements describedby [d2, d1]",
+   "subject": "b",
+   "operation": "elements",
+   "key": "ariaDescribedByElements",
+   "argument": [
+    "d2",
+    "d1"
+   ],
+   "reflected": {
+    "ariaActionsElements": null,
+    "ariaControlsElements": null,
+    "ariaDescribedByElements": [
+     "d2",
+     "d1"
+    ],
+    "ariaDetailsElements": null,
+    "ariaErrorMessageElements": null,
+    "ariaFlowToElements": null,
+    "ariaLabelledByElements": [
+     "l2",
+     "l1"
+    ],
+    "ariaActiveDescendantElement": null
+   },
+   "attributes": {
+    "aria-activedescendant": null,
+    "aria-controls": null,
+    "aria-describedby": "",
+    "aria-details": null,
+    "aria-errormessage": null,
+    "aria-flowto": null,
+    "aria-labelledby": "",
+    "aria-owns": null
+   },
+   "sameArray": true,
+   "ax": {
+    "name": "Second First",
+    "description": "More Describe",
+    "relations": {
+     "activedescendant": [],
+     "controls": [],
+     "describedby": [
+      "d2",
+      "d1"
+     ],
+     "details": [],
+     "errormessage": [],
+     "flowto": [],
+     "labelledby": [
+      "l2",
+      "l1"
+     ],
+     "owns": []
+    }
+   }
+  },
+  {
+   "name": "elements details [x1]",
+   "subject": "b",
+   "operation": "elements",
+   "key": "ariaDetailsElements",
+   "argument": [
+    "x1"
+   ],
+   "reflected": {
+    "ariaActionsElements": null,
+    "ariaControlsElements": null,
+    "ariaDescribedByElements": [
+     "d2",
+     "d1"
+    ],
+    "ariaDetailsElements": [
+     "x1"
+    ],
+    "ariaErrorMessageElements": null,
+    "ariaFlowToElements": null,
+    "ariaLabelledByElements": [
+     "l2",
+     "l1"
+    ],
+    "ariaActiveDescendantElement": null
+   },
+   "attributes": {
+    "aria-activedescendant": null,
+    "aria-controls": null,
+    "aria-describedby": "",
+    "aria-details": "",
+    "aria-errormessage": null,
+    "aria-flowto": null,
+    "aria-labelledby": "",
+    "aria-owns": null
+   },
+   "sameArray": true,
+   "ax": {
+    "name": "Second First",
+    "description": "More Describe",
+    "relations": {
+     "activedescendant": [],
+     "controls": [],
+     "describedby": [
+      "d2",
+      "d1"
+     ],
+     "details": [
+      "x1"
+     ],
+     "errormessage": [],
+     "flowto": [],
+     "labelledby": [
+      "l2",
+      "l1"
+     ],
+     "owns": []
+    }
+   }
+  },
+  {
+   "name": "elements flowto [f1]",
+   "subject": "b",
+   "operation": "elements",
+   "key": "ariaFlowToElements",
+   "argument": [
+    "f1"
+   ],
+   "reflected": {
+    "ariaActionsElements": null,
+    "ariaControlsElements": null,
+    "ariaDescribedByElements": [
+     "d2",
+     "d1"
+    ],
+    "ariaDetailsElements": [
+     "x1"
+    ],
+    "ariaErrorMessageElements": null,
+    "ariaFlowToElements": [
+     "f1"
+    ],
+    "ariaLabelledByElements": [
+     "l2",
+     "l1"
+    ],
+    "ariaActiveDescendantElement": null
+   },
+   "attributes": {
+    "aria-activedescendant": null,
+    "aria-controls": null,
+    "aria-describedby": "",
+    "aria-details": "",
+    "aria-errormessage": null,
+    "aria-flowto": "",
+    "aria-labelledby": "",
+    "aria-owns": null
+   },
+   "sameArray": true,
+   "ax": {
+    "name": "Second First",
+    "description": "More Describe",
+    "relations": {
+     "activedescendant": [],
+     "controls": [],
+     "describedby": [
+      "d2",
+      "d1"
+     ],
+     "details": [
+      "x1"
+     ],
+     "errormessage": [],
+     "flowto": [
+      "f1"
+     ],
+     "labelledby": [
+      "l2",
+      "l1"
+     ],
+     "owns": []
+    }
+   }
+  },
+  {
+   "name": "elements actions [l1]",
+   "subject": "b",
+   "operation": "elements",
+   "key": "ariaActionsElements",
+   "argument": [
+    "l1"
+   ],
+   "reflected": {
+    "ariaActionsElements": [
+     "l1"
+    ],
+    "ariaControlsElements": null,
+    "ariaDescribedByElements": [
+     "d2",
+     "d1"
+    ],
+    "ariaDetailsElements": [
+     "x1"
+    ],
+    "ariaErrorMessageElements": null,
+    "ariaFlowToElements": [
+     "f1"
+    ],
+    "ariaLabelledByElements": [
+     "l2",
+     "l1"
+    ],
+    "ariaActiveDescendantElement": null
+   },
+   "attributes": {
+    "aria-activedescendant": null,
+    "aria-controls": null,
+    "aria-describedby": "",
+    "aria-details": "",
+    "aria-errormessage": null,
+    "aria-flowto": "",
+    "aria-labelledby": "",
+    "aria-owns": null
+   },
+   "sameArray": true,
+   "ax": {
+    "name": "Second First",
+    "description": "More Describe",
+    "relations": {
+     "activedescendant": [],
+     "controls": [],
+     "describedby": [
+      "d2",
+      "d1"
+     ],
+     "details": [
+      "x1"
+     ],
+     "errormessage": [],
+     "flowto": [
+      "f1"
+     ],
+     "labelledby": [
+      "l2",
+      "l1"
+     ],
+     "owns": []
+    }
+   }
+  },
+  {
+   "name": "elements controls [list]",
+   "subject": "i",
+   "operation": "elements",
+   "key": "ariaControlsElements",
+   "argument": [
+    "list"
+   ],
+   "reflected": {
+    "ariaActionsElements": null,
+    "ariaControlsElements": [
+     "list"
+    ],
+    "ariaDescribedByElements": null,
+    "ariaDetailsElements": null,
+    "ariaErrorMessageElements": null,
+    "ariaFlowToElements": null,
+    "ariaLabelledByElements": null,
+    "ariaActiveDescendantElement": null
+   },
+   "attributes": {
+    "aria-activedescendant": null,
+    "aria-controls": "",
+    "aria-describedby": null,
+    "aria-details": null,
+    "aria-errormessage": null,
+    "aria-flowto": null,
+    "aria-labelledby": null,
+    "aria-owns": null
+   },
+   "sameArray": true,
+   "ax": {
+    "name": "",
+    "description": "",
+    "relations": {
+     "activedescendant": [],
+     "controls": [
+      "list"
+     ],
+     "describedby": [],
+     "details": [],
+     "errormessage": [],
+     "flowto": [],
+     "labelledby": [],
+     "owns": []
+    }
+   }
+  },
+  {
+   "name": "elements errormessage [e1]",
+   "subject": "i",
+   "operation": "elements",
+   "key": "ariaErrorMessageElements",
+   "argument": [
+    "e1"
+   ],
+   "reflected": {
+    "ariaActionsElements": null,
+    "ariaControlsElements": [
+     "list"
+    ],
+    "ariaDescribedByElements": null,
+    "ariaDetailsElements": null,
+    "ariaErrorMessageElements": [
+     "e1"
+    ],
+    "ariaFlowToElements": null,
+    "ariaLabelledByElements": null,
+    "ariaActiveDescendantElement": null
+   },
+   "attributes": {
+    "aria-activedescendant": null,
+    "aria-controls": "",
+    "aria-describedby": null,
+    "aria-details": null,
+    "aria-errormessage": "",
+    "aria-flowto": null,
+    "aria-labelledby": null,
+    "aria-owns": null
+   },
+   "sameArray": true,
+   "ax": {
+    "name": "",
+    "description": "",
+    "relations": {
+     "activedescendant": [],
+     "controls": [
+      "list"
+     ],
+     "describedby": [],
+     "details": [],
+     "errormessage": [
+      "e1"
+     ],
+     "flowto": [],
+     "labelledby": [],
+     "owns": []
+    }
+   }
+  },
+  {
+   "name": "attribute labelledby l1 replaces the elements",
+   "subject": "b",
+   "operation": "attr",
+   "key": "aria-labelledby",
+   "argument": "l1",
+   "reflected": {
+    "ariaActionsElements": [
+     "l1"
+    ],
+    "ariaControlsElements": null,
+    "ariaDescribedByElements": [
+     "d2",
+     "d1"
+    ],
+    "ariaDetailsElements": [
+     "x1"
+    ],
+    "ariaErrorMessageElements": null,
+    "ariaFlowToElements": [
+     "f1"
+    ],
+    "ariaLabelledByElements": [
+     "l1"
+    ],
+    "ariaActiveDescendantElement": null
+   },
+   "attributes": {
+    "aria-activedescendant": null,
+    "aria-controls": null,
+    "aria-describedby": "",
+    "aria-details": "",
+    "aria-errormessage": null,
+    "aria-flowto": "",
+    "aria-labelledby": "l1",
+    "aria-owns": null
+   },
+   "sameArray": true,
+   "ax": {
+    "name": "First",
+    "description": "More Describe",
+    "relations": {
+     "activedescendant": [],
+     "controls": [],
+     "describedby": [
+      "d2",
+      "d1"
+     ],
+     "details": [
+      "x1"
+     ],
+     "errormessage": [],
+     "flowto": [
+      "f1"
+     ],
+     "labelledby": [
+      "l1"
+     ],
+     "owns": []
+    }
+   }
+  },
+  {
+   "name": "elements labelledby [l2] replaces the attribute",
+   "subject": "b",
+   "operation": "elements",
+   "key": "ariaLabelledByElements",
+   "argument": [
+    "l2"
+   ],
+   "reflected": {
+    "ariaActionsElements": [
+     "l1"
+    ],
+    "ariaControlsElements": null,
+    "ariaDescribedByElements": [
+     "d2",
+     "d1"
+    ],
+    "ariaDetailsElements": [
+     "x1"
+    ],
+    "ariaErrorMessageElements": null,
+    "ariaFlowToElements": [
+     "f1"
+    ],
+    "ariaLabelledByElements": [
+     "l2"
+    ],
+    "ariaActiveDescendantElement": null
+   },
+   "attributes": {
+    "aria-activedescendant": null,
+    "aria-controls": null,
+    "aria-describedby": "",
+    "aria-details": "",
+    "aria-errormessage": null,
+    "aria-flowto": "",
+    "aria-labelledby": "",
+    "aria-owns": null
+   },
+   "sameArray": true,
+   "ax": {
+    "name": "Second",
+    "description": "More Describe",
+    "relations": {
+     "activedescendant": [],
+     "controls": [],
+     "describedby": [
+      "d2",
+      "d1"
+     ],
+     "details": [
+      "x1"
+     ],
+     "errormessage": [],
+     "flowto": [
+      "f1"
+     ],
+     "labelledby": [
+      "l2"
+     ],
+     "owns": []
+    }
+   }
+  },
+  {
+   "name": "remove d2",
+   "subject": "b",
+   "operation": "remove",
+   "key": null,
+   "argument": "d2",
+   "reflected": {
+    "ariaActionsElements": [
+     "l1"
+    ],
+    "ariaControlsElements": null,
+    "ariaDescribedByElements": [
+     "d1"
+    ],
+    "ariaDetailsElements": [
+     "x1"
+    ],
+    "ariaErrorMessageElements": null,
+    "ariaFlowToElements": [
+     "f1"
+    ],
+    "ariaLabelledByElements": [
+     "l2"
+    ],
+    "ariaActiveDescendantElement": null
+   },
+   "attributes": {
+    "aria-activedescendant": null,
+    "aria-controls": null,
+    "aria-describedby": "",
+    "aria-details": "",
+    "aria-errormessage": null,
+    "aria-flowto": "",
+    "aria-labelledby": "",
+    "aria-owns": null
+   },
+   "sameArray": true,
+   "ax": {
+    "name": "Second",
+    "description": "Describe",
+    "relations": {
+     "activedescendant": [],
+     "controls": [],
+     "describedby": [
+      "d1"
+     ],
+     "details": [
+      "x1"
+     ],
+     "errormessage": [],
+     "flowto": [
+      "f1"
+     ],
+     "labelledby": [
+      "l2"
+     ],
+     "owns": []
+    }
+   }
+  },
+  {
+   "name": "shadow-root target",
+   "subject": "b",
+   "operation": "shadow",
+   "key": "ariaLabelledByElements",
+   "argument": null,
+   "reflected": {
+    "ariaActionsElements": [
+     "l1"
+    ],
+    "ariaControlsElements": null,
+    "ariaDescribedByElements": [
+     "d1"
+    ],
+    "ariaDetailsElements": [
+     "x1"
+    ],
+    "ariaErrorMessageElements": null,
+    "ariaFlowToElements": [
+     "f1"
+    ],
+    "ariaLabelledByElements": [],
+    "ariaActiveDescendantElement": null
+   },
+   "attributes": {
+    "aria-activedescendant": null,
+    "aria-controls": null,
+    "aria-describedby": "",
+    "aria-details": "",
+    "aria-errormessage": null,
+    "aria-flowto": "",
+    "aria-labelledby": "",
+    "aria-owns": null
+   },
+   "sameArray": true,
+   "ax": {
+    "name": "Plain",
+    "description": "Describe",
+    "relations": {
+     "activedescendant": [],
+     "controls": [],
+     "describedby": [
+      "d1"
+     ],
+     "details": [
+      "x1"
+     ],
+     "errormessage": [],
+     "flowto": [
+      "f1"
+     ],
+     "labelledby": [],
+     "owns": []
+    }
+   }
+  },
+  {
+   "name": "elements describedby null clears",
+   "subject": "b",
+   "operation": "elements",
+   "key": "ariaDescribedByElements",
+   "argument": null,
+   "reflected": {
+    "ariaActionsElements": [
+     "l1"
+    ],
+    "ariaControlsElements": null,
+    "ariaDescribedByElements": null,
+    "ariaDetailsElements": [
+     "x1"
+    ],
+    "ariaErrorMessageElements": null,
+    "ariaFlowToElements": [
+     "f1"
+    ],
+    "ariaLabelledByElements": [],
+    "ariaActiveDescendantElement": null
+   },
+   "attributes": {
+    "aria-activedescendant": null,
+    "aria-controls": null,
+    "aria-describedby": null,
+    "aria-details": "",
+    "aria-errormessage": null,
+    "aria-flowto": "",
+    "aria-labelledby": "",
+    "aria-owns": null
+   },
+   "sameArray": true,
+   "ax": {
+    "name": "Plain",
+    "description": "",
+    "relations": {
+     "activedescendant": [],
+     "controls": [],
+     "describedby": [],
+     "details": [
+      "x1"
+     ],
+     "errormessage": [],
+     "flowto": [
+      "f1"
+     ],
+     "labelledby": [],
+     "owns": []
+    }
+   }
+  },
+  {
+   "name": "elements controls [] empties",
+   "subject": "i",
+   "operation": "elements",
+   "key": "ariaControlsElements",
+   "argument": [],
+   "reflected": {
+    "ariaActionsElements": null,
+    "ariaControlsElements": [],
+    "ariaDescribedByElements": null,
+    "ariaDetailsElements": null,
+    "ariaErrorMessageElements": [
+     "e1"
+    ],
+    "ariaFlowToElements": null,
+    "ariaLabelledByElements": null,
+    "ariaActiveDescendantElement": null
+   },
+   "attributes": {
+    "aria-activedescendant": null,
+    "aria-controls": "",
+    "aria-describedby": null,
+    "aria-details": null,
+    "aria-errormessage": "",
+    "aria-flowto": null,
+    "aria-labelledby": null,
+    "aria-owns": null
+   },
+   "sameArray": true,
+   "ax": {
+    "name": "",
+    "description": "",
+    "relations": {
+     "activedescendant": [],
+     "controls": [],
+     "describedby": [],
+     "details": [],
+     "errormessage": [
+      "e1"
+     ],
+     "flowto": [],
+     "labelledby": [],
+     "owns": []
+    }
+   }
+  }
+ ]
+}

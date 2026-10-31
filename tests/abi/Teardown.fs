@@ -403,7 +403,9 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
             held.Value <- rv_node_retain document
             rv_element_set_style (body, "height", "2000px", 0) |> check "tall body"
             let window = rv_host_window_event_target host
-            let listener = rv_event_target_add_listener (window, "scroll", 0, viewportCallback, 0n)
+
+            let listener =
+                rv_event_target_add_listener (window, "scroll", 0, viewportCallback, 0n)
 
             if listener = 0n then
                 failwith "no scroll listener"
@@ -432,16 +434,61 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
 
                 if viewportCalls <> 0 then
                     failwith "scroll listener ran after host destroy"
+        | "aria relations" ->
+            rv_element_set_attribute (div, "id", "label") |> check "label id"
+            rv_dom_node_set_text_content (div, "Label") |> check "label text"
+            let button = rv_document_create_element (host, "button")
+            rv_node_append_child (body, button) |> check "append button"
+            held.Value <- button
+            let mutable value = RvDomSequenceElementNullable()
+
+            let items =
+                System.Runtime.InteropServices.GCHandle.Alloc(
+                    [| div |],
+                    System.Runtime.InteropServices.GCHandleType.Pinned
+                )
+
+            value.present <- 1
+            value.count <- 1
+            value.items <- items.AddrOfPinnedObject()
+
+            rv_dom_element_set_aria_labelled_by_elements (button, [| value |])
+            |> check "ariaLabelledByElements"
+
+            items.Free()
+            let mutable read = RvDomSequenceElementNullable()
+
+            rv_dom_element_get_aria_labelled_by_elements (button, &read)
+            |> check "ariaLabelledByElements read"
+
+            if read.present <> 1 || read.count <> 1 then
+                failwithf "ariaLabelledByElements %d %d before destroy" read.present read.count
+
+            fun () ->
+                let mutable after = RvDomSequenceElementNullable()
+                let status = rv_dom_element_get_aria_labelled_by_elements (held.Value, &after)
+
+                if status <> 0 then
+                    failwithf "ariaLabelledByElements after destroy: %d" status
+
+                rv_dom_sequence_element_nullable_release &after
+                rv_dom_sequence_element_nullable_release &read
+                rv_node_release held.Value
         | "visual viewport" ->
-            rv_dom_window_get_visual_viewport (document, &held.contents) |> check "Window.visualViewport"
-            let listener = rv_event_target_add_listener (held.Value, "resize", 0, viewportCallback, 0n)
+            rv_dom_window_get_visual_viewport (document, &held.contents)
+            |> check "Window.visualViewport"
+
+            let listener =
+                rv_event_target_add_listener (held.Value, "resize", 0, viewportCallback, 0n)
 
             if listener = 0n then
                 failwith "no visualViewport resize listener"
 
             rv_host_set_page_scale (host, 2.0, 0, 0) |> check "page scale 2"
             let mutable width = -1.0
-            rv_dom_visual_viewport_get_width (held.Value, &width) |> check "VisualViewport.width"
+
+            rv_dom_visual_viewport_get_width (held.Value, &width)
+            |> check "VisualViewport.width"
 
             if width <> 32.0 then
                 failwithf "VisualViewport.width %f at page scale 2" width
@@ -452,7 +499,9 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
                 if status <> -10 then
                     failwithf "VisualViewport.width after destroy: %d" status
 
-                rv_listener_remove listener |> check "visualViewport listener removal after destroy"
+                rv_listener_remove listener
+                |> check "visualViewport listener removal after destroy"
+
                 rv_event_target_release held.Value
 
                 if viewportCalls <> 0 then
@@ -474,7 +523,9 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
                     rv_dom_html_form_element_get_elements (form, &held.contents) |> check "elements"
                     fun () -> rv_dom_html_collection_release held.Value
                 | "options collection" ->
-                    rv_dom_html_select_element_get_options (select, &held.contents) |> check "options"
+                    rv_dom_html_select_element_get_options (select, &held.contents)
+                    |> check "options"
+
                     fun () -> rv_dom_html_collection_release held.Value
                 | "form data" ->
                     rv_dom_dom_form_data_create (document, form, button, &held.contents)
@@ -517,7 +568,10 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
                 rv_node_release held.Value
         | "blob slice" ->
             let data = Text.Encoding.UTF8.GetBytes "kept"
-            let handle = Runtime.InteropServices.GCHandle.Alloc(data, Runtime.InteropServices.GCHandleType.Pinned)
+
+            let handle =
+                Runtime.InteropServices.GCHandle.Alloc(data, Runtime.InteropServices.GCHandleType.Pinned)
+
             let mutable part = RvDomUnionBufferSourceOrBlobOrUSVString()
             part.present <- 1
             part.tag <- RV_DOM_UNION_BUFFER_SOURCE_OR_BLOB_OR_USV_STRING_BUFFER_SOURCE
@@ -525,7 +579,10 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
             span.data <- handle.AddrOfPinnedObject()
             span.length <- data.Length
             part.arm0 <- span
-            let parts = Runtime.InteropServices.GCHandle.Alloc([| part |], Runtime.InteropServices.GCHandleType.Pinned)
+
+            let parts =
+                Runtime.InteropServices.GCHandle.Alloc([| part |], Runtime.InteropServices.GCHandleType.Pinned)
+
             let mutable sequence = RvDomSequenceBufferSourceOrBlobOrUSVString()
             sequence.present <- 1
             sequence.count <- 1
@@ -553,13 +610,17 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
             fun () ->
                 let bytes = Array.zeroCreate<byte> 4
                 let mutable length = 0L
-                rv_blob_read_bytes (held.Value, bytes, 4L, &length) |> check "slice bytes after destroy"
+
+                rv_blob_read_bytes (held.Value, bytes, 4L, &length)
+                |> check "slice bytes after destroy"
 
                 if Text.Encoding.UTF8.GetString(bytes, 0, int length) <> "ep" then
                     failwith "Blob.slice bytes changed after destroy"
 
                 let mutable count = 0u
-                rv_dom_file_list_get_length (list[0], &count) |> check "FileList.length after destroy"
+
+                rv_dom_file_list_get_length (list[0], &count)
+                |> check "FileList.length after destroy"
 
                 if count <> 1u then
                     failwith "FileList.length changed after destroy"
@@ -569,9 +630,14 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
                 rv_dom_blob_release held.Value
         | "url values" ->
             let text = Text.Encoding.UTF8.GetBytes "https://held.test/a?b=c"
-            rv_dom_domurl_create (document, text, text.Length, null, -1, &held.contents) |> check "URL"
+
+            rv_dom_domurl_create (document, text, text.Length, null, -1, &held.contents)
+            |> check "URL"
+
             let mutable parameters = 0n
-            rv_dom_domurl_get_search_params (held.Value, &parameters) |> check "URL.searchParams"
+
+            rv_dom_domurl_get_search_params (held.Value, &parameters)
+            |> check "URL.searchParams"
 
             fun () ->
                 let mutable size = 0u
@@ -584,7 +650,9 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
 
                 let buffer = Array.zeroCreate<byte> 64
                 let length = [| 0 |]
-                rv_dom_domurl_get_href (held.Value, buffer, buffer.Length, length) |> check "URL.href after destroy"
+
+                rv_dom_domurl_get_href (held.Value, buffer, buffer.Length, length)
+                |> check "URL.href after destroy"
 
                 if Text.Encoding.UTF8.GetString(buffer, 0, length[0]) <> "https://held.test/a?b=c" then
                     failwith "URL.href changed after destroy"
@@ -594,7 +662,10 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
         | "url pattern result" ->
             let pattern = Text.Encoding.UTF8.GetBytes "https://h.test/held/:id"
             let target = Text.Encoding.UTF8.GetBytes "https://h.test/held/7"
-            let memory = Runtime.InteropServices.Marshal.AllocHGlobal(pattern.Length + target.Length)
+
+            let memory =
+                Runtime.InteropServices.Marshal.AllocHGlobal(pattern.Length + target.Length)
+
             Runtime.InteropServices.Marshal.Copy(pattern, 0, memory, pattern.Length)
             Runtime.InteropServices.Marshal.Copy(target, 0, memory + nativeint pattern.Length, target.Length)
 
@@ -652,6 +723,7 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
                 rv_event_release held.Value
         | "crypto" ->
             let filled = Array.zeroCreate<byte> 16
+
             rv_dom_crypto_get_random_values (document, RV_DOM_ARRAY_BUFFER_VIEW_UINT8, filled, filled.Length)
             |> check "crypto.getRandomValues"
 
@@ -662,7 +734,9 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
 
             fun () ->
                 let bytes = Array.zeroCreate<byte> 16
-                let random = rv_dom_crypto_get_random_values (held.Value, RV_DOM_ARRAY_BUFFER_VIEW_UINT8, bytes, bytes.Length)
+
+                let random =
+                    rv_dom_crypto_get_random_values (held.Value, RV_DOM_ARRAY_BUFFER_VIEW_UINT8, bytes, bytes.Length)
 
                 if random <> 0 || bytes = Array.zeroCreate<byte> 16 then
                     failwithf "crypto.getRandomValues after destroy: %d" random
@@ -677,10 +751,14 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
                 rv_node_release held.Value
         | "caret position" ->
             rv_dom_node_set_text_content (span, "AAAA") |> check "caret text"
+
             rv_dom_document_caret_position_from_point (document, 2.0, 2.0, null, &held.contents)
             |> check "caretPositionFromPoint"
+
             let mutable node = 0n
-            rv_dom_caret_position_get_offset_node (held.Value, &node) |> check "CaretPosition.offsetNode"
+
+            rv_dom_caret_position_get_offset_node (held.Value, &node)
+            |> check "CaretPosition.offsetNode"
 
             if node = 0n then
                 failwith "no CaretPosition.offsetNode"
@@ -689,7 +767,9 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
 
             fun () ->
                 let mutable offset = 99u
-                rv_dom_caret_position_get_offset (held.Value, &offset) |> check "CaretPosition.offset after destroy"
+
+                rv_dom_caret_position_get_offset (held.Value, &offset)
+                |> check "CaretPosition.offset after destroy"
 
                 if offset > 4u then
                     failwithf "CaretPosition.offset %d after destroy" offset
@@ -830,6 +910,7 @@ let run (outDir: string) =
                     "url values"
                     "url pattern result"
                     "visual viewport"
+                    "aria relations"
                 ] do
                 for remove in [ false; true ] do
                     releaseAfterDestroy kind remove
