@@ -357,6 +357,30 @@ typedef void (*RvResourceHandler)(void* context, RvResourceLoad* load, const cha
 /* Sets the host's resource handler, or with a NULL handler removes it. Without a handler each such load
  * fails. */
 RV_EXPORT int32_t rv_host_set_resource_handler(RvHost*, RvResourceHandler handler, void* context);
+
+/* A form submission ("form-submission", v42), from requestSubmit, submit, a submit button or implicit submission.
+ * method is "GET" or "POST". url is the request URL; a GET carries the entry list in its query. target is the
+ * submitter's formtarget, the form's target or the base target, such as "_blank", or "" without one. content_type is NULL for a GET, and is
+ * "application/x-www-form-urlencoded", "text/plain" or "multipart/form-data; boundary=..." for a POST. body points to
+ * body_length bytes of the encoded entry list, of which a multipart file part carries its headers and no file bytes.
+ * form and the submitter, NULL for none, are borrowed. Every pointer is valid only during the callback. */
+typedef struct RvFormSubmission {
+    uint32_t size;
+    const char* method;
+    const char* url;
+    const char* target;
+    const char* content_type;
+    const uint8_t* body;
+    int32_t body_length;
+    RvNode* form;
+    RvNode* submitter;
+} RvFormSubmission;
+/* Called on the host thread from rv_run_loop_cycle, after the call that submitted has returned and its submit and
+ * formdata events have run. The document is never navigated, with or without a handler. */
+typedef void (*RvFormSubmissionHandler)(void* context, const RvFormSubmission* submission);
+/* Sets the host's form submission handler, or with a NULL handler removes it; a submission without a handler is
+ * dropped. */
+RV_EXPORT int32_t rv_host_set_form_submission_handler(RvHost*, RvFormSubmissionHandler handler, void* context);
 /* Completes the load with a status 200 response of length bytes, which WebCore copies. contentType is a
  * Content-Type value such as "text/css; charset=utf-8". The response allows every origin, so fonts and
  * other CORS-mode loads pass. Inside the handler WebCore receives the response before this returns;

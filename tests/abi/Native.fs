@@ -49,6 +49,23 @@ type TextSegments =
 [<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]
 type ResourceHandler = delegate of context: nativeint * load: nativeint * url: nativeint -> unit
 
+/// <summary>The <c>RvFormSubmission</c> of the header; every pointer is valid only during the handler call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type FormSubmission =
+    val mutable size: uint32
+    val mutable method: nativeint
+    val mutable url: nativeint
+    val mutable target: nativeint
+    val mutable contentType: nativeint
+    val mutable body: nativeint
+    val mutable bodyLength: int
+    val mutable form: nativeint
+    val mutable submitter: nativeint
+
+/// <summary>The <c>RvFormSubmissionHandler</c> of the header; <c>submission</c> points to a <c>FormSubmission</c>.</summary>
+[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]
+type FormSubmissionHandler = delegate of context: nativeint * submission: nativeint -> unit
+
 /// <summary>The <c>RvResourceCompletion</c> of the header: one terminal outcome with an image's natural size.</summary>
 [<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]
 type ResourceCompletion = delegate of context: nativeint * outcome: int * width: int * height: int -> unit
@@ -183,6 +200,7 @@ module Calls =
             "rv_document_active_element"
             "rv_run_loop_cycle"
             "rv_host_set_resource_handler"
+            "rv_host_set_form_submission_handler"
             "rv_resource_load_finish"
             "rv_resource_load_fail"
             "rv_abi_has"
@@ -617,6 +635,9 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_host_set_resource_handler(nativeint host, nativeint handler, nativeint context)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_set_form_submission_handler(nativeint host, nativeint handler, nativeint context)
 
     [<DllImport(Lib)>]
     extern int rv_resource_load_finish(
@@ -2157,13 +2178,25 @@ let rv_host_set_resource_handler (host: nativeint, handler: nativeint, context: 
     else
         Raw.rv_host_set_resource_handler (host, handler, context)
 
+let rv_host_set_form_submission_handler (host: nativeint, handler: nativeint, context: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_set_form_submission_handler (host, handler, context)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[79] <- Calls.Counts[79] + 1L
+        Calls.Ticks[79] <- Calls.Ticks[79] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_set_form_submission_handler (host, handler, context)
+
 let rv_resource_load_finish (value: nativeint, data: byte[], length: int, contentType: string) : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_resource_load_finish (value, data, length, contentType)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[79] <- Calls.Counts[79] + 1L
-        Calls.Ticks[79] <- Calls.Ticks[79] + spent
+        Calls.Counts[80] <- Calls.Counts[80] + 1L
+        Calls.Ticks[80] <- Calls.Ticks[80] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2174,8 +2207,8 @@ let rv_resource_load_fail (value: nativeint) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_resource_load_fail (value)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[80] <- Calls.Counts[80] + 1L
-        Calls.Ticks[80] <- Calls.Ticks[80] + spent
+        Calls.Counts[81] <- Calls.Counts[81] + 1L
+        Calls.Ticks[81] <- Calls.Ticks[81] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2186,8 +2219,8 @@ let rv_abi_has (feature: string) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_abi_has (feature)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[81] <- Calls.Counts[81] + 1L
-        Calls.Ticks[81] <- Calls.Ticks[81] + spent
+        Calls.Counts[82] <- Calls.Counts[82] + 1L
+        Calls.Ticks[82] <- Calls.Ticks[82] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2198,8 +2231,8 @@ let rv_host_resize (host: nativeint, width: int, height: int) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_resize (host, width, height)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[82] <- Calls.Counts[82] + 1L
-        Calls.Ticks[82] <- Calls.Ticks[82] + spent
+        Calls.Counts[83] <- Calls.Counts[83] + 1L
+        Calls.Ticks[83] <- Calls.Ticks[83] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2210,8 +2243,8 @@ let rv_host_set_device_scale (host: nativeint, scale: float32) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_set_device_scale (host, scale)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[83] <- Calls.Counts[83] + 1L
-        Calls.Ticks[83] <- Calls.Ticks[83] + spent
+        Calls.Counts[84] <- Calls.Counts[84] + 1L
+        Calls.Ticks[84] <- Calls.Ticks[84] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2222,8 +2255,8 @@ let rv_host_paint_size (host: nativeint, width: byref<int>, height: byref<int>) 
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_paint_size (host, &width, &height)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[84] <- Calls.Counts[84] + 1L
-        Calls.Ticks[84] <- Calls.Ticks[84] + spent
+        Calls.Counts[85] <- Calls.Counts[85] + 1L
+        Calls.Ticks[85] <- Calls.Ticks[85] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2234,8 +2267,8 @@ let rv_host_mouse (host: nativeint, action: int, x: int, y: int, button: int, cl
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_mouse (host, action, x, y, button, clickCount, modifiers)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[85] <- Calls.Counts[85] + 1L
-        Calls.Ticks[85] <- Calls.Ticks[85] + spent
+        Calls.Counts[86] <- Calls.Counts[86] + 1L
+        Calls.Ticks[86] <- Calls.Ticks[86] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2246,8 +2279,8 @@ let rv_host_wheel (host: nativeint, x: int, y: int, deltaX: float32, deltaY: flo
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_wheel (host, x, y, deltaX, deltaY, modifiers)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[86] <- Calls.Counts[86] + 1L
-        Calls.Ticks[86] <- Calls.Ticks[86] + spent
+        Calls.Counts[87] <- Calls.Counts[87] + 1L
+        Calls.Ticks[87] <- Calls.Ticks[87] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2260,8 +2293,8 @@ let rv_host_key
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_key (host, action, key, code, text, modifiers, repeat)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[87] <- Calls.Counts[87] + 1L
-        Calls.Ticks[87] <- Calls.Ticks[87] + spent
+        Calls.Counts[88] <- Calls.Counts[88] + 1L
+        Calls.Ticks[88] <- Calls.Ticks[88] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2272,8 +2305,8 @@ let rv_host_set_focused (host: nativeint, focused: int) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_set_focused (host, focused)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[88] <- Calls.Counts[88] + 1L
-        Calls.Ticks[88] <- Calls.Ticks[88] + spent
+        Calls.Counts[89] <- Calls.Counts[89] + 1L
+        Calls.Ticks[89] <- Calls.Ticks[89] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2284,8 +2317,8 @@ let rv_host_set_frame_callback (host: nativeint, callback: nativeint, context: n
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_set_frame_callback (host, callback, context)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[89] <- Calls.Counts[89] + 1L
-        Calls.Ticks[89] <- Calls.Ticks[89] + spent
+        Calls.Counts[90] <- Calls.Counts[90] + 1L
+        Calls.Ticks[90] <- Calls.Ticks[90] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2296,8 +2329,8 @@ let rv_host_update (host: nativeint) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_update (host)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[90] <- Calls.Counts[90] + 1L
-        Calls.Ticks[90] <- Calls.Ticks[90] + spent
+        Calls.Counts[91] <- Calls.Counts[91] + 1L
+        Calls.Ticks[91] <- Calls.Ticks[91] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2308,8 +2341,8 @@ let rv_host_dirty_rect (host: nativeint, x: byref<int>, y: byref<int>, width: by
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_dirty_rect (host, &x, &y, &width, &height)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[91] <- Calls.Counts[91] + 1L
-        Calls.Ticks[91] <- Calls.Ticks[91] + spent
+        Calls.Counts[92] <- Calls.Counts[92] + 1L
+        Calls.Ticks[92] <- Calls.Ticks[92] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2320,8 +2353,8 @@ let rv_event_number (``event``: nativeint, number: int, value: byref<double>) : 
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_event_number (``event``, number, &value)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[92] <- Calls.Counts[92] + 1L
-        Calls.Ticks[92] <- Calls.Ticks[92] + spent
+        Calls.Counts[93] <- Calls.Counts[93] + 1L
+        Calls.Ticks[93] <- Calls.Ticks[93] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2332,8 +2365,8 @@ let rv_event_string (``event``: nativeint, property: int, buffer: byte[], capaci
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_event_string (``event``, property, buffer, capacity, length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[93] <- Calls.Counts[93] + 1L
-        Calls.Ticks[93] <- Calls.Ticks[93] + spent
+        Calls.Counts[94] <- Calls.Counts[94] + 1L
+        Calls.Ticks[94] <- Calls.Ticks[94] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2344,8 +2377,8 @@ let rv_event_related_target (``event``: nativeint) : nativeint =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_event_related_target (``event``)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[94] <- Calls.Counts[94] + 1L
-        Calls.Ticks[94] <- Calls.Ticks[94] + spent
+        Calls.Counts[95] <- Calls.Counts[95] + 1L
+        Calls.Ticks[95] <- Calls.Ticks[95] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2356,8 +2389,8 @@ let rv_host_cursor (host: nativeint) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_cursor (host)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[95] <- Calls.Counts[95] + 1L
-        Calls.Ticks[95] <- Calls.Ticks[95] + spent
+        Calls.Counts[96] <- Calls.Counts[96] + 1L
+        Calls.Ticks[96] <- Calls.Ticks[96] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2368,8 +2401,8 @@ let rv_host_scroll_position (host: nativeint, x: byref<int>, y: byref<int>) : in
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_scroll_position (host, &x, &y)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[96] <- Calls.Counts[96] + 1L
-        Calls.Ticks[96] <- Calls.Ticks[96] + spent
+        Calls.Counts[97] <- Calls.Counts[97] + 1L
+        Calls.Ticks[97] <- Calls.Ticks[97] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2380,8 +2413,8 @@ let rv_host_scroll_to (host: nativeint, x: int, y: int) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_scroll_to (host, x, y)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[97] <- Calls.Counts[97] + 1L
-        Calls.Ticks[97] <- Calls.Ticks[97] + spent
+        Calls.Counts[98] <- Calls.Counts[98] + 1L
+        Calls.Ticks[98] <- Calls.Ticks[98] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2395,8 +2428,8 @@ let rv_host_ime_set_composition (host: nativeint, text: string, selectionStart: 
             Raw.rv_host_ime_set_composition (host, text, selectionStart, selectionEnd)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[98] <- Calls.Counts[98] + 1L
-        Calls.Ticks[98] <- Calls.Ticks[98] + spent
+        Calls.Counts[99] <- Calls.Counts[99] + 1L
+        Calls.Ticks[99] <- Calls.Ticks[99] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2407,8 +2440,8 @@ let rv_host_ime_commit (host: nativeint, text: string) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_ime_commit (host, text)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[99] <- Calls.Counts[99] + 1L
-        Calls.Ticks[99] <- Calls.Ticks[99] + spent
+        Calls.Counts[100] <- Calls.Counts[100] + 1L
+        Calls.Ticks[100] <- Calls.Ticks[100] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2419,8 +2452,8 @@ let rv_host_ime_cancel (host: nativeint) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_ime_cancel (host)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[100] <- Calls.Counts[100] + 1L
-        Calls.Ticks[100] <- Calls.Ticks[100] + spent
+        Calls.Counts[101] <- Calls.Counts[101] + 1L
+        Calls.Ticks[101] <- Calls.Ticks[101] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2431,8 +2464,8 @@ let rv_host_ime_rect (host: nativeint, x: byref<int>, y: byref<int>, width: byre
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_ime_rect (host, &x, &y, &width, &height)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[101] <- Calls.Counts[101] + 1L
-        Calls.Ticks[101] <- Calls.Ticks[101] + spent
+        Calls.Counts[102] <- Calls.Counts[102] + 1L
+        Calls.Ticks[102] <- Calls.Ticks[102] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2443,8 +2476,8 @@ let rv_element_class (node: nativeint, token: string, operation: int) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_element_class (node, token, operation)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[102] <- Calls.Counts[102] + 1L
-        Calls.Ticks[102] <- Calls.Ticks[102] + spent
+        Calls.Counts[103] <- Calls.Counts[103] + 1L
+        Calls.Ticks[103] <- Calls.Ticks[103] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2455,8 +2488,8 @@ let rv_element_set_style (node: nativeint, property: string, value: string, impo
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_element_set_style (node, property, value, important)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[103] <- Calls.Counts[103] + 1L
-        Calls.Ticks[103] <- Calls.Ticks[103] + spent
+        Calls.Counts[104] <- Calls.Counts[104] + 1L
+        Calls.Ticks[104] <- Calls.Ticks[104] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2467,8 +2500,8 @@ let rv_element_get_style (node: nativeint, property: string, buffer: byte[], cap
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_element_get_style (node, property, buffer, capacity, length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[104] <- Calls.Counts[104] + 1L
-        Calls.Ticks[104] <- Calls.Ticks[104] + spent
+        Calls.Counts[105] <- Calls.Counts[105] + 1L
+        Calls.Ticks[105] <- Calls.Ticks[105] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2482,8 +2515,8 @@ let rv_element_computed_style (node: nativeint, property: string, buffer: byte[]
             Raw.rv_element_computed_style (node, property, buffer, capacity, length)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[105] <- Calls.Counts[105] + 1L
-        Calls.Ticks[105] <- Calls.Ticks[105] + spent
+        Calls.Counts[106] <- Calls.Counts[106] + 1L
+        Calls.Ticks[106] <- Calls.Ticks[106] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2496,8 +2529,8 @@ let rv_element_rect
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_element_rect (node, &x, &y, &width, &height)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[106] <- Calls.Counts[106] + 1L
-        Calls.Ticks[106] <- Calls.Ticks[106] + spent
+        Calls.Counts[107] <- Calls.Counts[107] + 1L
+        Calls.Ticks[107] <- Calls.Ticks[107] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2508,8 +2541,8 @@ let rv_host_element_at (host: nativeint, x: int, y: int) : nativeint =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_element_at (host, x, y)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[107] <- Calls.Counts[107] + 1L
-        Calls.Ticks[107] <- Calls.Ticks[107] + spent
+        Calls.Counts[108] <- Calls.Counts[108] + 1L
+        Calls.Ticks[108] <- Calls.Ticks[108] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2520,8 +2553,8 @@ let rv_element_scroll_into_view (node: nativeint, block: int, inlineAlignment: i
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_element_scroll_into_view (node, block, inlineAlignment, smooth)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[108] <- Calls.Counts[108] + 1L
-        Calls.Ticks[108] <- Calls.Ticks[108] + spent
+        Calls.Counts[109] <- Calls.Counts[109] + 1L
+        Calls.Ticks[109] <- Calls.Ticks[109] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2532,8 +2565,8 @@ let rv_element_scroll_metric (node: nativeint, metric: int, value: byref<int>) :
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_element_scroll_metric (node, metric, &value)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[109] <- Calls.Counts[109] + 1L
-        Calls.Ticks[109] <- Calls.Ticks[109] + spent
+        Calls.Counts[110] <- Calls.Counts[110] + 1L
+        Calls.Ticks[110] <- Calls.Ticks[110] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2544,8 +2577,8 @@ let rv_element_scroll_to (node: nativeint, left: int, top: int, smooth: int) : i
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_element_scroll_to (node, left, top, smooth)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[110] <- Calls.Counts[110] + 1L
-        Calls.Ticks[110] <- Calls.Ticks[110] + spent
+        Calls.Counts[111] <- Calls.Counts[111] + 1L
+        Calls.Ticks[111] <- Calls.Ticks[111] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2556,8 +2589,8 @@ let rv_element_attach_shadow (node: nativeint, status: byref<int>) : nativeint =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_element_attach_shadow (node, &status)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[111] <- Calls.Counts[111] + 1L
-        Calls.Ticks[111] <- Calls.Ticks[111] + spent
+        Calls.Counts[112] <- Calls.Counts[112] + 1L
+        Calls.Ticks[112] <- Calls.Ticks[112] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2568,8 +2601,8 @@ let rv_element_shadow_root (node: nativeint) : nativeint =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_element_shadow_root (node)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[112] <- Calls.Counts[112] + 1L
-        Calls.Ticks[112] <- Calls.Ticks[112] + spent
+        Calls.Counts[113] <- Calls.Counts[113] + 1L
+        Calls.Ticks[113] <- Calls.Ticks[113] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2580,8 +2613,8 @@ let rv_text_selection (node: nativeint, start: byref<int>, ``end``: byref<int>) 
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_text_selection (node, &start, &``end``)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[113] <- Calls.Counts[113] + 1L
-        Calls.Ticks[113] <- Calls.Ticks[113] + spent
+        Calls.Counts[114] <- Calls.Counts[114] + 1L
+        Calls.Ticks[114] <- Calls.Ticks[114] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2592,8 +2625,8 @@ let rv_text_set_selection (node: nativeint, start: int, ``end``: int) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_text_set_selection (node, start, ``end``)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[114] <- Calls.Counts[114] + 1L
-        Calls.Ticks[114] <- Calls.Ticks[114] + spent
+        Calls.Counts[115] <- Calls.Counts[115] + 1L
+        Calls.Ticks[115] <- Calls.Ticks[115] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2606,8 +2639,8 @@ let rv_element_animations
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_element_animations (node, subtree, animations, capacity, &count)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[115] <- Calls.Counts[115] + 1L
-        Calls.Ticks[115] <- Calls.Ticks[115] + spent
+        Calls.Counts[116] <- Calls.Counts[116] + 1L
+        Calls.Ticks[116] <- Calls.Ticks[116] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2618,8 +2651,8 @@ let rv_host_animations (host: nativeint, animations: nativeint[], capacity: int,
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_animations (host, animations, capacity, &count)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[116] <- Calls.Counts[116] + 1L
-        Calls.Ticks[116] <- Calls.Ticks[116] + spent
+        Calls.Counts[117] <- Calls.Counts[117] + 1L
+        Calls.Ticks[117] <- Calls.Ticks[117] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2630,8 +2663,8 @@ let rv_animation_release (animation: nativeint) : unit =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_animation_release (animation)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[117] <- Calls.Counts[117] + 1L
-        Calls.Ticks[117] <- Calls.Ticks[117] + spent
+        Calls.Counts[118] <- Calls.Counts[118] + 1L
+        Calls.Ticks[118] <- Calls.Ticks[118] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2642,8 +2675,8 @@ let rv_animation_control (animation: nativeint, action: int) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_animation_control (animation, action)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[118] <- Calls.Counts[118] + 1L
-        Calls.Ticks[118] <- Calls.Ticks[118] + spent
+        Calls.Counts[119] <- Calls.Counts[119] + 1L
+        Calls.Ticks[119] <- Calls.Ticks[119] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2654,8 +2687,8 @@ let rv_animation_state (animation: nativeint) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_animation_state (animation)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[119] <- Calls.Counts[119] + 1L
-        Calls.Ticks[119] <- Calls.Ticks[119] + spent
+        Calls.Counts[120] <- Calls.Counts[120] + 1L
+        Calls.Ticks[120] <- Calls.Ticks[120] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2666,8 +2699,8 @@ let rv_animation_time (animation: nativeint, milliseconds: byref<double>) : int 
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_animation_time (animation, &milliseconds)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[120] <- Calls.Counts[120] + 1L
-        Calls.Ticks[120] <- Calls.Ticks[120] + spent
+        Calls.Counts[121] <- Calls.Counts[121] + 1L
+        Calls.Ticks[121] <- Calls.Ticks[121] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2678,8 +2711,8 @@ let rv_animation_seek (animation: nativeint, milliseconds: float) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_animation_seek (animation, milliseconds)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[121] <- Calls.Counts[121] + 1L
-        Calls.Ticks[121] <- Calls.Ticks[121] + spent
+        Calls.Counts[122] <- Calls.Counts[122] + 1L
+        Calls.Ticks[122] <- Calls.Ticks[122] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2690,8 +2723,8 @@ let rv_animation_set_rate (animation: nativeint, rate: float) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_animation_set_rate (animation, rate)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[122] <- Calls.Counts[122] + 1L
-        Calls.Ticks[122] <- Calls.Ticks[122] + spent
+        Calls.Counts[123] <- Calls.Counts[123] + 1L
+        Calls.Ticks[123] <- Calls.Ticks[123] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2702,8 +2735,8 @@ let rv_animation_name (animation: nativeint, buffer: byte[], capacity: int, leng
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_animation_name (animation, buffer, capacity, length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[123] <- Calls.Counts[123] + 1L
-        Calls.Ticks[123] <- Calls.Ticks[123] + spent
+        Calls.Counts[124] <- Calls.Counts[124] + 1L
+        Calls.Ticks[124] <- Calls.Ticks[124] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2714,8 +2747,8 @@ let rv_animation_target (animation: nativeint) : nativeint =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_animation_target (animation)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[124] <- Calls.Counts[124] + 1L
-        Calls.Ticks[124] <- Calls.Ticks[124] + spent
+        Calls.Counts[125] <- Calls.Counts[125] + 1L
+        Calls.Ticks[125] <- Calls.Ticks[125] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2726,8 +2759,8 @@ let rv_node_retain (node: nativeint) : nativeint =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_node_retain (node)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[125] <- Calls.Counts[125] + 1L
-        Calls.Ticks[125] <- Calls.Ticks[125] + spent
+        Calls.Counts[126] <- Calls.Counts[126] + 1L
+        Calls.Ticks[126] <- Calls.Ticks[126] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2738,8 +2771,8 @@ let rv_host_observe_resize (host: nativeint, callback: nativeint, context: nativ
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_observe_resize (host, callback, context)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[126] <- Calls.Counts[126] + 1L
-        Calls.Ticks[126] <- Calls.Ticks[126] + spent
+        Calls.Counts[127] <- Calls.Counts[127] + 1L
+        Calls.Ticks[127] <- Calls.Ticks[127] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2761,8 +2794,8 @@ let rv_host_observe_intersection
             Raw.rv_host_observe_intersection (host, callback, context, rootMargin, thresholds, thresholdCount)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[127] <- Calls.Counts[127] + 1L
-        Calls.Ticks[127] <- Calls.Ticks[127] + spent
+        Calls.Counts[128] <- Calls.Counts[128] + 1L
+        Calls.Ticks[128] <- Calls.Ticks[128] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2773,8 +2806,8 @@ let rv_observer_observe (value: nativeint, element: nativeint) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_observer_observe (value, element)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[128] <- Calls.Counts[128] + 1L
-        Calls.Ticks[128] <- Calls.Ticks[128] + spent
+        Calls.Counts[129] <- Calls.Counts[129] + 1L
+        Calls.Ticks[129] <- Calls.Ticks[129] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2785,8 +2818,8 @@ let rv_observer_unobserve (value: nativeint, element: nativeint) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_observer_unobserve (value, element)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[129] <- Calls.Counts[129] + 1L
-        Calls.Ticks[129] <- Calls.Ticks[129] + spent
+        Calls.Counts[130] <- Calls.Counts[130] + 1L
+        Calls.Ticks[130] <- Calls.Ticks[130] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2797,8 +2830,8 @@ let rv_observer_release (value: nativeint) : unit =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_observer_release (value)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[130] <- Calls.Counts[130] + 1L
-        Calls.Ticks[130] <- Calls.Ticks[130] + spent
+        Calls.Counts[131] <- Calls.Counts[131] + 1L
+        Calls.Ticks[131] <- Calls.Ticks[131] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2809,8 +2842,8 @@ let rv_element_snapshot (node: nativeint, rgba: byte[], length: int, width: byre
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_element_snapshot (node, rgba, length, &width, &height)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[131] <- Calls.Counts[131] + 1L
-        Calls.Ticks[131] <- Calls.Ticks[131] + spent
+        Calls.Counts[132] <- Calls.Counts[132] + 1L
+        Calls.Ticks[132] <- Calls.Ticks[132] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2823,8 +2856,8 @@ let rv_host_paint_rgba_rect
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_paint_rgba_rect (host, rgba, length, x, y, width, height)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[132] <- Calls.Counts[132] + 1L
-        Calls.Ticks[132] <- Calls.Ticks[132] + spent
+        Calls.Counts[133] <- Calls.Counts[133] + 1L
+        Calls.Ticks[133] <- Calls.Ticks[133] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2835,8 +2868,8 @@ let rv_host_set_popup_handler (host: nativeint, callback: nativeint, context: na
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_set_popup_handler (host, callback, context)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[133] <- Calls.Counts[133] + 1L
-        Calls.Ticks[133] <- Calls.Ticks[133] + spent
+        Calls.Counts[134] <- Calls.Counts[134] + 1L
+        Calls.Ticks[134] <- Calls.Ticks[134] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2847,8 +2880,8 @@ let rv_popup_item_count (value: nativeint) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_popup_item_count (value)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[134] <- Calls.Counts[134] + 1L
-        Calls.Ticks[134] <- Calls.Ticks[134] + spent
+        Calls.Counts[135] <- Calls.Counts[135] + 1L
+        Calls.Ticks[135] <- Calls.Ticks[135] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2864,8 +2897,8 @@ let rv_popup_item
             Raw.rv_popup_item (value, index, &kind, &enabled, buffer, capacity, length)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[135] <- Calls.Counts[135] + 1L
-        Calls.Ticks[135] <- Calls.Ticks[135] + spent
+        Calls.Counts[136] <- Calls.Counts[136] + 1L
+        Calls.Ticks[136] <- Calls.Ticks[136] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2876,8 +2909,8 @@ let rv_popup_choose (value: nativeint, index: int) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_popup_choose (value, index)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[136] <- Calls.Counts[136] + 1L
-        Calls.Ticks[136] <- Calls.Ticks[136] + spent
+        Calls.Counts[137] <- Calls.Counts[137] + 1L
+        Calls.Ticks[137] <- Calls.Ticks[137] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2888,8 +2921,8 @@ let rv_host_tooltip (host: nativeint, buffer: byte[], capacity: int, length: int
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_tooltip (host, buffer, capacity, length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[137] <- Calls.Counts[137] + 1L
-        Calls.Ticks[137] <- Calls.Ticks[137] + spent
+        Calls.Counts[138] <- Calls.Counts[138] + 1L
+        Calls.Ticks[138] <- Calls.Ticks[138] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2900,8 +2933,8 @@ let rv_host_set_clipboard (host: nativeint, style: int, write: nativeint, read: 
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_set_clipboard (host, style, write, read, context)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[138] <- Calls.Counts[138] + 1L
-        Calls.Ticks[138] <- Calls.Ticks[138] + spent
+        Calls.Counts[139] <- Calls.Counts[139] + 1L
+        Calls.Ticks[139] <- Calls.Ticks[139] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2912,8 +2945,8 @@ let rv_clipboard_offer (value: nativeint, ``type``: string, data: string) : int 
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_clipboard_offer (value, ``type``, data)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[139] <- Calls.Counts[139] + 1L
-        Calls.Ticks[139] <- Calls.Ticks[139] + spent
+        Calls.Counts[140] <- Calls.Counts[140] + 1L
+        Calls.Ticks[140] <- Calls.Ticks[140] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2924,8 +2957,8 @@ let rv_host_edit (host: nativeint, command: int) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_edit (host, command)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[140] <- Calls.Counts[140] + 1L
-        Calls.Ticks[140] <- Calls.Ticks[140] + spent
+        Calls.Counts[141] <- Calls.Counts[141] + 1L
+        Calls.Ticks[141] <- Calls.Ticks[141] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2936,8 +2969,8 @@ let rv_host_set_drag (host: nativeint, style: int) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_set_drag (host, style)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[141] <- Calls.Counts[141] + 1L
-        Calls.Ticks[141] <- Calls.Ticks[141] + spent
+        Calls.Counts[142] <- Calls.Counts[142] + 1L
+        Calls.Ticks[142] <- Calls.Ticks[142] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2948,8 +2981,8 @@ let rv_drag_data_create () : nativeint =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_drag_data_create ()
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[142] <- Calls.Counts[142] + 1L
-        Calls.Ticks[142] <- Calls.Ticks[142] + spent
+        Calls.Counts[143] <- Calls.Counts[143] + 1L
+        Calls.Ticks[143] <- Calls.Ticks[143] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2960,8 +2993,8 @@ let rv_drag_data_add (value: nativeint, ``type``: string, data: string) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_drag_data_add (value, ``type``, data)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[143] <- Calls.Counts[143] + 1L
-        Calls.Ticks[143] <- Calls.Ticks[143] + spent
+        Calls.Counts[144] <- Calls.Counts[144] + 1L
+        Calls.Ticks[144] <- Calls.Ticks[144] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2972,8 +3005,8 @@ let rv_drag_data_release (value: nativeint) : unit =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_drag_data_release (value)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[144] <- Calls.Counts[144] + 1L
-        Calls.Ticks[144] <- Calls.Ticks[144] + spent
+        Calls.Counts[145] <- Calls.Counts[145] + 1L
+        Calls.Ticks[145] <- Calls.Ticks[145] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2984,8 +3017,8 @@ let rv_host_drag (host: nativeint, action: int, x: int, y: int, allowed: int, da
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_drag (host, action, x, y, allowed, data, modifiers)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[145] <- Calls.Counts[145] + 1L
-        Calls.Ticks[145] <- Calls.Ticks[145] + spent
+        Calls.Counts[146] <- Calls.Counts[146] + 1L
+        Calls.Ticks[146] <- Calls.Ticks[146] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -2996,8 +3029,8 @@ let rv_host_set_drag_start (host: nativeint, callback: nativeint, context: nativ
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_set_drag_start (host, callback, context)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[146] <- Calls.Counts[146] + 1L
-        Calls.Ticks[146] <- Calls.Ticks[146] + spent
+        Calls.Counts[147] <- Calls.Counts[147] + 1L
+        Calls.Ticks[147] <- Calls.Ticks[147] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3008,8 +3041,8 @@ let rv_drag_item_count (value: nativeint) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_drag_item_count (value)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[147] <- Calls.Counts[147] + 1L
-        Calls.Ticks[147] <- Calls.Ticks[147] + spent
+        Calls.Counts[148] <- Calls.Counts[148] + 1L
+        Calls.Ticks[148] <- Calls.Ticks[148] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3020,8 +3053,8 @@ let rv_drag_item_type (value: nativeint, index: int, buffer: byte[], capacity: i
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_drag_item_type (value, index, buffer, capacity, length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[148] <- Calls.Counts[148] + 1L
-        Calls.Ticks[148] <- Calls.Ticks[148] + spent
+        Calls.Counts[149] <- Calls.Counts[149] + 1L
+        Calls.Ticks[149] <- Calls.Ticks[149] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3032,8 +3065,8 @@ let rv_drag_item_value (value: nativeint, index: int, buffer: byte[], capacity: 
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_drag_item_value (value, index, buffer, capacity, length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[149] <- Calls.Counts[149] + 1L
-        Calls.Ticks[149] <- Calls.Ticks[149] + spent
+        Calls.Counts[150] <- Calls.Counts[150] + 1L
+        Calls.Ticks[150] <- Calls.Ticks[150] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3044,8 +3077,8 @@ let rv_drag_data (value: nativeint) : nativeint =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_drag_data (value)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[150] <- Calls.Counts[150] + 1L
-        Calls.Ticks[150] <- Calls.Ticks[150] + spent
+        Calls.Counts[151] <- Calls.Counts[151] + 1L
+        Calls.Ticks[151] <- Calls.Ticks[151] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3068,8 +3101,8 @@ let rv_drag_image
             Raw.rv_drag_image (value, rgba, length, &width, &height, &offsetX, &offsetY)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[151] <- Calls.Counts[151] + 1L
-        Calls.Ticks[151] <- Calls.Ticks[151] + spent
+        Calls.Counts[152] <- Calls.Counts[152] + 1L
+        Calls.Ticks[152] <- Calls.Ticks[152] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3080,8 +3113,8 @@ let rv_drag_end (value: nativeint, x: int, y: int, operation: int) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_drag_end (value, x, y, operation)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[152] <- Calls.Counts[152] + 1L
-        Calls.Ticks[152] <- Calls.Ticks[152] + spent
+        Calls.Counts[153] <- Calls.Counts[153] + 1L
+        Calls.Ticks[153] <- Calls.Ticks[153] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3092,8 +3125,8 @@ let rv_host_set_accessibility (host: nativeint, enabled: int, callback: nativein
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_set_accessibility (host, enabled, callback, context)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[153] <- Calls.Counts[153] + 1L
-        Calls.Ticks[153] <- Calls.Ticks[153] + spent
+        Calls.Counts[154] <- Calls.Counts[154] + 1L
+        Calls.Ticks[154] <- Calls.Ticks[154] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3104,8 +3137,8 @@ let rv_host_attach_uia (host: nativeint, hwnd: nativeint) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_attach_uia (host, hwnd)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[154] <- Calls.Counts[154] + 1L
-        Calls.Ticks[154] <- Calls.Ticks[154] + spent
+        Calls.Counts[155] <- Calls.Counts[155] + 1L
+        Calls.Ticks[155] <- Calls.Ticks[155] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3116,8 +3149,8 @@ let rv_host_detach_uia (host: nativeint) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_detach_uia (host)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[155] <- Calls.Counts[155] + 1L
-        Calls.Ticks[155] <- Calls.Ticks[155] + spent
+        Calls.Counts[156] <- Calls.Counts[156] + 1L
+        Calls.Ticks[156] <- Calls.Ticks[156] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3128,8 +3161,8 @@ let rv_host_ax_root (host: nativeint) : nativeint =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_ax_root (host)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[156] <- Calls.Counts[156] + 1L
-        Calls.Ticks[156] <- Calls.Ticks[156] + spent
+        Calls.Counts[157] <- Calls.Counts[157] + 1L
+        Calls.Ticks[157] <- Calls.Ticks[157] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3140,8 +3173,8 @@ let rv_host_ax_focus (host: nativeint) : nativeint =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_ax_focus (host)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[157] <- Calls.Counts[157] + 1L
-        Calls.Ticks[157] <- Calls.Ticks[157] + spent
+        Calls.Counts[158] <- Calls.Counts[158] + 1L
+        Calls.Ticks[158] <- Calls.Ticks[158] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3152,8 +3185,8 @@ let rv_host_ax_hit_test (host: nativeint, x: int, y: int) : nativeint =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_ax_hit_test (host, x, y)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[158] <- Calls.Counts[158] + 1L
-        Calls.Ticks[158] <- Calls.Ticks[158] + spent
+        Calls.Counts[159] <- Calls.Counts[159] + 1L
+        Calls.Ticks[159] <- Calls.Ticks[159] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3164,8 +3197,8 @@ let rv_node_ax (node: nativeint) : nativeint =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_node_ax (node)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[159] <- Calls.Counts[159] + 1L
-        Calls.Ticks[159] <- Calls.Ticks[159] + spent
+        Calls.Counts[160] <- Calls.Counts[160] + 1L
+        Calls.Ticks[160] <- Calls.Ticks[160] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3176,8 +3209,8 @@ let rv_ax_dom_node (ax: nativeint) : nativeint =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_ax_dom_node (ax)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[160] <- Calls.Counts[160] + 1L
-        Calls.Ticks[160] <- Calls.Ticks[160] + spent
+        Calls.Counts[161] <- Calls.Counts[161] + 1L
+        Calls.Ticks[161] <- Calls.Ticks[161] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3188,8 +3221,8 @@ let rv_ax_retain (ax: nativeint) : nativeint =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_ax_retain (ax)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[161] <- Calls.Counts[161] + 1L
-        Calls.Ticks[161] <- Calls.Ticks[161] + spent
+        Calls.Counts[162] <- Calls.Counts[162] + 1L
+        Calls.Ticks[162] <- Calls.Ticks[162] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3200,8 +3233,8 @@ let rv_ax_release (ax: nativeint) : unit =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_ax_release (ax)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[162] <- Calls.Counts[162] + 1L
-        Calls.Ticks[162] <- Calls.Ticks[162] + spent
+        Calls.Counts[163] <- Calls.Counts[163] + 1L
+        Calls.Ticks[163] <- Calls.Ticks[163] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3212,8 +3245,8 @@ let rv_ax_id (ax: nativeint) : int64 =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_ax_id (ax)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[163] <- Calls.Counts[163] + 1L
-        Calls.Ticks[163] <- Calls.Ticks[163] + spent
+        Calls.Counts[164] <- Calls.Counts[164] + 1L
+        Calls.Ticks[164] <- Calls.Ticks[164] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3224,8 +3257,8 @@ let rv_ax_role (ax: nativeint) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_ax_role (ax)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[164] <- Calls.Counts[164] + 1L
-        Calls.Ticks[164] <- Calls.Ticks[164] + spent
+        Calls.Counts[165] <- Calls.Counts[165] + 1L
+        Calls.Ticks[165] <- Calls.Ticks[165] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3236,8 +3269,8 @@ let rv_ax_states (ax: nativeint) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_ax_states (ax)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[165] <- Calls.Counts[165] + 1L
-        Calls.Ticks[165] <- Calls.Ticks[165] + spent
+        Calls.Counts[166] <- Calls.Counts[166] + 1L
+        Calls.Ticks[166] <- Calls.Ticks[166] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3248,8 +3281,8 @@ let rv_ax_string (ax: nativeint, property: int, buffer: byte[], capacity: int, l
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_ax_string (ax, property, buffer, capacity, length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[166] <- Calls.Counts[166] + 1L
-        Calls.Ticks[166] <- Calls.Ticks[166] + spent
+        Calls.Counts[167] <- Calls.Counts[167] + 1L
+        Calls.Ticks[167] <- Calls.Ticks[167] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3260,8 +3293,8 @@ let rv_ax_number (ax: nativeint, property: int, value: byref<double>) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_ax_number (ax, property, &value)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[167] <- Calls.Counts[167] + 1L
-        Calls.Ticks[167] <- Calls.Ticks[167] + spent
+        Calls.Counts[168] <- Calls.Counts[168] + 1L
+        Calls.Ticks[168] <- Calls.Ticks[168] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3272,8 +3305,8 @@ let rv_ax_rect (ax: nativeint, x: byref<double>, y: byref<double>, width: byref<
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_ax_rect (ax, &x, &y, &width, &height)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[168] <- Calls.Counts[168] + 1L
-        Calls.Ticks[168] <- Calls.Ticks[168] + spent
+        Calls.Counts[169] <- Calls.Counts[169] + 1L
+        Calls.Ticks[169] <- Calls.Ticks[169] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3284,8 +3317,8 @@ let rv_ax_parent (ax: nativeint) : nativeint =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_ax_parent (ax)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[169] <- Calls.Counts[169] + 1L
-        Calls.Ticks[169] <- Calls.Ticks[169] + spent
+        Calls.Counts[170] <- Calls.Counts[170] + 1L
+        Calls.Ticks[170] <- Calls.Ticks[170] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3296,8 +3329,8 @@ let rv_ax_children (ax: nativeint, nodes: nativeint[], capacity: int, count: byr
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_ax_children (ax, nodes, capacity, &count)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[170] <- Calls.Counts[170] + 1L
-        Calls.Ticks[170] <- Calls.Ticks[170] + spent
+        Calls.Counts[171] <- Calls.Counts[171] + 1L
+        Calls.Ticks[171] <- Calls.Ticks[171] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3308,8 +3341,8 @@ let rv_ax_action (ax: nativeint, action: int) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_ax_action (ax, action)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[171] <- Calls.Counts[171] + 1L
-        Calls.Ticks[171] <- Calls.Ticks[171] + spent
+        Calls.Counts[172] <- Calls.Counts[172] + 1L
+        Calls.Ticks[172] <- Calls.Ticks[172] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3320,8 +3353,8 @@ let rv_ax_set_value (ax: nativeint, value: string) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_ax_set_value (ax, value)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[172] <- Calls.Counts[172] + 1L
-        Calls.Ticks[172] <- Calls.Ticks[172] + spent
+        Calls.Counts[173] <- Calls.Counts[173] + 1L
+        Calls.Ticks[173] <- Calls.Ticks[173] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3332,8 +3365,8 @@ let rv_ax_set_number (ax: nativeint, value: float) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_ax_set_number (ax, value)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[173] <- Calls.Counts[173] + 1L
-        Calls.Ticks[173] <- Calls.Ticks[173] + spent
+        Calls.Counts[174] <- Calls.Counts[174] + 1L
+        Calls.Ticks[174] <- Calls.Ticks[174] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3344,8 +3377,8 @@ let rv_ax_text_length (ax: nativeint) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_ax_text_length (ax)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[174] <- Calls.Counts[174] + 1L
-        Calls.Ticks[174] <- Calls.Ticks[174] + spent
+        Calls.Counts[175] <- Calls.Counts[175] + 1L
+        Calls.Ticks[175] <- Calls.Ticks[175] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3356,8 +3389,8 @@ let rv_ax_text (ax: nativeint, start: int, ``end``: int, buffer: byte[], capacit
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_ax_text (ax, start, ``end``, buffer, capacity, length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[175] <- Calls.Counts[175] + 1L
-        Calls.Ticks[175] <- Calls.Ticks[175] + spent
+        Calls.Counts[176] <- Calls.Counts[176] + 1L
+        Calls.Ticks[176] <- Calls.Ticks[176] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3368,8 +3401,8 @@ let rv_ax_text_boundary (ax: nativeint, offset: int, unit: int, start: byref<int
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_ax_text_boundary (ax, offset, unit, &start, &``end``)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[176] <- Calls.Counts[176] + 1L
-        Calls.Ticks[176] <- Calls.Ticks[176] + spent
+        Calls.Counts[177] <- Calls.Counts[177] + 1L
+        Calls.Ticks[177] <- Calls.Ticks[177] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3380,8 +3413,8 @@ let rv_ax_text_selection (ax: nativeint, start: byref<int>, ``end``: byref<int>)
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_ax_text_selection (ax, &start, &``end``)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[177] <- Calls.Counts[177] + 1L
-        Calls.Ticks[177] <- Calls.Ticks[177] + spent
+        Calls.Counts[178] <- Calls.Counts[178] + 1L
+        Calls.Ticks[178] <- Calls.Ticks[178] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3392,8 +3425,8 @@ let rv_ax_text_caret (ax: nativeint) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_ax_text_caret (ax)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[178] <- Calls.Counts[178] + 1L
-        Calls.Ticks[178] <- Calls.Ticks[178] + spent
+        Calls.Counts[179] <- Calls.Counts[179] + 1L
+        Calls.Ticks[179] <- Calls.Ticks[179] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3404,8 +3437,8 @@ let rv_ax_text_set_selection (ax: nativeint, start: int, ``end``: int) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_ax_text_set_selection (ax, start, ``end``)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[179] <- Calls.Counts[179] + 1L
-        Calls.Ticks[179] <- Calls.Ticks[179] + spent
+        Calls.Counts[180] <- Calls.Counts[180] + 1L
+        Calls.Ticks[180] <- Calls.Ticks[180] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3416,8 +3449,8 @@ let rv_ax_text_rects (ax: nativeint, start: int, ``end``: int, rects: float[], c
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_ax_text_rects (ax, start, ``end``, rects, capacity, &count)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[180] <- Calls.Counts[180] + 1L
-        Calls.Ticks[180] <- Calls.Ticks[180] + spent
+        Calls.Counts[181] <- Calls.Counts[181] + 1L
+        Calls.Ticks[181] <- Calls.Ticks[181] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3428,8 +3461,8 @@ let rv_ax_text_offset_at (ax: nativeint, x: int, y: int) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_ax_text_offset_at (ax, x, y)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[181] <- Calls.Counts[181] + 1L
-        Calls.Ticks[181] <- Calls.Ticks[181] + spent
+        Calls.Counts[182] <- Calls.Counts[182] + 1L
+        Calls.Ticks[182] <- Calls.Ticks[182] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3440,8 +3473,8 @@ let rv_ax_text_child_range (ancestor: nativeint, child: nativeint, start: byref<
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_ax_text_child_range (ancestor, child, &start, &``end``)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[182] <- Calls.Counts[182] + 1L
-        Calls.Ticks[182] <- Calls.Ticks[182] + spent
+        Calls.Counts[183] <- Calls.Counts[183] + 1L
+        Calls.Ticks[183] <- Calls.Ticks[183] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3452,8 +3485,8 @@ let rv_host_load_svg (host: nativeint, svg: string) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_load_svg (host, svg)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[183] <- Calls.Counts[183] + 1L
-        Calls.Ticks[183] <- Calls.Ticks[183] + spent
+        Calls.Counts[184] <- Calls.Counts[184] + 1L
+        Calls.Ticks[184] <- Calls.Ticks[184] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3464,8 +3497,8 @@ let rv_capability_count (category: int) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_capability_count (category)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[184] <- Calls.Counts[184] + 1L
-        Calls.Ticks[184] <- Calls.Ticks[184] + spent
+        Calls.Counts[185] <- Calls.Counts[185] + 1L
+        Calls.Ticks[185] <- Calls.Ticks[185] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3476,8 +3509,8 @@ let rv_capability_name_at (category: int, index: int, buffer: byte[], capacity: 
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_capability_name_at (category, index, buffer, capacity, length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[185] <- Calls.Counts[185] + 1L
-        Calls.Ticks[185] <- Calls.Ticks[185] + spent
+        Calls.Counts[186] <- Calls.Counts[186] + 1L
+        Calls.Ticks[186] <- Calls.Ticks[186] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3488,8 +3521,8 @@ let rv_host_capability_fact (host: nativeint, category: int, name: string, dimen
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_capability_fact (host, category, name, dimension, &fact)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[186] <- Calls.Counts[186] + 1L
-        Calls.Ticks[186] <- Calls.Ticks[186] + spent
+        Calls.Counts[187] <- Calls.Counts[187] + 1L
+        Calls.Ticks[187] <- Calls.Ticks[187] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3500,8 +3533,8 @@ let rv_host_capability_value_kind (host: nativeint, category: int, name: string,
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_capability_value_kind (host, category, name, &kind)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[187] <- Calls.Counts[187] + 1L
-        Calls.Ticks[187] <- Calls.Ticks[187] + spent
+        Calls.Counts[188] <- Calls.Counts[188] + 1L
+        Calls.Ticks[188] <- Calls.Ticks[188] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3512,8 +3545,8 @@ let rv_host_capability_value_number (host: nativeint, category: int, name: strin
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_capability_value_number (host, category, name, &number)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[188] <- Calls.Counts[188] + 1L
-        Calls.Ticks[188] <- Calls.Ticks[188] + spent
+        Calls.Counts[189] <- Calls.Counts[189] + 1L
+        Calls.Ticks[189] <- Calls.Ticks[189] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3529,8 +3562,8 @@ let rv_host_capability_value_text
             Raw.rv_host_capability_value_text (host, category, name, buffer, capacity, length)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[189] <- Calls.Counts[189] + 1L
-        Calls.Ticks[189] <- Calls.Ticks[189] + spent
+        Calls.Counts[190] <- Calls.Counts[190] + 1L
+        Calls.Ticks[190] <- Calls.Ticks[190] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3541,8 +3574,8 @@ let rv_host_select_svg_view (host: nativeint, fragment: string, selected: byref<
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_select_svg_view (host, fragment, &selected)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[190] <- Calls.Counts[190] + 1L
-        Calls.Ticks[190] <- Calls.Ticks[190] + spent
+        Calls.Counts[191] <- Calls.Counts[191] + 1L
+        Calls.Ticks[191] <- Calls.Ticks[191] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3555,8 +3588,8 @@ let rv_image_decode
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_image_decode (host, image, completion, context, &operation)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[191] <- Calls.Counts[191] + 1L
-        Calls.Ticks[191] <- Calls.Ticks[191] + spent
+        Calls.Counts[192] <- Calls.Counts[192] + 1L
+        Calls.Ticks[192] <- Calls.Ticks[192] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3579,8 +3612,8 @@ let rv_font_load
             Raw.rv_font_load (host, family, data, length, completion, context, &operation)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[192] <- Calls.Counts[192] + 1L
-        Calls.Ticks[192] <- Calls.Ticks[192] + spent
+        Calls.Counts[193] <- Calls.Counts[193] + 1L
+        Calls.Ticks[193] <- Calls.Ticks[193] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3591,8 +3624,8 @@ let rv_resource_cancel (operation: uint64) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_resource_cancel (operation)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[193] <- Calls.Counts[193] + 1L
-        Calls.Ticks[193] <- Calls.Ticks[193] + spent
+        Calls.Counts[194] <- Calls.Counts[194] + 1L
+        Calls.Ticks[194] <- Calls.Ticks[194] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3603,8 +3636,8 @@ let rv_resource_release (operation: uint64) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_resource_release (operation)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[194] <- Calls.Counts[194] + 1L
-        Calls.Ticks[194] <- Calls.Ticks[194] + spent
+        Calls.Counts[195] <- Calls.Counts[195] + 1L
+        Calls.Ticks[195] <- Calls.Ticks[195] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3615,8 +3648,8 @@ let rv_host_construct_event (host: nativeint, kind: int, ``type``: string, init:
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_construct_event (host, kind, ``type``, &init)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[195] <- Calls.Counts[195] + 1L
-        Calls.Ticks[195] <- Calls.Ticks[195] + spent
+        Calls.Counts[196] <- Calls.Counts[196] + 1L
+        Calls.Ticks[196] <- Calls.Ticks[196] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3627,8 +3660,8 @@ let rv_custom_event_detail_json (``event``: nativeint, buffer: byte[], capacity:
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_custom_event_detail_json (``event``, buffer, capacity, length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[196] <- Calls.Counts[196] + 1L
-        Calls.Ticks[196] <- Calls.Ticks[196] + spent
+        Calls.Counts[197] <- Calls.Counts[197] + 1L
+        Calls.Ticks[197] <- Calls.Ticks[197] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3639,8 +3672,8 @@ let rv_host_create_event_target (host: nativeint) : nativeint =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_create_event_target (host)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[197] <- Calls.Counts[197] + 1L
-        Calls.Ticks[197] <- Calls.Ticks[197] + spent
+        Calls.Counts[198] <- Calls.Counts[198] + 1L
+        Calls.Ticks[198] <- Calls.Ticks[198] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3651,8 +3684,8 @@ let rv_event_target_retain (target: nativeint) : nativeint =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_event_target_retain (target)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[198] <- Calls.Counts[198] + 1L
-        Calls.Ticks[198] <- Calls.Ticks[198] + spent
+        Calls.Counts[199] <- Calls.Counts[199] + 1L
+        Calls.Ticks[199] <- Calls.Ticks[199] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3663,8 +3696,8 @@ let rv_event_target_release (target: nativeint) : unit =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_event_target_release (target)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[199] <- Calls.Counts[199] + 1L
-        Calls.Ticks[199] <- Calls.Ticks[199] + spent
+        Calls.Counts[200] <- Calls.Counts[200] + 1L
+        Calls.Ticks[200] <- Calls.Ticks[200] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3675,8 +3708,8 @@ let rv_node_as_event_target (node: nativeint) : nativeint =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_node_as_event_target (node)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[200] <- Calls.Counts[200] + 1L
-        Calls.Ticks[200] <- Calls.Ticks[200] + spent
+        Calls.Counts[201] <- Calls.Counts[201] + 1L
+        Calls.Ticks[201] <- Calls.Ticks[201] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3687,8 +3720,8 @@ let rv_event_target_as_node (target: nativeint) : nativeint =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_event_target_as_node (target)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[201] <- Calls.Counts[201] + 1L
-        Calls.Ticks[201] <- Calls.Ticks[201] + spent
+        Calls.Counts[202] <- Calls.Counts[202] + 1L
+        Calls.Ticks[202] <- Calls.Ticks[202] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3699,8 +3732,8 @@ let rv_event_target_equals (left: nativeint, right: nativeint) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_event_target_equals (left, right)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[202] <- Calls.Counts[202] + 1L
-        Calls.Ticks[202] <- Calls.Ticks[202] + spent
+        Calls.Counts[203] <- Calls.Counts[203] + 1L
+        Calls.Ticks[203] <- Calls.Ticks[203] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3716,8 +3749,8 @@ let rv_event_target_add_listener
             Raw.rv_event_target_add_listener (target, ``type``, flags, callback, context)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[203] <- Calls.Counts[203] + 1L
-        Calls.Ticks[203] <- Calls.Ticks[203] + spent
+        Calls.Counts[204] <- Calls.Counts[204] + 1L
+        Calls.Ticks[204] <- Calls.Ticks[204] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3728,8 +3761,8 @@ let rv_event_target_dispatch (target: nativeint, ``event``: nativeint, defaultPr
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_event_target_dispatch (target, ``event``, &defaultPrevented)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[204] <- Calls.Counts[204] + 1L
-        Calls.Ticks[204] <- Calls.Ticks[204] + spent
+        Calls.Counts[205] <- Calls.Counts[205] + 1L
+        Calls.Ticks[205] <- Calls.Ticks[205] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3740,8 +3773,8 @@ let rv_event_get_target (``event``: nativeint, current: int) : nativeint =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_event_get_target (``event``, current)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[205] <- Calls.Counts[205] + 1L
-        Calls.Ticks[205] <- Calls.Ticks[205] + spent
+        Calls.Counts[206] <- Calls.Counts[206] + 1L
+        Calls.Ticks[206] <- Calls.Ticks[206] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3752,8 +3785,8 @@ let rv_event_get_related_target (``event``: nativeint) : nativeint =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_event_get_related_target (``event``)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[206] <- Calls.Counts[206] + 1L
-        Calls.Ticks[206] <- Calls.Ticks[206] + spent
+        Calls.Counts[207] <- Calls.Counts[207] + 1L
+        Calls.Ticks[207] <- Calls.Ticks[207] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3764,8 +3797,8 @@ let rv_host_window_event_target (host: nativeint) : nativeint =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_window_event_target (host)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[207] <- Calls.Counts[207] + 1L
-        Calls.Ticks[207] <- Calls.Ticks[207] + spent
+        Calls.Counts[208] <- Calls.Counts[208] + 1L
+        Calls.Ticks[208] <- Calls.Ticks[208] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3776,8 +3809,8 @@ let rv_host_max_touch_points (host: nativeint, value: byref<int>) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_max_touch_points (host, &value)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[208] <- Calls.Counts[208] + 1L
-        Calls.Ticks[208] <- Calls.Ticks[208] + spent
+        Calls.Counts[209] <- Calls.Counts[209] + 1L
+        Calls.Ticks[209] <- Calls.Ticks[209] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3788,8 +3821,8 @@ let rv_host_window_metrics (host: nativeint, metrics: nativeint) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_window_metrics (host, metrics)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[209] <- Calls.Counts[209] + 1L
-        Calls.Ticks[209] <- Calls.Ticks[209] + spent
+        Calls.Counts[210] <- Calls.Counts[210] + 1L
+        Calls.Ticks[210] <- Calls.Ticks[210] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3800,8 +3833,8 @@ let rv_host_set_visible (host: nativeint, visible: int) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_set_visible (host, visible)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[210] <- Calls.Counts[210] + 1L
-        Calls.Ticks[210] <- Calls.Ticks[210] + spent
+        Calls.Counts[211] <- Calls.Counts[211] + 1L
+        Calls.Ticks[211] <- Calls.Ticks[211] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3812,8 +3845,8 @@ let rv_host_match_media (host: nativeint, query: string) : nativeint =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_match_media (host, query)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[211] <- Calls.Counts[211] + 1L
-        Calls.Ticks[211] <- Calls.Ticks[211] + spent
+        Calls.Counts[212] <- Calls.Counts[212] + 1L
+        Calls.Ticks[212] <- Calls.Ticks[212] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3824,8 +3857,8 @@ let rv_media_query_matches (target: nativeint, matches: byref<int>) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_media_query_matches (target, &matches)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[212] <- Calls.Counts[212] + 1L
-        Calls.Ticks[212] <- Calls.Ticks[212] + spent
+        Calls.Counts[213] <- Calls.Counts[213] + 1L
+        Calls.Ticks[213] <- Calls.Ticks[213] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3836,8 +3869,8 @@ let rv_media_query_media (target: nativeint, buffer: byte[], capacity: int, leng
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_media_query_media (target, buffer, capacity, length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[213] <- Calls.Counts[213] + 1L
-        Calls.Ticks[213] <- Calls.Ticks[213] + spent
+        Calls.Counts[214] <- Calls.Counts[214] + 1L
+        Calls.Ticks[214] <- Calls.Ticks[214] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3848,8 +3881,8 @@ let rv_blob_read_bytes (blob: nativeint, buffer: byte[], capacity: int64, length
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_blob_read_bytes (blob, buffer, capacity, &length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[214] <- Calls.Counts[214] + 1L
-        Calls.Ticks[214] <- Calls.Ticks[214] + spent
+        Calls.Counts[215] <- Calls.Counts[215] + 1L
+        Calls.Ticks[215] <- Calls.Ticks[215] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3860,8 +3893,8 @@ let rv_file_list_create (files: nativeint[], count: int, result: nativeint[]) : 
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_file_list_create (files, count, result)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[215] <- Calls.Counts[215] + 1L
-        Calls.Ticks[215] <- Calls.Ticks[215] + spent
+        Calls.Counts[216] <- Calls.Counts[216] + 1L
+        Calls.Ticks[216] <- Calls.Ticks[216] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else

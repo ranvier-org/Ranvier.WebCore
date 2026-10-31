@@ -1,0 +1,42 @@
+{
+ "browser": "156.0.8078.4",
+ "differences": [
+  {
+   "case": "submitter overrides",
+   "kind": "submissions",
+   "chromium": [
+    {
+     "method": "POST",
+     "url": "https://app.test/other?k=1",
+     "contentType": "text/plain",
+     "body": "q=a+b%26c%3Dd&cb=on&o=v&outside=o",
+     "newWindow": false
+    },
+    {
+     "method": "POST",
+     "url": "https://app.test/other?k=1",
+     "contentType": "text/plain",
+     "body": "q=a+b%26c%3Dd&cb=on&o=v&outside=o",
+     "newWindow": false
+    }
+   ],
+   "native": [
+    {
+     "method": "POST",
+     "url": "https://app.test/other?k=1",
+     "contentType": "text/plain",
+     "body": "q=a b&c=d\r\ncb=on\r\no=v\r\noutside=o\r\n",
+     "newWindow": false
+    },
+    {
+     "method": "POST",
+     "url": "https://app.test/other?k=1",
+     "contentType": "text/plain",
+     "body": "q=a b&c=d\r\ncb=on\r\no=v\r\noutside=o\r\n",
+     "newWindow": false
+    }
+   ],
+   "qualification": "HTML text/plain encoding: each entry is name=value followed by CRLF, with no percent-encoding. WebCore follows it. The Chromium 156 record shows the Playwright request body percent-encoded and joined with \"&\", so this difference is measured and qualified, not a WebCore defect."
+  }
+ ]
+}

@@ -1,9 +1,9 @@
 {
-  "checkedAtUtc": "2026-10-31T09:02:43.988597+00:00",
+  "checkedAtUtc": "2026-10-31T09:19:37.148477+00:00",
   "purpose": "T06 text segmentation Native35/ABI43, DOM alpha.38, Views 0.1.28, WebCore backend alpha.28 reservation",
   "abi": 43,
   "stackedOn": "99316eb (G05 dc0951a + D16 42c4810 + H11 9443269 + G09 a292f73 Native32/ABI40)",
-  "abiNumberInUse": "",
+  "abiNumberInUse": "host/RanvierWebCoreAbi.cpp:1255:int32_t rv_abi_version(void) { return 43; }",
   "packages": [
     {
       "package": "Ranvier.WebCore",
