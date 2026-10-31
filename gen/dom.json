@@ -142,6 +142,18 @@
       "passReceiver": false,
       "stringInputs": "utf8-lengths"
     },
+    "ToggleEvent": {
+      "receiver": "Document",
+      "factory": "ToggleEvent::create",
+      "passReceiver": false,
+      "stringInputs": "utf8-lengths"
+    },
+    "CommandEvent": {
+      "receiver": "Document",
+      "factory": "CommandEvent::create",
+      "passReceiver": false,
+      "stringInputs": "utf8-lengths"
+    },
     "DOMFormData": {
       "receiver": "Document",
       "factory": "DOMFormData::create"
@@ -150,7 +162,9 @@
   "dictionaryCppTypes": {
     "CSSStyleSheetInit": "CSSStyleSheet::Init",
     "SubmitEventInit": "SubmitEvent::Init",
-    "FormDataEventInit": "FormDataEvent::Init"
+    "FormDataEventInit": "FormDataEvent::Init",
+    "ToggleEventInit": "ToggleEvent::Init",
+    "CommandEventInit": "CommandEvent::Init"
   },
   "dictionaryObjectMembers": [
     "FormDataEventInit.formData"
@@ -438,6 +452,8 @@
     "CompositionEvent",
     "SubmitEvent",
     "FormDataEvent",
+    "ToggleEvent",
+    "CommandEvent",
     "SVGGraphicsElement",
     "SVGGeometryElement",
     "SVGPolygonElement",
@@ -589,7 +605,6 @@
       "TextTrack",
       "TextTrackList",
       "TimeRanges",
-      "ToggleEvent",
       "TouchEvent"
     ],
     "aliases": {

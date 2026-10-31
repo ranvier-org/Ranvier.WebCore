@@ -1,0 +1,1185 @@
+{
+ "description": "D16 dialog, popover and command invoker cases. Each case runs on a fresh page of markup at viewport 800x600. Every step records its status, value and the events delivered to the document capture listeners during the step.",
+ "viewport": [
+  800,
+  600
+ ],
+ "eventTypes": [
+  "beforetoggle",
+  "toggle",
+  "cancel",
+  "close",
+  "command"
+ ],
+ "markup": "<!doctype html><html><head><style>html,body{margin:0}#under{position:absolute;left:0;top:0;width:800px;height:600px}dialog{box-sizing:border-box;width:200px;height:100px;padding:0;border:0;margin:0;position:absolute;left:300px;top:200px}[popover]{box-sizing:border-box;width:100px;height:50px;padding:0;border:0;margin:0;position:fixed;inset:auto;left:600px;top:400px}#p2{left:600px;top:500px}#pm{left:10px;top:500px}#ph{left:150px;top:500px}#ph2{left:260px;top:500px}button{position:absolute;width:40px;height:20px;padding:0;border:0;margin:0}</style></head><body><div id=\"under\"></div><button id=\"before\" style=\"left:0;top:0\">before</button><dialog id=\"d\"><form method=\"dialog\" id=\"df\"><button id=\"dsubmit\" value=\"ok\" style=\"left:0;top:0\">ok</button></form></dialog><dialog id=\"m\"><input id=\"mfirst\"><input id=\"mauto\" autofocus></dialog><dialog id=\"cb\" closedby=\"any\">any</dialog><dialog id=\"cn\" closedby=\"none\">none</dialog><div id=\"p\" popover>auto</div><div id=\"p2\" popover>auto two</div><div id=\"pm\" popover=\"manual\">manual</div><div id=\"ph\" popover=\"hint\">hint</div><div id=\"ph2\" popover=\"hint\">hint two</div><div id=\"plain\">plain</div><button id=\"tog\" popovertarget=\"p\" style=\"left:0;top:40px\">t</button><button id=\"show\" popovertarget=\"p\" popovertargetaction=\"show\" style=\"left:50px;top:40px\">s</button><button id=\"hide\" popovertarget=\"p\" popovertargetaction=\"hide\" style=\"left:100px;top:40px\">h</button><button id=\"cmodal\" commandfor=\"m\" command=\"show-modal\" style=\"left:0;top:80px\">o</button><button id=\"cclose\" commandfor=\"m\" command=\"close\" value=\"bycmd\" style=\"left:50px;top:80px\">c</button><button id=\"creq\" commandfor=\"m\" command=\"request-close\" value=\"req\" style=\"left:100px;top:80px\">r</button><button id=\"ctoggle\" commandfor=\"p\" command=\"toggle-popover\" style=\"left:150px;top:80px\">tp</button><button id=\"cshowp\" commandfor=\"p\" command=\"show-popover\" style=\"left:200px;top:80px\">sp</button><button id=\"chidep\" commandfor=\"p\" command=\"hide-popover\" style=\"left:250px;top:80px\">hp</button><button id=\"ccustom\" commandfor=\"plain\" command=\"--spin\" style=\"left:0;top:120px\">x</button><button id=\"cbad\" commandfor=\"plain\" command=\"bogus\" style=\"left:50px;top:120px\">b</button><button id=\"cdialogp\" commandfor=\"d\" command=\"show-popover\" style=\"left:100px;top:120px\">dp</button></body></html>",
+ "cases": [
+  {
+   "name": "dialog show and close",
+   "steps": [
+    {
+     "op": "prop",
+     "id": "d",
+     "name": "open"
+    },
+    {
+     "op": "show",
+     "id": "d"
+    },
+    {
+     "op": "prop",
+     "id": "d",
+     "name": "open"
+    },
+    {
+     "op": "hasAttr",
+     "id": "d",
+     "name": "open"
+    },
+    {
+     "op": "matches",
+     "id": "d",
+     "selector": ":modal"
+    },
+    {
+     "op": "matches",
+     "id": "d",
+     "selector": ":open"
+    },
+    {
+     "op": "show",
+     "id": "d"
+    },
+    {
+     "op": "showModal",
+     "id": "d"
+    },
+    {
+     "op": "close",
+     "id": "d",
+     "value": "first"
+    },
+    {
+     "op": "prop",
+     "id": "d",
+     "name": "returnValue"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "close",
+     "id": "d",
+     "value": "second"
+    },
+    {
+     "op": "prop",
+     "id": "d",
+     "name": "returnValue"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "set",
+     "id": "d",
+     "name": "open",
+     "value": true
+    },
+    {
+     "op": "hasAttr",
+     "id": "d",
+     "name": "open"
+    },
+    {
+     "op": "close",
+     "id": "d"
+    },
+    {
+     "op": "prop",
+     "id": "d",
+     "name": "returnValue"
+    },
+    {
+     "op": "set",
+     "id": "d",
+     "name": "returnValue",
+     "value": "manual"
+    },
+    {
+     "op": "prop",
+     "id": "d",
+     "name": "returnValue"
+    },
+    {
+     "op": "flush"
+    }
+   ]
+  },
+  {
+   "name": "modal dialog top layer and focus",
+   "steps": [
+    {
+     "op": "focus",
+     "id": "before"
+    },
+    {
+     "op": "active"
+    },
+    {
+     "op": "showModal",
+     "id": "m"
+    },
+    {
+     "op": "prop",
+     "id": "m",
+     "name": "open"
+    },
+    {
+     "op": "matches",
+     "id": "m",
+     "selector": ":modal"
+    },
+    {
+     "op": "active"
+    },
+    {
+     "op": "hit",
+     "x": 400,
+     "y": 250
+    },
+    {
+     "op": "hit",
+     "x": 20,
+     "y": 10
+    },
+    {
+     "op": "hit",
+     "x": 700,
+     "y": 550
+    },
+    {
+     "op": "focus",
+     "id": "before"
+    },
+    {
+     "op": "active"
+    },
+    {
+     "op": "show",
+     "id": "m"
+    },
+    {
+     "op": "showModal",
+     "id": "m"
+    },
+    {
+     "op": "showModal",
+     "id": "d"
+    },
+    {
+     "op": "matches",
+     "id": "d",
+     "selector": ":modal"
+    },
+    {
+     "op": "hit",
+     "x": 400,
+     "y": 250
+    },
+    {
+     "op": "close",
+     "id": "d"
+    },
+    {
+     "op": "close",
+     "id": "m"
+    },
+    {
+     "op": "matches",
+     "id": "m",
+     "selector": ":modal"
+    },
+    {
+     "op": "active"
+    },
+    {
+     "op": "hit",
+     "x": 20,
+     "y": 10
+    },
+    {
+     "op": "flush"
+    }
+   ]
+  },
+  {
+   "name": "dialog requestClose",
+   "steps": [
+    {
+     "op": "showModal",
+     "id": "m"
+    },
+    {
+     "op": "requestClose",
+     "id": "m",
+     "value": "r1"
+    },
+    {
+     "op": "prop",
+     "id": "m",
+     "name": "open"
+    },
+    {
+     "op": "prop",
+     "id": "m",
+     "name": "returnValue"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "prevent",
+     "type": "cancel"
+    },
+    {
+     "op": "showModal",
+     "id": "m"
+    },
+    {
+     "op": "requestClose",
+     "id": "m",
+     "value": "r2"
+    },
+    {
+     "op": "prop",
+     "id": "m",
+     "name": "open"
+    },
+    {
+     "op": "prop",
+     "id": "m",
+     "name": "returnValue"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "close",
+     "id": "m"
+    },
+    {
+     "op": "requestClose",
+     "id": "m",
+     "value": "r3"
+    },
+    {
+     "op": "flush"
+    }
+   ]
+  },
+  {
+   "name": "close requests and closedby",
+   "steps": [
+    {
+     "op": "prop",
+     "id": "d",
+     "name": "closedBy"
+    },
+    {
+     "op": "prop",
+     "id": "m",
+     "name": "closedBy"
+    },
+    {
+     "op": "prop",
+     "id": "cb",
+     "name": "closedBy"
+    },
+    {
+     "op": "prop",
+     "id": "cn",
+     "name": "closedBy"
+    },
+    {
+     "op": "showModal",
+     "id": "m"
+    },
+    {
+     "op": "prop",
+     "id": "m",
+     "name": "closedBy"
+    },
+    {
+     "op": "press",
+     "key": "Escape"
+    },
+    {
+     "op": "prop",
+     "id": "m",
+     "name": "open"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "showModal",
+     "id": "cn"
+    },
+    {
+     "op": "press",
+     "key": "Escape"
+    },
+    {
+     "op": "prop",
+     "id": "cn",
+     "name": "open"
+    },
+    {
+     "op": "close",
+     "id": "cn"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "show",
+     "id": "cb"
+    },
+    {
+     "op": "mouse",
+     "x": 700,
+     "y": 100
+    },
+    {
+     "op": "prop",
+     "id": "cb",
+     "name": "open"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "set",
+     "id": "m",
+     "name": "closedBy",
+     "value": "any"
+    },
+    {
+     "op": "prop",
+     "id": "m",
+     "name": "closedBy"
+    },
+    {
+     "op": "set",
+     "id": "m",
+     "name": "closedBy",
+     "value": "bogus"
+    },
+    {
+     "op": "prop",
+     "id": "m",
+     "name": "closedBy"
+    }
+   ]
+  },
+  {
+   "name": "form method dialog",
+   "steps": [
+    {
+     "op": "show",
+     "id": "d"
+    },
+    {
+     "op": "click",
+     "id": "dsubmit"
+    },
+    {
+     "op": "prop",
+     "id": "d",
+     "name": "open"
+    },
+    {
+     "op": "prop",
+     "id": "d",
+     "name": "returnValue"
+    },
+    {
+     "op": "flush"
+    }
+   ]
+  },
+  {
+   "name": "popover methods",
+   "steps": [
+    {
+     "op": "prop",
+     "id": "p",
+     "name": "popover"
+    },
+    {
+     "op": "prop",
+     "id": "pm",
+     "name": "popover"
+    },
+    {
+     "op": "prop",
+     "id": "ph",
+     "name": "popover"
+    },
+    {
+     "op": "prop",
+     "id": "plain",
+     "name": "popover"
+    },
+    {
+     "op": "showPopover",
+     "id": "p"
+    },
+    {
+     "op": "matches",
+     "id": "p",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "showPopover",
+     "id": "p"
+    },
+    {
+     "op": "togglePopover",
+     "id": "p"
+    },
+    {
+     "op": "matches",
+     "id": "p",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "togglePopover",
+     "id": "p",
+     "force": true
+    },
+    {
+     "op": "togglePopover",
+     "id": "p",
+     "force": true
+    },
+    {
+     "op": "hidePopover",
+     "id": "p"
+    },
+    {
+     "op": "hidePopover",
+     "id": "p"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "showPopover",
+     "id": "plain"
+    },
+    {
+     "op": "hidePopover",
+     "id": "plain"
+    },
+    {
+     "op": "togglePopover",
+     "id": "plain"
+    },
+    {
+     "op": "showPopover",
+     "id": "p",
+     "source": "tog"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "hidePopover",
+     "id": "p"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "set",
+     "id": "plain",
+     "name": "popover",
+     "value": "manual"
+    },
+    {
+     "op": "prop",
+     "id": "plain",
+     "name": "popover"
+    },
+    {
+     "op": "set",
+     "id": "plain",
+     "name": "popover",
+     "value": "bogus"
+    },
+    {
+     "op": "prop",
+     "id": "plain",
+     "name": "popover"
+    }
+   ]
+  },
+  {
+   "name": "popover stacking and light dismiss",
+   "steps": [
+    {
+     "op": "showPopover",
+     "id": "p"
+    },
+    {
+     "op": "showPopover",
+     "id": "p2"
+    },
+    {
+     "op": "matches",
+     "id": "p",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "showPopover",
+     "id": "pm"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "hit",
+     "x": 650,
+     "y": 520
+    },
+    {
+     "op": "mouse",
+     "x": 400,
+     "y": 300
+    },
+    {
+     "op": "matches",
+     "id": "p2",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "matches",
+     "id": "pm",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "showPopover",
+     "id": "p"
+    },
+    {
+     "op": "press",
+     "key": "Escape"
+    },
+    {
+     "op": "matches",
+     "id": "p",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "matches",
+     "id": "pm",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "showPopover",
+     "id": "ph"
+    },
+    {
+     "op": "matches",
+     "id": "ph",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "hidePopover",
+     "id": "pm"
+    },
+    {
+     "op": "hidePopover",
+     "id": "ph"
+    },
+    {
+     "op": "flush"
+    }
+   ]
+  },
+  {
+   "name": "popover beforetoggle cancel",
+   "steps": [
+    {
+     "op": "prevent",
+     "type": "beforetoggle"
+    },
+    {
+     "op": "showPopover",
+     "id": "p"
+    },
+    {
+     "op": "matches",
+     "id": "p",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "showPopover",
+     "id": "p"
+    },
+    {
+     "op": "prevent",
+     "type": "beforetoggle"
+    },
+    {
+     "op": "hidePopover",
+     "id": "p"
+    },
+    {
+     "op": "matches",
+     "id": "p",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "flush"
+    }
+   ]
+  },
+  {
+   "name": "popovertarget invokers",
+   "steps": [
+    {
+     "op": "prop",
+     "id": "tog",
+     "name": "popoverTargetElement"
+    },
+    {
+     "op": "prop",
+     "id": "tog",
+     "name": "popoverTargetAction"
+    },
+    {
+     "op": "prop",
+     "id": "show",
+     "name": "popoverTargetAction"
+    },
+    {
+     "op": "click",
+     "id": "tog"
+    },
+    {
+     "op": "matches",
+     "id": "p",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "click",
+     "id": "tog"
+    },
+    {
+     "op": "matches",
+     "id": "p",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "click",
+     "id": "show"
+    },
+    {
+     "op": "click",
+     "id": "show"
+    },
+    {
+     "op": "matches",
+     "id": "p",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "click",
+     "id": "hide"
+    },
+    {
+     "op": "matches",
+     "id": "p",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "mouse",
+     "x": 20,
+     "y": 50
+    },
+    {
+     "op": "matches",
+     "id": "p",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "set",
+     "id": "tog",
+     "name": "popoverTargetAction",
+     "value": "bogus"
+    },
+    {
+     "op": "prop",
+     "id": "tog",
+     "name": "popoverTargetAction"
+    },
+    {
+     "op": "set",
+     "id": "tog",
+     "name": "popoverTargetElement",
+     "value": "pm"
+    },
+    {
+     "op": "prop",
+     "id": "tog",
+     "name": "popoverTargetElement"
+    },
+    {
+     "op": "set",
+     "id": "tog",
+     "name": "popoverTargetElement",
+     "value": null
+    },
+    {
+     "op": "prop",
+     "id": "tog",
+     "name": "popoverTargetElement"
+    }
+   ]
+  },
+  {
+   "name": "command invokers",
+   "steps": [
+    {
+     "op": "prop",
+     "id": "cmodal",
+     "name": "command"
+    },
+    {
+     "op": "prop",
+     "id": "cmodal",
+     "name": "commandForElement"
+    },
+    {
+     "op": "prop",
+     "id": "cbad",
+     "name": "command"
+    },
+    {
+     "op": "prop",
+     "id": "ccustom",
+     "name": "command"
+    },
+    {
+     "op": "click",
+     "id": "cmodal"
+    },
+    {
+     "op": "prop",
+     "id": "m",
+     "name": "open"
+    },
+    {
+     "op": "matches",
+     "id": "m",
+     "selector": ":modal"
+    },
+    {
+     "op": "click",
+     "id": "cclose"
+    },
+    {
+     "op": "prop",
+     "id": "m",
+     "name": "open"
+    },
+    {
+     "op": "prop",
+     "id": "m",
+     "name": "returnValue"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "click",
+     "id": "cmodal"
+    },
+    {
+     "op": "click",
+     "id": "creq"
+    },
+    {
+     "op": "prop",
+     "id": "m",
+     "name": "open"
+    },
+    {
+     "op": "prop",
+     "id": "m",
+     "name": "returnValue"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "click",
+     "id": "ctoggle"
+    },
+    {
+     "op": "matches",
+     "id": "p",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "click",
+     "id": "cshowp"
+    },
+    {
+     "op": "click",
+     "id": "chidep"
+    },
+    {
+     "op": "matches",
+     "id": "p",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "click",
+     "id": "ccustom"
+    },
+    {
+     "op": "click",
+     "id": "cbad"
+    },
+    {
+     "op": "click",
+     "id": "cdialogp"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "prevent",
+     "type": "command"
+    },
+    {
+     "op": "click",
+     "id": "cmodal"
+    },
+    {
+     "op": "prop",
+     "id": "m",
+     "name": "open"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "set",
+     "id": "ccustom",
+     "name": "command",
+     "value": "close"
+    },
+    {
+     "op": "prop",
+     "id": "ccustom",
+     "name": "command"
+    },
+    {
+     "op": "set",
+     "id": "ccustom",
+     "name": "commandForElement",
+     "value": "d"
+    },
+    {
+     "op": "prop",
+     "id": "ccustom",
+     "name": "commandForElement"
+    }
+   ]
+  },
+  {
+   "name": "constructed toggle and command events",
+   "steps": [
+    {
+     "op": "construct",
+     "interface": "ToggleEvent",
+     "type": "toggle",
+     "init": {}
+    },
+    {
+     "op": "construct",
+     "interface": "ToggleEvent",
+     "type": "beforetoggle",
+     "init": {
+      "oldState": "closed",
+      "newState": "open",
+      "source": "tog",
+      "cancelable": true
+     }
+    },
+    {
+     "op": "construct",
+     "interface": "CommandEvent",
+     "type": "command",
+     "init": {}
+    },
+    {
+     "op": "construct",
+     "interface": "CommandEvent",
+     "type": "command",
+     "init": {
+      "command": "--spin",
+      "source": "ccustom",
+      "bubbles": true,
+      "cancelable": true
+     }
+    },
+    {
+     "op": "dispatch",
+     "id": "plain",
+     "interface": "CommandEvent",
+     "type": "command",
+     "init": {
+      "command": "show-modal",
+      "source": "cmodal",
+      "cancelable": true
+     }
+    },
+    {
+     "op": "prop",
+     "id": "m",
+     "name": "open"
+    },
+    {
+     "op": "dispatch",
+     "id": "p",
+     "interface": "ToggleEvent",
+     "type": "beforetoggle",
+     "init": {
+      "oldState": "closed",
+      "newState": "open",
+      "cancelable": true
+     }
+    },
+    {
+     "op": "matches",
+     "id": "p",
+     "selector": ":popover-open"
+    }
+   ]
+  },
+  {
+   "name": "popover hint stacking",
+   "steps": [
+    {
+     "op": "prop",
+     "id": "ph2",
+     "name": "popover"
+    },
+    {
+     "op": "showPopover",
+     "id": "p"
+    },
+    {
+     "op": "showPopover",
+     "id": "ph"
+    },
+    {
+     "op": "matches",
+     "id": "p",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "matches",
+     "id": "ph",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "showPopover",
+     "id": "ph2"
+    },
+    {
+     "op": "matches",
+     "id": "ph",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "matches",
+     "id": "p",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "showPopover",
+     "id": "p2"
+    },
+    {
+     "op": "matches",
+     "id": "p",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "matches",
+     "id": "ph2",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "showPopover",
+     "id": "ph"
+    },
+    {
+     "op": "mouse",
+     "x": 400,
+     "y": 300
+    },
+    {
+     "op": "matches",
+     "id": "ph",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "matches",
+     "id": "p2",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "showPopover",
+     "id": "p"
+    },
+    {
+     "op": "showPopover",
+     "id": "ph"
+    },
+    {
+     "op": "press",
+     "key": "Escape"
+    },
+    {
+     "op": "matches",
+     "id": "ph",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "matches",
+     "id": "p",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "press",
+     "key": "Escape"
+    },
+    {
+     "op": "matches",
+     "id": "p",
+     "selector": ":popover-open"
+    },
+    {
+     "op": "flush"
+    }
+   ]
+  },
+  {
+   "name": "close request after user activation",
+   "steps": [
+    {
+     "op": "mouse",
+     "x": 780,
+     "y": 590
+    },
+    {
+     "op": "showModal",
+     "id": "m"
+    },
+    {
+     "op": "press",
+     "key": "Escape"
+    },
+    {
+     "op": "prop",
+     "id": "m",
+     "name": "open"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "showModal",
+     "id": "m"
+    },
+    {
+     "op": "press",
+     "key": "Escape"
+    },
+    {
+     "op": "prop",
+     "id": "m",
+     "name": "open"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "showModal",
+     "id": "m"
+    },
+    {
+     "op": "mouse",
+     "x": 780,
+     "y": 590
+    },
+    {
+     "op": "requestClose",
+     "id": "m",
+     "value": "act"
+    },
+    {
+     "op": "prop",
+     "id": "m",
+     "name": "open"
+    },
+    {
+     "op": "flush"
+    }
+   ]
+  }
+ ]
+}

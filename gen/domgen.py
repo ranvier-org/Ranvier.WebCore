@@ -1584,6 +1584,10 @@ class Generator(ComplexGeneratorMixin):
                 body += [f"RefPtr impl = {self.cast_expression(cls, root_cls, f'*reinterpret_cast<{root_cls}*>(target)')};", "if (!impl)",
                          "    return RV_ERR_WRONG_INTERFACE;"]
         setting = member.attrs.get("EnabledBySetting")
+        if setting and "Event" in chain and self.world.interfaces[interface].attrs.get("EnabledBySetting") == setting:
+            # An event of a gated interface exists only where its setting was on: its constructor checks the
+            # setting, and the engine creates one only then. A constructed event has no target before dispatch.
+            setting = None
         if setting:
             body += self.setting_check(interface, chain, setting)
             notes.append(f"RV_ERR_UNSUPPORTED while the setting {setting} is off")

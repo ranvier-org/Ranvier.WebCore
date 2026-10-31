@@ -2123,6 +2123,13 @@ WEBCORE_EXPORT int32_t ranvier_dom_submit_event_create(RvNode* target, const uin
 WEBCORE_EXPORT int32_t ranvier_dom_submit_event_get_submitter(RvEvent* target, RvNode** result);
 WEBCORE_EXPORT int32_t ranvier_dom_form_data_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomFormDataEventInit* event_init_dict, RvEvent** result);
 WEBCORE_EXPORT int32_t ranvier_dom_form_data_event_get_form_data(RvEvent* target, RvDOMFormData** result);
+WEBCORE_EXPORT int32_t ranvier_dom_toggle_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomToggleEventInit* event_init_dict, RvEvent** result);
+WEBCORE_EXPORT int32_t ranvier_dom_toggle_event_get_old_state(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
+WEBCORE_EXPORT int32_t ranvier_dom_toggle_event_get_new_state(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
+WEBCORE_EXPORT int32_t ranvier_dom_toggle_event_get_source(RvEvent* target, RvNode** result);
+WEBCORE_EXPORT int32_t ranvier_dom_command_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomCommandEventInit* event_init_dict, RvEvent** result);
+WEBCORE_EXPORT int32_t ranvier_dom_command_event_get_source(RvEvent* target, RvNode** result);
+WEBCORE_EXPORT int32_t ranvier_dom_command_event_get_command(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
 WEBCORE_EXPORT int32_t ranvier_dom_svg_graphics_element_get_transform(RvNode* target, RvSVGAnimatedTransformList** result);
 WEBCORE_EXPORT int32_t ranvier_dom_svg_graphics_element_get_required_extensions(RvNode* target, RvSVGStringList** result);
 WEBCORE_EXPORT int32_t ranvier_dom_svg_graphics_element_get_system_language(RvNode* target, RvSVGStringList** result);
