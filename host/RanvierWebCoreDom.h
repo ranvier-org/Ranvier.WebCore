@@ -126,7 +126,8 @@ typedef struct RvDomSequenceFileOrUSVString RvDomSequenceFileOrUSVString;
 typedef struct RvDomSequencePointerEvent RvDomSequencePointerEvent;
 typedef struct RvDomUnionBufferSourceOrBlobOrUSVString RvDomUnionBufferSourceOrBlobOrUSVString;
 typedef struct RvDomSequenceBufferSourceOrBlobOrUSVString RvDomSequenceBufferSourceOrBlobOrUSVString;
-typedef struct RvDomSequenceSequenceOfUSVString RvDomSequenceSequenceOfUSVString;
+typedef struct RvDomSequenceUSVStringUtf8 RvDomSequenceUSVStringUtf8;
+typedef struct RvDomSequenceSequenceOfUSVStringUtf8 RvDomSequenceSequenceOfUSVStringUtf8;
 typedef struct RvDomPairUSVStringAndUSVString RvDomPairUSVStringAndUSVString;
 typedef struct RvDomSequencePairUSVStringAndUSVString RvDomSequencePairUSVStringAndUSVString;
 typedef struct RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString;
@@ -798,7 +799,8 @@ typedef struct RvDomSequenceFileOrUSVString RvDomSequenceFileOrUSVString;
 typedef struct RvDomSequencePointerEvent RvDomSequencePointerEvent;
 typedef struct RvDomUnionBufferSourceOrBlobOrUSVString RvDomUnionBufferSourceOrBlobOrUSVString;
 typedef struct RvDomSequenceBufferSourceOrBlobOrUSVString RvDomSequenceBufferSourceOrBlobOrUSVString;
-typedef struct RvDomSequenceSequenceOfUSVString RvDomSequenceSequenceOfUSVString;
+typedef struct RvDomSequenceUSVStringUtf8 RvDomSequenceUSVStringUtf8;
+typedef struct RvDomSequenceSequenceOfUSVStringUtf8 RvDomSequenceSequenceOfUSVStringUtf8;
 typedef struct RvDomPairUSVStringAndUSVString RvDomPairUSVStringAndUSVString;
 typedef struct RvDomSequencePairUSVStringAndUSVString RvDomSequencePairUSVStringAndUSVString;
 typedef struct RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString;
@@ -1243,10 +1245,18 @@ struct RvDomSequenceBufferSourceOrBlobOrUSVString {
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
-struct RvDomSequenceSequenceOfUSVString {
+struct RvDomSequenceUSVStringUtf8 {
     int32_t present;
     int32_t count;
-    RvDomSequenceUSVString* items;
+    RvDomUtf8StringSpan* items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceSequenceOfUSVStringUtf8 {
+    int32_t present;
+    int32_t count;
+    RvDomSequenceUSVStringUtf8* items;
 };
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
@@ -1268,14 +1278,14 @@ struct RvDomSequencePairUSVStringAndUSVString {
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
 enum {
-    RV_DOM_UNION_SEQUENCE_OF_SEQUENCE_OF_USV_STRING_OR_RECORD_OF_USV_STRING_AND_USV_STRING_OR_USV_STRING_SEQUENCE_SEQUENCE_OF_USV_STRING = 1,
+    RV_DOM_UNION_SEQUENCE_OF_SEQUENCE_OF_USV_STRING_OR_RECORD_OF_USV_STRING_AND_USV_STRING_OR_USV_STRING_SEQUENCE_SEQUENCE_OF_USV_STRING_UTF8 = 1,
     RV_DOM_UNION_SEQUENCE_OF_SEQUENCE_OF_USV_STRING_OR_RECORD_OF_USV_STRING_AND_USV_STRING_OR_USV_STRING_SEQUENCE_PAIR_USV_STRING_AND_USV_STRING = 2,
     RV_DOM_UNION_SEQUENCE_OF_SEQUENCE_OF_USV_STRING_OR_RECORD_OF_USV_STRING_AND_USV_STRING_OR_USV_STRING_STRING = 3,
 };
 struct RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString {
     int32_t present;
     int32_t tag;
-    RvDomSequenceSequenceOfUSVString arm0;
+    RvDomSequenceSequenceOfUSVStringUtf8 arm0;
     RvDomSequencePairUSVStringAndUSVString arm1;
     RvDomUtf8StringSpan arm2;
 };
@@ -1408,7 +1418,8 @@ RV_EXPORT void rv_dom_sequence_file_or_usv_string_release(RvDomSequenceFileOrUSV
 RV_EXPORT void rv_dom_sequence_pointer_event_release(RvDomSequencePointerEvent* value);
 RV_EXPORT void rv_dom_union_buffer_source_or_blob_or_usv_string_release(RvDomUnionBufferSourceOrBlobOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_buffer_source_or_blob_or_usv_string_release(RvDomSequenceBufferSourceOrBlobOrUSVString* value);
-RV_EXPORT void rv_dom_sequence_sequence_of_usv_string_release(RvDomSequenceSequenceOfUSVString* value);
+RV_EXPORT void rv_dom_sequence_usv_string_utf8_release(RvDomSequenceUSVStringUtf8* value);
+RV_EXPORT void rv_dom_sequence_sequence_of_usv_string_utf8_release(RvDomSequenceSequenceOfUSVStringUtf8* value);
 RV_EXPORT void rv_dom_pair_usv_string_and_usv_string_release(RvDomPairUSVStringAndUSVString* value);
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_usv_string_release(RvDomSequencePairUSVStringAndUSVString* value);
 RV_EXPORT void rv_dom_union_sequence_of_sequence_of_usv_string_or_record_of_usv_string_and_usv_string_or_usv_string_release(RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString* value);
@@ -7736,7 +7747,7 @@ RV_EXPORT int32_t rv_dom_url_search_params_delete(RvURLSearchParams* target, con
 RV_EXPORT int32_t rv_dom_url_search_params_get(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, char* buffer, int32_t capacity, int32_t* length);
 /* URLSearchParams.getAll(USVString name) -> sequence<USVString>; *result owns its contents; release with the matching
  * rv_dom_*_release */
-RV_EXPORT int32_t rv_dom_url_search_params_get_all(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, RvDomSequenceUSVString* result);
+RV_EXPORT int32_t rv_dom_url_search_params_get_all(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, RvDomSequenceUSVStringUtf8* result);
 /* URLSearchParams.has(USVString name, optional USVString value) -> boolean; value_length -1 means absent; value may
  * be NULL (absent) */
 RV_EXPORT int32_t rv_dom_url_search_params_has(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length, int32_t* result);

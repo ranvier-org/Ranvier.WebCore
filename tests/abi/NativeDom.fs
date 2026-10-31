@@ -1451,9 +1451,16 @@ type RvDomSequenceBufferSourceOrBlobOrUSVString =
     val mutable count: int
     val mutable items: nativeint
 
-/// <summary>ABI transport for SequenceOfUSVString sequence; result contents are owned until the matching release call.</summary>
+/// <summary>ABI transport for USVStringUtf8 sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
-type RvDomSequenceSequenceOfUSVString =
+type RvDomSequenceUSVStringUtf8 =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
+/// <summary>ABI transport for SequenceOfUSVStringUtf8 sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequenceSequenceOfUSVStringUtf8 =
     val mutable present: int
     val mutable count: int
     val mutable items: nativeint
@@ -1473,7 +1480,7 @@ type RvDomSequencePairUSVStringAndUSVString =
     val mutable items: nativeint
 
 [<Literal>]
-let RV_DOM_UNION_SEQUENCE_OF_SEQUENCE_OF_USV_STRING_OR_RECORD_OF_USV_STRING_AND_USV_STRING_OR_USV_STRING_SEQUENCE_SEQUENCE_OF_USV_STRING = 1
+let RV_DOM_UNION_SEQUENCE_OF_SEQUENCE_OF_USV_STRING_OR_RECORD_OF_USV_STRING_AND_USV_STRING_OR_USV_STRING_SEQUENCE_SEQUENCE_OF_USV_STRING_UTF8 = 1
 
 [<Literal>]
 let RV_DOM_UNION_SEQUENCE_OF_SEQUENCE_OF_USV_STRING_OR_RECORD_OF_USV_STRING_AND_USV_STRING_OR_USV_STRING_SEQUENCE_PAIR_USV_STRING_AND_USV_STRING = 2
@@ -1486,7 +1493,7 @@ let RV_DOM_UNION_SEQUENCE_OF_SEQUENCE_OF_USV_STRING_OR_RECORD_OF_USV_STRING_AND_
 type RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString =
     val mutable present: int
     val mutable tag: int
-    val mutable arm0: RvDomSequenceSequenceOfUSVString
+    val mutable arm0: RvDomSequenceSequenceOfUSVStringUtf8
     val mutable arm1: RvDomSequencePairUSVStringAndUSVString
     val mutable arm2: RvDomUtf8StringSpan
 
@@ -1692,7 +1699,10 @@ extern void rv_dom_union_buffer_source_or_blob_or_usv_string_release(RvDomUnionB
 extern void rv_dom_sequence_buffer_source_or_blob_or_usv_string_release(RvDomSequenceBufferSourceOrBlobOrUSVString& value)
 
 [<DllImport(Lib)>]
-extern void rv_dom_sequence_sequence_of_usv_string_release(RvDomSequenceSequenceOfUSVString& value)
+extern void rv_dom_sequence_usv_string_utf8_release(RvDomSequenceUSVStringUtf8& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_sequence_sequence_of_usv_string_utf8_release(RvDomSequenceSequenceOfUSVStringUtf8& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_pair_usv_string_and_usv_string_release(RvDomPairUSVStringAndUSVString& value)
@@ -9747,7 +9757,7 @@ extern int rv_dom_url_search_params_delete(nativeint target, byte[] name, int na
 extern int rv_dom_url_search_params_get(nativeint target, byte[] name, int name_length, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_url_search_params_get_all(nativeint target, byte[] name, int name_length, RvDomSequenceUSVString& result)
+extern int rv_dom_url_search_params_get_all(nativeint target, byte[] name, int name_length, RvDomSequenceUSVStringUtf8& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_url_search_params_has(nativeint target, byte[] name, int name_length, byte[] value, int value_length, int& result)

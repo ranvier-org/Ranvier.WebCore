@@ -1,10 +1,10 @@
 {
-  "sourceHead": "2a33e95f0467783abdff842635a0177183eb70af",
+  "sourceHead": "c0fd2f49b42599efa41e9aece86c05c286cc35f5",
   "nativeVersion": "0.1.0-preview.33",
   "abiVersion": 41,
   "platform": "private win-x64 slim",
   "buildScript": "artifacts/build_native33_candidate.py",
-  "buildHead": "2a33e95f0467783abdff842635a0177183eb70af",
+  "buildHead": "c0fd2f49b42599efa41e9aece86c05c286cc35f5",
   "sourcePatches": "0000-0035 (0035 recompiles UnifiedSource-dom-7)",
   "buildRuntimeSha256": {
     "brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
@@ -22,12 +22,12 @@
     "libwebpdemux.dll": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163",
     "libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
     "libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
-    "RanvierWebCoreHost.dll": "295ee1d544b772fb8341703dddb766dd209f2a19b29b60e78e23abea50704c43",
-    "RanvierWebCoreHost.lib": "52bfc11ac57ffc4822e64d9e46ee9d78dd2796dc3fc704991b3767fd7a78fe0a",
-    "RanvierWebCoreHost.pdb": "84ec73efcf33d432f7df25700adf6adc201ddbfbb058bb9949fee1b3b054ce87",
-    "WebCore.dll": "6f7e85e4e50fc6a6cf05b9800437d665c21c0618016fc7087d076e5e5e0bb6c3",
-    "WebCore.lib": "c68d0b6135edbbc2c6534a8ee5a6681cd3d95845c659eccc33293c385413d51f",
-    "WebCore.pdb": "2eaf4fa43cb2033e9ca9d5d53bdfc4c11088bb0592b22c429827f3c37adf27c8",
+    "RanvierWebCoreHost.dll": "de84b58c538ed8b26e09f6d052739318015a77cf13012469f5ec23d934beca27",
+    "RanvierWebCoreHost.lib": "ac8917be0ded9d621bc8eaac4eaef85ac1a5394f8d4271ebd6d828e4808f9fe1",
+    "RanvierWebCoreHost.pdb": "53974d573ef9544f8ea5c72d845c6315c09c71d88438b44c25237941335d35b4",
+    "WebCore.dll": "95d2a0ee2e5944c55639bda96d9b9457bfd2603d57df6b8ffaf1a163f2953a24",
+    "WebCore.lib": "e3533fb13a6cd1621059268529bee64c2552e046dc6c2e647393624497d5f8d1",
+    "WebCore.pdb": "7eec8bb0555c9bcfc538c49e96d1e39316208c17fa996ad1e8d5d271af268361",
     "zlib1.dll": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93"
   },
   "shippingFiles": [
@@ -109,12 +109,12 @@
     {
       "name": "RanvierWebCoreHost.dll",
       "bytes": 690688,
-      "sha256": "295ee1d544b772fb8341703dddb766dd209f2a19b29b60e78e23abea50704c43"
+      "sha256": "de84b58c538ed8b26e09f6d052739318015a77cf13012469f5ec23d934beca27"
     },
     {
       "name": "WebCore.dll",
-      "bytes": 46797824,
-      "sha256": "6f7e85e4e50fc6a6cf05b9800437d665c21c0618016fc7087d076e5e5e0bb6c3"
+      "bytes": 46798336,
+      "sha256": "95d2a0ee2e5944c55639bda96d9b9457bfd2603d57df6b8ffaf1a163f2953a24"
     },
     {
       "name": "zlib1.dll",

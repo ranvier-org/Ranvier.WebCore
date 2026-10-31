@@ -33,6 +33,18 @@ def hunk_lines(text):
     return [line for line in text.splitlines() if line[:1] in '+-' and not line.startswith(('+++', '---'))]
 assert hunk_lines(document_diff) and hunk_lines(document_diff) == hunk_lines(patch_0035), 'Document.cpp differs from patch 0035'
 recompiled_sources = {'Source/WebCore/dom/Document.cpp'}
+# A later lane's patch stacks above H13 and stays out of this candidate. Its files are held out of the freshness guard
+# only when neither the glue, UnifiedSource-dom-7 nor the host depends on them.
+later_patch = Path('C:/wk/native-formsubmit/patches/0037-frame-loader-client-form-submission-hook.patch')
+later_files = sorted(set(re.findall(r'^diff --git a/(\S+) b/', later_patch.read_text(encoding='utf-8'), re.M)))
+later_scan = json.loads(subprocess.run([sys.executable, '-I', 'C:/wk/t06-artifacts/units_for_headers.py', '--json', *later_files],
+                                       capture_output=True, text=True, check=True).stdout)['all']
+compiled_here = ['Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-7.cpp.obj',
+                 'Source/WebCore/CMakeFiles/WebCore.dir/C_/wk/ranvier-webcore/host/dom/RanvierDomGlue.cpp.obj',
+                 'Tools/TestWebKitAPI/CMakeFiles/RanvierWebCoreHost.dir/RanvierAbi/RanvierWebCoreAbi.cpp.obj',
+                 'Tools/TestWebKitAPI/CMakeFiles/RanvierWebCoreHost.dir/RanvierAbi/RanvierWebCoreDom.cpp.obj']
+assert not set(later_scan) & set(compiled_here), 'a unit of this build depends on a later patch'
+recompiled_sources |= set(later_files)
 newest_source = max(os.stat(Path('C:/wk/src') / line[3:]).st_mtime_ns for line in status
                     if (Path('C:/wk/src') / line[3:]).is_file() and line[3:] not in recompiled_sources)
 runtime = out / 'runtime'
@@ -86,7 +98,10 @@ if code:
     raise SystemExit('UnifiedSource-dom-7 failed')
 replacements[dom7_target] = obj
 (out / 'source-patches.json').write_text(json.dumps({'0035': {'file': 'Source/WebCore/dom/Document.cpp',
-    'hunk': hunk_lines(document_diff), 'object': obj}}, indent=2))
+    'hunk': hunk_lines(document_diff), 'object': obj},
+    'heldOutLaterPatch': {'patch': later_patch.name, 'reason': 'H13 stacks before D14; the patch stays out of this candidate',
+                          'files': later_files, 'dependentUnits': later_scan, 'compiledHere': compiled_here,
+                          'dependentUnitsCompiledHere': sorted(set(later_scan) & set(compiled_here))}}, indent=2))
 (out / 'replacement-objects.json').write_text(json.dumps(replacements, indent=2))
 
 extra = []
