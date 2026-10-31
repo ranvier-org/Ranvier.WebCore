@@ -241,15 +241,23 @@ def verify(native_directory):
         p.set_length(foreign['y'], 30)
         state['foreignObject']['movedPaint'] = [p.pixel(p.paint(), 202, 10), p.pixel(p.paint(), 202, 40)]
 
+        # A qualification is one native value, or a value per sys.platform family where ports differ; "browser" marks
+        # a platform whose native value equals the measured browser value.
+        family = 'windows' if sys.platform == 'win32' else 'macos' if sys.platform == 'darwin' else 'linux'
+        qualifications = {}
+        for key, native_only in oracle.get('nativeQualifications', {}).items():
+            value = native_only[family] if isinstance(native_only, dict) else native_only
+            if value != 'browser':
+                qualifications[key] = value
         for key, want in oracle['state'].items():
             got = json.loads(json.dumps(state[key]))
             for field, value in want.items():
-                if key + '.' + field in oracle.get('nativeQualifications', {}):
+                if key + '.' + field in qualifications:
                     continue
                 p.expect(got.get(field) == value, key + '.' + field + ' matches measured browser: native ' + repr(got.get(field)) + ' browser ' + repr(value))
-        for key, native_only in oracle.get('nativeQualifications', {}).items():
+        for key, native_only in qualifications.items():
             section, field = key.split('.')
-            p.expect(state[section][field] == native_only, 'retained native qualification ' + key + ': ' + repr(state[section][field]))
+            p.expect(state[section][field] == native_only, 'retained native qualification ' + key + ' (' + family + '): ' + repr(state[section][field]))
 
         for function, target in [('rv_dom_svg_use_element_get_x', n['useRect']), ('rv_dom_svg_image_element_get_x', n['image']), ('rv_dom_svg_foreign_object_element_get_x', n['foreign']),
                                  ('rv_dom_svga_element_get_target', n['link']), ('rv_dom_svg_script_element_get_href', n['script'])]:
