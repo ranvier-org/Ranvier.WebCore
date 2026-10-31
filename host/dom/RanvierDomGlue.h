@@ -2838,6 +2838,13 @@ WEBCORE_EXPORT int32_t ranvier_dom_highlight_get_priority(RvHighlight* target, i
 WEBCORE_EXPORT int32_t ranvier_dom_highlight_set_priority(RvHighlight* target, int32_t value);
 WEBCORE_EXPORT int32_t ranvier_dom_highlight_get_type(RvHighlight* target, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_highlight_set_type(RvHighlight* target, int32_t value);
+WEBCORE_EXPORT int32_t ranvier_dom_file_reader_create(RvNode* target, RvEventTarget** result);
+WEBCORE_EXPORT int32_t ranvier_dom_file_reader_get_ready_state(RvEventTarget* target, uint16_t* result);
+WEBCORE_EXPORT int32_t ranvier_dom_file_reader_read_as_array_buffer(RvEventTarget* target, RvBlob* blob);
+WEBCORE_EXPORT int32_t ranvier_dom_file_reader_read_as_binary_string(RvEventTarget* target, RvBlob* blob);
+WEBCORE_EXPORT int32_t ranvier_dom_file_reader_read_as_text(RvEventTarget* target, RvBlob* blob, const uint8_t* encoding, int32_t encoding_length);
+WEBCORE_EXPORT int32_t ranvier_dom_file_reader_read_as_data_url(RvEventTarget* target, RvBlob* blob);
+WEBCORE_EXPORT int32_t ranvier_dom_file_reader_abort(RvEventTarget* target);
 WEBCORE_EXPORT int32_t ranvier_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_css_supports_1(RvNode* target, const uint8_t* condition_text, int32_t condition_text_length, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_css_get_highlights(RvNode* target, RvHighlightRegistry** result);
@@ -2876,6 +2883,8 @@ WEBCORE_EXPORT int32_t ranvier_dom_css_style_value_parse(RvNode* target, const u
 WEBCORE_EXPORT int32_t ranvier_dom_css_style_value_parse_all(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* css_text, int32_t css_text_length, RvDomSequenceCSSStyleValue* result);
 WEBCORE_EXPORT int32_t ranvier_dom_domurl_parse(RvNode* target, const uint8_t* url, int32_t url_length, const uint8_t* base, int32_t base_length, RvDOMURL** result);
 WEBCORE_EXPORT int32_t ranvier_dom_domurl_can_parse(RvNode* target, const uint8_t* url, int32_t url_length, const uint8_t* base, int32_t base_length, int32_t* result);
+WEBCORE_EXPORT int32_t ranvier_dom_domurl_create_object_url(RvNode* target, RvBlob* blob, char* buffer, int32_t capacity, int32_t* length);
+WEBCORE_EXPORT int32_t ranvier_dom_domurl_revoke_object_url(RvNode* target, const uint8_t* url, int32_t url_length);
 WEBCORE_EXPORT int32_t ranvier_dom_style_property_map_read_only_entries(RvStylePropertyMapReadOnly* target, RvNode* context, RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* result);
 WEBCORE_EXPORT int32_t ranvier_dom_dom_form_data_entries(RvDOMFormData* target, RvNode* context, RvDomSequencePairUSVStringAndUnionFileOrUSVString* result);
 WEBCORE_EXPORT int32_t ranvier_dom_url_search_params_entries(RvURLSearchParams* target, RvNode* context, RvDomSequencePairUSVStringAndUSVString* result);

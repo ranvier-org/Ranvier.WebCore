@@ -2818,6 +2818,13 @@ int32_t rv_dom_highlight_get_priority(RvHighlight* target, int32_t* result) { re
 int32_t rv_dom_highlight_set_priority(RvHighlight* target, int32_t value) { return ranvier_dom_highlight_set_priority(target, value); }
 int32_t rv_dom_highlight_get_type(RvHighlight* target, int32_t* result) { return ranvier_dom_highlight_get_type(target, result); }
 int32_t rv_dom_highlight_set_type(RvHighlight* target, int32_t value) { return ranvier_dom_highlight_set_type(target, value); }
+int32_t rv_dom_file_reader_create(RvNode* target, RvEventTarget** result) { return ranvier_dom_file_reader_create(target, result); }
+int32_t rv_dom_file_reader_get_ready_state(RvEventTarget* target, uint16_t* result) { return ranvier_dom_file_reader_get_ready_state(target, result); }
+int32_t rv_dom_file_reader_read_as_array_buffer(RvEventTarget* target, RvBlob* blob) { return ranvier_dom_file_reader_read_as_array_buffer(target, blob); }
+int32_t rv_dom_file_reader_read_as_binary_string(RvEventTarget* target, RvBlob* blob) { return ranvier_dom_file_reader_read_as_binary_string(target, blob); }
+int32_t rv_dom_file_reader_read_as_text(RvEventTarget* target, RvBlob* blob, const uint8_t* encoding, int32_t encoding_length) { return ranvier_dom_file_reader_read_as_text(target, blob, encoding, encoding_length); }
+int32_t rv_dom_file_reader_read_as_data_url(RvEventTarget* target, RvBlob* blob) { return ranvier_dom_file_reader_read_as_data_url(target, blob); }
+int32_t rv_dom_file_reader_abort(RvEventTarget* target) { return ranvier_dom_file_reader_abort(target); }
 int32_t rv_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, int32_t* result) { return ranvier_dom_css_supports_2(target, property, property_length, value, value_length, result); }
 int32_t rv_dom_css_supports_1(RvNode* target, const uint8_t* condition_text, int32_t condition_text_length, int32_t* result) { return ranvier_dom_css_supports_1(target, condition_text, condition_text_length, result); }
 int32_t rv_dom_css_get_highlights(RvNode* target, RvHighlightRegistry** result) { return ranvier_dom_css_get_highlights(target, result); }
@@ -2856,6 +2863,8 @@ int32_t rv_dom_css_style_value_parse(RvNode* target, const uint8_t* property, in
 int32_t rv_dom_css_style_value_parse_all(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* css_text, int32_t css_text_length, RvDomSequenceCSSStyleValue* result) { return ranvier_dom_css_style_value_parse_all(target, property, property_length, css_text, css_text_length, result); }
 int32_t rv_dom_domurl_parse(RvNode* target, const uint8_t* url, int32_t url_length, const uint8_t* base, int32_t base_length, RvDOMURL** result) { return ranvier_dom_domurl_parse(target, url, url_length, base, base_length, result); }
 int32_t rv_dom_domurl_can_parse(RvNode* target, const uint8_t* url, int32_t url_length, const uint8_t* base, int32_t base_length, int32_t* result) { return ranvier_dom_domurl_can_parse(target, url, url_length, base, base_length, result); }
+int32_t rv_dom_domurl_create_object_url(RvNode* target, RvBlob* blob, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_domurl_create_object_url(target, blob, buffer, capacity, length); }
+int32_t rv_dom_domurl_revoke_object_url(RvNode* target, const uint8_t* url, int32_t url_length) { return ranvier_dom_domurl_revoke_object_url(target, url, url_length); }
 int32_t rv_dom_style_property_map_read_only_entries(RvStylePropertyMapReadOnly* target, RvNode* context, RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* result) { return ranvier_dom_style_property_map_read_only_entries(target, context, result); }
 int32_t rv_dom_dom_form_data_entries(RvDOMFormData* target, RvNode* context, RvDomSequencePairUSVStringAndUnionFileOrUSVString* result) { return ranvier_dom_dom_form_data_entries(target, context, result); }
 int32_t rv_dom_url_search_params_entries(RvURLSearchParams* target, RvNode* context, RvDomSequencePairUSVStringAndUSVString* result) { return ranvier_dom_url_search_params_entries(target, context, result); }

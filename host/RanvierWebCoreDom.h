@@ -341,6 +341,9 @@ enum {
     RV_DOM_NODE_FILTER_SHOW_DOCUMENT_TYPE = 0x00000200, /* NodeFilter.SHOW_DOCUMENT_TYPE */
     RV_DOM_NODE_FILTER_SHOW_DOCUMENT_FRAGMENT = 0x00000400, /* NodeFilter.SHOW_DOCUMENT_FRAGMENT */
     RV_DOM_NODE_FILTER_SHOW_NOTATION = 0x00000800, /* NodeFilter.SHOW_NOTATION */
+    RV_DOM_FILE_READER_EMPTY = 0, /* FileReader.EMPTY */
+    RV_DOM_FILE_READER_LOADING = 1, /* FileReader.LOADING */
+    RV_DOM_FILE_READER_DONE = 2, /* FileReader.DONE */
     RV_DOM_ARRAY_BUFFER_VIEW_INT8 = 0, /* ArrayBufferView element kind Int8Array */
     RV_DOM_ARRAY_BUFFER_VIEW_UINT8 = 1, /* ArrayBufferView element kind Uint8Array */
     RV_DOM_ARRAY_BUFFER_VIEW_UINT8_CLAMPED = 2, /* ArrayBufferView element kind Uint8ClampedArray */
@@ -8175,6 +8178,27 @@ RV_EXPORT int32_t rv_dom_highlight_set_priority(RvHighlight* target, int32_t val
 RV_EXPORT int32_t rv_dom_highlight_get_type(RvHighlight* target, int32_t* result);
 /* Highlight.type setter: attribute HighlightType type */
 RV_EXPORT int32_t rv_dom_highlight_set_type(RvHighlight* target, int32_t value);
+/* FileReader */
+
+/* FileReader.constructor: target is the Document of the constructed object; *result is a new reference;
+ * RV_ERR_UNSUPPORTED while the setting FileReaderAPIEnabled is off */
+RV_EXPORT int32_t rv_dom_file_reader_create(RvNode* target, RvEventTarget** result);
+/* FileReader.readyState getter: readonly attribute unsigned short readyState; RV_ERR_UNSUPPORTED while the setting
+ * FileReaderAPIEnabled is off */
+RV_EXPORT int32_t rv_dom_file_reader_get_ready_state(RvEventTarget* target, uint16_t* result);
+/* FileReader.readAsArrayBuffer(Blob blob) -> undefined; RV_ERR_UNSUPPORTED while the setting FileReaderAPIEnabled is
+ * off */
+RV_EXPORT int32_t rv_dom_file_reader_read_as_array_buffer(RvEventTarget* target, RvBlob* blob);
+/* FileReader.readAsBinaryString(Blob blob) -> undefined; RV_ERR_UNSUPPORTED while the setting FileReaderAPIEnabled is
+ * off */
+RV_EXPORT int32_t rv_dom_file_reader_read_as_binary_string(RvEventTarget* target, RvBlob* blob);
+/* FileReader.readAsText(Blob blob, optional DOMString encoding) -> undefined; encoding_length -1 means absent;
+ * RV_ERR_UNSUPPORTED while the setting FileReaderAPIEnabled is off */
+RV_EXPORT int32_t rv_dom_file_reader_read_as_text(RvEventTarget* target, RvBlob* blob, const uint8_t* encoding, int32_t encoding_length);
+/* FileReader.readAsDataURL(Blob blob) -> undefined; RV_ERR_UNSUPPORTED while the setting FileReaderAPIEnabled is off */
+RV_EXPORT int32_t rv_dom_file_reader_read_as_data_url(RvEventTarget* target, RvBlob* blob);
+/* FileReader.abort() -> undefined; RV_ERR_UNSUPPORTED while the setting FileReaderAPIEnabled is off */
+RV_EXPORT int32_t rv_dom_file_reader_abort(RvEventTarget* target);
 /* DOMCSSNamespace */
 
 /* CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths */
@@ -8299,6 +8323,10 @@ RV_EXPORT int32_t rv_dom_css_style_value_parse_all(RvNode* target, const uint8_t
 RV_EXPORT int32_t rv_dom_domurl_parse(RvNode* target, const uint8_t* url, int32_t url_length, const uint8_t* base, int32_t base_length, RvDOMURL** result);
 /* DOMURL.canParse: static operation with checked Document context and UTF-8 byte lengths; base_length -1 means absent */
 RV_EXPORT int32_t rv_dom_domurl_can_parse(RvNode* target, const uint8_t* url, int32_t url_length, const uint8_t* base, int32_t base_length, int32_t* result);
+/* DOMURL.createObjectURL: static operation with checked Document context and UTF-8 byte lengths */
+RV_EXPORT int32_t rv_dom_domurl_create_object_url(RvNode* target, RvBlob* blob, char* buffer, int32_t capacity, int32_t* length);
+/* DOMURL.revokeObjectURL: static operation with checked Document context and UTF-8 byte lengths */
+RV_EXPORT int32_t rv_dom_domurl_revoke_object_url(RvNode* target, const uint8_t* url, int32_t url_length);
 /* StylePropertyMapReadOnly */
 
 /* StylePropertyMapReadOnly.entries: owned snapshot of the engine key/value iterable; context is an explicit checked

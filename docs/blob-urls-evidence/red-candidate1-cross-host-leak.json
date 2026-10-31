@@ -1,0 +1,962 @@
+{
+  "browser": "156.0.8078.4",
+  "platform": "win32",
+  "reader": {
+    "arrayBuffer": {
+      "events": [
+        "return",
+        "loadstart",
+        "progress",
+        "load",
+        "loadend"
+      ],
+      "states": {
+        "loadstart": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "progress": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "load": {
+          "readyState": 2,
+          "result": "bytes",
+          "error": null
+        },
+        "loadend": {
+          "readyState": 2,
+          "result": "bytes",
+          "error": null
+        }
+      },
+      "threw": null,
+      "second": null,
+      "final": {
+        "readyState": 2,
+        "result": {
+          "kind": "bytes",
+          "length": 6,
+          "hex": "68c3a9ff4100"
+        },
+        "error": null
+      }
+    },
+    "text": {
+      "events": [
+        "return",
+        "loadstart",
+        "progress",
+        "load",
+        "loadend"
+      ],
+      "states": {
+        "loadstart": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "progress": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "load": {
+          "readyState": 2,
+          "result": "string",
+          "error": null
+        },
+        "loadend": {
+          "readyState": 2,
+          "result": "string",
+          "error": null
+        }
+      },
+      "threw": null,
+      "second": null,
+      "final": {
+        "readyState": 2,
+        "result": {
+          "kind": "string",
+          "value": "hÃ©ÿA\u0000"
+        },
+        "error": null
+      }
+    },
+    "textLatin1": {
+      "events": [
+        "return",
+        "loadstart",
+        "progress",
+        "load",
+        "loadend"
+      ],
+      "states": {
+        "loadstart": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "progress": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "load": {
+          "readyState": 2,
+          "result": "string",
+          "error": null
+        },
+        "loadend": {
+          "readyState": 2,
+          "result": "string",
+          "error": null
+        }
+      },
+      "threw": null,
+      "second": null,
+      "final": {
+        "readyState": 2,
+        "result": {
+          "kind": "string",
+          "value": "hÃ©ÿA\u0000"
+        },
+        "error": null
+      }
+    },
+    "textUtf16": {
+      "events": [
+        "return",
+        "loadstart",
+        "progress",
+        "load",
+        "loadend"
+      ],
+      "states": {
+        "loadstart": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "progress": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "load": {
+          "readyState": 2,
+          "result": "string",
+          "error": null
+        },
+        "loadend": {
+          "readyState": 2,
+          "result": "string",
+          "error": null
+        }
+      },
+      "threw": null,
+      "second": null,
+      "final": {
+        "readyState": 2,
+        "result": {
+          "kind": "string",
+          "value": "AB"
+        },
+        "error": null
+      }
+    },
+    "textBogusLabel": {
+      "events": [
+        "return",
+        "loadstart",
+        "progress",
+        "load",
+        "loadend"
+      ],
+      "states": {
+        "loadstart": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "progress": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "load": {
+          "readyState": 2,
+          "result": "string",
+          "error": null
+        },
+        "loadend": {
+          "readyState": 2,
+          "result": "string",
+          "error": null
+        }
+      },
+      "threw": null,
+      "second": null,
+      "final": {
+        "readyState": 2,
+        "result": {
+          "kind": "string",
+          "value": "hé"
+        },
+        "error": null
+      }
+    },
+    "textBomWins": {
+      "events": [
+        "return",
+        "loadstart",
+        "progress",
+        "load",
+        "loadend"
+      ],
+      "states": {
+        "loadstart": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "progress": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "load": {
+          "readyState": 2,
+          "result": "string",
+          "error": null
+        },
+        "loadend": {
+          "readyState": 2,
+          "result": "string",
+          "error": null
+        }
+      },
+      "threw": null,
+      "second": null,
+      "final": {
+        "readyState": 2,
+        "result": {
+          "kind": "string",
+          "value": "A"
+        },
+        "error": null
+      }
+    },
+    "binaryString": {
+      "events": [
+        "return",
+        "loadstart",
+        "progress",
+        "load",
+        "loadend"
+      ],
+      "states": {
+        "loadstart": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "progress": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "load": {
+          "readyState": 2,
+          "result": "string",
+          "error": null
+        },
+        "loadend": {
+          "readyState": 2,
+          "result": "string",
+          "error": null
+        }
+      },
+      "threw": null,
+      "second": null,
+      "final": {
+        "readyState": 2,
+        "result": {
+          "kind": "string",
+          "value": "hÃ©ÿA\u0000"
+        },
+        "error": null
+      }
+    },
+    "dataUrl": {
+      "events": [
+        "return",
+        "loadstart",
+        "progress",
+        "load",
+        "loadend"
+      ],
+      "states": {
+        "loadstart": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "progress": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "load": {
+          "readyState": 2,
+          "result": "string",
+          "error": null
+        },
+        "loadend": {
+          "readyState": 2,
+          "result": "string",
+          "error": null
+        }
+      },
+      "threw": null,
+      "second": null,
+      "final": {
+        "readyState": 2,
+        "result": {
+          "kind": "string",
+          "value": "data:text/plain;charset=latin1;base64,aMOp/0EA"
+        },
+        "error": null
+      }
+    },
+    "dataUrlEmpty": {
+      "events": [
+        "return",
+        "loadstart",
+        "load",
+        "loadend"
+      ],
+      "states": {
+        "loadstart": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "load": {
+          "readyState": 2,
+          "result": "string",
+          "error": null
+        },
+        "loadend": {
+          "readyState": 2,
+          "result": "string",
+          "error": null
+        }
+      },
+      "threw": null,
+      "second": null,
+      "final": {
+        "readyState": 2,
+        "result": {
+          "kind": "string",
+          "value": "data:application/octet-stream;base64,"
+        },
+        "error": null
+      }
+    },
+    "empty": {
+      "events": [
+        "return",
+        "loadstart",
+        "load",
+        "loadend"
+      ],
+      "states": {
+        "loadstart": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "load": {
+          "readyState": 2,
+          "result": "bytes",
+          "error": null
+        },
+        "loadend": {
+          "readyState": 2,
+          "result": "bytes",
+          "error": null
+        }
+      },
+      "threw": null,
+      "second": null,
+      "final": {
+        "readyState": 2,
+        "result": {
+          "kind": "bytes",
+          "length": 0,
+          "hex": ""
+        },
+        "error": null
+      }
+    },
+    "big": {
+      "events": [
+        "return",
+        "loadstart",
+        "progress",
+        "load",
+        "loadend"
+      ],
+      "states": {
+        "loadstart": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "progress": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "load": {
+          "readyState": 2,
+          "result": "bytes",
+          "error": null
+        },
+        "loadend": {
+          "readyState": 2,
+          "result": "bytes",
+          "error": null
+        }
+      },
+      "threw": null,
+      "second": null,
+      "final": {
+        "readyState": 2,
+        "result": {
+          "kind": "bytes",
+          "length": 1048576,
+          "checksum": 625999872
+        },
+        "error": null
+      }
+    },
+    "abortSync": {
+      "events": [
+        "return",
+        "abort",
+        "loadend",
+        "acted"
+      ],
+      "states": {
+        "abort": {
+          "readyState": 2,
+          "result": "null",
+          "error": "AbortError"
+        },
+        "loadend": {
+          "readyState": 2,
+          "result": "null",
+          "error": "AbortError"
+        }
+      },
+      "threw": null,
+      "second": null,
+      "final": {
+        "readyState": 2,
+        "result": {
+          "kind": "null"
+        },
+        "error": "AbortError"
+      }
+    },
+    "abortInLoadstart": {
+      "events": [
+        "return",
+        "loadstart",
+        "abort",
+        "loadend",
+        "acted"
+      ],
+      "states": {
+        "loadstart": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "abort": {
+          "readyState": 2,
+          "result": "null",
+          "error": "AbortError"
+        },
+        "loadend": {
+          "readyState": 2,
+          "result": "null",
+          "error": "AbortError"
+        }
+      },
+      "threw": null,
+      "second": null,
+      "final": {
+        "readyState": 2,
+        "result": {
+          "kind": "null"
+        },
+        "error": "AbortError"
+      }
+    },
+    "abortInLoad": {
+      "events": [
+        "return",
+        "loadstart",
+        "progress",
+        "load",
+        "acted",
+        "loadend"
+      ],
+      "states": {
+        "loadstart": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "progress": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "load": {
+          "readyState": 2,
+          "result": "string",
+          "error": null
+        },
+        "loadend": {
+          "readyState": 2,
+          "result": "string",
+          "error": null
+        }
+      },
+      "threw": null,
+      "second": null,
+      "final": {
+        "readyState": 2,
+        "result": {
+          "kind": "string",
+          "value": "x"
+        },
+        "error": null
+      }
+    },
+    "readInLoadend": {
+      "events": [
+        "return",
+        "loadstart",
+        "progress",
+        "load",
+        "loadend",
+        "acted",
+        "loadstart",
+        "progress",
+        "load",
+        "loadend"
+      ],
+      "states": {
+        "loadstart": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "progress": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "load": {
+          "readyState": 2,
+          "result": "string",
+          "error": null
+        },
+        "loadend": {
+          "readyState": 2,
+          "result": "string",
+          "error": null
+        }
+      },
+      "threw": null,
+      "second": "ok",
+      "final": {
+        "readyState": 2,
+        "result": {
+          "kind": "string",
+          "value": "y"
+        },
+        "error": null
+      }
+    },
+    "readWhileLoading": {
+      "events": [
+        "return",
+        "acted",
+        "loadstart",
+        "progress",
+        "load",
+        "loadend"
+      ],
+      "states": {
+        "loadstart": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "progress": {
+          "readyState": 1,
+          "result": "null",
+          "error": null
+        },
+        "load": {
+          "readyState": 2,
+          "result": "string",
+          "error": null
+        },
+        "loadend": {
+          "readyState": 2,
+          "result": "string",
+          "error": null
+        }
+      },
+      "threw": null,
+      "second": "InvalidStateError",
+      "final": {
+        "readyState": 2,
+        "result": {
+          "kind": "string",
+          "value": "x"
+        },
+        "error": null
+      }
+    }
+  },
+  "readerAbortWhenEmpty": {
+    "readyState": 0,
+    "fired": [],
+    "result": null,
+    "error": null
+  },
+  "readerInitial": {
+    "readyState": 0,
+    "result": null,
+    "error": null
+  },
+  "promises": {
+    "text": {
+      "ok": true,
+      "value": "A�"
+    },
+    "arrayBuffer": {
+      "ok": true,
+      "length": 2,
+      "hex": "6162"
+    },
+    "textLatin1Type": {
+      "ok": true,
+      "value": "é"
+    },
+    "mixedBytes": {
+      "ok": true,
+      "length": 6,
+      "hex": "68c3a9ff4100"
+    },
+    "emptyText": {
+      "ok": true,
+      "value": ""
+    },
+    "bigBytes": {
+      "ok": true,
+      "length": 1048576,
+      "checksum": 625999872
+    }
+  },
+  "format": {
+    "matches": true,
+    "origin": "null",
+    "distinct": true
+  },
+  "urlReads": {
+    "typed": {
+      "ok": true,
+      "type": "text/plain",
+      "length": 3,
+      "hex": "616263"
+    },
+    "empty": {
+      "ok": true,
+      "type": "",
+      "length": 0,
+      "hex": ""
+    },
+    "slice": {
+      "ok": true,
+      "type": "",
+      "length": 3,
+      "hex": "323334"
+    },
+    "fragment": {
+      "ok": true,
+      "type": "text/plain",
+      "length": 3,
+      "hex": "616263"
+    }
+  },
+  "revoked": {
+    "read": {
+      "ok": false,
+      "outcome": "loadFailed",
+      "error": "NotFoundError"
+    },
+    "other": {
+      "ok": true,
+      "type": "text/plain",
+      "length": 3,
+      "hex": "616263"
+    }
+  },
+  "revokeNoOp": "ok",
+  "unknown": {
+    "ok": false,
+    "outcome": "loadFailed",
+    "error": "NotFoundError"
+  },
+  "images": {
+    "svg": {
+      "outcome": "load",
+      "width": 7,
+      "height": 5
+    },
+    "gif": {
+      "outcome": "error",
+      "width": 0,
+      "height": 0
+    },
+    "gifUntyped": {
+      "outcome": "error",
+      "width": 0,
+      "height": 0
+    },
+    "garbage": {
+      "outcome": "error",
+      "width": 0,
+      "height": 0
+    }
+  },
+  "imageRevoked": {
+    "outcome": "error",
+    "width": 0,
+    "height": 0
+  },
+  "handlerSawBlob": [],
+  "file": {
+    "name": "data.txt",
+    "size": 10,
+    "type": "text/plain",
+    "text": "file-bytes",
+    "urlRead": {
+      "ok": true,
+      "type": "text/plain",
+      "length": 10,
+      "hex": "66696c652d6279746573"
+    },
+    "slice": "il",
+    "readBytesStatus": -9
+  },
+  "deleted": {
+    "reader": {
+      "events": [
+        "error",
+        "loadend"
+      ],
+      "readyState": 2,
+      "result": null,
+      "error": "NotFoundError"
+    },
+    "text": {
+      "ok": false,
+      "name": "NotFoundError"
+    },
+    "urlRead": {
+      "ok": false,
+      "outcome": "loadFailed",
+      "error": "NotFoundError"
+    }
+  },
+  "isolation": {
+    "otherRead": {
+      "ok": true,
+      "type": "",
+      "length": 3,
+      "hex": "69736f"
+    },
+    "otherImage": "error",
+    "selfRead": {
+      "ok": true,
+      "type": "",
+      "length": 3,
+      "hex": "69736f"
+    },
+    "selfImage": "load",
+    "afterReplaceRead": {
+      "ok": false,
+      "outcome": "loadFailed",
+      "error": "NotFoundError"
+    },
+    "afterReplaceImage": "error",
+    "beforeDestroyOtherRead": {
+      "ok": true,
+      "type": "",
+      "length": 4,
+      "hex": "6c617465"
+    },
+    "afterDestroyRead": {
+      "ok": false,
+      "outcome": "loadFailed",
+      "error": "NotFoundError"
+    }
+  },
+  "teardown": {
+    "before": {
+      "ok": true,
+      "type": "",
+      "length": 5,
+      "hex": "6368696c64"
+    },
+    "after": {
+      "ok": false,
+      "outcome": "loadFailed",
+      "error": "NotFoundError"
+    },
+    "readerEvents": [],
+    "readerState": 2,
+    "promise": "invalidated",
+    "destroyPromise": "invalidated",
+    "destroyReaderEvents": [],
+    "destroyReadyStateStatus": 0
+  },
+  "differences": {
+    "reader.text.final.result.value": {
+      "chromium": "hé�A\u0000",
+      "native": "hÃ©ÿA\u0000"
+    },
+    "images.gif.height": {
+      "chromium": 2,
+      "native": 0
+    },
+    "images.gif.outcome": {
+      "chromium": "load",
+      "native": "error"
+    },
+    "images.gif.width": {
+      "chromium": 3,
+      "native": 0
+    },
+    "images.gifUntyped.height": {
+      "chromium": 2,
+      "native": 0
+    },
+    "images.gifUntyped.outcome": {
+      "chromium": "load",
+      "native": "error"
+    },
+    "images.gifUntyped.width": {
+      "chromium": 3,
+      "native": 0
+    },
+    "isolation.afterCloseRead": {
+      "chromium": {
+        "ok": false
+      },
+      "native": "<absent>"
+    },
+    "isolation.afterDestroyRead": {
+      "chromium": "<absent>",
+      "native": {
+        "ok": false
+      }
+    },
+    "isolation.beforeDestroyOtherRead": {
+      "chromium": "<absent>",
+      "native": {
+        "ok": true,
+        "type": "",
+        "length": 4,
+        "hex": "6c617465"
+      }
+    },
+    "isolation.crossOriginImage": {
+      "chromium": "error",
+      "native": "<absent>"
+    },
+    "isolation.crossOriginRead": {
+      "chromium": {
+        "ok": false
+      },
+      "native": "<absent>"
+    },
+    "isolation.otherRead.hex": {
+      "chromium": "<absent>",
+      "native": "69736f"
+    },
+    "isolation.otherRead.length": {
+      "chromium": "<absent>",
+      "native": 3
+    },
+    "isolation.otherRead.ok": {
+      "chromium": false,
+      "native": true
+    },
+    "isolation.otherRead.type": {
+      "chromium": "<absent>",
+      "native": ""
+    },
+    "isolation.sameOriginRead": {
+      "chromium": {
+        "ok": true,
+        "v": "iso"
+      },
+      "native": "<absent>"
+    },
+    "isolation.selfRead.hex": {
+      "chromium": "<absent>",
+      "native": "69736f"
+    },
+    "isolation.selfRead.length": {
+      "chromium": "<absent>",
+      "native": 3
+    },
+    "isolation.selfRead.type": {
+      "chromium": "<absent>",
+      "native": ""
+    },
+    "isolation.selfRead.v": {
+      "chromium": "iso",
+      "native": "<absent>"
+    },
+    "teardown.destroyPromise": {
+      "chromium": "<absent>",
+      "native": "invalidated"
+    },
+    "teardown.destroyReaderEvents": {
+      "chromium": "<absent>",
+      "native": []
+    },
+    "teardown.destroyReadyStateStatus": {
+      "chromium": "<absent>",
+      "native": 0
+    },
+    "teardown.promise": {
+      "chromium": "pending",
+      "native": "invalidated"
+    }
+  }
+}

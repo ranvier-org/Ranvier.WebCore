@@ -5110,6 +5110,22 @@ and [<AllowNullLiteral>] Highlight =
 /// <summary>HighlightRegistry in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HighlightRegistry = interface end
 
+/// <summary>FileReader in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] FileReader =
+    inherit EventTarget
+    /// <summary>FileReader.readyState.</summary>
+    abstract member readyState: uint16 with get
+    /// <summary>FileReader.readAsArrayBuffer.</summary>
+    abstract member readAsArrayBuffer: blob: Blob -> unit
+    /// <summary>FileReader.readAsBinaryString.</summary>
+    abstract member readAsBinaryString: blob: Blob -> unit
+    /// <summary>FileReader.readAsText.</summary>
+    abstract member readAsText: blob: Blob * ?encoding: string -> unit
+    /// <summary>FileReader.readAsDataURL.</summary>
+    abstract member readAsDataURL: blob: Blob -> unit
+    /// <summary>FileReader.abort.</summary>
+    abstract member abort: unit -> unit
+
 /// <summary>HTMLUnknownElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLUnknownElement =
     inherit HTMLElement
