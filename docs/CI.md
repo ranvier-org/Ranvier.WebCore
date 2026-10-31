@@ -8,7 +8,8 @@ trusted publishing policy for owner `ranvier-org`, repository `Ranvier.WebCore`,
 and no environment.
 
 A pull request builds `win-x64` only. A pull request from a `codex/batch-*` branch, or one labelled
-`full-matrix`, builds every runtime; adding the label starts that run. Pushes to `main` and `v*` tags always
+`full-matrix`, builds every runtime; adding the label starts that run. The five-runtime managed aggregate is
+packed only when every runtime is built, so a `win-x64`-only pull request skips it. Pushes to `main` and `v*` tags always
 build every runtime.
 
 ## Runner

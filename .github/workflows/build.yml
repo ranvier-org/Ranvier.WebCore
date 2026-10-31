@@ -554,6 +554,8 @@ jobs:
     needs: [native, prebuilt, package-contract]
     if: >-
       ${{ !cancelled() && inputs.rids == '' && (inputs.flavor == '' || inputs.flavor == 'slim') &&
+          !(github.event_name == 'pull_request' && !startsWith(github.head_ref, 'codex/batch-') &&
+            !contains(github.event.pull_request.labels.*.name, 'full-matrix')) &&
           (needs.native.result == 'success' || needs.native.result == 'skipped') &&
           (needs.prebuilt.result == 'success' || needs.prebuilt.result == 'skipped') &&
           needs.package-contract.result == 'success' }}
