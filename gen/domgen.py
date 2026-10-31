@@ -386,7 +386,7 @@ class World:
             found.append((member, mapped))
         return found
 
-    def map(self, t: idl.Type) -> Mapped:
+    def map(self, t: idl.Type, nested=False) -> Mapped:
         t = self.resolve(t)
         if t.name == "undefined":
             return Mapped("void")
@@ -402,6 +402,12 @@ class World:
             return Mapped("enum", False, "int32_t", enum=t.name)
         if t.name == "EventTarget":
             return Mapped("node", t.nullable, interface="EventTarget", cls="EventTarget")
+        if t.name in self.config.get('byteSpanTypes', []):
+            if t.nullable:
+                raise Unsupported(f'nullable byte span {t.name}')
+            if not nested:
+                raise Unsupported(f'byte span {t.name} outside a union or sequence input')
+            return Mapped('bytes', False, 'RvDomByteSpan', label=t.name)
         if t.name in self.config.get('opaqueUnionArms', []):
             return Mapped('opaque', t.nullable, interface=t.name, cls=self.cpp_class(t.name))
         if t.name in self.interfaces and not self.interfaces[t.name].mixin:
@@ -426,7 +432,7 @@ class World:
             strings = self.string_union(t)
             if strings is not None:
                 return Mapped("string", t.nullable, atom=strings)
-            children = [self.map(child) for child in t.subtypes]
+            children = [self.map(child, nested=True) for child in t.subtypes]
             label = "Or".join(type_label(self.resolve(child)) for child in t.subtypes)
             if label in self.config.get('finiteUnionInputs', []):
                 for source, child in zip(t.subtypes, children):
@@ -438,7 +444,7 @@ class World:
             return Mapped("union", t.nullable, "RvDomUnion" + label + ("Nullable" if t.nullable else ""),
                           subtypes=children, label=label)
         if t.name in ("sequence", "FrozenArray"):
-            child = self.map(t.subtypes[0])
+            child = self.map(t.subtypes[0], nested=True)
             element = self.resolve(t.subtypes[0])
             label = type_label(element)
             if child.kind == 'pair':
@@ -861,6 +867,9 @@ class Generator(ComplexGeneratorMixin):
         if not locked:
             return None
         locked_names = [n for _, n in locked["params"][1:]]
+        # A length-delimited string argument adds its <name>_length parameter after the data pointer.
+        locked_names = [n for i, n in enumerate(locked_names)
+                        if not (i and n.endswith('_length') and locked_names[i - 1] == n.removesuffix('_length'))]
         for index, (member, args, returns) in enumerate(supported):
             # The overload whose arguments are the lock's parameters before the result's.
             names = [c_name(a.name) for a in member.arguments]

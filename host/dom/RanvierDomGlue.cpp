@@ -7,6 +7,8 @@
 #include "AbstractRange.h"
 #include "AriaNotifyOptions.h"
 #include "Attr.h"
+#include "Blob.h"
+#include "BlobPropertyBag.h"
 #include "CSSConditionRule.h"
 #include "CSSContainerRule.h"
 #include "CSSCounterStyleRule.h"
@@ -93,6 +95,7 @@
 #include "Exception.h"
 #include "ExceptionOr.h"
 #include "File.h"
+#include "FileList.h"
 #include "FocusEvent.h"
 #include "FocusOptions.h"
 #include "FormDataEvent.h"
@@ -165,6 +168,8 @@
 #include "HTMLUListElement.h"
 #include "ImportNodeOptions.h"
 #include "InputEvent.h"
+#include "JavaScriptCore/ArrayBuffer.h"
+#include "JavaScriptCore/ArrayBufferView.h"
 #include "KeyboardEvent.h"
 #include "LiveNodeList.h"
 #include "LocalDOMWindow.h"
@@ -291,6 +296,7 @@
 #include "JSAriaNotifyOptions.h"
 #include "JSAriaNotifyOptions.h"
 #include "JSDocument.h"
+#include "JSEndingType.h"
 #include "JSScrollBehavior.h"
 #include "JSScrollLogicalPosition.h"
 #include "JSShadowRootMode.h"
@@ -628,6 +634,7 @@ int32_t storeConstGetter(V&& value, Handle** result)
 static constexpr ASCIILiteral enumerationAriaNotificationInterrupt[] = { "none"_s, "all"_s, "pending"_s };
 static constexpr ASCIILiteral enumerationAriaNotificationPriority[] = { "normal"_s, "high"_s };
 static constexpr ASCIILiteral enumerationDocumentReadyState[] = { "loading"_s, "interactive"_s, "complete"_s };
+static constexpr ASCIILiteral enumerationEndingType[] = { "transparent"_s, "native"_s };
 static constexpr ASCIILiteral enumerationScrollBehavior[] = { "auto"_s, "instant"_s, "smooth"_s };
 static constexpr ASCIILiteral enumerationScrollLogicalPosition[] = { "start"_s, "center"_s, "end"_s, "nearest"_s };
 static constexpr ASCIILiteral enumerationShadowRootMode[] = { "user-agent"_s, "closed"_s, "open"_s };
@@ -2057,6 +2064,7 @@ void clearRvDomUnionFileOrUSVStringNullable(RvDomUnionFileOrUSVStringNullable* v
     if (!value) return;
     switch (value->tag) {
     case 1:
+        if (value->arm0) reinterpret_cast<Blob*>(value->arm0)->deref();
         break;
     case 2:
         std::free(const_cast<uint8_t*>(value->arm1.data));
@@ -2069,7 +2077,7 @@ template<size_t I = 0, typename V> void encodeArmsRvDomUnionFileOrUSVStringNulla
     if constexpr (I < 2) {
         if (value.index() == I) {
             if constexpr (I == 0) {
-                result->arm0 = nullptr;
+                storeHandle<Blob>(std::get<I>(value), &result->arm0);
             }
             else if constexpr (I == 1) {
                 result->arm1 = copyOwnedDomStringSpan(asString(std::get<I>(value)));
@@ -2093,6 +2101,7 @@ void clearRvDomUnionFileOrUSVString(RvDomUnionFileOrUSVString* value)
     if (!value) return;
     switch (value->tag) {
     case 1:
+        if (value->arm0) reinterpret_cast<Blob*>(value->arm0)->deref();
         break;
     case 2:
         std::free(const_cast<uint8_t*>(value->arm1.data));
@@ -2105,7 +2114,7 @@ template<size_t I = 0, typename V> void encodeArmsRvDomUnionFileOrUSVString(V&& 
     if constexpr (I < 2) {
         if (value.index() == I) {
             if constexpr (I == 0) {
-                result->arm0 = nullptr;
+                storeHandle<Blob>(std::get<I>(value), &result->arm0);
             }
             else if constexpr (I == 1) {
                 result->arm1 = copyOwnedDomStringSpan(asString(std::get<I>(value)));
@@ -2167,6 +2176,74 @@ template<typename V> int32_t encodeRvDomSequencePointerEvent(V&& input, RvDomSeq
         storeHandle<Event>(value[i], &result->items[i]);
     }
     return RV_OK;
+}
+
+std::optional<Variant<Ref<JSC::ArrayBufferView>, Ref<JSC::ArrayBuffer>, Ref<Blob>, String>> decodeRvDomUnionBufferSourceOrBlobOrUSVString(const RvDomUnionBufferSourceOrBlobOrUSVString* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        if (source->arm0.length < 0 || (source->arm0.length > 0 && !source->arm0.data)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr arm0 = JSC::ArrayBuffer::tryCreate(source->arm0.length ? std::span<const uint8_t> { source->arm0.data, static_cast<size_t>(source->arm0.length) } : std::span<const uint8_t> { });
+        if (!arm0) { status = Ranvier::recordException(Exception { ExceptionCode::RangeError, "Out of memory"_s }); return std::nullopt; }
+        return Variant<Ref<JSC::ArrayBufferView>, Ref<JSC::ArrayBuffer>, Ref<Blob>, String> { Variant<Ref<JSC::ArrayBufferView>, Ref<JSC::ArrayBuffer>, Ref<Blob>, String> { WTF::InPlaceIndex<1>, arm0.releaseNonNull() } };
+    }
+    case 2: {
+        if (!source->arm1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<Blob> arm1 = reinterpret_cast<Blob*>(source->arm1);
+        if (source->arm1 && !arm1) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<Ref<JSC::ArrayBufferView>, Ref<JSC::ArrayBuffer>, Ref<Blob>, String> { Variant<Ref<JSC::ArrayBufferView>, Ref<JSC::ArrayBuffer>, Ref<Blob>, String> { WTF::InPlaceIndex<2>, Ref { *arm1 } } };
+    }
+    case 3: {
+        if (source->arm2.length < 0 || (source->arm2.length > 0 && !source->arm2.data)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        String arm2 = source->arm2.length < 0 ? String() : source->arm2.length ? String::fromUTF8(std::span<const uint8_t> { source->arm2.data, static_cast<size_t>(source->arm2.length) }) : emptyString();
+        if (source->arm2.length >= 0 && arm2.isNull()) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        return Variant<Ref<JSC::ArrayBufferView>, Ref<JSC::ArrayBuffer>, Ref<Blob>, String> { Variant<Ref<JSC::ArrayBufferView>, Ref<JSC::ArrayBuffer>, Ref<Blob>, String> { WTF::InPlaceIndex<3>, arm2 } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionBufferSourceOrBlobOrUSVString(RvDomUnionBufferSourceOrBlobOrUSVString* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        break;
+    case 2:
+        if (value->arm1) reinterpret_cast<Blob*>(value->arm1)->deref();
+        break;
+    case 3:
+        std::free(const_cast<uint8_t*>(value->arm2.data));
+        break;
+    }
+    *value = { };
+}
+
+std::optional<Vector<Variant<Ref<JSC::ArrayBufferView>, Ref<JSC::ArrayBuffer>, Ref<Blob>, String>>> decodeRvDomSequenceBufferSourceOrBlobOrUSVString(const RvDomSequenceBufferSourceOrBlobOrUSVString* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    Vector<Variant<Ref<JSC::ArrayBufferView>, Ref<JSC::ArrayBuffer>, Ref<Blob>, String>> result;
+    result.reserveInitialCapacity(source->count);
+    for (int32_t i = 0; i < source->count; ++i) {
+        auto item = decodeRvDomUnionBufferSourceOrBlobOrUSVString(&source->items[i], status);
+        if (status != RV_OK) return std::nullopt;
+        result.append(std::move(*item));
+    }
+    return Vector<Variant<Ref<JSC::ArrayBufferView>, Ref<JSC::ArrayBuffer>, Ref<Blob>, String>> { std::move(result) };
+}
+
+void clearRvDomSequenceBufferSourceOrBlobOrUSVString(RvDomSequenceBufferSourceOrBlobOrUSVString* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        clearRvDomUnionBufferSourceOrBlobOrUSVString(&value->items[i]);
+    }
+    std::free(value->items);
+    *value = { };
 }
 
 void clearRvDomSequenceCSSStyleValue(RvDomSequenceCSSStyleValue* value)
@@ -2281,7 +2358,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom:Blob", "dom:File", "dom:FileList", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-constructor:Blob", "dom-constructor:File", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -2499,6 +2576,16 @@ void ranvier_dom_sequence_file_or_usv_string_release(RvDomSequenceFileOrUSVStrin
 void ranvier_dom_sequence_pointer_event_release(RvDomSequencePointerEvent* value)
 {
     if (isMainThread()) clearRvDomSequencePointerEvent(value);
+}
+
+void ranvier_dom_union_buffer_source_or_blob_or_usv_string_release(RvDomUnionBufferSourceOrBlobOrUSVString* value)
+{
+    if (isMainThread()) clearRvDomUnionBufferSourceOrBlobOrUSVString(value);
+}
+
+void ranvier_dom_sequence_buffer_source_or_blob_or_usv_string_release(RvDomSequenceBufferSourceOrBlobOrUSVString* value)
+{
+    if (isMainThread()) clearRvDomSequenceBufferSourceOrBlobOrUSVString(value);
 }
 
 void ranvier_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value)
@@ -3279,6 +3366,34 @@ RvTreeWalker* ranvier_dom_tree_walker_retain(RvTreeWalker* handle)
     if (!handle || !isMainThread())
         return nullptr;
     reinterpret_cast<TreeWalker*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_blob_release(RvBlob* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<Blob*>(handle)->deref();
+}
+
+RvBlob* ranvier_dom_blob_retain(RvBlob* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<Blob*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_file_list_release(RvFileList* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<FileList*>(handle)->deref();
+}
+
+RvFileList* ranvier_dom_file_list_retain(RvFileList* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<FileList*>(handle)->ref();
     return handle;
 }
 
@@ -12602,6 +12717,33 @@ int32_t ranvier_dom_html_input_element_get_form(RvNode* target, RvNode** result)
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return deliver([&]() -> decltype(auto) { return impl->formForBindings(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// HTMLInputElement.files getter: attribute FileList? files; *result is a new reference, or NULL
+int32_t ranvier_dom_html_input_element_get_files(RvNode* target, RvFileList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLInputElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->filesForBindings(); }, [&](auto&& value) { return storeHandle<FileList>(value, result); });
+}
+
+// HTMLInputElement.files setter: attribute FileList? files; value may be NULL
+int32_t ranvier_dom_html_input_element_set_files(RvNode* target, RvFileList* value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLInputElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<FileList> a0 = reinterpret_cast<FileList*>(value);
+    return invoke([&]() -> decltype(auto) { return impl->setFilesForBindings(a0.get()); });
 }
 
 // HTMLInputElement.formAction getter: attribute USVString formAction
@@ -29433,6 +29575,22 @@ int32_t ranvier_dom_dom_form_data_append(RvDOMFormData* target, const uint8_t* n
     return invoke([&]() -> decltype(auto) { return impl->append(a0.string(), a1.string()); });
 }
 
+// DOMFormData.append(USVString name, Blob blobValue, optional USVString filename) -> undefined; filename_length -1 means absent; filename may be NULL (absent)
+int32_t ranvier_dom_dom_form_data_append_3(RvDOMFormData* target, const uint8_t* name, int32_t name_length, RvBlob* blob_value, const uint8_t* filename, int32_t filename_length)
+{
+    if (!target || !(name_length >= 0 && (name_length <= 0 || name)) || !blob_value || !(filename_length >= -1 && (filename_length <= 0 || filename)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMFormData> impl = reinterpret_cast<DOMFormData*>(target);
+    StringArg a0 { name, name_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    RefPtr<Blob> a1 = reinterpret_cast<Blob*>(blob_value);
+    StringArg a2 { filename, filename_length };
+    if (filename_length >= 0 && a2.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->append(a0.string(), HandleArg<Blob> { a1.get() }, a2); });
+}
+
 // DOMFormData.delete(USVString name) -> undefined
 int32_t ranvier_dom_dom_form_data_delete(RvDOMFormData* target, const uint8_t* name, int32_t name_length)
 {
@@ -29498,6 +29656,22 @@ int32_t ranvier_dom_dom_form_data_set(RvDOMFormData* target, const uint8_t* name
     StringArg a1 { value, value_length };
     if (a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
     return invoke([&]() -> decltype(auto) { return impl->set(a0.string(), a1.string()); });
+}
+
+// DOMFormData.set(USVString name, Blob blobValue, optional USVString filename) -> undefined; filename_length -1 means absent; filename may be NULL (absent)
+int32_t ranvier_dom_dom_form_data_set_3(RvDOMFormData* target, const uint8_t* name, int32_t name_length, RvBlob* blob_value, const uint8_t* filename, int32_t filename_length)
+{
+    if (!target || !(name_length >= 0 && (name_length <= 0 || name)) || !blob_value || !(filename_length >= -1 && (filename_length <= 0 || filename)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMFormData> impl = reinterpret_cast<DOMFormData*>(target);
+    StringArg a0 { name, name_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    RefPtr<Blob> a1 = reinterpret_cast<Blob*>(blob_value);
+    StringArg a2 { filename, filename_length };
+    if (filename_length >= 0 && a2.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->set(a0.string(), HandleArg<Blob> { a1.get() }, a2); });
 }
 
 // ValidityState.valueMissing getter: readonly attribute boolean valueMissing
@@ -37943,6 +38117,142 @@ int32_t ranvier_dom_tree_walker_next_node(RvTreeWalker* target, RvNode** result)
         return RV_ERR_WRONG_THREAD;
     RefPtr<TreeWalker> impl = reinterpret_cast<TreeWalker*>(target);
     return deliver([&]() -> decltype(auto) { return impl->nextNode(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// Blob.constructor: target is the Document of the constructed object; blob_parts may be NULL for an absent optional argument; options defaults to {} in IDL; options may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_blob_create(RvNode* target, const RvDomSequenceBufferSourceOrBlobOrUSVString* blob_parts, const RvDomBlobPropertyBag* options, RvBlob** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    std::optional<Vector<Variant<Ref<JSC::ArrayBufferView>, Ref<JSC::ArrayBuffer>, Ref<Blob>, String>>> a0;
+    if (blob_parts) {
+        int32_t status0 = RV_OK;
+        a0 = decodeRvDomSequenceBufferSourceOrBlobOrUSVString(blob_parts, status0);
+        if (status0 != RV_OK) return status0;
+    }
+    BlobPropertyBag a1 { };
+    if (options) {
+        if (options->size >= offsetof(RvDomBlobPropertyBag, type) + sizeof(options->type) && options->type)
+            assignString(a1.type, options->type);
+        if (options->size >= offsetof(RvDomBlobPropertyBag, endings) + sizeof(options->endings) && !assignEnumeration(a1.endings, options->endings, enumerationEndingType))
+            return RV_ERR_UNSUPPORTED;
+    }
+    return deliver([&]() -> decltype(auto) { return Blob::create(*impl, std::move(a0), std::move(a1)); }, [&](auto&& value) { return storeHandle<Blob>(value, result); });
+}
+
+// Blob.size getter: readonly attribute unsigned long long size
+int32_t ranvier_dom_blob_get_size(RvBlob* target, uint64_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Blob> impl = reinterpret_cast<Blob*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->size(); }, [&](auto&& value) { return store<uint64_t>(value, result); });
+}
+
+// Blob.type getter: readonly attribute DOMString type
+int32_t ranvier_dom_blob_get_type(RvBlob* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Blob> impl = reinterpret_cast<Blob*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->type(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// Blob.slice(optional long long start = 0, optional long long end = 0x7FFFFFFFFFFFFFFF, optional DOMString contentType = "") -> Blob; start defaults to 0 in IDL; end defaults to 0x7FFFFFFFFFFFFFFF in IDL; content_type defaults to "" in IDL; *result is a new reference
+int32_t ranvier_dom_blob_slice(RvBlob* target, int64_t start, int64_t end, const uint8_t* content_type, int32_t content_type_length, RvBlob** result)
+{
+    if (!target || !(content_type_length >= 0 && (content_type_length <= 0 || content_type)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Blob> impl = reinterpret_cast<Blob*>(target);
+    StringArg a2 { content_type, content_type_length };
+    if (a2.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return impl->slice(start, end, a2.string()); }, [&](auto&& value) { return storeHandle<Blob>(value, result); });
+}
+
+// File.constructor: target is the Document of the constructed object; options defaults to {} in IDL; options may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_file_create(RvNode* target, const RvDomSequenceBufferSourceOrBlobOrUSVString* file_bits, const uint8_t* file_name, int32_t file_name_length, const RvDomFilePropertyBag* options, RvBlob** result)
+{
+    if (!target || !file_bits || !(file_name_length >= 0 && (file_name_length <= 0 || file_name)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceBufferSourceOrBlobOrUSVString(file_bits, status0);
+    if (status0 != RV_OK) return status0;
+    StringArg a1 { file_name, file_name_length };
+    if (a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    File::PropertyBag a2 { };
+    if (options) {
+        if (options->size >= offsetof(RvDomFilePropertyBag, type) + sizeof(options->type) && options->type)
+            assignString(a2.type, options->type);
+        if (options->size >= offsetof(RvDomFilePropertyBag, endings) + sizeof(options->endings) && !assignEnumeration(a2.endings, options->endings, enumerationEndingType))
+            return RV_ERR_UNSUPPORTED;
+        if (options->size >= offsetof(RvDomFilePropertyBag, last_modified) + sizeof(options->last_modified) && options->last_modified)
+            assignValue(a2.lastModified, *options->last_modified);
+    }
+    return deliver([&]() -> decltype(auto) { return File::create(*impl, DomSequenceArgument<Variant<Ref<JSC::ArrayBufferView>, Ref<JSC::ArrayBuffer>, Ref<Blob>, String>> { std::move(*a0) }, a1.string(), std::move(a2)); }, [&](auto&& value) { return storeHandle<Blob>(value, result); });
+}
+
+// File.name getter: readonly attribute DOMString name
+int32_t ranvier_dom_file_get_name(RvBlob* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<File>(*reinterpret_cast<Blob*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->name(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// File.lastModified getter: readonly attribute long long lastModified
+int32_t ranvier_dom_file_get_last_modified(RvBlob* target, int64_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<File>(*reinterpret_cast<Blob*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->lastModified(); }, [&](auto&& value) { return store<int64_t>(value, result); });
+}
+
+// FileList.length getter: readonly attribute unsigned long length
+int32_t ranvier_dom_file_list_get_length(RvFileList* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FileList> impl = reinterpret_cast<FileList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->length(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// FileList.item(unsigned long index) -> File?; *result is a new reference, or NULL
+int32_t ranvier_dom_file_list_item(RvFileList* target, uint32_t index, RvBlob** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FileList> impl = reinterpret_cast<FileList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->item(index); }, [&](auto&& value) { return storeHandle<Blob>(value, result); });
 }
 
 // CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths

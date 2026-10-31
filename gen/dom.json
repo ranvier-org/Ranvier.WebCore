@@ -157,6 +157,15 @@
     "DOMFormData": {
       "receiver": "Document",
       "factory": "DOMFormData::create"
+    },
+    "Blob": {
+      "receiver": "Document",
+      "factory": "Blob::create"
+    },
+    "File": {
+      "receiver": "Document",
+      "factory": "File::create",
+      "stringInputs": "utf8-lengths"
     }
   },
   "dictionaryCppTypes": {
@@ -164,13 +173,11 @@
     "SubmitEventInit": "SubmitEvent::Init",
     "FormDataEventInit": "FormDataEvent::Init",
     "ToggleEventInit": "ToggleEvent::Init",
-    "CommandEventInit": "CommandEvent::Init"
+    "CommandEventInit": "CommandEvent::Init",
+    "FilePropertyBag": "File::PropertyBag"
   },
   "dictionaryObjectMembers": [
     "FormDataEventInit.formData"
-  ],
-  "opaqueUnionArms": [
-    "File"
   ],
   "flattenUnionTypedefs": [
     "CSSPerspectiveValue"
@@ -257,7 +264,8 @@
     "CSSStyleValueOrUSVString",
     "DOMStringOrSequenceOfUnrestrictedDouble",
     "CSSNumericValueOrDOMStringOrCSSOMKeywordValue",
-    "FileOrUSVString"
+    "FileOrUSVString",
+    "BufferSourceOrBlobOrUSVString"
   ],
   "complexNullableElements": [
     "CSSStyleValue"
@@ -268,7 +276,8 @@
     "StylePropertyMapReadOnly": "utf8-lengths",
     "StylePropertyMap": "utf8-lengths",
     "DOMMatrix": "utf8-lengths",
-    "DOMFormData": "utf8-lengths"
+    "DOMFormData": "utf8-lengths",
+    "Blob": "utf8-lengths"
   },
   "objectContexts": {
     "StylePropertyMapReadOnly": "Document",
@@ -551,7 +560,10 @@
     "SVGUseElement",
     "NodeFilter",
     "NodeIterator",
-    "TreeWalker"
+    "TreeWalker",
+    "Blob",
+    "File",
+    "FileList"
   ],
   "skipDirectories": [
     "Modules/",
@@ -581,7 +593,6 @@
       "ClipboardEvent",
       "DragEvent",
       "ErrorEvent",
-      "FileList",
       "FormDataEvent",
       "GamepadEvent",
       "HTMLFormControlsCollection",
@@ -884,5 +895,8 @@
         }
       }
     }
-  }
+  },
+  "byteSpanTypes": [
+    "BufferSource"
+  ]
 }

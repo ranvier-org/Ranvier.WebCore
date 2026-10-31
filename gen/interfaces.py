@@ -52,6 +52,8 @@ class InterfaceEmitter:
             result = NUMBERS[value.name]
         elif value.name == 'boolean':
             result = 'bool'
+        elif value.name in self.world.config.get('byteSpanTypes', []):
+            result = 'byte array'
         elif value.name == 'undefined':
             result = 'unit'
         elif value.name in ('sequence', 'FrozenArray'):

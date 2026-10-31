@@ -1316,6 +1316,18 @@
     {
       "name": "TreeWalker",
       "base": null
+    },
+    {
+      "name": "Blob",
+      "base": null
+    },
+    {
+      "name": "File",
+      "base": "Blob"
+    },
+    {
+      "name": "FileList",
+      "base": null
     }
   ],
   "contractInterfaces": [
@@ -3712,6 +3724,33 @@
       "source": "dom/TreeWalker.idl"
     },
     {
+      "name": "Blob",
+      "idlName": "Blob",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "fileapi/Blob.idl"
+    },
+    {
+      "name": "File",
+      "idlName": "File",
+      "base": "Blob",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "fileapi/File.idl"
+    },
+    {
+      "name": "FileList",
+      "idlName": "FileList",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "fileapi/FileList.idl"
+    },
+    {
       "name": "HTMLUnknownElement",
       "idlName": "HTMLUnknownElement",
       "base": "HTMLElement",
@@ -3890,15 +3929,6 @@
       "mixin": false,
       "contractOnly": true,
       "source": "dom/ErrorEvent.idl"
-    },
-    {
-      "name": "FileList",
-      "idlName": "FileList",
-      "base": null,
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "fileapi/FileList.idl"
     },
     {
       "name": "GamepadEvent",
@@ -42372,6 +42402,103 @@
         "enum": null,
         "label": null,
         "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLInputElement",
+      "member": "files",
+      "contractOwner": "HTMLInputElement",
+      "kind": "getter",
+      "function": "rv_dom_html_input_element_get_files",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvFileList**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "FileList",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "FileList",
+        "root": "FileList",
+        "class": "FileList",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLInputElement",
+      "member": "files",
+      "contractOwner": "HTMLInputElement",
+      "kind": "setter",
+      "function": "rv_dom_html_input_element_set_files",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvFileList*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "FileList?",
+          "idl": {
+            "name": "FileList",
+            "nullable": true,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "FileList",
+            "root": "FileList",
+            "class": "FileList",
+            "enum": null,
+            "label": null,
+            "nullable": true,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
         "atom": false,
         "subtypes": []
       }
@@ -105613,6 +105740,132 @@
     },
     {
       "interface": "DOMFormData",
+      "member": "append",
+      "contractOwner": "DOMFormData",
+      "kind": "operation",
+      "function": "rv_dom_dom_form_data_append_3",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMFormData*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "name"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "name_length"
+        },
+        {
+          "ctype": "RvBlob*",
+          "name": "blob_value"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "filename"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "filename_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "name",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "blobValue",
+          "idlType": "Blob",
+          "idl": {
+            "name": "Blob",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "Blob",
+            "root": "Blob",
+            "class": "Blob",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "filename",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMFormData",
       "member": "delete",
       "contractOwner": "DOMFormData",
       "kind": "operation",
@@ -105756,10 +106009,10 @@
         "atom": false,
         "subtypes": [
           {
-            "kind": "opaque",
+            "kind": "object",
             "ctype": null,
             "interface": "File",
-            "root": null,
+            "root": "Blob",
             "class": "File",
             "enum": null,
             "label": null,
@@ -105880,10 +106133,10 @@
             "atom": false,
             "subtypes": [
               {
-                "kind": "opaque",
+                "kind": "object",
                 "ctype": null,
                 "interface": "File",
-                "root": null,
+                "root": "Blob",
                 "class": "File",
                 "enum": null,
                 "label": null,
@@ -106043,6 +106296,132 @@
             "subtypes": []
           },
           "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMFormData",
+      "member": "set",
+      "contractOwner": "DOMFormData",
+      "kind": "operation",
+      "function": "rv_dom_dom_form_data_set_3",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMFormData*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "name"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "name_length"
+        },
+        {
+          "ctype": "RvBlob*",
+          "name": "blob_value"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "filename"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "filename_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "name",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "blobValue",
+          "idlType": "Blob",
+          "idl": {
+            "name": "Blob",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "Blob",
+            "root": "Blob",
+            "class": "Blob",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "filename",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
           "default": null,
           "variadic": false,
           "mapping": {
@@ -134292,6 +134671,763 @@
       }
     },
     {
+      "interface": "Blob",
+      "member": "constructor",
+      "contractOwner": "Blob",
+      "kind": "constructor",
+      "function": "rv_dom_blob_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomSequenceBufferSourceOrBlobOrUSVString*",
+          "name": "blob_parts"
+        },
+        {
+          "ctype": "const RvDomBlobPropertyBag*",
+          "name": "options"
+        },
+        {
+          "ctype": "RvBlob**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "blobParts",
+          "idlType": "sequence<BlobPart>",
+          "idl": {
+            "name": "sequence",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "union",
+                "nullable": false,
+                "subtypes": [
+                  {
+                    "name": "BufferSource",
+                    "nullable": false,
+                    "subtypes": []
+                  },
+                  {
+                    "name": "Blob",
+                    "nullable": false,
+                    "subtypes": []
+                  },
+                  {
+                    "name": "USVString",
+                    "nullable": false,
+                    "subtypes": []
+                  }
+                ]
+              }
+            ]
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceBufferSourceOrBlobOrUSVString",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "BufferSourceOrBlobOrUSVString sequence",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "union",
+                "ctype": "RvDomUnionBufferSourceOrBlobOrUSVString",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": "BufferSourceOrBlobOrUSVString",
+                "nullable": false,
+                "atom": false,
+                "subtypes": [
+                  {
+                    "kind": "bytes",
+                    "ctype": "RvDomByteSpan",
+                    "interface": null,
+                    "root": null,
+                    "class": null,
+                    "enum": null,
+                    "label": "BufferSource",
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": []
+                  },
+                  {
+                    "kind": "object",
+                    "ctype": null,
+                    "interface": "Blob",
+                    "root": "Blob",
+                    "class": "Blob",
+                    "enum": null,
+                    "label": null,
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": []
+                  },
+                  {
+                    "kind": "string",
+                    "ctype": null,
+                    "interface": null,
+                    "root": null,
+                    "class": null,
+                    "enum": null,
+                    "label": null,
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": [],
+                    "stringTransport": "utf8-lengths"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "options",
+          "idlType": "BlobPropertyBag",
+          "idl": {
+            "name": "BlobPropertyBag",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "BlobPropertyBag",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "Blob",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "Blob",
+        "root": "Blob",
+        "class": "Blob",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:Blob",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "Blob",
+      "member": "size",
+      "contractOwner": "Blob",
+      "kind": "getter",
+      "function": "rv_dom_blob_get_size",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvBlob*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint64_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint64_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Blob",
+      "member": "type",
+      "contractOwner": "Blob",
+      "kind": "getter",
+      "function": "rv_dom_blob_get_type",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvBlob*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Blob",
+      "member": "slice",
+      "contractOwner": "Blob",
+      "kind": "operation",
+      "function": "rv_dom_blob_slice",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvBlob*",
+          "name": "target"
+        },
+        {
+          "ctype": "int64_t",
+          "name": "start"
+        },
+        {
+          "ctype": "int64_t",
+          "name": "end"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "content_type"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "content_type_length"
+        },
+        {
+          "ctype": "RvBlob**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "start",
+          "idlType": "long long",
+          "idl": {
+            "name": "long long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "int64_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "end",
+          "idlType": "long long",
+          "idl": {
+            "name": "long long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0x7FFFFFFFFFFFFFFF",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "int64_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "contentType",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "\"\"",
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "Blob",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "Blob",
+        "root": "Blob",
+        "class": "Blob",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "File",
+      "member": "constructor",
+      "contractOwner": "File",
+      "kind": "constructor",
+      "function": "rv_dom_file_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomSequenceBufferSourceOrBlobOrUSVString*",
+          "name": "file_bits"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "file_name"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "file_name_length"
+        },
+        {
+          "ctype": "const RvDomFilePropertyBag*",
+          "name": "options"
+        },
+        {
+          "ctype": "RvBlob**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "fileBits",
+          "idlType": "sequence<BlobPart>",
+          "idl": {
+            "name": "sequence",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "union",
+                "nullable": false,
+                "subtypes": [
+                  {
+                    "name": "BufferSource",
+                    "nullable": false,
+                    "subtypes": []
+                  },
+                  {
+                    "name": "Blob",
+                    "nullable": false,
+                    "subtypes": []
+                  },
+                  {
+                    "name": "USVString",
+                    "nullable": false,
+                    "subtypes": []
+                  }
+                ]
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceBufferSourceOrBlobOrUSVString",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "BufferSourceOrBlobOrUSVString sequence",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "union",
+                "ctype": "RvDomUnionBufferSourceOrBlobOrUSVString",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": "BufferSourceOrBlobOrUSVString",
+                "nullable": false,
+                "atom": false,
+                "subtypes": [
+                  {
+                    "kind": "bytes",
+                    "ctype": "RvDomByteSpan",
+                    "interface": null,
+                    "root": null,
+                    "class": null,
+                    "enum": null,
+                    "label": "BufferSource",
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": []
+                  },
+                  {
+                    "kind": "object",
+                    "ctype": null,
+                    "interface": "Blob",
+                    "root": "Blob",
+                    "class": "Blob",
+                    "enum": null,
+                    "label": null,
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": []
+                  },
+                  {
+                    "kind": "string",
+                    "ctype": null,
+                    "interface": null,
+                    "root": null,
+                    "class": null,
+                    "enum": null,
+                    "label": null,
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": [],
+                    "stringTransport": "utf8-lengths"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "fileName",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "options",
+          "idlType": "FilePropertyBag",
+          "idl": {
+            "name": "FilePropertyBag",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "FilePropertyBag",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "File",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "File",
+        "root": "Blob",
+        "class": "File",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:File",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "File",
+      "member": "name",
+      "contractOwner": "File",
+      "kind": "getter",
+      "function": "rv_dom_file_get_name",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvBlob*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "File",
+      "member": "lastModified",
+      "contractOwner": "File",
+      "kind": "getter",
+      "function": "rv_dom_file_get_last_modified",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvBlob*",
+          "name": "target"
+        },
+        {
+          "ctype": "int64_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "long long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "int64_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FileList",
+      "member": "length",
+      "contractOwner": "FileList",
+      "kind": "getter",
+      "function": "rv_dom_file_list_get_length",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFileList*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FileList",
+      "member": "item",
+      "contractOwner": "FileList",
+      "kind": "operation",
+      "function": "rv_dom_file_list_item",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFileList*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t",
+          "name": "index"
+        },
+        {
+          "ctype": "RvBlob**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "index",
+          "idlType": "unsigned long",
+          "idl": {
+            "name": "unsigned long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "uint32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "File",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "File",
+        "root": "Blob",
+        "class": "File",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
       "interface": "DOMCSSNamespace",
       "member": "supports",
       "contractOwner": "CSS",
@@ -136204,10 +137340,10 @@
                 "atom": false,
                 "subtypes": [
                   {
-                    "kind": "opaque",
+                    "kind": "object",
                     "ctype": null,
                     "interface": "File",
-                    "root": null,
+                    "root": "Blob",
                     "class": "File",
                     "enum": null,
                     "label": null,
@@ -136311,6 +137447,14 @@
       ],
       {},
       "page/ScrollLogicalPosition.idl"
+    ],
+    "EndingType": [
+      [
+        "transparent",
+        "native"
+      ],
+      {},
+      "fileapi/EndingType.idl"
     ]
   },
   "containers": [
@@ -137624,10 +138768,10 @@
         "atom": false,
         "subtypes": [
           {
-            "kind": "opaque",
+            "kind": "object",
             "ctype": null,
             "interface": "File",
-            "root": null,
+            "root": "Blob",
             "class": "File",
             "enum": null,
             "label": null,
@@ -137665,10 +138809,10 @@
         "atom": false,
         "subtypes": [
           {
-            "kind": "opaque",
+            "kind": "object",
             "ctype": null,
             "interface": "File",
-            "root": null,
+            "root": "Blob",
             "class": "File",
             "enum": null,
             "label": null,
@@ -137717,10 +138861,10 @@
             "atom": false,
             "subtypes": [
               {
-                "kind": "opaque",
+                "kind": "object",
                 "ctype": null,
                 "interface": "File",
-                "root": null,
+                "root": "Blob",
                 "class": "File",
                 "enum": null,
                 "label": null,
@@ -137774,6 +138918,125 @@
         ]
       },
       "releaseFunction": "rv_dom_sequence_pointer_event_release"
+    },
+    {
+      "mapping": {
+        "kind": "union",
+        "ctype": "RvDomUnionBufferSourceOrBlobOrUSVString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "BufferSourceOrBlobOrUSVString",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "bytes",
+            "ctype": "RvDomByteSpan",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "BufferSource",
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "Blob",
+            "root": "Blob",
+            "class": "Blob",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_buffer_source_or_blob_or_usv_string_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceBufferSourceOrBlobOrUSVString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "BufferSourceOrBlobOrUSVString sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "union",
+            "ctype": "RvDomUnionBufferSourceOrBlobOrUSVString",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "BufferSourceOrBlobOrUSVString",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "bytes",
+                "ctype": "RvDomByteSpan",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": "BufferSource",
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "Blob",
+                "root": "Blob",
+                "class": "Blob",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              }
+            ]
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_buffer_source_or_blob_or_usv_string_release"
     },
     {
       "mapping": {
@@ -137961,10 +139224,10 @@
             "atom": false,
             "subtypes": [
               {
-                "kind": "opaque",
+                "kind": "object",
                 "ctype": null,
                 "interface": "File",
-                "root": null,
+                "root": "Blob",
                 "class": "File",
                 "enum": null,
                 "label": null,
@@ -138039,10 +139302,10 @@
                 "atom": false,
                 "subtypes": [
                   {
-                    "kind": "opaque",
+                    "kind": "object",
                     "ctype": null,
                     "interface": "File",
-                    "root": null,
+                    "root": "Blob",
                     "class": "File",
                     "enum": null,
                     "label": null,
@@ -139888,6 +141151,105 @@
         "mapping": {
           "kind": "number",
           "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "BlobPropertyBag": [
+      {
+        "name": "type",
+        "field": "type",
+        "ctype": "const char*",
+        "required": false,
+        "default": "\"\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "endings",
+        "field": "endings",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "\"transparent\"",
+        "mapping": {
+          "kind": "enum",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": "EndingType",
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "FilePropertyBag": [
+      {
+        "name": "type",
+        "field": "type",
+        "ctype": "const char*",
+        "required": false,
+        "default": "\"\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "endings",
+        "field": "endings",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "\"transparent\"",
+        "mapping": {
+          "kind": "enum",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": "EndingType",
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "lastModified",
+        "field": "last_modified",
+        "ctype": "const int64_t*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "number",
+          "ctype": "int64_t",
           "interface": null,
           "root": null,
           "class": null,
