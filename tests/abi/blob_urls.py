@@ -18,6 +18,7 @@ import time
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from form_collections import Native, P, I, U, utf8
 from binary_values import Binary
+from utf8_inputs import Utf8
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, WRONG_THREAD, DOM_EXCEPTION, BUFFER_TOO_SMALL, UNSUPPORTED, DETACHED, WRONG_INTERFACE = 0, -1, -2, -3, -6, -9, -10, -11
