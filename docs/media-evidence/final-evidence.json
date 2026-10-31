@@ -1,0 +1,84 @@
+{
+  "groups": {
+    "G01 #46": "lane-green: matchMedia, MediaQueryList.matches and change over viewport, resolution, pointer, hover, prefers-color-scheme, prefers-reduced-motion and prefers-contrast; width, pointer and reduced-motion evaluated; host and viewport changes verified; one owned change subscription gets no callback after removal (private Windows x64 slim; not accepted)",
+    "G15 #59": "lane-green: rv_host_set_media_preferences supplies theme, contrast, reduced motion, text scale and pointer/hover devices; rv_host_media_preferences reads them back; queries and subscriptions observe the supplied state; unavailable preferences are explicit capability facilities (private Windows x64 slim; not accepted)"
+  },
+  "abi": "54 placeholder (root renumbers at batch integration)",
+  "members": [
+    "rv_host_set_media_preferences",
+    "rv_host_media_preferences",
+    "RvMediaPreferences",
+    "RV_MEDIA_* values",
+    "rv_abi_has(\"media-preferences\")",
+    "capability facilities media-preferences, media-color-scheme, media-reduced-motion, media-contrast, media-pointer, media-hover, media-text-scale (implemented), media-forced-colors, media-contrast-less, media-reduced-transparency, media-reduced-data (not implemented)"
+  ],
+  "engine": "Page::setUseColorAppearance; Settings forcedPrefersReducedMotion/ContrastAccessibilityValue + Page::accessibilitySettingsDidChange; RvChromeClient pointing-device overrides + Page::updateStyleAfterChangeInEnvironment; LocalFrame::setTextZoomFactor",
+  "sourcePatch": {
+    "file": "patches/0040-empty-chrome-client-pointer-overridable.patch",
+    "sha256": "f21ccfb97fc69ae20559651b4b1f51bddc0b91e1c53419e76c0bc109789631e6",
+    "recompiledUnits": [
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-editing-9.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-3.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-24.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-9.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-svg-14.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-svg-17.cpp.obj"
+    ]
+  },
+  "qualifications": [
+    "forced-colors always none (WebCore MediaQueryFeatures has no input)",
+    "prefers-contrast less and custom never match",
+    "scripting reports the build (none on slim)",
+    "text scale changes layout, not the computed font-size or any media query; Chromium has no equivalent",
+    "change order across lists: WebKit fires in list creation order, Chromium in its own feature order; only the set and one event per list are compared",
+    "engine-defaults step (no pointing device) is native-only: Chromium always reports one"
+  ],
+  "red": {
+    "probe": "red-candidate6.log (absent rv_host_set_media_preferences on C25-shadow runtime)",
+    "features": [
+      "red-native-features.json",
+      "red-chromium-features.json"
+    ]
+  },
+  "probe": {
+    "assertions": 401,
+    "steps": 6,
+    "chromiumSteps": 5,
+    "repeats": 30,
+    "repeatsDistinct": [
+      "media queries PASS: 401 assertions, 6 fixture steps, 5 with Chromium, 1 run(s)"
+    ]
+  },
+  "oracle": {
+    "browser": "156.0.8078.4",
+    "steps": "5/5",
+    "repeats": 30,
+    "oracleSha256": [
+      "126072abeb034e9cd15ae92f1d450cd25dd893d368bfa7581592141297e964ff"
+    ]
+  },
+  "batch": {
+    "rawAssertions": 91144,
+    "baselineRawAssertions": 90743,
+    "baseline": "C25 shadow ed60fd4",
+    "teardown": 104,
+    "probes": 64,
+    "allExitZero": true
+  },
+  "candidate": "media-candidate-2 (parent C:/wk/native-cascade-shadow/artifacts/native46-candidate-6)",
+  "runtime": {
+    "WebCore.dll": "e96a54409912d8bb5f014d6fa769a3cb9087dff7f2279d7a686f5377ffce2bde",
+    "RanvierWebCoreHost.dll": "4e0fe9e2463f94cb94a52ee8c87af9c5b9faa5243f782f54ce10ea30df402d0c",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+  },
+  "files": {
+    "batch-green.json": "fcbac0f4cb03ba14d4f8cf7c58c05a4ff5bba8690bddc1d4464f2f620f5d0d0e",
+    "runtime-receipt.json": "94e26730b2e54e1a9c541addc9b51bf4d293025f4e1be410aa85bc03d446c5b6",
+    "source-patches.json": "d2e6e748ed0552e8cee15dccfda5156d39c89b7612de6780b9be4bd31ae3636a",
+    "teardown-probes.json": "263c729dc539fcce1f0738a1299bf5852c5eb4a6838f9caf7abb99ef436dd33c",
+    "media-queries-probe.log": "812d955f4789e91b6ee87d37f68c7cd3d688a5ae6317867706398c671569cf84",
+    "media-queries-repeat30.txt": "a4ffff3cc22673b5ac6b6a334c16aaeb6a034277e518eff3951ac652b9942422",
+    "oracle-repeat30.txt": "c701bad1d873c6699bed9438303b53617b06352ae3e2891d51332e85c3a02105",
+    "red-candidate6.log": "1b2bf57f30c8fa2b9432e90ce0fef7638fc540520b45406e2d9f8251d41d643f"
+  }
+}
