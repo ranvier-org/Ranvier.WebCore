@@ -77,6 +77,23 @@ lines = (build / 'build.ninja').read_text().splitlines()
 
 replacements = json.loads((parent / 'replacement-objects.json').read_text())
 borrowed = {Path(path): Path(path).stat().st_mtime_ns for path in replacements.values()}
+# Every unit a series patch reaches, unified or standalone, is a parent object compiled after the patched source.
+patched_files = sorted({name for item in patch_receipt.values() for name in item['files']})
+scan = json.loads(subprocess.run([sys.executable, '-I', 'C:/wk/t06-artifacts/units_for_headers.py', '--json', *patched_files],
+                                 capture_output=True, text=True, check=True).stdout)
+ninja_text = (build / 'build.ninja').read_text()
+unit_check = {}
+for name in patched_files:
+    units = list(scan.get(name, []))
+    if name.startswith('Source/WebCore/') and name.endswith('.cpp'):
+        standalone = 'Source/WebCore/CMakeFiles/WebCore.dir/' + name.removeprefix('Source/WebCore/') + '.obj'
+        if ('build ' + standalone.replace('/', chr(92)) + ':') in ninja_text:
+            units.append(standalone)
+    source_time = os.stat(Path('C:/wk/src') / name).st_mtime_ns
+    for unit in units:
+        obj = replacements.get(unit)
+        assert obj and Path(obj).stat().st_mtime_ns > source_time, unit + ' is not a parent object newer than ' + name
+        unit_check[unit] = obj
 glue_target = 'Source/WebCore/CMakeFiles/WebCore.dir/C_/wk/ranvier-webcore/host/dom/RanvierDomGlue.cpp.obj'
 assert glue_target in replacements
 build_files = {p: p.stat().st_mtime_ns for p in [build / 'CMakeCache.txt', build / 'build.ninja', build / '.ninja_log', build / '.ninja_deps', build / 'bin/WebCore.dll'] if p.exists()}
@@ -108,7 +125,7 @@ undefined = subprocess.run([str(compiler.parent / 'llvm-nm.exe'), '--undefined-o
 inspector_symbols = [line for line in undefined if re.search(r'Inspector(Controller|Instrumentation|Frontend|Agent)|InspectorOverlay', line)]
 assert not inspector_symbols, inspector_symbols
 (out / 'source-patches.json').write_text(json.dumps({'patches': patch_receipt, 'parent': str(parent), 'parentReceipt': parent_patches,
-                                                     'hostGlueObjects': glue_objects, 'recompiledUnits': {glue_target: obj},
+                                                     'hostGlueObjects': glue_objects, 'recompiledUnits': {glue_target: obj}, 'patchUnitsBorrowed': unit_check,
                                                      'inspectGlue': {'object': inspect_obj, 'undefinedSymbols': len(undefined),
                                                                      'inspectorSymbols': inspector_symbols}}, indent=2))
 (out / 'replacement-objects.json').write_text(json.dumps(replacements, indent=2))
