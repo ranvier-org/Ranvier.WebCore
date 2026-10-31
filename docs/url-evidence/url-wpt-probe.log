@@ -1,0 +1,5 @@
+{"urltestdata": {"cases": 896, "native": 896, "chromium": 787}, "setters_tests": {"cases": 278, "native": 278, "chromium": 238}, "urlpatterntestdata": {"cases": 369, "native": 369, "chromium": 369}}
+url_wpt: 15930 calls, 150 qualified disagreements, 0 both-fail cases
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+
+EXIT_CODE=0

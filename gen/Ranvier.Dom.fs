@@ -2815,15 +2815,6 @@ and [<AllowNullLiteral>] DOMRectReadOnly =
     /// <summary>DOMRectReadOnly.left.</summary>
     abstract member left: float with get
 
-/// <summary>CaretPosition in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] CaretPosition =
-    /// <summary>CaretPosition.offsetNode.</summary>
-    abstract member offsetNode: Node with get
-    /// <summary>CaretPosition.offset.</summary>
-    abstract member offset: uint32 with get
-    /// <summary>CaretPosition.getClientRect.</summary>
-    abstract member getClientRect: unit -> DOMRect
-
 /// <summary>DOMRect in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] DOMRect =
     inherit DOMRectReadOnly
@@ -4849,6 +4840,146 @@ and [<AllowNullLiteral>] FileList =
     /// <summary>FileList.item.</summary>
     abstract member item: index: uint32 -> File
 
+/// <summary>CaretPosition in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CaretPosition =
+    /// <summary>CaretPosition.offsetNode.</summary>
+    abstract member offsetNode: Node with get
+    /// <summary>CaretPosition.offset.</summary>
+    abstract member offset: uint32 with get
+    /// <summary>CaretPosition.getClientRect.</summary>
+    abstract member getClientRect: unit -> DOMRect
+
+/// <summary>URL in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] URL =
+
+    /// <summary>URL.href.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.href{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}")>]
+#endif
+    abstract member href: string with get, set
+
+    /// <summary>URL.origin.</summary>
+    abstract member origin: string with get
+
+    /// <summary>URL.protocol.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.protocol{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}")>]
+#endif
+    abstract member protocol: string with get, set
+
+
+    /// <summary>URL.username.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.username{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}")>]
+#endif
+    abstract member username: string with get, set
+
+
+    /// <summary>URL.password.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.password{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}")>]
+#endif
+    abstract member password: string with get, set
+
+
+    /// <summary>URL.host.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.host{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}")>]
+#endif
+    abstract member host: string with get, set
+
+
+    /// <summary>URL.hostname.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.hostname{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}")>]
+#endif
+    abstract member hostname: string with get, set
+
+
+    /// <summary>URL.port.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.port{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}")>]
+#endif
+    abstract member port: string with get, set
+
+
+    /// <summary>URL.pathname.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.pathname{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}")>]
+#endif
+    abstract member pathname: string with get, set
+
+
+    /// <summary>URL.hash.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.hash{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}")>]
+#endif
+    abstract member hash: string with get, set
+
+
+    /// <summary>URL.search.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.search{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}")>]
+#endif
+    abstract member search: string with get, set
+
+    /// <summary>URL.searchParams.</summary>
+    abstract member searchParams: URLSearchParams with get
+    /// <summary>URL.toJSON.</summary>
+    abstract member toJSON: unit -> string
+
+/// <summary>URLSearchParams in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] URLSearchParams =
+    /// <summary>URLSearchParams.size.</summary>
+    abstract member size: uint32 with get
+    /// <summary>URLSearchParams.append.</summary>
+    abstract member append: name: string * value: string -> unit
+    /// <summary>URLSearchParams.delete.</summary>
+    abstract member delete: name: string * ?value: string -> unit
+    /// <summary>URLSearchParams.get.</summary>
+    abstract member get: name: string -> string
+    /// <summary>URLSearchParams.getAll.</summary>
+    abstract member getAll: name: string -> (string) array
+    /// <summary>URLSearchParams.has.</summary>
+    abstract member has: name: string * ?value: string -> bool
+    /// <summary>URLSearchParams.set.</summary>
+    abstract member set: name: string * value: string -> unit
+    /// <summary>URLSearchParams.sort.</summary>
+    abstract member sort: unit -> unit
+    /// <summary>URLSearchParams.toString.</summary>
+    abstract member toString: unit -> string
+
+/// <summary>URLPattern in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] URLPattern =
+
+    /// <summary>URLPattern.test.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.test($1, $2)")>]
+    abstract member __ranvier_test: ?input: obj * ?baseURL: string -> bool
+#else
+    abstract member test: unit -> bool
+    abstract member test: input: string * ?baseURL: string -> bool
+    abstract member test: input: URLPatternInit * ?baseURL: string -> bool
+#endif
+    /// <summary>URLPattern.protocol.</summary>
+    abstract member protocol: string with get
+    /// <summary>URLPattern.username.</summary>
+    abstract member username: string with get
+    /// <summary>URLPattern.password.</summary>
+    abstract member password: string with get
+    /// <summary>URLPattern.hostname.</summary>
+    abstract member hostname: string with get
+    /// <summary>URLPattern.port.</summary>
+    abstract member port: string with get
+    /// <summary>URLPattern.pathname.</summary>
+    abstract member pathname: string with get
+    /// <summary>URLPattern.search.</summary>
+    abstract member search: string with get
+    /// <summary>URLPattern.hash.</summary>
+    abstract member hash: string with get
+    /// <summary>URLPattern.hasRegExpGroups.</summary>
+    abstract member hasRegExpGroups: bool with get
+
 /// <summary>HTMLUnknownElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLUnknownElement =
     inherit HTMLElement
@@ -5311,6 +5442,11 @@ and [<RequireQualifiedAccess>] FileOrUSVString =
     | File of File
     | USVString of string
 
+/// <summary>USVStringOrURLPatternInit in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] USVStringOrURLPatternInit =
+    | USVString of string
+    | URLPatternInit of URLPatternInit
+
 /// <summary>NodeOrDOMString in the scoped DOM interface model.</summary>
 and [<RequireQualifiedAccess>] NodeOrDOMString =
     | Node of Node
@@ -5444,6 +5580,18 @@ and [<AllowNullLiteral; DomDictionary>] DOMMatrix2DInit() =
     member val m22: (float) option = None with get, set
     member val m41: (float) option = None with get, set
     member val m42: (float) option = None with get, set
+
+/// <summary>URLPatternInit in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] URLPatternInit() =
+    member val protocol: (string) option = None with get, set
+    member val username: (string) option = None with get, set
+    member val password: (string) option = None with get, set
+    member val hostname: (string) option = None with get, set
+    member val port: (string) option = None with get, set
+    member val pathname: (string) option = None with get, set
+    member val search: (string) option = None with get, set
+    member val hash: (string) option = None with get, set
+    member val baseURL: (string) option = None with get, set
 
 /// <summary>FocusOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] FocusOptions() =
@@ -5737,6 +5885,14 @@ module BrowserUnionAdapters =
         | :? string as arm -> FileOrUSVString.USVString arm
         | _ -> failwith "Unexpected DOM union result"
 
+    let private boxUSVStringOrURLPatternInit (value: USVStringOrURLPatternInit) : obj =
+        if isNull (box value) then
+            nullArg "value"
+
+        match value with
+        | USVStringOrURLPatternInit.USVString value -> box (normalizeUSVString value)
+        | USVStringOrURLPatternInit.URLPatternInit value -> box value
+
     let private boxNodeOrDOMString (value: NodeOrDOMString) : obj =
         match value with
         | NodeOrDOMString.Node value -> box value
@@ -5983,6 +6139,17 @@ module BrowserUnionAdapters =
                 None
             else
                 Some (unboxFileOrUSVString value)
+
+
+    type URLPattern with
+        member this.test() : bool =
+            this.__ranvier_test (?input = None, ?baseURL = None)
+
+        member this.test(input: string, ?baseURL: string) : bool =
+            this.__ranvier_test (?input = Some (box (normalizeUSVString input)), ?baseURL = baseURL)
+
+        member this.test(input: URLPatternInit, ?baseURL: string) : bool =
+            this.__ranvier_test (?input = Some (box input), ?baseURL = baseURL)
 
 
     type ChildNode with
