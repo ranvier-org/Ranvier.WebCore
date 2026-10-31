@@ -93,6 +93,7 @@ typedef struct RvHighlightRegistry RvHighlightRegistry;
 typedef struct RvCanvasRenderingContext2D RvCanvasRenderingContext2D;
 typedef struct RvCanvasGradient RvCanvasGradient;
 typedef struct RvCanvasPattern RvCanvasPattern;
+typedef struct RvPath2D RvPath2D;
 typedef struct RvDomUnionNodeOrDOMString RvDomUnionNodeOrDOMString;
 typedef struct RvDomSequenceNodeOrDOMString RvDomSequenceNodeOrDOMString;
 typedef struct RvDomSequenceCSSStyleSheet RvDomSequenceCSSStyleSheet;
@@ -146,6 +147,8 @@ typedef struct RvDomPairUSVStringAndUnionUndefinedOrUSVString RvDomPairUSVString
 typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequenceAbstractRange RvDomSequenceAbstractRange;
 typedef struct RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern;
+typedef struct RvDomUnionUnrestrictedDoubleOrDOMPointInit RvDomUnionUnrestrictedDoubleOrDOMPointInit;
+typedef struct RvDomSequenceUnrestrictedDoubleOrDOMPointInit RvDomSequenceUnrestrictedDoubleOrDOMPointInit;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
@@ -376,6 +379,12 @@ enum {
 enum {
     RV_DOM_ARIA_NOTIFICATION_PRIORITY_NORMAL = 0, /* "normal" */
     RV_DOM_ARIA_NOTIFICATION_PRIORITY_HIGH = 1, /* "high" */
+};
+
+/* The values of the IDL enumeration CanvasFillRule. */
+enum {
+    RV_DOM_CANVAS_FILL_RULE_NONZERO = 0, /* "nonzero" */
+    RV_DOM_CANVAS_FILL_RULE_EVENODD = 1, /* "evenodd" */
 };
 
 /* The values of the IDL enumeration DocumentReadyState. */
@@ -966,6 +975,8 @@ typedef struct RvDomPairUSVStringAndUnionUndefinedOrUSVString RvDomPairUSVString
 typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequenceAbstractRange RvDomSequenceAbstractRange;
 typedef struct RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern;
+typedef struct RvDomUnionUnrestrictedDoubleOrDOMPointInit RvDomUnionUnrestrictedDoubleOrDOMPointInit;
+typedef struct RvDomSequenceUnrestrictedDoubleOrDOMPointInit RvDomSequenceUnrestrictedDoubleOrDOMPointInit;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
@@ -1545,6 +1556,27 @@ struct RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern {
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_DOM_POINT_INIT_NUMBER = 1,
+    RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_DOM_POINT_INIT_DOM_POINT_INIT = 2,
+};
+struct RvDomUnionUnrestrictedDoubleOrDOMPointInit {
+    int32_t present;
+    int32_t tag;
+    double arm0;
+    const RvDomDOMPointInit* arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceUnrestrictedDoubleOrDOMPointInit {
+    int32_t present;
+    int32_t count;
+    RvDomUnionUnrestrictedDoubleOrDOMPointInit* items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
 struct RvDomSequenceCSSStyleValue {
     int32_t present;
     int32_t count;
@@ -1651,6 +1683,8 @@ RV_EXPORT void rv_dom_pair_usv_string_and_union_undefined_or_usv_string_release(
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string_release(RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange* value);
 RV_EXPORT void rv_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release(RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* value);
+RV_EXPORT void rv_dom_union_unrestricted_double_or_dom_point_init_release(RvDomUnionUnrestrictedDoubleOrDOMPointInit* value);
+RV_EXPORT void rv_dom_sequence_unrestricted_double_or_dom_point_init_release(RvDomSequenceUnrestrictedDoubleOrDOMPointInit* value);
 RV_EXPORT void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value);
 RV_EXPORT void rv_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* value);
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* value);
@@ -1924,6 +1958,10 @@ RV_EXPORT RvCanvasGradient* rv_dom_canvas_gradient_retain(RvCanvasGradient*);
 RV_EXPORT void rv_dom_canvas_pattern_release(RvCanvasPattern*);
 /* Adds a reference to a CanvasPattern and returns it. */
 RV_EXPORT RvCanvasPattern* rv_dom_canvas_pattern_retain(RvCanvasPattern*);
+/* Releases a handle to a Path2D. */
+RV_EXPORT void rv_dom_path2_d_release(RvPath2D*);
+/* Adds a reference to a Path2D and returns it. */
+RV_EXPORT RvPath2D* rv_dom_path2_d_retain(RvPath2D*);
 /* Concrete scoped interface name of a CSSRule handle; borrows target. */
 RV_EXPORT int32_t rv_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* Concrete scoped interface name of a StyleSheet handle; borrows target. */
@@ -8257,6 +8295,113 @@ RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_clear_rect(RvCanvasRenderin
 /* CanvasRenderingContext2D.fillRect(unrestricted double x, unrestricted double y, unrestricted double w, unrestricted
  * double h) -> undefined */
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_fill_rect(RvCanvasRenderingContext2D* target, double x, double y, double w, double h);
+/* CanvasRenderingContext2D.strokeRect(unrestricted double x, unrestricted double y, unrestricted double w,
+ * unrestricted double h) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_stroke_rect(RvCanvasRenderingContext2D* target, double x, double y, double w, double h);
+/* CanvasRenderingContext2D.beginPath() -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_begin_path(RvCanvasRenderingContext2D* target);
+/* CanvasRenderingContext2D.fill(optional CanvasFillRule fillRule = "nonzero") -> undefined; fill_rule defaults to
+ * "nonzero" in IDL */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_fill_1(RvCanvasRenderingContext2D* target, int32_t fill_rule);
+/* CanvasRenderingContext2D.fill(Path2D path, optional CanvasFillRule fillRule = "nonzero") -> undefined; fill_rule
+ * defaults to "nonzero" in IDL */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_fill_2(RvCanvasRenderingContext2D* target, RvPath2D* path, int32_t fill_rule);
+/* CanvasRenderingContext2D.stroke() -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_stroke_0(RvCanvasRenderingContext2D* target);
+/* CanvasRenderingContext2D.stroke(Path2D path) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_stroke_1(RvCanvasRenderingContext2D* target, RvPath2D* path);
+/* CanvasRenderingContext2D.clip(optional CanvasFillRule fillRule = "nonzero") -> undefined; fill_rule defaults to
+ * "nonzero" in IDL */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_clip_1(RvCanvasRenderingContext2D* target, int32_t fill_rule);
+/* CanvasRenderingContext2D.clip(Path2D path, optional CanvasFillRule fillRule = "nonzero") -> undefined; fill_rule
+ * defaults to "nonzero" in IDL */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_clip_2(RvCanvasRenderingContext2D* target, RvPath2D* path, int32_t fill_rule);
+/* CanvasRenderingContext2D.isPointInPath(unrestricted double x, unrestricted double y, optional CanvasFillRule
+ * fillRule = "nonzero") -> boolean; fill_rule defaults to "nonzero" in IDL */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_is_point_in_path_3(RvCanvasRenderingContext2D* target, double x, double y, int32_t fill_rule, int32_t* result);
+/* CanvasRenderingContext2D.isPointInPath(Path2D path, unrestricted double x, unrestricted double y, optional
+ * CanvasFillRule fillRule = "nonzero") -> boolean; fill_rule defaults to "nonzero" in IDL */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_is_point_in_path_4(RvCanvasRenderingContext2D* target, RvPath2D* path, double x, double y, int32_t fill_rule, int32_t* result);
+/* CanvasRenderingContext2D.isPointInStroke(unrestricted double x, unrestricted double y) -> boolean */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_is_point_in_stroke_2(RvCanvasRenderingContext2D* target, double x, double y, int32_t* result);
+/* CanvasRenderingContext2D.isPointInStroke(Path2D path, unrestricted double x, unrestricted double y) -> boolean */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_is_point_in_stroke_3(RvCanvasRenderingContext2D* target, RvPath2D* path, double x, double y, int32_t* result);
+/* CanvasRenderingContext2D.closePath() -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_close_path(RvCanvasRenderingContext2D* target);
+/* CanvasRenderingContext2D.moveTo(unrestricted double x, unrestricted double y) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_move_to(RvCanvasRenderingContext2D* target, double x, double y);
+/* CanvasRenderingContext2D.lineTo(unrestricted double x, unrestricted double y) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_line_to(RvCanvasRenderingContext2D* target, double x, double y);
+/* CanvasRenderingContext2D.quadraticCurveTo(unrestricted double cpx, unrestricted double cpy, unrestricted double x,
+ * unrestricted double y) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_quadratic_curve_to(RvCanvasRenderingContext2D* target, double cpx, double cpy, double x, double y);
+/* CanvasRenderingContext2D.bezierCurveTo(unrestricted double cp1x, unrestricted double cp1y, unrestricted double
+ * cp2x, unrestricted double cp2y, unrestricted double x, unrestricted double y) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_bezier_curve_to(RvCanvasRenderingContext2D* target, double cp1x, double cp1y, double cp2x, double cp2y, double x, double y);
+/* CanvasRenderingContext2D.arcTo(unrestricted double x1, unrestricted double y1, unrestricted double x2, unrestricted
+ * double y2, unrestricted double radius) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_arc_to(RvCanvasRenderingContext2D* target, double x1, double y1, double x2, double y2, double radius);
+/* CanvasRenderingContext2D.rect(unrestricted double x, unrestricted double y, unrestricted double w, unrestricted
+ * double h) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_rect(RvCanvasRenderingContext2D* target, double x, double y, double w, double h);
+/* CanvasRenderingContext2D.roundRect(unrestricted double x, unrestricted double y, unrestricted double w,
+ * unrestricted double h, sequence<(unrestricted double or DOMPointInit)> radii) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_round_rect_5_list(RvCanvasRenderingContext2D* target, double x, double y, double w, double h, const RvDomSequenceUnrestrictedDoubleOrDOMPointInit* radii);
+/* CanvasRenderingContext2D.roundRect(unrestricted double x, unrestricted double y, unrestricted double w,
+ * unrestricted double h, optional (unrestricted double or DOMPointInit) radii = 0.0) -> undefined; radii defaults to
+ * 0.0 in IDL */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_round_rect_5_value(RvCanvasRenderingContext2D* target, double x, double y, double w, double h, const RvDomUnionUnrestrictedDoubleOrDOMPointInit* radii);
+/* CanvasRenderingContext2D.arc(unrestricted double x, unrestricted double y, unrestricted double radius, unrestricted
+ * double startAngle, unrestricted double endAngle, optional boolean anticlockwise = false) -> undefined;
+ * anticlockwise defaults to false in IDL */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_arc(RvCanvasRenderingContext2D* target, double x, double y, double radius, double start_angle, double end_angle, int32_t anticlockwise);
+/* CanvasRenderingContext2D.ellipse(unrestricted double x, unrestricted double y, unrestricted double radiusX,
+ * unrestricted double radiusY, unrestricted double rotation, unrestricted double startAngle, unrestricted double
+ * endAngle, optional boolean anticlockwise = false) -> undefined; anticlockwise defaults to false in IDL */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_ellipse(RvCanvasRenderingContext2D* target, double x, double y, double radius_x, double radius_y, double rotation, double start_angle, double end_angle, int32_t anticlockwise);
+/* Path2D */
+
+/* Path2D.constructor: target is the Document of the constructed object; *result is a new reference */
+RV_EXPORT int32_t rv_dom_path2_d_create_0(RvNode* target, RvPath2D** result);
+/* Path2D.constructor: target is the Document of the constructed object; *result is a new reference */
+RV_EXPORT int32_t rv_dom_path2_d_create_1_path(RvNode* target, RvPath2D* path, RvPath2D** result);
+/* Path2D.constructor: target is the Document of the constructed object; *result is a new reference */
+RV_EXPORT int32_t rv_dom_path2_d_create_1_d(RvNode* target, const uint8_t* d, int32_t d_length, RvPath2D** result);
+/* Path2D.addPath(Path2D path, optional DOMMatrix2DInit transform = {}) -> undefined; transform defaults to {} in IDL;
+ * transform may be NULL for the IDL default */
+RV_EXPORT int32_t rv_dom_path2_d_add_path(RvPath2D* target, RvPath2D* path, const RvDomDOMMatrix2DInit* transform);
+/* Path2D.closePath() -> undefined */
+RV_EXPORT int32_t rv_dom_path2_d_close_path(RvPath2D* target);
+/* Path2D.moveTo(unrestricted double x, unrestricted double y) -> undefined */
+RV_EXPORT int32_t rv_dom_path2_d_move_to(RvPath2D* target, double x, double y);
+/* Path2D.lineTo(unrestricted double x, unrestricted double y) -> undefined */
+RV_EXPORT int32_t rv_dom_path2_d_line_to(RvPath2D* target, double x, double y);
+/* Path2D.quadraticCurveTo(unrestricted double cpx, unrestricted double cpy, unrestricted double x, unrestricted
+ * double y) -> undefined */
+RV_EXPORT int32_t rv_dom_path2_d_quadratic_curve_to(RvPath2D* target, double cpx, double cpy, double x, double y);
+/* Path2D.bezierCurveTo(unrestricted double cp1x, unrestricted double cp1y, unrestricted double cp2x, unrestricted
+ * double cp2y, unrestricted double x, unrestricted double y) -> undefined */
+RV_EXPORT int32_t rv_dom_path2_d_bezier_curve_to(RvPath2D* target, double cp1x, double cp1y, double cp2x, double cp2y, double x, double y);
+/* Path2D.arcTo(unrestricted double x1, unrestricted double y1, unrestricted double x2, unrestricted double y2,
+ * unrestricted double radius) -> undefined */
+RV_EXPORT int32_t rv_dom_path2_d_arc_to(RvPath2D* target, double x1, double y1, double x2, double y2, double radius);
+/* Path2D.rect(unrestricted double x, unrestricted double y, unrestricted double w, unrestricted double h) ->
+ * undefined */
+RV_EXPORT int32_t rv_dom_path2_d_rect(RvPath2D* target, double x, double y, double w, double h);
+/* Path2D.roundRect(unrestricted double x, unrestricted double y, unrestricted double w, unrestricted double h,
+ * sequence<(unrestricted double or DOMPointInit)> radii) -> undefined */
+RV_EXPORT int32_t rv_dom_path2_d_round_rect_5_list(RvPath2D* target, double x, double y, double w, double h, const RvDomSequenceUnrestrictedDoubleOrDOMPointInit* radii);
+/* Path2D.roundRect(unrestricted double x, unrestricted double y, unrestricted double w, unrestricted double h,
+ * optional (unrestricted double or DOMPointInit) radii = 0.0) -> undefined; radii defaults to 0.0 in IDL */
+RV_EXPORT int32_t rv_dom_path2_d_round_rect_5_value(RvPath2D* target, double x, double y, double w, double h, const RvDomUnionUnrestrictedDoubleOrDOMPointInit* radii);
+/* Path2D.arc(unrestricted double x, unrestricted double y, unrestricted double radius, unrestricted double
+ * startAngle, unrestricted double endAngle, optional boolean anticlockwise = false) -> undefined; anticlockwise
+ * defaults to false in IDL */
+RV_EXPORT int32_t rv_dom_path2_d_arc(RvPath2D* target, double x, double y, double radius, double start_angle, double end_angle, int32_t anticlockwise);
+/* Path2D.ellipse(unrestricted double x, unrestricted double y, unrestricted double radiusX, unrestricted double
+ * radiusY, unrestricted double rotation, unrestricted double startAngle, unrestricted double endAngle, optional
+ * boolean anticlockwise = false) -> undefined; anticlockwise defaults to false in IDL */
+RV_EXPORT int32_t rv_dom_path2_d_ellipse(RvPath2D* target, double x, double y, double radius_x, double radius_y, double rotation, double start_angle, double end_angle, int32_t anticlockwise);
 /* DOMCSSNamespace */
 
 /* CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths */

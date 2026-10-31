@@ -585,6 +585,23 @@ def c_name(name):
     return name + "_" if name in RESERVED or name in C_KEYWORDS else name
 
 
+def overload_suffix(member, overloads):
+    """The name suffix of an overload: its argument count, then, when another overload has the same count, the
+    first argument that differs from it by name, or by type when the names are the same (`list` for a sequence,
+    `value` otherwise)."""
+    count = len(member.arguments)
+    suffix = f"_{count}"
+    others = [o for o in overloads if o is not member and len(o.arguments) == count]
+    for index, argument in enumerate(member.arguments):
+        differing = [o.arguments[index] for o in others if str(o.arguments[index].type) != str(argument.type)]
+        if not differing:
+            continue
+        if all(other.name != argument.name for other in differing):
+            return f"{suffix}_{c_name(argument.name)}"
+        return f"{suffix}_{'list' if argument.type.name == 'sequence' else 'value'}"
+    return suffix
+
+
 class Generator(ComplexGeneratorMixin):
     unsupported_type = Unsupported
     result_field_name = staticmethod(lambda name: c_name(name))
@@ -1095,7 +1112,7 @@ class Generator(ComplexGeneratorMixin):
                     self.skip(name, member, str(error))
             plain = self.plain_overload(name, op_name, supported)
             for index, (member, args, returns) in enumerate(supported):
-                suffix = "" if len(supported) == 1 or index == plain else f"_{len(member.arguments)}"
+                suffix = "" if len(supported) == 1 or index == plain else overload_suffix(member, [m for m, _, _ in supported])
                 self.operation(name, member, args, returns, suffix)
 
     def special_name(self, member):
@@ -1600,7 +1617,8 @@ class Generator(ComplexGeneratorMixin):
             if overloaded:
                 locked = self.lock.get(function.name)
                 if not locked or function.params != [tuple(parameter) for parameter in locked['params']]:
-                    function.name += f'_{len(member.arguments)}'
+                    siblings = [m for m in self.world.members(interface) if m.kind == 'constructor']
+                    function.name += overload_suffix(member, siblings)
         except Unsupported as error:
             self.skip(interface, member, f"constructor: {error}")
 
@@ -1707,11 +1725,16 @@ class Generator(ComplexGeneratorMixin):
                     params.append((ctype, name))
                     passed.append(f"!!{name}" if mapped.kind == "bool" else name)
             elif mapped.kind == "enum":
-                if function.kind != "setter":
-                    raise Unsupported(f"enumeration {mapped.enum} argument")
+                if mapped.nullable or (argument.optional and argument.default is None):
+                    raise Unsupported(f"optional enumeration {mapped.enum} argument without a default")
                 self.enums_used[mapped.enum] = self.world.enums[mapped.enum]
                 params.append(("int32_t", name))
-                prepare.append(f"auto a{index} = enumerationFromIndex<std::remove_cvref_t<decltype({self.getter_call(interface, member, mapped)})>>({name}, {enum_table(mapped.enum)});")
+                if function.kind == "setter":
+                    cpp_enum = f"std::remove_cvref_t<decltype({self.getter_call(interface, member, mapped)})>"
+                else:
+                    # An operation argument names the enumeration's C++ type, the IDL name unless ImplementedAs renames it.
+                    cpp_enum = self.world.enums[mapped.enum][1].get("ImplementedAs", mapped.enum)
+                prepare.append(f"auto a{index} = enumerationFromIndex<{cpp_enum}>({name}, {enum_table(mapped.enum)});")
                 prepare.append(f"if (!a{index})")
                 prepare.append("    return RV_ERR_UNSUPPORTED;")
                 passed.append(f"*a{index}")

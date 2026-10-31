@@ -245,6 +245,11 @@
       "factory": "RanvierCollectionLike::createHighlight",
       "passReceiver": false
     },
+    "Path2D": {
+      "receiver": "Document",
+      "factory": "Path2D::create",
+      "passReceiver": false
+    },
     "FileReader": {
       "receiver": "Document",
       "factory": "FileReader::create"
@@ -684,7 +689,8 @@
     "HTMLCanvasElement",
     "CanvasRenderingContext2D",
     "CanvasGradient",
-    "CanvasPattern"
+    "CanvasPattern",
+    "Path2D"
   ],
   "skipDirectories": [
     "Modules/",
@@ -1152,7 +1158,24 @@
       "canvas",
       "fillStyle",
       "fillRect",
-      "clearRect"
+      "clearRect",
+      "strokeRect",
+      "beginPath",
+      "closePath",
+      "moveTo",
+      "lineTo",
+      "quadraticCurveTo",
+      "bezierCurveTo",
+      "arcTo",
+      "rect",
+      "roundRect",
+      "arc",
+      "ellipse",
+      "fill",
+      "stroke",
+      "clip",
+      "isPointInPath",
+      "isPointInStroke"
     ],
     "CanvasGradient": [],
     "CanvasPattern": []

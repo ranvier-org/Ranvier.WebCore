@@ -5153,12 +5153,105 @@ and [<AllowNullLiteral>] CanvasRenderingContext2D =
     abstract member clearRect: x: float * y: float * w: float * h: float -> unit
     /// <summary>CanvasRenderingContext2D.fillRect.</summary>
     abstract member fillRect: x: float * y: float * w: float * h: float -> unit
+    /// <summary>CanvasRenderingContext2D.strokeRect.</summary>
+    abstract member strokeRect: x: float * y: float * w: float * h: float -> unit
+    /// <summary>CanvasRenderingContext2D.beginPath.</summary>
+    abstract member beginPath: unit -> unit
+    /// <summary>CanvasRenderingContext2D.fill.</summary>
+    abstract member fill: ?fillRule: CanvasFillRule -> unit
+    /// <summary>CanvasRenderingContext2D.fill.</summary>
+    abstract member fill: path: Path2D * ?fillRule: CanvasFillRule -> unit
+    /// <summary>CanvasRenderingContext2D.stroke.</summary>
+    abstract member stroke: unit -> unit
+    /// <summary>CanvasRenderingContext2D.stroke.</summary>
+    abstract member stroke: path: Path2D -> unit
+    /// <summary>CanvasRenderingContext2D.clip.</summary>
+    abstract member clip: ?fillRule: CanvasFillRule -> unit
+    /// <summary>CanvasRenderingContext2D.clip.</summary>
+    abstract member clip: path: Path2D * ?fillRule: CanvasFillRule -> unit
+    /// <summary>CanvasRenderingContext2D.isPointInPath.</summary>
+    abstract member isPointInPath: x: float * y: float * ?fillRule: CanvasFillRule -> bool
+    /// <summary>CanvasRenderingContext2D.isPointInPath.</summary>
+    abstract member isPointInPath: path: Path2D * x: float * y: float * ?fillRule: CanvasFillRule -> bool
+    /// <summary>CanvasRenderingContext2D.isPointInStroke.</summary>
+    abstract member isPointInStroke: x: float * y: float -> bool
+    /// <summary>CanvasRenderingContext2D.isPointInStroke.</summary>
+    abstract member isPointInStroke: path: Path2D * x: float * y: float -> bool
+    /// <summary>CanvasRenderingContext2D.closePath.</summary>
+    abstract member closePath: unit -> unit
+    /// <summary>CanvasRenderingContext2D.moveTo.</summary>
+    abstract member moveTo: x: float * y: float -> unit
+    /// <summary>CanvasRenderingContext2D.lineTo.</summary>
+    abstract member lineTo: x: float * y: float -> unit
+    /// <summary>CanvasRenderingContext2D.quadraticCurveTo.</summary>
+    abstract member quadraticCurveTo: cpx: float * cpy: float * x: float * y: float -> unit
+    /// <summary>CanvasRenderingContext2D.bezierCurveTo.</summary>
+    abstract member bezierCurveTo: cp1x: float * cp1y: float * cp2x: float * cp2y: float * x: float * y: float -> unit
+    /// <summary>CanvasRenderingContext2D.arcTo.</summary>
+    abstract member arcTo: x1: float * y1: float * x2: float * y2: float * radius: float -> unit
+    /// <summary>CanvasRenderingContext2D.rect.</summary>
+    abstract member rect: x: float * y: float * w: float * h: float -> unit
+    /// <summary>CanvasRenderingContext2D.roundRect.</summary>
+    abstract member roundRect: x: float * y: float * w: float * h: float * radii: (UnrestrictedDoubleOrDOMPointInit) array -> unit
+
+    /// <summary>CanvasRenderingContext2D.roundRect.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.roundRect($1, $2, $3, $4, $5)")>]
+    abstract member __ranvier_roundRect: x: float * y: float * w: float * h: float * ?radii: obj -> unit
+#else
+    abstract member roundRect: x: float * y: float * w: float * h: float -> unit
+    abstract member roundRect: x: float * y: float * w: float * h: float * radii: float -> unit
+    abstract member roundRect: x: float * y: float * w: float * h: float * radii: DOMPointInit -> unit
+#endif
+    /// <summary>CanvasRenderingContext2D.arc.</summary>
+    abstract member arc: x: float * y: float * radius: float * startAngle: float * endAngle: float * ?anticlockwise: bool -> unit
+
+    /// <summary>CanvasRenderingContext2D.ellipse.</summary>
+    abstract member ellipse:
+        x: float * y: float * radiusX: float * radiusY: float * rotation: float * startAngle: float * endAngle: float * ?anticlockwise: bool -> unit
 
 /// <summary>CanvasGradient in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] CanvasGradient = interface end
 
 /// <summary>CanvasPattern in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] CanvasPattern = interface end
+
+/// <summary>Path2D in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] Path2D =
+    /// <summary>Path2D.addPath.</summary>
+    abstract member addPath: path: Path2D * ?transform: DOMMatrix2DInit -> unit
+    /// <summary>Path2D.closePath.</summary>
+    abstract member closePath: unit -> unit
+    /// <summary>Path2D.moveTo.</summary>
+    abstract member moveTo: x: float * y: float -> unit
+    /// <summary>Path2D.lineTo.</summary>
+    abstract member lineTo: x: float * y: float -> unit
+    /// <summary>Path2D.quadraticCurveTo.</summary>
+    abstract member quadraticCurveTo: cpx: float * cpy: float * x: float * y: float -> unit
+    /// <summary>Path2D.bezierCurveTo.</summary>
+    abstract member bezierCurveTo: cp1x: float * cp1y: float * cp2x: float * cp2y: float * x: float * y: float -> unit
+    /// <summary>Path2D.arcTo.</summary>
+    abstract member arcTo: x1: float * y1: float * x2: float * y2: float * radius: float -> unit
+    /// <summary>Path2D.rect.</summary>
+    abstract member rect: x: float * y: float * w: float * h: float -> unit
+    /// <summary>Path2D.roundRect.</summary>
+    abstract member roundRect: x: float * y: float * w: float * h: float * radii: (UnrestrictedDoubleOrDOMPointInit) array -> unit
+
+    /// <summary>Path2D.roundRect.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.roundRect($1, $2, $3, $4, $5)")>]
+    abstract member __ranvier_roundRect: x: float * y: float * w: float * h: float * ?radii: obj -> unit
+#else
+    abstract member roundRect: x: float * y: float * w: float * h: float -> unit
+    abstract member roundRect: x: float * y: float * w: float * h: float * radii: float -> unit
+    abstract member roundRect: x: float * y: float * w: float * h: float * radii: DOMPointInit -> unit
+#endif
+    /// <summary>Path2D.arc.</summary>
+    abstract member arc: x: float * y: float * radius: float * startAngle: float * endAngle: float * ?anticlockwise: bool -> unit
+
+    /// <summary>Path2D.ellipse.</summary>
+    abstract member ellipse:
+        x: float * y: float * radiusX: float * radiusY: float * rotation: float * startAngle: float * endAngle: float * ?anticlockwise: bool -> unit
 
 /// <summary>HTMLUnknownElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLUnknownElement =
@@ -5611,6 +5704,11 @@ and [<RequireQualifiedAccess>] DOMStringOrCanvasGradientOrCanvasPattern =
     | CanvasGradient of CanvasGradient
     | CanvasPattern of CanvasPattern
 
+/// <summary>UnrestrictedDoubleOrDOMPointInit in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] UnrestrictedDoubleOrDOMPointInit =
+    | UnrestrictedDouble of float
+    | DOMPointInit of DOMPointInit
+
 /// <summary>NodeOrDOMString in the scoped DOM interface model.</summary>
 and [<RequireQualifiedAccess>] NodeOrDOMString =
     | Node of Node
@@ -5810,6 +5908,11 @@ and [<DomStringEnum; RequireQualifiedAccess>] SlotAssignmentMode =
 and [<DomStringEnum; RequireQualifiedAccess>] VisibilityState =
     | [<CompiledName("hidden")>] Hidden
     | [<CompiledName("visible")>] Visible
+
+/// <summary>CanvasFillRule in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] CanvasFillRule =
+    | [<CompiledName("nonzero")>] Nonzero
+    | [<CompiledName("evenodd")>] Evenodd
 
 /// <summary>HighlightType in the scoped DOM interface model.</summary>
 and [<DomStringEnum; RequireQualifiedAccess>] HighlightType =
@@ -6083,6 +6186,11 @@ module BrowserUnionAdapters =
         | arm when isCanvasGradient arm -> DOMStringOrCanvasGradientOrCanvasPattern.CanvasGradient (unbox<CanvasGradient> arm)
         | arm when isCanvasPattern arm -> DOMStringOrCanvasGradientOrCanvasPattern.CanvasPattern (unbox<CanvasPattern> arm)
         | _ -> failwith "Unexpected DOM union result"
+
+    let private boxUnrestrictedDoubleOrDOMPointInit (value: UnrestrictedDoubleOrDOMPointInit) : obj =
+        match value with
+        | UnrestrictedDoubleOrDOMPointInit.UnrestrictedDouble value -> box value
+        | UnrestrictedDoubleOrDOMPointInit.DOMPointInit value -> box value
 
     let private boxNodeOrDOMString (value: NodeOrDOMString) : obj =
         match value with
@@ -6368,6 +6476,26 @@ module BrowserUnionAdapters =
                 unboxDOMStringOrCanvasGradientOrCanvasPattern value
             and set (value: DOMStringOrCanvasGradientOrCanvasPattern) =
                 this.__ranvier_set_fillStyle (boxDOMStringOrCanvasGradientOrCanvasPattern value)
+
+        member this.roundRect(x: float, y: float, w: float, h: float) : unit =
+            this.__ranvier_roundRect (x, y, w, h, ?radii = None)
+
+        member this.roundRect(x: float, y: float, w: float, h: float, radii: float) : unit =
+            this.__ranvier_roundRect (x, y, w, h, ?radii = Some (box radii))
+
+        member this.roundRect(x: float, y: float, w: float, h: float, radii: DOMPointInit) : unit =
+            this.__ranvier_roundRect (x, y, w, h, ?radii = Some (box radii))
+
+
+    type Path2D with
+        member this.roundRect(x: float, y: float, w: float, h: float) : unit =
+            this.__ranvier_roundRect (x, y, w, h, ?radii = None)
+
+        member this.roundRect(x: float, y: float, w: float, h: float, radii: float) : unit =
+            this.__ranvier_roundRect (x, y, w, h, ?radii = Some (box radii))
+
+        member this.roundRect(x: float, y: float, w: float, h: float, radii: DOMPointInit) : unit =
+            this.__ranvier_roundRect (x, y, w, h, ?radii = Some (box radii))
 
 
     type ChildNode with

@@ -1019,6 +1019,45 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
 
                 if rv_diagnostic_live_count () <> live then
                     failwith "cascade snapshot leaked"
+        | "canvas path" ->
+            let canvas = rv_document_create_element (host, "canvas")
+            rv_node_append_child (div, canvas) |> check "append canvas"
+            rv_canvas_get_context (canvas, 1, 0n, &held.contents) |> check "getContext 2d"
+            rv_node_release canvas
+            let mutable path = 0n
+            rv_dom_path2_d_create_0 (document, &path) |> check "Path2D"
+            rv_dom_path2_d_rect (path, 0.0, 0.0, 10.0, 10.0) |> check "Path2D.rect"
+
+            rv_dom_canvas_rendering_context2_d_fill_2 (held.Value, path, RV_DOM_CANVAS_FILL_RULE_NONZERO)
+            |> check "fill(path)"
+
+            rv_dom_canvas_rendering_context2_d_clip_2 (held.Value, path, RV_DOM_CANVAS_FILL_RULE_EVENODD)
+            |> check "clip(path)"
+
+            fun () ->
+                let filled =
+                    rv_dom_canvas_rendering_context2_d_fill_2 (held.Value, path, RV_DOM_CANVAS_FILL_RULE_NONZERO)
+
+                if filled <> 0 && filled <> -10 then
+                    failwithf "fill(path) after destroy: %d" filled
+
+                let mutable hit = -1
+
+                let tested =
+                    rv_dom_canvas_rendering_context2_d_is_point_in_path_4 (
+                        held.Value,
+                        path,
+                        5.0,
+                        5.0,
+                        RV_DOM_CANVAS_FILL_RULE_NONZERO,
+                        &hit
+                    )
+
+                if tested <> 0 && tested <> -10 then
+                    failwithf "isPointInPath(path) after destroy: %d" tested
+
+                rv_dom_path2_d_release path
+                rv_dom_canvas_rendering_context2_d_release held.Value
         | "crypto" ->
             let filled = Array.zeroCreate<byte> 16
 
@@ -1295,6 +1334,7 @@ let run (outDir: string) =
                     "string results"
                     "aria relations"
                     "coordinate spaces"
+                    "canvas path"
                 ] do
                 for remove in [ false; true ] do
                     releaseAfterDestroy kind remove

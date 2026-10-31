@@ -421,7 +421,7 @@ interface CSSRotate {
         generator = domgen.Generator(domgen.World(self.source, config))
         generator.lock = {}
         generator.lock_structs = {}
-        with self.assertRaisesRegex(SystemExit, 'generated names collide.*css_rotate_create_1'):
+        with self.assertRaisesRegex(SystemExit, r"generated names collide: \['css_rotate_create_1_value'\]"):
             generator.run()
 
     def test_optional_matrix_constructor_union_keeps_absence_distinct_from_present_empty_values(self):
@@ -734,6 +734,48 @@ interface Surface {
                       'impl->setPaint(std::move(arm)); else impl->setPaint(RefPtr { std::move(arm) }); });', glue)
         plain = self.canvas_generator(['paint']).glue()
         self.assertNotIn('WTF::switchOn(std::move(*a0)', plain)
+
+    def path_generator(self, extra=''):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+dictionary Corner { unrestricted double x = 0; };
+interface Shape {
+    constructor();
+    constructor(Shape shape);
+    constructor(DOMString d);
+    undefined round(unrestricted double w, sequence<(unrestricted double or Corner)> radii);
+    undefined round(unrestricted double w, optional (unrestricted double or Corner) radii = 0.0);
+    undefined fill(optional Mode mode = "open");
+    undefined fill(Shape shape, optional Mode mode = "open");
+''' + extra + '''
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['Shape']
+        config['constructors'] = {'Shape': {'receiver': 'Document', 'factory': 'Shape::create', 'passReceiver': False}}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        return generator
+
+    def test_same_arity_overloads_take_the_first_differing_argument_name_or_type(self):
+        generator = self.path_generator()
+        names = sorted(function.name for function in generator.functions if function.interface == 'Shape')
+        self.assertEqual(['shape_create_0', 'shape_create_1_d', 'shape_create_1_shape', 'shape_fill_1', 'shape_fill_2',
+                          'shape_round_2_list', 'shape_round_2_value'], [n for n in names if not n.endswith(('_release', '_retain'))])
+        again = sorted(function.name for function in self.path_generator().functions if function.interface == 'Shape')
+        self.assertEqual(names, again)
+
+    def test_enumeration_operation_arguments_take_a_checked_index_of_the_named_enumeration(self):
+        generator = self.path_generator()
+        fill = next(function for function in generator.functions if function.name == 'shape_fill_2')
+        self.assertEqual(('int32_t', 'mode'), fill.params[-1])
+        glue = generator.glue()
+        self.assertIn('auto a1 = enumerationFromIndex<Mode>(mode, enumerationMode);', glue)
+        self.assertIn('RV_DOM_MODE_CLOSED = 1', generator.header())
+        absent = self.path_generator('    undefined pick(optional Mode mode);')
+        self.assertEqual('optional enumeration Mode argument without a default', dict(absent.excluded)['Shape.pick'])
 
     def test_opaque_union_arm_returns_a_tag_with_a_null_payload_and_no_decoder(self):
         generator = self.form_data_generator()

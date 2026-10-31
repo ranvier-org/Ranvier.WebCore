@@ -266,7 +266,13 @@ class InterfaceEmitter:
             lines += ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]',
                       f'    abstract member __ranvier_{member.name}: {raw_params} -> {raw_result}', '#else']
         for selected in selected_arguments:
-            lines += [f'    abstract member {identifier(member.name)}: {self.parameters(member.arguments, selected)} -> {result}']
+            signature = f'{self.parameters(member.arguments, selected)} -> {result}'
+            if len(f'    abstract member {identifier(member.name)}: {signature}') > 150:
+                # Fantomas breaks a signature past the line length after the colon, with a blank line before the member.
+                lines = ([''] if lines and lines[0] != '' else []) + lines
+                lines += [f'    abstract member {identifier(member.name)}:', f'        {signature}']
+            else:
+                lines += [f'    abstract member {identifier(member.name)}: {signature}']
         if needs_adapter:
             lines += ['#endif']
             self.adapters.append((owner, member))

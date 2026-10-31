@@ -645,6 +645,12 @@ let RV_DOM_ARIA_NOTIFICATION_PRIORITY_NORMAL = 0
 let RV_DOM_ARIA_NOTIFICATION_PRIORITY_HIGH = 1
 
 [<Literal>]
+let RV_DOM_CANVAS_FILL_RULE_NONZERO = 0
+
+[<Literal>]
+let RV_DOM_CANVAS_FILL_RULE_EVENODD = 1
+
+[<Literal>]
 let RV_DOM_DOCUMENT_READY_STATE_LOADING = 0
 
 [<Literal>]
@@ -1728,6 +1734,27 @@ type RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern =
     val mutable arm1: nativeint
     val mutable arm2: nativeint
 
+[<Literal>]
+let RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_DOM_POINT_INIT_NUMBER = 1
+
+[<Literal>]
+let RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_DOM_POINT_INIT_DOM_POINT_INIT = 2
+
+/// <summary>ABI transport for UnrestrictedDoubleOrDOMPointInit; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionUnrestrictedDoubleOrDOMPointInit =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: float
+    val mutable arm1: nativeint
+
+/// <summary>ABI transport for UnrestrictedDoubleOrDOMPointInit sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequenceUnrestrictedDoubleOrDOMPointInit =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
 /// <summary>ABI transport for CSSStyleValue sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomSequenceCSSStyleValue =
@@ -1935,6 +1962,12 @@ extern void rv_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange& v
 
 [<DllImport(Lib)>]
 extern void rv_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release(RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_union_unrestricted_double_or_dom_point_init_release(RvDomUnionUnrestrictedDoubleOrDOMPointInit& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_sequence_unrestricted_double_or_dom_point_init_release(RvDomSequenceUnrestrictedDoubleOrDOMPointInit& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue& value)
@@ -2355,6 +2388,12 @@ extern void rv_dom_canvas_pattern_release(nativeint handle)
 
 [<DllImport(Lib)>]
 extern nativeint rv_dom_canvas_pattern_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_path2_d_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_path2_d_retain(nativeint handle)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_rule_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -10287,6 +10326,120 @@ extern int rv_dom_canvas_rendering_context2_d_clear_rect(nativeint target, float
 
 [<DllImport(Lib)>]
 extern int rv_dom_canvas_rendering_context2_d_fill_rect(nativeint target, float x, float y, float w, float h)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_stroke_rect(nativeint target, float x, float y, float w, float h)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_begin_path(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_fill_1(nativeint target, int fill_rule)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_fill_2(nativeint target, nativeint path, int fill_rule)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_stroke_0(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_stroke_1(nativeint target, nativeint path)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_clip_1(nativeint target, int fill_rule)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_clip_2(nativeint target, nativeint path, int fill_rule)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_is_point_in_path_3(nativeint target, float x, float y, int fill_rule, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_is_point_in_path_4(nativeint target, nativeint path, float x, float y, int fill_rule, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_is_point_in_stroke_2(nativeint target, float x, float y, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_is_point_in_stroke_3(nativeint target, nativeint path, float x, float y, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_close_path(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_move_to(nativeint target, float x, float y)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_line_to(nativeint target, float x, float y)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_quadratic_curve_to(nativeint target, float cpx, float cpy, float x, float y)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_bezier_curve_to(nativeint target, float cp1x, float cp1y, float cp2x, float cp2y, float x, float y)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_arc_to(nativeint target, float x1, float y1, float x2, float y2, float radius)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_rect(nativeint target, float x, float y, float w, float h)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_round_rect_5_list(nativeint target, float x, float y, float w, float h, [<In>] RvDomSequenceUnrestrictedDoubleOrDOMPointInit[] radii)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_round_rect_5_value(nativeint target, float x, float y, float w, float h, [<In>] RvDomUnionUnrestrictedDoubleOrDOMPointInit[] radii)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_arc(nativeint target, float x, float y, float radius, float start_angle, float end_angle, int anticlockwise)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_ellipse(nativeint target, float x, float y, float radius_x, float radius_y, float rotation, float start_angle, float end_angle, int anticlockwise)
+
+[<DllImport(Lib)>]
+extern int rv_dom_path2_d_create_0(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_path2_d_create_1_path(nativeint target, nativeint path, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_path2_d_create_1_d(nativeint target, byte[] d, int d_length, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_path2_d_add_path(nativeint target, nativeint path, [<In>] RvDomDOMMatrix2DInit[] transform)
+
+[<DllImport(Lib)>]
+extern int rv_dom_path2_d_close_path(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_path2_d_move_to(nativeint target, float x, float y)
+
+[<DllImport(Lib)>]
+extern int rv_dom_path2_d_line_to(nativeint target, float x, float y)
+
+[<DllImport(Lib)>]
+extern int rv_dom_path2_d_quadratic_curve_to(nativeint target, float cpx, float cpy, float x, float y)
+
+[<DllImport(Lib)>]
+extern int rv_dom_path2_d_bezier_curve_to(nativeint target, float cp1x, float cp1y, float cp2x, float cp2y, float x, float y)
+
+[<DllImport(Lib)>]
+extern int rv_dom_path2_d_arc_to(nativeint target, float x1, float y1, float x2, float y2, float radius)
+
+[<DllImport(Lib)>]
+extern int rv_dom_path2_d_rect(nativeint target, float x, float y, float w, float h)
+
+[<DllImport(Lib)>]
+extern int rv_dom_path2_d_round_rect_5_list(nativeint target, float x, float y, float w, float h, [<In>] RvDomSequenceUnrestrictedDoubleOrDOMPointInit[] radii)
+
+[<DllImport(Lib)>]
+extern int rv_dom_path2_d_round_rect_5_value(nativeint target, float x, float y, float w, float h, [<In>] RvDomUnionUnrestrictedDoubleOrDOMPointInit[] radii)
+
+[<DllImport(Lib)>]
+extern int rv_dom_path2_d_arc(nativeint target, float x, float y, float radius, float start_angle, float end_angle, int anticlockwise)
+
+[<DllImport(Lib)>]
+extern int rv_dom_path2_d_ellipse(nativeint target, float x, float y, float radius_x, float radius_y, float rotation, float start_angle, float end_angle, int anticlockwise)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_supports_2(nativeint target, byte[] property, int property_length, byte[] value, int value_length, int& result)
