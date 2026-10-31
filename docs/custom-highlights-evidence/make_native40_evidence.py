@@ -63,6 +63,8 @@ result = {
         'registryClear': 'registry.clear() unregisters names one by one and leaves each highlight its ranges, as Chromium does (WebKit HighlightRegistry::clear empties them)',
         'order': 'a range added again and a name set again keep their positions; the constructor adds a repeated range once; values() and entries() are snapshot copies',
     },
+    'assertionCount': 'custom_highlights counts 378 on every run. Before f079f62 the Ahem font wait counted assertions on each '
+                      'iteration (385 on native40-candidate-3); no case was removed.',
     'qualifications': qualified['differences'],
     'files': {},
 }
