@@ -22,7 +22,6 @@ NAME, DESCRIPTION = 0, 1
 # Steps where WebKit differs from Chromium (docs/element-internals-evidence), keyed by step, with the measured
 # difference. Every other step must match exactly.
 QUALIFIED = {
-    'elements controls [] empties': 'An empty array leaves the WebKit accessibility controls relation at the earlier target (list) while the reflection reads []; Chromium drops the relation.',
     'elements labelledby [l2, l1, l2]': 'WebKit keeps the duplicate in the reflected array (l2, l1, l2); Chromium keeps each element once. Both relations list l2, l1.',
 }
 # WebKit gates ariaActionsElements behind ARIAActionsSupportEnabled, off in every WebKit configuration: the members
@@ -185,6 +184,20 @@ def verify(native_directory):
         worker.join()
         p.expect(results[0][:2] == (WRONG_THREAD, WRONG_THREAD) and results[0][2] in (WRONG_THREAD, NULL_ARGUMENT), 'wrong thread ' + str(results))
         p.expect(read_sequence(nodes['b'], 'ariaLabelledByElements') == ['l1', 'l2'], 'off-thread calls change nothing')
+        # Source patch 0039: an emptied reflection clears its relation, for every array kind.
+        target = nodes['x1']
+        for member, kind in [('ariaControlsElements', 1), ('ariaDescribedByElements', 2), ('ariaDetailsElements', 3),
+                             ('ariaErrorMessageElements', 4), ('ariaFlowToElements', 5), ('ariaLabelledByElements', 6)]:
+            p.expect(write_sequence(nodes['i'], member, ['x1']) == OK, member + ' one target')
+            p.update()
+            axi = node_ax(nodes['i'])
+            p.expect(relations(axi, kind, None, 0, ctypes.byref(count)) in (OK, BUFFER_TOO_SMALL) and count.value == 1, member + ' relation with one target')
+            p.expect(write_sequence(nodes['i'], member, []) == OK, member + ' emptied')
+            p.update()
+            p.expect(relations(axi, kind, None, 0, ctypes.byref(count)) in (OK, BUFFER_TOO_SMALL) and count.value == 0, member + ' [] clears the relation')
+            p.expect(read_sequence(nodes['i'], member) == [], member + ' [] reads []')
+            p.expect(write_sequence(nodes['i'], member, None) == OK, member + ' cleared')
+            ax_release(axi)
         # A removed target leaves the reflection and the relation.
         p.expect(remove(nodes['l2']) == OK, 'remove l2')
         p.update()
