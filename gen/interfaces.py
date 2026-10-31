@@ -106,7 +106,18 @@ class InterfaceEmitter:
             if argument.optional and self.union(t):
                 alternatives = [None] + alternatives
             variants.append(alternatives)
-        return itertools.product(*variants)
+        # An omitted optional union omits the later optional arguments too: F# cannot tell `test(baseURL)` from
+        # `test(input)`. A variadic argument stays, since its array keeps the call distinct.
+        combinations = []
+        for combination in itertools.product(*variants):
+            if None in combination:
+                first = combination.index(None)
+                combination = combination[:first] + tuple(
+                    None if argument.optional and not argument.variadic else chosen
+                    for argument, chosen in zip(arguments[first:], combination[first:]))
+            if combination not in combinations:
+                combinations.append(combination)
+        return combinations
 
     def parameters(self, arguments, selected, raw=False):
         params = []

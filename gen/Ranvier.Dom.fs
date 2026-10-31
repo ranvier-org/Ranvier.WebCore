@@ -4942,7 +4942,7 @@ and [<AllowNullLiteral>] URLPattern =
     [<Fable.Core.Emit("$0.test($1, $2)")>]
     abstract member __ranvier_test: ?input: obj * ?baseURL: string -> bool
 #else
-    abstract member test: ?baseURL: string -> bool
+    abstract member test: unit -> bool
     abstract member test: input: string * ?baseURL: string -> bool
     abstract member test: input: URLPatternInit * ?baseURL: string -> bool
 #endif
@@ -6127,8 +6127,8 @@ module BrowserUnionAdapters =
 
 
     type URLPattern with
-        member this.test(?baseURL: string) : bool =
-            this.__ranvier_test (?input = None, ?baseURL = baseURL)
+        member this.test() : bool =
+            this.__ranvier_test (?input = None, ?baseURL = None)
 
         member this.test(input: string, ?baseURL: string) : bool =
             this.__ranvier_test (?input = Some (box (normalizeUSVString input)), ?baseURL = baseURL)
