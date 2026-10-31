@@ -19,11 +19,13 @@ run 18: identical
 run 19: identical
 run 20: identical
 run 21: identical
-Traceback (most recent call last):
-  File "C:\wk\native-waapi\docs\web-animations-evidence\oracle_repeat.py", line 12, in <module>
-    subprocess.run(['node', str(repo / 'tests/abi/web_animations_browser.mjs')], env=dict(os.environ, ORACLE_OUT=str(out)), check=True, capture_output=True)
-    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Python314\Lib\subprocess.py", line 578, in run
-    raise CalledProcessError(retcode, process.args,
-                             output=stdout, stderr=stderr)
-subprocess.CalledProcessError: Command '['node', 'C:\\wk\\native-waapi\\tests\\abi\\web_animations_browser.mjs']' returned non-zero exit status 1.
+run 22: identical
+run 23: identical
+run 24: identical
+run 25: identical
+run 26: identical
+run 27: identical
+run 28: identical
+run 29: identical
+run 30: identical
+ORACLE_REPEAT identical=30/30
