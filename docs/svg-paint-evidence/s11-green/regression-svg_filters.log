@@ -1,0 +1,4 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+SPECULAR_PROVIDER {'initial': [0, 0, 255, 255]}
+SPECULAR_PROVIDER {'zeroConstant': [255, 255, 255, 255]}
+PASS SVG filters: 8941 assertions

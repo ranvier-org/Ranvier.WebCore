@@ -1,0 +1,13 @@
+diff --git a/Source/WebCore/svg/SVGFEConvolveMatrixElement.cpp b/Source/WebCore/svg/SVGFEConvolveMatrixElement.cpp
+index 0ae0d82b86..78cae0bf40 100644
+--- a/Source/WebCore/svg/SVGFEConvolveMatrixElement.cpp
++++ b/Source/WebCore/svg/SVGFEConvolveMatrixElement.cpp
+@@ -222,7 +222,7 @@ void SVGFEConvolveMatrixElement::svgAttributeChanged(const QualifiedName& attrNa
+     case AttributeNames::orderAttr:
+     case AttributeNames::kernelMatrixAttr: {
+         InstanceInvalidationGuard guard(*this);
+-        updateSVGRendererForElementChange();
++        markFilterEffectForRebuild();
+         break;
+     }
+     case AttributeNames::edgeModeAttr:

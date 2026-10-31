@@ -1,0 +1,26 @@
+[
+  {
+    "units": 2,
+    "content": 1,
+    "x": 0,
+    "y": 0,
+    "width": 1,
+    "height": 1
+  },
+  {
+    "units": 2,
+    "content": 2,
+    "x": 0,
+    "y": 0,
+    "width": 1,
+    "height": 1
+  },
+  {
+    "units": 1,
+    "content": 1,
+    "x": 0,
+    "y": 0,
+    "width": 1,
+    "height": 1
+  }
+]

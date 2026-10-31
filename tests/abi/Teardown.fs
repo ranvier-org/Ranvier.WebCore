@@ -5,6 +5,7 @@ module RanvierWebCoreAbi.Teardown
 open System.IO
 open System.Text.Json
 open RanvierWebCoreAbi.Native
+open RanvierWebCoreAbi.NativeDom
 
 let private html = "<!doctype html><html><head></head><body></body></html>"
 
@@ -36,6 +37,9 @@ let private cycleFor (milliseconds: int) =
 
 let private cycle () =
     cycleFor cycleMilliseconds
+
+/// Checks that run once the watched nodes are collected, then release the value handles they hold.
+let private afterCollection = ResizeArray<unit -> unit> ()
 
 /// A one-pixel GIF.
 let private gif =
@@ -118,6 +122,10 @@ let private probe (name: string) (cycleBefore: string) (action: nativeint -> nat
             targetRefsAfterCollection = refsOf targetWatch
         }
 
+    for check in afterCollection do
+        check ()
+
+    afterCollection.Clear ()
     rv_watch_release documentWatch
 
     if targetWatch <> 0n then
@@ -178,6 +186,93 @@ let private image (source: string) (remove: bool) (host: nativeint) (_: nativein
 
     element
 
+let private svgPaint =
+    "<!doctype html><html><body><svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><defs>"
+    + "<linearGradient id='gradient' x1='1'/><pattern id='pattern' width='4' height='4'/>"
+    + "<filter id='filter'><feGaussianBlur id='blur' stdDeviation='2'/></filter>"
+    + "<clipPath id='clip'><rect width='5' height='5'/></clipPath><mask id='mask' x='3'/><marker id='marker' orient='30'/>"
+    + "</defs><rect id='painted' width='20' height='20' fill='url(#gradient)' filter='url(#filter)' clip-path='url(#clip)' mask='url(#mask)'/>"
+    + "<use id='use' href='#painted' x='5'/><image id='image' href='"
+    + gif
+    + "' width='4' height='4'/></svg></body></html>"
+
+let private element (host: nativeint) (id: string) =
+    let node = rv_document_get_element_by_id (host, id)
+
+    if node = 0n then
+        failwithf "missing SVG element %s" id
+
+    node
+
+let private handleOf (name: string) (getter: nativeint -> nativeint ref -> int) (target: nativeint) =
+    let result = ref 0n
+
+    if getter target result <> 0 || result.Value = 0n then
+        failwithf "%s failed" name
+
+    result.Value
+
+/// Loads the SVG paint fixture, retains a typed value handle from each S08-S11 group, and, when <c>replace</c> is set,
+/// replaces the document before the host is destroyed. The handles stay readable and writable after collection.
+let private svgPaintHandles (replace: bool) (host: nativeint) (_: nativeint) (_: nativeint) =
+    rv_host_load_html (host, svgPaint) |> check "load SVG paint"
+    cycle ()
+    let take id = element host id
+    let gradient = take "gradient"
+    let ids = [ "pattern"; "blur"; "clip"; "mask"; "marker"; "use"; "image" ]
+    let nodes = ids |> List.map take
+    let pattern, blur, clip, mask, marker, useNode, image =
+        match nodes with
+        | [ a; b; c; d; e; f; g ] -> a, b, c, d, e, f, g
+        | _ -> failwith "SVG paint nodes"
+
+    let x1 = handleOf "gradient x1" (fun t r -> rv_dom_svg_linear_gradient_element_get_x1 (t, &r.contents)) gradient
+    let width = handleOf "pattern width" (fun t r -> rv_dom_svg_pattern_element_get_width (t, &r.contents)) pattern
+    let deviation = handleOf "blur stdDeviationX" (fun t r -> rv_dom_svgfe_gaussian_blur_element_get_std_deviation_x (t, &r.contents)) blur
+    let units = handleOf "clipPathUnits" (fun t r -> rv_dom_svg_clip_path_element_get_clip_path_units (t, &r.contents)) clip
+    let maskX = handleOf "mask x" (fun t r -> rv_dom_svg_mask_element_get_x (t, &r.contents)) mask
+    let angle = handleOf "marker orientAngle" (fun t r -> rv_dom_svg_marker_element_get_orient_angle (t, &r.contents)) marker
+    let useX = handleOf "use x" (fun t r -> rv_dom_svg_use_element_get_x (t, &r.contents)) useNode
+    let href = handleOf "image href" (fun t r -> rv_dom_svg_image_element_get_href (t, &r.contents)) image
+    let x1Base = handleOf "gradient x1 baseVal" (fun t r -> rv_dom_svg_animated_length_get_base_val (t, &r.contents)) x1
+
+    for node in nodes do
+        rv_node_release node
+
+    if replace then
+        rv_host_load_html (host, html) |> check "replace SVG paint document"
+        cycle ()
+
+    afterCollection.Add (fun () ->
+        rv_dom_svg_length_set_value (x1Base, 7.0f) |> check "retained gradient length write"
+        let mutable value = 0.0f
+        rv_dom_svg_length_get_value (x1Base, &value) |> check "retained gradient length read"
+
+        if value <> 7.0f then
+            failwithf "retained gradient length reads %f" value
+
+        rv_dom_svg_animated_number_set_base_val (deviation, 3.0f) |> check "retained blur write"
+        let mutable deviationValue = 0.0f
+        rv_dom_svg_animated_number_get_base_val (deviation, &deviationValue) |> check "retained blur read"
+
+        if deviationValue <> 3.0f then
+            failwithf "retained blur reads %f" deviationValue
+
+        let mutable unitValue = 0us
+        rv_dom_svg_animated_enumeration_get_base_val (units, &unitValue) |> check "retained clip units read"
+        rv_dom_svg_animated_string_set_base_val (href, "data:,") |> check "retained image href write"
+        rv_dom_svg_length_release x1Base
+
+        for animated in [ x1; width; maskX; useX ] do
+            rv_dom_svg_animated_length_release animated
+
+        rv_dom_svg_animated_number_release deviation
+        rv_dom_svg_animated_enumeration_release units
+        rv_dom_svg_animated_angle_release angle
+        rv_dom_svg_animated_string_release href)
+
+    gradient
+
 /// Runs each probe without a run-loop cycle before disposal, with a single cycle and with a 20 ms cycle, and writes
 /// teardown-probes.json.
 let run (outDir: string) =
@@ -217,6 +312,8 @@ let run (outDir: string) =
                 probe "image with a data source, removed" cycleBefore (image gif true)
                 probe "image with a missing file source" cycleBefore (image "file:///C:/ranvier-missing.png" false)
                 probe "image with a missing file source, removed" cycleBefore (image "file:///C:/ranvier-missing.png" true)
+                probe "SVG paint handles retained past host destroy" cycleBefore (svgPaintHandles false)
+                probe "SVG paint handles retained past document replacement" cycleBefore (svgPaintHandles true)
         ]
 
     let json =

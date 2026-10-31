@@ -174,6 +174,7 @@
 #include "PointerEvent.h"
 #include "RadioNodeList.h"
 #include "Range.h"
+#include "SVGAElement.h"
 #include "SVGAngle.h"
 #include "SVGAnimateElement.h"
 #include "SVGAnimateMotionElement.h"
@@ -181,18 +182,54 @@
 #include "SVGAnimatedString.h"
 #include "SVGAnimationElement.h"
 #include "SVGCircleElement.h"
+#include "SVGClipPathElement.h"
+#include "SVGComponentTransferFunctionElement.h"
+#include "SVGDefsElement.h"
+#include "SVGDescElement.h"
 #include "SVGElement.h"
 #include "SVGElementTypeHelpers.h"
 #include "SVGEllipseElement.h"
+#include "SVGFEBlendElement.h"
+#include "SVGFEColorMatrixElement.h"
+#include "SVGFEComponentTransferElement.h"
+#include "SVGFECompositeElement.h"
 #include "SVGFEConvolveMatrixElement.h"
+#include "SVGFEDiffuseLightingElement.h"
+#include "SVGFEDisplacementMapElement.h"
+#include "SVGFEDistantLightElement.h"
+#include "SVGFEDropShadowElement.h"
+#include "SVGFEFloodElement.h"
+#include "SVGFEFuncAElement.h"
+#include "SVGFEFuncBElement.h"
+#include "SVGFEFuncGElement.h"
+#include "SVGFEFuncRElement.h"
+#include "SVGFEGaussianBlurElement.h"
+#include "SVGFEImageElement.h"
+#include "SVGFEMergeElement.h"
+#include "SVGFEMergeNodeElement.h"
+#include "SVGFEMorphologyElement.h"
+#include "SVGFEOffsetElement.h"
+#include "SVGFEPointLightElement.h"
+#include "SVGFESpecularLightingElement.h"
+#include "SVGFESpotLightElement.h"
+#include "SVGFETileElement.h"
+#include "SVGFETurbulenceElement.h"
+#include "SVGFilterElement.h"
+#include "SVGForeignObjectElement.h"
+#include "SVGGElement.h"
 #include "SVGGeometryElement.h"
+#include "SVGGradientElement.h"
 #include "SVGGraphicsElement.h"
+#include "SVGImageElement.h"
 #include "SVGLength.h"
 #include "SVGLengthList.h"
 #include "SVGLineElement.h"
+#include "SVGLinearGradientElement.h"
 #include "SVGMPathElement.h"
 #include "SVGMarkerElement.h"
+#include "SVGMaskElement.h"
 #include "SVGMatrix.h"
+#include "SVGMetadataElement.h"
 #include "SVGNumber.h"
 #include "SVGNumberList.h"
 #include "SVGPathElement.h"
@@ -202,20 +239,26 @@
 #include "SVGPolygonElement.h"
 #include "SVGPolylineElement.h"
 #include "SVGPreserveAspectRatio.h"
+#include "SVGRadialGradientElement.h"
 #include "SVGRect.h"
 #include "SVGRectElement.h"
 #include "SVGSVGElement.h"
+#include "SVGScriptElement.h"
 #include "SVGSetElement.h"
+#include "SVGStopElement.h"
 #include "SVGStringList.h"
 #include "SVGStyleElement.h"
+#include "SVGSwitchElement.h"
 #include "SVGSymbolElement.h"
 #include "SVGTSpanElement.h"
 #include "SVGTextContentElement.h"
 #include "SVGTextElement.h"
 #include "SVGTextPathElement.h"
 #include "SVGTextPositioningElement.h"
+#include "SVGTitleElement.h"
 #include "SVGTransform.h"
 #include "SVGTransformList.h"
+#include "SVGUseElement.h"
 #include "SVGViewElement.h"
 #include "SVGViewSpec.h"
 #include "ScrollIntoViewOptions.h"
@@ -2094,7 +2137,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -34031,6 +34074,2892 @@ int32_t ranvier_dom_svg_animated_integer_get_anim_val(RvSVGAnimatedInteger* targ
         return RV_ERR_WRONG_THREAD;
     RefPtr<SVGAnimatedInteger> impl = reinterpret_cast<SVGAnimatedInteger*>(target);
     return deliver([&]() -> decltype(auto) { return impl->animVal(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// SVGGradientElement.gradientUnits getter: readonly attribute SVGAnimatedEnumeration gradientUnits; *result is a new reference
+int32_t ranvier_dom_svg_gradient_element_get_gradient_units(RvNode* target, RvSVGAnimatedEnumeration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGGradientElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->gradientUnitsAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedEnumeration>(value, result); });
+}
+
+// SVGGradientElement.gradientTransform getter: readonly attribute SVGAnimatedTransformList gradientTransform; *result is a new reference
+int32_t ranvier_dom_svg_gradient_element_get_gradient_transform(RvNode* target, RvSVGAnimatedTransformList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGGradientElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->gradientTransformAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedTransformList>(value, result); });
+}
+
+// SVGGradientElement.spreadMethod getter: readonly attribute SVGAnimatedEnumeration spreadMethod; *result is a new reference
+int32_t ranvier_dom_svg_gradient_element_get_spread_method(RvNode* target, RvSVGAnimatedEnumeration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGGradientElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->spreadMethodAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedEnumeration>(value, result); });
+}
+
+// SVGGradientElement.href getter: readonly attribute SVGAnimatedString href; *result is a new reference
+int32_t ranvier_dom_svg_gradient_element_get_href(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGGradientElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hrefAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGLinearGradientElement.x1 getter: readonly attribute SVGAnimatedLength x1; *result is a new reference
+int32_t ranvier_dom_svg_linear_gradient_element_get_x1(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGLinearGradientElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->x1Animated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGLinearGradientElement.y1 getter: readonly attribute SVGAnimatedLength y1; *result is a new reference
+int32_t ranvier_dom_svg_linear_gradient_element_get_y1(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGLinearGradientElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->y1Animated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGLinearGradientElement.x2 getter: readonly attribute SVGAnimatedLength x2; *result is a new reference
+int32_t ranvier_dom_svg_linear_gradient_element_get_x2(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGLinearGradientElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->x2Animated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGLinearGradientElement.y2 getter: readonly attribute SVGAnimatedLength y2; *result is a new reference
+int32_t ranvier_dom_svg_linear_gradient_element_get_y2(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGLinearGradientElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->y2Animated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGRadialGradientElement.cx getter: readonly attribute SVGAnimatedLength cx; *result is a new reference
+int32_t ranvier_dom_svg_radial_gradient_element_get_cx(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGRadialGradientElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->cxAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGRadialGradientElement.cy getter: readonly attribute SVGAnimatedLength cy; *result is a new reference
+int32_t ranvier_dom_svg_radial_gradient_element_get_cy(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGRadialGradientElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->cyAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGRadialGradientElement.r getter: readonly attribute SVGAnimatedLength r; *result is a new reference
+int32_t ranvier_dom_svg_radial_gradient_element_get_r(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGRadialGradientElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->rAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGRadialGradientElement.fx getter: readonly attribute SVGAnimatedLength fx; *result is a new reference
+int32_t ranvier_dom_svg_radial_gradient_element_get_fx(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGRadialGradientElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->fxAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGRadialGradientElement.fy getter: readonly attribute SVGAnimatedLength fy; *result is a new reference
+int32_t ranvier_dom_svg_radial_gradient_element_get_fy(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGRadialGradientElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->fyAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGRadialGradientElement.fr getter: readonly attribute SVGAnimatedLength fr; *result is a new reference
+int32_t ranvier_dom_svg_radial_gradient_element_get_fr(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGRadialGradientElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->frAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGStopElement.offset getter: readonly attribute SVGAnimatedNumber offset; *result is a new reference
+int32_t ranvier_dom_svg_stop_element_get_offset(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGStopElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->offsetAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFEBlendElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference
+int32_t ranvier_dom_svgfe_blend_element_get_in1(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEBlendElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->in1Animated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFEBlendElement.in2 getter: readonly attribute SVGAnimatedString in2; *result is a new reference
+int32_t ranvier_dom_svgfe_blend_element_get_in2(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEBlendElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->in2Animated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFEBlendElement.mode getter: readonly attribute SVGAnimatedEnumeration mode; *result is a new reference
+int32_t ranvier_dom_svgfe_blend_element_get_mode(RvNode* target, RvSVGAnimatedEnumeration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEBlendElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->modeAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedEnumeration>(value, result); });
+}
+
+// SVGFEBlendElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference
+int32_t ranvier_dom_svgfe_blend_element_get_x(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEBlendElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEBlendElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference
+int32_t ranvier_dom_svgfe_blend_element_get_y(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEBlendElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEBlendElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference
+int32_t ranvier_dom_svgfe_blend_element_get_width(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEBlendElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->widthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEBlendElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference
+int32_t ranvier_dom_svgfe_blend_element_get_height(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEBlendElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->heightAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEBlendElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference
+int32_t ranvier_dom_svgfe_blend_element_get_result(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEBlendElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->resultAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFEColorMatrixElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference
+int32_t ranvier_dom_svgfe_color_matrix_element_get_in1(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEColorMatrixElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->in1Animated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFEColorMatrixElement.type getter: readonly attribute SVGAnimatedEnumeration type; *result is a new reference
+int32_t ranvier_dom_svgfe_color_matrix_element_get_type(RvNode* target, RvSVGAnimatedEnumeration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEColorMatrixElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->typeAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedEnumeration>(value, result); });
+}
+
+// SVGFEColorMatrixElement.values getter: readonly attribute SVGAnimatedNumberList values; *result is a new reference
+int32_t ranvier_dom_svgfe_color_matrix_element_get_values(RvNode* target, RvSVGAnimatedNumberList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEColorMatrixElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->valuesAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumberList>(value, result); });
+}
+
+// SVGFEColorMatrixElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference
+int32_t ranvier_dom_svgfe_color_matrix_element_get_x(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEColorMatrixElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEColorMatrixElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference
+int32_t ranvier_dom_svgfe_color_matrix_element_get_y(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEColorMatrixElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEColorMatrixElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference
+int32_t ranvier_dom_svgfe_color_matrix_element_get_width(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEColorMatrixElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->widthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEColorMatrixElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference
+int32_t ranvier_dom_svgfe_color_matrix_element_get_height(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEColorMatrixElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->heightAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEColorMatrixElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference
+int32_t ranvier_dom_svgfe_color_matrix_element_get_result(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEColorMatrixElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->resultAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFEComponentTransferElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference
+int32_t ranvier_dom_svgfe_component_transfer_element_get_in1(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEComponentTransferElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->in1Animated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFEComponentTransferElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference
+int32_t ranvier_dom_svgfe_component_transfer_element_get_x(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEComponentTransferElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEComponentTransferElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference
+int32_t ranvier_dom_svgfe_component_transfer_element_get_y(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEComponentTransferElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEComponentTransferElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference
+int32_t ranvier_dom_svgfe_component_transfer_element_get_width(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEComponentTransferElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->widthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEComponentTransferElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference
+int32_t ranvier_dom_svgfe_component_transfer_element_get_height(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEComponentTransferElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->heightAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEComponentTransferElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference
+int32_t ranvier_dom_svgfe_component_transfer_element_get_result(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEComponentTransferElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->resultAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFECompositeElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference
+int32_t ranvier_dom_svgfe_composite_element_get_in1(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFECompositeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->in1Animated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFECompositeElement.in2 getter: readonly attribute SVGAnimatedString in2; *result is a new reference
+int32_t ranvier_dom_svgfe_composite_element_get_in2(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFECompositeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->in2Animated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFECompositeElement.operator getter: readonly attribute SVGAnimatedEnumeration operator; *result is a new reference
+int32_t ranvier_dom_svgfe_composite_element_get_operator(RvNode* target, RvSVGAnimatedEnumeration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFECompositeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->svgOperatorAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedEnumeration>(value, result); });
+}
+
+// SVGFECompositeElement.k1 getter: readonly attribute SVGAnimatedNumber k1; *result is a new reference
+int32_t ranvier_dom_svgfe_composite_element_get_k1(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFECompositeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->k1Animated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFECompositeElement.k2 getter: readonly attribute SVGAnimatedNumber k2; *result is a new reference
+int32_t ranvier_dom_svgfe_composite_element_get_k2(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFECompositeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->k2Animated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFECompositeElement.k3 getter: readonly attribute SVGAnimatedNumber k3; *result is a new reference
+int32_t ranvier_dom_svgfe_composite_element_get_k3(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFECompositeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->k3Animated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFECompositeElement.k4 getter: readonly attribute SVGAnimatedNumber k4; *result is a new reference
+int32_t ranvier_dom_svgfe_composite_element_get_k4(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFECompositeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->k4Animated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFECompositeElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference
+int32_t ranvier_dom_svgfe_composite_element_get_x(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFECompositeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFECompositeElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference
+int32_t ranvier_dom_svgfe_composite_element_get_y(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFECompositeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFECompositeElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference
+int32_t ranvier_dom_svgfe_composite_element_get_width(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFECompositeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->widthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFECompositeElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference
+int32_t ranvier_dom_svgfe_composite_element_get_height(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFECompositeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->heightAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFECompositeElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference
+int32_t ranvier_dom_svgfe_composite_element_get_result(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFECompositeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->resultAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFEDiffuseLightingElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference
+int32_t ranvier_dom_svgfe_diffuse_lighting_element_get_in1(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDiffuseLightingElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->in1Animated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFEDiffuseLightingElement.surfaceScale getter: readonly attribute SVGAnimatedNumber surfaceScale; *result is a new reference
+int32_t ranvier_dom_svgfe_diffuse_lighting_element_get_surface_scale(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDiffuseLightingElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->surfaceScaleAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFEDiffuseLightingElement.diffuseConstant getter: readonly attribute SVGAnimatedNumber diffuseConstant; *result is a new reference
+int32_t ranvier_dom_svgfe_diffuse_lighting_element_get_diffuse_constant(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDiffuseLightingElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->diffuseConstantAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFEDiffuseLightingElement.kernelUnitLengthX getter: readonly attribute SVGAnimatedNumber kernelUnitLengthX; *result is a new reference
+int32_t ranvier_dom_svgfe_diffuse_lighting_element_get_kernel_unit_length_x(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDiffuseLightingElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->kernelUnitLengthXAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFEDiffuseLightingElement.kernelUnitLengthY getter: readonly attribute SVGAnimatedNumber kernelUnitLengthY; *result is a new reference
+int32_t ranvier_dom_svgfe_diffuse_lighting_element_get_kernel_unit_length_y(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDiffuseLightingElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->kernelUnitLengthYAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFEDiffuseLightingElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference
+int32_t ranvier_dom_svgfe_diffuse_lighting_element_get_x(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDiffuseLightingElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEDiffuseLightingElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference
+int32_t ranvier_dom_svgfe_diffuse_lighting_element_get_y(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDiffuseLightingElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEDiffuseLightingElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference
+int32_t ranvier_dom_svgfe_diffuse_lighting_element_get_width(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDiffuseLightingElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->widthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEDiffuseLightingElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference
+int32_t ranvier_dom_svgfe_diffuse_lighting_element_get_height(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDiffuseLightingElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->heightAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEDiffuseLightingElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference
+int32_t ranvier_dom_svgfe_diffuse_lighting_element_get_result(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDiffuseLightingElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->resultAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFEDisplacementMapElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference
+int32_t ranvier_dom_svgfe_displacement_map_element_get_in1(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDisplacementMapElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->in1Animated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFEDisplacementMapElement.in2 getter: readonly attribute SVGAnimatedString in2; *result is a new reference
+int32_t ranvier_dom_svgfe_displacement_map_element_get_in2(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDisplacementMapElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->in2Animated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFEDisplacementMapElement.scale getter: readonly attribute SVGAnimatedNumber scale; *result is a new reference
+int32_t ranvier_dom_svgfe_displacement_map_element_get_scale(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDisplacementMapElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->scaleAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFEDisplacementMapElement.xChannelSelector getter: readonly attribute SVGAnimatedEnumeration xChannelSelector; *result is a new reference
+int32_t ranvier_dom_svgfe_displacement_map_element_get_x_channel_selector(RvNode* target, RvSVGAnimatedEnumeration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDisplacementMapElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xChannelSelectorAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedEnumeration>(value, result); });
+}
+
+// SVGFEDisplacementMapElement.yChannelSelector getter: readonly attribute SVGAnimatedEnumeration yChannelSelector; *result is a new reference
+int32_t ranvier_dom_svgfe_displacement_map_element_get_y_channel_selector(RvNode* target, RvSVGAnimatedEnumeration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDisplacementMapElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yChannelSelectorAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedEnumeration>(value, result); });
+}
+
+// SVGFEDisplacementMapElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference
+int32_t ranvier_dom_svgfe_displacement_map_element_get_x(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDisplacementMapElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEDisplacementMapElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference
+int32_t ranvier_dom_svgfe_displacement_map_element_get_y(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDisplacementMapElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEDisplacementMapElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference
+int32_t ranvier_dom_svgfe_displacement_map_element_get_width(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDisplacementMapElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->widthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEDisplacementMapElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference
+int32_t ranvier_dom_svgfe_displacement_map_element_get_height(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDisplacementMapElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->heightAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEDisplacementMapElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference
+int32_t ranvier_dom_svgfe_displacement_map_element_get_result(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDisplacementMapElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->resultAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFEDistantLightElement.azimuth getter: readonly attribute SVGAnimatedNumber azimuth; *result is a new reference
+int32_t ranvier_dom_svgfe_distant_light_element_get_azimuth(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDistantLightElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->azimuthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFEDistantLightElement.elevation getter: readonly attribute SVGAnimatedNumber elevation; *result is a new reference
+int32_t ranvier_dom_svgfe_distant_light_element_get_elevation(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDistantLightElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->elevationAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFEDropShadowElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference
+int32_t ranvier_dom_svgfe_drop_shadow_element_get_in1(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDropShadowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->in1Animated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFEDropShadowElement.dx getter: readonly attribute SVGAnimatedNumber dx; *result is a new reference
+int32_t ranvier_dom_svgfe_drop_shadow_element_get_dx(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDropShadowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->dxAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFEDropShadowElement.dy getter: readonly attribute SVGAnimatedNumber dy; *result is a new reference
+int32_t ranvier_dom_svgfe_drop_shadow_element_get_dy(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDropShadowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->dyAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFEDropShadowElement.stdDeviationX getter: readonly attribute SVGAnimatedNumber stdDeviationX; *result is a new reference
+int32_t ranvier_dom_svgfe_drop_shadow_element_get_std_deviation_x(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDropShadowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->stdDeviationXAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFEDropShadowElement.stdDeviationY getter: readonly attribute SVGAnimatedNumber stdDeviationY; *result is a new reference
+int32_t ranvier_dom_svgfe_drop_shadow_element_get_std_deviation_y(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDropShadowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->stdDeviationYAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFEDropShadowElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference
+int32_t ranvier_dom_svgfe_drop_shadow_element_get_x(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDropShadowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEDropShadowElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference
+int32_t ranvier_dom_svgfe_drop_shadow_element_get_y(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDropShadowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEDropShadowElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference
+int32_t ranvier_dom_svgfe_drop_shadow_element_get_width(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDropShadowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->widthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEDropShadowElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference
+int32_t ranvier_dom_svgfe_drop_shadow_element_get_height(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDropShadowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->heightAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEDropShadowElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference
+int32_t ranvier_dom_svgfe_drop_shadow_element_get_result(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDropShadowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->resultAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFEDropShadowElement.setStdDeviation(float stdDeviationX, float stdDeviationY) -> undefined
+int32_t ranvier_dom_svgfe_drop_shadow_element_set_std_deviation(RvNode* target, float std_deviation_x, float std_deviation_y)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEDropShadowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!std::isfinite(std_deviation_x))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(std_deviation_y))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setStdDeviation(std_deviation_x, std_deviation_y); });
+}
+
+// SVGFEFloodElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference
+int32_t ranvier_dom_svgfe_flood_element_get_x(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEFloodElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEFloodElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference
+int32_t ranvier_dom_svgfe_flood_element_get_y(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEFloodElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEFloodElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference
+int32_t ranvier_dom_svgfe_flood_element_get_width(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEFloodElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->widthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEFloodElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference
+int32_t ranvier_dom_svgfe_flood_element_get_height(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEFloodElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->heightAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEFloodElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference
+int32_t ranvier_dom_svgfe_flood_element_get_result(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEFloodElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->resultAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFEGaussianBlurElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference
+int32_t ranvier_dom_svgfe_gaussian_blur_element_get_in1(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEGaussianBlurElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->in1Animated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFEGaussianBlurElement.stdDeviationX getter: readonly attribute SVGAnimatedNumber stdDeviationX; *result is a new reference
+int32_t ranvier_dom_svgfe_gaussian_blur_element_get_std_deviation_x(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEGaussianBlurElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->stdDeviationXAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFEGaussianBlurElement.stdDeviationY getter: readonly attribute SVGAnimatedNumber stdDeviationY; *result is a new reference
+int32_t ranvier_dom_svgfe_gaussian_blur_element_get_std_deviation_y(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEGaussianBlurElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->stdDeviationYAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFEGaussianBlurElement.edgeMode getter: readonly attribute SVGAnimatedEnumeration edgeMode; *result is a new reference
+int32_t ranvier_dom_svgfe_gaussian_blur_element_get_edge_mode(RvNode* target, RvSVGAnimatedEnumeration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEGaussianBlurElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->edgeModeAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedEnumeration>(value, result); });
+}
+
+// SVGFEGaussianBlurElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference
+int32_t ranvier_dom_svgfe_gaussian_blur_element_get_x(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEGaussianBlurElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEGaussianBlurElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference
+int32_t ranvier_dom_svgfe_gaussian_blur_element_get_y(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEGaussianBlurElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEGaussianBlurElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference
+int32_t ranvier_dom_svgfe_gaussian_blur_element_get_width(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEGaussianBlurElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->widthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEGaussianBlurElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference
+int32_t ranvier_dom_svgfe_gaussian_blur_element_get_height(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEGaussianBlurElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->heightAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEGaussianBlurElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference
+int32_t ranvier_dom_svgfe_gaussian_blur_element_get_result(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEGaussianBlurElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->resultAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFEGaussianBlurElement.setStdDeviation(float stdDeviationX, float stdDeviationY) -> undefined
+int32_t ranvier_dom_svgfe_gaussian_blur_element_set_std_deviation(RvNode* target, float std_deviation_x, float std_deviation_y)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEGaussianBlurElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!std::isfinite(std_deviation_x))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(std_deviation_y))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setStdDeviation(std_deviation_x, std_deviation_y); });
+}
+
+// SVGFEImageElement.preserveAspectRatio getter: readonly attribute SVGAnimatedPreserveAspectRatio preserveAspectRatio; *result is a new reference
+int32_t ranvier_dom_svgfe_image_element_get_preserve_aspect_ratio(RvNode* target, RvSVGAnimatedPreserveAspectRatio** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEImageElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->preserveAspectRatioAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedPreserveAspectRatio>(value, result); });
+}
+
+// SVGFEImageElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference
+int32_t ranvier_dom_svgfe_image_element_get_x(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEImageElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEImageElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference
+int32_t ranvier_dom_svgfe_image_element_get_y(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEImageElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEImageElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference
+int32_t ranvier_dom_svgfe_image_element_get_width(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEImageElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->widthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEImageElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference
+int32_t ranvier_dom_svgfe_image_element_get_height(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEImageElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->heightAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEImageElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference
+int32_t ranvier_dom_svgfe_image_element_get_result(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEImageElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->resultAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFEImageElement.href getter: readonly attribute SVGAnimatedString href; *result is a new reference
+int32_t ranvier_dom_svgfe_image_element_get_href(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEImageElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hrefAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFEMergeElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference
+int32_t ranvier_dom_svgfe_merge_element_get_x(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEMergeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEMergeElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference
+int32_t ranvier_dom_svgfe_merge_element_get_y(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEMergeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEMergeElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference
+int32_t ranvier_dom_svgfe_merge_element_get_width(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEMergeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->widthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEMergeElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference
+int32_t ranvier_dom_svgfe_merge_element_get_height(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEMergeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->heightAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEMergeElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference
+int32_t ranvier_dom_svgfe_merge_element_get_result(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEMergeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->resultAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFEMergeNodeElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference
+int32_t ranvier_dom_svgfe_merge_node_element_get_in1(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEMergeNodeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->in1Animated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFEMorphologyElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference
+int32_t ranvier_dom_svgfe_morphology_element_get_in1(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEMorphologyElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->in1Animated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFEMorphologyElement.operator getter: readonly attribute SVGAnimatedEnumeration operator; *result is a new reference
+int32_t ranvier_dom_svgfe_morphology_element_get_operator(RvNode* target, RvSVGAnimatedEnumeration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEMorphologyElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->svgOperatorAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedEnumeration>(value, result); });
+}
+
+// SVGFEMorphologyElement.radiusX getter: readonly attribute SVGAnimatedNumber radiusX; *result is a new reference
+int32_t ranvier_dom_svgfe_morphology_element_get_radius_x(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEMorphologyElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->radiusXAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFEMorphologyElement.radiusY getter: readonly attribute SVGAnimatedNumber radiusY; *result is a new reference
+int32_t ranvier_dom_svgfe_morphology_element_get_radius_y(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEMorphologyElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->radiusYAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFEMorphologyElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference
+int32_t ranvier_dom_svgfe_morphology_element_get_x(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEMorphologyElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEMorphologyElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference
+int32_t ranvier_dom_svgfe_morphology_element_get_y(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEMorphologyElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEMorphologyElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference
+int32_t ranvier_dom_svgfe_morphology_element_get_width(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEMorphologyElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->widthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEMorphologyElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference
+int32_t ranvier_dom_svgfe_morphology_element_get_height(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEMorphologyElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->heightAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEMorphologyElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference
+int32_t ranvier_dom_svgfe_morphology_element_get_result(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEMorphologyElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->resultAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFEOffsetElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference
+int32_t ranvier_dom_svgfe_offset_element_get_in1(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEOffsetElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->in1Animated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFEOffsetElement.dx getter: readonly attribute SVGAnimatedNumber dx; *result is a new reference
+int32_t ranvier_dom_svgfe_offset_element_get_dx(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEOffsetElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->dxAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFEOffsetElement.dy getter: readonly attribute SVGAnimatedNumber dy; *result is a new reference
+int32_t ranvier_dom_svgfe_offset_element_get_dy(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEOffsetElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->dyAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFEOffsetElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference
+int32_t ranvier_dom_svgfe_offset_element_get_x(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEOffsetElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEOffsetElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference
+int32_t ranvier_dom_svgfe_offset_element_get_y(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEOffsetElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEOffsetElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference
+int32_t ranvier_dom_svgfe_offset_element_get_width(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEOffsetElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->widthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEOffsetElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference
+int32_t ranvier_dom_svgfe_offset_element_get_height(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEOffsetElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->heightAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFEOffsetElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference
+int32_t ranvier_dom_svgfe_offset_element_get_result(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEOffsetElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->resultAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFEPointLightElement.x getter: readonly attribute SVGAnimatedNumber x; *result is a new reference
+int32_t ranvier_dom_svgfe_point_light_element_get_x(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEPointLightElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFEPointLightElement.y getter: readonly attribute SVGAnimatedNumber y; *result is a new reference
+int32_t ranvier_dom_svgfe_point_light_element_get_y(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEPointLightElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFEPointLightElement.z getter: readonly attribute SVGAnimatedNumber z; *result is a new reference
+int32_t ranvier_dom_svgfe_point_light_element_get_z(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFEPointLightElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->zAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFESpecularLightingElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference
+int32_t ranvier_dom_svgfe_specular_lighting_element_get_in1(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFESpecularLightingElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->in1Animated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFESpecularLightingElement.surfaceScale getter: readonly attribute SVGAnimatedNumber surfaceScale; *result is a new reference
+int32_t ranvier_dom_svgfe_specular_lighting_element_get_surface_scale(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFESpecularLightingElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->surfaceScaleAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFESpecularLightingElement.specularConstant getter: readonly attribute SVGAnimatedNumber specularConstant; *result is a new reference
+int32_t ranvier_dom_svgfe_specular_lighting_element_get_specular_constant(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFESpecularLightingElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->specularConstantAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFESpecularLightingElement.specularExponent getter: readonly attribute SVGAnimatedNumber specularExponent; *result is a new reference
+int32_t ranvier_dom_svgfe_specular_lighting_element_get_specular_exponent(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFESpecularLightingElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->specularExponentAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFESpecularLightingElement.kernelUnitLengthX getter: readonly attribute SVGAnimatedNumber kernelUnitLengthX; *result is a new reference
+int32_t ranvier_dom_svgfe_specular_lighting_element_get_kernel_unit_length_x(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFESpecularLightingElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->kernelUnitLengthXAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFESpecularLightingElement.kernelUnitLengthY getter: readonly attribute SVGAnimatedNumber kernelUnitLengthY; *result is a new reference
+int32_t ranvier_dom_svgfe_specular_lighting_element_get_kernel_unit_length_y(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFESpecularLightingElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->kernelUnitLengthYAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFESpecularLightingElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference
+int32_t ranvier_dom_svgfe_specular_lighting_element_get_x(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFESpecularLightingElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFESpecularLightingElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference
+int32_t ranvier_dom_svgfe_specular_lighting_element_get_y(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFESpecularLightingElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFESpecularLightingElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference
+int32_t ranvier_dom_svgfe_specular_lighting_element_get_width(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFESpecularLightingElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->widthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFESpecularLightingElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference
+int32_t ranvier_dom_svgfe_specular_lighting_element_get_height(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFESpecularLightingElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->heightAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFESpecularLightingElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference
+int32_t ranvier_dom_svgfe_specular_lighting_element_get_result(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFESpecularLightingElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->resultAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFESpotLightElement.x getter: readonly attribute SVGAnimatedNumber x; *result is a new reference
+int32_t ranvier_dom_svgfe_spot_light_element_get_x(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFESpotLightElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFESpotLightElement.y getter: readonly attribute SVGAnimatedNumber y; *result is a new reference
+int32_t ranvier_dom_svgfe_spot_light_element_get_y(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFESpotLightElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFESpotLightElement.z getter: readonly attribute SVGAnimatedNumber z; *result is a new reference
+int32_t ranvier_dom_svgfe_spot_light_element_get_z(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFESpotLightElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->zAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFESpotLightElement.pointsAtX getter: readonly attribute SVGAnimatedNumber pointsAtX; *result is a new reference
+int32_t ranvier_dom_svgfe_spot_light_element_get_points_at_x(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFESpotLightElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->pointsAtXAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFESpotLightElement.pointsAtY getter: readonly attribute SVGAnimatedNumber pointsAtY; *result is a new reference
+int32_t ranvier_dom_svgfe_spot_light_element_get_points_at_y(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFESpotLightElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->pointsAtYAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFESpotLightElement.pointsAtZ getter: readonly attribute SVGAnimatedNumber pointsAtZ; *result is a new reference
+int32_t ranvier_dom_svgfe_spot_light_element_get_points_at_z(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFESpotLightElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->pointsAtZAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFESpotLightElement.specularExponent getter: readonly attribute SVGAnimatedNumber specularExponent; *result is a new reference
+int32_t ranvier_dom_svgfe_spot_light_element_get_specular_exponent(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFESpotLightElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->specularExponentAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFESpotLightElement.limitingConeAngle getter: readonly attribute SVGAnimatedNumber limitingConeAngle; *result is a new reference
+int32_t ranvier_dom_svgfe_spot_light_element_get_limiting_cone_angle(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFESpotLightElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->limitingConeAngleAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFETileElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference
+int32_t ranvier_dom_svgfe_tile_element_get_in1(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFETileElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->in1Animated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFETileElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference
+int32_t ranvier_dom_svgfe_tile_element_get_x(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFETileElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFETileElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference
+int32_t ranvier_dom_svgfe_tile_element_get_y(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFETileElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFETileElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference
+int32_t ranvier_dom_svgfe_tile_element_get_width(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFETileElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->widthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFETileElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference
+int32_t ranvier_dom_svgfe_tile_element_get_height(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFETileElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->heightAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFETileElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference
+int32_t ranvier_dom_svgfe_tile_element_get_result(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFETileElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->resultAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFETurbulenceElement.baseFrequencyX getter: readonly attribute SVGAnimatedNumber baseFrequencyX; *result is a new reference
+int32_t ranvier_dom_svgfe_turbulence_element_get_base_frequency_x(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFETurbulenceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->baseFrequencyXAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFETurbulenceElement.baseFrequencyY getter: readonly attribute SVGAnimatedNumber baseFrequencyY; *result is a new reference
+int32_t ranvier_dom_svgfe_turbulence_element_get_base_frequency_y(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFETurbulenceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->baseFrequencyYAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFETurbulenceElement.numOctaves getter: readonly attribute SVGAnimatedInteger numOctaves; *result is a new reference
+int32_t ranvier_dom_svgfe_turbulence_element_get_num_octaves(RvNode* target, RvSVGAnimatedInteger** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFETurbulenceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->numOctavesAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedInteger>(value, result); });
+}
+
+// SVGFETurbulenceElement.seed getter: readonly attribute SVGAnimatedNumber seed; *result is a new reference
+int32_t ranvier_dom_svgfe_turbulence_element_get_seed(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFETurbulenceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->seedAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGFETurbulenceElement.stitchTiles getter: readonly attribute SVGAnimatedEnumeration stitchTiles; *result is a new reference
+int32_t ranvier_dom_svgfe_turbulence_element_get_stitch_tiles(RvNode* target, RvSVGAnimatedEnumeration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFETurbulenceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->stitchTilesAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedEnumeration>(value, result); });
+}
+
+// SVGFETurbulenceElement.type getter: readonly attribute SVGAnimatedEnumeration type; *result is a new reference
+int32_t ranvier_dom_svgfe_turbulence_element_get_type(RvNode* target, RvSVGAnimatedEnumeration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFETurbulenceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->typeAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedEnumeration>(value, result); });
+}
+
+// SVGFETurbulenceElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference
+int32_t ranvier_dom_svgfe_turbulence_element_get_x(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFETurbulenceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFETurbulenceElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference
+int32_t ranvier_dom_svgfe_turbulence_element_get_y(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFETurbulenceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFETurbulenceElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference
+int32_t ranvier_dom_svgfe_turbulence_element_get_width(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFETurbulenceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->widthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFETurbulenceElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference
+int32_t ranvier_dom_svgfe_turbulence_element_get_height(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFETurbulenceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->heightAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFETurbulenceElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference
+int32_t ranvier_dom_svgfe_turbulence_element_get_result(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFETurbulenceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->resultAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGFilterElement.filterUnits getter: readonly attribute SVGAnimatedEnumeration filterUnits; *result is a new reference
+int32_t ranvier_dom_svg_filter_element_get_filter_units(RvNode* target, RvSVGAnimatedEnumeration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFilterElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->filterUnitsAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedEnumeration>(value, result); });
+}
+
+// SVGFilterElement.primitiveUnits getter: readonly attribute SVGAnimatedEnumeration primitiveUnits; *result is a new reference
+int32_t ranvier_dom_svg_filter_element_get_primitive_units(RvNode* target, RvSVGAnimatedEnumeration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFilterElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->primitiveUnitsAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedEnumeration>(value, result); });
+}
+
+// SVGFilterElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference
+int32_t ranvier_dom_svg_filter_element_get_x(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFilterElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFilterElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference
+int32_t ranvier_dom_svg_filter_element_get_y(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFilterElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFilterElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference
+int32_t ranvier_dom_svg_filter_element_get_width(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFilterElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->widthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFilterElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference
+int32_t ranvier_dom_svg_filter_element_get_height(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFilterElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->heightAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGFilterElement.href getter: readonly attribute SVGAnimatedString href; *result is a new reference
+int32_t ranvier_dom_svg_filter_element_get_href(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGFilterElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hrefAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGComponentTransferFunctionElement.type getter: readonly attribute SVGAnimatedEnumeration type; *result is a new reference
+int32_t ranvier_dom_svg_component_transfer_function_element_get_type(RvNode* target, RvSVGAnimatedEnumeration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGComponentTransferFunctionElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->typeAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedEnumeration>(value, result); });
+}
+
+// SVGComponentTransferFunctionElement.tableValues getter: readonly attribute SVGAnimatedNumberList tableValues; *result is a new reference
+int32_t ranvier_dom_svg_component_transfer_function_element_get_table_values(RvNode* target, RvSVGAnimatedNumberList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGComponentTransferFunctionElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->tableValuesAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumberList>(value, result); });
+}
+
+// SVGComponentTransferFunctionElement.slope getter: readonly attribute SVGAnimatedNumber slope; *result is a new reference
+int32_t ranvier_dom_svg_component_transfer_function_element_get_slope(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGComponentTransferFunctionElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->slopeAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGComponentTransferFunctionElement.intercept getter: readonly attribute SVGAnimatedNumber intercept; *result is a new reference
+int32_t ranvier_dom_svg_component_transfer_function_element_get_intercept(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGComponentTransferFunctionElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->interceptAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGComponentTransferFunctionElement.amplitude getter: readonly attribute SVGAnimatedNumber amplitude; *result is a new reference
+int32_t ranvier_dom_svg_component_transfer_function_element_get_amplitude(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGComponentTransferFunctionElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->amplitudeAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGComponentTransferFunctionElement.exponent getter: readonly attribute SVGAnimatedNumber exponent; *result is a new reference
+int32_t ranvier_dom_svg_component_transfer_function_element_get_exponent(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGComponentTransferFunctionElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->exponentAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGComponentTransferFunctionElement.offset getter: readonly attribute SVGAnimatedNumber offset; *result is a new reference
+int32_t ranvier_dom_svg_component_transfer_function_element_get_offset(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGComponentTransferFunctionElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->offsetAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGClipPathElement.clipPathUnits getter: readonly attribute SVGAnimatedEnumeration clipPathUnits; *result is a new reference
+int32_t ranvier_dom_svg_clip_path_element_get_clip_path_units(RvNode* target, RvSVGAnimatedEnumeration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGClipPathElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->clipPathUnitsAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedEnumeration>(value, result); });
+}
+
+// SVGClipPathElement.transform getter: readonly attribute SVGAnimatedTransformList transform; *result is a new reference
+int32_t ranvier_dom_svg_clip_path_element_get_transform(RvNode* target, RvSVGAnimatedTransformList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGClipPathElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->transformAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedTransformList>(value, result); });
+}
+
+// SVGMaskElement.maskUnits getter: readonly attribute SVGAnimatedEnumeration maskUnits; *result is a new reference
+int32_t ranvier_dom_svg_mask_element_get_mask_units(RvNode* target, RvSVGAnimatedEnumeration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMaskElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->maskUnitsAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedEnumeration>(value, result); });
+}
+
+// SVGMaskElement.maskContentUnits getter: readonly attribute SVGAnimatedEnumeration maskContentUnits; *result is a new reference
+int32_t ranvier_dom_svg_mask_element_get_mask_content_units(RvNode* target, RvSVGAnimatedEnumeration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMaskElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->maskContentUnitsAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedEnumeration>(value, result); });
+}
+
+// SVGMaskElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference
+int32_t ranvier_dom_svg_mask_element_get_x(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMaskElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGMaskElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference
+int32_t ranvier_dom_svg_mask_element_get_y(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMaskElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGMaskElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference
+int32_t ranvier_dom_svg_mask_element_get_width(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMaskElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->widthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGMaskElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference
+int32_t ranvier_dom_svg_mask_element_get_height(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMaskElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->heightAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGMaskElement.requiredExtensions getter: readonly attribute SVGStringList requiredExtensions; *result is a new reference
+int32_t ranvier_dom_svg_mask_element_get_required_extensions(RvNode* target, RvSVGStringList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMaskElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->requiredExtensions(); }, [&](auto&& value) { return storeHandle<SVGStringList>(value, result); });
+}
+
+// SVGMaskElement.systemLanguage getter: readonly attribute SVGStringList systemLanguage; *result is a new reference
+int32_t ranvier_dom_svg_mask_element_get_system_language(RvNode* target, RvSVGStringList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMaskElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->systemLanguage(); }, [&](auto&& value) { return storeHandle<SVGStringList>(value, result); });
+}
+
+// SVGAElement.target getter: readonly attribute SVGAnimatedString target; *result is a new reference
+int32_t ranvier_dom_svga_element_get_target(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGAElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->targetAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGAElement.hreflang getter: attribute DOMString hreflang
+int32_t ranvier_dom_svga_element_get_hreflang(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGAElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::hreflangAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// SVGAElement.hreflang setter: attribute DOMString hreflang
+int32_t ranvier_dom_svga_element_set_hreflang(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGAElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::hreflangAttr, AtomString { a0.string() }); });
+}
+
+// SVGAElement.rel getter: attribute DOMString rel
+int32_t ranvier_dom_svga_element_get_rel(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGAElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::relAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// SVGAElement.rel setter: attribute DOMString rel
+int32_t ranvier_dom_svga_element_set_rel(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGAElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::relAttr, AtomString { a0.string() }); });
+}
+
+// SVGAElement.relList getter: readonly attribute DOMTokenList relList; *result is a new reference
+int32_t ranvier_dom_svga_element_get_rel_list(RvNode* target, RvDOMTokenList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGAElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->relList(); }, [&](auto&& value) { return storeHandle<DOMTokenList>(value, result); });
+}
+
+// SVGAElement.type getter: attribute DOMString type
+int32_t ranvier_dom_svga_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGAElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// SVGAElement.type setter: attribute DOMString type
+int32_t ranvier_dom_svga_element_set_type(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGAElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::typeAttr, AtomString { a0.string() }); });
+}
+
+// SVGAElement.href getter: readonly attribute SVGAnimatedString href; *result is a new reference
+int32_t ranvier_dom_svga_element_get_href(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGAElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hrefAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGForeignObjectElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference
+int32_t ranvier_dom_svg_foreign_object_element_get_x(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGForeignObjectElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGForeignObjectElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference
+int32_t ranvier_dom_svg_foreign_object_element_get_y(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGForeignObjectElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGForeignObjectElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference
+int32_t ranvier_dom_svg_foreign_object_element_get_width(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGForeignObjectElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->widthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGForeignObjectElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference
+int32_t ranvier_dom_svg_foreign_object_element_get_height(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGForeignObjectElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->heightAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGImageElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference
+int32_t ranvier_dom_svg_image_element_get_x(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGImageElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGImageElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference
+int32_t ranvier_dom_svg_image_element_get_y(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGImageElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGImageElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference
+int32_t ranvier_dom_svg_image_element_get_width(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGImageElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->widthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGImageElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference
+int32_t ranvier_dom_svg_image_element_get_height(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGImageElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->heightAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGImageElement.preserveAspectRatio getter: readonly attribute SVGAnimatedPreserveAspectRatio preserveAspectRatio; *result is a new reference
+int32_t ranvier_dom_svg_image_element_get_preserve_aspect_ratio(RvNode* target, RvSVGAnimatedPreserveAspectRatio** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGImageElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->preserveAspectRatioAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedPreserveAspectRatio>(value, result); });
+}
+
+// SVGImageElement.crossOrigin getter: attribute DOMString? crossOrigin
+int32_t ranvier_dom_svg_image_element_get_cross_origin(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGImageElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->crossOrigin(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// SVGImageElement.crossOrigin setter: attribute DOMString? crossOrigin; value may be NULL (null)
+int32_t ranvier_dom_svg_image_element_set_cross_origin(RvNode* target, const char* value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGImageElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setCrossOrigin(a0.atom()); });
+}
+
+// SVGImageElement.href getter: readonly attribute SVGAnimatedString href; *result is a new reference
+int32_t ranvier_dom_svg_image_element_get_href(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGImageElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hrefAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGScriptElement.type getter: attribute DOMString type
+int32_t ranvier_dom_svg_script_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGScriptElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// SVGScriptElement.type setter: attribute DOMString type
+int32_t ranvier_dom_svg_script_element_set_type(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGScriptElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::typeAttr, AtomString { a0.string() }); });
+}
+
+// SVGScriptElement.async getter: attribute boolean async
+int32_t ranvier_dom_svg_script_element_get_async(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGScriptElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->async(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// SVGScriptElement.async setter: attribute boolean async
+int32_t ranvier_dom_svg_script_element_set_async(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGScriptElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setBooleanAttribute(HTMLNames::asyncAttr, !!value); });
+}
+
+// SVGScriptElement.href getter: readonly attribute SVGAnimatedString href; *result is a new reference
+int32_t ranvier_dom_svg_script_element_get_href(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGScriptElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hrefAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGUseElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference
+int32_t ranvier_dom_svg_use_element_get_x(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGUseElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGUseElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference
+int32_t ranvier_dom_svg_use_element_get_y(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGUseElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGUseElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference
+int32_t ranvier_dom_svg_use_element_get_width(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGUseElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->widthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGUseElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference
+int32_t ranvier_dom_svg_use_element_get_height(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGUseElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->heightAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGUseElement.href getter: readonly attribute SVGAnimatedString href; *result is a new reference
+int32_t ranvier_dom_svg_use_element_get_href(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGUseElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hrefAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
 }
 
 // CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths

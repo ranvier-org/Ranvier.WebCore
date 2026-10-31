@@ -1,0 +1,25 @@
+{
+  "nativeRuntime": {
+    "RanvierWebCoreHost.dll": "8af39b22c57377305f405844f89ae4d44ba8ec255b5d3dc0ab4a78fcbfed13bc",
+    "WebCore.dll": "a4477901ca664b3c86a95d0a4bcb1ece6920fed2d1d6779d69b3ee5019da24c7",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+  },
+  "browserInputOrderPixels": {
+    "input": [
+      64,
+      64,
+      255,
+      255
+    ],
+    "order": [
+      255,
+      255,
+      255,
+      255
+    ]
+  },
+  "files": {
+    "svg-convolve-cache-native-green.json": "b7831dc277e180ea4f90ba1476dd1f621a3ddf9a5b3823f983cce618f8aab9f6",
+    "svg-convolve-native-oracle.json": "dd377ce1414bdc81fcb0d53cd93a3f9ea0d9d71dff8820ce27d1995e495d42af"
+  }
+}

@@ -1,0 +1,8 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+differs from the pin, outside the series: Source/WebCore/html/HTMLImageElement.cpp
+differs from the pin, outside the series: Source/WebCore/html/HTMLImageElement.h
+differs from the pin, outside the series: Source/WebCore/loader/ImageLoader.cpp
+differs from the pin, outside the series: Source/WebCore/loader/ImageLoader.h
+differs from the pin, outside the series: Source/WebCore/svg/SVGImageElement.cpp
+differs from the pin, outside the series: Source/WebCore/svg/SVGImageElement.h
+differs from the pin, outside the series: Tools/TestWebKitAPI/CMakeLists.txt

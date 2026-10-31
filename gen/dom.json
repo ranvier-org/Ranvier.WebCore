@@ -1,674 +1,798 @@
 {
-    "comment": [
-        "The interfaces gen/domgen.py exports, one C function per IDL member: what a native app's UI uses.",
-        "Each interface takes its own members, those of its partial interfaces and those of the mixins it includes,",
-        "except partials and mixins declared under the directories of skipDirectories, which hold browser features.",
-        "exclude lists members left out by name, as Interface.member, or member alone for every interface.",
-        "atomArguments lists operations whose C++ takes AtomString for string arguments the IDL does not mark [AtomString].",
-        "Members whose types or extended attributes the generator does not map are left out on their own and listed",
-        "in gen/dom-report.txt."
-    ],
-    "attributeBridges": {
-        "Document.adoptedStyleSheets": {
-            "sequenceElement": "CSSStyleSheet",
-            "getter": "impl->adoptedStyleSheets()",
-            "setter": "impl->setAdoptedStyleSheets({value})",
-            "feature": "dom-adopted-style-sheets"
-        },
-        "ShadowRoot.adoptedStyleSheets": {
-            "sequenceElement": "CSSStyleSheet",
-            "getter": "impl->adoptedStyleSheets()",
-            "setter": "impl->setAdoptedStyleSheets({value})",
-            "feature": "dom-adopted-style-sheets"
-        }
+  "comment": [
+    "The interfaces gen/domgen.py exports, one C function per IDL member: what a native app's UI uses.",
+    "Each interface takes its own members, those of its partial interfaces and those of the mixins it includes,",
+    "except partials and mixins declared under the directories of skipDirectories, which hold browser features.",
+    "exclude lists members left out by name, as Interface.member, or member alone for every interface.",
+    "atomArguments lists operations whose C++ takes AtomString for string arguments the IDL does not mark [AtomString].",
+    "Members whose types or extended attributes the generator does not map are left out on their own and listed",
+    "in gen/dom-report.txt."
+  ],
+  "attributeBridges": {
+    "Document.adoptedStyleSheets": {
+      "sequenceElement": "CSSStyleSheet",
+      "getter": "impl->adoptedStyleSheets()",
+      "setter": "impl->setAdoptedStyleSheets({value})",
+      "feature": "dom-adopted-style-sheets"
     },
-    "constructors": {
-        "CSSTransformValue": {"receiver": "Document", "factory": "CSSTransformValue::create", "passReceiver": false},
-        "CSSTranslate": {"receiver": "Document", "factory": "CSSTranslate::create", "passReceiver": false},
-        "CSSRotate": {"receiver": "Document", "factory": "CSSRotate::create", "passReceiver": false},
-        "CSSScale": {"receiver": "Document", "factory": "CSSScale::create", "passReceiver": false},
-        "CSSSkew": {"receiver": "Document", "factory": "CSSSkew::create", "passReceiver": false},
-        "CSSSkewX": {"receiver": "Document", "factory": "CSSSkewX::create", "passReceiver": false},
-        "CSSSkewY": {"receiver": "Document", "factory": "CSSSkewY::create", "passReceiver": false},
-        "CSSPerspective": {"receiver": "Document", "factory": "CSSPerspective::create", "passReceiver": false},
-        "CSSMatrixComponent": {"receiver": "Document", "factory": "CSSMatrixComponent::create", "passReceiver": false},
-        "DOMMatrixReadOnly": {
-            "receiver": "Document",
-            "factory": "DOMMatrixReadOnly::create"
-        },
-        "DOMMatrix": {
-            "receiver": "Document",
-            "factory": "DOMMatrix::create"
-        },
-        "DOMRectReadOnly": {
-            "receiver": "Document",
-            "factory": "DOMRectReadOnly::create",
-            "passReceiver": false
-        },
-        "DOMRect": {
-            "receiver": "Document",
-            "factory": "DOMRect::create",
-            "passReceiver": false
-        },
-        "DOMPointReadOnly": {
-            "receiver": "Document",
-            "factory": "DOMPointReadOnly::create",
-            "passReceiver": false
-        },
-        "DOMPoint": {
-            "receiver": "Document",
-            "factory": "DOMPoint::create",
-            "passReceiver": false
-        },
-        "DOMQuad": {
-            "receiver": "Document",
-            "factory": "DOMQuad::create",
-            "passReceiver": false
-        },
-        "CSSStyleSheet": {
-            "receiver": "Document",
-            "factory": "CSSStyleSheet::create"
-        },
-        "CSSOMKeywordValue": {
-            "receiver": "Document",
-            "factory": "CSSOMKeywordValue::create",
-            "passReceiver": false,
-            "stringInputs": "utf8-lengths"
-        },
-        "CSSUnitValue": {
-            "receiver": "Document",
-            "factory": "CSSUnitValue::create",
-            "passReceiver": false,
-            "stringInputs": "utf8-lengths"
-        },
-        "CSSUnparsedValue": {
-            "receiver": "Document",
-            "factory": "CSSUnparsedValue::create",
-            "passReceiver": false
-        },
-        "CSSOMVariableReferenceValue": {
-            "receiver": "Document",
-            "factory": "CSSOMVariableReferenceValue::create",
-            "passReceiver": false,
-            "stringInputs": "utf8-lengths"
-        }
+    "ShadowRoot.adoptedStyleSheets": {
+      "sequenceElement": "CSSStyleSheet",
+      "getter": "impl->adoptedStyleSheets()",
+      "setter": "impl->setAdoptedStyleSheets({value})",
+      "feature": "dom-adopted-style-sheets"
+    }
+  },
+  "constructors": {
+    "CSSTransformValue": {
+      "receiver": "Document",
+      "factory": "CSSTransformValue::create",
+      "passReceiver": false
     },
-    "dictionaryCppTypes": {
-        "CSSStyleSheetInit": "CSSStyleSheet::Init"
+    "CSSTranslate": {
+      "receiver": "Document",
+      "factory": "CSSTranslate::create",
+      "passReceiver": false
     },
-    "flattenUnionTypedefs": ["CSSPerspectiveValue"],
-    "finiteUnionInputs": ["DoubleOrCSSNumericValue"],
-    "svgMatrixDictionaryBindings": [
-        "SVGSVGElement.createSVGTransformFromMatrix",
-        "SVGTransform.setMatrix",
-        "SVGTransformList.createSVGTransformFromMatrix"
-    ],
-    "browserMatrixFlagAdapters": [
-        "CSSTransformComponent.toMatrix",
-        "CSSTransformValue.toMatrix"
-    ],
-    "validatedReferenceUnions": [
-        "DoubleOrCSSNumericValue",
-        "CSSNumericValueOrDOMStringOrCSSOMKeywordValue"
-    ],
-    "setterValueChecks": {
-        "CSSTranslate.x": "css-length-or-percentage",
-        "CSSTranslate.y": "css-length-or-percentage",
-        "CSSScale.x": "css-numberish-number",
-        "CSSScale.y": "css-numberish-number",
-        "CSSScale.z": "css-numberish-number"
+    "CSSRotate": {
+      "receiver": "Document",
+      "factory": "CSSRotate::create",
+      "passReceiver": false
     },
-    "constGetterBindings": {
-        "CSSTranslate.x": {"interface": "CSSNumericValue", "root": "CSSStyleValue"},
-        "CSSTranslate.y": {"interface": "CSSNumericValue", "root": "CSSStyleValue"},
-        "CSSTranslate.z": {"interface": "CSSNumericValue", "root": "CSSStyleValue"},
-        "CSSRotate.angle": {"interface": "CSSNumericValue", "root": "CSSStyleValue"},
-        "CSSSkew.ax": {"interface": "CSSNumericValue", "root": "CSSStyleValue"},
-        "CSSSkew.ay": {"interface": "CSSNumericValue", "root": "CSSStyleValue"},
-        "CSSSkewX.ax": {"interface": "CSSNumericValue", "root": "CSSStyleValue"},
-        "CSSSkewY.ay": {"interface": "CSSNumericValue", "root": "CSSStyleValue"}
+    "CSSScale": {
+      "receiver": "Document",
+      "factory": "CSSScale::create",
+      "passReceiver": false
     },
-    "nestedDictionaries": [
-        "DOMQuadInit"
-    ],
-    "trackedHandleRoots": {
-        "DOMRectReadOnly": "DOMRect",
-        "DOMPointReadOnly": "DOMPoint",
-        "DOMMatrixReadOnly": "DOMMatrix"
+    "CSSSkew": {
+      "receiver": "Document",
+      "factory": "CSSSkew::create",
+      "passReceiver": false
     },
-    "dictionaryStringInputs": {
-        "DOMCSSCustomPropertyDescriptor": "utf8-lengths-presence"
+    "CSSSkewX": {
+      "receiver": "Document",
+      "factory": "CSSSkewX::create",
+      "passReceiver": false
     },
-    "stringifiers": [
-        "CSSStyleValue",
-        "DOMMatrixReadOnly",
-        "CSSTransformComponent"
-    ],
-    "complexStringSpans": [
-        "USVStringOrCSSOMVariableReferenceValue",
-        "CSSStyleValueOrUSVString",
-        "DOMStringOrSequenceOfUnrestrictedDouble",
-        "CSSNumericValueOrDOMStringOrCSSOMKeywordValue"
-    ],
-    "complexNullableElements": [
-        "CSSStyleValue"
-    ],
-    "interfaceStringInputs": {
-        "CSSOMKeywordValue": "utf8-lengths",
-        "CSSOMVariableReferenceValue": "utf8-lengths",
-        "StylePropertyMapReadOnly": "utf8-lengths",
-        "StylePropertyMap": "utf8-lengths",
-        "DOMMatrix": "utf8-lengths"
+    "CSSSkewY": {
+      "receiver": "Document",
+      "factory": "CSSSkewY::create",
+      "passReceiver": false
     },
-    "objectContexts": {
-        "StylePropertyMapReadOnly": "Document",
-        "StylePropertyMap": "Document",
-        "DOMMatrix": "Document"
+    "CSSPerspective": {
+      "receiver": "Document",
+      "factory": "CSSPerspective::create",
+      "passReceiver": false
     },
-    "finiteNumberInputs": [
-        "CSSUnitValue",
-        "SVGSVGElement",
-        "SVGGeometryElement",
-        "SVGRect",
-        "SVGMatrix",
-        "SVGPoint",
-        "SVGTransform",
-        "SVGNumber",
-        "SVGLength",
-        "SVGAngle",
-        "SVGAnimatedNumber",
-        "SVGAnimationElement"
+    "CSSMatrixComponent": {
+      "receiver": "Document",
+      "factory": "CSSMatrixComponent::create",
+      "passReceiver": false
+    },
+    "DOMMatrixReadOnly": {
+      "receiver": "Document",
+      "factory": "DOMMatrixReadOnly::create"
+    },
+    "DOMMatrix": {
+      "receiver": "Document",
+      "factory": "DOMMatrix::create"
+    },
+    "DOMRectReadOnly": {
+      "receiver": "Document",
+      "factory": "DOMRectReadOnly::create",
+      "passReceiver": false
+    },
+    "DOMRect": {
+      "receiver": "Document",
+      "factory": "DOMRect::create",
+      "passReceiver": false
+    },
+    "DOMPointReadOnly": {
+      "receiver": "Document",
+      "factory": "DOMPointReadOnly::create",
+      "passReceiver": false
+    },
+    "DOMPoint": {
+      "receiver": "Document",
+      "factory": "DOMPoint::create",
+      "passReceiver": false
+    },
+    "DOMQuad": {
+      "receiver": "Document",
+      "factory": "DOMQuad::create",
+      "passReceiver": false
+    },
+    "CSSStyleSheet": {
+      "receiver": "Document",
+      "factory": "CSSStyleSheet::create"
+    },
+    "CSSOMKeywordValue": {
+      "receiver": "Document",
+      "factory": "CSSOMKeywordValue::create",
+      "passReceiver": false,
+      "stringInputs": "utf8-lengths"
+    },
+    "CSSUnitValue": {
+      "receiver": "Document",
+      "factory": "CSSUnitValue::create",
+      "passReceiver": false,
+      "stringInputs": "utf8-lengths"
+    },
+    "CSSUnparsedValue": {
+      "receiver": "Document",
+      "factory": "CSSUnparsedValue::create",
+      "passReceiver": false
+    },
+    "CSSOMVariableReferenceValue": {
+      "receiver": "Document",
+      "factory": "CSSOMVariableReferenceValue::create",
+      "passReceiver": false,
+      "stringInputs": "utf8-lengths"
+    }
+  },
+  "dictionaryCppTypes": {
+    "CSSStyleSheetInit": "CSSStyleSheet::Init"
+  },
+  "flattenUnionTypedefs": [
+    "CSSPerspectiveValue"
+  ],
+  "finiteUnionInputs": [
+    "DoubleOrCSSNumericValue"
+  ],
+  "svgMatrixDictionaryBindings": [
+    "SVGSVGElement.createSVGTransformFromMatrix",
+    "SVGTransform.setMatrix",
+    "SVGTransformList.createSVGTransformFromMatrix"
+  ],
+  "browserMatrixFlagAdapters": [
+    "CSSTransformComponent.toMatrix",
+    "CSSTransformValue.toMatrix"
+  ],
+  "validatedReferenceUnions": [
+    "DoubleOrCSSNumericValue",
+    "CSSNumericValueOrDOMStringOrCSSOMKeywordValue"
+  ],
+  "setterValueChecks": {
+    "CSSTranslate.x": "css-length-or-percentage",
+    "CSSTranslate.y": "css-length-or-percentage",
+    "CSSScale.x": "css-numberish-number",
+    "CSSScale.y": "css-numberish-number",
+    "CSSScale.z": "css-numberish-number"
+  },
+  "constGetterBindings": {
+    "CSSTranslate.x": {
+      "interface": "CSSNumericValue",
+      "root": "CSSStyleValue"
+    },
+    "CSSTranslate.y": {
+      "interface": "CSSNumericValue",
+      "root": "CSSStyleValue"
+    },
+    "CSSTranslate.z": {
+      "interface": "CSSNumericValue",
+      "root": "CSSStyleValue"
+    },
+    "CSSRotate.angle": {
+      "interface": "CSSNumericValue",
+      "root": "CSSStyleValue"
+    },
+    "CSSSkew.ax": {
+      "interface": "CSSNumericValue",
+      "root": "CSSStyleValue"
+    },
+    "CSSSkew.ay": {
+      "interface": "CSSNumericValue",
+      "root": "CSSStyleValue"
+    },
+    "CSSSkewX.ax": {
+      "interface": "CSSNumericValue",
+      "root": "CSSStyleValue"
+    },
+    "CSSSkewY.ay": {
+      "interface": "CSSNumericValue",
+      "root": "CSSStyleValue"
+    }
+  },
+  "nestedDictionaries": [
+    "DOMQuadInit"
+  ],
+  "trackedHandleRoots": {
+    "DOMRectReadOnly": "DOMRect",
+    "DOMPointReadOnly": "DOMPoint",
+    "DOMMatrixReadOnly": "DOMMatrix"
+  },
+  "dictionaryStringInputs": {
+    "DOMCSSCustomPropertyDescriptor": "utf8-lengths-presence"
+  },
+  "stringifiers": [
+    "CSSStyleValue",
+    "DOMMatrixReadOnly",
+    "CSSTransformComponent"
+  ],
+  "complexStringSpans": [
+    "USVStringOrCSSOMVariableReferenceValue",
+    "CSSStyleValueOrUSVString",
+    "DOMStringOrSequenceOfUnrestrictedDouble",
+    "CSSNumericValueOrDOMStringOrCSSOMKeywordValue"
+  ],
+  "complexNullableElements": [
+    "CSSStyleValue"
+  ],
+  "interfaceStringInputs": {
+    "CSSOMKeywordValue": "utf8-lengths",
+    "CSSOMVariableReferenceValue": "utf8-lengths",
+    "StylePropertyMapReadOnly": "utf8-lengths",
+    "StylePropertyMap": "utf8-lengths",
+    "DOMMatrix": "utf8-lengths"
+  },
+  "objectContexts": {
+    "StylePropertyMapReadOnly": "Document",
+    "StylePropertyMap": "Document",
+    "DOMMatrix": "Document"
+  },
+  "finiteNumberInputs": [
+    "CSSUnitValue",
+    "SVGSVGElement",
+    "SVGGeometryElement",
+    "SVGRect",
+    "SVGMatrix",
+    "SVGPoint",
+    "SVGTransform",
+    "SVGNumber",
+    "SVGLength",
+    "SVGAngle",
+    "SVGAnimatedNumber",
+    "SVGAnimationElement",
+    "SVGFEGaussianBlurElement",
+    "SVGFEDropShadowElement"
+  ],
+  "interfaces": [
+    "Node",
+    "CharacterData",
+    "Text",
+    "Comment",
+    "DocumentFragment",
+    "ShadowRoot",
+    "Document",
+    "HTMLDocument",
+    "DOMImplementation",
+    "Element",
+    "Attr",
+    "NamedNodeMap",
+    "HTMLElement",
+    "HTMLAnchorElement",
+    "HTMLAreaElement",
+    "HTMLBodyElement",
+    "HTMLButtonElement",
+    "HTMLDetailsElement",
+    "HTMLDialogElement",
+    "HTMLDivElement",
+    "HTMLFieldSetElement",
+    "HTMLFormElement",
+    "HTMLHeadElement",
+    "HTMLImageElement",
+    "HTMLInputElement",
+    "HTMLLabelElement",
+    "HTMLLegendElement",
+    "HTMLLIElement",
+    "HTMLMeterElement",
+    "HTMLOListElement",
+    "HTMLOptGroupElement",
+    "HTMLOptionElement",
+    "HTMLOutputElement",
+    "HTMLParagraphElement",
+    "HTMLProgressElement",
+    "HTMLSelectElement",
+    "HTMLSlotElement",
+    "HTMLSpanElement",
+    "HTMLTableElement",
+    "HTMLTableCaptionElement",
+    "HTMLTableColElement",
+    "HTMLTableSectionElement",
+    "HTMLTableRowElement",
+    "HTMLTableCellElement",
+    "HTMLTextAreaElement",
+    "HTMLTemplateElement",
+    "HTMLUListElement",
+    "HTMLBaseElement",
+    "HTMLBRElement",
+    "HTMLDataElement",
+    "HTMLDataListElement",
+    "HTMLDirectoryElement",
+    "HTMLDListElement",
+    "HTMLFontElement",
+    "HTMLHeadingElement",
+    "HTMLHRElement",
+    "HTMLHtmlElement",
+    "HTMLMapElement",
+    "HTMLMarqueeElement",
+    "HTMLMenuElement",
+    "HTMLMetaElement",
+    "HTMLModElement",
+    "HTMLParamElement",
+    "HTMLPictureElement",
+    "HTMLPreElement",
+    "HTMLQuoteElement",
+    "HTMLSelectedContentElement",
+    "HTMLSourceElement",
+    "HTMLTimeElement",
+    "HTMLTitleElement",
+    "SVGElement",
+    "MathMLElement",
+    "HTMLStyleElement",
+    "SVGStyleElement",
+    "HTMLLinkElement",
+    "StyleSheet",
+    "StyleSheetList",
+    "CSSStyleSheet",
+    "MediaList",
+    "CSSRule",
+    "CSSRuleList",
+    "CSSStyleRule",
+    "CSSStyleProperties",
+    "CSSGroupingRule",
+    "CSSConditionRule",
+    "CSSMediaRule",
+    "CSSSupportsRule",
+    "CSSContainerRule",
+    "CSSLayerBlockRule",
+    "CSSLayerStatementRule",
+    "CSSScopeRule",
+    "CSSNestedDeclarations",
+    "CSSImportRule",
+    "CSSNamespaceRule",
+    "CSSKeyframesRule",
+    "CSSKeyframeRule",
+    "CSSFontFaceRule",
+    "CSSFontFaceDescriptors",
+    "CSSFontFeatureValuesRule",
+    "CSSFontPaletteValuesRule",
+    "CSSCounterStyleRule",
+    "CSSPropertyRule",
+    "CSSStyleValue",
+    "CSSNumericValue",
+    "CSSTransformValue",
+    "CSSTransformComponent",
+    "CSSTranslate",
+    "CSSRotate",
+    "CSSScale",
+    "CSSSkew",
+    "CSSSkewX",
+    "CSSSkewY",
+    "CSSPerspective",
+    "CSSMatrixComponent",
+    "CSSUnitValue",
+    "CSSOMKeywordValue",
+    "CSSStyleImageValue",
+    "CSSUnparsedValue",
+    "CSSOMVariableReferenceValue",
+    "StylePropertyMapReadOnly",
+    "StylePropertyMap",
+    "CSSPositionTryRule",
+    "CSSPositionTryDescriptors",
+    "CSSStartingStyleRule",
+    "CSSViewTransitionRule",
+    "CSSStyleDeclaration",
+    "DOMTokenList",
+    "DOMStringMap",
+    "AbstractRange",
+    "StaticRange",
+    "Range",
+    "DOMSelection",
+    "DOMRectReadOnly",
+    "DOMRect",
+    "DOMRectList",
+    "DOMPointReadOnly",
+    "DOMPoint",
+    "DOMQuad",
+    "DOMMatrixReadOnly",
+    "DOMMatrix",
+    "NodeList",
+    "RadioNodeList",
+    "HTMLCollection",
+    "ValidityState",
+    "Event",
+    "UIEvent",
+    "MouseEvent",
+    "PointerEvent",
+    "WheelEvent",
+    "KeyboardEvent",
+    "FocusEvent",
+    "InputEvent",
+    "CompositionEvent",
+    "SVGGraphicsElement",
+    "SVGGeometryElement",
+    "SVGPolygonElement",
+    "SVGPolylineElement",
+    "SVGSVGElement",
+    "SVGRect",
+    "SVGMatrix",
+    "SVGPoint",
+    "SVGAnimatedRect",
+    "SVGPreserveAspectRatio",
+    "SVGAnimatedPreserveAspectRatio",
+    "SVGTransform",
+    "SVGTransformList",
+    "SVGAnimatedTransformList",
+    "SVGNumber",
+    "SVGLength",
+    "SVGAngle",
+    "SVGNumberList",
+    "SVGLengthList",
+    "SVGPointList",
+    "SVGAnimatedNumber",
+    "SVGAnimatedLength",
+    "SVGAnimatedLengthList",
+    "SVGAnimatedNumberList",
+    "SVGAnimatedEnumeration",
+    "SVGAnimatedString",
+    "SVGAnimatedBoolean",
+    "SVGStringList",
+    "SVGViewSpec",
+    "SVGAnimatedAngle",
+    "SVGSymbolElement",
+    "SVGViewElement",
+    "SVGMarkerElement",
+    "SVGPatternElement",
+    "SVGTextContentElement",
+    "SVGTextPositioningElement",
+    "SVGCircleElement",
+    "SVGEllipseElement",
+    "SVGLineElement",
+    "SVGRectElement",
+    "SVGPathElement",
+    "SVGTextElement",
+    "SVGTSpanElement",
+    "SVGTextPathElement",
+    "SVGAnimationElement",
+    "SVGAnimateElement",
+    "SVGAnimateMotionElement",
+    "SVGAnimateTransformElement",
+    "SVGSetElement",
+    "SVGMPathElement",
+    "SVGFEConvolveMatrixElement",
+    "SVGAnimatedInteger",
+    "SVGGradientElement",
+    "SVGLinearGradientElement",
+    "SVGRadialGradientElement",
+    "SVGStopElement",
+    "SVGFEBlendElement",
+    "SVGFEColorMatrixElement",
+    "SVGFEComponentTransferElement",
+    "SVGFECompositeElement",
+    "SVGFEDiffuseLightingElement",
+    "SVGFEDisplacementMapElement",
+    "SVGFEDistantLightElement",
+    "SVGFEDropShadowElement",
+    "SVGFEFloodElement",
+    "SVGFEFuncAElement",
+    "SVGFEFuncBElement",
+    "SVGFEFuncGElement",
+    "SVGFEFuncRElement",
+    "SVGFEGaussianBlurElement",
+    "SVGFEImageElement",
+    "SVGFEMergeElement",
+    "SVGFEMergeNodeElement",
+    "SVGFEMorphologyElement",
+    "SVGFEOffsetElement",
+    "SVGFEPointLightElement",
+    "SVGFESpecularLightingElement",
+    "SVGFESpotLightElement",
+    "SVGFETileElement",
+    "SVGFETurbulenceElement",
+    "SVGFilterElement",
+    "SVGComponentTransferFunctionElement",
+    "SVGClipPathElement",
+    "SVGMaskElement",
+    "SVGAElement",
+    "SVGDefsElement",
+    "SVGDescElement",
+    "SVGForeignObjectElement",
+    "SVGGElement",
+    "SVGImageElement",
+    "SVGMetadataElement",
+    "SVGScriptElement",
+    "SVGSwitchElement",
+    "SVGTitleElement",
+    "SVGUseElement"
+  ],
+  "skipDirectories": [
+    "Modules/",
+    "bindings/scripts/test/",
+    "testing/",
+    "css/scripts/test/"
+  ],
+  "customGetters": [
+    "Node.nodeType"
+  ],
+  "contract": {
+    "htmlTags": "html/HTMLTagNames.in",
+    "svgTags": "svg/svgtags.in",
+    "dictionaries": [
+      "EventListenerOptions",
+      "AddEventListenerOptions"
     ],
     "interfaces": [
-        "Node",
-        "CharacterData",
-        "Text",
-        "Comment",
-        "DocumentFragment",
-        "ShadowRoot",
-        "Document",
-        "HTMLDocument",
-        "DOMImplementation",
-        "Element",
-        "Attr",
-        "NamedNodeMap",
-        "HTMLElement",
-        "HTMLAnchorElement",
-        "HTMLAreaElement",
-        "HTMLBodyElement",
-        "HTMLButtonElement",
-        "HTMLDetailsElement",
-        "HTMLDialogElement",
-        "HTMLDivElement",
-        "HTMLFieldSetElement",
-        "HTMLFormElement",
-        "HTMLHeadElement",
-        "HTMLImageElement",
-        "HTMLInputElement",
-        "HTMLLabelElement",
-        "HTMLLegendElement",
-        "HTMLLIElement",
-        "HTMLMeterElement",
-        "HTMLOListElement",
-        "HTMLOptGroupElement",
-        "HTMLOptionElement",
-        "HTMLOutputElement",
-        "HTMLParagraphElement",
-        "HTMLProgressElement",
-        "HTMLSelectElement",
-        "HTMLSlotElement",
-        "HTMLSpanElement",
-        "HTMLTableElement",
-        "HTMLTableCaptionElement",
-        "HTMLTableColElement",
-        "HTMLTableSectionElement",
-        "HTMLTableRowElement",
-        "HTMLTableCellElement",
-        "HTMLTextAreaElement",
-        "HTMLTemplateElement",
-        "HTMLUListElement",
-        "HTMLBaseElement",
-        "HTMLBRElement",
-        "HTMLDataElement",
-        "HTMLDataListElement",
-        "HTMLDirectoryElement",
-        "HTMLDListElement",
-        "HTMLFontElement",
-        "HTMLHeadingElement",
-        "HTMLHRElement",
-        "HTMLHtmlElement",
-        "HTMLMapElement",
-        "HTMLMarqueeElement",
-        "HTMLMenuElement",
-        "HTMLMetaElement",
-        "HTMLModElement",
-        "HTMLParamElement",
-        "HTMLPictureElement",
-        "HTMLPreElement",
-        "HTMLQuoteElement",
-        "HTMLSelectedContentElement",
-        "HTMLSourceElement",
-        "HTMLTimeElement",
-        "HTMLTitleElement",
-        "SVGElement",
-        "MathMLElement",
-        "HTMLStyleElement",
-        "SVGStyleElement",
-        "HTMLLinkElement",
-        "StyleSheet",
-        "StyleSheetList",
-        "CSSStyleSheet",
-        "MediaList",
-        "CSSRule",
-        "CSSRuleList",
-        "CSSStyleRule",
-        "CSSStyleProperties",
-        "CSSGroupingRule",
-        "CSSConditionRule",
-        "CSSMediaRule",
-        "CSSSupportsRule",
-        "CSSContainerRule",
-        "CSSLayerBlockRule",
-        "CSSLayerStatementRule",
-        "CSSScopeRule",
-        "CSSNestedDeclarations",
-        "CSSImportRule",
-        "CSSNamespaceRule",
-        "CSSKeyframesRule",
-        "CSSKeyframeRule",
-        "CSSFontFaceRule",
-        "CSSFontFaceDescriptors",
-        "CSSFontFeatureValuesRule",
-        "CSSFontPaletteValuesRule",
-        "CSSCounterStyleRule",
-        "CSSPropertyRule",
-        "CSSStyleValue",
-        "CSSNumericValue",
-        "CSSTransformValue",
-        "CSSTransformComponent",
-        "CSSTranslate",
-        "CSSRotate",
-        "CSSScale",
-        "CSSSkew",
-        "CSSSkewX",
-        "CSSSkewY",
-        "CSSPerspective",
-        "CSSMatrixComponent",
-        "CSSUnitValue",
-        "CSSOMKeywordValue",
-        "CSSStyleImageValue",
-        "CSSUnparsedValue",
-        "CSSOMVariableReferenceValue",
-        "StylePropertyMapReadOnly",
-        "StylePropertyMap",
-        "CSSPositionTryRule",
-        "CSSPositionTryDescriptors",
-        "CSSStartingStyleRule",
-        "CSSViewTransitionRule",
-        "CSSStyleDeclaration",
-        "DOMTokenList",
-        "DOMStringMap",
-        "AbstractRange",
-        "StaticRange",
-        "Range",
-        "DOMSelection",
-        "DOMRectReadOnly",
-        "DOMRect",
-        "DOMRectList",
-        "DOMPointReadOnly",
-        "DOMPoint",
-        "DOMQuad",
-        "DOMMatrixReadOnly",
-        "DOMMatrix",
-        "NodeList",
-        "RadioNodeList",
-        "HTMLCollection",
-        "ValidityState",
-        "Event",
-        "UIEvent",
-        "MouseEvent",
-        "PointerEvent",
-        "WheelEvent",
-        "KeyboardEvent",
-        "FocusEvent",
-        "InputEvent",
-        "CompositionEvent",
-        "SVGGraphicsElement",
-        "SVGGeometryElement",
-        "SVGPolygonElement",
-        "SVGPolylineElement",
-        "SVGSVGElement",
-        "SVGRect",
-        "SVGMatrix",
-        "SVGPoint",
-        "SVGAnimatedRect",
-        "SVGPreserveAspectRatio",
-        "SVGAnimatedPreserveAspectRatio",
-        "SVGTransform",
-        "SVGTransformList",
-        "SVGAnimatedTransformList",
-        "SVGNumber",
-        "SVGLength",
-        "SVGAngle",
-        "SVGNumberList",
-        "SVGLengthList",
-        "SVGPointList",
-        "SVGAnimatedNumber",
-        "SVGAnimatedLength",
-        "SVGAnimatedLengthList",
-        "SVGAnimatedNumberList",
-        "SVGAnimatedEnumeration",
-        "SVGAnimatedString",
-        "SVGAnimatedBoolean",
-        "SVGStringList",
-        "SVGViewSpec",
-        "SVGAnimatedAngle",
-        "SVGSymbolElement",
-        "SVGViewElement",
-        "SVGMarkerElement",
-        "SVGPatternElement",
-        "SVGTextContentElement",
-        "SVGTextPositioningElement",
-        "SVGCircleElement",
-        "SVGEllipseElement",
-        "SVGLineElement",
-        "SVGRectElement",
-        "SVGPathElement",
-        "SVGTextElement",
-        "SVGTSpanElement",
-        "SVGTextPathElement",
-        "SVGAnimationElement",
-        "SVGAnimateElement",
-        "SVGAnimateMotionElement",
-        "SVGAnimateTransformElement",
-        "SVGSetElement",
-        "SVGMPathElement",
-        "SVGFEConvolveMatrixElement",
-        "SVGAnimatedInteger"
+      "SVGElement",
+      "SVGSVGElement",
+      "CSSAnimationEvent",
+      "CSSTransitionEvent",
+      "BeforeUnloadEvent",
+      "CSSStyleSheet",
+      "CSSStyleProperties",
+      "CustomElementRegistry",
+      "ClipboardEvent",
+      "DragEvent",
+      "ErrorEvent",
+      "FileList",
+      "FormDataEvent",
+      "GamepadEvent",
+      "HTMLFormControlsCollection",
+      "HTMLOptionsCollection",
+      "HashChangeEvent",
+      "MediaEncryptedEvent",
+      "MediaError",
+      "MediaKeys",
+      "PageRevealEvent",
+      "PageSwapEvent",
+      "PageTransitionEvent",
+      "PictureInPictureEvent",
+      "PopStateEvent",
+      "ProgressEvent",
+      "PromiseRejectionEvent",
+      "RemotePlayback",
+      "SecurityPolicyViolationEvent",
+      "StorageEvent",
+      "StylePropertyMap",
+      "SubmitEvent",
+      "TextTrack",
+      "TextTrackList",
+      "TimeRanges",
+      "ToggleEvent",
+      "TouchEvent"
     ],
-    "skipDirectories": [
-        "Modules/",
-        "bindings/scripts/test/",
-        "testing/",
-        "css/scripts/test/"
-    ],
-    "customGetters": [
-        "Node.nodeType"
-    ],
-    "contract": {
-        "htmlTags": "html/HTMLTagNames.in",
-        "svgTags": "svg/svgtags.in",
-        "dictionaries": [
-            "EventListenerOptions",
-            "AddEventListenerOptions"
-        ],
-        "interfaces": [
-            "SVGElement",
-            "SVGSVGElement",
-            "CSSAnimationEvent",
-            "CSSTransitionEvent",
-            "BeforeUnloadEvent",
-            "CSSStyleSheet",
-            "CSSStyleProperties",
-            "CustomElementRegistry",
-            "ClipboardEvent",
-            "DragEvent",
-            "ErrorEvent",
-            "FileList",
-            "FormDataEvent",
-            "GamepadEvent",
-            "HTMLFormControlsCollection",
-            "HTMLOptionsCollection",
-            "HashChangeEvent",
-            "MediaEncryptedEvent",
-            "MediaError",
-            "MediaKeys",
-            "PageRevealEvent",
-            "PageSwapEvent",
-            "PageTransitionEvent",
-            "PictureInPictureEvent",
-            "PopStateEvent",
-            "ProgressEvent",
-            "PromiseRejectionEvent",
-            "RemotePlayback",
-            "SecurityPolicyViolationEvent",
-            "StorageEvent",
-            "StylePropertyMap",
-            "SubmitEvent",
-            "TextTrack",
-            "TextTrackList",
-            "TimeRanges",
-            "ToggleEvent",
-            "TouchEvent"
-        ],
-        "aliases": {
-            "CSSAnimationEvent": "AnimationEvent",
-            "CSSTransitionEvent": "TransitionEvent",
-            "CSSOMKeywordValue": "CSSKeywordValue",
-            "CSSStyleImageValue": "CSSImageValue",
-            "CSSOMVariableReferenceValue": "CSSVariableReferenceValue"
-        },
-        "mixins": {
-            "AriaAttributes": "ARIAMixin",
-            "ChildNode": "ChildNode",
-            "ParentNode": "ParentNode",
-            "NonDocumentTypeChildNode": "NonDocumentTypeChildNode",
-            "GlobalEventHandlers": "GlobalEventHandlers",
-            "ElementCSSInlineStyle": "ElementCSSInlineStyle",
-            "ElementContentEditable": "ElementContentEditable",
-            "HTMLHyperlinkElementUtils": "HTMLHyperlinkElementUtils",
-            "HTMLOrSVGOrMathMLElement": "HTMLOrSVGElement",
-            "LinkStyle": "LinkStyle",
-            "PopoverInvokerElement": "PopoverTargetAttributes",
-            "Slotable": "Slottable"
-        }
+    "aliases": {
+      "CSSAnimationEvent": "AnimationEvent",
+      "CSSTransitionEvent": "TransitionEvent",
+      "CSSOMKeywordValue": "CSSKeywordValue",
+      "CSSStyleImageValue": "CSSImageValue",
+      "CSSOMVariableReferenceValue": "CSSVariableReferenceValue"
     },
-    "runtimeTypeRoots": [
-        "CSSRule",
-        "StyleSheet",
-        "CSSStyleDeclaration",
-        "CSSStyleValue",
-        "StylePropertyMapReadOnly",
-        "DOMRectReadOnly",
-        "DOMPointReadOnly",
-        "DOMMatrixReadOnly",
-        "CSSTransformComponent"
-    ],
-    "interfaceHeaders": {
-        "SVGAnimatedInteger": "svg/properties/SVGAnimatedPropertyImpl.h",
-        "SVGAnimatedBoolean": "svg/properties/SVGAnimatedPropertyImpl.h",
-        "SVGAnimatedNumber": "svg/properties/SVGAnimatedPropertyImpl.h",
-        "SVGAnimatedEnumeration": "svg/properties/SVGAnimatedPropertyImpl.h",
-        "SVGAnimatedAngle": "svg/properties/SVGAnimatedPropertyImpl.h",
-        "SVGAnimatedLength": "svg/properties/SVGAnimatedPropertyImpl.h",
-        "SVGAnimatedRect": "svg/properties/SVGAnimatedPropertyImpl.h",
-        "SVGAnimatedPreserveAspectRatio": "svg/properties/SVGAnimatedPropertyImpl.h",
-        "SVGAnimatedLengthList": "svg/properties/SVGAnimatedPropertyImpl.h",
-        "SVGAnimatedNumberList": "svg/properties/SVGAnimatedPropertyImpl.h",
-        "SVGAnimatedTransformList": "svg/properties/SVGAnimatedPropertyImpl.h"
-    },
-    "nodeCastTags": {
-        "HTMLModElement": [
-            "del",
-            "ins"
-        ],
-        "HTMLPreElement": [
-            "pre",
-            "listing",
-            "xmp"
-        ],
-        "HTMLQuoteElement": [
-            "blockquote",
-            "q"
-        ]
-    },
-    "castVia": {
-        "SVGAnimationElement": "SVGElement",
-        "RadioNodeList": "LiveNodeList",
-        "CSSConditionRule": "CSSGroupingRule"
-    },
-    "atomArguments": [
-        "StyleSheetList.namedItem",
-        "HTMLFormElement.namedItem",
-        "DocumentFragment.getElementById",
-        "HTMLCollection.namedItem",
-        "HTMLSelectElement.namedItem"
-    ],
-    "exclude": [
-        "SVGPathElement.getPathSegAtLength",
-        "CSSNumericValue.add",
-        "CSSNumericValue.sub",
-        "CSSNumericValue.mul",
-        "CSSNumericValue.div",
-        "CSSNumericValue.min",
-        "CSSNumericValue.max",
-        "CSSNumericValue.equals",
-        "CSSNumericValue.to",
-        "CSSNumericValue.toSum",
-        "CSSNumericValue.type",
-        "CSSNumericValue.parse",
-        "ElementCreationOptions.customElementRegistry",
-        "ImportNodeOptions.customElementRegistry",
-        "AddEventListenerOptions.signal",
-        "AddEventListenerOptions.webkitTrustedOnly",
-        "Document.cookie",
-        "Document.domain",
-        "Document.referrer",
-        "Document.lastModified",
-        "Document.location",
-        "Document.open",
-        "Document.close",
-        "Document.write",
-        "Document.writeln",
-        "Document.URL",
-        "Document.documentURI",
-        "Document.origin",
-        "Document.defaultView",
-        "Document.hasStorageAccess",
-        "Document.requestStorageAccess",
-        "Document.fullscreenEnabled",
-        "Document.exitFullscreen",
-        "Document.exitPointerLock",
-        "Document.pictureInPictureEnabled",
-        "Document.exitPictureInPicture",
-        "Document.wasDiscarded",
-        "Document.fullscreen",
-        "Document.fullscreenElement",
-        "Document.pointerLockElement",
-        "Document.immersiveElement",
-        "Document.immersiveEnabled",
-        "Document.captureEvents",
-        "Document.releaseEvents",
-        "Document.clear",
-        "Document.applets",
-        "Document.plugins",
-        "Document.embeds",
-        "Document.alinkColor",
-        "Document.bgColor",
-        "Document.fgColor",
-        "Document.linkColor",
-        "Document.vlinkColor",
-        "Document.currentScript",
-        "Document.createNSResolver",
-        "Document.xmlVersion",
-        "Document.xmlStandalone",
-        "Document.xmlEncoding",
-        "Document.charset",
-        "Document.inputEncoding",
-        "Element.requestFullscreen",
-        "Element.requestPointerLock",
-        "HTMLAnchorElement.ping",
-        "HTMLAreaElement.ping",
-        "HTMLAnchorElement.attributionSourceId",
-        "HTMLAnchorElement.attributionDestination",
-        "HTMLAnchorElement.attributionSourceNonce",
-        "HTMLFormElement.submit",
-        "HTMLFormElement.requestSubmit",
-        "HTMLFormElement.requestAutocomplete",
-        "HTMLImageElement.decode",
-        "HTMLInputElement.showPicker",
-        "HTMLSelectElement.showPicker"
-    ],
-    "namespaceBindings": {
-        "DOMCSSNamespace": {
-            "receiver": "Document",
-            "members": [
-                "supports",
-                "registerProperty"
-            ],
-            "feature": "dom-css-supports",
-            "memberFeatures": {
-                "registerProperty": "dom-css-register-property"
-            },
-            "stringInputs": "utf8-lengths"
-        }
-    },
-    "staticBindings": {
-        "DOMMatrixReadOnly": {
-            "receiver": "Document",
-            "members": ["fromMatrix"],
-            "feature": "dom-geometry-matrix-readonly",
-            "stringInputs": "utf8-lengths"
-        },
-        "DOMMatrix": {
-            "receiver": "Document",
-            "members": ["fromMatrix"],
-            "feature": "dom-geometry-matrix",
-            "stringInputs": "utf8-lengths"
-        },
-        "DOMRectReadOnly": {
-            "receiver": "Document",
-            "members": ["fromRect"],
-            "feature": "dom-geometry-rect-readonly",
-            "stringInputs": "utf8-lengths"
-        },
-        "DOMRect": {
-            "receiver": "Document",
-            "members": ["fromRect"],
-            "feature": "dom-geometry-rect",
-            "stringInputs": "utf8-lengths"
-        },
-        "DOMPointReadOnly": {
-            "receiver": "Document",
-            "members": ["fromPoint"],
-            "feature": "dom-geometry-point-readonly",
-            "stringInputs": "utf8-lengths"
-        },
-        "DOMPoint": {
-            "receiver": "Document",
-            "members": ["fromPoint"],
-            "feature": "dom-geometry-point",
-            "stringInputs": "utf8-lengths"
-        },
-        "DOMQuad": {
-            "receiver": "Document",
-            "members": ["fromRect", "fromQuad"],
-            "feature": "dom-geometry-quad",
-            "stringInputs": "utf8-lengths"
-        },
-        "CSSStyleValue": {
-            "receiver": "Document",
-            "members": [
-                "parse",
-                "parseAll"
-            ],
-            "feature": "dom-css-style-values",
-            "stringInputs": "utf8-lengths"
-        }
-    },
-    "iterableBindings": {
-        "StylePropertyMapReadOnly": {
-            "feature": "dom-css-style-map-entries"
-        }
-    },
-    "windowBindings": {
-        "DOMWindow": {
-            "receiver": "Document",
-            "members": [
-                "getComputedStyle"
-            ],
-            "feature": "dom-computed-style",
-            "stringInputs": "utf8-lengths"
-        }
+    "mixins": {
+      "AriaAttributes": "ARIAMixin",
+      "ChildNode": "ChildNode",
+      "ParentNode": "ParentNode",
+      "NonDocumentTypeChildNode": "NonDocumentTypeChildNode",
+      "GlobalEventHandlers": "GlobalEventHandlers",
+      "ElementCSSInlineStyle": "ElementCSSInlineStyle",
+      "ElementContentEditable": "ElementContentEditable",
+      "HTMLHyperlinkElementUtils": "HTMLHyperlinkElementUtils",
+      "HTMLOrSVGOrMathMLElement": "HTMLOrSVGElement",
+      "LinkStyle": "LinkStyle",
+      "PopoverInvokerElement": "PopoverTargetAttributes",
+      "Slotable": "Slottable"
     }
+  },
+  "runtimeTypeRoots": [
+    "CSSRule",
+    "StyleSheet",
+    "CSSStyleDeclaration",
+    "CSSStyleValue",
+    "StylePropertyMapReadOnly",
+    "DOMRectReadOnly",
+    "DOMPointReadOnly",
+    "DOMMatrixReadOnly",
+    "CSSTransformComponent"
+  ],
+  "interfaceHeaders": {
+    "SVGAnimatedInteger": "svg/properties/SVGAnimatedPropertyImpl.h",
+    "SVGAnimatedBoolean": "svg/properties/SVGAnimatedPropertyImpl.h",
+    "SVGAnimatedNumber": "svg/properties/SVGAnimatedPropertyImpl.h",
+    "SVGAnimatedEnumeration": "svg/properties/SVGAnimatedPropertyImpl.h",
+    "SVGAnimatedAngle": "svg/properties/SVGAnimatedPropertyImpl.h",
+    "SVGAnimatedLength": "svg/properties/SVGAnimatedPropertyImpl.h",
+    "SVGAnimatedRect": "svg/properties/SVGAnimatedPropertyImpl.h",
+    "SVGAnimatedPreserveAspectRatio": "svg/properties/SVGAnimatedPropertyImpl.h",
+    "SVGAnimatedLengthList": "svg/properties/SVGAnimatedPropertyImpl.h",
+    "SVGAnimatedNumberList": "svg/properties/SVGAnimatedPropertyImpl.h",
+    "SVGAnimatedTransformList": "svg/properties/SVGAnimatedPropertyImpl.h"
+  },
+  "nodeCastTags": {
+    "HTMLModElement": [
+      "del",
+      "ins"
+    ],
+    "HTMLPreElement": [
+      "pre",
+      "listing",
+      "xmp"
+    ],
+    "HTMLQuoteElement": [
+      "blockquote",
+      "q"
+    ]
+  },
+  "castVia": {
+    "SVGAnimationElement": "SVGElement",
+    "RadioNodeList": "LiveNodeList",
+    "CSSConditionRule": "CSSGroupingRule"
+  },
+  "atomArguments": [
+    "StyleSheetList.namedItem",
+    "HTMLFormElement.namedItem",
+    "DocumentFragment.getElementById",
+    "HTMLCollection.namedItem",
+    "HTMLSelectElement.namedItem"
+  ],
+  "exclude": [
+    "SVGPathElement.getPathSegAtLength",
+    "CSSNumericValue.add",
+    "CSSNumericValue.sub",
+    "CSSNumericValue.mul",
+    "CSSNumericValue.div",
+    "CSSNumericValue.min",
+    "CSSNumericValue.max",
+    "CSSNumericValue.equals",
+    "CSSNumericValue.to",
+    "CSSNumericValue.toSum",
+    "CSSNumericValue.type",
+    "CSSNumericValue.parse",
+    "ElementCreationOptions.customElementRegistry",
+    "ImportNodeOptions.customElementRegistry",
+    "AddEventListenerOptions.signal",
+    "AddEventListenerOptions.webkitTrustedOnly",
+    "Document.cookie",
+    "Document.domain",
+    "Document.referrer",
+    "Document.lastModified",
+    "Document.location",
+    "Document.open",
+    "Document.close",
+    "Document.write",
+    "Document.writeln",
+    "Document.URL",
+    "Document.documentURI",
+    "Document.origin",
+    "Document.defaultView",
+    "Document.hasStorageAccess",
+    "Document.requestStorageAccess",
+    "Document.fullscreenEnabled",
+    "Document.exitFullscreen",
+    "Document.exitPointerLock",
+    "Document.pictureInPictureEnabled",
+    "Document.exitPictureInPicture",
+    "Document.wasDiscarded",
+    "Document.fullscreen",
+    "Document.fullscreenElement",
+    "Document.pointerLockElement",
+    "Document.immersiveElement",
+    "Document.immersiveEnabled",
+    "Document.captureEvents",
+    "Document.releaseEvents",
+    "Document.clear",
+    "Document.applets",
+    "Document.plugins",
+    "Document.embeds",
+    "Document.alinkColor",
+    "Document.bgColor",
+    "Document.fgColor",
+    "Document.linkColor",
+    "Document.vlinkColor",
+    "Document.currentScript",
+    "Document.createNSResolver",
+    "Document.xmlVersion",
+    "Document.xmlStandalone",
+    "Document.xmlEncoding",
+    "Document.charset",
+    "Document.inputEncoding",
+    "Element.requestFullscreen",
+    "Element.requestPointerLock",
+    "HTMLAnchorElement.ping",
+    "HTMLAreaElement.ping",
+    "HTMLAnchorElement.attributionSourceId",
+    "HTMLAnchorElement.attributionDestination",
+    "HTMLAnchorElement.attributionSourceNonce",
+    "HTMLFormElement.submit",
+    "HTMLFormElement.requestSubmit",
+    "HTMLFormElement.requestAutocomplete",
+    "HTMLImageElement.decode",
+    "HTMLInputElement.showPicker",
+    "HTMLSelectElement.showPicker"
+  ],
+  "namespaceBindings": {
+    "DOMCSSNamespace": {
+      "receiver": "Document",
+      "members": [
+        "supports",
+        "registerProperty"
+      ],
+      "feature": "dom-css-supports",
+      "memberFeatures": {
+        "registerProperty": "dom-css-register-property"
+      },
+      "stringInputs": "utf8-lengths"
+    }
+  },
+  "staticBindings": {
+    "DOMMatrixReadOnly": {
+      "receiver": "Document",
+      "members": [
+        "fromMatrix"
+      ],
+      "feature": "dom-geometry-matrix-readonly",
+      "stringInputs": "utf8-lengths"
+    },
+    "DOMMatrix": {
+      "receiver": "Document",
+      "members": [
+        "fromMatrix"
+      ],
+      "feature": "dom-geometry-matrix",
+      "stringInputs": "utf8-lengths"
+    },
+    "DOMRectReadOnly": {
+      "receiver": "Document",
+      "members": [
+        "fromRect"
+      ],
+      "feature": "dom-geometry-rect-readonly",
+      "stringInputs": "utf8-lengths"
+    },
+    "DOMRect": {
+      "receiver": "Document",
+      "members": [
+        "fromRect"
+      ],
+      "feature": "dom-geometry-rect",
+      "stringInputs": "utf8-lengths"
+    },
+    "DOMPointReadOnly": {
+      "receiver": "Document",
+      "members": [
+        "fromPoint"
+      ],
+      "feature": "dom-geometry-point-readonly",
+      "stringInputs": "utf8-lengths"
+    },
+    "DOMPoint": {
+      "receiver": "Document",
+      "members": [
+        "fromPoint"
+      ],
+      "feature": "dom-geometry-point",
+      "stringInputs": "utf8-lengths"
+    },
+    "DOMQuad": {
+      "receiver": "Document",
+      "members": [
+        "fromRect",
+        "fromQuad"
+      ],
+      "feature": "dom-geometry-quad",
+      "stringInputs": "utf8-lengths"
+    },
+    "CSSStyleValue": {
+      "receiver": "Document",
+      "members": [
+        "parse",
+        "parseAll"
+      ],
+      "feature": "dom-css-style-values",
+      "stringInputs": "utf8-lengths"
+    }
+  },
+  "iterableBindings": {
+    "StylePropertyMapReadOnly": {
+      "feature": "dom-css-style-map-entries"
+    }
+  },
+  "windowBindings": {
+    "DOMWindow": {
+      "receiver": "Document",
+      "members": [
+        "getComputedStyle"
+      ],
+      "feature": "dom-computed-style",
+      "stringInputs": "utf8-lengths"
+    }
+  }
 }

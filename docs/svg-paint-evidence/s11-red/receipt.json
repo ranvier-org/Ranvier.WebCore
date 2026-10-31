@@ -1,0 +1,21 @@
+{
+  "missingBindingRuntime": {
+    "dir": "artifacts/s10-runtime (S10 private candidate)",
+    "RanvierWebCoreHost.dll": "3668b6504a59ec1ef40191db856d82135b63fc9400d0f827e7ef553867f37217"
+  },
+  "symbolViewBoxRuntime": {
+    "RanvierWebCoreHost.dll": "f1fad2b6d4a2837c2eb597828a2808da03d29f18e97651d912395f49c0613fb5",
+    "WebCore.dll": "1e7db36c5d4395beb04fb2365cb4a65e8156e21702982c1dfb7bc51636a7f087",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+  },
+  "missingBinding": "required native binding is absent: rv_dom_svga_element_get_target",
+  "symbolViewBox": "use.symbolViewBoxPaint native [[255,0,0,255],[255,0,0,255]] vs Chromium [[255,0,0,255],[255,255,255,255]]; all other S11 state matched or is a recorded qualification",
+  "files": {
+    "native-missing-binding-red.log": "c60006149fa4137ce8685b49757388a50f5c5039cd378d1068c6a20aba4f9e8f",
+    "native-symbol-viewbox-red.log": "e148685a38d523cd696b49ba8b53dcc06deeabe6b7407491838a900024b60793",
+    "svg-resources-oracle.json": "4a78111fb7cd0c72a1e29eac36aa375cad4adab12a0c8a9ea2a822cd59d25c26",
+    "svg-resources.svg": "c2bec6de93282d7eef9da10c31e47590ce52b16c28bcb06824f0630be392f046",
+    "svg_paint_probe.py": "5b1298774d637ce06b7fda73495a703f4a9f682ba821320420290c87f2766da1",
+    "svg_resources.py": "3833d631d08826cf5fc45faff97b46142518ad894258b273c49da1c0362dba76"
+  }
+}

@@ -1,0 +1,30 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+Traceback (most recent call last):
+  File "C:\wk\native-svg-paint\tests\abi\svg_paint_probe.py", line 40, in bind
+    function = getattr(self.library, name)
+  File "C:\Python314\Lib\ctypes\__init__.py", line 486, in __getattr__
+    func = self.__getitem__(name)
+  File "C:\Python314\Lib\ctypes\__init__.py", line 491, in __getitem__
+    func = self._FuncPtr((name_or_ordinal, self))
+AttributeError: function 'rv_dom_svg_filter_element_get_filter_units' not found
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\wk\native-svg-paint\tests\abi\svg_filters.py", line 28, in <module>
+    verify(parser.parse_args().native_directory)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-svg-paint\tests\abi\svg_filters.py", line 13, in verify
+    units = p.property('svg_filter_element', filter_node, 'filter_units', 'svg_animated_enumeration')
+  File "C:\wk\native-svg-paint\tests\abi\svg_paint_probe.py", line 93, in property
+    return self.object('rv_dom_' + kind + '_get_' + field, [self.pointer], [target], root)
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-svg-paint\tests\abi\svg_paint_probe.py", line 60, in object
+    self.call(name, arguments + [ctypes.POINTER(self.pointer)], *values, ctypes.byref(result))
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-svg-paint\tests\abi\svg_paint_probe.py", line 55, in call
+    status = self.bind(name, self.integer, arguments)(*values)
+             ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-svg-paint\tests\abi\svg_paint_probe.py", line 42, in bind
+    raise AssertionError('required native binding is absent: ' + name) from error
+AssertionError: required native binding is absent: rv_dom_svg_filter_element_get_filter_units

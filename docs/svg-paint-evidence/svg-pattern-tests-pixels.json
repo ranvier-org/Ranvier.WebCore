@@ -1,0 +1,65 @@
+[
+  {
+    "phase": "initial",
+    "pixel": [
+      255,
+      0,
+      0,
+      255
+    ]
+  },
+  {
+    "phase": "extensionList",
+    "pixel": [
+      255,
+      0,
+      0,
+      255
+    ]
+  },
+  {
+    "phase": "extensionAuthored",
+    "pixel": [
+      255,
+      0,
+      0,
+      255
+    ]
+  },
+  {
+    "phase": "extensionClear",
+    "pixel": [
+      255,
+      0,
+      0,
+      255
+    ]
+  },
+  {
+    "phase": "languageList",
+    "pixel": [
+      255,
+      0,
+      0,
+      255
+    ]
+  },
+  {
+    "phase": "languageAuthored",
+    "pixel": [
+      255,
+      0,
+      0,
+      255
+    ]
+  },
+  {
+    "phase": "languageClear",
+    "pixel": [
+      255,
+      0,
+      0,
+      255
+    ]
+  }
+]

@@ -1,0 +1,158 @@
+[
+  {
+    "phase": "initial",
+    "point": [
+      25,
+      25
+    ],
+    "actual": [
+      255,
+      0,
+      0,
+      255
+    ]
+  },
+  {
+    "phase": "initial",
+    "point": [
+      75,
+      25
+    ],
+    "actual": [
+      255,
+      255,
+      255,
+      255
+    ]
+  },
+  {
+    "phase": "initial",
+    "point": [
+      175,
+      25
+    ],
+    "actual": [
+      0,
+      0,
+      255,
+      255
+    ]
+  },
+  {
+    "phase": "initial",
+    "point": [
+      225,
+      25
+    ],
+    "actual": [
+      255,
+      255,
+      255,
+      255
+    ]
+  },
+  {
+    "phase": "initial",
+    "point": [
+      235,
+      200
+    ],
+    "actual": [
+      0,
+      255,
+      0,
+      255
+    ]
+  },
+  {
+    "phase": "maskExtension",
+    "point": [
+      175,
+      25
+    ],
+    "actual": [
+      0,
+      0,
+      255,
+      255
+    ]
+  },
+  {
+    "phase": "maskLanguage",
+    "point": [
+      175,
+      25
+    ],
+    "actual": [
+      0,
+      0,
+      255,
+      255
+    ]
+  },
+  {
+    "phase": "maskBlack",
+    "point": [
+      175,
+      25
+    ],
+    "actual": [
+      255,
+      255,
+      255,
+      255
+    ]
+  },
+  {
+    "phase": "maskAlpha",
+    "point": [
+      175,
+      25
+    ],
+    "actual": [
+      255,
+      255,
+      255,
+      255
+    ]
+  },
+  {
+    "phase": "maskAlphaRepaint",
+    "point": [
+      175,
+      25
+    ],
+    "actual": [
+      0,
+      0,
+      255,
+      255
+    ]
+  },
+  {
+    "phase": "markerNone",
+    "point": [
+      223,
+      205
+    ],
+    "actual": [
+      0,
+      255,
+      0,
+      255
+    ]
+  },
+  {
+    "phase": "markerMeet",
+    "point": [
+      223,
+      205
+    ],
+    "actual": [
+      255,
+      255,
+      255,
+      255
+    ]
+  }
+]

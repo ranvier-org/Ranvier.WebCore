@@ -1,0 +1,116 @@
+{
+  "status": "focused unallocated private S08 checkpoint only",
+  "baseline": "Native19 d5471ced80c72a32e39eba210f89312703a2161a",
+  "inheritedAbiVersion": 27,
+  "counts": {
+    "interfaces": 209,
+    "functions": 2249,
+    "roots": 50,
+    "dictionaries": 22,
+    "stubs": 0
+  },
+  "assertions": {
+    "native": 565,
+    "browserState": 82,
+    "browserPixels": 25
+  },
+  "probes": [
+    {
+      "probe": "native",
+      "exitCode": 0,
+      "log": "s08-native.log"
+    },
+    {
+      "probe": "browser-state",
+      "exitCode": 0,
+      "log": "s08-browser-state.log"
+    },
+    {
+      "probe": "browser-pixels",
+      "exitCode": 0,
+      "log": "s08-browser-pixels.log"
+    }
+  ],
+  "runtime": {
+    "RanvierWebCoreHost.dll": "5487cebeaa63ce19b8ed7ecffe60d498d2b56f92573d95e83430b8ea21d90acb",
+    "WebCore.dll": "681b7cafd108731b1c74ab1f55a61c3c58c232863753a69bf40409c65352edb1",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+  },
+  "generatedSourcesNormalizedLf": {
+    "gen/dom.json": "1e3e35d328dd899d3c9e282d477090035dbf9d3a758b74136830c586fd3719c8",
+    "gen/dom-api.json": "d3324bd0d48de0fa5421cb299086566f3ed9bcbf6a75a1f56fdd39e3526d4c93",
+    "gen/Ranvier.Dom.fs": "b664a27cd95ae696b735421092f0be1c98a1692e6745e4aecae3bd410f2e8b83",
+    "host/RanvierWebCoreDom.cpp": "05e1fdb7db0f8bf2eba1baf5cdb22731ed8b67c359453d1c632abe8d8cb5ec4e",
+    "host/RanvierWebCoreDom.h": "504c76a3bbd8f48ab69927a9a3d85fcf4b49a5b3990fb8031b4c8081e426bbac",
+    "host/dom/RanvierDomGlue.cpp": "9b7eee81e775bda13578932c4cebf073166d3e1003d2ee99717ed01c3a56258a",
+    "host/dom/RanvierDomGlue.h": "f8e57726b187cf548698b31c427969993651d475520fbe55ee5aafc3a47afff8"
+  },
+  "qualification": [
+    "Generated-source digests normalized LF; intermediate build preceded source CRLF normalization. Final integrated allocation proof requires exact frozen bytes.",
+    "Previously absent pattern viewBox must be initialized by the actual attribute parser before live rectangle edits affect paint; paired raw native/Chrome behavior retained.",
+    "Pattern SVGTests lists reflect actual state but do not suppress pattern paint in measured native/Chrome.",
+    "Native19 and cached51 borrowed replacement objects unchanged; no shared Source edits.",
+    "S09/S10/S11/H05 and shared/platform/official acceptance remain pending."
+  ],
+  "files": {
+    ".gitattributes": "2831291e9459e73b733a0948e181033b4043161cad60697841e1c09b7d571d2a",
+    "check_svg_paint_browser_pixels.py": "0d4fdc764fa69adefe471e9a0dc07efea5469829b103515ff5e75864a44eeaac",
+    "initial-red-svg-paint-servers.svg": "3193f0ae120094fb7808abd6ef382d92e07b4d364b74a3c77fa76f4dee19bb2d",
+    "initial-red-svg_paint_probe.py": "ebd5951ece251a425cf49aeeed9ee33f93acac778aeb5e2931a014e02db5d52e",
+    "initial-red-svg_paint_servers.py": "a48773c86d306bf8cecf95cd1413a9566ba77318e12f5449f84a2449d74f9e57",
+    "initial-s08-red.json": "3bf0608b4ce504f62bdbed955fb8bd35f643d3ce3787fd7e928589bd2548c8ad",
+    "initial-s08-red.log": "a887599a6489330a4d252e93e3853f01d57426cb2a3c545794846c768038d05d",
+    "pattern-authoredViewBox.png": "39dd8b295e96ab06d51464ae2db9db375477e8153758cde9a497f1da31a80164",
+    "pattern-tests-extensionAuthored.png": "bdeaafa38f4e34848e448ec0a18b6201add96dd3fec3d9860f7bd4a81f812995",
+    "pattern-tests-extensionClear.png": "bdeaafa38f4e34848e448ec0a18b6201add96dd3fec3d9860f7bd4a81f812995",
+    "pattern-tests-extensionList.png": "bdeaafa38f4e34848e448ec0a18b6201add96dd3fec3d9860f7bd4a81f812995",
+    "pattern-tests-initial.png": "bdeaafa38f4e34848e448ec0a18b6201add96dd3fec3d9860f7bd4a81f812995",
+    "pattern-tests-languageAuthored.png": "bdeaafa38f4e34848e448ec0a18b6201add96dd3fec3d9860f7bd4a81f812995",
+    "pattern-tests-languageClear.png": "bdeaafa38f4e34848e448ec0a18b6201add96dd3fec3d9860f7bd4a81f812995",
+    "pattern-tests-languageList.png": "bdeaafa38f4e34848e448ec0a18b6201add96dd3fec3d9860f7bd4a81f812995",
+    "pattern-translated.png": "48434998cf59ccaaf00396ab4c48d0dfa565d67a4c1f1b65619534e51b078e34",
+    "pattern-typedViewBox.png": "48434998cf59ccaaf00396ab4c48d0dfa565d67a4c1f1b65619534e51b078e34",
+    "pattern-viewbox-native-red.log": "ed32f94bb928f1e15b7910542a4912f9e2092469bcf3ff3f2dda8a0dc3fed9eb",
+    "pattern-viewbox-red-receipt.json": "3cb07192b568407c9e59d30ea520b8f6c03e2f3627e5059bb6af4739b158b833",
+    "pattern-viewbox-red-svg-paint-servers.svg": "6be6a8b340b8753dc0044a4d993020e89ff6bd2803f7063b891e484286b81ba4",
+    "pattern-viewbox-red-svg_paint_probe.py": "ebd5951ece251a425cf49aeeed9ee33f93acac778aeb5e2931a014e02db5d52e",
+    "pattern-viewbox-red-svg_paint_servers.py": "3ddd167c0de149e9b5799e7ed77b2b355719ff89d5d812d4689fa0e818f34507",
+    "s08-browser-pixels.log": "cf2cfa9da28de784884b149375b4333d9e5c7f88d7c9cddefdfeaf3a4e201e3e",
+    "s08-browser-state.log": "3a99fd059a49698fd07d1140cfb96d6c5259cd49ac501b260be370ec8632d33b",
+    "s08-executed-svg-paint-servers.svg": "6be6a8b340b8753dc0044a4d993020e89ff6bd2803f7063b891e484286b81ba4",
+    "s08-executed-svg_paint_probe.py": "3b661b6d7cab7f13ecac1dfdbcf5d1789feea734d5f92c93d536985acd0c73c2",
+    "s08-executed-svg_paint_servers.py": "21d379c83f032fe67eabed8c07c48c28f67d5e3a7c5ddbd305dafaedef285c8e",
+    "s08-native.log": "16302b4af60a10d2f07d766e954c9764389043ebc36cab7641f1a3d6ca3d47c3",
+    "svg-paint-browser-capabilities.json": "b496eace318ee2d58e39b72913d163fabab1598dafe9e6ec82e47ec9189eaefb",
+    "svg-paint-browser-capabilities.mjs": "33d03a560aba06c68b7c14ff35c34dab2023f271c282d2618f5804bca71340e2",
+    "svg-paint-browser-pixels.json": "5d49567a16fc313274378f8d9feba44be1456a5e9d4b1453714db66edd428617",
+    "svg-paint-full-gradientObjectUnits.png": "e9bfb9e0418ef1df5e2d26948da1ecb802aa4c5e922a57458d11da142973fd64",
+    "svg-paint-full-gradientTranslate.png": "adb5b430962a91fee6fa2593af2fae41e16b243539773103bf40b3ce2f78b7b7",
+    "svg-paint-full-initial.png": "bdeaafa38f4e34848e448ec0a18b6201add96dd3fec3d9860f7bd4a81f812995",
+    "svg-paint-full-linear50.png": "adb9089fbc199bb9c7660514e425f0879807b459ac228d53fa164c11d9c72359",
+    "svg-paint-full-missingGradient.png": "2e492c2baefde5db9d0525094e5b2de1b47ae2d894e2f133584d59219cba1a57",
+    "svg-paint-full-patternContentUnits.png": "503a24753ff998c4d7587defd6d4a95f06b7a48b98f3cf051c59228ef9261494",
+    "svg-paint-full-patternMissing.png": "e0a2a835c39a0b963b8a7a1b0b10e5c2f38f92a6a9baf399d4f1bef0f0ee669d",
+    "svg-paint-full-patternMoved.png": "ba4bc8f95ec096e779bf575974643c47cd0f2b7da53cbf59ecf673603fad8e15",
+    "svg-paint-full-patternMovedY.png": "7540cbcdbf525b4a61fab1cf06b467e829171ab728049278e97b6dd0f678021e",
+    "svg-paint-full-patternObjectUnits.png": "f1cd5dc538b534e0b1a02791e92009c0d8d086828600f8cc111ba903c85ff55d",
+    "svg-paint-full-patternTests.png": "6a87a6f539b578627cd50c3b669e64c5a9c0b21c2d4d7589d8364719a4c81b9c",
+    "svg-paint-full-patternTransform.png": "bc40808fa79ea6daab4c5744d728c66076f6bbde7ea655ffefea5a7341d3aeda",
+    "svg-paint-full-patternViewBox.png": "7f3d2122164a6d25a6c10605de3dbb357f2c6f65ac0f2c82ac7fba3a91b84bd4",
+    "svg-paint-full-radialFocal.png": "157eab857532657a0a1cc7fae96586822494cb2f27acf5e131487d6baa0e42d7",
+    "svg-paint-full-radialMoved.png": "84a1747b0e63ff1f49372b5f10fb007c74e598f552a8fad6106797b7d1437e12",
+    "svg-paint-full-spreadRepeat.png": "131c7208117a98585a6cdd8a327345a952fca1de0712ee9e42e9ddf01247f110",
+    "svg-paint-full-stopGreen.png": "3398651f34a721b776ee9a1d784a1f27f2b590bbc25c22143aa984eb15d5c209",
+    "svg-paint-full-stopOpacity.png": "6a87a6f539b578627cd50c3b669e64c5a9c0b21c2d4d7589d8364719a4c81b9c",
+    "svg-paint-servers-browser-full.json": "aea836484876cef76b0ccb0a83494ce6aaeaada0bbf14cff6f09dd7ce5942ecb",
+    "svg-paint-servers-browser-full.mjs": "8907f0ef9363a1836a128e273d529e3bcc1db8943792d37d77971f85d4215d13",
+    "svg-pattern-tests-oracle.json": "f5f5c17a3ad3662e28a81a78cb5017b485d691d3a1a3f82df2ea65402f601134",
+    "svg-pattern-tests-oracle.mjs": "b18e880ec0ac2679e9702f152ee42c41e02cb58c7dac4650d95a62a6d091c6c5",
+    "svg-pattern-tests-pixels.json": "bc55e4ea1d5bdaf444e1cc8cff62fdef0963920ca6cdfa1cd02a67d17f82c0ce",
+    "svg-pattern-units-oracle.json": "eec4ebf6aa643b49d0ed03a880566b6b3adcb46c60160118f5ae975a51cc3cb4",
+    "svg-pattern-units-oracle.mjs": "08a53b27cd884b55100a65123451ce391629fbf1b0ae935b19db9483ff9e7e60",
+    "svg-pattern-viewbox-oracle.json": "b140ffe7beabd5bcbb8a4c3229d5caa4e54371db5cd58e140151a15cd708ba2e",
+    "svg-pattern-viewbox-oracle.mjs": "193545ab62ddc44c02d22218f7203165395657958f497f5958f300e861413334",
+    "svg-pattern-viewbox-pixels.json": "eb7997c8a28ae22cca9ed05439db0d4277d14f86263c16bfb43adc08a90571f7"
+  }
+}

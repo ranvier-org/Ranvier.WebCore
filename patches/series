@@ -27,3 +27,8 @@
 0025-svg-screen-ctm-pan.patch
 0026-svg-text-length-query-transforms.patch
 0027-svg-view-reset-target.patch
+0028-svg-convolve-structural-cache.patch
+0029-svg-feimage-aspect-cache.patch
+0030-svg-symbol-view-box-instances.patch
+0031-svg-href-attribute-synchronization.patch
+0032-svg-smil-first-interval-end.patch
