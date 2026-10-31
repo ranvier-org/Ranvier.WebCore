@@ -89,7 +89,7 @@ def run(name, command, expected=None, environment=None, executed=None, timeout=3
 
 # The baseline batch's probes in its order, each with its exact assertion count; then the probes batch 5 adds.
 ADDED = [('canvas_paths', 325), ('canvas_state', 475), ('canvas_paints', 210), ('canvas_text', 473), ('canvas_pixels', 297),
-         ('canvas_export', 284)]
+         ('canvas_export', 286)]
 changes = {'capabilities': None}
 baseline = [item for item in json.loads(BASELINE.read_text()) if item['name'] not in ['frames', 'teardown'] + [name for name, _ in ADDED]]
 probes = [(item['name'], changes.get(item['name'], item.get('assertions'))) for item in baseline] + ADDED
