@@ -1,0 +1,39 @@
+{
+ "runtime": "C:/wk/native-batch-5/artifacts/batch5-candidate-1-frozen/runtimes/win-x64/native",
+ "step2ArmedPauseCancel": {
+  "exitCode": 3221226505,
+  "survived": false,
+  "stdout": [
+   "ARMED True",
+   "PAUSED pending True"
+  ],
+  "stderrTail": []
+ },
+ "step4AnimateCancel": {
+  "samples": [
+   326946816,
+   327221248,
+   327540736
+  ],
+  "checked": true,
+  "round": 1000,
+  "bound": 16777216
+ },
+ "step4PauseCancel": {
+  "samples": [
+   327684096,
+   327262208,
+   327335936
+  ],
+  "pendingPauses": [
+   1000,
+   1000,
+   1000
+  ],
+  "statusesOk": true,
+  "round": 1000,
+  "bound": 16777216,
+  "flat": true
+ },
+ "assertions": 11
+}
