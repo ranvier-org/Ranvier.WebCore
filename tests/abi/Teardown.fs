@@ -401,6 +401,7 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
                     failwithf "%s listener ran after host destroy" kind
         | "scrolled document" ->
             held.Value <- rv_node_retain document
+            rv_element_set_style (body, "height", "2000px", 0) |> check "tall body"
             let window = rv_host_window_event_target host
             let listener = rv_event_target_add_listener (window, "scroll", 0, viewportCallback, 0n)
 
