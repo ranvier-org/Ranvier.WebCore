@@ -1,0 +1,128 @@
+{
+  "abi": 47,
+  "runtime": "C:/wk/native-evdetail/artifacts/native39-candidate-4/runtime",
+  "browser": "156.0.8078.4",
+  "cases": 25,
+  "differ": 19,
+  "byCategory": {
+    "A": {
+      "cases": 7,
+      "differ": 6
+    },
+    "B": {
+      "cases": 6,
+      "differ": 5
+    },
+    "C": {
+      "cases": 10,
+      "differ": 8
+    },
+    "R": {
+      "cases": 2,
+      "differ": 0
+    }
+  },
+  "cases_differ": {
+    "setAttribute value": {
+      "category": "C",
+      "observed": "a",
+      "expected": "a\u0000b"
+    },
+    "setAttribute value trailing": {
+      "category": "C",
+      "observed": "\u00e9",
+      "expected": "\u00e9\u0000"
+    },
+    "textContent": {
+      "category": "C",
+      "observed": "x",
+      "expected": "x\u0000y\u0000z"
+    },
+    "createTextNode": {
+      "category": "C",
+      "observed": "",
+      "expected": "\u0000lead"
+    },
+    "appendData": {
+      "category": "C",
+      "observed": "a",
+      "expected": "a\u0000tail"
+    },
+    "id": {
+      "category": "C",
+      "observed": "i",
+      "expected": "i\u0000d"
+    },
+    "setAttributeNS null namespace": {
+      "category": "C",
+      "observed": "n",
+      "expected": "n\u0000s"
+    },
+    "createComment": {
+      "category": "C",
+      "observed": "c",
+      "expected": "c\u0000omment"
+    },
+    "append string": {
+      "category": "A",
+      "observed": "p",
+      "expected": "p\u0000q"
+    },
+    "prepend string": {
+      "category": "A",
+      "observed": "x",
+      "expected": "\u0000x"
+    },
+    "replaceChildren strings": {
+      "category": "A",
+      "observed": "rz",
+      "expected": "r\u0000sz"
+    },
+    "classList add": {
+      "category": "A",
+      "observed": "a",
+      "expected": "a\u0000b"
+    },
+    "classList remove": {
+      "category": "A",
+      "observed": "",
+      "expected": "a"
+    },
+    "hidden until-found suffix": {
+      "category": "A",
+      "observed": "until-found",
+      "expected": ""
+    },
+    "ToggleEvent states": {
+      "category": "B",
+      "observed": [
+        "o",
+        "n"
+      ],
+      "expected": [
+        "o\u0000ld",
+        "n\u0000ew"
+      ]
+    },
+    "CommandEvent command": {
+      "category": "B",
+      "observed": "--c",
+      "expected": "--c\u0000md"
+    },
+    "CompositionEvent data": {
+      "category": "B",
+      "observed": "",
+      "expected": "\u0000"
+    },
+    "ErrorEvent message": {
+      "category": "B",
+      "observed": "m",
+      "expected": "m\u0000sg"
+    },
+    "Blob type with U+0000": {
+      "category": "B",
+      "observed": "text/plain",
+      "expected": ""
+    }
+  }
+}

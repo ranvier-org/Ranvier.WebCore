@@ -1,4 +1,4 @@
-"""Native39/ABI47 I08 event detail probe against an actual runtime directory: the constructors and getters of the event
+"""Native39/ABI51 I08 event detail probe against an actual runtime directory: the constructors and getters of the event
 detail interfaces, rv_dom_event_get_interface_name, engine-dispatched payloads and teardown, compared with the Chromium
 oracle tests/fixtures/event-details-oracle.json. Every difference must be listed in tests/fixtures/event-details-qualified.json."""
 import argparse
@@ -44,21 +44,21 @@ def struct(name, fields):
 
 # The generated RvDom*EventInit layouts of host/RanvierWebCoreDom.h, by native prefix.
 INITS = {
-    'error_event': struct('ErrorEventInit', [('message', cstr), ('filename', cstr), ('lineno', u32), ('colno', u32)]),
+    'error_event': struct('ErrorEventInit', [('message', StringInput), ('filename', StringInput), ('lineno', u32), ('colno', u32)]),
     'progress_event': struct('ProgressEventInit', [('length_computable', i32), ('loaded', f64), ('total', f64)]),
-    'css_animation_event': struct('AnimationEventInit', [('animation_name', cstr), ('elapsed_time', f64), ('pseudo_element', cstr)]),
-    'css_transition_event': struct('TransitionEventInit', [('property_name', cstr), ('elapsed_time', f64), ('pseudo_element', cstr)]),
+    'css_animation_event': struct('AnimationEventInit', [('animation_name', StringInput), ('elapsed_time', f64), ('pseudo_element', StringInput)]),
+    'css_transition_event': struct('TransitionEventInit', [('property_name', StringInput), ('elapsed_time', f64), ('pseudo_element', StringInput)]),
     'content_visibility_auto_state_change_event': struct('ContentVisibilityInit', [('skipped', i32)]),
     'animation_playback_event': struct('AnimationPlaybackEventInit', [('current_time', ctypes.POINTER(Numberish)), ('timeline_time', ctypes.POINTER(Numberish))]),
     'page_transition_event': struct('PageTransitionEventInit', [('persisted', i32)]),
-    'hash_change_event': struct('HashChangeEventInit', [('old_url', cstr), ('new_url', cstr)]),
-    'media_query_list_event': struct('MediaQueryListEventInit', [('media', cstr), ('matches', i32)]),
+    'hash_change_event': struct('HashChangeEventInit', [('old_url', StringInput), ('new_url', StringInput)]),
+    'media_query_list_event': struct('MediaQueryListEventInit', [('media', StringInput), ('matches', i32)]),
     'pop_state_event': struct('PopStateEventInit', [('has_ua_visual_transition', i32)]),
-    'composition_event': struct('CompositionEventInit', [('detail', i32), ('data', cstr)]),
+    'composition_event': struct('CompositionEventInit', [('detail', i32), ('data', StringInput)]),
     'submit_event': struct('SubmitEventInit', [('submitter', p)]),
     'form_data_event': struct('FormDataEventInit', [('form_data', p)]),
-    'toggle_event': struct('ToggleEventInit', [('old_state', cstr), ('new_state', cstr), ('source', p)]),
-    'command_event': struct('CommandEventInit', [('source', p), ('command', cstr)]),
+    'toggle_event': struct('ToggleEventInit', [('old_state', StringInput), ('new_state', StringInput), ('source', p)]),
+    'command_event': struct('CommandEventInit', [('source', p), ('command', StringInput)]),
 }
 # The IDL fields of each interface the dispatched scenario and the constructed cases read: native getter prefix, C type.
 FIELDS = {
@@ -112,9 +112,7 @@ def verify(directory, oracle_path, qualified_path, evidence):
     callback_type = ctypes.CFUNCTYPE(i32, p, p)
 
     def bind(name, returns, arguments):
-        function = getattr(library, name)
-        function.restype, function.argtypes = returns, arguments
-        return function
+        return bind_utf8(library, name, returns, arguments)
 
     spec = json.loads((ROOT / 'tests/fixtures/event-details-cases.json').read_text(encoding='utf-8'))
     oracle = json.loads(Path(oracle_path).read_text(encoding='utf-8'))
@@ -246,7 +244,7 @@ def verify(directory, oracle_path, qualified_path, evidence):
                     keep.append(number)
                     setattr(value, c_name, ctypes.pointer(number))
                 elif isinstance(item, str):
-                    setattr(value, c_name, item.encode())
+                    setattr(value, c_name, string_input(item))
                 else:
                     setattr(value, c_name, item)
         return value, keep
@@ -302,11 +300,11 @@ def verify(directory, oracle_path, qualified_path, evidence):
     worker.join()
     expect(errors == [WRONG_THREAD], 'interface name off thread')
     # BeforeUnloadEvent has no constructor; Document.createEvent makes one.
-    create_event = bind('rv_dom_document_create_event', i32, [p, cstr, ctypes.POINTER(p)])
+    create_event = bind('rv_dom_document_create_event', i32, [p, Utf8, ctypes.POINTER(p)])
     unload = p()
     expect(create_event(document, b'BeforeUnloadEvent', ctypes.byref(unload)) == OK and unload.value, 'createEvent BeforeUnloadEvent')
     expect(name_of(unload) == 'BeforeUnloadEvent', 'BeforeUnloadEvent name')
-    set_return = bind('rv_dom_before_unload_event_set_return_value', i32, [p, cstr])
+    set_return = bind('rv_dom_before_unload_event_set_return_value', i32, [p, Utf8])
     get_return = bind('rv_dom_before_unload_event_get_return_value', i32, [p, cstr, i32, ctypes.POINTER(i32)])
     expect(text(get_return, unload) == (OK, ''), 'returnValue default')
     expect(set_return(unload, b'stay') == OK and text(get_return, unload) == (OK, 'stay'), 'returnValue set')

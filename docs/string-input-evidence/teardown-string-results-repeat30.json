@@ -1,0 +1,156 @@
+{
+  "filter": "RANVIER_TEARDOWN_ONLY=string results",
+  "driver": "artifacts/native43-candidate-3-driver",
+  "runs": [
+    {
+      "run": 1,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 2,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 3,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 4,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 5,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 6,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 7,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 8,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 9,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 10,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 11,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 12,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 13,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 14,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 15,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 16,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 17,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 18,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 19,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 20,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 21,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 22,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 23,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 24,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 25,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 26,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 27,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 28,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 29,
+      "records": 2,
+      "allCollected": true
+    },
+    {
+      "run": 30,
+      "records": 2,
+      "allCollected": true
+    }
+  ]
+}

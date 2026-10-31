@@ -5,6 +5,9 @@ from pathlib import Path
 import sys
 import threading
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
+
 
 def verify(native_directory):
     directory = Path(native_directory).resolve()
@@ -31,9 +34,7 @@ def verify(native_directory):
         _fields_ = [('present', integer), ('count', integer), ('items', ctypes.POINTER(pointer))]
 
     def bind(name, returns, arguments):
-        method = getattr(library, name)
-        method.restype, method.argtypes = returns, arguments
-        return method
+        return bind_utf8(library, name, returns, arguments)
 
     get = bind('rv_dom_style_property_map_read_only_get', integer, [pointer, pointer, pointer, integer, ctypes.POINTER(MaybeValue)])
     get_all = bind('rv_dom_style_property_map_read_only_get_all', integer, [pointer, pointer, pointer, integer, ctypes.POINTER(Values)])
@@ -89,7 +90,7 @@ def verify(native_directory):
         document = handle('rv_dom_node_get_owner_document', [pointer], [body], 'rv_node_release')
         css = b'.probe {width:30px; height:10px} #never {color:red}'
         markup = b'<style id="first">' + css + b'</style><style id="copy">' + css + b'</style><div id="item" class="probe"></div>'
-        call('rv_dom_element_set_inner_html', [pointer, string], body, markup)
+        call('rv_dom_element_set_inner_html', [pointer, Utf8], body, markup)
         find = bind('rv_document_get_element_by_id', pointer, [pointer, string])
         nodes = {}
         for name in ['first', 'copy', 'item']:

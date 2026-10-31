@@ -22,6 +22,11 @@
  * Strings out: a getter copies UTF-8 into a caller-owned buffer and writes the byte count, without a
  * terminator, to *length, or -1 for a null string. When capacity is below the byte count it returns
  * RV_ERR_BUFFER_TOO_SMALL with *length set and the buffer untouched.
+ *
+ * Strings in (ABI 51, breaking): every generated rv_dom_* string input carries UTF-8 bytes with an explicit byte
+ * count, so a string may hold U+0000. A plain argument is a pointer and a length, -1 for null or absent; a string
+ * inside a union or sequence is an RvDomUtf8StringSpan; a dictionary string field is an RvDomUtf8StringInput, present
+ * 0 for its default. The hand-written functions of this header take NUL-terminated UTF-8.
  */
 #pragma once
 

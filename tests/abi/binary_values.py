@@ -14,6 +14,7 @@ import time
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from form_collections import Native, Case, EntryValue, EntryValues, Entries, P, I, U, utf8, span_text
+from utf8_inputs import StringInput, string_input
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, WRONG_THREAD, BUFFER_TOO_SMALL, UNSUPPORTED, WRONG_INTERFACE = 0, -1, -2, -6, -9, -11
@@ -38,11 +39,11 @@ class Parts(ctypes.Structure):
 
 
 class BlobPropertyBag(ctypes.Structure):
-    _fields_ = [('size', U), ('type', ctypes.c_char_p), ('endings', I)]
+    _fields_ = [('size', U), ('type', StringInput), ('endings', I)]
 
 
 class FilePropertyBag(ctypes.Structure):
-    _fields_ = [('size', U), ('type', ctypes.c_char_p), ('endings', I), ('last_modified', ctypes.POINTER(L))]
+    _fields_ = [('size', U), ('type', StringInput), ('endings', I), ('last_modified', ctypes.POINTER(L))]
 
 
 def native_endings(data):
@@ -86,7 +87,7 @@ class Binary:
     def blob(self, values=(), type=None, endings=None, status=OK):
         options = None
         if type is not None or endings is not None:
-            options = BlobPropertyBag(size=ctypes.sizeof(BlobPropertyBag), type=None if type is None else type.encode('utf-8'),
+            options = BlobPropertyBag(size=ctypes.sizeof(BlobPropertyBag), type=string_input(type),
                                       endings=TRANSPARENT if endings is None else endings)
         result = P()
         actual = self.n.call('rv_dom_blob_create', [P, P, ctypes.POINTER(BlobPropertyBag), ctypes.POINTER(P)], self.document,
@@ -96,7 +97,7 @@ class Binary:
 
     def file(self, values, name, type=None, last_modified=None, endings=None):
         holder = None if last_modified is None else L(last_modified)
-        options = FilePropertyBag(size=ctypes.sizeof(FilePropertyBag), type=None if type is None else type.encode('utf-8'),
+        options = FilePropertyBag(size=ctypes.sizeof(FilePropertyBag), type=string_input(type),
                                   endings=TRANSPARENT if endings is None else endings,
                                   last_modified=None if holder is None else ctypes.pointer(holder))
         text, length = utf8(name)
@@ -356,7 +357,7 @@ def errors(native, case, b, report):
     n.expect(n.call('rv_dom_blob_create', [P, P, P, ctypes.POINTER(P)], case.document, ctypes.byref(sequence), None, ctypes.byref(P())) == NULL_ARGUMENT, 'negative byte length')
     item[0].tag = 9
     n.expect(n.call('rv_dom_blob_create', [P, P, P, ctypes.POINTER(P)], case.document, ctypes.byref(sequence), None, ctypes.byref(P())) == UNSUPPORTED, 'unknown part tag')
-    options = BlobPropertyBag(size=ctypes.sizeof(BlobPropertyBag), type=None, endings=7)
+    options = BlobPropertyBag(size=ctypes.sizeof(BlobPropertyBag), type=string_input(None), endings=7)
     n.expect(n.call('rv_dom_blob_create', [P, P, ctypes.POINTER(BlobPropertyBag), ctypes.POINTER(P)], case.document, None, ctypes.byref(options), ctypes.byref(P())) == UNSUPPORTED, 'endings out of range')
     outcome = {}
 

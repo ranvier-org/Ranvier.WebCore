@@ -203,7 +203,7 @@ class InterfaceEmitter:
             signature = f'    abstract member {identifier(member.name)}: {result} with {access}'
             if not needs_adapter:
                 source = self.sources.get(owner, owner)
-                if setter and self.world.resolve(member.type).name == 'USVString' and self.world.config.get('interfaceStringInputs', {}).get(source) == 'utf8-lengths':
+                if setter and self.world.resolve(member.type).name == 'USVString' and source in self.world.config.get('browserWellFormedSetters', []):
                     expression = '$0.' + member.name + "{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}"
                     return [''] + lines + ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif', signature, '']
                 if getter and not setter and self.world.resolve(member.type).name in WIDE_INTEGERS:
@@ -305,7 +305,7 @@ class InterfaceEmitter:
         if not self.adapters:
             return []
         lines = ['', '#if FABLE_COMPILER', '[<AutoOpen>]', 'module BrowserUnionAdapters =']
-        span_unions = set(self.world.config.get('complexStringSpans', []))
+        span_unions = set(self.world.config.get('browserWellFormedUnions', []))
         reference_unions = span_unions | set(self.world.config.get('validatedReferenceUnions', []))
         if any(self.world.resolve(child).name == 'undefined' for children in self.unions.values() for child in children):
             lines += ['    [<Fable.Core.Emit("$0 === undefined")>]',
