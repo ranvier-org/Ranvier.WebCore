@@ -1166,7 +1166,7 @@ module Raw =
     extern int rv_text_segment(
         int granularity,
         [<MarshalAs(UnmanagedType.LPUTF8Str)>] string locale,
-        [<In>] char[] text,
+        [<In>] uint16[] text,
         int length,
         TextSegments& result
     )
@@ -3867,7 +3867,7 @@ let rv_file_list_create (files: nativeint[], count: int, result: nativeint[]) : 
     else
         Raw.rv_file_list_create (files, count, result)
 
-let rv_text_segment (granularity: int, locale: string, text: char[], length: int, result: byref<TextSegments>) : int =
+let rv_text_segment (granularity: int, locale: string, text: uint16[], length: int, result: byref<TextSegments>) : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_text_segment (granularity, locale, text, length, &result)

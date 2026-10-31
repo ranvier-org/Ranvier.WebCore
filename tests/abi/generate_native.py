@@ -119,7 +119,7 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
     if ctype == "const RvEventInit*":
         return "EventInit&", ""
     if ctype == "const uint16_t*":
-        return "char[]", "[<In>] "
+        return "uint16[]", "[<In>] "
     if ctype == "RvTextSegments*":
         return "TextSegments&", ""
     if ctype == "void**":
