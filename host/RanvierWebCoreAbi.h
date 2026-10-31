@@ -2492,7 +2492,7 @@ RV_EXPORT int32_t rv_element_request_pointer_lock(RvNode* element, int32_t unadj
 /* Document.exitPointerLock: pointerlockchange on the next rv_run_loop_cycle when the document holds the lock. */
 RV_EXPORT int32_t rv_document_exit_pointer_lock(RvNode* document);
 
-/* v55: "canvas-pixels" for rv_abi_has: ImageData construction and pixel bytes without JavaScript. RvImageData is the
+/* v58: "canvas-pixels" for rv_abi_has: ImageData construction and pixel bytes without JavaScript. RvImageData is the
  * generated ImageData handle, released with rv_dom_image_data_release; RanvierWebCoreDom.h holds its generated members
  * and the generated createImageData, getImageData, putImageData and drawImage of CanvasRenderingContext2D. */
 typedef struct RvImageData RvImageData;
@@ -2528,7 +2528,7 @@ RV_EXPORT int32_t rv_image_data_read(RvImageData* data, int64_t offset, uint8_t*
  * and returns RV_ERR_DOM_EXCEPTION with a RangeError; detached data returns an InvalidStateError. */
 RV_EXPORT int32_t rv_image_data_write(RvImageData* data, int64_t offset, const uint8_t* bytes, int64_t length);
 
-/* v55: "canvas-export" for rv_abi_has: HTMLCanvasElement.toBlob and toDataURL through the shared RV_IMAGE_ENCODING_*
+/* v58: "canvas-export" for rv_abi_has: HTMLCanvasElement.toBlob and toDataURL through the shared RV_IMAGE_ENCODING_*
  * encoders, and the bitmaprenderer context. RanvierWebCoreDom.h holds the generated ImageBitmapRenderingContext and
  * ImageBitmap members. encoding is PNG, JPEG or WEBP and quality follows the RV_IMAGE_ENCODING_* contract. An encoding
  * the engine cannot encode on this flavor, RGBA8 and an unknown value return RV_ERR_UNSUPPORTED: a browser falls back
@@ -2551,7 +2551,7 @@ RV_EXPORT int32_t rv_canvas_to_blob(RvNode* canvas, int32_t encoding, double qua
  * first call. RV_OK with *context NULL means the canvas already has a context of another type. */
 RV_EXPORT int32_t rv_canvas_get_bitmap_context(RvNode* canvas, RvImageBitmapRenderingContext** context);
 
-/* v55: "image-bitmaps" for rv_abi_has: createImageBitmap without JavaScript. */
+/* v58: "image-bitmaps" for rv_abi_has: createImageBitmap without JavaScript. */
 enum {
     RV_IMAGE_BITMAP_SOURCE_NODE = 0, /* RvNode*: an <img>, an SVG <image> or a <canvas> */
     RV_IMAGE_BITMAP_SOURCE_BITMAP = 1, /* RvImageBitmap* */

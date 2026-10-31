@@ -15,7 +15,7 @@ import zlib
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
 
-ABI = 55
+ABI = 58
 OK, NULL_ARGUMENT, DOM_EXCEPTION, UNSUPPORTED, WRONG_INTERFACE = 0, -1, -3, -9, -11
 TWO_D = 1
 SRGB, DISPLAY_P3 = 0, 1

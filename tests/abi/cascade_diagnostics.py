@@ -20,7 +20,7 @@ from svg_paint_probe import SvgProbe
 from utf8_inputs import Utf8
 
 OK, NULL_ARGUMENT, WRONG_THREAD, NOT_ELEMENT, BUFFER_TOO_SMALL, UNSUPPORTED = 0, -1, -2, -4, -6, -9
-ABI = 57
+ABI = 58
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 MATCHED_RULES, CASCADE = 2, 3
 ORIGINS = {'user-agent': 0, 'user': 1, 'author': 2, 'inline': 3, 'presentational-hint': 4}

@@ -21,7 +21,7 @@ from form_collections import Native, P, I, Utf8
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, WRONG_THREAD, DOM_EXCEPTION, NOT_ELEMENT, UNSUPPORTED, DETACHED, WRONG_HOST = 0, -1, -2, -3, -4, -9, -10, -12
-ABI = 57
+ABI = 58
 D = ctypes.c_double
 RECT_TOLERANCE, RATIO_TOLERANCE, TIME_TOLERANCE = 0.01, 0.001, 0.001
 
