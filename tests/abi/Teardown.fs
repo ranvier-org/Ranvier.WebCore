@@ -685,6 +685,30 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
                 rv_dom_file_list_release list[0]
                 rv_dom_blob_release file
                 rv_dom_blob_release held.Value
+        | "resize entries" ->
+            // A resize observer released with a notification pending: nothing is delivered after release, through
+            // rv_host_destroy, and the released observer keeps neither the target nor the document.
+            let mutable delivered = 0
+            let callback = ResizeEntriesCallback(fun _ _ _ count -> delivered <- delivered + count)
+            let pointer = Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate callback
+            let observer = rv_host_observe_resize_entries (host, pointer, 0n)
+
+            if observer = 0n then
+                failwith "rv_host_observe_resize_entries"
+
+            rv_observer_observe_box (observer, div, 1) |> check "observe border box"
+            rv_host_update host |> check "update"
+            rv_element_set_style (div, "width", "33px", 0) |> check "resize"
+            rv_observer_release observer
+            rv_host_update host |> check "update after release"
+            held.Value <- rv_node_retain div
+
+            fun () ->
+                if delivered <> 1 then
+                    failwithf "resize entries delivered: %d" delivered
+
+                GC.KeepAlive callback
+                rv_node_release held.Value
         | "blob reads" ->
             // A FileReader and an engine read in flight, and a revoked object URL, when the host is destroyed.
             let data = Array.zeroCreate<byte> (1 <<< 20)
@@ -1203,6 +1227,7 @@ let run (outDir: string) =
                     "error event"
                     "blob slice"
                     "blob reads"
+                    "resize entries"
                     "caret position"
                     "crypto"
                     "diagnostics"
