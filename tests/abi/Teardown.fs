@@ -274,6 +274,24 @@ let private svgPaintHandles (replace: bool) (host: nativeint) (_: nativeint) (_:
 
     gradient
 
+/// Creates a tree walker or node iterator over target with a host NodeFilter, and returns it with a weak reference
+/// to the filter's managed function. The function lives only in the native filter, outside the caller's frame.
+[<System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)>]
+let private hostFilterTraversal (kind: string) (document: nativeint) (target: nativeint) =
+    let owner = obj ()
+    let filter = fun (_: nativeint) -> (if isNull owner then Traversal.FilterResult.Skip else Traversal.FilterResult.Accept)
+    use handle = Traversal.NodeFilter.Create(target, filter)
+    let mutable traversal = 0n
+
+    if kind = "tree walker" then
+        rv_dom_document_create_tree_walker (document, target, 0xFFFFFFFFu, handle.Handle, &traversal)
+        |> check "create_tree_walker"
+    else
+        rv_dom_document_create_node_iterator (document, target, 0xFFFFFFFFu, handle.Handle, &traversal)
+        |> check "create_node_iterator"
+
+    traversal, WeakReference filter
+
 /// Appends a div with a child span, takes one extra handle of the kind from the div (removing the div first when
 /// <c>remove</c> is set), destroys the host, then releases that handle. The document and the div must be destroyed
 /// after collection whatever the destroy order.
@@ -298,17 +316,8 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
             fun () -> rv_dom_dom_string_map_release held.Value
         | "tree walker"
         | "node iterator" ->
-            // A host NodeFilter whose managed function must be released with the traversal, after host destroy.
-            let filter = fun (_: nativeint) -> Traversal.FilterResult.Accept
-            let weak = WeakReference filter
-            use handle = Traversal.NodeFilter.Create(div, filter)
-
-            if kind = "tree walker" then
-                rv_dom_document_create_tree_walker (document, div, 0xFFFFFFFFu, handle.Handle, &held.contents)
-                |> check "create_tree_walker"
-            else
-                rv_dom_document_create_node_iterator (document, div, 0xFFFFFFFFu, handle.Handle, &held.contents)
-                |> check "create_node_iterator"
+            let traversal, weak = hostFilterTraversal kind document div
+            held.Value <- traversal
 
             fun () ->
                 if kind = "tree walker" then

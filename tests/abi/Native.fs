@@ -1091,7 +1091,7 @@ module Raw =
     extern nativeint rv_event_target_as_node(nativeint value)
 
     [<DllImport(Lib)>]
-    extern int rv_event_target_equals(nativeint value, nativeint value)
+    extern int rv_event_target_equals(nativeint left, nativeint right)
 
     [<DllImport(Lib)>]
     extern nativeint rv_event_target_add_listener(
@@ -3628,17 +3628,17 @@ let rv_event_target_as_node (value: nativeint) : nativeint =
     else
         Raw.rv_event_target_as_node (value)
 
-let rv_event_target_equals (value: nativeint, value: nativeint) : int =
+let rv_event_target_equals (left: nativeint, right: nativeint) : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_event_target_equals (value, value)
+        let result = Raw.rv_event_target_equals (left, right)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[202] <- Calls.Counts[202] + 1L
         Calls.Ticks[202] <- Calls.Ticks[202] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_event_target_equals (value, value)
+        Raw.rv_event_target_equals (left, right)
 
 let rv_event_target_add_listener
     (value: nativeint, ``type``: string, flags: int, callback: nativeint, context: nativeint)
