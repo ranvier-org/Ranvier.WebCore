@@ -58,7 +58,7 @@ The regression first failed at the missing specialized retained-result path. All
 
 ## Native17 producer verification
 
-The selected surface now contains 153 interfaces, 1,926 functions, 24 handle roots and 21 dictionaries, with no stubs. Native17 uses ABI25. The final private Windows batch passed 6,384 assertions across 19 raw API probes, the full ABI driver and 42 final teardown cases. The transform fixture contributes 405 assertions, including typed-map assignment and actual element geometry. [The evidence manifest](css-transforms-evidence/evidence.json) records executed runtime hashes, source hashes and individual log hashes. Immediate engine references can survive until collection; final expiry is the checked teardown requirement.
+The selected surface now contains 153 interfaces, 1,926 functions, 24 handle roots and 21 dictionaries, with no stubs. Native17 uses ABI25. The final private Windows batch passed 6,384 assertions across 19 raw API probes, the full ABI driver and 42 final teardown cases. The transform fixture contributes 405 assertions, including typed-map assignment and actual element geometry. The evidence manifest, `css-transforms-evidence/evidence.json`, records executed runtime hashes, source hashes and individual log hashes. Immediate engine references can survive until collection; final expiry is the checked teardown requirement.
 
 Native regressions reproduced invalid translate/scale setter acceptance, matrix aliasing and incorrect matrix flags. Scoped input validation checks dimensions before mutation. Patch 0022 makes matrix conversion return an independent matrix with the component's flag, including perspective-none. No engine mathematics or class signatures were replaced.
 
