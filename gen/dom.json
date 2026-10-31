@@ -9,6 +9,9 @@
     "in gen/dom-report.txt.",
     "callbackObjectRoots lists callback interfaces passed as refcounted object handles; contract names the shared",
     "contract's function type, and resultEnum the integer enumeration it returns.",
+    "typedArrayViewTypes lists the IDL types passed as an in/out typed array: an element kind, a writable buffer and its",
+    "byte length; only a [ReturnValue] argument maps. windowObjectBindings binds the operations of the object a readonly",
+    "Window attribute (accessor) holds, called through the Window of a checked Document.",
     "eventTargetObjects lists interfaces derived directly from EventTarget whose handles are RvEventTarget references; attached is the C++ condition under which their members answer, else RV_ERR_DETACHED."
   ],
   "attributeBridges": {
@@ -956,6 +959,21 @@
   "byteSpanTypes": [
     "BufferSource"
   ],
+  "typedArrayViewTypes": [
+    "ArrayBufferView"
+  ],
+  "windowObjectBindings": {
+    "Crypto": {
+      "receiver": "Document",
+      "accessor": "crypto",
+      "members": [
+        "getRandomValues",
+        "randomUUID"
+      ],
+      "feature": "dom-crypto-random",
+      "stringInputs": "utf8-lengths"
+    }
+  },
   "creationGatedInterfaces": {
     "CaretPosition": "Document.caretPositionFromPoint",
     "VisualViewport": "DOMWindow.visualViewport"

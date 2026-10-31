@@ -1,0 +1,19 @@
+{
+  "runtime": "C:/wk/native-binary/artifacts/native31-frozen/runtimes/win-x64/native",
+  "abiVersion": 39,
+  "exports": {
+    "rv_dom_crypto_get_random_values": false,
+    "rv_dom_crypto_random_uuid": false,
+    "rv_dom_window_get_crypto": false,
+    "rv_dom_crypto_get_subtle": false,
+    "rv_dom_subtle_crypto_digest": false,
+    "rv_crypto_digest": false
+  },
+  "exportsPresent": 0,
+  "features": {
+    "dom-crypto-random": 0,
+    "dom:Crypto": 0,
+    "dom:SubtleCrypto": 0,
+    "dom-crypto-subtle": 0
+  }
+}

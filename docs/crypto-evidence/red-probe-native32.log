@@ -1,0 +1,13 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+Traceback (most recent call last):
+  File "C:\wk\native-crypto\tests\abi\crypto_random.py", line 207, in <module>
+    main()
+    ~~~~^^
+  File "C:\wk\native-crypto\tests\abi\crypto_random.py", line 200, in main
+    report = verify(args.native_directory)
+  File "C:\wk\native-crypto\tests\abi\crypto_random.py", line 180, in verify
+    native.expect(native.bind('rv_abi_has', I, [ctypes.c_char_p])(FEATURE.encode()) == 1, FEATURE + ' advertised')
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-crypto\tests\abi\form_collections.py", line 86, in expect
+    raise AssertionError(label)
+AssertionError: dom-crypto-random advertised
