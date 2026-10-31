@@ -336,6 +336,12 @@ Typed transform conversion returns a new matrix whose is2D flag matches the comp
 
 `tests/abi/css_transforms.py` checks repeated conversion identity, mutation isolation, forced-3D options and perspective-none component/list flags. The initial native probe reproduces all these failures before the repair.
 
+## 0034-svg-string-list-null-attribute
+
+Removing `requiredExtensions` or `systemLanguage` empties the element's SVGStringList: both setters clear the list and return for a null attribute value, so the list reports `numberOfItems` 0, keeps its identity, and the element passes SVGTests conditional processing again, inside and outside `<switch>`, as in SVG 2 and Chromium. A present empty attribute keeps WebKit's single empty item.
+
+`tests/abi/svg_tests_lists.py` compares removal, empty, restore, clear and append steps with the Chromium 156 oracle `tests/fixtures/svg-tests-lists-oracle.json` (`tests/abi/svg_tests_lists_browser.mjs`). Measured differences that remain: `clear()` leaves the attribute `""` where Chromium removes it, `systemLanguage` serialises with `", "`, and `requiredExtensions=""` holds one empty item. Evidence: `docs/mathml-evidence/source-0034/evidence.json`.
+
 ## Working on the series
 
 ```
