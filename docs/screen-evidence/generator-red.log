@@ -1,0 +1,60 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+E.....E
+======================================================================
+ERROR: test_a_dotted_accessor_reaches_a_nested_object_and_keeps_its_setting_gate (__main__.GeneratorTests.test_a_dotted_accessor_reaches_a_nested_object_and_keeps_its_setting_gate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\wk\native-screen\tests\generator\test_domgen.py", line 1380, in test_a_dotted_accessor_reaches_a_nested_object_and_keeps_its_setting_gate
+    generator = self.screen_generator()
+  File "C:\wk\native-screen\tests\generator\test_domgen.py", line 1360, in screen_generator
+    return self.window_object_generator(self.CRYPTO + self.SCREEN, **{'windowObjectBindings': {
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        'Screen': {'receiver': 'Document', 'accessor': 'screen', 'members': ['width', 'colorDepth', 'pixelDepth'],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   'feature': 'dom-screen', 'stringInputs': 'utf8-lengths'},
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        'ScreenOrientation': {'receiver': 'Document', 'accessor': 'screen.orientation', 'members': ['type', 'angle'],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                              'feature': 'dom-screen-orientation', 'stringInputs': 'utf8-lengths'}}, **overrides})
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-screen\tests\generator\test_domgen.py", line 1296, in window_object_generator
+    generator.run()
+    ~~~~~~~~~~~~~^^
+  File "C:\wk\native-screen\gen\domgen.py", line 626, in run
+    self.window_object_context(name, binding)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "C:\wk\native-screen\gen\domgen.py", line 760, in window_object_context
+    raise SystemExit(f'{name}.{member.name}: {reason or "configured member is not an operation"}')
+SystemExit: Screen.width: configured member is not an operation
+
+======================================================================
+ERROR: test_window_object_bindings_read_readonly_attributes_through_the_accessor (__main__.GeneratorTests.test_window_object_bindings_read_readonly_attributes_through_the_accessor)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\wk\native-screen\tests\generator\test_domgen.py", line 1367, in test_window_object_bindings_read_readonly_attributes_through_the_accessor
+    generator = self.screen_generator()
+  File "C:\wk\native-screen\tests\generator\test_domgen.py", line 1360, in screen_generator
+    return self.window_object_generator(self.CRYPTO + self.SCREEN, **{'windowObjectBindings': {
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        'Screen': {'receiver': 'Document', 'accessor': 'screen', 'members': ['width', 'colorDepth', 'pixelDepth'],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   'feature': 'dom-screen', 'stringInputs': 'utf8-lengths'},
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        'ScreenOrientation': {'receiver': 'Document', 'accessor': 'screen.orientation', 'members': ['type', 'angle'],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                              'feature': 'dom-screen-orientation', 'stringInputs': 'utf8-lengths'}}, **overrides})
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-screen\tests\generator\test_domgen.py", line 1296, in window_object_generator
+    generator.run()
+    ~~~~~~~~~~~~~^^
+  File "C:\wk\native-screen\gen\domgen.py", line 626, in run
+    self.window_object_context(name, binding)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "C:\wk\native-screen\gen\domgen.py", line 760, in window_object_context
+    raise SystemExit(f'{name}.{member.name}: {reason or "configured member is not an operation"}')
+SystemExit: Screen.width: configured member is not an operation
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.245s
+
+FAILED (errors=2)

@@ -1,0 +1,437 @@
+{
+  "group": [
+    "G04 #49"
+  ],
+  "native": "0.1.0-preview.38",
+  "abi": 46,
+  "features": [
+    "screen",
+    "dom-screen",
+    "dom-screen-orientation"
+  ],
+  "members": [
+    "rv_host_set_screen (RvScreenMetrics: size, work area, color depth, orientation)",
+    "Screen width/height/availLeft/availTop/availWidth/availHeight/colorDepth/pixelDepth (Window.screen)",
+    "ScreenOrientation type/angle (Window.screen.orientation, ScreenOrientationAPIEnabled on)"
+  ],
+  "excluded": [
+    "ScreenOrientation.lock/unlock and onchange as native exports: locking stays off (Unsupported); changes are delivered by the Views provider after SetScreen/Resize"
+  ],
+  "sourceHeadOfBatch": "ed56af20f5bf3325af2c91a1e09d6f2a017b740d",
+  "sourcePatches": {
+    "list": [
+      "0035 (G09 native32-candidate-3 UnifiedSource-dom-7, reused)",
+      "0037 (recompiled)",
+      "0038 (recompiled)"
+    ],
+    "recompiled0037And0038": [
+      "0037-frame-loader-client-form-submission-hook.patch",
+      "0038-platform-screen-win-embedder-screen-data.patch"
+    ],
+    "recompiledUnits": 33
+  },
+  "patch0038": {
+    "sha256": "edd1af84fafbc5ce7ac74cd16263799445405d638af46e859f892eacf56da8bd",
+    "files": [
+      "Source/WebCore/platform/PlatformScreen.cpp",
+      "Source/WebCore/platform/win/PlatformScreenWin.cpp"
+    ]
+  },
+  "red": {
+    "windowsMonitorLeak": {
+      "engine": {
+        "width": 1920,
+        "height": 1080,
+        "avail_left": 0,
+        "avail_top": 24,
+        "avail_width": 1920,
+        "avail_height": 1008,
+        "color_depth": 24,
+        "orientationTypeStatus": -9
+      },
+      "primaryMonitor": {
+        "width": 1920,
+        "height": 1080,
+        "avail_left": 0,
+        "avail_top": 24,
+        "avail_width": 1920,
+        "avail_height": 1008,
+        "color_depth": 24
+      },
+      "engineEqualsHostSize": false
+    },
+    "noPlatformScreenOnWindows": "red-link-no-platformscreen.log (updateSingletonProperties undefined at host link)",
+    "generator": "generator-red.log",
+    "chromium": "chromium-red.json"
+  },
+  "greenBefore0038Applied": {
+    "candidate": "native38-candidate-4 (mirror sources)",
+    "default": {
+      "created": {
+        "width": 320,
+        "height": 200,
+        "avail_left": 0,
+        "avail_top": 0,
+        "avail_width": 320,
+        "avail_height": 200,
+        "color_depth": 24,
+        "pixel_depth": 24,
+        "type": "landscape-primary",
+        "angle": 0
+      },
+      "resized": {
+        "width": 300,
+        "height": 500,
+        "avail_left": 0,
+        "avail_top": 0,
+        "avail_width": 300,
+        "avail_height": 500,
+        "color_depth": 24,
+        "pixel_depth": 24,
+        "type": "portrait-primary",
+        "angle": 90
+      }
+    }
+  },
+  "green": {
+    "screenMetricsAssertions": 222,
+    "repeat30": "screen_metrics repeat30 on native38-frozen-7 (candidate-7, head ed56af2): 30/30 PASS 222 assertions",
+    "probes": 52,
+    "allExitZero": true,
+    "rawAssertions": 73447,
+    "newProbes": [
+      "screen_metrics"
+    ],
+    "probesRun": [
+      {
+        "name": "css_supports",
+        "exitCode": 0,
+        "assertions": 72
+      },
+      {
+        "name": "computed_style",
+        "exitCode": 0,
+        "assertions": 93
+      },
+      {
+        "name": "fragment_rectangles",
+        "exitCode": 0,
+        "assertions": 140
+      },
+      {
+        "name": "table_surface",
+        "exitCode": 0,
+        "assertions": 44
+      },
+      {
+        "name": "element_reflection",
+        "exitCode": 0,
+        "assertions": 269
+      },
+      {
+        "name": "area_surface",
+        "exitCode": 0,
+        "assertions": 117
+      },
+      {
+        "name": "cssom_surface",
+        "exitCode": 0,
+        "assertions": 407
+      },
+      {
+        "name": "keyframe_rules",
+        "exitCode": 0,
+        "assertions": 93
+      },
+      {
+        "name": "counter_style_rules",
+        "exitCode": 0,
+        "assertions": 86
+      },
+      {
+        "name": "detached_cssom_context",
+        "exitCode": 0,
+        "assertions": 389
+      },
+      {
+        "name": "svg_mathml_surface",
+        "exitCode": 0,
+        "assertions": 95
+      },
+      {
+        "name": "style_property_maps",
+        "exitCode": 0,
+        "assertions": 189
+      },
+      {
+        "name": "declared_style_maps",
+        "exitCode": 0,
+        "assertions": 2069
+      },
+      {
+        "name": "style_map_entries",
+        "exitCode": 0,
+        "assertions": 144
+      },
+      {
+        "name": "typed_style_values",
+        "exitCode": 0,
+        "assertions": 190
+      },
+      {
+        "name": "custom_properties",
+        "exitCode": 0,
+        "assertions": 231
+      },
+      {
+        "name": "geometry_values",
+        "exitCode": 0,
+        "assertions": 260
+      },
+      {
+        "name": "matrix_values",
+        "exitCode": 0,
+        "assertions": 1091
+      },
+      {
+        "name": "css_transforms",
+        "exitCode": 0,
+        "assertions": 405
+      },
+      {
+        "name": "svg_geometry",
+        "exitCode": 0,
+        "assertions": 639
+      },
+      {
+        "name": "svg_surfaces",
+        "exitCode": 0,
+        "assertions": 1594
+      },
+      {
+        "name": "svg_documents",
+        "exitCode": 0,
+        "assertions": 78
+      },
+      {
+        "name": "svg_view_controls",
+        "exitCode": 0,
+        "assertions": 318
+      },
+      {
+        "name": "svg_animation_variants",
+        "exitCode": 0,
+        "assertions": 70
+      },
+      {
+        "name": "capabilities",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "svg_view_selection",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "svg_paint_servers",
+        "exitCode": 0,
+        "assertions": 565
+      },
+      {
+        "name": "svg_filters",
+        "exitCode": 0,
+        "assertions": 9086
+      },
+      {
+        "name": "svg_clip_mask_marker",
+        "exitCode": 0,
+        "assertions": 565
+      },
+      {
+        "name": "svg_resources",
+        "exitCode": 0,
+        "assertions": 454
+      },
+      {
+        "name": "mathml_surface",
+        "exitCode": 0,
+        "assertions": 371
+      },
+      {
+        "name": "svg_tests_lists",
+        "exitCode": 0,
+        "assertions": 191
+      },
+      {
+        "name": "image_decode",
+        "exitCode": 0,
+        "assertions": 73
+      },
+      {
+        "name": "font_load",
+        "exitCode": 0,
+        "assertions": 42
+      },
+      {
+        "name": "event_construction",
+        "exitCode": 0,
+        "assertions": 82
+      },
+      {
+        "name": "tree_traversal",
+        "exitCode": 0,
+        "assertions": 22285
+      },
+      {
+        "name": "focus_input",
+        "exitCode": 0,
+        "assertions": 80
+      },
+      {
+        "name": "viewport_events",
+        "exitCode": 0,
+        "assertions": 364
+      },
+      {
+        "name": "form_collections",
+        "exitCode": 0,
+        "assertions": 1168
+      },
+      {
+        "name": "form_navigation",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "viewport_scroll",
+        "exitCode": 0,
+        "assertions": 3232
+      },
+      {
+        "name": "dialog_popover",
+        "exitCode": 0,
+        "assertions": 845
+      },
+      {
+        "name": "binary_values",
+        "exitCode": 0,
+        "assertions": 446
+      },
+      {
+        "name": "caret_hit",
+        "exitCode": 0,
+        "assertions": 18251
+      },
+      {
+        "name": "url_values",
+        "exitCode": 0,
+        "assertions": 3538
+      },
+      {
+        "name": "url_wpt",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "form_submission",
+        "exitCode": 0,
+        "assertions": 418
+      },
+      {
+        "name": "text_segmentation",
+        "exitCode": 0,
+        "assertions": 812
+      },
+      {
+        "name": "crypto_random",
+        "exitCode": 0,
+        "assertions": 275
+      },
+      {
+        "name": "visual_viewport",
+        "exitCode": 0,
+        "assertions": 987
+      },
+      {
+        "name": "screen_metrics",
+        "exitCode": 0,
+        "assertions": 222
+      },
+      {
+        "name": "abi_layouts",
+        "exitCode": 0,
+        "assertions": 12
+      },
+      {
+        "name": "frames",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "teardown",
+        "exitCode": 0,
+        "assertions": null
+      }
+    ],
+    "teardownCases": 90,
+    "teardownCasesAdded": 2,
+    "teardownAllCollected": true
+  },
+  "chromiumOracle": {
+    "browser": "156.0.8078.4",
+    "cases": 4,
+    "lock": {
+      "resolved": true,
+      "type": "portrait-secondary"
+    }
+  },
+  "defaultScreen": "every RID: the host size in CSS pixels, all of it available, depth 24, landscape-primary unless taller than wide; follows rv_host_resize until rv_host_set_screen (the host publishes it through PlatformScreen, which 0038 makes Windows read; WPE and Mac read it already)",
+  "qualifications": [
+    {
+      "name": "orientation lock",
+      "reason": "native locking stays off and reads Unsupported; Chromium headless resolves lock(portrait) without changing the type (oracle lock field)"
+    },
+    {
+      "name": "angle",
+      "reason": "the angle follows from the type on the natural landscape orientation (WebKit table); the app sets the type"
+    },
+    {
+      "name": "event order",
+      "reason": "the order of orientation change and resize events is never asserted"
+    },
+    {
+      "name": "detached document",
+      "reason": "a document kept past rv_host_destroy has no frame, and its Screen reports 0"
+    },
+    {
+      "name": "browser size-only change",
+      "reason": "Chromium fires no event for a screen size change without an orientation or viewport change, so the browser provider delivers changes it can observe"
+    }
+  ],
+  "files": {
+    "0038-proposed.diff": "edd1af84fafbc5ce7ac74cd16263799445405d638af46e859f892eacf56da8bd",
+    "absence_g04.py": "f7c09d0bda19d4448ef2a366aca133f3a36f11c04ccd3c29f08bcb6fca4f8e9a",
+    "allocation-absence.json": "160e2b43e45f81f669dc8d80d22f47dd4c7961c98d3f86132c40c37013e1ff72",
+    "batch-green.json": "770ef6055739532558c09df634beacbcf01ccb7220927615b2cb162b583fa26f",
+    "build_native38_candidate.py": "6ce189b131433b7cb817660c10caa06e4aabea4c9b25173220f71912984d72fb",
+    "chromium-red.json": "4114a14e127555a9daf11ee8d57d22b693a5f0869a0874864c60314707644437",
+    "generator-red.log": "359091561009349ddb0ff2dd794a1fe71ce546f265db164bbfe648e4e11aa2e1",
+    "green-0038-candidate4.json": "86f6f7b69a39e4105c959ae7b625cd0ec45bc216d3b94eec7f7e5987f109ea30",
+    "green-0038-default.json": "9fd990b569b8636712b116f5ee18a56cb6d5ede52459af65d59d116fd4880618",
+    "make_native38_evidence.py": "26e626ed316bd26ed8c1c5ae2bd3a3463b8bdaee4ac4c2d19d2e640f8f42e5d3",
+    "measure_screen_red.py": "809495f1ab142b4f1b464ca82b083b695383bfbeacd9df0944bd2dba78b7461b",
+    "red-link-no-platformscreen.log": "ffb1060093c467e09e327d4d6e4b8256769167622ec96283b0d93b0390e3fcae",
+    "red-no-0038.json": "814e4cefebde783c42f839929ed72e0b31b13e05a98e251863c3989123dd331d",
+    "replacement-objects.json": "d9a881fd5c263e951926d8612cbb17319a0f37e3397867cb5bb1b6f832f46a23",
+    "run_native38_full_batch.py": "59e4a082fe7fccd0cc933e5c853c181fa57580b93bdc6a32bfc94bb722c5f2df",
+    "runtime-receipt.json": "3c0d18e017ce6eb938a290fdc0b1e40cfe6c8762f9c357ce7cc0c179fbbdc533",
+    "screen-metrics-probe.log": "27642eba19e4eb2c3a1f69ecd1f8d8060a0f90756c99b597516e6b60ec570a86",
+    "screen-red-browser.mjs": "c59e2614edde39d8dcc6af58c3cad178901af96fd170f3929b41e520cce27752",
+    "screen-repeat30-candidate4.txt": "bfd23d1bbb6b2881ab8e3626f5091fb71937e915f0de6f2de46f5d61e2700698",
+    "screen-repeat30.txt": "4255422739048fb9ad8fa465ffcd634d88696f8dacda21b10487b12efef230d3",
+    "source-patches-candidate4.json": "c122cb2104d8caba55ccb9a6d00587f0f355c91d3347037bc5482071b4579341",
+    "source-patches.json": "9e20b94099936798b0bf399726e512dc45a4643fbaccf4f0afac3f934d9c4683",
+    "teardown-probes.json": "dcfd2e8b414e5a6bff6b7ab9b25d6cfb4c7a950525c65b293d663c7d3aeab6a2"
+  }
+}
