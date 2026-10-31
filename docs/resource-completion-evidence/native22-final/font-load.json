@@ -1,0 +1,40 @@
+{
+  "assertions": 42,
+  "cases": {
+    "fallbackWidth": 57.7734375,
+    "ahem": [
+      [
+        1,
+        0,
+        0,
+        0
+      ]
+    ],
+    "ahemWidth": 80.0,
+    "afterReleaseWidth": 57.7734375,
+    "malformed": [
+      [
+        2,
+        2,
+        0,
+        0
+      ]
+    ],
+    "empty": [
+      [
+        3,
+        2,
+        0,
+        0
+      ]
+    ],
+    "cancel": [
+      [
+        4,
+        0,
+        0,
+        0
+      ]
+    ]
+  }
+}
