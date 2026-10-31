@@ -173,12 +173,14 @@ S11 focused checkpoint (Native20-merged private candidate): the 11 content/reuse
 
 **Files:** final plan/scope/evidence, generated checks, `scripts/abi_tests.py`, `.github/workflows/build.yml`, allocation/version files only after approval.
 
-- [ ] Forward-merge final H07 Native20 into this branch and resolve only owned production files. Preserve all Native19 source patches/DOM functions and H07 capability contracts; root owns any shared Source changes.
-- [ ] Obtain fresh allocation proof and coordinator approval; then set the actual final version/ABI and affected version probes. Never move an existing tag or infer managed/native version equality.
-- [ ] Freeze exact source/fixtures/canonical/model hashes. Compile private replacement objects and link a coherent runtime, checking borrowed/cached object mtimes.
-- [ ] Batch the complete affected native surface/callback/frame/teardown regressions once source is stable; retain each actual exit code, exact executed source snapshot, raw log digest and all shipping DLL hashes. Run generator/.NET/Fable checks and actual browser fixtures; new consumer JIT/AOT/platform/official gates remain separate.
+- [x] Forward-merge final H07 Native20 into this branch and resolve only owned production files. Preserve all Native19 source patches/DOM functions and H07 capability contracts; root owns any shared Source changes.
+- [x] Obtain fresh allocation proof and coordinator approval; then set the actual final version/ABI and affected version probes. Never move an existing tag or infer managed/native version equality.
+- [x] Freeze exact source/fixtures/canonical/model hashes. Compile private replacement objects and link a coherent runtime, checking borrowed/cached object mtimes.
+- [x] Batch the complete affected native surface/callback/frame/teardown regressions once source is stable; retain each actual exit code, exact executed source snapshot, raw log digest and all shipping DLL hashes. Run generator/.NET/Fable checks and actual browser fixtures; new consumer JIT/AOT/platform/official gates remain separate.
 - [ ] Request the existing independent acceptance lane's bounded audit, fix findings and repeat only checks affected by a real change.
 - [ ] Commit via a message file/coauthor footer, push and open an attached conventional stacked PR on Native20, add project tracking and hand exact HEAD/run IDs to the sole release/CI owner. Keep issues85–88 open until their complete shared/platform/official acceptance is proven.
+
+Final producer: Native20 head 4e7d904 (with Native19 1d97ac4) is forward-merged; Native21/ABI29 is allocated on the approved absence receipt. The private win-x64 runtime (Host c7497f6a, WebCore 6b61b6a3, JSC 95149cdc) passes 32 runs: 26,701 raw assertions across 30 probes, full frames and 42 teardown cases, plus ten repository gates (`svg-paint-evidence/native21-final/final-evidence.json`). The S08-S11 probes run in the slim CI jobs. Independent acceptance audit, official multi-RID CI/packages and consumers remain pending.
 
 ## Coordinator review checkpoint
 

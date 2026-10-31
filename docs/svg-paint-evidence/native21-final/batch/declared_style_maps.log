@@ -1,0 +1,13 @@
+PASS declared COW case: setProperty
+PASS declared COW case: setShorthandProperty
+PASS declared COW case: setCustomProperty
+PASS declared COW case: removeProperty
+PASS declared COW case: removeCustomProperty
+PASS declared COW case: clear
+PASS declared COW case: custom-important
+PASS declared COW case: inline-custom-important
+PASS declared COW case: expired-weak-owner
+PASS declared typed style maps: 2069 assertions; six fresh-pair mutators; retained handles released
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+
+EXIT_CODE=0

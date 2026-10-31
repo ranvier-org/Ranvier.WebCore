@@ -1,0 +1,4 @@
+PASS custom property registration: 231 assertions; retained handles released
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+
+EXIT_CODE=0

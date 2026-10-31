@@ -1,0 +1,5 @@
+TEXT_LENGTH_ADJUSTMENT {'computed': 90.0, 'bbox': (10.0, 84.0, 96.40625, 26.609375), 'end': (98.19078063964844, 106.84040069580078), 'authored': '90', 'lengthAdjust': 2}
+PASS SVG surfaces: 1594 assertions
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+
+EXIT_CODE=0

@@ -1,0 +1,4 @@
+PASS SVG documents: 78 assertions
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+
+EXIT_CODE=0
