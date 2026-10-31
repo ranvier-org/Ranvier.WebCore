@@ -5250,6 +5250,12 @@ and [<AllowNullLiteral>] CanvasRenderingContext2D =
     abstract member isPointInStroke: x: float * y: float -> bool
     /// <summary>CanvasRenderingContext2D.isPointInStroke.</summary>
     abstract member isPointInStroke: path: Path2D * x: float * y: float -> bool
+    /// <summary>CanvasRenderingContext2D.fillText.</summary>
+    abstract member fillText: text: string * x: float * y: float * ?maxWidth: float -> unit
+    /// <summary>CanvasRenderingContext2D.strokeText.</summary>
+    abstract member strokeText: text: string * x: float * y: float * ?maxWidth: float -> unit
+    /// <summary>CanvasRenderingContext2D.measureText.</summary>
+    abstract member measureText: text: string -> TextMetrics
     /// <summary>CanvasRenderingContext2D.lineWidth.</summary>
     abstract member lineWidth: float with get, set
     /// <summary>CanvasRenderingContext2D.lineCap.</summary>
@@ -5264,6 +5270,18 @@ and [<AllowNullLiteral>] CanvasRenderingContext2D =
     abstract member getLineDash: unit -> (float) array
     /// <summary>CanvasRenderingContext2D.lineDashOffset.</summary>
     abstract member lineDashOffset: float with get, set
+    /// <summary>CanvasRenderingContext2D.font.</summary>
+    abstract member font: string with get, set
+    /// <summary>CanvasRenderingContext2D.textAlign.</summary>
+    abstract member textAlign: CanvasTextAlign with get, set
+    /// <summary>CanvasRenderingContext2D.textBaseline.</summary>
+    abstract member textBaseline: CanvasTextBaseline with get, set
+    /// <summary>CanvasRenderingContext2D.direction.</summary>
+    abstract member direction: CanvasDirection with get, set
+    /// <summary>CanvasRenderingContext2D.letterSpacing.</summary>
+    abstract member letterSpacing: string with get, set
+    /// <summary>CanvasRenderingContext2D.wordSpacing.</summary>
+    abstract member wordSpacing: string with get, set
     /// <summary>CanvasRenderingContext2D.closePath.</summary>
     abstract member closePath: unit -> unit
     /// <summary>CanvasRenderingContext2D.moveTo.</summary>
@@ -5358,6 +5376,33 @@ and [<AllowNullLiteral>] Path2D =
 
 /// <summary>ImageBitmap in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] ImageBitmap = interface end
+
+/// <summary>TextMetrics in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] TextMetrics =
+    /// <summary>TextMetrics.width.</summary>
+    abstract member width: float with get
+    /// <summary>TextMetrics.actualBoundingBoxLeft.</summary>
+    abstract member actualBoundingBoxLeft: float with get
+    /// <summary>TextMetrics.actualBoundingBoxRight.</summary>
+    abstract member actualBoundingBoxRight: float with get
+    /// <summary>TextMetrics.fontBoundingBoxAscent.</summary>
+    abstract member fontBoundingBoxAscent: float with get
+    /// <summary>TextMetrics.fontBoundingBoxDescent.</summary>
+    abstract member fontBoundingBoxDescent: float with get
+    /// <summary>TextMetrics.actualBoundingBoxAscent.</summary>
+    abstract member actualBoundingBoxAscent: float with get
+    /// <summary>TextMetrics.actualBoundingBoxDescent.</summary>
+    abstract member actualBoundingBoxDescent: float with get
+    /// <summary>TextMetrics.emHeightAscent.</summary>
+    abstract member emHeightAscent: float with get
+    /// <summary>TextMetrics.emHeightDescent.</summary>
+    abstract member emHeightDescent: float with get
+    /// <summary>TextMetrics.hangingBaseline.</summary>
+    abstract member hangingBaseline: float with get
+    /// <summary>TextMetrics.alphabeticBaseline.</summary>
+    abstract member alphabeticBaseline: float with get
+    /// <summary>TextMetrics.ideographicBaseline.</summary>
+    abstract member ideographicBaseline: float with get
 
 /// <summary>HTMLUnknownElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLUnknownElement =
@@ -6023,6 +6068,12 @@ and [<DomStringEnum; RequireQualifiedAccess>] VisibilityState =
     | [<CompiledName("hidden")>] Hidden
     | [<CompiledName("visible")>] Visible
 
+/// <summary>CanvasDirection in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] CanvasDirection =
+    | [<CompiledName("ltr")>] Ltr
+    | [<CompiledName("rtl")>] Rtl
+    | [<CompiledName("inherit")>] Inherit
+
 /// <summary>CanvasFillRule in the scoped DOM interface model.</summary>
 and [<DomStringEnum; RequireQualifiedAccess>] CanvasFillRule =
     | [<CompiledName("nonzero")>] Nonzero
@@ -6039,6 +6090,23 @@ and [<DomStringEnum; RequireQualifiedAccess>] CanvasLineJoin =
     | [<CompiledName("round")>] Round
     | [<CompiledName("bevel")>] Bevel
     | [<CompiledName("miter")>] Miter
+
+/// <summary>CanvasTextAlign in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] CanvasTextAlign =
+    | [<CompiledName("start")>] Start
+    | [<CompiledName("end")>] End
+    | [<CompiledName("left")>] Left
+    | [<CompiledName("right")>] Right
+    | [<CompiledName("center")>] Center
+
+/// <summary>CanvasTextBaseline in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] CanvasTextBaseline =
+    | [<CompiledName("top")>] Top
+    | [<CompiledName("hanging")>] Hanging
+    | [<CompiledName("middle")>] Middle
+    | [<CompiledName("alphabetic")>] Alphabetic
+    | [<CompiledName("ideographic")>] Ideographic
+    | [<CompiledName("bottom")>] Bottom
 
 /// <summary>ImageSmoothingQuality in the scoped DOM interface model.</summary>
 and [<DomStringEnum; RequireQualifiedAccess>] ImageSmoothingQuality =

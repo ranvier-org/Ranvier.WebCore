@@ -1019,6 +1019,41 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
 
                 if rv_diagnostic_live_count () <> live then
                     failwith "cascade snapshot leaked"
+        | "canvas text metrics" ->
+            let canvas = rv_document_create_element (host, "canvas")
+            rv_node_append_child (div, canvas) |> check "append canvas"
+            rv_canvas_get_context (canvas, 1, 0n, &held.contents) |> check "getContext 2d"
+            rv_node_release canvas
+
+            rv_dom_canvas_rendering_context2_d_set_font (held.Value, utf8 "20px monospace", utf8Length "20px monospace")
+            |> check "font"
+
+            let mutable metrics = 0n
+
+            rv_dom_canvas_rendering_context2_d_measure_text (held.Value, utf8 "XX", utf8Length "XX", &metrics)
+            |> check "measureText"
+
+            fun () ->
+                let mutable width = 0.0
+
+                rv_dom_text_metrics_get_width (metrics, &width)
+                |> check "TextMetrics.width after destroy"
+
+                if width <= 0.0 then
+                    failwithf "TextMetrics.width after destroy: %f" width
+
+                let mutable later = 0n
+
+                let measured =
+                    rv_dom_canvas_rendering_context2_d_measure_text (held.Value, utf8 "X", utf8Length "X", &later)
+
+                if measured = 0 then
+                    rv_dom_text_metrics_release later
+                elif measured <> -10 && measured <> -11 then
+                    failwithf "measureText after destroy: %d" measured
+
+                rv_dom_text_metrics_release metrics
+                rv_dom_canvas_rendering_context2_d_release held.Value
         | "canvas gradient" ->
             let canvas = rv_document_create_element (host, "canvas")
             rv_node_append_child (div, canvas) |> check "append canvas"
@@ -1377,6 +1412,7 @@ let run (outDir: string) =
                     "coordinate spaces"
                     "canvas path"
                     "canvas gradient"
+                    "canvas text metrics"
                 ] do
                 for remove in [ false; true ] do
                     releaseAfterDestroy kind remove

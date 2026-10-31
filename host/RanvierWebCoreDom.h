@@ -95,6 +95,7 @@ typedef struct RvCanvasGradient RvCanvasGradient;
 typedef struct RvCanvasPattern RvCanvasPattern;
 typedef struct RvPath2D RvPath2D;
 typedef struct RvImageBitmap RvImageBitmap;
+typedef struct RvTextMetrics RvTextMetrics;
 typedef struct RvDomUnionNodeOrDOMString RvDomUnionNodeOrDOMString;
 typedef struct RvDomSequenceNodeOrDOMString RvDomSequenceNodeOrDOMString;
 typedef struct RvDomSequenceCSSStyleSheet RvDomSequenceCSSStyleSheet;
@@ -383,6 +384,13 @@ enum {
     RV_DOM_ARIA_NOTIFICATION_PRIORITY_HIGH = 1, /* "high" */
 };
 
+/* The values of the IDL enumeration CanvasDirection. */
+enum {
+    RV_DOM_CANVAS_DIRECTION_LTR = 0, /* "ltr" */
+    RV_DOM_CANVAS_DIRECTION_RTL = 1, /* "rtl" */
+    RV_DOM_CANVAS_DIRECTION_INHERIT = 2, /* "inherit" */
+};
+
 /* The values of the IDL enumeration CanvasFillRule. */
 enum {
     RV_DOM_CANVAS_FILL_RULE_NONZERO = 0, /* "nonzero" */
@@ -401,6 +409,25 @@ enum {
     RV_DOM_CANVAS_LINE_JOIN_ROUND = 0, /* "round" */
     RV_DOM_CANVAS_LINE_JOIN_BEVEL = 1, /* "bevel" */
     RV_DOM_CANVAS_LINE_JOIN_MITER = 2, /* "miter" */
+};
+
+/* The values of the IDL enumeration CanvasTextAlign. */
+enum {
+    RV_DOM_CANVAS_TEXT_ALIGN_START = 0, /* "start" */
+    RV_DOM_CANVAS_TEXT_ALIGN_END = 1, /* "end" */
+    RV_DOM_CANVAS_TEXT_ALIGN_LEFT = 2, /* "left" */
+    RV_DOM_CANVAS_TEXT_ALIGN_RIGHT = 3, /* "right" */
+    RV_DOM_CANVAS_TEXT_ALIGN_CENTER = 4, /* "center" */
+};
+
+/* The values of the IDL enumeration CanvasTextBaseline. */
+enum {
+    RV_DOM_CANVAS_TEXT_BASELINE_TOP = 0, /* "top" */
+    RV_DOM_CANVAS_TEXT_BASELINE_HANGING = 1, /* "hanging" */
+    RV_DOM_CANVAS_TEXT_BASELINE_MIDDLE = 2, /* "middle" */
+    RV_DOM_CANVAS_TEXT_BASELINE_ALPHABETIC = 3, /* "alphabetic" */
+    RV_DOM_CANVAS_TEXT_BASELINE_IDEOGRAPHIC = 4, /* "ideographic" */
+    RV_DOM_CANVAS_TEXT_BASELINE_BOTTOM = 5, /* "bottom" */
 };
 
 /* The values of the IDL enumeration DocumentReadyState. */
@@ -2010,6 +2037,10 @@ RV_EXPORT RvPath2D* rv_dom_path2_d_retain(RvPath2D*);
 RV_EXPORT void rv_dom_image_bitmap_release(RvImageBitmap*);
 /* Adds a reference to a ImageBitmap and returns it. */
 RV_EXPORT RvImageBitmap* rv_dom_image_bitmap_retain(RvImageBitmap*);
+/* Releases a handle to a TextMetrics. */
+RV_EXPORT void rv_dom_text_metrics_release(RvTextMetrics*);
+/* Adds a reference to a TextMetrics and returns it. */
+RV_EXPORT RvTextMetrics* rv_dom_text_metrics_retain(RvTextMetrics*);
 /* Concrete scoped interface name of a CSSRule handle; borrows target. */
 RV_EXPORT int32_t rv_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* Concrete scoped interface name of a StyleSheet handle; borrows target. */
@@ -8400,6 +8431,30 @@ RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_miter_limit(RvCanvasRen
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_line_dash_offset(RvCanvasRenderingContext2D* target, double* result);
 /* CanvasRenderingContext2D.lineDashOffset setter: attribute unrestricted double lineDashOffset */
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_line_dash_offset(RvCanvasRenderingContext2D* target, double value);
+/* CanvasRenderingContext2D.font getter: attribute DOMString font */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_font(RvCanvasRenderingContext2D* target, char* buffer, int32_t capacity, int32_t* length);
+/* CanvasRenderingContext2D.font setter: attribute DOMString font */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_font(RvCanvasRenderingContext2D* target, const uint8_t* value, int32_t value_length);
+/* CanvasRenderingContext2D.textAlign getter: attribute CanvasTextAlign textAlign */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_text_align(RvCanvasRenderingContext2D* target, int32_t* result);
+/* CanvasRenderingContext2D.textAlign setter: attribute CanvasTextAlign textAlign */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_text_align(RvCanvasRenderingContext2D* target, int32_t value);
+/* CanvasRenderingContext2D.textBaseline getter: attribute CanvasTextBaseline textBaseline */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_text_baseline(RvCanvasRenderingContext2D* target, int32_t* result);
+/* CanvasRenderingContext2D.textBaseline setter: attribute CanvasTextBaseline textBaseline */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_text_baseline(RvCanvasRenderingContext2D* target, int32_t value);
+/* CanvasRenderingContext2D.direction getter: attribute CanvasDirection direction */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_direction(RvCanvasRenderingContext2D* target, int32_t* result);
+/* CanvasRenderingContext2D.direction setter: attribute CanvasDirection direction */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_direction(RvCanvasRenderingContext2D* target, int32_t value);
+/* CanvasRenderingContext2D.letterSpacing getter: attribute DOMString letterSpacing */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_letter_spacing(RvCanvasRenderingContext2D* target, char* buffer, int32_t capacity, int32_t* length);
+/* CanvasRenderingContext2D.letterSpacing setter: attribute DOMString letterSpacing */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_letter_spacing(RvCanvasRenderingContext2D* target, const uint8_t* value, int32_t value_length);
+/* CanvasRenderingContext2D.wordSpacing getter: attribute DOMString wordSpacing */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_word_spacing(RvCanvasRenderingContext2D* target, char* buffer, int32_t capacity, int32_t* length);
+/* CanvasRenderingContext2D.wordSpacing setter: attribute DOMString wordSpacing */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_word_spacing(RvCanvasRenderingContext2D* target, const uint8_t* value, int32_t value_length);
 /* CanvasRenderingContext2D.save() -> undefined */
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_save(RvCanvasRenderingContext2D* target);
 /* CanvasRenderingContext2D.restore() -> undefined */
@@ -8478,6 +8533,14 @@ RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_is_point_in_path_4(RvCanvas
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_is_point_in_stroke_2(RvCanvasRenderingContext2D* target, double x, double y, int32_t* result);
 /* CanvasRenderingContext2D.isPointInStroke(Path2D path, unrestricted double x, unrestricted double y) -> boolean */
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_is_point_in_stroke_3(RvCanvasRenderingContext2D* target, RvPath2D* path, double x, double y, int32_t* result);
+/* CanvasRenderingContext2D.fillText(DOMString text, unrestricted double x, unrestricted double y, optional
+ * unrestricted double maxWidth) -> undefined; max_width may be NULL (absent) */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_fill_text(RvCanvasRenderingContext2D* target, const uint8_t* text, int32_t text_length, double x, double y, const double* max_width);
+/* CanvasRenderingContext2D.strokeText(DOMString text, unrestricted double x, unrestricted double y, optional
+ * unrestricted double maxWidth) -> undefined; max_width may be NULL (absent) */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_stroke_text(RvCanvasRenderingContext2D* target, const uint8_t* text, int32_t text_length, double x, double y, const double* max_width);
+/* CanvasRenderingContext2D.measureText(DOMString text) -> TextMetrics; *result is a new reference */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_measure_text(RvCanvasRenderingContext2D* target, const uint8_t* text, int32_t text_length, RvTextMetrics** result);
 /* CanvasRenderingContext2D.setLineDash(sequence<unrestricted double> segments) -> undefined */
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_line_dash(RvCanvasRenderingContext2D* target, const RvDomSequenceUnrestrictedDouble* segments);
 /* CanvasRenderingContext2D.getLineDash() -> sequence<unrestricted double>; *result owns its contents; release with
@@ -8569,6 +8632,32 @@ RV_EXPORT int32_t rv_dom_path2_d_arc(RvPath2D* target, double x, double y, doubl
  * radiusY, unrestricted double rotation, unrestricted double startAngle, unrestricted double endAngle, optional
  * boolean anticlockwise = false) -> undefined; anticlockwise defaults to false in IDL */
 RV_EXPORT int32_t rv_dom_path2_d_ellipse(RvPath2D* target, double x, double y, double radius_x, double radius_y, double rotation, double start_angle, double end_angle, int32_t anticlockwise);
+/* TextMetrics */
+
+/* TextMetrics.width getter: readonly attribute double width */
+RV_EXPORT int32_t rv_dom_text_metrics_get_width(RvTextMetrics* target, double* result);
+/* TextMetrics.actualBoundingBoxLeft getter: readonly attribute double actualBoundingBoxLeft */
+RV_EXPORT int32_t rv_dom_text_metrics_get_actual_bounding_box_left(RvTextMetrics* target, double* result);
+/* TextMetrics.actualBoundingBoxRight getter: readonly attribute double actualBoundingBoxRight */
+RV_EXPORT int32_t rv_dom_text_metrics_get_actual_bounding_box_right(RvTextMetrics* target, double* result);
+/* TextMetrics.fontBoundingBoxAscent getter: readonly attribute double fontBoundingBoxAscent */
+RV_EXPORT int32_t rv_dom_text_metrics_get_font_bounding_box_ascent(RvTextMetrics* target, double* result);
+/* TextMetrics.fontBoundingBoxDescent getter: readonly attribute double fontBoundingBoxDescent */
+RV_EXPORT int32_t rv_dom_text_metrics_get_font_bounding_box_descent(RvTextMetrics* target, double* result);
+/* TextMetrics.actualBoundingBoxAscent getter: readonly attribute double actualBoundingBoxAscent */
+RV_EXPORT int32_t rv_dom_text_metrics_get_actual_bounding_box_ascent(RvTextMetrics* target, double* result);
+/* TextMetrics.actualBoundingBoxDescent getter: readonly attribute double actualBoundingBoxDescent */
+RV_EXPORT int32_t rv_dom_text_metrics_get_actual_bounding_box_descent(RvTextMetrics* target, double* result);
+/* TextMetrics.emHeightAscent getter: readonly attribute double emHeightAscent */
+RV_EXPORT int32_t rv_dom_text_metrics_get_em_height_ascent(RvTextMetrics* target, double* result);
+/* TextMetrics.emHeightDescent getter: readonly attribute double emHeightDescent */
+RV_EXPORT int32_t rv_dom_text_metrics_get_em_height_descent(RvTextMetrics* target, double* result);
+/* TextMetrics.hangingBaseline getter: readonly attribute double hangingBaseline */
+RV_EXPORT int32_t rv_dom_text_metrics_get_hanging_baseline(RvTextMetrics* target, double* result);
+/* TextMetrics.alphabeticBaseline getter: readonly attribute double alphabeticBaseline */
+RV_EXPORT int32_t rv_dom_text_metrics_get_alphabetic_baseline(RvTextMetrics* target, double* result);
+/* TextMetrics.ideographicBaseline getter: readonly attribute double ideographicBaseline */
+RV_EXPORT int32_t rv_dom_text_metrics_get_ideographic_baseline(RvTextMetrics* target, double* result);
 /* DOMCSSNamespace */
 
 /* CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths */

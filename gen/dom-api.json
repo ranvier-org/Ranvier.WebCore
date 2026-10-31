@@ -1588,6 +1588,10 @@
     {
       "name": "ImageBitmap",
       "base": null
+    },
+    {
+      "name": "TextMetrics",
+      "base": null
     }
   ],
   "contractInterfaces": [
@@ -4234,6 +4238,15 @@
       "mixin": false,
       "contractOnly": false,
       "source": "html/ImageBitmap.idl"
+    },
+    {
+      "name": "TextMetrics",
+      "idlName": "TextMetrics",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/TextMetrics.idl"
     },
     {
       "name": "HTMLUnknownElement",
@@ -148717,6 +148730,630 @@
     },
     {
       "interface": "CanvasRenderingContext2D",
+      "member": "font",
+      "contractOwner": "CanvasRenderingContext2D",
+      "kind": "getter",
+      "function": "rv_dom_canvas_rendering_context2_d_get_font",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCanvasRenderingContext2D*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CanvasRenderingContext2D",
+      "member": "font",
+      "contractOwner": "CanvasRenderingContext2D",
+      "kind": "setter",
+      "function": "rv_dom_canvas_rendering_context2_d_set_font",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCanvasRenderingContext2D*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CanvasRenderingContext2D",
+      "member": "textAlign",
+      "contractOwner": "CanvasRenderingContext2D",
+      "kind": "getter",
+      "function": "rv_dom_canvas_rendering_context2_d_get_text_align",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCanvasRenderingContext2D*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "CanvasTextAlign",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "enum",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": "CanvasTextAlign",
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CanvasRenderingContext2D",
+      "member": "textAlign",
+      "contractOwner": "CanvasRenderingContext2D",
+      "kind": "setter",
+      "function": "rv_dom_canvas_rendering_context2_d_set_text_align",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCanvasRenderingContext2D*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "CanvasTextAlign",
+          "idl": {
+            "name": "CanvasTextAlign",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "enum",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": "CanvasTextAlign",
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CanvasRenderingContext2D",
+      "member": "textBaseline",
+      "contractOwner": "CanvasRenderingContext2D",
+      "kind": "getter",
+      "function": "rv_dom_canvas_rendering_context2_d_get_text_baseline",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCanvasRenderingContext2D*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "CanvasTextBaseline",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "enum",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": "CanvasTextBaseline",
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CanvasRenderingContext2D",
+      "member": "textBaseline",
+      "contractOwner": "CanvasRenderingContext2D",
+      "kind": "setter",
+      "function": "rv_dom_canvas_rendering_context2_d_set_text_baseline",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCanvasRenderingContext2D*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "CanvasTextBaseline",
+          "idl": {
+            "name": "CanvasTextBaseline",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "enum",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": "CanvasTextBaseline",
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CanvasRenderingContext2D",
+      "member": "direction",
+      "contractOwner": "CanvasRenderingContext2D",
+      "kind": "getter",
+      "function": "rv_dom_canvas_rendering_context2_d_get_direction",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCanvasRenderingContext2D*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "CanvasDirection",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "enum",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": "CanvasDirection",
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CanvasRenderingContext2D",
+      "member": "direction",
+      "contractOwner": "CanvasRenderingContext2D",
+      "kind": "setter",
+      "function": "rv_dom_canvas_rendering_context2_d_set_direction",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCanvasRenderingContext2D*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "CanvasDirection",
+          "idl": {
+            "name": "CanvasDirection",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "enum",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": "CanvasDirection",
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CanvasRenderingContext2D",
+      "member": "letterSpacing",
+      "contractOwner": "CanvasRenderingContext2D",
+      "kind": "getter",
+      "function": "rv_dom_canvas_rendering_context2_d_get_letter_spacing",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCanvasRenderingContext2D*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CanvasRenderingContext2D",
+      "member": "letterSpacing",
+      "contractOwner": "CanvasRenderingContext2D",
+      "kind": "setter",
+      "function": "rv_dom_canvas_rendering_context2_d_set_letter_spacing",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCanvasRenderingContext2D*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CanvasRenderingContext2D",
+      "member": "wordSpacing",
+      "contractOwner": "CanvasRenderingContext2D",
+      "kind": "getter",
+      "function": "rv_dom_canvas_rendering_context2_d_get_word_spacing",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCanvasRenderingContext2D*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CanvasRenderingContext2D",
+      "member": "wordSpacing",
+      "contractOwner": "CanvasRenderingContext2D",
+      "kind": "setter",
+      "function": "rv_dom_canvas_rendering_context2_d_set_word_spacing",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCanvasRenderingContext2D*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CanvasRenderingContext2D",
       "member": "save",
       "contractOwner": "CanvasRenderingContext2D",
       "kind": "operation",
@@ -151672,6 +152309,376 @@
         "interface": null,
         "root": null,
         "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CanvasRenderingContext2D",
+      "member": "fillText",
+      "contractOwner": "CanvasRenderingContext2D",
+      "kind": "operation",
+      "function": "rv_dom_canvas_rendering_context2_d_fill_text",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCanvasRenderingContext2D*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "text"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "text_length"
+        },
+        {
+          "ctype": "double",
+          "name": "x"
+        },
+        {
+          "ctype": "double",
+          "name": "y"
+        },
+        {
+          "ctype": "const double*",
+          "name": "max_width"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "text",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "x",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "y",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "maxWidth",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CanvasRenderingContext2D",
+      "member": "strokeText",
+      "contractOwner": "CanvasRenderingContext2D",
+      "kind": "operation",
+      "function": "rv_dom_canvas_rendering_context2_d_stroke_text",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCanvasRenderingContext2D*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "text"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "text_length"
+        },
+        {
+          "ctype": "double",
+          "name": "x"
+        },
+        {
+          "ctype": "double",
+          "name": "y"
+        },
+        {
+          "ctype": "const double*",
+          "name": "max_width"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "text",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "x",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "y",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "maxWidth",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CanvasRenderingContext2D",
+      "member": "measureText",
+      "contractOwner": "CanvasRenderingContext2D",
+      "kind": "operation",
+      "function": "rv_dom_canvas_rendering_context2_d_measure_text",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCanvasRenderingContext2D*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "text"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "text_length"
+        },
+        {
+          "ctype": "RvTextMetrics**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "text",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "TextMetrics",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "TextMetrics",
+        "root": "TextMetrics",
+        "class": "TextMetrics",
         "enum": null,
         "label": null,
         "nullable": false,
@@ -155809,6 +156816,438 @@
       "stringInputs": "utf8-lengths"
     },
     {
+      "interface": "TextMetrics",
+      "member": "width",
+      "contractOwner": "TextMetrics",
+      "kind": "getter",
+      "function": "rv_dom_text_metrics_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvTextMetrics*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TextMetrics",
+      "member": "actualBoundingBoxLeft",
+      "contractOwner": "TextMetrics",
+      "kind": "getter",
+      "function": "rv_dom_text_metrics_get_actual_bounding_box_left",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvTextMetrics*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TextMetrics",
+      "member": "actualBoundingBoxRight",
+      "contractOwner": "TextMetrics",
+      "kind": "getter",
+      "function": "rv_dom_text_metrics_get_actual_bounding_box_right",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvTextMetrics*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TextMetrics",
+      "member": "fontBoundingBoxAscent",
+      "contractOwner": "TextMetrics",
+      "kind": "getter",
+      "function": "rv_dom_text_metrics_get_font_bounding_box_ascent",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvTextMetrics*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TextMetrics",
+      "member": "fontBoundingBoxDescent",
+      "contractOwner": "TextMetrics",
+      "kind": "getter",
+      "function": "rv_dom_text_metrics_get_font_bounding_box_descent",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvTextMetrics*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TextMetrics",
+      "member": "actualBoundingBoxAscent",
+      "contractOwner": "TextMetrics",
+      "kind": "getter",
+      "function": "rv_dom_text_metrics_get_actual_bounding_box_ascent",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvTextMetrics*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TextMetrics",
+      "member": "actualBoundingBoxDescent",
+      "contractOwner": "TextMetrics",
+      "kind": "getter",
+      "function": "rv_dom_text_metrics_get_actual_bounding_box_descent",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvTextMetrics*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TextMetrics",
+      "member": "emHeightAscent",
+      "contractOwner": "TextMetrics",
+      "kind": "getter",
+      "function": "rv_dom_text_metrics_get_em_height_ascent",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvTextMetrics*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TextMetrics",
+      "member": "emHeightDescent",
+      "contractOwner": "TextMetrics",
+      "kind": "getter",
+      "function": "rv_dom_text_metrics_get_em_height_descent",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvTextMetrics*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TextMetrics",
+      "member": "hangingBaseline",
+      "contractOwner": "TextMetrics",
+      "kind": "getter",
+      "function": "rv_dom_text_metrics_get_hanging_baseline",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvTextMetrics*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TextMetrics",
+      "member": "alphabeticBaseline",
+      "contractOwner": "TextMetrics",
+      "kind": "getter",
+      "function": "rv_dom_text_metrics_get_alphabetic_baseline",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvTextMetrics*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TextMetrics",
+      "member": "ideographicBaseline",
+      "contractOwner": "TextMetrics",
+      "kind": "getter",
+      "function": "rv_dom_text_metrics_get_ideographic_baseline",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvTextMetrics*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
       "interface": "DOMCSSNamespace",
       "member": "supports",
       "contractOwner": "CSS",
@@ -159732,6 +161171,38 @@
       ],
       {},
       "html/canvas/CanvasLineJoin.idl"
+    ],
+    "CanvasTextAlign": [
+      [
+        "start",
+        "end",
+        "left",
+        "right",
+        "center"
+      ],
+      {},
+      "html/canvas/CanvasTextAlign.idl"
+    ],
+    "CanvasTextBaseline": [
+      [
+        "top",
+        "hanging",
+        "middle",
+        "alphabetic",
+        "ideographic",
+        "bottom"
+      ],
+      {},
+      "html/canvas/CanvasTextBaseline.idl"
+    ],
+    "CanvasDirection": [
+      [
+        "ltr",
+        "rtl",
+        "inherit"
+      ],
+      {},
+      "html/canvas/CanvasDirection.idl"
     ],
     "CanvasFillRule": [
       [

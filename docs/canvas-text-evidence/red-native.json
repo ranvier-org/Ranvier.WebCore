@@ -1,0 +1,41 @@
+{
+ "abi": 55,
+ "exports": {
+  "rv_dom_text_metrics_release": false,
+  "rv_dom_text_metrics_retain": false,
+  "rv_dom_canvas_rendering_context2_d_get_font": false,
+  "rv_dom_canvas_rendering_context2_d_set_font": false,
+  "rv_dom_canvas_rendering_context2_d_get_text_align": false,
+  "rv_dom_canvas_rendering_context2_d_set_text_align": false,
+  "rv_dom_canvas_rendering_context2_d_get_text_baseline": false,
+  "rv_dom_canvas_rendering_context2_d_set_text_baseline": false,
+  "rv_dom_canvas_rendering_context2_d_get_direction": false,
+  "rv_dom_canvas_rendering_context2_d_set_direction": false,
+  "rv_dom_canvas_rendering_context2_d_get_letter_spacing": false,
+  "rv_dom_canvas_rendering_context2_d_set_letter_spacing": false,
+  "rv_dom_canvas_rendering_context2_d_get_word_spacing": false,
+  "rv_dom_canvas_rendering_context2_d_set_word_spacing": false,
+  "rv_dom_canvas_rendering_context2_d_fill_text": false,
+  "rv_dom_canvas_rendering_context2_d_stroke_text": false,
+  "rv_dom_canvas_rendering_context2_d_measure_text": false,
+  "rv_dom_text_metrics_get_width": false,
+  "rv_dom_text_metrics_get_actual_bounding_box_left": false,
+  "rv_dom_text_metrics_get_actual_bounding_box_right": false,
+  "rv_dom_text_metrics_get_font_bounding_box_ascent": false,
+  "rv_dom_text_metrics_get_font_bounding_box_descent": false,
+  "rv_dom_text_metrics_get_actual_bounding_box_ascent": false,
+  "rv_dom_text_metrics_get_actual_bounding_box_descent": false,
+  "rv_dom_text_metrics_get_em_height_ascent": false,
+  "rv_dom_text_metrics_get_em_height_descent": false,
+  "rv_dom_text_metrics_get_hanging_baseline": false,
+  "rv_dom_text_metrics_get_alphabetic_baseline": false,
+  "rv_dom_text_metrics_get_ideographic_baseline": false
+ },
+ "abiHas": {
+  "dom:TextMetrics": 0,
+  "dom:CanvasGradient": 1,
+  "font-readiness": 0
+ },
+ "r04Present": true,
+ "red": true
+}

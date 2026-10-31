@@ -699,7 +699,8 @@
     "CanvasGradient",
     "CanvasPattern",
     "Path2D",
-    "ImageBitmap"
+    "ImageBitmap",
+    "TextMetrics"
   ],
   "skipDirectories": [
     "Modules/",
@@ -1217,7 +1218,16 @@
       "shadowBlur",
       "shadowColor",
       "imageSmoothingEnabled",
-      "imageSmoothingQuality"
+      "imageSmoothingQuality",
+      "font",
+      "textAlign",
+      "textBaseline",
+      "direction",
+      "letterSpacing",
+      "wordSpacing",
+      "fillText",
+      "strokeText",
+      "measureText"
     ],
     "CanvasGradient": [
       "addColorStop"

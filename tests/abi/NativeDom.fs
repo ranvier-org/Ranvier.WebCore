@@ -645,6 +645,15 @@ let RV_DOM_ARIA_NOTIFICATION_PRIORITY_NORMAL = 0
 let RV_DOM_ARIA_NOTIFICATION_PRIORITY_HIGH = 1
 
 [<Literal>]
+let RV_DOM_CANVAS_DIRECTION_LTR = 0
+
+[<Literal>]
+let RV_DOM_CANVAS_DIRECTION_RTL = 1
+
+[<Literal>]
+let RV_DOM_CANVAS_DIRECTION_INHERIT = 2
+
+[<Literal>]
 let RV_DOM_CANVAS_FILL_RULE_NONZERO = 0
 
 [<Literal>]
@@ -667,6 +676,39 @@ let RV_DOM_CANVAS_LINE_JOIN_BEVEL = 1
 
 [<Literal>]
 let RV_DOM_CANVAS_LINE_JOIN_MITER = 2
+
+[<Literal>]
+let RV_DOM_CANVAS_TEXT_ALIGN_START = 0
+
+[<Literal>]
+let RV_DOM_CANVAS_TEXT_ALIGN_END = 1
+
+[<Literal>]
+let RV_DOM_CANVAS_TEXT_ALIGN_LEFT = 2
+
+[<Literal>]
+let RV_DOM_CANVAS_TEXT_ALIGN_RIGHT = 3
+
+[<Literal>]
+let RV_DOM_CANVAS_TEXT_ALIGN_CENTER = 4
+
+[<Literal>]
+let RV_DOM_CANVAS_TEXT_BASELINE_TOP = 0
+
+[<Literal>]
+let RV_DOM_CANVAS_TEXT_BASELINE_HANGING = 1
+
+[<Literal>]
+let RV_DOM_CANVAS_TEXT_BASELINE_MIDDLE = 2
+
+[<Literal>]
+let RV_DOM_CANVAS_TEXT_BASELINE_ALPHABETIC = 3
+
+[<Literal>]
+let RV_DOM_CANVAS_TEXT_BASELINE_IDEOGRAPHIC = 4
+
+[<Literal>]
+let RV_DOM_CANVAS_TEXT_BASELINE_BOTTOM = 5
 
 [<Literal>]
 let RV_DOM_DOCUMENT_READY_STATE_LOADING = 0
@@ -2456,6 +2498,12 @@ extern void rv_dom_image_bitmap_release(nativeint handle)
 
 [<DllImport(Lib)>]
 extern nativeint rv_dom_image_bitmap_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_text_metrics_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_text_metrics_retain(nativeint handle)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_rule_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -10474,6 +10522,42 @@ extern int rv_dom_canvas_rendering_context2_d_get_line_dash_offset(nativeint tar
 extern int rv_dom_canvas_rendering_context2_d_set_line_dash_offset(nativeint target, float value)
 
 [<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_font(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_font(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_text_align(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_text_align(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_text_baseline(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_text_baseline(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_direction(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_direction(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_letter_spacing(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_letter_spacing(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_word_spacing(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_word_spacing(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
 extern int rv_dom_canvas_rendering_context2_d_save(nativeint target)
 
 [<DllImport(Lib)>]
@@ -10567,6 +10651,15 @@ extern int rv_dom_canvas_rendering_context2_d_is_point_in_stroke_2(nativeint tar
 extern int rv_dom_canvas_rendering_context2_d_is_point_in_stroke_3(nativeint target, nativeint path, float x, float y, int& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_fill_text(nativeint target, byte[] text, int text_length, float x, float y, float[] max_width)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_stroke_text(nativeint target, byte[] text, int text_length, float x, float y, float[] max_width)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_measure_text(nativeint target, byte[] text, int text_length, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_canvas_rendering_context2_d_set_line_dash(nativeint target, [<In>] RvDomSequenceUnrestrictedDouble[] segments)
 
 [<DllImport(Lib)>]
@@ -10655,6 +10748,42 @@ extern int rv_dom_path2_d_arc(nativeint target, float x, float y, float radius, 
 
 [<DllImport(Lib)>]
 extern int rv_dom_path2_d_ellipse(nativeint target, float x, float y, float radius_x, float radius_y, float rotation, float start_angle, float end_angle, int anticlockwise)
+
+[<DllImport(Lib)>]
+extern int rv_dom_text_metrics_get_width(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_text_metrics_get_actual_bounding_box_left(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_text_metrics_get_actual_bounding_box_right(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_text_metrics_get_font_bounding_box_ascent(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_text_metrics_get_font_bounding_box_descent(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_text_metrics_get_actual_bounding_box_ascent(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_text_metrics_get_actual_bounding_box_descent(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_text_metrics_get_em_height_ascent(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_text_metrics_get_em_height_descent(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_text_metrics_get_hanging_baseline(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_text_metrics_get_alphabetic_baseline(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_text_metrics_get_ideographic_baseline(nativeint target, float& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_supports_2(nativeint target, byte[] property, int property_length, byte[] value, int value_length, int& result)
