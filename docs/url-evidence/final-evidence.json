@@ -1,0 +1,147 @@
+{
+  "group": [
+    "H13 #115"
+  ],
+  "native": "0.1.0-preview.33",
+  "abi": 41,
+  "features": [
+    "dom:DOMURL",
+    "dom:URLSearchParams",
+    "dom:URLPattern",
+    "dom-url-static",
+    "dom-url-search-params-entries"
+  ],
+  "members": [
+    "URL constructor, parse, canParse, href/origin/protocol/username/password/host/hostname/port/pathname/search/hash, searchParams, toJSON",
+    "URLSearchParams constructor (sequence, record, string), size, append, delete, get, getAll, has, set, sort, entries, toString",
+    "URLPattern constructors, test, exec (URLPatternResult), component getters, hasRegExpGroups"
+  ],
+  "excluded": [
+    "URL.createObjectURL",
+    "URL.revokeObjectURL (later blob-URL group)"
+  ],
+  "sourceHeadOfBatch": "2a33e95f0467783abdff842635a0177183eb70af",
+  "route": {
+    "decision": "native: WebKit WTF URLParser and WebCore URLPattern through generated exports",
+    "systemUriHrefAgreement": "30/40",
+    "files": [
+      "route-red-cases.json",
+      "route-red-chromium.json",
+      "route-red-system-uri.json"
+    ]
+  },
+  "red": {
+    "runtime": "native-caret/artifacts/native32-frozen (Native32/ABI40)",
+    "files": [
+      "red-url-values-native32.log",
+      "red-url-wpt-native32.log"
+    ],
+    "earlier": "native-dialog native30-candidate-1: url_values.py fails at the missing rv_dom_domurl_release"
+  },
+  "green": {
+    "urlValuesAssertions": 3522,
+    "ownCases": {
+      "parse": 83,
+      "setters": 27,
+      "params": 10,
+      "linked": 2,
+      "patterns": 22
+    },
+    "qualifiedDifferences": 6,
+    "wpt": {
+      "urltestdata": {
+        "cases": 896,
+        "native": 896,
+        "chromium": 787
+      },
+      "setters_tests": {
+        "cases": 278,
+        "native": 278,
+        "chromium": 238
+      },
+      "urlpatterntestdata": {
+        "cases": 369,
+        "native": 369,
+        "chromium": 369
+      }
+    },
+    "wptDisagreements": 150,
+    "wptBothFail": 0,
+    "probes": 46,
+    "allExitZero": true,
+    "rawAssertions": 67183,
+    "teardownCases": 84,
+    "teardownCasesAdded": 4,
+    "teardownAllCollected": true
+  },
+  "chromiumOracle": {
+    "browser": "156.0.8078.4",
+    "wptRecordBrowser": "156.0.8078.4",
+    "wptCommit": "15b31607c5102637a3401608427e6a05aaaf3849"
+  },
+  "qualifications": [
+    {
+      "case": "parse[39]",
+      "note": "A space is a forbidden host code point (WHATWG URL host parser): the engine fails, as the spec and WPT require; Chromium percent-encodes it."
+    },
+    {
+      "case": "parse[44]",
+      "note": "\"|\" is outside the path percent-encode set: the engine keeps it, as the spec does; Chromium encodes it as %7C."
+    },
+    {
+      "case": "parse[53]",
+      "note": "The engine keeps the drive letter case of file:c:\foo; Chromium uppercases it."
+    },
+    {
+      "case": "parse[55]",
+      "note": "The spec file-host state replaces the host \"localhost\" with the empty host: the engine does; Chromium keeps localhost."
+    },
+    {
+      "case": "setters[3]",
+      "note": "The protocol setter cannot turn a non-special scheme into a special one: the engine keeps mailto:, as the spec does; Chromium switches to https."
+    },
+    {
+      "case": "setters[22]",
+      "note": "Setting search to \"?\" sets an empty query, so href keeps the \"?\" (spec); Chromium drops it."
+    },
+    {
+      "name": "WPT disagreements",
+      "count": 150,
+      "reason": "149 cases the engine passes and Chromium fails; urlpattern[347] is a JavaScript overload-conversion TypeError with no C ABI call"
+    },
+    {
+      "name": "NUL-terminated sequences",
+      "count": null,
+      "reason": "URLSearchParams.getAll and the sequence<sequence<USVString>> init arm cut a value at U+0000; get, entries and the record and string arms keep it"
+    }
+  ],
+  "packaging": {
+    "wptUnderSrc": [],
+    "packedManagedPackage": {
+      "Ranvier.WebCore.1.0.0.nupkg": {
+        "entries": 10,
+        "wptEntries": []
+      }
+    },
+    "note": "Ranvier.WebCore packed from this head carries no tests/fixtures or WPT entry; the native flavor packages carry only runtimes"
+  },
+  "files": {
+    "absence_h13.py": "27ff524b6597b66801ab8433d5077bbe2102bf5061d2c132c817739290bbb4ab",
+    "allocation-absence.json": "d26e345d9930edeb062f9a59b75d7be58f9dce1bee64803a48099468cf3538de",
+    "batch-green.json": "974e99d9a85ea8969efea1177282e7c022cea2ae488065235a273f8b9670fbe6",
+    "build_native33_candidate.py": "1ee07ec4921b6f7fe29c2ae617bf454a0963f1c21ec816d2052ac3dbd66aaad5",
+    "make_native33_evidence.py": "36e4fae9de7f4d1326d5a758956392e0557d904dc73ff119240ed13760edf9f4",
+    "package-wpt-check.json": "bfaea2b32596cae12a00598ec6bb164a6eb7a0cb34aa2e01c44d6f51c76edd81",
+    "red-url-values-native32.log": "3b2fe11e97c8058e4b0697bd451bdf5dc2cadfd9ac3e7b7c302894aead870219",
+    "red-url-wpt-native32.log": "8d9a47a34fc7d6c32e39e0822b748ffb93cb613173737bfd3959ae8edf920c35",
+    "route-red-cases.json": "d69de8a03599b2afa764fe61291ca8ee944f708cbcdc583b015d2247926e3bac",
+    "route-red-chromium.json": "62d715956954e8bbe9af57608938c60b871d5b53317a253a4c15c0ac23093a7a",
+    "route-red-system-uri.json": "994e34cfd28f3e79c35a079daa7ff8ab3669d44c4b027924598798807bd5faf4",
+    "run_native33_full_batch.py": "9edc2783cefd60e7ebf6e9b4409c4c64b2ee63d155d2eb24889493c74052a9f0",
+    "runtime-receipt.json": "5265f31a69ca57c033286080821878f933fa9d27240cd2d9bc6688c482edf03a",
+    "source-patches.json": "50f9f9e236c531d688f64553e6e4c32e475586544b37bfd06460ec2009036843",
+    "teardown-probes.json": "e728d223f8325af450b2d762989a624a1027c3bd775fca1bc3408ca148f3f2eb",
+    "url-values-probe.log": "ded12cbde35b733b23e7dd29777363a74ab7e27527cea4192e93efdadc243f6e",
+    "url-wpt-probe.log": "d91bc3ccf91c9faa8d0b0362caa164274a0b3439e595fb53cf03ee09c61f24fb"
+  }
+}
