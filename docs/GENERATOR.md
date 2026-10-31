@@ -413,6 +413,8 @@ Animation timelines (A07, A08) extend two keys:
   absent: `TimelineRangeOffset.offset` is an `RvCSSStyleValue*`. In a result dictionary (`resultDictionaries`
   `TimelineRangeOffset`, the dictionary arm of `Animation.rangeStart` and `rangeEnd`) the member is a new reference, or
   NULL, which the dictionary's release drops.
+- `unionFieldDefaults` assigns `ViewTimelineOptions.inset` its IDL default "auto" before the options are read: the C++
+  struct leaves the member empty, and a present field replaces it.
 
 The Animation handle is an `RvEventTarget` (`eventTargetObjects`): `finish`, `cancel` and `remove` events reach
 `rv_event_target_add_listener`, and `rv_animation_as_event_target` maps the hand-written CSS-animation handle to it.

@@ -43416,6 +43416,7 @@ int32_t ranvier_dom_view_timeline_create(RvNode* target, const RvDomViewTimeline
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     ViewTimelineOptions a0 { };
+    a0.inset = String { "auto"_s };
     if (options) {
         if (options->size >= offsetof(RvDomViewTimelineOptions, subject) + sizeof(options->subject) && options->subject) {
             RefPtr value = dynamicDowncast<Element>(*nodeOf(options->subject));

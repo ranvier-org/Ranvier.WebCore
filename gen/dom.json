@@ -27,6 +27,7 @@
     "an overload, by argument count, its own factory settings.",
     "optionalObjectMembers lists optional nullable object or node dictionary members passed as Rv<Root>* const* (RvNode* const*): NULL absent, a pointer to NULL null.",
     "absentObjectMembers lists optional nonnullable object dictionary members without a default, passed as Rv<Root>*: NULL absent; in a result dictionary the member is a new reference, or NULL, that the dictionary's release drops.",
+    "unionFieldDefaults lists dictionary union members with a string arm whose IDL string default the glue assigns, for a C++ struct that leaves the member empty; a present field replaces it.",
     "setterExpressions maps Interface.member to the C++ a setter calls with {value}, for a member whose C++ type differs from its IDL type.",
     "browserArgumentConversions maps Interface.member.argument to the JavaScript function the Fable provider applies to an argument: Keyframe sequences become the browser's keyframe objects."
   ],
@@ -1258,5 +1259,8 @@
   },
   "absentObjectMembers": [
     "TimelineRangeOffset.offset"
+  ],
+  "unionFieldDefaults": [
+    "ViewTimelineOptions.inset"
   ]
 }

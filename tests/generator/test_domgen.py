@@ -2514,6 +2514,29 @@ partial interface Element {
         self.assertIn('Vector<Variant<Ref<Node>, String, Mode>>', glue)
         self.assertNotIn('Variant<Ref<Node>, Variant<String, Mode>>', glue)
 
+    def test_union_field_default_applies_before_the_options_are_read(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+dictionary PadOptions { (DOMString or sequence<DOMString>) inset = "auto"; DOMString label = "x"; };
+partial interface Element { undefined pad(optional PadOptions options = {}); };
+''')
+        config = dict(self.world.config)
+        config['unionFieldDefaults'] = ['PadOptions.inset']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        body = {item.name: chr(10).join(item.body) for item in generator.functions}['element_pad']
+        # The default holds for NULL options and for a size that stops before the field; a present field replaces it.
+        self.assertIn('a0.inset = String { "auto"_s };', body)
+        self.assertLess(body.index('a0.inset = String { "auto"_s };'), body.index('if (options) {'))
+        config['unionFieldDefaults'] = ['PadOptions.label']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        with self.assertRaises(SystemExit):
+            generator.run()
+
     def test_configured_svg_mathml_shared_style_and_focus_members(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

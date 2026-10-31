@@ -1821,6 +1821,15 @@ class Generator(ComplexGeneratorMixin):
                     prepare += self.dictionary_object_prefix(name, struct, cpp, f"a{index}", mapped.interface, objects, argument)
                 else:
                     prepare.append(f"{cpp} a{index} {{ }};")
+                for field_member, field_mapped in fields:
+                    label = f"{mapped.interface}.{field_member.name}"
+                    if label in self.world.config.get("unionFieldDefaults", []):
+                        # The C++ struct leaves the member empty; the IDL default applies whether or not options is NULL.
+                        default = field_member.default or ""
+                        if (field_mapped.kind != "union" or not default.startswith('"')
+                                or not any(child.kind == "string" for child in field_mapped.subtypes)):
+                            raise SystemExit(f"{label}: unionFieldDefaults takes a union member with a string arm and a string default")
+                        prepare.append(f"a{index}.{field_member.attrs.get('ImplementedAs', field_member.name)} = String {{ {default}_s }};")
                 prepare.append(f"if ({name}) {{")
                 for field_member, field_mapped in fields:
                     if (field_mapped.kind == "object" and not getattr(field_mapped, "optional_handle", False)
