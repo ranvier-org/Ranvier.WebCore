@@ -1,0 +1,286 @@
+{
+ "browser": "Chromium 156.0.8078.4",
+ "steps": [
+  {
+   "name": "timing",
+   "value": {
+    "delay": 100,
+    "endDelay": 50,
+    "fill": "both",
+    "iterationStart": 0.25,
+    "iterations": 2,
+    "duration": 1000,
+    "direction": "alternate",
+    "easing": "linear"
+   }
+  },
+  {
+   "name": "computed at 600",
+   "value": {
+    "delay": 100,
+    "endDelay": 50,
+    "fill": "both",
+    "iterationStart": 0.25,
+    "iterations": 2,
+    "duration": 1000,
+    "direction": "alternate",
+    "easing": "linear",
+    "endTime": 2150,
+    "activeDuration": 2000,
+    "localTime": 600,
+    "progress": 0.75,
+    "currentIteration": 0
+   }
+  },
+  {
+   "name": "keyframes",
+   "value": [
+    {
+     "offset": null,
+     "computedOffset": 0,
+     "easing": "linear",
+     "composite": "auto",
+     "properties": [
+      [
+       "opacity",
+       "0"
+      ]
+     ]
+    },
+    {
+     "offset": 0.5,
+     "computedOffset": 0.5,
+     "easing": "ease-in",
+     "composite": "auto",
+     "properties": [
+      [
+       "opacity",
+       "1"
+      ]
+     ]
+    },
+    {
+     "offset": null,
+     "computedOffset": 1,
+     "easing": "linear",
+     "composite": "auto",
+     "properties": [
+      [
+       "opacity",
+       "0.5"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "name": "timing after update",
+   "value": {
+    "delay": 0,
+    "endDelay": 50,
+    "fill": "both",
+    "iterationStart": 0,
+    "iterations": 1,
+    "duration": 2000,
+    "direction": "normal",
+    "easing": "linear"
+   }
+  },
+  {
+   "name": "computed after update",
+   "value": {
+    "delay": 0,
+    "endDelay": 50,
+    "fill": "both",
+    "iterationStart": 0,
+    "iterations": 1,
+    "duration": 2000,
+    "direction": "normal",
+    "easing": "linear",
+    "endTime": 2050,
+    "activeDuration": 2000,
+    "localTime": 500,
+    "progress": 0.25,
+    "currentIteration": 0
+   }
+  },
+  {
+   "name": "opacity after update",
+   "value": "0.5"
+  },
+  {
+   "name": "auto duration",
+   "value": {
+    "delay": 0,
+    "endDelay": 50,
+    "fill": "both",
+    "iterationStart": 0,
+    "iterations": 1,
+    "duration": "auto",
+    "direction": "normal",
+    "easing": "linear"
+   }
+  },
+  {
+   "name": "timing after second update",
+   "value": {
+    "delay": 0,
+    "endDelay": 0,
+    "fill": "forwards",
+    "iterationStart": 0,
+    "iterations": 1,
+    "duration": 2000,
+    "direction": "normal",
+    "easing": "ease-out"
+   }
+  },
+  {
+   "name": "keyframes after set",
+   "value": [
+    {
+     "offset": null,
+     "computedOffset": 0,
+     "easing": "linear",
+     "composite": "auto",
+     "properties": [
+      [
+       "transform",
+       "translateX(0px)"
+      ]
+     ]
+    },
+    {
+     "offset": null,
+     "computedOffset": 1,
+     "easing": "linear",
+     "composite": "add",
+     "properties": [
+      [
+       "transform",
+       "translateX(100px)"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "name": "style after set",
+   "value": [
+    "1",
+    "matrix(1, 0, 0, 1, 37.8138, 0)"
+   ]
+  },
+  {
+   "name": "retarget",
+   "value": {
+    "target": "b",
+    "a": "none",
+    "b": "matrix(1, 0, 0, 1, 37.8138, 0)"
+   }
+  },
+  {
+   "name": "pseudo",
+   "value": {
+    "pseudoElement": "::before",
+    "target": "b"
+   }
+  },
+  {
+   "name": "composites",
+   "value": [
+    "add",
+    "accumulate"
+   ]
+  },
+  {
+   "name": "invalid",
+   "value": {
+    "updateTiming negative duration": "TypeError",
+    "updateTiming bad duration string": "TypeError",
+    "updateTiming bad easing": "TypeError",
+    "updateTiming negative iterations": "TypeError",
+    "updateTiming NaN iterations": "TypeError",
+    "updateTiming negative iterationStart": "TypeError",
+    "setKeyframes unsorted": "TypeError",
+    "setKeyframes bad easing": "TypeError",
+    "pseudoElement bogus": "SyntaxError"
+   }
+  },
+  {
+   "name": "timing after invalid",
+   "value": {
+    "delay": 0,
+    "endDelay": 0,
+    "fill": "forwards",
+    "iterationStart": 0,
+    "iterations": 1,
+    "duration": 2000,
+    "direction": "normal",
+    "easing": "ease-out"
+   }
+  },
+  {
+   "name": "keyframes after invalid",
+   "value": [
+    {
+     "offset": null,
+     "computedOffset": 0,
+     "easing": "linear",
+     "composite": "auto",
+     "properties": [
+      [
+       "transform",
+       "translateX(0px)"
+      ]
+     ]
+    },
+    {
+     "offset": null,
+     "computedOffset": 1,
+     "easing": "linear",
+     "composite": "add",
+     "properties": [
+      [
+       "transform",
+       "translateX(100px)"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "name": "removed target",
+   "value": {
+    "target": "b",
+    "connected": false,
+    "progress": 0.378138130825794
+   }
+  },
+  {
+   "name": "null target",
+   "value": {
+    "target": null,
+    "progress": 0.378138130825794,
+    "keyframes": 2
+   }
+  },
+  {
+   "name": "cancelled",
+   "value": {
+    "delay": 0,
+    "endDelay": 0,
+    "fill": "forwards",
+    "iterationStart": 0,
+    "iterations": 1,
+    "duration": 2000,
+    "direction": "normal",
+    "easing": "ease-out",
+    "endTime": 2000,
+    "activeDuration": 2000,
+    "localTime": null,
+    "progress": null,
+    "currentIteration": null
+   }
+  }
+ ]
+}

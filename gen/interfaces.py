@@ -111,11 +111,26 @@ class InterfaceEmitter:
 
     def complex(self, member):
         return (self.union(member.type) or any(self.union(arg.type) for arg in member.arguments)
-                or any(self.union_sequence(arg.type) and not arg.variadic for arg in member.arguments))
+                or any(self.union_sequence(arg.type) and not arg.variadic for arg in member.arguments)
+                or bool(self.result_union_fields(member.type)))
 
     def raw_name(self, member):
         """The browser member an adapter calls; an overload with a union sequence takes its own name."""
         return f'__ranvier_{member.name}' + ('List' if any(self.union_sequence(a.type) for a in member.arguments) else '')
+
+    def result_union_fields(self, value):
+        """The (dictionary, field, union type) of a dictionary result, or a sequence of one, whose fields are unions: a
+        browser returns plain values there, which the Fable adapter wraps in the contract's unions."""
+        t = self.resolve(value)
+        if t.name in ('sequence', 'FrozenArray'):
+            t = self.resolve(t.subtypes[0])
+        if t.name not in self.world.dictionaries or t.name not in self.world.config.get('resultDictionaries', []):
+            return []
+        try:
+            fields = self.world.dictionary_fields(t.name)
+        except self.generator.unsupported_type:
+            return []
+        return [(t.name, member, self.resolve(member.type)) for member, _ in fields if self.union(member.type)]
 
     def choices(self, arguments):
         variants = []
@@ -277,7 +292,14 @@ class InterfaceEmitter:
         conversions = {i: self.world.config.get('browserArgumentConversions', {}).get(f'{self.sources.get(owner, owner)}.{member.name}.{a.name}')
                        for i, a in enumerate(member.arguments)}
         conversions = {i: c for i, c in conversions.items() if c}
-        if conversions and not needs_adapter and not anonymous_property:
+        result_conversion = self.world.config.get('browserResultConversions', {}).get(f'{self.sources.get(owner, owner)}.{member.name}')
+        if result_conversion and not needs_adapter and not anonymous_property:
+            names = [f'a{i}' for i in range(len(member.arguments))]
+            passed = [f'({conversions[i]})({n})' if i in conversions else n for i, n in enumerate(names)]
+            expression = (f"((o{''.join(',' + n for n in names)})=>({result_conversion})(o.{member.name}({','.join(passed)})))"
+                          f"($0{''.join(f',${i + 1}' for i in range(len(member.arguments)))})")
+            lines = ([''] if lines[0] != '' else []) + lines + ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif']
+        elif conversions and not needs_adapter and not anonymous_property:
             names = [f'a{i}' for i in range(len(member.arguments))]
             passed = [f'({conversions[i]})({n})' if i in conversions else n for i, n in enumerate(names)]
             expression = (f"((o,{','.join(names)})=>o.{member.name}({','.join(passed)}))"
@@ -293,10 +315,12 @@ class InterfaceEmitter:
             lines = ([''] if lines[0] != '' else []) + lines + ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif']
         if needs_adapter:
             raw_params = self.parameters(member.arguments, [a.type for a in member.arguments], raw=True)
-            raw_result = 'obj' if self.union(member.type) else result
+            raw_result = 'obj' if self.union(member.type) or self.result_union_fields(member.type) else result
             arg_expressions = [('...' if a.variadic else '') + (f'({conversions[i]})(${i + 1})' if i in conversions else f'${i + 1}')
                                for i, a in enumerate(member.arguments)]
             expression = f'$0.{member.name}(' + ', '.join(arg_expressions) + ')'
+            if result_conversion:
+                expression = f'({result_conversion})({expression})'
             if anonymous_property:
                 expression = self.browser_property_expression(owner, member)
             raw_signature = f'{raw_params} -> {raw_result}'
@@ -411,7 +435,8 @@ class InterfaceEmitter:
                               f'            {boxed}']
                 else:
                     lines += [f'        | {name}.{label(child)} value -> {boxed}']
-            if any(self.union(member.type) and label(self.resolve(member.type)) == name for _, member in self.adapters):
+            if any((self.union(member.type) and label(self.resolve(member.type)) == name)
+                   or any(label(union) == name for _, _, union in self.result_union_fields(member.type)) for _, member in self.adapters):
                 lines += ['', f'    let private unbox{name} (value: obj) : {name} =', '        match value with']
                 for child in children:
                     resolved = self.resolve(child)
@@ -425,6 +450,28 @@ class InterfaceEmitter:
                         value = f'{name}.{label(child)} (unbox<{ftype}> arm)'
                         lines += [head, f'            {value}'] if name not in self.world.config.get('validatedReferenceUnions', []) and len(head + ' ' + value) > 150 else [head + ' ' + value]
                 lines += ['        | _ -> failwith "Unexpected DOM union result"']
+        converted = {}
+        for _, member in self.adapters:
+            for name, field, union in self.result_union_fields(member.type):
+                converted.setdefault(name, []).append((field, union))
+        if converted:
+            lines += ['', '    [<Fable.Core.Emit("$0[$1]")>]', '    let private rawField (_: obj) (_: string) : obj =',
+                      '        Fable.Core.Util.jsNative']
+        for name, fields in converted.items():
+            lines += ['', f'    let private resultDict{name} (raw: obj) : {name} =', f'        let value = unbox<{name}> raw']
+            for field, union in fields:
+                union_name = label(union)
+                plain = f'unbox{union_name} (rawField raw "{field.name}")'
+                if union.nullable or (not field.required and field.default is None):
+                    # An optional field: absent or null is None. Fantomas's layout: a multi-line if between blank lines.
+                    raw_name = identifier(field.name) + 'Field'
+                    lines += [f'        let {raw_name} = rawField raw "{field.name}"', '',
+                              f'        value.{identifier(field.name)} <-',
+                              f'            (if isNull {raw_name} then', '                 None', '             else',
+                              f'                 Some (unbox{union_name} {raw_name}))', '']
+                else:
+                    lines += [f'        value.{identifier(field.name)} <- {plain}']
+            lines += ['        value']
         for owner in dict.fromkeys(owner for owner, _ in self.adapters):
             lines += ['', f'    type {owner} with']
             for current, member in self.adapters:
@@ -521,6 +568,13 @@ class InterfaceEmitter:
                                       f'                Some (unbox{union_name} value)']
                         else:
                             lines += [f'            unbox{union_name} value']
+                    elif self.result_union_fields(member.type):
+                        name = self.result_union_fields(member.type)[0][0]
+                        t = self.world.resolve(member.type)
+                        if t.name in ('sequence', 'FrozenArray'):
+                            lines += [f'            {raw_call} |> unbox<obj array> |> Array.map resultDict{name}']
+                        else:
+                            lines += [f'            resultDict{name} ({raw_call})']
                     else:
                         lines += [f'            {raw_call}']
                     lines += ['']
@@ -577,7 +631,18 @@ class InterfaceEmitter:
             declarations.append((name, '[<AllowNullLiteral>]', body or ['    interface end']))
         for name, children in self.unions.items():
             declarations.append((name, '[<RequireQualifiedAccess>]', [f'    | {label(child)} of {self.type(child)}' for child in children]))
-        for name, fields in self.dictionaries.items():
+        # A derived contract dictionary is a subclass, which JavaScript defines only after its base class.
+        ordered = []
+
+        def place(name):
+            base = self.world.dictionaries[name].base
+            if name in self.world.contract_dictionary_fields and base in self.dictionaries:
+                place(base)
+            if name not in ordered:
+                ordered.append(name)
+        for name in self.dictionaries:
+            place(name)
+        for name, fields in [(name, self.dictionaries[name]) for name in ordered]:
             body = []
             base = self.world.dictionaries[name].base
             inherited = set()

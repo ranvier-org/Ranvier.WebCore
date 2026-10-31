@@ -28,6 +28,11 @@
     "optionalObjectMembers lists optional nullable object dictionary members passed as Rv<Root>* const*: NULL absent, a pointer to NULL null.",
     "setterExpressions maps Interface.member to the C++ a setter calls with {value}, for a member whose C++ type differs from its IDL type.",
     "browserArgumentConversions maps Interface.member.argument to the JavaScript function the Fable provider applies to an argument: Keyframe sequences become the browser's keyframe objects.",
+    "customOperations replaces a [Custom] operation with the signature its native binding implements, and callExpressions names the C++ an operation calls.",
+    "syntheticDictionaries lists the dictionaries of syntheticIdl, which no WebKit IDL file defines.",
+    "contextDocuments names the C++ document of an object whose operations take a checked context Document: another document returns RV_ERR_WRONG_HOST.",
+    "resultValueOverloads adds C++ overloads that convert a result dictionary field to its IDL transport type.",
+    "browserResultConversions maps Interface.member to the JavaScript function the Fable provider applies to the browser's result: getKeyframes gives ComputedKeyframe objects.",
     "browserIndexedGetters lists named IDL getters that browsers expose only as an indexed property; the Fable binding reads $0[index], null when absent."
   ],
   "attributeBridges": {
@@ -357,7 +362,8 @@
     "StaticRangeInit": "StaticRange::Init",
     "Keyframe": "Ranvier::Keyframe",
     "KeyframeProperty": "Ranvier::KeyframeProperty",
-    "FontFaceDescriptors": "FontFace::Descriptors"
+    "FontFaceDescriptors": "FontFace::Descriptors",
+    "ComputedKeyframe": "Ranvier::ComputedKeyframe"
   },
   "dictionaryObjectMembers": [
     "FormDataEventInit.formData"
@@ -792,6 +798,8 @@
     "KeyframeEffect",
     "AnimationTimeline",
     "DocumentTimeline",
+    "CSSAnimation",
+    "CSSTransition",
     "DataTransfer",
     "DataTransferItemList",
     "DataTransferItem",
@@ -903,7 +911,8 @@
     "CSSTransformComponent",
     "Event",
     "AnimationEffect",
-    "AnimationTimeline"
+    "AnimationTimeline",
+    "WebAnimation"
   ],
   "interfaceHeaders": {
     "SVGAnimatedInteger": "svg/properties/SVGAnimatedPropertyImpl.h",
@@ -947,7 +956,9 @@
   "castVia": {
     "SVGAnimationElement": "SVGElement",
     "RadioNodeList": "LiveNodeList",
-    "CSSConditionRule": "CSSGroupingRule"
+    "CSSConditionRule": "CSSGroupingRule",
+    "CSSAnimation": "WebAnimation",
+    "CSSTransition": "WebAnimation"
   },
   "atomArguments": [
     "StyleSheetList.namedItem",
@@ -1040,9 +1051,6 @@
     "UIEventInit.view",
     "KeyframeAnimationOptions.rangeStart",
     "KeyframeAnimationOptions.rangeEnd",
-    "AnimationEffect.getTiming",
-    "AnimationEffect.getComputedTiming",
-    "AnimationEffect.updateTiming",
     "DataTransferItem.getAsString",
     "DataTransferItem.webkitGetAsEntry"
   ],
@@ -1266,7 +1274,11 @@
   "resultDictionaries": [
     "URLPatternResult",
     "URLPatternComponentResult",
-    "URLPatternInit"
+    "URLPatternInit",
+    "EffectTiming",
+    "ComputedEffectTiming",
+    "ComputedKeyframe",
+    "KeyframeProperty"
   ],
   "sequenceStringSpans": [
     "URLSearchParams"
@@ -1464,9 +1476,33 @@
     "Animatable.animate.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})",
     "Element.animate.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})",
     "KeyframeEffect.setKeyframes.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})",
-    "Element.animate.options": "(o)=>{if(o==null||typeof o!=='object')return o;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing', 'iterationComposite', 'composite', 'pseudoElement', 'id', 'timeline'])if(o[k]!==undefined)r[k]=o[k];const d=o.duration;r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;return r;}"
+    "Element.animate.options": "(o)=>{if(o==null||typeof o!=='object')return o;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing', 'iterationComposite', 'composite', 'pseudoElement', 'id', 'timeline'])if(o[k]!==undefined)r[k]=o[k];const d=o.duration;r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;return r;}",
+    "AnimationEffect.updateTiming.timing": "(t)=>{if(t==null)return t;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing'])if(t[k]!==undefined)r[k]=t[k];const d=t.duration;if(d!==undefined)r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;return r;}"
   },
   "unionArgumentConversions": [
     "CanvasImageSource"
-  ]
+  ],
+  "customOperations": {
+    "KeyframeEffect.getKeyframes": {
+      "idl": "sequence<ComputedKeyframe> getKeyframes();"
+    }
+  },
+  "callExpressions": {
+    "KeyframeEffect.getKeyframes": "Ranvier::computedKeyframes(*impl)"
+  },
+  "syntheticDictionaries": [
+    "Keyframe",
+    "KeyframeProperty",
+    "ComputedKeyframe"
+  ],
+  "contextDocuments": {
+    "AnimationEffect": "[&]() -> Document* { auto* effect = dynamicDowncast<KeyframeEffect>(impl.get()); return effect ? effect->document() : nullptr; }()",
+    "KeyframeEffect": "impl->document()"
+  },
+  "resultValueOverloads": [
+    "CSSNumberish resultValue(const WebAnimationTime& value) { return value; }"
+  ],
+  "browserResultConversions": {
+    "KeyframeEffect.getKeyframes": "(l)=>l.map((k)=>({offset:k.offset,computedOffset:k.computedOffset,easing:k.easing,composite:k.composite,properties:Object.keys(k).filter((n)=>!['offset','computedOffset','easing','composite'].includes(n)).map((n)=>({name:n,value:k[n]}))}))"
+  }
 }

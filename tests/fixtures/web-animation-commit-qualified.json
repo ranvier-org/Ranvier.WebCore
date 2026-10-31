@@ -1,0 +1,41 @@
+{
+ "comment": "WebKit commitStyles results that differ from the Chromium oracle by engine behaviour. The probe asserts the native value here and that the oracle still records the Chromium value, so either engine changing is caught.",
+ "cases": {
+  "opacity and transform": {
+   "field": "committed/afterCancel",
+   "reason": "WebKit serializes the style attribute with the important declaration after the normal one; the declarations, values and priorities are the same.",
+   "webkit": "margin-top: 0px; color: rgb(1, 2, 3) !important; transform: translateX(50px); opacity: 0.5;",
+   "chromium": "color: rgb(1, 2, 3) !important; margin-top: 0px; transform: translateX(50px); opacity: 0.5;"
+  },
+  "over an important inline value": {
+   "field": "all",
+   "reason": "WebKit commits the animation effect value (0.5) and replaces the important inline declaration; Chromium commits the computed value with the important inline declaration (0.2). Both drop the priority.",
+   "webkit": {
+    "committed": "opacity: 0.5;",
+    "afterCancel": "opacity: 0.5;",
+    "inline": {
+     "opacity": [
+      "0.5",
+      ""
+     ]
+    },
+    "computed": {
+     "opacity": "0.5"
+    }
+   },
+   "chromium": {
+    "committed": "opacity: 0.2;",
+    "afterCancel": "opacity: 0.2;",
+    "inline": {
+     "opacity": [
+      "0.2",
+      ""
+     ]
+    },
+    "computed": {
+     "opacity": "0.2"
+    }
+   }
+  }
+ }
+}

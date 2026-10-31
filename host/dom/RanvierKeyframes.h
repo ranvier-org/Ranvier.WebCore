@@ -4,7 +4,9 @@
 
 #include "Exception.h"
 #include "ExceptionOr.h"
+#include "JSCompositeOperationOrAuto.h"
 #include "JSDOMGlobalObject.h"
+#include "KeyframeEffect.h"
 #include <JavaScriptCore/TopExceptionScope.h>
 #include <JavaScriptCore/ErrorInstance.h>
 #include <JavaScriptCore/JSArray.h>
@@ -28,6 +30,34 @@ struct Keyframe {
     String composite;
     Vector<KeyframeProperty> properties;
 };
+
+// One computed keyframe of KeyframeEffect.getKeyframes() (gen/RanvierKeyframes.idl).
+struct ComputedKeyframe {
+    std::optional<double> offset;
+    double computedOffset { 0 };
+    String easing;
+    String composite;
+    Vector<KeyframeProperty> properties;
+};
+
+// The computed keyframes WebKit's getKeyframes binding returns: custom properties by name, then each property by its
+// IDL attribute name, with its string value. An offset that is not a number is null.
+inline Vector<ComputedKeyframe> computedKeyframes(WebCore::KeyframeEffect& effect)
+{
+    return effect.getKeyframes().map([](auto& keyframe) {
+        ComputedKeyframe result;
+        if (auto* offset = std::get_if<double>(&keyframe.offset))
+            result.offset = *offset;
+        result.computedOffset = keyframe.computedOffset;
+        result.easing = keyframe.easing;
+        result.composite = WebCore::convertEnumerationToString(keyframe.composite);
+        for (auto& [name, value] : keyframe.customStyleStrings)
+            result.properties.append({ name, value });
+        for (auto& [property, value] : keyframe.styleStrings)
+            result.properties.append({ WebCore::KeyframeEffect::CSSPropertyIDToIDLAttributeName(property), value });
+        return result;
+    });
+}
 
 // The JavaScript array of plain objects a script would pass: one object per keyframe, holding offset, easing and
 // composite when present and each property as a string. Null keyframes give a null object. The caller holds the

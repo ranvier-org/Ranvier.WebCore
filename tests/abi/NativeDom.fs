@@ -1428,6 +1428,50 @@ type RvDomFontFaceDescriptors =
     val mutable display: RvDomUtf8StringInput
     val mutable size_adjust: RvDomUtf8StringInput
 
+/// <summary>The IDL dictionary EffectTiming; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomEffectTiming =
+    val mutable size: uint32
+    val mutable delay: float
+    val mutable end_delay: float
+    val mutable fill: int
+    val mutable iteration_start: float
+    val mutable iterations: float
+    val mutable duration: nativeint
+    val mutable direction: int
+    val mutable easing: RvDomUtf8StringInput
+
+/// <summary>The IDL dictionary ComputedEffectTiming; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomComputedEffectTiming =
+    val mutable size: uint32
+    val mutable delay: float
+    val mutable end_delay: float
+    val mutable fill: int
+    val mutable iteration_start: float
+    val mutable iterations: float
+    val mutable duration: nativeint
+    val mutable direction: int
+    val mutable easing: RvDomUtf8StringInput
+    val mutable end_time: nativeint
+    val mutable active_duration: nativeint
+    val mutable local_time: nativeint
+    val mutable progress: nativeint
+    val mutable current_iteration: nativeint
+
+/// <summary>The IDL dictionary OptionalEffectTiming; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomOptionalEffectTiming =
+    val mutable size: uint32
+    val mutable delay: nativeint
+    val mutable end_delay: nativeint
+    val mutable fill: nativeint
+    val mutable iteration_start: nativeint
+    val mutable iterations: nativeint
+    val mutable duration: nativeint
+    val mutable direction: nativeint
+    val mutable easing: RvDomUtf8StringInput
+
 /// <summary>The IDL dictionary KeyframeEffectOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomKeyframeEffectOptions =
@@ -1443,6 +1487,16 @@ type RvDomKeyframeEffectOptions =
     val mutable iteration_composite: int
     val mutable composite: int
     val mutable pseudo_element: RvDomUtf8StringInput
+
+/// <summary>The IDL dictionary ComputedKeyframe; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomComputedKeyframe =
+    val mutable size: uint32
+    val mutable offset: nativeint
+    val mutable computed_offset: float
+    val mutable easing: RvDomUtf8StringInput
+    val mutable composite: RvDomUtf8StringInput
+    val mutable properties: nativeint
 
 /// <summary>The IDL dictionary DocumentTimelineOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
@@ -2145,6 +2199,20 @@ type RvDomUnionUnsignedLongOrAnimationFrameRatePreset =
     val mutable arm1: int
 
 [<Literal>]
+let RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_DOM_STRING_NUMBER = 1
+
+[<Literal>]
+let RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_DOM_STRING_STRING = 2
+
+/// <summary>ABI transport for UnrestrictedDoubleOrDOMString; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionUnrestrictedDoubleOrDOMString =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: float
+    val mutable arm1: RvDomUtf8StringSpan
+
+[<Literal>]
 let RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_KEYFRAME_EFFECT_OPTIONS_NUMBER = 1
 
 [<Literal>]
@@ -2157,6 +2225,13 @@ type RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions =
     val mutable tag: int
     val mutable arm0: float
     val mutable arm1: nativeint
+
+/// <summary>ABI transport for ComputedKeyframe sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequenceComputedKeyframe =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
 
 [<Literal>]
 let RV_DOM_UNION_DOM_STRING_OR_CANVAS_GRADIENT_OR_CANVAS_PATTERN_STRING = 1
@@ -2470,7 +2545,13 @@ extern void rv_dom_union_dom_string_or_array_buffer_or_array_buffer_view_release
 extern void rv_dom_union_unsigned_long_or_animation_frame_rate_preset_release(RvDomUnionUnsignedLongOrAnimationFrameRatePreset& value)
 
 [<DllImport(Lib)>]
+extern void rv_dom_union_unrestricted_double_or_dom_string_release(RvDomUnionUnrestrictedDoubleOrDOMString& value)
+
+[<DllImport(Lib)>]
 extern void rv_dom_union_unrestricted_double_or_keyframe_effect_options_release(RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_sequence_computed_keyframe_release(RvDomSequenceComputedKeyframe& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release(RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern& value)
@@ -2519,6 +2600,18 @@ extern void rv_dom_url_pattern_init_release(nativeint value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_url_pattern_component_result_release(nativeint value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_effect_timing_release(nativeint value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_computed_effect_timing_release(nativeint value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_computed_keyframe_release(nativeint value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_keyframe_property_release(nativeint value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_dom_implementation_release(nativeint handle)
@@ -3023,6 +3116,9 @@ extern int rv_dom_animation_effect_get_interface_name(nativeint target, byte[] b
 
 [<DllImport(Lib)>]
 extern int rv_dom_animation_timeline_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_node_get_node_type(nativeint target, uint16& result)
@@ -11179,6 +11275,15 @@ extern int rv_dom_web_animation_persist(nativeint target)
 extern int rv_dom_web_animation_commit_styles(nativeint target)
 
 [<DllImport(Lib)>]
+extern int rv_dom_animation_effect_get_timing(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_animation_effect_get_computed_timing(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_animation_effect_update_timing(nativeint target, nativeint context, [<In>] RvDomOptionalEffectTiming[] timing)
+
+[<DllImport(Lib)>]
 extern int rv_dom_keyframe_effect_create_3(nativeint target, nativeint target_, [<In>] RvDomSequenceKeyframeNullable[] keyframes, [<In>] RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions[] options, nativeint& result)
 
 [<DllImport(Lib)>]
@@ -11209,6 +11314,9 @@ extern int rv_dom_keyframe_effect_get_composite(nativeint target, int& result)
 extern int rv_dom_keyframe_effect_set_composite(nativeint target, int value)
 
 [<DllImport(Lib)>]
+extern int rv_dom_keyframe_effect_get_keyframes(nativeint target, RvDomSequenceComputedKeyframe& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_keyframe_effect_set_keyframes(nativeint target, nativeint context, [<In>] RvDomSequenceKeyframeNullable[] keyframes)
 
 [<DllImport(Lib)>]
@@ -11219,6 +11327,12 @@ extern int rv_dom_animation_timeline_get_duration(nativeint target, RvDomUnionDo
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_timeline_create(nativeint target, [<In>] RvDomDocumentTimelineOptions[] options, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_animation_get_animation_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_transition_get_transition_property(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_data_transfer_create(nativeint target, nativeint& result)

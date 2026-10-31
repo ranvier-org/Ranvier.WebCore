@@ -1321,6 +1321,37 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
 
                 rv_dom_path2_d_release path
                 rv_dom_canvas_rendering_context2_d_release held.Value
+        | "animation discovery" ->
+            // A CSS transition of the div, listed by getAnimations, and the list's handles, held past host destroy.
+            rv_element_set_style (div, "transition", utf8 "opacity 100s linear", utf8Length "opacity 100s linear", 0) |> check "transition"
+            let buffer = Array.zeroCreate<byte> 64
+            rv_element_computed_style (div, "opacity", buffer, buffer.Length, [| 0 |]) |> check "opacity before"
+            rv_element_set_style (div, "opacity", utf8 "0.2", utf8Length "0.2", 0) |> check "opacity change"
+            let mutable listed = RvDomSequenceWebAnimation()
+            rv_dom_element_get_animations (div, null, &listed) |> check "Element.getAnimations"
+
+            let handles =
+                Array.init listed.count (fun index ->
+                    rv_event_target_retain (Runtime.InteropServices.Marshal.ReadIntPtr(listed.items, index * IntPtr.Size)))
+
+            rv_dom_sequence_web_animation_release &listed
+
+            if handles.Length <> 1 then
+                failwithf "expected one CSS transition, got %d" handles.Length
+
+            let name = Array.zeroCreate<byte> 64
+            let nameLength = [| 0 |]
+            rv_dom_web_animation_get_interface_name (handles[0], name, name.Length, nameLength)
+            |> check "interface name"
+
+            if System.Text.Encoding.UTF8.GetString(name, 0, nameLength[0]) <> "CSSTransition" then
+                failwith "getAnimations listed no CSSTransition"
+
+            held.Value <- handles[0]
+
+            fun () ->
+                for handle in handles do
+                    rv_event_target_release handle
         | "crypto" ->
             let filled = Array.zeroCreate<byte> 16
 
@@ -1625,6 +1656,7 @@ let run (outDir: string) =
                     "canvas path"
                     "canvas gradient"
                     "canvas text metrics"
+                    "animation discovery"
                 ] do
                 for remove in [ false; true ] do
                     releaseAfterDestroy kind remove

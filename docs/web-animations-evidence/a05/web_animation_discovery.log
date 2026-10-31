@@ -1,0 +1,4 @@
+PASS web animation discovery: 185 assertions against Chromium 156.0.8078.4
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+
+EXIT_CODE=0
