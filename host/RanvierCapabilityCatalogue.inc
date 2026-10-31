@@ -384,6 +384,7 @@ static constexpr const char* capabilityAbiNames[] = {
     "canvas-context",
     "canvas-pixels",
     "cascade-diagnostics",
+    "media-capabilities",
     "accessibility-uia",
     "resize",
     "input",

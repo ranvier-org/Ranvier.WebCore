@@ -1,0 +1,187 @@
+{
+ "video": {
+  "width": 640,
+  "height": 360,
+  "bitrate": 1000000,
+  "framerate": 30
+ },
+ "decoding": [
+  {
+   "name": "file avc1",
+   "type": "file",
+   "video": "video/mp4;codecs=\"avc1.42E01E\"",
+   "webkit": "resolve"
+  },
+  {
+   "name": "file vp9",
+   "type": "file",
+   "video": "video/webm;codecs=\"vp09.00.10.08\"",
+   "webkit": "resolve"
+  },
+  {
+   "name": "file vp8",
+   "type": "file",
+   "video": "video/webm;codecs=\"vp8\"",
+   "webkit": "resolve"
+  },
+  {
+   "name": "file av1",
+   "type": "file",
+   "video": "video/mp4;codecs=\"av01.0.04M.08\"",
+   "webkit": "resolve"
+  },
+  {
+   "name": "file opus",
+   "type": "file",
+   "audio": "audio/webm;codecs=\"opus\"",
+   "webkit": "resolve"
+  },
+  {
+   "name": "file aac",
+   "type": "file",
+   "audio": "audio/mp4;codecs=\"mp4a.40.2\"",
+   "webkit": "resolve"
+  },
+  {
+   "name": "file audio and video",
+   "type": "file",
+   "video": "video/webm;codecs=\"vp8\"",
+   "audio": "audio/webm;codecs=\"opus\"",
+   "webkit": "resolve"
+  },
+  {
+   "name": "file unknown container",
+   "type": "file",
+   "video": "video/x-ranvier-unknown",
+   "webkit": "resolve"
+  },
+  {
+   "name": "file hdr pq rec2020",
+   "type": "file",
+   "video": "video/webm;codecs=\"vp09.02.10.10\"",
+   "hdrMetadataType": "smpteSt2086",
+   "colorGamut": "rec2020",
+   "transferFunction": "pq",
+   "webkit": "resolve"
+  },
+  {
+   "name": "media-source vp8",
+   "type": "media-source",
+   "video": "video/webm;codecs=\"vp8\"",
+   "webkit": "resolve"
+  },
+  {
+   "name": "webrtc vp8",
+   "type": "webrtc",
+   "video": "video/VP8",
+   "webkit": "resolve"
+  },
+  {
+   "name": "audio full",
+   "type": "file",
+   "audio": "audio/webm;codecs=\"opus\"",
+   "channels": "2",
+   "audioBitrate": 128000,
+   "samplerate": 48000,
+   "spatialRendering": false,
+   "webkit": "resolve"
+  },
+  {
+   "name": "invalid empty",
+   "type": "file",
+   "webkit": "TypeError"
+  },
+  {
+   "name": "invalid bucket without codecs",
+   "type": "file",
+   "video": "video/mp4",
+   "webkit": "TypeError"
+  },
+  {
+   "name": "invalid two codecs",
+   "type": "file",
+   "video": "video/mp4;codecs=\"avc1.42E01E,mp4a.40.2\"",
+   "webkit": "TypeError"
+  },
+  {
+   "name": "invalid zero framerate",
+   "type": "file",
+   "video": "video/webm;codecs=\"vp8\"",
+   "framerate": 0,
+   "webkit": "TypeError"
+  },
+  {
+   "name": "invalid audio type as video",
+   "type": "file",
+   "video": "audio/webm;codecs=\"opus\"",
+   "webkit": "TypeError"
+  },
+  {
+   "name": "invalid video type as audio",
+   "type": "file",
+   "audio": "video/webm;codecs=\"vp8\"",
+   "webkit": "TypeError"
+  },
+  {
+   "name": "invalid empty content type",
+   "type": "file",
+   "video": "",
+   "webkit": "TypeError"
+  },
+  {
+   "name": "invalid not a mime type",
+   "type": "file",
+   "video": "not a mime type",
+   "webkit": "TypeError"
+  },
+  {
+   "name": "extra parameter",
+   "type": "file",
+   "video": "video/webm;codecs=\"vp8\";foo=bar",
+   "webkit": "resolve"
+  }
+ ],
+ "encoding": [
+  {
+   "name": "record vp8",
+   "type": "record",
+   "video": "video/webm;codecs=\"vp8\"",
+   "webkit": "resolve"
+  },
+  {
+   "name": "record opus",
+   "type": "record",
+   "audio": "audio/webm;codecs=\"opus\"",
+   "webkit": "resolve"
+  },
+  {
+   "name": "webrtc vp8",
+   "type": "webrtc",
+   "video": "video/VP8",
+   "webkit": "resolve"
+  },
+  {
+   "name": "invalid empty",
+   "type": "record",
+   "webkit": "TypeError"
+  },
+  {
+   "name": "invalid zero framerate",
+   "type": "record",
+   "video": "video/webm;codecs=\"vp8\"",
+   "framerate": 0,
+   "webkit": "TypeError"
+  }
+ ],
+ "qualified": {
+  "decoding": {
+   "invalid bucket without codecs": "WebKit requires exactly one codec for a bucket container (TypeError); Chromium resolves unsupported",
+   "invalid two codecs": "WebKit requires exactly one codec for a bucket container (TypeError); Chromium resolves unsupported",
+   "extra parameter": "WebKit accepts parameters besides codecs (FIXME in MediaCapabilities.cpp); Chromium rejects with TypeError"
+  },
+  "encoding": {
+   "record vp8": "Chromium rejects record encoding with TypeError; WebKit validates it as any configuration",
+   "record opus": "Chromium rejects record encoding with TypeError; WebKit validates it as any configuration"
+  }
+ }
+}

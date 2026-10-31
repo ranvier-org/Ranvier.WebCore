@@ -1,0 +1,145 @@
+{
+ "abi": 54,
+ "advertised": {
+  "media-capabilities": 0,
+  "image-decode": 1,
+  "font-load": 1,
+  "blob-urls": 1
+ },
+ "exports": {
+  "rv_media_decoding_info": false,
+  "rv_media_encoding_info": false,
+  "rv_media_capabilities_info": false,
+  "rv_host_media_decoding_info": false,
+  "rv_host_media_encoding_info": false,
+  "rv_dom_media_capabilities_decoding_info": false,
+  "rv_dom_media_capabilities_encoding_info": false,
+  "rv_dom_navigator_get_media_capabilities": false,
+  "rv_host_media_capabilities": false
+ },
+ "facilityNames": 123,
+ "mediaNamesListed": [
+  "video",
+  "web-audio",
+  "media-stream",
+  "media-recorder",
+  "web-codecs",
+  "encrypted-media",
+  "build:ENABLE_WEB_RTC"
+ ],
+ "facts": {
+  "video": {
+   "exported": -1,
+   "implemented": 0,
+   "enabled": -1,
+   "permitted": -1,
+   "available": -1
+  },
+  "web-audio": {
+   "exported": -1,
+   "implemented": 0,
+   "enabled": -1,
+   "permitted": -1,
+   "available": -1
+  },
+  "media-stream": {
+   "exported": -1,
+   "implemented": 0,
+   "enabled": -1,
+   "permitted": -1,
+   "available": -1
+  },
+  "media-recorder": {
+   "exported": -1,
+   "implemented": 0,
+   "enabled": -1,
+   "permitted": -1,
+   "available": -1
+  },
+  "web-codecs": {
+   "exported": -1,
+   "implemented": 0,
+   "enabled": -1,
+   "permitted": -1,
+   "available": -1
+  },
+  "encrypted-media": {
+   "exported": -1,
+   "implemented": 0,
+   "enabled": -1,
+   "permitted": -1,
+   "available": -1
+  },
+  "media-capabilities": {
+   "exported": -1,
+   "implemented": -1,
+   "enabled": -1,
+   "permitted": -1,
+   "available": -1
+  },
+  "media-decoding": {
+   "exported": -1,
+   "implemented": -1,
+   "enabled": -1,
+   "permitted": -1,
+   "available": -1
+  },
+  "media-encoding": {
+   "exported": -1,
+   "implemented": -1,
+   "enabled": -1,
+   "permitted": -1,
+   "available": -1
+  },
+  "build:ENABLE_VIDEO": {
+   "exported": -1,
+   "implemented": -1,
+   "enabled": -1,
+   "permitted": -1,
+   "available": -1
+  },
+  "build:ENABLE_WEB_AUDIO": {
+   "exported": -1,
+   "implemented": -1,
+   "enabled": -1,
+   "permitted": -1,
+   "available": -1
+  },
+  "build:ENABLE_MEDIA_STREAM": {
+   "exported": -1,
+   "implemented": -1,
+   "enabled": -1,
+   "permitted": -1,
+   "available": -1
+  },
+  "build:ENABLE_WEB_RTC": {
+   "exported": -1,
+   "implemented": -1,
+   "enabled": -1,
+   "permitted": -1,
+   "available": -1
+  },
+  "build:ENABLE_WEB_CODECS": {
+   "exported": -1,
+   "implemented": -1,
+   "enabled": -1,
+   "permitted": -1,
+   "available": -1
+  },
+  "build:ENABLE_MEDIA_SOURCE": {
+   "exported": -1,
+   "implemented": -1,
+   "enabled": -1,
+   "permitted": -1,
+   "available": -1
+  },
+  "build:ENABLE_ENCRYPTED_MEDIA": {
+   "exported": -1,
+   "implemented": -1,
+   "enabled": -1,
+   "permitted": -1,
+   "available": -1
+  }
+ },
+ "scriptsEnabled": 0
+}

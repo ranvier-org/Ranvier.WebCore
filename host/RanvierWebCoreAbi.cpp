@@ -2,6 +2,7 @@
 #include "RanvierWebCoreAbi.h"
 #include "dom/RanvierDomGlue.h"
 #include "RanvierSvgViewGlue.h"
+#include "RanvierImageEncoding.h"
 #include "RanvierResourceGlue.h"
 #include "RanvierEventGlue.h"
 #include "RanvierViewportGlue.h"
@@ -1320,6 +1321,8 @@ static_assert(sizeof(RvScreenMetrics) == 36 && offsetof(RvScreenMetrics, avail_l
 
 
 static_assert(sizeof(RvWindowMetrics) == 32 && offsetof(RvWindowMetrics, outerHeight) == 16 && offsetof(RvWindowMetrics, devicePixelRatio) == 24);
+static_assert(sizeof(RvMediaVideoConfiguration) == 64 && offsetof(RvMediaVideoConfiguration, bitrate) == 32 && offsetof(RvMediaVideoConfiguration, transfer_function) == 60);
+static_assert(sizeof(RvMediaAudioConfiguration) == 64 && offsetof(RvMediaAudioConfiguration, bitrate) == 40 && offsetof(RvMediaAudioConfiguration, spatial_rendering) == 56);
 
 int32_t rv_abi_version(void) { return 55; }
 
@@ -1372,6 +1375,8 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "canvas-pixels"))
         return 1;
     if (!std::strcmp(feature, "cascade-diagnostics"))
+        return 1;
+    if (!std::strcmp(feature, "media-capabilities"))
         return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "accessibility-uia"))
@@ -3593,6 +3598,35 @@ int32_t rv_blob_url_read(RvHost* host, const uint8_t* url, int32_t url_length, R
     if (!liveHosts.contains(host))
         return RV_ERR_UNSUPPORTED;
     return ranvier_blob_url_read(reinterpret_cast<RvNode*>(&host->document()), url, url_length, completion, context, operation);
+}
+
+int32_t rv_media_decoding_info(RvHost* host, int32_t type, const RvMediaVideoConfiguration* video, const RvMediaAudioConfiguration* audio,
+    RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_media_capabilities_query(reinterpret_cast<RvNode*>(&host->document()), 0, type, video, audio, completion, context, operation);
+}
+
+int32_t rv_media_encoding_info(RvHost* host, int32_t type, const RvMediaVideoConfiguration* video, const RvMediaAudioConfiguration* audio,
+    RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_media_capabilities_query(reinterpret_cast<RvNode*>(&host->document()), 1, type, video, audio, completion, context, operation);
+}
+
+int32_t rv_media_capabilities_info(uint64_t operation, int32_t* supported, int32_t* smooth, int32_t* power_efficient)
+{
+    return ranvier_media_capabilities_info(operation, supported, smooth, power_efficient);
 }
 
 int32_t rv_blob_read_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length)

@@ -23,6 +23,12 @@ LAYOUTS = {
     # Views mirrors RvWindowMetrics as WindowMetrics in Ranvier.View.WebCore/Viewport.fs; its fixture checks the mirror.
     'RvWindowMetrics': ([('size', I), ('innerWidth', I), ('innerHeight', I), ('outerWidth', I), ('outerHeight', I),
                          ('devicePixelRatio', D)], 32, [0, 4, 8, 12, 16, 24], None),
+    'RvMediaVideoConfiguration': ([('size', I), ('content_type', P), ('content_type_length', I), ('width', U), ('height', U),
+                                   ('bitrate', ctypes.c_uint64), ('framerate', D), ('alpha_channel', I), ('hdr_metadata_type', I),
+                                   ('color_gamut', I), ('transfer_function', I)], 64, [0, 8, 16, 20, 24, 32, 40, 48, 52, 56, 60], None),
+    'RvMediaAudioConfiguration': ([('size', I), ('content_type', P), ('content_type_length', I), ('channels', P), ('channels_length', I),
+                                   ('bitrate', ctypes.c_int64), ('samplerate', ctypes.c_int64), ('spatial_rendering', I)], 64,
+                                  [0, 8, 16, 24, 32, 40, 48, 56], None),
 }
 
 
