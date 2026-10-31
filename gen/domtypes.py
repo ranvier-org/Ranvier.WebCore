@@ -295,7 +295,7 @@ class ComplexGeneratorMixin:
             lines = [f'{cpp} {variable} {{ }};', f'if ({expression}) {{',
                      '    auto decodeFields = [&]() -> int32_t {']
             for member, child in fields:
-                lines += ['        ' + line for line in self.dictionary_field(expression, mapped.handle, variable, member, child)]
+                lines += ['        ' + line for line in self.dictionary_field(expression, mapped.handle, variable, member, child, mapped.interface)]
             lines += ['        return RV_OK;', '    };', '    status = decodeFields();',
                       '    if (status != RV_OK) return std::nullopt;', '}']
             return lines, f'std::move({variable})'

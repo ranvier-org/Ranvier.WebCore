@@ -1684,6 +1684,7 @@ interface Matcher {
                      'std::free(const_cast<uint8_t*>(value->input.data));',
                      'releaseDictRvDomPartInit(const_cast<RvDomPartInit*>(value->arm1));',
                      'result->arm1 = encodeDictRvDomPartInit(std::get<I>(value));',
+                     'if (source->arm1->name.present != 0 && source->arm1->name.present != 1)',
                      'void ranvier_dom_match_result_release(RvDomMatchResult* value)',
                      '    if (isMainThread()) releaseDictRvDomMatchResult(value);']:
             self.assertIn(line, glue)
