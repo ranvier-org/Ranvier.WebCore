@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from form_collections import Native, Case, P, I
 
 OK, NULL_ARGUMENT, WRONG_THREAD, UNSUPPORTED = 0, -1, -2, -9
-ABI = 46
+ABI = 50
 PORTRAIT_PRIMARY, PORTRAIT_SECONDARY, LANDSCAPE_PRIMARY, LANDSCAPE_SECONDARY = 0, 1, 2, 3
 TYPES = ['portrait-primary', 'portrait-secondary', 'landscape-primary', 'landscape-secondary']
 ANGLES = {LANDSCAPE_PRIMARY: 0, PORTRAIT_PRIMARY: 90, LANDSCAPE_SECONDARY: 180, PORTRAIT_SECONDARY: 270}

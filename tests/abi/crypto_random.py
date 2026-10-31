@@ -18,7 +18,7 @@ from form_collections import Native, Case, P, I
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, WRONG_THREAD, DOM_EXCEPTION, BUFFER_TOO_SMALL, UNSUPPORTED, WRONG_INTERFACE = 0, -1, -2, -3, -6, -9, -11
-ABI = 46
+ABI = 50
 FEATURE = 'dom-crypto-random'
 # RV_DOM_ARRAY_BUFFER_VIEW_* and the element size of each kind, in the order of the header's constants.
 KINDS = [('Int8Array', 1), ('Uint8Array', 1), ('Uint8ClampedArray', 1), ('Int16Array', 2), ('Uint16Array', 2),
