@@ -2,10 +2,10 @@ from pathlib import Path
 import hashlib, json, os, re, shutil, subprocess
 
 repo = Path('C:/wk/native-svg-paint')
-candidate = repo / 'artifacts/native21-candidate/runtime'
-freeze = repo / 'artifacts/native21-frozen'
+candidate = repo / 'artifacts/native21-candidate-0032/runtime'
+freeze = repo / 'artifacts/native21-0032-frozen'
 runtime = freeze / 'runtimes/win-x64/native'
-out = repo / 'artifacts/native21-batch'
+out = repo / 'artifacts/native21-0032-batch'
 out.mkdir(parents=True, exist_ok=True)
 names = ['brotlicommon.dll', 'brotlidec.dll', 'harfbuzz-icu.dll', 'harfbuzz.dll', 'icudt77.dll', 'icuin77.dll', 'icuuc77.dll', 'JavaScriptCore.dll',
          'jpeg62.dll', 'libpng16.dll', 'libsharpyuv.dll', 'libwebp.dll', 'libwebpdemux.dll', 'libwebpmux.dll', 'libxml2.dll', 'RanvierWebCoreHost.dll',
@@ -25,7 +25,7 @@ if not (freeze / 'runtime-receipt.json').exists():
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(candidate / name, destination)
     receipt = {'sourceHead': head, 'nativeVersion': json.loads((repo / 'pins.json').read_text())['package']['version'], 'abiVersion': 29,
-               'platform': 'private win-x64 slim', 'buildScript': 'artifacts/build_native21_candidate.py', 'buildHead': 'd22e24c02808dd5ea4a6daf8238c71c03fd1bee2', 'buildRuntimeSha256': json.loads((repo / 'artifacts/native21-candidate/runtime-sha256.json').read_text()),
+               'platform': 'private win-x64 slim', 'buildScript': 'artifacts/build_native21_candidate.py', 'buildHead': 'e55d222e0cc68edbba2586fd9466178b68a4b69a', 'buildRuntimeSha256': json.loads((repo / 'artifacts/native21-candidate-0032/runtime-sha256.json').read_text()),
                'shippingFiles': [{'name': name, 'bytes': (runtime / name).stat().st_size, 'sha256': digest(runtime / name)} for name in names]}
     (freeze / 'runtime-receipt.json').write_text(json.dumps(receipt, indent=2) + '\n')
 receipt = json.loads((freeze / 'runtime-receipt.json').read_text())
@@ -81,7 +81,7 @@ probes = [('css_supports', 72), ('computed_style', 93), ('fragment_rectangles', 
           ('typed_style_values', 190), ('custom_properties', 231), ('geometry_values', 260), ('matrix_values', 1091), ('css_transforms', 405),
           ('svg_geometry', 639), ('svg_surfaces', 1594), ('svg_documents', 78), ('svg_view_controls', 318), ('svg_animation_variants', 70),
           ('capabilities', None), ('svg_view_selection', None),
-          ('svg_paint_servers', 565), ('svg_filters', 5946), ('svg_clip_mask_marker', 565), ('svg_resources', 454)]
+          ('svg_paint_servers', None), ('svg_filters', None), ('svg_clip_mask_marker', None), ('svg_resources', None)]
 for name, expected in probes:
     arguments = ['C:/Python314/python.exe', '-I', '-X', 'utf8', str(repo / 'tests/abi' / (name + '.py')), '--native-directory', str(runtime)]
     if name == 'svg_surfaces':

@@ -45,12 +45,14 @@
   "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-css-23.cpp.obj": "C:/wk/native-custom-properties/artifacts/custom-properties-priority/000-UnifiedSource-css-23.cpp.obj",
   "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/CSSPropertyNames.cpp.obj": "C:/wk/native-typed-style-maps/artifacts/typed-maps-repaired/002-CSSPropertyNames.cpp.obj",
   "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-23.cpp.obj": "C:/wk/native-typed-style-maps/artifacts/typed-maps-priority-complete/000-UnifiedSource-dom-23.cpp.obj",
-  "Source/WebCore/CMakeFiles/WebCore.dir/C_/wk/ranvier-webcore/host/dom/RanvierDomGlue.cpp.obj": "C:/wk/native-svg-paint/artifacts/native21-candidate/000-RanvierDomGlue.cpp.obj",
+  "Source/WebCore/CMakeFiles/WebCore.dir/C_/wk/ranvier-webcore/host/dom/RanvierDomGlue.cpp.obj": "C:/wk/native-svg-paint/artifacts/native21-candidate-0032/000-RanvierDomGlue.cpp.obj",
   "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-css-35.cpp.obj": "C:/wk/native-css-transforms/artifacts/css-transforms-repaired/001-UnifiedSource-css-35.cpp.obj",
   "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-css-36.cpp.obj": "C:/wk/native-css-transforms/artifacts/css-transforms-repaired/002-UnifiedSource-css-36.cpp.obj",
-  "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-svg-13.cpp.obj": "C:/wk/native-svg-paint/artifacts/native21-candidate/003-UnifiedSource-svg-13.cpp.obj",
+  "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-svg-13.cpp.obj": "C:/wk/native-svg-paint/artifacts/native21-candidate-0032/004-UnifiedSource-svg-13.cpp.obj",
   "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-rendering-30.cpp.obj": "C:/wk/native-svg-surfaces/artifacts/svg-surfaces-candidate/002-UnifiedSource-rendering-30.cpp.obj",
-  "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-svg-4.cpp.obj": "C:/wk/native-svg-paint/artifacts/native21-candidate/001-UnifiedSource-svg-4.cpp.obj",
-  "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-svg-5.cpp.obj": "C:/wk/native-svg-paint/artifacts/native21-candidate/002-UnifiedSource-svg-5.cpp.obj",
-  "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-svg-14.cpp.obj": "C:/wk/native-svg-paint/artifacts/native21-candidate/004-UnifiedSource-svg-14.cpp.obj"
+  "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-svg-3.cpp.obj": "C:/wk/native-svg-paint/artifacts/native21-candidate-0032/001-UnifiedSource-svg-3.cpp.obj",
+  "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-svg-4.cpp.obj": "C:/wk/native-svg-paint/artifacts/native21-candidate-0032/002-UnifiedSource-svg-4.cpp.obj",
+  "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-svg-5.cpp.obj": "C:/wk/native-svg-paint/artifacts/native21-candidate-0032/003-UnifiedSource-svg-5.cpp.obj",
+  "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-svg-14.cpp.obj": "C:/wk/native-svg-paint/artifacts/native21-candidate-0032/005-UnifiedSource-svg-14.cpp.obj",
+  "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-svg-17.cpp.obj": "C:/wk/native-svg-paint/artifacts/native21-candidate-0032/006-UnifiedSource-svg-17.cpp.obj"
 }
