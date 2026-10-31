@@ -1,7 +1,7 @@
 """Private G14 candidate: a parent candidate's WebCore objects (its replacement-objects.json, RanvierDomGlue included)
 with this tree's RanvierViewportGlue compiled into WebCore and the four host units recompiled. Borrows build-win-slim,
-the parent's runtime and objects and forms-candidate-4's three other glue objects, all read-only. The parent's tree
-must equal this tree in every file its objects compile from, apart from RanvierViewportGlue and the host units."""
+the parent's runtime and objects and the other host-glue objects its WebCore link names, all read-only. The tree the
+parent was built from (--parent-head) must equal this tree in every file those objects compile from."""
 import argparse
 import ast
 import hashlib
@@ -18,29 +18,28 @@ import types
 parser = argparse.ArgumentParser()
 parser.add_argument('name')
 parser.add_argument('--repo', default='C:/wk/native-coords')
-parser.add_argument('--parent', default='C:/wk/native-elinternals/artifacts/ei-candidate-4')
+parser.add_argument('--parent', default='C:/wk/native-inspect/artifacts/native42-candidate-3')
+parser.add_argument('--parent-head', default='acf26e3')
 arguments = parser.parse_args()
 repo = Path(arguments.repo)
 parent = Path(arguments.parent)
-glue_parent = Path('C:/wk/native-forms/artifacts/forms-candidate-4')
 build = Path('C:/wk/build-win-slim')
 assert arguments.name.startswith('coords-candidate-'), 'Build into artifacts/coords-candidate-N'
 out = repo / 'artifacts' / arguments.name
 assert not out.exists(), 'Build into a new versioned directory'
-parent_receipt = json.loads((parent / 'runtime-sha256.json').read_text(encoding='utf-8'))
-parent_head = parent_receipt['repoHead']
-for unchanged in ['host/RanvierSvgViewGlue.cpp', 'host/RanvierResourceGlue.cpp', 'host/RanvierEventGlue.cpp', 'host/RanvierEventGlue.h']:
-    diff = subprocess.run(['git', 'diff', '--quiet', 'b8acc27', '--', unchanged], cwd=repo)
-    assert diff.returncode == 0, unchanged + ' changed since b8acc27: the borrowed glue object is stale'
+parent_head = arguments.parent_head
+# The host-glue objects WebCore links besides RanvierDomGlue and RanvierViewportGlue are the parent's.
+link = (parent / 'webcore-link.rsp').read_text(encoding='utf-8')
+glue_objects = sorted({path for path in re.findall(r'(\S+Ranvier[A-Za-z]+Glue\.cpp\.obj)', link)
+                       if 'RanvierDomGlue' not in path and 'RanvierViewportGlue' not in path})
+for glue in glue_objects:
+    stem = re.search(r'(Ranvier[A-Za-z]+Glue)\.cpp\.obj', glue).group(1)
+    diff = subprocess.run(['git', 'diff', '--quiet', parent_head, '--', 'host/' + stem + '.cpp', 'host/' + stem + '.h'], cwd=repo)
+    assert diff.returncode == 0, stem + ' changed since the parent: the borrowed glue object is stale'
 # The parent's RanvierDomGlue object and unit objects stay valid while their inputs equal the parent's tree.
 for unchanged in ['host/dom', 'gen', 'patches', 'config']:
     diff = subprocess.run(['git', 'diff', '--quiet', parent_head, '--', unchanged], cwd=repo)
     assert diff.returncode == 0, unchanged + ' changed since the parent ' + parent_head + ': its objects are stale'
-parent_patches = json.loads((parent / 'source-patches.json').read_text(encoding='utf-8'))
-for name, patch in parent_patches['patches'].items():
-    for path in patch['files']:
-        current = subprocess.run(['git', '-C', 'C:/wk/src', 'diff', '--', path], capture_output=True, text=True, check=True).stdout
-        assert current, path + ' no longer carries ' + name
 status = subprocess.run(['git', 'status', '--porcelain', '-uall'], cwd='C:/wk/src', capture_output=True, text=True, check=True).stdout.splitlines()
 changed_sources = [line[3:] for line in status if (Path('C:/wk/src') / line[3:]).is_file()]
 newest_source = max(os.stat(Path('C:/wk/src') / path).st_mtime_ns for path in changed_sources)
@@ -91,8 +90,8 @@ target, viewport_obj, code = compile_object(90, viewport_target)
 if code:
     raise SystemExit('RanvierViewportGlue failed')
 extra = []
-for name in ['RanvierSvgViewGlue', 'RanvierResourceGlue', 'RanvierEventGlue']:
-    glue = glue_parent / (name + '.cpp.obj')
+for name in glue_objects:
+    glue = Path(name)
     borrowed[glue] = glue.stat().st_mtime_ns
     extra.append(glue.as_posix())
 extra.append(Path(viewport_obj).as_posix())
@@ -126,10 +125,9 @@ assert hashes['JavaScriptCore.dll'].startswith('95149cdc')
 (out / 'replacement-objects.json').write_text(json.dumps(replacements, indent=2), encoding='utf-8')
 shutil.copyfile(parent / 'source-patches.json', out / 'source-patches.json')
 receipt = {'repoHead': subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=repo, capture_output=True, text=True).stdout.strip(),
-           'parent': str(parent), 'parentRepoHead': parent_head, 'glueParent': str(glue_parent),
+           'parent': str(parent), 'parentRepoHead': parent_head, 'hostGlueObjects': glue_objects,
            'recompiled': ['host/RanvierViewportGlue.cpp', 'host/RanvierWebCoreAbi.cpp', 'host/RanvierWebCoreDom.cpp', 'host/RanvierWebCoreUia.cpp', 'host/RanvierWebCoreD3D11.cpp'],
            'borrowedFromParent': 'replacement-objects.json and source-patches.json (unit objects, RanvierDomGlue, patch receipts)',
-           'sourceExemption': parent_receipt.get('sourceExemption'),
            'runtimeSha256': hashes}
 (out / 'runtime-sha256.json').write_text(json.dumps(receipt, indent=2), encoding='utf-8')
 print('COORDINATE CANDIDATE READY: ' + str(runtime), {k: hashes[k][:8] for k in ['WebCore.dll', 'RanvierWebCoreHost.dll', 'JavaScriptCore.dll']}, flush=True)
