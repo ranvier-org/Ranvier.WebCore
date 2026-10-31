@@ -1548,6 +1548,10 @@
     {
       "name": "URLPattern",
       "base": null
+    },
+    {
+      "name": "VisualViewport",
+      "base": "EventTarget"
     }
   ],
   "contractInterfaces": [
@@ -4104,6 +4108,15 @@
       "mixin": false,
       "contractOnly": false,
       "source": "Modules/url-pattern/URLPattern.idl"
+    },
+    {
+      "name": "VisualViewport",
+      "idlName": "VisualViewport",
+      "base": "EventTarget",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "page/VisualViewport.idl"
     },
     {
       "name": "HTMLUnknownElement",
@@ -141258,6 +141271,258 @@
       "stringInputs": "utf8-lengths"
     },
     {
+      "interface": "VisualViewport",
+      "member": "offsetLeft",
+      "contractOwner": "VisualViewport",
+      "kind": "getter",
+      "function": "rv_dom_visual_viewport_get_offset_left",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "VisualViewport",
+      "member": "offsetTop",
+      "contractOwner": "VisualViewport",
+      "kind": "getter",
+      "function": "rv_dom_visual_viewport_get_offset_top",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "VisualViewport",
+      "member": "pageLeft",
+      "contractOwner": "VisualViewport",
+      "kind": "getter",
+      "function": "rv_dom_visual_viewport_get_page_left",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "VisualViewport",
+      "member": "pageTop",
+      "contractOwner": "VisualViewport",
+      "kind": "getter",
+      "function": "rv_dom_visual_viewport_get_page_top",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "VisualViewport",
+      "member": "width",
+      "contractOwner": "VisualViewport",
+      "kind": "getter",
+      "function": "rv_dom_visual_viewport_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "VisualViewport",
+      "member": "height",
+      "contractOwner": "VisualViewport",
+      "kind": "getter",
+      "function": "rv_dom_visual_viewport_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "VisualViewport",
+      "member": "scale",
+      "contractOwner": "VisualViewport",
+      "kind": "getter",
+      "function": "rv_dom_visual_viewport_get_scale",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
       "interface": "DOMCSSNamespace",
       "member": "supports",
       "contractOwner": "CSS",
@@ -142164,6 +142429,170 @@
       "receiver": "Document",
       "context": "Window",
       "feature": "dom-window-scrolling",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths-nullable"
+    },
+    {
+      "interface": "DOMWindow",
+      "member": "visualViewport",
+      "contractOwner": "Window",
+      "kind": "context_operation",
+      "function": "rv_dom_window_get_visual_viewport",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvEventTarget**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "VisualViewport",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "VisualViewport",
+        "root": "EventTarget",
+        "class": "VisualViewport",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "context": "Window",
+      "feature": "visual-viewport",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths-nullable"
+    },
+    {
+      "interface": "Crypto",
+      "member": "getRandomValues",
+      "contractOwner": "Crypto",
+      "kind": "context_operation",
+      "function": "rv_dom_crypto_get_random_values",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "array_kind"
+        },
+        {
+          "ctype": "uint8_t*",
+          "name": "array"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "array_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "array",
+          "idlType": "ArrayBufferView",
+          "idl": {
+            "name": "ArrayBufferView",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "typedarray",
+            "ctype": "uint8_t*",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "ArrayBufferView",
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "ArrayBufferView",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "typedarray",
+        "ctype": "uint8_t*",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "ArrayBufferView",
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "context": "Window",
+      "feature": "dom-crypto-random",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths-nullable"
+    },
+    {
+      "interface": "Crypto",
+      "member": "randomUUID",
+      "contractOwner": "Crypto",
+      "kind": "context_operation",
+      "function": "rv_dom_crypto_random_uuid",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "context": "Window",
+      "feature": "dom-crypto-random",
       "binding": "facade",
       "stringInputs": "utf8-lengths-nullable"
     },

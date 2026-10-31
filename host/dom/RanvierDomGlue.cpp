@@ -69,6 +69,7 @@
 #include "Comment.h"
 #include "CompositionEvent.h"
 #include "ContentVisibilityAutoStateChangeEvent.h"
+#include "Crypto.h"
 #include "CustomEvent.h"
 #include "DOMCSSCustomPropertyDescriptor.h"
 #include "DOMCSSNamespace.h"
@@ -182,6 +183,8 @@
 #include "InputEvent.h"
 #include "JavaScriptCore/ArrayBuffer.h"
 #include "JavaScriptCore/ArrayBufferView.h"
+#include "JavaScriptCore/DataView.h"
+#include "JavaScriptCore/TypedArrays.h"
 #include "KeyboardEvent.h"
 #include "LiveNodeList.h"
 #include "LocalDOMWindow.h"
@@ -311,6 +314,7 @@
 #include "URLPatternResult.h"
 #include "URLSearchParams.h"
 #include "ValidityState.h"
+#include "VisualViewport.h"
 #include "WheelEvent.h"
 #include "svg/properties/SVGAnimatedPropertyImpl.h"
 #include "wtf/KeyValuePair.h"
@@ -651,6 +655,57 @@ int32_t storeConstGetter(V&& value, Handle** result)
     return RV_OK;
 }
 } // namespace
+
+
+namespace {
+template<typename View>
+RefPtr<JSC::ArrayBufferView> typedArrayView(RefPtr<JSC::ArrayBuffer>&& buffer, int32_t length, int32_t elementSize, int32_t& status)
+{
+    if (length % elementSize) {
+        status = Ranvier::recordException(Exception { ExceptionCode::RangeError, "The byte length is not a multiple of the element size."_s });
+        return nullptr;
+    }
+    RefPtr<JSC::ArrayBufferView> view = View::tryCreate(WTF::move(buffer), 0, static_cast<size_t>(length / elementSize));
+    if (!view)
+        status = Ranvier::recordException(Exception { ExceptionCode::RangeError, "The view could not be allocated."_s });
+    return view;
+}
+
+// A view of the kind (RV_DOM_ARRAY_BUFFER_VIEW_*) over a copy of the caller's bytes, or null with the status set.
+RefPtr<JSC::ArrayBufferView> makeTypedArrayView(int32_t kind, const uint8_t* bytes, int32_t length, int32_t& status)
+{
+    RefPtr buffer = JSC::ArrayBuffer::tryCreate(length ? std::span<const uint8_t> { bytes, static_cast<size_t>(length) } : std::span<const uint8_t> { });
+    if (!buffer) {
+        status = Ranvier::recordException(Exception { ExceptionCode::RangeError, "The array buffer could not be allocated."_s });
+        return nullptr;
+    }
+    switch (kind) {
+    case 0: return typedArrayView<JSC::Int8Array>(WTF::move(buffer), length, 1, status);
+    case 1: return typedArrayView<JSC::Uint8Array>(WTF::move(buffer), length, 1, status);
+    case 2: return typedArrayView<JSC::Uint8ClampedArray>(WTF::move(buffer), length, 1, status);
+    case 3: return typedArrayView<JSC::Int16Array>(WTF::move(buffer), length, 2, status);
+    case 4: return typedArrayView<JSC::Uint16Array>(WTF::move(buffer), length, 2, status);
+    case 5: return typedArrayView<JSC::Int32Array>(WTF::move(buffer), length, 4, status);
+    case 6: return typedArrayView<JSC::Uint32Array>(WTF::move(buffer), length, 4, status);
+    case 7: return typedArrayView<JSC::Float16Array>(WTF::move(buffer), length, 2, status);
+    case 8: return typedArrayView<JSC::Float32Array>(WTF::move(buffer), length, 4, status);
+    case 9: return typedArrayView<JSC::Float64Array>(WTF::move(buffer), length, 8, status);
+    case 10: return typedArrayView<JSC::BigInt64Array>(WTF::move(buffer), length, 8, status);
+    case 11: return typedArrayView<JSC::BigUint64Array>(WTF::move(buffer), length, 8, status);
+    case 12: return JSC::DataView::create(WTF::move(buffer), 0, static_cast<size_t>(length));
+    }
+    status = RV_ERR_UNSUPPORTED;
+    return nullptr;
+}
+
+// Copies the view's bytes, which the member may have written, back to the caller's buffer.
+void copyTypedArrayView(JSC::ArrayBufferView& view, uint8_t* bytes)
+{
+    auto span = view.span();
+    if (!span.empty())
+        memcpySpan(std::span<uint8_t> { bytes, span.size() }, span);
+}
+}
 
 static constexpr ASCIILiteral enumerationAriaNotificationInterrupt[] = { "none"_s, "all"_s, "pending"_s };
 static constexpr ASCIILiteral enumerationAriaNotificationPriority[] = { "normal"_s, "high"_s };
@@ -3116,7 +3171,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:ErrorEvent", "dom:ProgressEvent", "dom:CSSAnimationEvent", "dom:CSSTransitionEvent", "dom:ContentVisibilityAutoStateChangeEvent", "dom:AnimationPlaybackEvent", "dom:PageTransitionEvent", "dom:HashChangeEvent", "dom:MediaQueryListEvent", "dom:PopStateEvent", "dom:BeforeUnloadEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom:Blob", "dom:File", "dom:FileList", "dom:CaretPosition", "dom:DOMURL", "dom:URLSearchParams", "dom:URLPattern", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-type-query:Event", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:CompositionEvent", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-constructor:ErrorEvent", "dom-constructor:ProgressEvent", "dom-constructor:CSSAnimationEvent", "dom-constructor:CSSTransitionEvent", "dom-constructor:ContentVisibilityAutoStateChangeEvent", "dom-constructor:AnimationPlaybackEvent", "dom-constructor:PageTransitionEvent", "dom-constructor:HashChangeEvent", "dom-constructor:MediaQueryListEvent", "dom-constructor:PopStateEvent", "dom-constructor:Blob", "dom-constructor:File", "dom-constructor:DOMURL", "dom-constructor:URLSearchParams", "dom-constructor:URLPattern", "dom-constructor:URLPattern", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:ErrorEvent", "dom:ProgressEvent", "dom:CSSAnimationEvent", "dom:CSSTransitionEvent", "dom:ContentVisibilityAutoStateChangeEvent", "dom:AnimationPlaybackEvent", "dom:PageTransitionEvent", "dom:HashChangeEvent", "dom:MediaQueryListEvent", "dom:PopStateEvent", "dom:BeforeUnloadEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom:Blob", "dom:File", "dom:FileList", "dom:CaretPosition", "dom:DOMURL", "dom:URLSearchParams", "dom:URLPattern", "dom:VisualViewport", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-type-query:Event", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:CompositionEvent", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-constructor:ErrorEvent", "dom-constructor:ProgressEvent", "dom-constructor:CSSAnimationEvent", "dom-constructor:CSSTransitionEvent", "dom-constructor:ContentVisibilityAutoStateChangeEvent", "dom-constructor:AnimationPlaybackEvent", "dom-constructor:PageTransitionEvent", "dom-constructor:HashChangeEvent", "dom-constructor:MediaQueryListEvent", "dom-constructor:PopStateEvent", "dom-constructor:Blob", "dom-constructor:File", "dom-constructor:DOMURL", "dom-constructor:URLSearchParams", "dom-constructor:URLPattern", "dom-constructor:URLPattern", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -3127,6 +3182,10 @@ int32_t ranvier_dom_has(const char* feature)
     if (!std::strcmp(feature, "dom-computed-style"))
         return 1;
     if (!std::strcmp(feature, "dom-window-scrolling"))
+        return 1;
+    if (!std::strcmp(feature, "visual-viewport"))
+        return 1;
+    if (!std::strcmp(feature, "dom-crypto-random"))
         return 1;
     if (!std::strcmp(feature, "dom-geometry-matrix-readonly"))
         return 1;
@@ -40442,6 +40501,111 @@ int32_t ranvier_dom_url_pattern_exec(RvURLPattern* target, const RvDomUnionUSVSt
     return deliver([&]() -> decltype(auto) { return impl->exec(std::move(*a0), a1); }, [&](auto&& value) { return storeOptionalDictionary(value, result, [](const auto& item) { return encodeDictRvDomURLPatternResult(item); }); });
 }
 
+// VisualViewport.offsetLeft getter: readonly attribute double offsetLeft; RV_ERR_DETACHED once the object's window has no frame
+int32_t ranvier_dom_visual_viewport_get_offset_left(RvEventTarget* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<VisualViewport>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!(impl->frame()))
+        return RV_ERR_DETACHED;
+    return deliver([&]() -> decltype(auto) { return impl->offsetLeft(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// VisualViewport.offsetTop getter: readonly attribute double offsetTop; RV_ERR_DETACHED once the object's window has no frame
+int32_t ranvier_dom_visual_viewport_get_offset_top(RvEventTarget* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<VisualViewport>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!(impl->frame()))
+        return RV_ERR_DETACHED;
+    return deliver([&]() -> decltype(auto) { return impl->offsetTop(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// VisualViewport.pageLeft getter: readonly attribute double pageLeft; RV_ERR_DETACHED once the object's window has no frame
+int32_t ranvier_dom_visual_viewport_get_page_left(RvEventTarget* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<VisualViewport>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!(impl->frame()))
+        return RV_ERR_DETACHED;
+    return deliver([&]() -> decltype(auto) { return impl->pageLeft(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// VisualViewport.pageTop getter: readonly attribute double pageTop; RV_ERR_DETACHED once the object's window has no frame
+int32_t ranvier_dom_visual_viewport_get_page_top(RvEventTarget* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<VisualViewport>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!(impl->frame()))
+        return RV_ERR_DETACHED;
+    return deliver([&]() -> decltype(auto) { return impl->pageTop(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// VisualViewport.width getter: readonly attribute double width; RV_ERR_DETACHED once the object's window has no frame
+int32_t ranvier_dom_visual_viewport_get_width(RvEventTarget* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<VisualViewport>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!(impl->frame()))
+        return RV_ERR_DETACHED;
+    return deliver([&]() -> decltype(auto) { return impl->width(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// VisualViewport.height getter: readonly attribute double height; RV_ERR_DETACHED once the object's window has no frame
+int32_t ranvier_dom_visual_viewport_get_height(RvEventTarget* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<VisualViewport>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!(impl->frame()))
+        return RV_ERR_DETACHED;
+    return deliver([&]() -> decltype(auto) { return impl->height(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// VisualViewport.scale getter: readonly attribute double scale; RV_ERR_DETACHED once the object's window has no frame
+int32_t ranvier_dom_visual_viewport_get_scale(RvEventTarget* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<VisualViewport>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!(impl->frame()))
+        return RV_ERR_DETACHED;
+    return deliver([&]() -> decltype(auto) { return impl->scale(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
 // CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths
 int32_t ranvier_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, int32_t* result)
 {
@@ -40696,6 +40860,61 @@ int32_t ranvier_dom_window_scroll_by_2(RvNode* target, double x, double y)
     if (!impl->window())
         return RV_ERR_UNSUPPORTED;
     return invoke([&]() -> decltype(auto) { return impl->window()->scrollBy(x, y); });
+}
+
+// Window.visualViewport getter: checked Document context; *result is a new reference; RV_ERR_UNSUPPORTED while the setting VisualViewportAPIEnabled is off
+int32_t ranvier_dom_window_get_visual_viewport(RvNode* target, RvEventTarget** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.visualViewportAPIEnabled))
+        return RV_ERR_UNSUPPORTED;
+    if (!impl->window())
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->window()->visualViewport(); }, [&](auto&& value) { return storeHandle<EventTarget>(value, result); });
+}
+
+// Window.crypto.getRandomValues: checked Document context; array_kind is an RV_DOM_ARRAY_BUFFER_VIEW_* element kind and array_length the byte length; the member reads and writes a copy, which returns to array on RV_OK; an unknown kind returns RV_ERR_UNSUPPORTED
+int32_t ranvier_dom_crypto_get_random_values(RvNode* target, int32_t array_kind, uint8_t* array, int32_t array_length)
+{
+    if (!target || !(array_length >= 0 && (array_length == 0 || array)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!impl->window())
+        return RV_ERR_UNSUPPORTED;
+    int32_t status0 = RV_OK;
+    RefPtr<JSC::ArrayBufferView> a0 = makeTypedArrayView(array_kind, array, array_length, status0);
+    if (!a0)
+        return status0;
+    auto status = invoke([&]() -> decltype(auto) { return impl->window()->crypto().getRandomValues(*a0); });
+    if (status == RV_OK)
+        copyTypedArrayView(*a0, array);
+    return status;
+}
+
+// Window.crypto.randomUUID: checked Document context
+int32_t ranvier_dom_crypto_random_uuid(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!impl->window())
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->window()->crypto().randomUUID(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // DOMMatrixReadOnly.fromMatrix: static operation with checked Document context and UTF-8 byte lengths; other defaults to {} in IDL; other may be NULL for the IDL default; *result is a new reference

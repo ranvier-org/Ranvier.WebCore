@@ -1,0 +1,15 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+Traceback (most recent call last):
+  File "C:\wk\native-segment\tests\abi\text_segmentation.py", line 178, in <module>
+    verify(arguments.native_directory, arguments.abi, arguments.record_differences)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-segment\tests\abi\text_segmentation.py", line 54, in verify
+    segment_raw = bind('rv_text_segment', [integer, ctypes.c_char_p, ctypes.c_char_p, integer, ctypes.POINTER(TextSegments)])
+  File "C:\wk\native-segment\tests\abi\text_segmentation.py", line 44, in bind
+    function = getattr(library, name)
+  File "C:\Python314\Lib\ctypes\__init__.py", line 486, in __getattr__
+    func = self.__getitem__(name)
+  File "C:\Python314\Lib\ctypes\__init__.py", line 491, in __getitem__
+    func = self._FuncPtr((name_or_ordinal, self))
+AttributeError: function 'rv_text_segment' not found
+EXIT_CODE=1

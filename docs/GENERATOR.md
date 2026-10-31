@@ -90,6 +90,17 @@ element or pseudo-element. A windowless context returns unsupported. Nullable in
 length -1 for null, zero for empty and positive lengths for complete UTF-8; invalid spans preserve
 the result. Namespace and Window operations remain facade metadata rather than invented interface members.
 
+`windowObjectBindings` selects the operations of the object a readonly Window attribute holds (`accessor`), called
+through the Window of a checked Document: `rv_dom_crypto_random_uuid` calls `window()->crypto().randomUUID()`. A
+windowless document returns unsupported. The functions are facades whose contract owner is the object's interface.
+
+`typedArrayViewTypes` maps a top-level `[ReturnValue]` argument of a listed type (`ArrayBufferView`) to three
+parameters: an `RV_DOM_ARRAY_BUFFER_VIEW_*` element kind, a writable `uint8_t*` buffer and its `int32_t` byte length.
+The glue builds a view of that kind over a copy of the bytes, calls the member, and copies the bytes back on `RV_OK`,
+which stands for the returned view. A byte length that is not a multiple of the element size raises RangeError, and an
+unknown kind returns `RV_ERR_UNSUPPORTED`. A listed type nested in a union or sequence, as a result, or without
+`[ReturnValue]` is not mapped.
+
 Non-nullable IDL string results convert null internal engine strings to empty strings, matching
 browser DOM conversion. Nullable string results preserve null. This includes empty computed
 declarations for invalid/unresolved pseudo selectors. The computed-style ABI fixture verifies

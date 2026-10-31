@@ -1,0 +1,402 @@
+{
+  "group": [
+    "G03 #48"
+  ],
+  "native": "0.1.0-preview.37",
+  "abi": 45,
+  "features": [
+    "visual-viewport",
+    "dom:VisualViewport",
+    "page-scale",
+    "obscured-insets"
+  ],
+  "members": [
+    "Window.visualViewport",
+    "VisualViewport.offsetLeft/offsetTop/pageLeft/pageTop/width/height/scale",
+    "resize and scroll events through rv_event_target_add_listener",
+    "rv_host_set_page_scale",
+    "rv_host_page_scale",
+    "rv_host_set_obscured_insets"
+  ],
+  "excluded": [
+    "VisualViewport.onresize/onscroll handler attributes (EventHandler; the managed service subscribes with listeners)",
+    "onscrollend (Chromium only; not in the pinned WebKit IDL)"
+  ],
+  "sourceHeadOfBatch": "b654195a83f45a4054675a167b4763da4188fd62",
+  "batchRunHead": {
+    "head": "8ced3b8",
+    "note": "b654195 plus tests/abi/crypto_random.py ABI = 45 only; the runtime is the b654195 build"
+  },
+  "stackedOn": "B22 c78a71a (Native36/ABI44), T06 901ced5 (Native35/ABI43), D14 23dd017 (Native34/ABI42, patch 0037), H13 3c7e8d4 (Native33/ABI41), G09 fb87eb0 (Native32/ABI40)",
+  "red": {
+    "files": [
+      "red-chromium.json",
+      "red-native.json",
+      "red-navigation-chromium.json"
+    ],
+    "native32": "no VisualViewport exports, no page scale or obscured inset input; VisualViewportAPIEnabled off in WebCore"
+  },
+  "green": {
+    "visualViewportAssertions": 987,
+    "repeats": 30,
+    "repeatsDistinct": [
+      "PASS visual_viewport: 987 assertions"
+    ],
+    "probes": 50,
+    "allExitZero": true,
+    "rawAssertions": 73213,
+    "probesRun": [
+      {
+        "name": "css_supports",
+        "exitCode": 0,
+        "assertions": 72
+      },
+      {
+        "name": "computed_style",
+        "exitCode": 0,
+        "assertions": 93
+      },
+      {
+        "name": "fragment_rectangles",
+        "exitCode": 0,
+        "assertions": 140
+      },
+      {
+        "name": "table_surface",
+        "exitCode": 0,
+        "assertions": 44
+      },
+      {
+        "name": "element_reflection",
+        "exitCode": 0,
+        "assertions": 269
+      },
+      {
+        "name": "area_surface",
+        "exitCode": 0,
+        "assertions": 117
+      },
+      {
+        "name": "cssom_surface",
+        "exitCode": 0,
+        "assertions": 407
+      },
+      {
+        "name": "keyframe_rules",
+        "exitCode": 0,
+        "assertions": 93
+      },
+      {
+        "name": "counter_style_rules",
+        "exitCode": 0,
+        "assertions": 86
+      },
+      {
+        "name": "detached_cssom_context",
+        "exitCode": 0,
+        "assertions": 389
+      },
+      {
+        "name": "svg_mathml_surface",
+        "exitCode": 0,
+        "assertions": 95
+      },
+      {
+        "name": "style_property_maps",
+        "exitCode": 0,
+        "assertions": 189
+      },
+      {
+        "name": "declared_style_maps",
+        "exitCode": 0,
+        "assertions": 2069
+      },
+      {
+        "name": "style_map_entries",
+        "exitCode": 0,
+        "assertions": 144
+      },
+      {
+        "name": "typed_style_values",
+        "exitCode": 0,
+        "assertions": 190
+      },
+      {
+        "name": "custom_properties",
+        "exitCode": 0,
+        "assertions": 231
+      },
+      {
+        "name": "geometry_values",
+        "exitCode": 0,
+        "assertions": 260
+      },
+      {
+        "name": "matrix_values",
+        "exitCode": 0,
+        "assertions": 1091
+      },
+      {
+        "name": "css_transforms",
+        "exitCode": 0,
+        "assertions": 405
+      },
+      {
+        "name": "svg_geometry",
+        "exitCode": 0,
+        "assertions": 639
+      },
+      {
+        "name": "svg_surfaces",
+        "exitCode": 0,
+        "assertions": 1594
+      },
+      {
+        "name": "svg_documents",
+        "exitCode": 0,
+        "assertions": 78
+      },
+      {
+        "name": "svg_view_controls",
+        "exitCode": 0,
+        "assertions": 318
+      },
+      {
+        "name": "svg_animation_variants",
+        "exitCode": 0,
+        "assertions": 70
+      },
+      {
+        "name": "capabilities",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "svg_view_selection",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "svg_paint_servers",
+        "exitCode": 0,
+        "assertions": 565
+      },
+      {
+        "name": "svg_filters",
+        "exitCode": 0,
+        "assertions": 9086
+      },
+      {
+        "name": "svg_clip_mask_marker",
+        "exitCode": 0,
+        "assertions": 565
+      },
+      {
+        "name": "svg_resources",
+        "exitCode": 0,
+        "assertions": 454
+      },
+      {
+        "name": "mathml_surface",
+        "exitCode": 0,
+        "assertions": 371
+      },
+      {
+        "name": "svg_tests_lists",
+        "exitCode": 0,
+        "assertions": 191
+      },
+      {
+        "name": "image_decode",
+        "exitCode": 0,
+        "assertions": 73
+      },
+      {
+        "name": "font_load",
+        "exitCode": 0,
+        "assertions": 42
+      },
+      {
+        "name": "event_construction",
+        "exitCode": 0,
+        "assertions": 82
+      },
+      {
+        "name": "tree_traversal",
+        "exitCode": 0,
+        "assertions": 22285
+      },
+      {
+        "name": "focus_input",
+        "exitCode": 0,
+        "assertions": 80
+      },
+      {
+        "name": "viewport_events",
+        "exitCode": 0,
+        "assertions": 364
+      },
+      {
+        "name": "form_collections",
+        "exitCode": 0,
+        "assertions": 1168
+      },
+      {
+        "name": "form_navigation",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "viewport_scroll",
+        "exitCode": 0,
+        "assertions": 3232
+      },
+      {
+        "name": "dialog_popover",
+        "exitCode": 0,
+        "assertions": 845
+      },
+      {
+        "name": "binary_values",
+        "exitCode": 0,
+        "assertions": 446
+      },
+      {
+        "name": "caret_hit",
+        "exitCode": 0,
+        "assertions": 18251
+      },
+      {
+        "name": "url_values",
+        "exitCode": 0,
+        "assertions": 3538
+      },
+      {
+        "name": "url_wpt",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "form_submission",
+        "exitCode": 0,
+        "assertions": 418
+      },
+      {
+        "name": "text_segmentation",
+        "exitCode": 0,
+        "assertions": 812
+      },
+      {
+        "name": "crypto_random",
+        "exitCode": 0,
+        "assertions": 275
+      },
+      {
+        "name": "visual_viewport",
+        "exitCode": 0,
+        "assertions": 987
+      },
+      {
+        "name": "frames",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "teardown",
+        "exitCode": 0,
+        "assertions": null
+      }
+    ],
+    "teardownCases": 88,
+    "teardownCasesAdded": 2,
+    "teardownAllCollected": true
+  },
+  "chromiumOracle": {
+    "browser": "156.0.8078.4",
+    "steps": 14
+  },
+  "catalogueRegenerated": {
+    "names": [
+      "dom:VisualViewport",
+      "visual-viewport",
+      "page-scale",
+      "obscured-insets",
+      "dom:CaretPosition"
+    ],
+    "capabilitiesNativeChecks": [
+      7340,
+      7522
+    ],
+    "note": "capability catalogue regeneration; dom:CaretPosition was missing from the G09 catalogue at fb87eb0"
+  },
+  "settingEnabled": {
+    "setting": "VisualViewportAPIEnabled",
+    "effect": "every other probe kept its assertion count and output"
+  },
+  "measured": {
+    "pageScale": "non-finite or <= 0 returns RV_ERR_UNSUPPORTED; others apply unclamped (0.01, 0.25, 10, 20 checked); sizes are LayoutUnits (320 / 1.5 reads 213.328125)",
+    "obscuredInsets": "shrink VisualViewport width/height and innerWidth/innerHeight by the covered edges; window resize then visualViewport resize; document coordinates stay in place, top inset included; rv_host_element_at finds nothing in the covered right and bottom areas",
+    "detached": "members of a VisualViewport held past rv_host_destroy return RV_ERR_DETACHED"
+  },
+  "qualifications": [
+    {
+      "name": "layout viewport at the origin while page-scaled",
+      "steps": [
+        "scrollTo(100, 50) at page scale 2",
+        "wheel 30, 40 at 150, 100 at page scale 2"
+      ],
+      "native": "offsetLeft/offsetTop equal pageLeft/pageTop (100/50, 115/70)",
+      "chromium": "offsets 0/0 and 15/20"
+    },
+    {
+      "name": "pans scroll the window",
+      "steps": [
+        "scrollTo(100, 50) at page scale 2",
+        "wheel 30, 40 at 150, 100 at page scale 2",
+        "page scale 1 at 100,50"
+      ],
+      "native": "window scroll and visualViewport scroll fire together; the wheel moves scrollX to 115",
+      "chromium": "the wheel pans only the visual viewport (scrollX stays 100)"
+    },
+    {
+      "name": "innerWidth at page scale 2",
+      "native": 150,
+      "chromium": 300
+    },
+    {
+      "name": "window reuse across a page replacement",
+      "native": "LoadSvg keeps the frame window and its VisualViewport, which follows the new page",
+      "chromium": "a navigated frame gets a new VisualViewport; the held one reads zeros (red-navigation-chromium.json)",
+      "managed": "the native provider reads Detached once the host shows another document"
+    },
+    {
+      "name": "browser-only",
+      "chromium": [
+        "onscrollend",
+        "all-zero members (scale 0) of a detached frame"
+      ],
+      "managed": "the browser provider reads Detached"
+    }
+  ],
+  "files": {
+    "absence_g03.py": "9cb5c57c9ade7bc6424349805005bc38f02fd1fc6cd4f807222f7f2452cbf802",
+    "allocation-absence.json": "1ff3be380201ce3966481164f1286b714dd9b23eb8e7b46c61d679201d1d5b23",
+    "batch-green.json": "200a6ba4400dbf9e7243a94e8786010818549726729d4b0d4cfc0f40a688c4f8",
+    "build_vv_candidate.py": "a8eea100bb338eacf810cfee940202d77f0a221d46cbcca400c5ff0ef27dc744",
+    "make_vv_evidence.py": "fd98c85fe3e94df0c09ee7fc15315ae6a7439dd3bc07ca56f86b11d056bf5cdf",
+    "measure_native.py": "180d4c16393434c1e085dfd82789c1575c5a0fc19db9c7870870a613b30bce1f",
+    "pe_exports.py": "4fa7d17aabd5b788b916a9d95eb90831c0201174b48c951ca742f93164919d96",
+    "red-chromium.json": "389d1dce0788be9e9d54305cbba6f5546d63c2c9a7aea962fc998205a8931054",
+    "red-native.json": "eb098fc048662f7d3fcbf2408481e2eca4ef3a80077cf7b302fa758e6fded19d",
+    "red-navigation-chromium.json": "6b5e2bb458e44120eb5e99f548cfbbaafd33d6dafdab472e7b7ce6c2881a5597",
+    "red_chromium.mjs": "92395a023904f3b0be0a3fa3a05a2b70fece7c1af18aa5fda7587716b353b5be",
+    "red_native.py": "53ae0d622b7107c367838ec2394b1c9f995c071182f8b796fba52e6d3cc67cf2",
+    "red_navigation_chromium.mjs": "c24b5792e23f1f23735cbe89634c3c4b9bf42597c27ed64a9d540cf5038da7b6",
+    "run_vv_full_batch.py": "f913b8805f03a6e7c7c9cf4ee42031d8397bb3c5b980f165a5b6378764c52991",
+    "runtime-receipt.json": "41f91ec0a3b29c65a4facee0546ee82069df502caf0121816b29f327d90229b8",
+    "source-patches.json": "f65600a18bf3d307053ad6497041a748c9239219ba74116d369fac4b26ca39a2",
+    "teardown-probes.json": "93d1a026cd622610ee2768575f5530f0db1789a880e60bff40752f1f0e812139",
+    "visual-viewport-probe.log": "e37c480455f0ee4523c8e52eea3d792c82e7325bc2bf90a66f7f646a034fbeb9",
+    "visual-viewport-repeat30.txt": "597cd0e4630b8d1169271b548ede1a889d9f7408b3ad0de0058381c78e83e94e"
+  }
+}

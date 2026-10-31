@@ -1401,8 +1401,63 @@ RV_EXPORT int32_t rv_blob_read_bytes(RvBlob* blob, uint8_t* buffer, int64_t capa
  * Returns RV_ERR_WRONG_INTERFACE for an item that is a Blob and not a File. */
 RV_EXPORT int32_t rv_file_list_create(RvBlob* const* files, int32_t count, RvFileList** result);
 
+/* "text-segmentation" for rv_abi_has: graphemes, words, sentences and line-break opportunities of UTF-16 text,
+ * with the engine's ICU. Graphemes and lines use WebKit's caret and line iterators (line-break normal; CSS loose,
+ * strict and anywhere are out of scope); words and sentences use ICU's iterators for the locale. Every word,
+ * sentence and line boundary is a grapheme boundary: a rule boundary inside a grapheme cluster joins its two segments. */
+enum {
+    RV_SEGMENT_GRAPHEME = 0,
+    RV_SEGMENT_WORD = 1,
+    RV_SEGMENT_SENTENCE = 2,
+    RV_SEGMENT_LINE = 3,
+};
+/* The segments of a text. Segment i starts at starts[i], in UTF-16 code units, and ends where segment i + 1 starts,
+ * the last at the text's length. word_like holds one flag per segment for RV_SEGMENT_WORD, 1 where ICU's rule status
+ * is UBRK_WORD_NONE_LIMIT or above (Intl.Segmenter's isWordLike), and is NULL otherwise. locale is ICU's valid
+ * locale for the request, NUL-terminated UTF-8. The buffers are owned until rv_text_segments_release. */
+typedef struct RvTextSegments {
+    int32_t count;
+    int32_t* starts;
+    int32_t* word_like;
+    char* locale;
+} RvTextSegments;
+/* Segments length UTF-16 code units of text at granularity for locale, a BCP 47 language tag; NULL or "" is the
+ * root locale. text may be NULL for length 0, which gives zero segments. A locale that is not a well-formed tag
+ * returns RV_ERR_DOM_EXCEPTION with a RangeError. Runs on the owning thread after the first rv_host_create, and
+ * keeps working after every host is destroyed. Windows packages segment with their own ICU 77; Linux and macOS
+ * packages use the system ICU, so results follow its version (rv_text_segmentation_version). */
+RV_EXPORT int32_t rv_text_segment(int32_t granularity, const char* locale, const uint16_t* text, int32_t length, RvTextSegments* result);
+/* Frees the buffers of segments and zeroes it; on any thread. */
+RV_EXPORT void rv_text_segments_release(RvTextSegments* segments);
+/* The ICU and Unicode versions behind rv_text_segment, such as "icu=77.1 unicode=16.0", as rv_node_get_string
+ * copies a string. Windows packages carry ICU; Linux and macOS packages use the system's. */
+RV_EXPORT int32_t rv_text_segmentation_version(char* buffer, int32_t capacity, int32_t* length);
+
+/* v45: "page-scale" and "obscured-insets" for rv_abi_has, and "visual-viewport" for the generated
+ * rv_dom_window_get_visual_viewport and rv_dom_visual_viewport_* functions (RanvierWebCoreDom.h). A VisualViewport
+ * handle is an RvEventTarget: its resize and scroll events fire in rv_host_update, after the window's. */
+
+/* Sets the page scale, as a pinch zoom does: 1 at creation. Returns RV_ERR_UNSUPPORTED for a non-finite scale or one
+ * at or below 0; any other scale applies unclamped, since the engine has no minimum or maximum. originX and originY
+ * are the scroll position, in CSS pixels of the scaled document, that the viewport takes. The visual viewport is then
+ * the viewport's CSS size divided by the scale, in LayoutUnits of 1/64 CSS pixel: 320 / 1.5 reads 213.328125. While
+ * the page is scaled, window.innerWidth and innerHeight are the visual viewport's size, and the layout viewport stays
+ * at the document's origin, so VisualViewport.offsetLeft and offsetTop equal pageLeft and pageTop. */
+RV_EXPORT int32_t rv_host_set_page_scale(RvHost*, double scale, int32_t originX, int32_t originY);
+/* Writes the page scale. */
+RV_EXPORT int32_t rv_host_page_scale(RvHost*, double* scale);
+/* Sets the CSS pixel widths of the viewport's edges that host UI covers, such as a toolbar or an on-screen
+ * keyboard: 0 at creation. Returns RV_ERR_UNSUPPORTED for a non-finite or negative inset. The insets shrink the
+ * visual viewport and window.innerWidth and innerHeight by the covered edges, and fire the window's and then the
+ * visual viewport's resize event. Document coordinates stay in place, top inset included, and rv_host_element_at
+ * finds nothing in the covered right and bottom areas. */
+RV_EXPORT int32_t rv_host_set_obscured_insets(RvHost*, double top, double right, double bottom, double left);
+
 /* "dom-generated" and "dom:<Interface>" for rv_abi_has: the generated functions of RanvierWebCoreDom.h, one per
  * IDL member of the interfaces gen/dom.json lists, from the same library. */
+
+/* v44: "dom-crypto-random" for rv_abi_has: rv_dom_crypto_get_random_values and rv_dom_crypto_random_uuid
+ * (RanvierWebCoreDom.h) call the crypto object of a document's Window. */
 
 #ifdef __cplusplus
 }

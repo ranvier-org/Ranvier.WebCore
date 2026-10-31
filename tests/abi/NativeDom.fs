@@ -582,6 +582,45 @@ let RV_DOM_NODE_FILTER_SHOW_DOCUMENT_FRAGMENT = 1024
 let RV_DOM_NODE_FILTER_SHOW_NOTATION = 2048
 
 [<Literal>]
+let RV_DOM_ARRAY_BUFFER_VIEW_INT8 = 0
+
+[<Literal>]
+let RV_DOM_ARRAY_BUFFER_VIEW_UINT8 = 1
+
+[<Literal>]
+let RV_DOM_ARRAY_BUFFER_VIEW_UINT8_CLAMPED = 2
+
+[<Literal>]
+let RV_DOM_ARRAY_BUFFER_VIEW_INT16 = 3
+
+[<Literal>]
+let RV_DOM_ARRAY_BUFFER_VIEW_UINT16 = 4
+
+[<Literal>]
+let RV_DOM_ARRAY_BUFFER_VIEW_INT32 = 5
+
+[<Literal>]
+let RV_DOM_ARRAY_BUFFER_VIEW_UINT32 = 6
+
+[<Literal>]
+let RV_DOM_ARRAY_BUFFER_VIEW_FLOAT16 = 7
+
+[<Literal>]
+let RV_DOM_ARRAY_BUFFER_VIEW_FLOAT32 = 8
+
+[<Literal>]
+let RV_DOM_ARRAY_BUFFER_VIEW_FLOAT64 = 9
+
+[<Literal>]
+let RV_DOM_ARRAY_BUFFER_VIEW_BIG_INT64 = 10
+
+[<Literal>]
+let RV_DOM_ARRAY_BUFFER_VIEW_BIG_UINT64 = 11
+
+[<Literal>]
+let RV_DOM_ARRAY_BUFFER_VIEW_DATA_VIEW = 12
+
+[<Literal>]
 let RV_DOM_ARIA_NOTIFICATION_INTERRUPT_NONE = 0
 
 [<Literal>]
@@ -10019,6 +10058,27 @@ extern int rv_dom_url_pattern_test(nativeint target, [<In>] RvDomUnionUSVStringO
 extern int rv_dom_url_pattern_exec(nativeint target, [<In>] RvDomUnionUSVStringOrURLPatternInit[] input, byte[] base_url, int base_url_length, nativeint& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_visual_viewport_get_offset_left(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_visual_viewport_get_offset_top(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_visual_viewport_get_page_left(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_visual_viewport_get_page_top(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_visual_viewport_get_width(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_visual_viewport_get_height(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_visual_viewport_get_scale(nativeint target, float& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_css_supports_2(nativeint target, byte[] property, int property_length, byte[] value, int value_length, int& result)
 
 [<DllImport(Lib)>]
@@ -10053,6 +10113,15 @@ extern int rv_dom_window_scroll_by_1(nativeint target, [<In>] RvDomScrollToOptio
 
 [<DllImport(Lib)>]
 extern int rv_dom_window_scroll_by_2(nativeint target, float x, float y)
+
+[<DllImport(Lib)>]
+extern int rv_dom_window_get_visual_viewport(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_crypto_get_random_values(nativeint target, int array_kind, byte[] array, int array_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_crypto_random_uuid(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_dom_matrix_read_only_from_matrix(nativeint target, [<In>] RvDomDOMMatrixInit[] other, nativeint& result)

@@ -1,0 +1,4 @@
+text_segmentation: 812 assertions, 15 qualified differences, icu=77.1 unicode=16.0
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+
+EXIT_CODE=0

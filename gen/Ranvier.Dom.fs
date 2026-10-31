@@ -5082,6 +5082,24 @@ and [<AllowNullLiteral>] URLPattern =
     /// <summary>URLPattern.hasRegExpGroups.</summary>
     abstract member hasRegExpGroups: bool with get
 
+/// <summary>VisualViewport in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] VisualViewport =
+    inherit EventTarget
+    /// <summary>VisualViewport.offsetLeft.</summary>
+    abstract member offsetLeft: float with get
+    /// <summary>VisualViewport.offsetTop.</summary>
+    abstract member offsetTop: float with get
+    /// <summary>VisualViewport.pageLeft.</summary>
+    abstract member pageLeft: float with get
+    /// <summary>VisualViewport.pageTop.</summary>
+    abstract member pageTop: float with get
+    /// <summary>VisualViewport.width.</summary>
+    abstract member width: float with get
+    /// <summary>VisualViewport.height.</summary>
+    abstract member height: float with get
+    /// <summary>VisualViewport.scale.</summary>
+    abstract member scale: float with get
+
 /// <summary>HTMLUnknownElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLUnknownElement =
     inherit HTMLElement
