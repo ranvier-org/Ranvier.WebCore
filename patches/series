@@ -35,3 +35,4 @@
 0033-image-loader-native-decode.patch
 0034-svg-string-list-null-attribute.patch
 0035-caret-position-text-control-shadow-roots.patch
+0036-empty-frame-loader-client-overridable-navigation-policy.patch
