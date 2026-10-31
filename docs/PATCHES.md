@@ -401,6 +401,19 @@ leaves the engine's behaviour unchanged. `Headers.cmake` lists the header among 
 `tests/abi/animation_lifecycle.py` checks `rv_animation_ready` and `rv_animation_finished` against the Chromium 156
 oracle `tests/fixtures/animation-lifecycle-oracle.json`. Evidence: `docs/animation-lifecycle-evidence/native-evidence.json`.
 
+## 0052-eventloop-checkpoint-microtasks
+
+While the VM disallows entry, `EventLoopTaskGroup::queueMicrotask` queues a C++ microtask as a checkpoint task
+(`runAtEndOfMicrotaskCheckpoint`) and schedules the event loop, instead of wrapping it in a JavaScript microtask cell. A
+microtask checkpoint runs checkpoint tasks in queueing order without entering the VM, so the engine's C++ microtasks
+(Web Animations AbortError rejections and asynchronous finish, among others) run under a host that disallows VM entry.
+With VM entry allowed the function is unchanged. The change is one function of `EventLoop.cpp`, with no class layout
+change, and recompiles one unified source.
+
+Without the patch, `cancel()` of an animation with a pending pause queues its rejection as a JavaScript microtask, and
+the armed VM-entry crash (`crashOnDisallowedVMEntry`) aborts the host at the next checkpoint. Evidence:
+`docs/batch-6-evidence/` (vm1 test plan steps 1-4).
+
 ## Working on the series
 
 ```
