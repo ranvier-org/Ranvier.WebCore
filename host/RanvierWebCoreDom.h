@@ -90,6 +90,9 @@ typedef struct RvURLSearchParams RvURLSearchParams;
 typedef struct RvURLPattern RvURLPattern;
 typedef struct RvHighlight RvHighlight;
 typedef struct RvHighlightRegistry RvHighlightRegistry;
+typedef struct RvDataTransfer RvDataTransfer;
+typedef struct RvDataTransferItemList RvDataTransferItemList;
+typedef struct RvDataTransferItem RvDataTransferItem;
 typedef struct RvDomUnionNodeOrDOMString RvDomUnionNodeOrDOMString;
 typedef struct RvDomSequenceNodeOrDOMString RvDomSequenceNodeOrDOMString;
 typedef struct RvDomSequenceCSSStyleSheet RvDomSequenceCSSStyleSheet;
@@ -617,6 +620,19 @@ typedef struct RvDomDOMPointInit {
     double z; /* unrestricted double, default 0 */
     double w; /* unrestricted double, default 1 */
 } RvDomDOMPointInit;
+
+/* The IDL dictionary InputEventInit. size is sizeof(RvDomInputEventInit) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomInputEventInit {
+    uint32_t size;
+    int32_t bubbles; /* boolean, default false */
+    int32_t cancelable; /* boolean, default false */
+    int32_t composed; /* boolean, default false */
+    int32_t detail; /* long, default 0 */
+    RvDomUtf8StringInput data; /* DOMString?, default null */
+    int32_t is_composing; /* boolean, default false */
+    RvDomUtf8StringInput input_type; /* DOMString, default "" */
+} RvDomInputEventInit;
 
 /* The IDL dictionary CompositionEventInit. size is sizeof(RvDomCompositionEventInit) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
@@ -1891,6 +1907,18 @@ RV_EXPORT RvHighlight* rv_dom_highlight_retain(RvHighlight*);
 RV_EXPORT void rv_dom_highlight_registry_release(RvHighlightRegistry*);
 /* Adds a reference to a HighlightRegistry and returns it. */
 RV_EXPORT RvHighlightRegistry* rv_dom_highlight_registry_retain(RvHighlightRegistry*);
+/* Releases a handle to a DataTransfer. */
+RV_EXPORT void rv_dom_data_transfer_release(RvDataTransfer*);
+/* Adds a reference to a DataTransfer and returns it. */
+RV_EXPORT RvDataTransfer* rv_dom_data_transfer_retain(RvDataTransfer*);
+/* Releases a handle to a DataTransferItemList. */
+RV_EXPORT void rv_dom_data_transfer_item_list_release(RvDataTransferItemList*);
+/* Adds a reference to a DataTransferItemList and returns it. */
+RV_EXPORT RvDataTransferItemList* rv_dom_data_transfer_item_list_retain(RvDataTransferItemList*);
+/* Releases a handle to a DataTransferItem. */
+RV_EXPORT void rv_dom_data_transfer_item_release(RvDataTransferItem*);
+/* Adds a reference to a DataTransferItem and returns it. */
+RV_EXPORT RvDataTransferItem* rv_dom_data_transfer_item_retain(RvDataTransferItem*);
 /* Concrete scoped interface name of a CSSRule handle; borrows target. */
 RV_EXPORT int32_t rv_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* Concrete scoped interface name of a StyleSheet handle; borrows target. */
@@ -6507,12 +6535,17 @@ RV_EXPORT int32_t rv_dom_keyboard_event_get_modifier_state(RvEvent* target, cons
 RV_EXPORT int32_t rv_dom_focus_event_get_related_target(RvEvent* target, RvNode** result);
 /* InputEvent */
 
+/* InputEvent.constructor: target is the Document of the constructed object; event_init_dict defaults to {} in IDL;
+ * event_init_dict may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_input_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomInputEventInit* event_init_dict, RvEvent** result);
 /* InputEvent.inputType getter: readonly attribute DOMString inputType */
 RV_EXPORT int32_t rv_dom_input_event_get_input_type(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
 /* InputEvent.data getter: readonly attribute USVString? data */
 RV_EXPORT int32_t rv_dom_input_event_get_data(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
 /* InputEvent.isComposing getter: readonly attribute boolean isComposing */
 RV_EXPORT int32_t rv_dom_input_event_get_is_composing(RvEvent* target, int32_t* result);
+/* InputEvent.dataTransfer getter: readonly attribute DataTransfer? dataTransfer; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_input_event_get_data_transfer(RvEvent* target, RvDataTransfer** result);
 /* InputEvent.getTargetRanges() -> sequence<StaticRange>; *result owns its contents; release with the matching
  * rv_dom_*_release */
 RV_EXPORT int32_t rv_dom_input_event_get_target_ranges(RvEvent* target, RvDomSequenceStaticRange* result);
@@ -8199,6 +8232,68 @@ RV_EXPORT int32_t rv_dom_file_reader_read_as_text(RvEventTarget* target, RvBlob*
 RV_EXPORT int32_t rv_dom_file_reader_read_as_data_url(RvEventTarget* target, RvBlob* blob);
 /* FileReader.abort() -> undefined; RV_ERR_UNSUPPORTED while the setting FileReaderAPIEnabled is off */
 RV_EXPORT int32_t rv_dom_file_reader_abort(RvEventTarget* target);
+/* DataTransfer */
+
+/* DataTransfer.constructor: target is the Document of the constructed object; *result is a new reference */
+RV_EXPORT int32_t rv_dom_data_transfer_create(RvNode* target, RvDataTransfer** result);
+/* DataTransfer.dropEffect getter: attribute DOMString dropEffect */
+RV_EXPORT int32_t rv_dom_data_transfer_get_drop_effect(RvDataTransfer* target, char* buffer, int32_t capacity, int32_t* length);
+/* DataTransfer.dropEffect setter: attribute DOMString dropEffect */
+RV_EXPORT int32_t rv_dom_data_transfer_set_drop_effect(RvDataTransfer* target, const uint8_t* value, int32_t value_length);
+/* DataTransfer.effectAllowed getter: attribute DOMString effectAllowed */
+RV_EXPORT int32_t rv_dom_data_transfer_get_effect_allowed(RvDataTransfer* target, char* buffer, int32_t capacity, int32_t* length);
+/* DataTransfer.effectAllowed setter: attribute DOMString effectAllowed */
+RV_EXPORT int32_t rv_dom_data_transfer_set_effect_allowed(RvDataTransfer* target, const uint8_t* value, int32_t value_length);
+/* DataTransfer.items getter: readonly attribute DataTransferItemList items; context is an explicit checked Document
+ * for the operation; *result is a new reference; RV_ERR_UNSUPPORTED while the setting DataTransferItemsEnabled is off */
+RV_EXPORT int32_t rv_dom_data_transfer_get_items(RvDataTransfer* target, RvNode* context, RvDataTransferItemList** result);
+/* DataTransfer.types getter: readonly attribute FrozenArray<DOMString> types; context is an explicit checked Document
+ * for the operation; *result owns its contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_data_transfer_get_types(RvDataTransfer* target, RvNode* context, RvDomSequenceDOMString* result);
+/* DataTransfer.files getter: readonly attribute FileList files; context is an explicit checked Document for the
+ * operation; *result is a new reference */
+RV_EXPORT int32_t rv_dom_data_transfer_get_files(RvDataTransfer* target, RvNode* context, RvFileList** result);
+/* DataTransfer.setDragImage(Element image, long x, long y) -> undefined */
+RV_EXPORT int32_t rv_dom_data_transfer_set_drag_image(RvDataTransfer* target, RvNode* image, int32_t x, int32_t y);
+/* DataTransfer.getData(DOMString format) -> DOMString; context is an explicit checked Document for the operation */
+RV_EXPORT int32_t rv_dom_data_transfer_get_data(RvDataTransfer* target, RvNode* context, const uint8_t* format, int32_t format_length, char* buffer, int32_t capacity, int32_t* length);
+/* DataTransfer.setData(DOMString format, DOMString data) -> undefined; context is an explicit checked Document for
+ * the operation */
+RV_EXPORT int32_t rv_dom_data_transfer_set_data(RvDataTransfer* target, RvNode* context, const uint8_t* format, int32_t format_length, const uint8_t* data, int32_t data_length);
+/* DataTransfer.clearData(optional DOMString format) -> undefined; format_length -1 means absent */
+RV_EXPORT int32_t rv_dom_data_transfer_clear_data(RvDataTransfer* target, const uint8_t* format, int32_t format_length);
+/* DataTransferItemList */
+
+/* DataTransferItemList.length getter: readonly attribute long length */
+RV_EXPORT int32_t rv_dom_data_transfer_item_list_get_length(RvDataTransferItemList* target, int32_t* result);
+/* DataTransferItemList.item(unsigned long index) -> DataTransferItem?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_data_transfer_item_list_item(RvDataTransferItemList* target, uint32_t index, RvDataTransferItem** result);
+/* DataTransferItemList.add(DOMString data, DOMString type) -> DataTransferItem?; context is an explicit checked
+ * Document for the operation; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_data_transfer_item_list_add_2(RvDataTransferItemList* target, RvNode* context, const uint8_t* data, int32_t data_length, const uint8_t* type, int32_t type_length, RvDataTransferItem** result);
+/* DataTransferItemList.add(File file) -> DataTransferItem?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_data_transfer_item_list_add_1(RvDataTransferItemList* target, RvBlob* file, RvDataTransferItem** result);
+/* DataTransferItemList.remove(unsigned long index) -> undefined */
+RV_EXPORT int32_t rv_dom_data_transfer_item_list_remove(RvDataTransferItemList* target, uint32_t index);
+/* DataTransferItemList.clear() -> undefined */
+RV_EXPORT int32_t rv_dom_data_transfer_item_list_clear(RvDataTransferItemList* target);
+/* DataTransferItem */
+
+/* DataTransferItem.kind getter: readonly attribute DOMString kind */
+RV_EXPORT int32_t rv_dom_data_transfer_item_get_kind(RvDataTransferItem* target, char* buffer, int32_t capacity, int32_t* length);
+/* DataTransferItem.type getter: readonly attribute DOMString type */
+RV_EXPORT int32_t rv_dom_data_transfer_item_get_type(RvDataTransferItem* target, char* buffer, int32_t capacity, int32_t* length);
+/* DataTransferItem.getAsFile() -> File?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_data_transfer_item_get_as_file(RvDataTransferItem* target, RvBlob** result);
+/* ClipboardEvent */
+
+/* ClipboardEvent.clipboardData getter: readonly attribute DataTransfer? clipboardData; *result is a new reference, or
+ * NULL */
+RV_EXPORT int32_t rv_dom_clipboard_event_get_clipboard_data(RvEvent* target, RvDataTransfer** result);
+/* DragEvent */
+
+/* DragEvent.dataTransfer getter: readonly attribute DataTransfer? dataTransfer; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_drag_event_get_data_transfer(RvEvent* target, RvDataTransfer** result);
 /* DOMCSSNamespace */
 
 /* CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths */

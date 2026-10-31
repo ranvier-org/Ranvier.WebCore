@@ -1,0 +1,94 @@
+{
+ "comment": [
+  "I07/T09/T04 DataTransfer cases: tests/abi/data_transfer.py replays them natively and tests/abi/data_transfer_browser.mjs",
+  "in Chromium (tests/fixtures/data-transfer-oracle.json). File contents are UTF-8 text, except the paste image's hex bytes."
+ ],
+ "viewport": [
+  320,
+  240
+ ],
+ "markup": "<!doctype html><html><head><style>body{margin:0;font:16px sans-serif}#t{position:absolute;left:0;top:0;width:200px;height:80px;background:#ccc}#e{position:absolute;left:0;top:90px;width:200px;height:40px}#s{position:absolute;left:0;top:150px;width:100px;height:30px;background:#c00}#img{position:absolute;left:220px;top:150px;width:40px;height:20px;background:#00c}</style></head><body><div id=t>drop</div><div id=e contenteditable>ab<b>cd</b>ef</div><div id=s draggable=true></div><div id=img></div></body></html>",
+ "drop": {
+  "strings": [
+   [
+    "text/plain",
+    "XY"
+   ],
+   [
+    "text/html",
+    "<i>X</i>Y"
+   ]
+  ],
+  "files": [
+   [
+    "note.txt",
+    "hello file",
+    "text/plain"
+   ],
+   [
+    "table.csv",
+    "a,b",
+    "text/csv"
+   ]
+  ],
+  "point": [
+   50,
+   40
+  ],
+  "allowed": 1
+ },
+ "paste": {
+  "strings": [
+   [
+    "text/plain",
+    "PQ"
+   ],
+   [
+    "text/html",
+    "<u>P</u>Q"
+   ]
+  ],
+  "file": [
+   "image.png",
+   "image/png",
+   "89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000d4944415478da63fccfc0500f000485018084a98c210000000049454e44ae426082"
+  ]
+ },
+ "copy": {
+  "text": "C1",
+  "file": [
+   "c.txt",
+   "text/plain",
+   "copied"
+  ]
+ },
+ "dragOut": {
+  "text": "drag",
+  "from": [
+   10,
+   160
+  ],
+  "to": [
+   60,
+   200
+  ],
+  "imageOffset": [
+   5,
+   7
+  ],
+  "imageSize": [
+   40,
+   20
+  ]
+ },
+ "replace": {
+  "html": "hello world",
+  "range": [
+   6,
+   11
+  ],
+  "text": "there",
+  "expected": "hello there",
+  "secondExpected": "HELLO there"
+ }
+}

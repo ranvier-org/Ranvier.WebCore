@@ -364,6 +364,7 @@
       "function": "rv_dom_event_get_interface_name",
       "feature": "dom-type-query:Event",
       "interfaces": [
+        "DragEvent",
         "PointerEvent",
         "WheelEvent",
         "CompositionEvent",
@@ -375,6 +376,7 @@
         "BeforeUnloadEvent",
         "CSSAnimationEvent",
         "CSSTransitionEvent",
+        "ClipboardEvent",
         "CommandEvent",
         "ContentVisibilityAutoStateChangeEvent",
         "CustomEvent",
@@ -391,6 +393,7 @@
         "Event"
       ],
       "names": [
+        "DragEvent",
         "PointerEvent",
         "WheelEvent",
         "CompositionEvent",
@@ -402,6 +405,7 @@
         "BeforeUnloadEvent",
         "AnimationEvent",
         "TransitionEvent",
+        "ClipboardEvent",
         "CommandEvent",
         "ContentVisibilityAutoStateChangeEvent",
         "CustomEvent",
@@ -1564,6 +1568,26 @@
     {
       "name": "FileReader",
       "base": "EventTarget"
+    },
+    {
+      "name": "DataTransfer",
+      "base": null
+    },
+    {
+      "name": "DataTransferItemList",
+      "base": null
+    },
+    {
+      "name": "DataTransferItem",
+      "base": null
+    },
+    {
+      "name": "ClipboardEvent",
+      "base": "Event"
+    },
+    {
+      "name": "DragEvent",
+      "base": "MouseEvent"
     }
   ],
   "contractInterfaces": [
@@ -4158,6 +4182,51 @@
       "source": "fileapi/FileReader.idl"
     },
     {
+      "name": "DataTransfer",
+      "idlName": "DataTransfer",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/DataTransfer.idl"
+    },
+    {
+      "name": "DataTransferItemList",
+      "idlName": "DataTransferItemList",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/DataTransferItemList.idl"
+    },
+    {
+      "name": "DataTransferItem",
+      "idlName": "DataTransferItem",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/DataTransferItem.idl"
+    },
+    {
+      "name": "ClipboardEvent",
+      "idlName": "ClipboardEvent",
+      "base": "Event",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/ClipboardEvent.idl"
+    },
+    {
+      "name": "DragEvent",
+      "idlName": "DragEvent",
+      "base": "MouseEvent",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/DragEvent.idl"
+    },
+    {
       "name": "HTMLUnknownElement",
       "idlName": "HTMLUnknownElement",
       "base": "HTMLElement",
@@ -4282,24 +4351,6 @@
       "mixin": false,
       "contractOnly": true,
       "source": "dom/CustomElementRegistry.idl"
-    },
-    {
-      "name": "ClipboardEvent",
-      "idlName": "ClipboardEvent",
-      "base": "Event",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "dom/ClipboardEvent.idl"
-    },
-    {
-      "name": "DragEvent",
-      "idlName": "DragEvent",
-      "base": "MouseEvent",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "dom/DragEvent.idl"
     },
     {
       "name": "GamepadEvent",
@@ -114548,6 +114599,106 @@
     },
     {
       "interface": "InputEvent",
+      "member": "constructor",
+      "contractOwner": "InputEvent",
+      "kind": "constructor",
+      "function": "rv_dom_input_event_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "type"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "type_length"
+        },
+        {
+          "ctype": "const RvDomInputEventInit*",
+          "name": "event_init_dict"
+        },
+        {
+          "ctype": "RvEvent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "type",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "eventInitDict",
+          "idlType": "InputEventInit",
+          "idl": {
+            "name": "InputEventInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "InputEventInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "InputEvent",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "event",
+        "ctype": null,
+        "interface": "InputEvent",
+        "root": null,
+        "class": "InputEvent",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:InputEvent",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "InputEvent",
       "member": "inputType",
       "contractOwner": "InputEvent",
       "kind": "getter",
@@ -114666,6 +114817,42 @@
         "enum": null,
         "label": null,
         "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "InputEvent",
+      "member": "dataTransfer",
+      "contractOwner": "InputEvent",
+      "kind": "getter",
+      "function": "rv_dom_input_event_get_data_transfer",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDataTransfer**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DataTransfer",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DataTransfer",
+        "root": "DataTransfer",
+        "class": "DataTransfer",
+        "enum": null,
+        "label": null,
+        "nullable": true,
         "atom": false,
         "subtypes": []
       }
@@ -146595,6 +146782,1351 @@
       "stringInputs": "utf8-lengths"
     },
     {
+      "interface": "DataTransfer",
+      "member": "constructor",
+      "contractOwner": "DataTransfer",
+      "kind": "constructor",
+      "function": "rv_dom_data_transfer_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDataTransfer**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DataTransfer",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DataTransfer",
+        "root": "DataTransfer",
+        "class": "DataTransfer",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:DataTransfer",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DataTransfer",
+      "member": "dropEffect",
+      "contractOwner": "DataTransfer",
+      "kind": "getter",
+      "function": "rv_dom_data_transfer_get_drop_effect",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDataTransfer*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DataTransfer",
+      "member": "dropEffect",
+      "contractOwner": "DataTransfer",
+      "kind": "setter",
+      "function": "rv_dom_data_transfer_set_drop_effect",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDataTransfer*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DataTransfer",
+      "member": "effectAllowed",
+      "contractOwner": "DataTransfer",
+      "kind": "getter",
+      "function": "rv_dom_data_transfer_get_effect_allowed",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDataTransfer*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DataTransfer",
+      "member": "effectAllowed",
+      "contractOwner": "DataTransfer",
+      "kind": "setter",
+      "function": "rv_dom_data_transfer_set_effect_allowed",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDataTransfer*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DataTransfer",
+      "member": "items",
+      "contractOwner": "DataTransfer",
+      "kind": "getter",
+      "function": "rv_dom_data_transfer_get_items",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDataTransfer*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "context"
+        },
+        {
+          "ctype": "RvDataTransferItemList**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DataTransferItemList",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DataTransferItemList",
+        "root": "DataTransferItemList",
+        "class": "DataTransferItemList",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "contextReceiver": "Document",
+      "contextParameter": "context"
+    },
+    {
+      "interface": "DataTransfer",
+      "member": "types",
+      "contractOwner": "DataTransfer",
+      "kind": "getter",
+      "function": "rv_dom_data_transfer_get_types",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDataTransfer*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "context"
+        },
+        {
+          "ctype": "RvDomSequenceDOMString*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "FrozenArray",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceDOMString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "DOMString sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          }
+        ]
+      },
+      "contextReceiver": "Document",
+      "contextParameter": "context"
+    },
+    {
+      "interface": "DataTransfer",
+      "member": "files",
+      "contractOwner": "DataTransfer",
+      "kind": "getter",
+      "function": "rv_dom_data_transfer_get_files",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDataTransfer*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "context"
+        },
+        {
+          "ctype": "RvFileList**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "FileList",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "FileList",
+        "root": "FileList",
+        "class": "FileList",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "contextReceiver": "Document",
+      "contextParameter": "context"
+    },
+    {
+      "interface": "DataTransfer",
+      "member": "setDragImage",
+      "contractOwner": "DataTransfer",
+      "kind": "operation",
+      "function": "rv_dom_data_transfer_set_drag_image",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDataTransfer*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "image"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "x"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "y"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "image",
+          "idlType": "Element",
+          "idl": {
+            "name": "Element",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "node",
+            "ctype": null,
+            "interface": "Element",
+            "root": null,
+            "class": "Element",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "x",
+          "idlType": "long",
+          "idl": {
+            "name": "long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "y",
+          "idlType": "long",
+          "idl": {
+            "name": "long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DataTransfer",
+      "member": "getData",
+      "contractOwner": "DataTransfer",
+      "kind": "operation",
+      "function": "rv_dom_data_transfer_get_data",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDataTransfer*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "context"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "format"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "format_length"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "format",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths",
+      "contextReceiver": "Document",
+      "contextParameter": "context"
+    },
+    {
+      "interface": "DataTransfer",
+      "member": "setData",
+      "contractOwner": "DataTransfer",
+      "kind": "operation",
+      "function": "rv_dom_data_transfer_set_data",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDataTransfer*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "context"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "format"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "format_length"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "data"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "data_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "format",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "data",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths",
+      "contextReceiver": "Document",
+      "contextParameter": "context"
+    },
+    {
+      "interface": "DataTransfer",
+      "member": "clearData",
+      "contractOwner": "DataTransfer",
+      "kind": "operation",
+      "function": "rv_dom_data_transfer_clear_data",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDataTransfer*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "format"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "format_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "format",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DataTransferItemList",
+      "member": "length",
+      "contractOwner": "DataTransferItemList",
+      "kind": "getter",
+      "function": "rv_dom_data_transfer_item_list_get_length",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDataTransferItemList*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DataTransferItemList",
+      "member": "item",
+      "contractOwner": "DataTransferItemList",
+      "kind": "operation",
+      "function": "rv_dom_data_transfer_item_list_item",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDataTransferItemList*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t",
+          "name": "index"
+        },
+        {
+          "ctype": "RvDataTransferItem**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "index",
+          "idlType": "unsigned long",
+          "idl": {
+            "name": "unsigned long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "uint32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DataTransferItem",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DataTransferItem",
+        "root": "DataTransferItem",
+        "class": "DataTransferItem",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DataTransferItemList",
+      "member": "add",
+      "contractOwner": "DataTransferItemList",
+      "kind": "operation",
+      "function": "rv_dom_data_transfer_item_list_add_2",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDataTransferItemList*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "context"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "data"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "data_length"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "type"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "type_length"
+        },
+        {
+          "ctype": "RvDataTransferItem**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "data",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "type",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DataTransferItem",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DataTransferItem",
+        "root": "DataTransferItem",
+        "class": "DataTransferItem",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths",
+      "contextReceiver": "Document",
+      "contextParameter": "context"
+    },
+    {
+      "interface": "DataTransferItemList",
+      "member": "add",
+      "contractOwner": "DataTransferItemList",
+      "kind": "operation",
+      "function": "rv_dom_data_transfer_item_list_add_1",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDataTransferItemList*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvBlob*",
+          "name": "file"
+        },
+        {
+          "ctype": "RvDataTransferItem**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "file",
+          "idlType": "File",
+          "idl": {
+            "name": "File",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "File",
+            "root": "Blob",
+            "class": "File",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DataTransferItem",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DataTransferItem",
+        "root": "DataTransferItem",
+        "class": "DataTransferItem",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DataTransferItemList",
+      "member": "remove",
+      "contractOwner": "DataTransferItemList",
+      "kind": "operation",
+      "function": "rv_dom_data_transfer_item_list_remove",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDataTransferItemList*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t",
+          "name": "index"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "index",
+          "idlType": "unsigned long",
+          "idl": {
+            "name": "unsigned long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "uint32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DataTransferItemList",
+      "member": "clear",
+      "contractOwner": "DataTransferItemList",
+      "kind": "operation",
+      "function": "rv_dom_data_transfer_item_list_clear",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDataTransferItemList*",
+          "name": "target"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DataTransferItem",
+      "member": "kind",
+      "contractOwner": "DataTransferItem",
+      "kind": "getter",
+      "function": "rv_dom_data_transfer_item_get_kind",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDataTransferItem*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DataTransferItem",
+      "member": "type",
+      "contractOwner": "DataTransferItem",
+      "kind": "getter",
+      "function": "rv_dom_data_transfer_item_get_type",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDataTransferItem*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DataTransferItem",
+      "member": "getAsFile",
+      "contractOwner": "DataTransferItem",
+      "kind": "operation",
+      "function": "rv_dom_data_transfer_item_get_as_file",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDataTransferItem*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvBlob**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "File",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "File",
+        "root": "Blob",
+        "class": "File",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "ClipboardEvent",
+      "member": "clipboardData",
+      "contractOwner": "ClipboardEvent",
+      "kind": "getter",
+      "function": "rv_dom_clipboard_event_get_clipboard_data",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDataTransfer**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DataTransfer",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DataTransfer",
+        "root": "DataTransfer",
+        "class": "DataTransfer",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DragEvent",
+      "member": "dataTransfer",
+      "contractOwner": "DragEvent",
+      "kind": "getter",
+      "function": "rv_dom_drag_event_get_data_transfer",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDataTransfer**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DataTransfer",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DataTransfer",
+        "root": "DataTransfer",
+        "class": "DataTransfer",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
       "interface": "DOMCSSNamespace",
       "member": "supports",
       "contractOwner": "CSS",
@@ -154418,6 +155950,141 @@
         "mapping": {
           "kind": "number",
           "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "InputEventInit": [
+      {
+        "name": "bubbles",
+        "field": "bubbles",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "cancelable",
+        "field": "cancelable",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "composed",
+        "field": "composed",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "detail",
+        "field": "detail",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "data",
+        "field": "data",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "null",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": true,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "isComposing",
+        "field": "is_composing",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "inputType",
+        "field": "input_type",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "\"\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
           "interface": null,
           "root": null,
           "class": null,

@@ -803,14 +803,35 @@ typedef struct RvClipboardRequest RvClipboardRequest;
  * data is data_length UTF-8 bytes without a terminator, valid for the call. first is 1 for the first type of a copy or
  * cut, when the app replaces what its clipboard held. */
 typedef void (*RvClipboardWrite)(void* context, const char* type, const uint8_t* data, int32_t data_length, int32_t first);
-/* App style: called at a paste; the app offers each type it holds with rv_clipboard_offer before it returns. */
+/* App style: called at a paste; the app offers each type it holds with rv_clipboard_offer and each file with
+ * rv_clipboard_offer_file before it returns, or refuses the read with rv_clipboard_deny. */
 typedef void (*RvClipboardRead)(void* context, RvClipboardRequest* request);
 
 /* Sets the host's clipboard style. The callbacks are for RV_CLIPBOARD_APP and NULL otherwise.
  * RV_CLIPBOARD_NATIVE returns RV_ERR_UNSUPPORTED where WebCore has no platform clipboard (Linux). */
 RV_EXPORT int32_t rv_host_set_clipboard(RvHost*, int32_t style, RvClipboardWrite write, RvClipboardRead read, void* context);
-/* Offers one type of the clipboard's content to a paste, during RvClipboardRead. */
+/* Offers one type of the clipboard's content to a paste, during RvClipboardRead. The type "Files", in any case, is
+ * reserved for files and returns RV_ERR_UNSUPPORTED. */
 RV_EXPORT int32_t rv_clipboard_offer(RvClipboardRequest*, const char* type, const uint8_t* data, int32_t data_length);
+
+/* "clipboard-files" for rv_abi_has: files and images in the App clipboard style. docs/CLIPBOARD-DND.md describes them. */
+
+typedef struct RvBlob RvBlob;
+
+/* Offers a File, such as an image/png file for an image, to a paste during RvClipboardRead: the paste's
+ * clipboardData lists it in files, as an item of kind "file" and as the type "Files". The page's File is a copy with
+ * the same name, type and bytes. RV_ERR_WRONG_INTERFACE for a Blob that is not a File, RV_ERR_UNSUPPORTED for one
+ * backed by a file on disk. A plain-text paste carries no files. */
+RV_EXPORT int32_t rv_clipboard_offer_file(RvClipboardRequest*, RvBlob* file);
+/* Refuses the paste during RvClipboardRead: no paste event fires and nothing is inserted, and rv_host_edit returns
+ * RV_ERR_DOM_EXCEPTION, with NotAllowedError in rv_last_exception. */
+RV_EXPORT int32_t rv_clipboard_deny(RvClipboardRequest*);
+/* App style: called after the copied types for each File a copy or cut listener added with clipboardData.items.add,
+ * in order. file is borrowed for the call; rv_dom_blob_retain keeps it. first is 1 for the first call of a copy or
+ * cut across RvClipboardWrite and this callback. */
+typedef void (*RvClipboardWriteFile)(void* context, RvBlob* file, int32_t first);
+/* Sets the host's file write callback, or with a NULL callback removes it; files a page copies then reach no app. */
+RV_EXPORT int32_t rv_host_set_clipboard_file_write(RvHost*, RvClipboardWriteFile write, void* context);
 /* Runs an editing command on the selection of the host's document, as a menu would; Control+C, X and V in
  * rv_host_key run the same commands. Copy, cut and paste fire their DOM events first, and a page that
  * cancels one supplies or takes the data itself. Returns 1 when the command ran, 0 when it does not apply,
@@ -850,16 +871,22 @@ enum {
 typedef struct RvDragData RvDragData;
 
 RV_EXPORT int32_t rv_host_set_drag(RvHost*, int32_t style);
-/* The data of a drag, of types such as "text/plain", "text/html" and "text/uri-list" (file URLs for files). */
+/* The data of a drag: strings of types such as "text/plain", "text/html" and "text/uri-list", and files. The type
+ * "Files", in any case, is reserved for files and returns RV_ERR_UNSUPPORTED. */
 RV_EXPORT RvDragData* rv_drag_data_create(void);
 RV_EXPORT int32_t rv_drag_data_add(RvDragData*, const char* type, const uint8_t* data, int32_t data_length);
+/* "data-transfer-files" for rv_abi_has: adds a File to the drag's data, as rv_clipboard_offer_file does to a paste.
+ * The drop's dataTransfer lists it in files and items; dragenter, dragover and dragleave list only the type "Files". */
+RV_EXPORT int32_t rv_drag_data_add_file(RvDragData*, RvBlob* file);
 RV_EXPORT void rv_drag_data_release(RvDragData*);
 /* Forwards a drag from outside the page at x, y CSS pixels of the viewport, with the RV_DROP_* operations
  * the source allows. As the element under the point changes the host fires dragleave and dragenter, then
  * dragover, or drop for RV_DRAG_DROP, each with a dataTransfer holding data; drop's data is readable. Returns
  * the RV_DROP_* operation the page accepts, which the app shows as the cursor: the dataTransfer's dropEffect
  * when a listener cancelled dragover, else RV_DROP_COPY for text over editable content, else RV_DROP_NONE.
- * A drop that no listener cancels inserts the text, or the HTML, into editable content at the point. */
+ * A drop that no listener cancels inserts the text, or the HTML, into editable content at the point.
+ * The dataTransfer of dragenter, dragover and dragleave is protected: its types are readable, its data and files are
+ * not. Drop's is read-only. Each is unreadable once its event is over; the Files read from it stay valid. */
 RV_EXPORT int32_t rv_host_drag(RvHost*, int32_t action, int32_t x, int32_t y, int32_t allowed, RvDragData* data, int32_t modifiers);
 
 /* v20: "drag-out" for rv_abi_has: drags that start in the page. */
@@ -880,15 +907,31 @@ RV_EXPORT int32_t rv_drag_item_count(RvDrag*);
 /* Copies the type or the value of the drag's item at index. */
 RV_EXPORT int32_t rv_drag_item_type(RvDrag*, int32_t index, char* buffer, int32_t capacity, int32_t* length);
 RV_EXPORT int32_t rv_drag_item_value(RvDrag*, int32_t index, char* buffer, int32_t capacity, int32_t* length);
-/* A copy of the drag's items as drag data, for rv_host_drag; released with rv_drag_data_release. */
+/* A copy of the drag's items and files as drag data, for rv_host_drag; released with rv_drag_data_release. */
 RV_EXPORT RvDragData* rv_drag_data(RvDrag*);
+/* The Files dragstart listeners added to the drag's items, and a new reference to the one at index. */
+RV_EXPORT int32_t rv_drag_file_count(RvDrag*);
+RV_EXPORT int32_t rv_drag_file(RvDrag*, int32_t index, RvBlob** result);
 /* Paints the dragged element as rv_element_snapshot does, and writes where the press was within the image,
- * in device pixels, to *offsetX and *offsetY. RV_ERR_UNSUPPORTED for a selection drag, which has no element. */
+ * in device pixels, to *offsetX and *offsetY. When a dragstart listener called setDragImage with an element in the
+ * document, paints that element instead, with the offset it gave. RV_ERR_UNSUPPORTED for a selection drag without
+ * one, which has no element. */
 RV_EXPORT int32_t rv_drag_image(RvDrag*, uint8_t* rgba, int32_t length, int32_t* width, int32_t* height, int32_t* offsetX, int32_t* offsetY);
 /* Ends the drag at x, y CSS pixels of the viewport with the RV_DROP_* operation the drop target accepted, or
  * RV_DROP_NONE when the drag was cancelled: the page's dragend fires with it. The drag is invalid after the
  * call. */
 RV_EXPORT int32_t rv_drag_end(RvDrag*, int32_t x, int32_t y, int32_t operation);
+
+/* "range-replacement" for rv_abi_has: an editor's replacement of a range, such as a spelling correction. */
+
+typedef struct RvAbstractRange RvAbstractRange;
+
+/* Replaces the range, a Range or StaticRange of the host's document, with text (text_length UTF-8 bytes) as an
+ * insertReplacementText edit: beforeinput fires, cancelable, with the range as getTargetRanges() and, in editable
+ * content, a dataTransfer of text/plain and text/html; then the edit and input. The dataTransfer stays readable while
+ * a handle holds it. Returns 1 when the edit applied, 0 when a listener cancelled beforeinput or the range is not
+ * editable, RV_ERR_UNSUPPORTED for a range of another document. */
+RV_EXPORT int32_t rv_host_replace_range(RvHost*, RvAbstractRange* range, const uint8_t* text, int32_t text_length);
 
 /* "accessibility" for rv_abi_has: the page's accessibility tree, which the app exposes through the platform's
  * accessibility API (UI Automation, NSAccessibility, AT-SPI). docs/ACCESSIBILITY.md describes the model.

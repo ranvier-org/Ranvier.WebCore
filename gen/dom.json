@@ -248,6 +248,16 @@
     "FileReader": {
       "receiver": "Document",
       "factory": "FileReader::create"
+    },
+    "DataTransfer": {
+      "receiver": "Document",
+      "factory": "DataTransfer::create",
+      "passReceiver": false
+    },
+    "InputEvent": {
+      "receiver": "Document",
+      "factory": "InputEvent::create",
+      "passReceiver": false
     }
   },
   "dictionaryCppTypes": {
@@ -266,7 +276,8 @@
     "HashChangeEventInit": "HashChangeEvent::Init",
     "MediaQueryListEventInit": "MediaQueryListEvent::Init",
     "PopStateEventInit": "PopStateEvent::Init",
-    "CompositionEventInit": "CompositionEvent::Init"
+    "CompositionEventInit": "CompositionEvent::Init",
+    "InputEventInit": "InputEvent::Init"
   },
   "dictionaryObjectMembers": [
     "FormDataEventInit.formData"
@@ -380,7 +391,10 @@
     "StylePropertyMap": "Document",
     "DOMMatrix": "Document",
     "DOMFormData": "Document",
-    "URLSearchParams": "Document"
+    "URLSearchParams": "Document",
+    "DataTransfer": "Document",
+    "DataTransferItemList": "Document",
+    "DataTransferItem": "Document"
   },
   "finiteNumberInputs": [
     "CSSUnitValue",
@@ -680,7 +694,12 @@
     "VisualViewport",
     "Highlight",
     "HighlightRegistry",
-    "FileReader"
+    "FileReader",
+    "DataTransfer",
+    "DataTransferItemList",
+    "DataTransferItem",
+    "ClipboardEvent",
+    "DragEvent"
   ],
   "skipDirectories": [
     "Modules/",
@@ -716,8 +735,6 @@
       "CSSStyleSheet",
       "CSSStyleProperties",
       "CustomElementRegistry",
-      "ClipboardEvent",
-      "DragEvent",
       "ErrorEvent",
       "FormDataEvent",
       "GamepadEvent",
@@ -815,7 +832,8 @@
     "HashChangeEvent",
     "MediaQueryListEvent",
     "PopStateEvent",
-    "CustomEvent"
+    "CustomEvent",
+    "ClipboardEvent"
   ],
   "castVia": {
     "SVGAnimationElement": "SVGElement",
@@ -911,7 +929,9 @@
     "AnimationEventInit.animation",
     "CSSTransitionEvent.animation",
     "TransitionEventInit.animation",
-    "UIEventInit.view"
+    "UIEventInit.view",
+    "DataTransferItem.getAsString",
+    "DataTransferItem.webkitGetAsEntry"
   ],
   "namespaceBindings": {
     "DOMCSSNamespace": {
@@ -1098,7 +1118,9 @@
   },
   "creationGatedInterfaces": {
     "CaretPosition": "Document.caretPositionFromPoint",
-    "VisualViewport": "DOMWindow.visualViewport"
+    "VisualViewport": "DOMWindow.visualViewport",
+    "DataTransferItemList": "DataTransfer.items",
+    "DataTransferItem": "DataTransferItemList.item"
   },
   "contextSettingsObjects": [
     "FileReader"
