@@ -132,6 +132,7 @@ with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
     run([sys.executable, '-I', tests / 'touch_input.py', '--native-directory', out])
     run([sys.executable, '-I', tests / 'pen_input.py', '--native-directory', out])
     run([sys.executable, '-I', tests / 'pointer_lock.py', '--native-directory', out])
+    run([sys.executable, '-I', tests / 'event_loop_latency.py', '--native-directory', out])
     run([sys.executable, '-I', tests / 'viewport_events.py', '--native-directory', out])
     run([sys.executable, '-I', '-X', 'utf8', tests / 'form_collections.py', '--native-directory', out])
     run([sys.executable, '-I', '-X', 'utf8', tests / 'viewport_scroll.py', '--native-directory', out])

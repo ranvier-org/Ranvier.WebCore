@@ -517,6 +517,10 @@ jobs:
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/pointer_lock.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
+      - name: Verify event-loop tasks run on the next run-loop turn after a timer-driven style resolution
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/event_loop_latency.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
       - name: Verify window metrics, visibility, media queries and viewport event order
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/viewport_events.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"

@@ -1,0 +1,1301 @@
+[
+  {
+    "name": "css_supports",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\css_supports.log",
+    "logSha256": "05fd7ee5d224db2bdda49560178074bf6224c29dfed768643c846465a3ab3934",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\css_supports.py": "dcbb43a68a90f831a23e26d42930f522d4bf99b9e36438b92273a0b69c434896",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 72
+  },
+  {
+    "name": "computed_style",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\computed_style.log",
+    "logSha256": "70ebb4d87e4cd0001182e37a9082c86ea0337184fdf093a1af5135b7f903c4a7",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\computed_style.py": "7342d39a0b817589112a5248ebb6d22855578c6cc8f29691691422578b55bfcd",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 93
+  },
+  {
+    "name": "fragment_rectangles",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\fragment_rectangles.log",
+    "logSha256": "57a9638643ef3082abeb95f7b9f252efe211cab6677aca91510c564b52b97d40",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\fragment_rectangles.py": "cc7f707a06ef3b9397ee93d7397b1782cf66fb090bf23e847a5c10ecdaff6bb5",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 140
+  },
+  {
+    "name": "table_surface",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\table_surface.log",
+    "logSha256": "8bae3582a7fb2f662138794d8f64ab15bda8da5b98a4d71e7afab8e74c70b312",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\table_surface.py": "9af4551cbf8de4b54d406812bb18783e8b36c68fb8d03ed35c8fb8b95e48cd95",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 44
+  },
+  {
+    "name": "element_reflection",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\element_reflection.log",
+    "logSha256": "58175ae7a9e94642aaa3480e343152e27b64eac99c977e48f6c6ec7963e93bd4",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\element_reflection.py": "ca432ad77afb81a73f02acb50d46e27bad7a8db190719f328815e2d2e7145293",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 269
+  },
+  {
+    "name": "area_surface",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\area_surface.log",
+    "logSha256": "968d2113dff8c257fdbe03256fa57d16913f6043213f4b0af43d768c0b17d49a",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\area_surface.py": "2a0dff1a85adae76b21a6077b29eb6ae16996c056332a0f523107f74a2c9459d",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 117
+  },
+  {
+    "name": "cssom_surface",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\cssom_surface.log",
+    "logSha256": "6fedf047a7e46989b2d1590a07e9b8e42c6399a07c0bb7fb1ddf72f7c7bda910",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\cssom_surface.py": "4a8733651eba84b68dc9c55b79ad7a5a6b5d42b556491e79a6d81085f1cf38b6",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 407
+  },
+  {
+    "name": "keyframe_rules",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\keyframe_rules.log",
+    "logSha256": "f6bee323788d263ad2cbf2f40d7e14126ae0953bf2756be2b5bb445abb427733",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\keyframe_rules.py": "6b8a7d278e834f32ca23bfebbe8ce667723dfb289d6ff0c3d7066f21a4bf83c9",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 93
+  },
+  {
+    "name": "counter_style_rules",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\counter_style_rules.log",
+    "logSha256": "b2bc8e2d39c7a86523d540ceb732205aadfb4f3fef3d88f51f0c57ec6ab26584",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\counter_style_rules.py": "bcc222d0ded48145626ac44e6841375f599eb6e091ea6b37a0b2a362141a5721",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 86
+  },
+  {
+    "name": "detached_cssom_context",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\detached_cssom_context.log",
+    "logSha256": "848ae3d09d5a9e63440a50d7af89f95236d133df48399209146c792944017c0d",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\detached_cssom_context.py": "10bb0d745a4bf5545449c3fd0e861df2b0516a565bc12f163e99b2688ca21332",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 389
+  },
+  {
+    "name": "svg_mathml_surface",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\svg_mathml_surface.log",
+    "logSha256": "6221d6c18fff05c9aa0010b9b3c6edc3a4752fa82b16782d2182769e16c7e036",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_mathml_surface.py": "8621fadb942b9ec56a58cd8483d7f91172d0c7e41e4327ac35cd573e07c0f216",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 95
+  },
+  {
+    "name": "style_property_maps",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\style_property_maps.log",
+    "logSha256": "93d43c1f4e7a811536d7dae8186ad03f818049107c5a612eeb1767a257f8faa6",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\style_property_maps.py": "bccf8279740b1328f553785c46f1215fd7f4fb3376b72b945a94f785034fba92",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 189
+  },
+  {
+    "name": "declared_style_maps",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\declared_style_maps.log",
+    "logSha256": "17c73785458969864abeae85d5f935572174e29b1eecff1a771fa90978c23b7b",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\declared_style_maps.py": "20c38b912b283e9c0d730f56f1cb2d63007aac620652ec008b52ac9bef7fc565",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 2069
+  },
+  {
+    "name": "style_map_entries",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\style_map_entries.log",
+    "logSha256": "a301369b66f47a650587c8bb2ac3011aa9be133a4675428c8d8d96dc271c343d",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\style_map_entries.py": "1eecaeb0bb9813a4aaccd9c3b5a485a8820cf200e1bff130bf0ffa85865d261e",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 144
+  },
+  {
+    "name": "typed_style_values",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\typed_style_values.log",
+    "logSha256": "4e691d16e784408ffec8a6f48c76916dab3c05c1053eeb73ae1e70c51e3718d1",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\typed_style_values.py": "af0bbd346898f982a2a7e1790e33a18185486adc48aa5355071d2ad27c201c43",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 190
+  },
+  {
+    "name": "custom_properties",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\custom_properties.log",
+    "logSha256": "96880645c1fc2da5221bba93ca4b419fc04154cdc2e74a40837edfa45cebbe72",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\custom_properties.py": "7bdfa9566762f28b1604f14832164a231fee6d6447a184021a8ef37fb1d1e774",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 231
+  },
+  {
+    "name": "geometry_values",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\geometry_values.log",
+    "logSha256": "29be327c4ca69a4a3daa3125018c3fd6bf49b541073fb1200180fb70117e8ad5",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\geometry_values.py": "df24fa7a320af87b83633332343e022970e08a204096243b85164de015962fbc",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 260
+  },
+  {
+    "name": "matrix_values",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\matrix_values.log",
+    "logSha256": "072aefb0eecf088e70d410235077a7bc5efeeffa1d27a5af9dc62145229d150e",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\matrix_values.py": "f2572da2574bcb708790e88125cf7a338d4bfb54dd784c39c15475133c692988",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 1091
+  },
+  {
+    "name": "css_transforms",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\css_transforms.log",
+    "logSha256": "5890f78ca29b51c5d29d09139f3d93d92de5346d724bdd72119c2d52b6a278ba",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\css_transforms.py": "4db314a6304c8573004acde5fc55742c1d5e97bdbc97d7b391112fec789cd178",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 405
+  },
+  {
+    "name": "svg_geometry",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\svg_geometry.log",
+    "logSha256": "2fe8049b46ffce2bd4b349dfdd7066caeda689ee3ec0dcdb9f86861c58ed76cb",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_geometry.py": "42b7c58172392b51c9c157949c035ecd951724772b184862b1a38429acfbad44",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 639
+  },
+  {
+    "name": "svg_surfaces",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\svg_surfaces.log",
+    "logSha256": "836c19207512a19d33faf26d61626eddb6f8dcca8d5f1c2b3b9551d69cc68a74",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_surfaces.py": "d70bf49035606004360f5094571cbf4e9152a403c2da82eb58866aa4b57524c5",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 1594
+  },
+  {
+    "name": "svg_documents",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\svg_documents.log",
+    "logSha256": "70715fb4da194d2073a68d432087ae0b316e1b35fcd23c300fe24b150ecfa702",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_documents.py": "f5798e5d6f67d568c918f7935f47960f8d4e3ccf8482fded9bde0439a468a06f",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 78
+  },
+  {
+    "name": "svg_view_controls",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\svg_view_controls.log",
+    "logSha256": "2dbdea20c9425e470f860ad8f303fbc8053ce0674e59f96ac24b28853324f6ca",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_view_controls.py": "30a2b6e4509824ab0ac1b63482cb05a5ae68533febeb9365ae5c9b02d5beac99",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 318
+  },
+  {
+    "name": "svg_animation_variants",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\svg_animation_variants.log",
+    "logSha256": "f1bfd6a2fac87ec95676243aaa313b97d3d9ecdbfbbeb172885a8d6eeb76daaf",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_animation_variants.py": "afe0220b397596c720d7cd12b28951d52adbde2b8604c42e021986fbebed7215",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 70
+  },
+  {
+    "name": "capabilities",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\capabilities.log",
+    "logSha256": "fb62f0a832b46b85fc489a5acf82f64a6215c6527371fcb48a0fb24de25fc358",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\capabilities.py": "173d3ec1301dad43d2ec80b9e19438871507f409de8d4452627a49511c9a2b0c",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json"
+  },
+  {
+    "name": "svg_view_selection",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\svg_view_selection.log",
+    "logSha256": "a1b07596c926922e76bdc1991ee1d5dd67500ab04461131759dec92997e1a3f5",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_view_selection.py": "2fb3856803ac1d6fcedbe2dfc17bef44655ddb33f6f7c5c238a3cdbb5b734f9e",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json"
+  },
+  {
+    "name": "svg_paint_servers",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\svg_paint_servers.log",
+    "logSha256": "4fee53f7e062bb018ebea3b6218dfca73e4fe5cf6a563e36e925c18650dc3731",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_servers.py": "295755e2c4d2bf215d164d1ab60dd26a17c232429335ababcd891bc867c1af7f",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 565
+  },
+  {
+    "name": "svg_filters",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\svg_filters.log",
+    "logSha256": "866b9c9713548497e6e0a475a65b51c9097d8344f2a8f99073ee8c3a65d1ac32",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_filters.py": "aa8dcffcdf93bf610a30c92e7729fc5b785d9bca7495f6c566a7b93caafcc0bf",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 9086
+  },
+  {
+    "name": "svg_clip_mask_marker",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\svg_clip_mask_marker.log",
+    "logSha256": "e16f521e717f252b4f1ea93688bded2b355b95918481a3fe4c93e1c1770a0b55",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_clip_mask_marker.py": "dea40f8570060edbbe2df0a15a4633f051a6c05b9efd45c42a520e5654ad7cd1",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 565
+  },
+  {
+    "name": "svg_resources",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\svg_resources.log",
+    "logSha256": "a205f7e30a24e5a88f3d18a06349efafde93d4c2217bf46e5655bf2df54683ce",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_resources.py": "494a9f41578ab54372eecca58e5d178e082fd42435fe049c7ada3257de729cfc",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 454
+  },
+  {
+    "name": "mathml_surface",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\mathml_surface.log",
+    "logSha256": "922b3c785d90314ad7b02ce723e7409ee11f08bebc6f85f40d40546c553702ac",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\mathml_surface.py": "47435993b61a26f21684348fad0b79300c55d32f013190efa7bfd1152cbc9ae7",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 371
+  },
+  {
+    "name": "svg_tests_lists",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\svg_tests_lists.log",
+    "logSha256": "acf281005da2802259647ade5f0a0d4ee2599f3d9012e65ccadad5643e3f7d4e",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_tests_lists.py": "ac7d5ee9e715bd84d7fe0dbfcb11f6116b85d72e34de7d6e6aee6185611ed3c9",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 191
+  },
+  {
+    "name": "image_decode",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\image_decode.log",
+    "logSha256": "018d055b5dd88f29facb84e4a90e68c4b9e9a4d8efc9d85490880c4af63bc80c",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\image_decode.py": "d7de0ed7139f9695175f9a1f7c8fd2ee9c2e9b0b444648aaffc7a8ce7b99d8b2",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 73
+  },
+  {
+    "name": "font_load",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\font_load.log",
+    "logSha256": "8f6ccb81b6bf11aa32f7e500015ee02ae77cbba161ca0274f7f87c6399423573",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\font_load.py": "eb3ef89fbd246d3111276aebc63cfb280d87df6b221680537d0ae34a4804cab2",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 42
+  },
+  {
+    "name": "event_construction",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\event_construction.log",
+    "logSha256": "7a0a95498b578b237f423c6fcaffc384f75b0485ce7de4cc4d3f44611724a98a",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\event_construction.py": "0a629d261c19b0a4f2abf1f5d2955cb37b0e21fff5613fb9902384d645877362",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 82
+  },
+  {
+    "name": "tree_traversal",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\tree_traversal.log",
+    "logSha256": "f28092037b213721bb8660488972b271d69faf844d1ecea669fd907e6794b157",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\tree_traversal.py": "5451403906e464e4008941f236166765233a380c8f503b83729a15150a837f29",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 22285
+  },
+  {
+    "name": "focus_input",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\focus_input.log",
+    "logSha256": "6500eb7b15f69d453ac2f3ddd062a96f97752ecef04427b1b924f3e73d1fd94e",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\focus_input.py": "d92ca8ea28aa03122d8c5ee8c7398c407033a4ff7e4805d1b82f5e50dd6b4de8",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 80
+  },
+  {
+    "name": "viewport_events",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\viewport_events.log",
+    "logSha256": "d988f47bcc0624b3275f457859bd91782b48a1c5a551b73944404084642fdb8e",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\viewport_events.py": "7b985e009fda8bf56907ca70c548ba6e472dd5c0aa9afcff3d8e14091ca9b213",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 364
+  },
+  {
+    "name": "form_collections",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\form_collections.log",
+    "logSha256": "68664e70da8b405dbe08db8f2bbbb7608e65038e52b281f4cc9210bef8ce8f20",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\form_collections.py": "af6805c6883616eab742d3a36337c8b03170a5ded50fd068e3e8accac0fba9ed",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 1168
+  },
+  {
+    "name": "form_navigation",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\form_navigation.log",
+    "logSha256": "f86a9620c464525aa9c37835ea0a8bec69676007af73551d78178b8fb4ae8bf7",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\form_navigation.py": "09964f725a60f1e0c2e24ba4e10a46aa61da0e04c40d7c5d91384ccaf3a7c8e9",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json"
+  },
+  {
+    "name": "viewport_scroll",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\viewport_scroll.log",
+    "logSha256": "ed319fc0f6b645675b2bef99e6d35f7f6c66811eb9a7836d6edecf17b51eb07f",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\viewport_scroll.py": "1b39db4ab26c0d470599f8476dc8ac2ee42b89d38bf5042d3f0d807c70295d81",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 2156
+  },
+  {
+    "name": "dialog_popover",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\dialog_popover.log",
+    "logSha256": "01a52aa2686cbbdb7e821a1fc24486d8eea81e52e491bf224ca6bda41ad805b1",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\dialog_popover.py": "18e52071c79db2c1aa77da9acc43f398ec3c7c5611d98d0ed5bdd080da81d895",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 845
+  },
+  {
+    "name": "binary_values",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\binary_values.log",
+    "logSha256": "48b00e70b98ab68307ff3c93af15c81baf0c47d39d5b56d410a76ec5edb5ebb4",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\binary_values.py": "648b8dfb626247d53bd4b04eaec64fb7557fe7ae30be06f6ee7bf3fd84986285",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 446
+  },
+  {
+    "name": "caret_hit",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\caret_hit.log",
+    "logSha256": "e6dd6e6acd1ba3b50d8d40bb854b9c4a05d372077b567a6dcd85c74315c88a36",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\caret_hit.py": "c7707340911a4453c77215928493ee4259ca14714b682c553baaf6fca16d2b2d",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 18251
+  },
+  {
+    "name": "url_values",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\url_values.log",
+    "logSha256": "86f5cd1d16ea3b6cf9a9d7bbcdf3ecc54fdde300d18014509a55e6ae1f690c1e",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\url_values.py": "618c5fb54c567d4d395efb28240005c81fab589f39d2f9de8c5c44cbee094a97",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 3538
+  },
+  {
+    "name": "url_wpt",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\url_wpt.log",
+    "logSha256": "ab3c0f0b88e7c7e391c372db4ca57f6fc03352972cfc69afad9671ad259b476d",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\url_wpt.py": "4c336fd9ab5f123ed3e0c64409ec746f800204cc537393ba35bde52d4b90ad49",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json"
+  },
+  {
+    "name": "form_submission",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\form_submission.log",
+    "logSha256": "851a92b510a8e41694b29dc0c344704c9e4a4b96d82dd13800d065f1013cdc35",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\form_submission.py": "7e2ee2b0c4c19e49943070fa0f4148dc8cb9603fb95b423b0e747fc3d48d495d",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 418
+  },
+  {
+    "name": "text_segmentation",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\text_segmentation.log",
+    "logSha256": "c3c1ba992710ab1e0b4923a932a4c32d821bf422d8a1acb19dbb142ce82f1083",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\text_segmentation.py": "007d42a8c0a1f778642f540d9aabeb8a106314fd9109b4f0b915cb872f4e919a",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 812
+  },
+  {
+    "name": "crypto_random",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\crypto_random.log",
+    "logSha256": "9eaad71433340c8b8899193f0b4d629ab4d5d7f2fa9e129c8dcb09508d124203",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\crypto_random.py": "56de0d8c9f8a4056d4e2fb0fb63b9082e8f4ae796921740deda7cb5e77a25238",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 275
+  },
+  {
+    "name": "visual_viewport",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\visual_viewport.log",
+    "logSha256": "1af9f2335c9c9e657ca8f18b82f7bb9b45a382af9d57d345c2d8628bfa034a3b",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\visual_viewport.py": "932433ad3f7555e8a919ec1bfb64778140f04809d68261430a25e839a5ce501c",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 987
+  },
+  {
+    "name": "screen_metrics",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\screen_metrics.log",
+    "logSha256": "b1725f6462a5fc1c3e2c14e2fa6ede92b25cab08c84a6e127a5e72a1534db4d5",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\screen_metrics.py": "0b7ccaf3604c76aa779495c66b6cd916760012849c59aa715176941d6f6b9fc1",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 222
+  },
+  {
+    "name": "custom_highlights",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\custom_highlights.log",
+    "logSha256": "e91fb9e8d12473adbf5173d793665698afb919271a844eeb8d89c521b7e72c1c",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\custom_highlights.py": "bc197386a542d02fd190b3aa46f9ebf8d4ea303852c2b76fb997b9c1a487f779",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 378
+  },
+  {
+    "name": "abi_layouts",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\abi_layouts.log",
+    "logSha256": "719be4be7028f063fb8fc73dea0e0f4d44f7a04ccb4ea267d73d8903f3a70c04",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\abi_layouts.py": "db4d5d5e33af549fa180e611c0eb86934d9950a55fd71c41eb5139a659bfe752",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 36
+  },
+  {
+    "name": "event_details",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\event_details.log",
+    "logSha256": "fbffa1ffe840eb351e73ac58530d5590763261863cc36d80f32075bc00d59ded",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\event_details.py": "f6e6dcc6de02e833847cbb24ad689a690aa46cb7048b77930afb0c822a070dc4",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 391
+  },
+  {
+    "name": "aria_relations",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\aria_relations.log",
+    "logSha256": "f6ab02d137d97c8f57b9478cbba25627a4a80d774d0a520f93dbde65d33659ba",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\aria_relations.py": "7320f3b1d2c444d3e96575de8edfa199e206b8e256482372f093f12740c9dd7c",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 1210
+  },
+  {
+    "name": "inspector_diagnostics",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\inspector_diagnostics.log",
+    "logSha256": "c6ff10eb471e8976cfeda379649ac78516659a6c75db952bd5056a3843a49347",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\inspector_diagnostics.py": "c527ec340d01106a288b6f4867291dbdb47d7ce253a606a060f0685d5bc5aac4",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 929
+  },
+  {
+    "name": "string_nul",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\string_nul.log",
+    "logSha256": "fcb7d5b892c7cec94458c9e624180dd7008a02e60b6d38ec417a29637a46077b",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\string_nul.py": "07a27a25af625dc1c7f3cd8cf0c67b4a96c243ab4502ac9ce6d402b4913612d1",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 192
+  },
+  {
+    "name": "native_types",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\native_types.log",
+    "logSha256": "007ae55d331ec42abe87dfb90b60386d0dc274c882a22abd75b61f20ee830aa2",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json"
+  },
+  {
+    "name": "blob_urls",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\blob_urls.log",
+    "logSha256": "6e2988d816c757d108e967c8c87108eb748a1df02acf8db69527b73a03e64f7d",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\blob_urls.py": "e0b29ada21b7c7c8fde39b1fc61a6a80b6faac4aa118b8d0cec0342bbfa2f127",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 697
+  },
+  {
+    "name": "coordinate_spaces",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\coordinate_spaces.log",
+    "logSha256": "1a6f6f21fb9f7c0ecc017b4e025c13901b7501ec65d348cda4baf6c9cc31915c",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\coordinate_spaces.py": "74ae91da6e592463e4ca1670d708a65aaf43ebf7d7dad55e59f442d7c9e7b9e7",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 6803
+  },
+  {
+    "name": "cascade_diagnostics",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\cascade_diagnostics.log",
+    "logSha256": "1f5a429a5338bfaf8bb48f8fa77d040d0524179af01777ffbb49264948d961ea",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\cascade_diagnostics.py": "e371fd1eb2fa6be2da03cdf599a5b2130fc6f38f9b4811dcab4e29ebaaa4c80e",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 6693
+  },
+  {
+    "name": "host_string_nul",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\host_string_nul.log",
+    "logSha256": "8c2c74eea5657b6ae7a8088c9a29ce1bd604d1d34141e58aefb6de1616174460",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\host_string_nul.py": "0755a2167b6e9ed8651cea790d4ffa9a703edc37fbd73661c3bb32038bd31667",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 309
+  },
+  {
+    "name": "resize_observation",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\resize_observation.log",
+    "logSha256": "a3784ccd2912dba1cfb86d32c588297c9283d531a525e80ac6eedbe71e433b1f",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\resize_observation.py": "79caef204f75d732747ca74771795b3513d39a849f4e830ca03ce0ef2b462f01",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 1008
+  },
+  {
+    "name": "intersection_observation",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\intersection_observation.log",
+    "logSha256": "5838ab7bb42aac7ab2064b19e9b8de92039f898df50f5927b88247cb8c4b4e8e",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\intersection_observation.py": "e6f91cb7ee049d3872caa15e6e65e2d0c7a3326be5d1c4fd6c0cafee9f8b1be8",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 1414
+  },
+  {
+    "name": "media_queries",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\media_queries.log",
+    "logSha256": "812d955f4789e91b6ee87d37f68c7cd3d688a5ae6317867706398c671569cf84",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\media_queries.py": "5a808fbefa2beb998ccd8fdc074566edff15b50d0f9092fadca939bd3588dd7d",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 401
+  },
+  {
+    "name": "listener_signal_removal",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\listener_signal_removal.log",
+    "logSha256": "50a5e191acc64853c11050a8f458f2d47b13bae9c319c20b02fd7aa54818d512",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\listener_signal_removal.py": "0dedad4c3f4421f14f6dfd274e3efba12870ef26cf761299bb684872bdce83ab",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 70
+  },
+  {
+    "name": "canvas_context",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\canvas_context.log",
+    "logSha256": "0b7f3a82e9269e65a89cdc6d77fd340740b0a613aa271c35df2f0c64765de30a",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\canvas_context.py": "a3b5ef3062a613fe7cc712fdfb548688ab9a3ce505d0e39bbcb6abdeddf15f10",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 205
+  },
+  {
+    "name": "value_factories",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\value_factories.log",
+    "logSha256": "2e4d112cd795612bcf0d25d676f462b217c9a4e8e7790d2d1471c27fa5cafd9b",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\value_factories.py": "c909907676859771a839a5058e7e5b79cddd20315d5bccbb252dbbdb37d5b4db",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 398
+  },
+  {
+    "name": "font_readiness",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\font_readiness.log",
+    "logSha256": "3f8f676e0d7f566b033fc74b00bb99ac3f58651b4af2af658e7bbb7b92c9753e",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\font_readiness.py": "1bae4f65dbdf11e92a2e5d99d7d564334849a69b74d272b7b20ef77efb38a542",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 82
+  },
+  {
+    "name": "image_readiness",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\image_readiness.log",
+    "logSha256": "3d315fd839e93c38b1b7411e25f984527775b89eab961c5f9411977abf35a1d2",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\image_readiness.py": "d56ede3b893e42e24efdfc9ad2c55c17d62e89bb90c5d7ce52ae7743e6fd2e96",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 23
+  },
+  {
+    "name": "wake_locks",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\wake_locks.log",
+    "logSha256": "28371f023dd3ce4fa4d468e674d0d02cfba929701d769743a40f5f3f6a4cb92b",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\wake_locks.py": "8e4e490f91d18cbe42884f188c6d91aac27cd410dab932f13d233f7f951840af",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 115
+  },
+  {
+    "name": "notifications",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\notifications.log",
+    "logSha256": "413424158b3b29a5a77bf44d1f482874da6a61ad96c51496098eef3e79faee82",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\notifications.py": "d841611ffae95aedb94ad270466f70aa5053de5b2055c3394eeea3b4056e0bf2",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 149
+  },
+  {
+    "name": "data_transfer",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\data_transfer.log",
+    "logSha256": "100ad1fb580a30d151667c337234a90fc7a648a28a7c1a8bb1e283be5259979e",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\data_transfer.py": "cd6c7b31d0123beaf10447e7167cface0cde22c4aa375857b7b5bb89e32a3780",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 851
+  },
+  {
+    "name": "touch_input",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\touch_input.log",
+    "logSha256": "dc586e0f27d01a8d0fbd6a11edb04fe9c8447bd8129b7407e77d23db7c0e68a4",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\touch_input.py": "a947c59bde100e8d6e636323f5ed22f13760555d072527da47fb03a77148c2ae",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 429
+  },
+  {
+    "name": "pen_input",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\pen_input.log",
+    "logSha256": "c9e4d653a6f99aff158c48b5121bdff44147499dfa0a509b504fdf1fb5f06294",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\pen_input.py": "fbaab80e73c5d0382c166e1075346ceb8ad6bb5e3efcaae6e21509bcd86d361d",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 80
+  },
+  {
+    "name": "pointer_lock",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\pointer_lock.log",
+    "logSha256": "3c4656e6839365b48e673f5081d6e4a678012c317591a3d7c705fe2045a0fc0e",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\pointer_lock.py": "ace1f98e15969d3e964e8fdadab39667665796f23e5935fb15c6d2906601fc8d",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 153
+  },
+  {
+    "name": "web_animations",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\web_animations.log",
+    "logSha256": "710b9cbccdd770787812f61dc70ed467d98740e329f7a99d9789e9d8a4a5e3a8",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\web_animations.py": "b15158a2042ab031d244d2b62b06c7f2c3b23829cb93ab4fb56e2528f3f71354",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 1286
+  },
+  {
+    "name": "font_construction",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\font_construction.log",
+    "logSha256": "89c6e622723f47ee85f0c0c5d6d5bc65f4b4be322a238757e92352884a9c22aa",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\font_construction.py": "ece3267f115e6c7a4c97c19eadd69e8e42fe973a6dae7114ea4743bfa6b8e48b",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 249
+  },
+  {
+    "name": "media_capabilities",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\media_capabilities.log",
+    "logSha256": "315353b0618d5052ad6873b67385a1a7330ae4a64e43da6a0607adb67867a7b7",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\media_capabilities.py": "642544ecc69a5cd615cb5c0327eb30be78f3677230eefba77a5c6aceb1696e94",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 365
+  },
+  {
+    "name": "snapshot_options",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\snapshot_options.log",
+    "logSha256": "349d1c751f2218f3901bd945d588b78008c999cf54c6ba54b9793acc44a0ea75",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\snapshot_options.py": "b8ee15aa405b2548bfda6a7b73c4e36dc9769a40600c42eb8e0c16bd78c09e60",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 579
+  },
+  {
+    "name": "canvas_paths",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\canvas_paths.log",
+    "logSha256": "b1716f5c23e0dc6b08477e5278a487ad6aabb44623830198597fb5b16ec056bd",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\canvas_paths.py": "b42086dc20dfbea8e6b89974a83209079d887d7c0040eae104cb15ec6353333d",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 325
+  },
+  {
+    "name": "canvas_state",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\canvas_state.log",
+    "logSha256": "dddf7b03e142352e21fab3e587a6fa0631729bb0605aa15f9d9b133e1c567bd9",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\canvas_state.py": "f6bf343022644b9604c16eb44b99368f2f0503d69a91c9d65805beef3cc654dd",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 475
+  },
+  {
+    "name": "canvas_paints",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\canvas_paints.log",
+    "logSha256": "f1256f2c34adbb533090cd39b1c900e233f7d3b66fe698770663fa08f5e815a9",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\canvas_paints.py": "e143c8cbe8f0feb103fbc20d69b1195f725b5cf28e68816ceec53dcd443e8074",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 210
+  },
+  {
+    "name": "canvas_text",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\canvas_text.log",
+    "logSha256": "8bf9a2df9cadd58f2a0c11888314c77b8467648e835dac30b7877598da78a726",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\canvas_text.py": "2b842fbc9066c687fdd1a716263ca75c98b1457bc1348941b9761bc087d5bb28",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 473
+  },
+  {
+    "name": "canvas_pixels",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\canvas_pixels.log",
+    "logSha256": "8baf15c3e52a7d6f5a8cb9ec2f0d8d38db2cb80c7b22ccef34727c20417349d0",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\canvas_pixels.py": "093c738556b395c1fda8cd0780b06895a3ee59d3512df7c9dbbf8f249b29e121",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 297
+  },
+  {
+    "name": "canvas_export",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\canvas_export.log",
+    "logSha256": "8fe5d1d149bb34aff6f62d6f4b16067d5403d3583d52fdce307e252a94d512dc",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\canvas_export.py": "bc94fa2e1fe52688a25437187dbe737d7cfa99861e711a0da81e4f4ebb0a5f81",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 286
+  },
+  {
+    "name": "web_animation_effects",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\web_animation_effects.log",
+    "logSha256": "e1d68a43c84bc39018cd0e41b252079e1b4c60dde6a4dd964eb8838825fb63d0",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\web_animation_effects.py": "adf6169e543fc7f54b0c5f46c028cfd94434167cbf1c5ec25217ba574a319724",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 106
+  },
+  {
+    "name": "web_animation_commit",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\web_animation_commit.log",
+    "logSha256": "9bebce14f3ae7a9628fb0c08dc6a332223186f44593e7cb7457d9a6b958b3144",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\web_animation_commit.py": "9f81032cabf174e8fba02f191a4b4bf648bf9161686d6d07ca0c3befc6985b98",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 70
+  },
+  {
+    "name": "web_animation_discovery",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\web_animation_discovery.log",
+    "logSha256": "98979501337987151545780018971af516a02b7d189cca90babc6ae0a89eb7cb",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\web_animation_discovery.py": "561c9fb4aea4e5bcd16116efbfefd7b9d3d71515996554b982e6182d94d917c7",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 185
+  },
+  {
+    "name": "animation_lifecycle",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\animation_lifecycle.log",
+    "logSha256": "017d054bcd852c924cc1ca91da37a9606d9b9135f98d04db49d1c91490b1aef7",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\animation_lifecycle.py": "dd9300c4777b5f2d75b5b487b6571b6e4e7249a228bebd4b08905798f367b181",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 600
+  },
+  {
+    "name": "animation_events",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\animation_events.log",
+    "logSha256": "5bec7c30ec264a49fe1885d13ef741781479be6cbaceae00a1544e5c059a9079",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\animation_events.py": "d3c91c6cb6c3a5eb505119d41348b2588b2a1a0004d7a8fac2ce4dae838d2387",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 235
+  },
+  {
+    "name": "animation_timelines",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\animation_timelines.log",
+    "logSha256": "5a16bf9e8137baccd1baae6be24b95cd46fcbcdb89179ec9c1b623aa5f4202aa",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\animation_timelines.py": "21879c40252e2ea335f446b5bbb9a54a3986b80732049d84ed81e3fe6d09fc77",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 1914
+  },
+  {
+    "name": "custom_effects",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\custom_effects.log",
+    "logSha256": "ee4ae55f0c12766177da75acbe54f0677905b242b125130ae674675c0437a9db",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\custom_effects.py": "c72fa8c6602975b3b733b219ce86aab9b761b9ec1e9a030a7ccd240d13632db5",
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json",
+    "assertions": 663
+  },
+  {
+    "name": "frames",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\frames.log",
+    "logSha256": "8369a177e08a4a65682981feeecbea11eb72619e6f338d4a1d6cf49f325cf532",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\brotlidec.dll": "d42e2160f76f29a91f8be01b009b585c45496219794e16eab90b3599b6f70a7f",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\FSharp.Core.dll": "1af305b7625c30a54d141caf805c5b0b5a8f6166fb5cef22e3570f55d33152bd",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\harfbuzz-icu.dll": "27662b477f7cb0c20cee64543a06296a48a00a17b6c7b57629bb166a30d5b164",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\harfbuzz.dll": "b519b2abc7f446ca45bff77aae1708f45afc9f557698bcd7295837cce0f12bfa",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\icudt77.dll": "b00d2fb856f548608c137e771257a70d0722654535c6c00b371c0fab3e2b802c",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\icuin77.dll": "e3785739e1fcf2e38053bbb85ef5f0f5dab63f865cbda762da5258566085a240",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\icuuc77.dll": "189c623f996c41488c262867bae04a5bb33dd485bd423e0a8bec05c455a90902",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\JavaScriptCore.dll": "1af0ee5fc6c4a907812cd16a92d72961786c3a631ffb81b14479f0123c9264dc",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\jpeg62.dll": "394811c1b1bf1fd914248a145ba3fcad1f5f27c7009754ce08e48ccb0266b785",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\libpng16.dll": "8b46592c5ea338dd6b23ca380d6db64a7849c2a534fc465a006ec668645d8185",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\libsharpyuv.dll": "df165de83480692f494c23061ef9c40c10abe19a89b1fa9fae2f1cd5152c07a7",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\libwebp.dll": "550c5a4860f61d32a274fdd7b5c8cbe266eee28b3a3ca888195248ea1d5e0f71",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\libwebpdemux.dll": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\RanvierWebCoreAbi.Driver.deps.json": "2826e597f87f7fb5628983d27e7fe294021913b60b1b6213bfeb6959cc0bc21a",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\RanvierWebCoreAbi.Driver.dll": "cedcf1b6f508382885a947baea7bcc15628ffb59b90d1331b7a61d94cd7967ee",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\RanvierWebCoreAbi.Driver.exe": "d258f76c5eaca58c0e73c83b5a4ac49c9f8d2975603d9f781ae8c06b0c5552a8",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\RanvierWebCoreAbi.Driver.runtimeconfig.json": "2ca90a18bac3b48286c20acd3c1ae4f83fa38de5acf4b2f8cdd277bf90dc9bd7",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\RanvierWebCoreHost.dll": "88eda842d630aa608022c880c66ae9e7f506285f3fb76ecaf6107cd8aca9df3b",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\WebCore.dll": "88608dd0fad8e4e9f90d2854e14a7fc62be31e57a551978f394574e09b7b299e",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\zlib1.dll": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\cs\\FSharp.Core.resources.dll": "6521e3ed8998a2121fdf0951a7320741de7776d100236e3d54f395b781378cf5",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\de\\FSharp.Core.resources.dll": "7b4d4497c939f00e9f77f4ea1544f47a719c9a656fc35f5a23fc05cd08b82766",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\es\\FSharp.Core.resources.dll": "fe48943a4daf55a4a914bd0e4ab280c6debf6e9f02da51721ac7e13c809e452f",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\fr\\FSharp.Core.resources.dll": "a9d4712165ffbb3c076e3aaf51458f6d5aed384ffd3316d7013f54a02e5355cb",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\it\\FSharp.Core.resources.dll": "96f9668d451cf6226ed24400c8ccafe09a175afc15c00d5e2850a6def454afa6",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\ja\\FSharp.Core.resources.dll": "df268f8e7e061a265e9733b6dea143d634d32bd5dc6e98d2ff657a3a5449bf46",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\ko\\FSharp.Core.resources.dll": "2fd195fb6b16dbb24021f721585326c466b1cd1b1305aee5dd5867326d3ee7fe",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\pl\\FSharp.Core.resources.dll": "a1cf152aa5faede420a9f240b4029c6387602153bedde7d98b04ef124420e052",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\pt-BR\\FSharp.Core.resources.dll": "627a76d378b62e3536f7f8ef1513523b37129a780e17328ee447a7ee3bdf43bb",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\ru\\FSharp.Core.resources.dll": "ffc8ca0e104be87dbc963ecdbb8029d614b7d22b1911e7188340076c2a4eb616",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\tr\\FSharp.Core.resources.dll": "184a8ed7b221fa260c5522dee0fc3575993e5a04989d29b7e37a0c64a7f468ed",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\zh-Hans\\FSharp.Core.resources.dll": "9e4a6d6d399ed610d47091498cb3c2bd1b98e6e4bcd6cb803975e3fcb86c1e1e",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\zh-Hant\\FSharp.Core.resources.dll": "bb2e84215725b906da250a2473dc56d1a6fc0f5aecfdf4e30beb81d07a3f7b56"
+    },
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json"
+  },
+  {
+    "name": "teardown",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-batch\\teardown.log",
+    "logSha256": "4ed732510783a013f41afa8737ff6986f4a3f46ab8b8460495ee0ef65a71b3a2",
+    "executedSources": {
+      "C:\\wk\\native-vm2\\tests\\abi\\svg_paint_probe.py": "2c64b8ecc91b313df5774ddfb4b400b22c6bc9dffcaf06bdfc022839103951a0"
+    },
+    "executedAssets": {
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\brotlidec.dll": "d42e2160f76f29a91f8be01b009b585c45496219794e16eab90b3599b6f70a7f",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\FSharp.Core.dll": "1af305b7625c30a54d141caf805c5b0b5a8f6166fb5cef22e3570f55d33152bd",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\harfbuzz-icu.dll": "27662b477f7cb0c20cee64543a06296a48a00a17b6c7b57629bb166a30d5b164",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\harfbuzz.dll": "b519b2abc7f446ca45bff77aae1708f45afc9f557698bcd7295837cce0f12bfa",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\icudt77.dll": "b00d2fb856f548608c137e771257a70d0722654535c6c00b371c0fab3e2b802c",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\icuin77.dll": "e3785739e1fcf2e38053bbb85ef5f0f5dab63f865cbda762da5258566085a240",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\icuuc77.dll": "189c623f996c41488c262867bae04a5bb33dd485bd423e0a8bec05c455a90902",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\JavaScriptCore.dll": "1af0ee5fc6c4a907812cd16a92d72961786c3a631ffb81b14479f0123c9264dc",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\jpeg62.dll": "394811c1b1bf1fd914248a145ba3fcad1f5f27c7009754ce08e48ccb0266b785",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\libpng16.dll": "8b46592c5ea338dd6b23ca380d6db64a7849c2a534fc465a006ec668645d8185",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\libsharpyuv.dll": "df165de83480692f494c23061ef9c40c10abe19a89b1fa9fae2f1cd5152c07a7",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\libwebp.dll": "550c5a4860f61d32a274fdd7b5c8cbe266eee28b3a3ca888195248ea1d5e0f71",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\libwebpdemux.dll": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\RanvierWebCoreAbi.Driver.deps.json": "2826e597f87f7fb5628983d27e7fe294021913b60b1b6213bfeb6959cc0bc21a",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\RanvierWebCoreAbi.Driver.dll": "cedcf1b6f508382885a947baea7bcc15628ffb59b90d1331b7a61d94cd7967ee",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\RanvierWebCoreAbi.Driver.exe": "d258f76c5eaca58c0e73c83b5a4ac49c9f8d2975603d9f781ae8c06b0c5552a8",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\RanvierWebCoreAbi.Driver.runtimeconfig.json": "2ca90a18bac3b48286c20acd3c1ae4f83fa38de5acf4b2f8cdd277bf90dc9bd7",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\RanvierWebCoreHost.dll": "88eda842d630aa608022c880c66ae9e7f506285f3fb76ecaf6107cd8aca9df3b",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\WebCore.dll": "88608dd0fad8e4e9f90d2854e14a7fc62be31e57a551978f394574e09b7b299e",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\zlib1.dll": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\cs\\FSharp.Core.resources.dll": "6521e3ed8998a2121fdf0951a7320741de7776d100236e3d54f395b781378cf5",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\de\\FSharp.Core.resources.dll": "7b4d4497c939f00e9f77f4ea1544f47a719c9a656fc35f5a23fc05cd08b82766",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\es\\FSharp.Core.resources.dll": "fe48943a4daf55a4a914bd0e4ab280c6debf6e9f02da51721ac7e13c809e452f",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\fr\\FSharp.Core.resources.dll": "a9d4712165ffbb3c076e3aaf51458f6d5aed384ffd3316d7013f54a02e5355cb",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\it\\FSharp.Core.resources.dll": "96f9668d451cf6226ed24400c8ccafe09a175afc15c00d5e2850a6def454afa6",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\ja\\FSharp.Core.resources.dll": "df268f8e7e061a265e9733b6dea143d634d32bd5dc6e98d2ff657a3a5449bf46",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\ko\\FSharp.Core.resources.dll": "2fd195fb6b16dbb24021f721585326c466b1cd1b1305aee5dd5867326d3ee7fe",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\pl\\FSharp.Core.resources.dll": "a1cf152aa5faede420a9f240b4029c6387602153bedde7d98b04ef124420e052",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\pt-BR\\FSharp.Core.resources.dll": "627a76d378b62e3536f7f8ef1513523b37129a780e17328ee447a7ee3bdf43bb",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\ru\\FSharp.Core.resources.dll": "ffc8ca0e104be87dbc963ecdbb8029d614b7d22b1911e7188340076c2a4eb616",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\tr\\FSharp.Core.resources.dll": "184a8ed7b221fa260c5522dee0fc3575993e5a04989d29b7e37a0c64a7f468ed",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\zh-Hans\\FSharp.Core.resources.dll": "9e4a6d6d399ed610d47091498cb3c2bd1b98e6e4bcd6cb803975e3fcb86c1e1e",
+      "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-driver\\zh-Hant\\FSharp.Core.resources.dll": "bb2e84215725b906da250a2473dc56d1a6fc0f5aecfdf4e30beb81d07a3f7b56"
+    },
+    "runtimeReceipt": "C:\\wk\\native-vm2\\artifacts\\vm2-fix2b-frozen\\runtime-receipt.json"
+  }
+]

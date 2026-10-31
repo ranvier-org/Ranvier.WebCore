@@ -1,0 +1,58 @@
+{
+ "runtime": "C:/wk/native-vm2/artifacts/vm2-fix2b/runtime",
+ "checkpoints": {
+  "event_loop_latency | other": {
+   "count": 6,
+   "underRunLoopCycle": 5,
+   "maxPerformWorkFrames": 0,
+   "callers": {
+    "WebCore!WebCore::Document::finishedParsing": 1,
+    "WebCore!WebCore::EventLoop::run": 5
+   }
+  },
+  "event_loop_latency | dispatched": {
+   "count": 2,
+   "underRunLoopCycle": 2,
+   "maxPerformWorkFrames": 1,
+   "callers": {
+    "WebCore!WTF::Detail::CallableWrapper<`lambda at C:\\wk\\native-vm2\\artifacts\\vm2-fix2b\\overlay\\Source\\WebCore\\dom\\EventLoop.cpp:585:39',void>::call": 2
+   }
+  },
+  "cancel | other": {
+   "count": 13,
+   "underRunLoopCycle": 10,
+   "maxPerformWorkFrames": 0,
+   "callers": {
+    "WebCore!WebCore::Document::finishedParsing": 1,
+    "WebCore!WebCore::EventLoop::run": 10,
+    "WebCore!WebCore::AnimationTimelinesController::updateAnimationsAndSendEvents": 2
+   }
+  },
+  "cancel | dispatched": {
+   "count": 6,
+   "underRunLoopCycle": 6,
+   "maxPerformWorkFrames": 1,
+   "callers": {
+    "WebCore!WTF::Detail::CallableWrapper<`lambda at C:\\wk\\native-vm2\\artifacts\\vm2-fix2b\\overlay\\Source\\WebCore\\dom\\EventLoop.cpp:585:39',void>::call": 6
+   }
+  },
+  "pausecancel | other": {
+   "count": 11,
+   "underRunLoopCycle": 8,
+   "maxPerformWorkFrames": 0,
+   "callers": {
+    "WebCore!WebCore::Document::finishedParsing": 1,
+    "WebCore!WebCore::EventLoop::run": 8,
+    "WebCore!WebCore::AnimationTimelinesController::updateAnimationsAndSendEvents": 2
+   }
+  },
+  "pausecancel | dispatched": {
+   "count": 5,
+   "underRunLoopCycle": 5,
+   "maxPerformWorkFrames": 1,
+   "callers": {
+    "WebCore!WTF::Detail::CallableWrapper<`lambda at C:\\wk\\native-vm2\\artifacts\\vm2-fix2b\\overlay\\Source\\WebCore\\dom\\EventLoop.cpp:585:39',void>::call": 5
+   }
+  }
+ }
+}

@@ -1,0 +1,42 @@
+{
+ "runtime": "C:/wk/native-vm2/artifacts/vm2-fix2/runtime",
+ "step2ArmedPauseCancel": {
+  "exitCode": 0,
+  "survived": true,
+  "stdout": [
+   "ARMED True",
+   "PAUSED pending True",
+   "CANCELLED",
+   "{\"armed\": true, \"pendingAfterPause\": true, \"afterCancel\": {\"playState\": \"idle\", \"pending\": false, \"replaceState\": \"active\", \"currentTime\": null, \"startTime\": null, \"playbackRate\": 1}}",
+   "PAUSE_CANCEL_SURVIVED"
+  ],
+  "stderrTail": []
+ },
+ "step4AnimateCancel": {
+  "samples": [
+   326471680,
+   326590464,
+   326733824
+  ],
+  "checked": true,
+  "round": 1000,
+  "bound": 16777216
+ },
+ "step4PauseCancel": {
+  "samples": [
+   326811648,
+   327090176,
+   327102464
+  ],
+  "pendingPauses": [
+   1000,
+   1000,
+   1000
+  ],
+  "statusesOk": true,
+  "round": 1000,
+  "bound": 16777216,
+  "flat": true
+ },
+ "assertions": 11
+}

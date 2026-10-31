@@ -1,0 +1,61 @@
+{
+ "patch": {
+  "file": "patches/0052-eventloop-checkpoint-microtasks.patch",
+  "sha256": "3f937c914131e9c5fa8631fb935134b26eb3246af6ba4df2f03dad3ff903abe6"
+ },
+ "candidate": {
+  "name": "vm2-fix2b",
+  "parent": "batch6-candidate-diag1 (batch 6 without 0052)",
+  "builder": "docs/vm2-evidence/build_vm2_overlay.py",
+  "runtimeSha256": {
+   "JavaScriptCore.dll": "1af0ee5fc6c4a907812cd16a92d72961786c3a631ffb81b14479f0123c9264dc",
+   "RanvierWebCoreHost.dll": "88eda842d630aa608022c880c66ae9e7f506285f3fb76ecaf6107cd8aca9df3b",
+   "WebCore.dll": "88608dd0fad8e4e9f90d2854e14a7fc62be31e57a551978f394574e09b7b299e"
+  },
+  "dom10DisassemblySha256": "6afb3682ab1fc14dff97eb780ff336470b2320df647906dceca85679d24177b9",
+  "equalToVm2Fix2": true,
+  "noopOverlayReproducesParentDom10": "c10de9465d9876e2e4f43188369f7ba945545385852367a64ae49aa6946e23dd"
+ },
+ "cause": "Document::considerSpeculationRules queues a C++ microtask per style resolution unless one is pending. With the first revision the microtask runs, so the next is queued from m_styleRecalcTimer inside the Windows shared-timer message; scheduleToRunIfNeeded arms WindowEventLoop::m_timer there, MainThreadSharedTimer::setFireInterval defers it through CreateTimerQueueTimer (processingCustomTimerMessage), and ThreadTimers::updateSharedTimer ignores later zero-delay starts while both fire times are past. Every task queued afterwards waits for the timer-queue post.",
+ "latencyProbe30x": {
+  "fix2b": "fix2b.txt",
+  "candidate-2": "candidate-2.txt",
+  "candidate-1": "candidate-1.txt"
+ },
+ "latencySummary": {
+  "candidate-1 (first 0052)": "denial 130-28730 turns, 0.26-15.2 ms; 0/30 pass",
+  "candidate-2 (no 0052)": "denial 1 turn, 0.08-0.16 ms; 30/30",
+  "vm2-fix2b": "denial 1 turn, 0.08-0.10 ms; 30/30"
+ },
+ "viewsUnmodified": {
+  "source": "C:/wk/rv-batch-6 HEAD 3966bc0 built clean in C:/wk/vm2-views (JIT); AOT C:/wk/int6-tools/runs/run1/aot",
+  "I03 30x": {
+   "aot fix2b": "30/30",
+   "jit fix2b": "30/30",
+   "aot diag1": "30/30"
+  },
+  "R07 30x": {
+   "aot fix2b": "30/30",
+   "jit fix2b": "30/30",
+   "aot diag1": "30/30"
+  },
+  "candidate-1": {
+   "aot I03": "0/3",
+   "aot R07": "0/3",
+   "jit I03": "2/3",
+   "jit R07": "0/3"
+  },
+  "fullSuites fix2": {
+   "jit": "170 PASS lines exit 0",
+   "aot": "170 PASS lines exit 0"
+  }
+ },
+ "nativeBatch": "BATCH6_FULL_BATCH=103693 RAW +135 TEARDOWN on vm2-fix2b; all 95 records equal to batch6-candidate-2 (name, exit code, assertions)",
+ "vm1": {
+  "step1": "vm1/census (cancel, pausecancel; census and entry): AbortError rejection delivered, empty stuck-queue census",
+  "step2": "vm1/steps-vm2-fix2.json survived armed pause+cancel",
+  "step4": "flat over 3x1000 (animate+cancel and pause+cancel)",
+  "censusFlake": "vm1_probe hangs in about 1 of 4 runs on both batch6-candidate-2 (5/20) and vm2-fix2b (4/20): a tracer flake independent of the patch"
+ },
+ "dispatch": "dispatch-trace.json: every dispatched checkpoint (13) runs under rv_run_loop_cycle with one RunLoop::performWork frame"
+}

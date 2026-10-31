@@ -50,3 +50,4 @@
 0049-image-bitmap-crop-completion-handler.patch
 0050-image-bitmap-unaccelerated-buffers.patch
 0051-web-animation-promise-observer.patch
+0052-eventloop-checkpoint-microtasks.patch
