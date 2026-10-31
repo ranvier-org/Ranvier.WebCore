@@ -40,12 +40,15 @@ instrumentation or agent; the candidate builder checks the glue object's undefin
   after the element's rules), with the property's logical counterpart under the element's writing mode. Each entry
   carries origin, specificity, `!important`, layer order and dotted name, the enclosing `@media`, `@supports` and
   `@container` conditions, sheet, rule and declaration indices, the shorthand it expanded from and a `var()` flag.
+  `:host()` and `::slotted()` rules from a shadow tree precede the element's tree's rules and `::part()` rules follow
+  the style attribute; their sheet, rule and layer fields count in the tree scope defining the rule.
   `RV_CASCADE_WINNER` marks the declaration `Style::PropertyCascade` selects; it is never derived from the computed
   value. With no winner on an inherited property, or a winning `inherit` (or `unset` on an inherited property), entries
   continue with the composed-tree parent at the next `RV_CASCADE_DEPTH`. The query reads the current DOM and rule
   sets, applying only a pending style sheet change, and updates no element style or layout. Declared limits: a winning
   `revert` or `revert-layer` is reported as that keyword; `:visited`, `@starting-style` and animations are absent; the
-  value is the declared value, and `var()` resolution is `rv_element_computed_style`'s.
+  value is the declared value, and `var()` resolution is `rv_element_computed_style`'s; a `::slotted()` rule's
+  specificity is the engine's, its argument's alone (css-scoping-1 adds the pseudo-element).
 - Box model: content, padding, border and margin boxes in `getBoundingClientRect` space. The border box equals
   `rv_element_rect`; untransformed values are LayoutUnit multiples of 1/64 px.
 

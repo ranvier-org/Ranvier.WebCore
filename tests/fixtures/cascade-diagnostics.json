@@ -1,6 +1,6 @@
 {
   "fixture": "tests/fixtures/cascade-diagnostics.html",
-  "description": "C25 cascade conformance cases. Each case names an element and a property, the computed value every engine must report, and the expected cascade entries for native diagnostics in cascade input order. Author entries default to sheet 1, depth 0, not important, unlayered (layer order -1, layer name empty), no shorthand, no conditions, no var() and not the winner. A userAgent block describes the user-agent entries ahead of them, whose text is engine-specific. Values are compared with the fixture only, never across engines.",
+  "description": "C25 cascade conformance cases. Each case names an element and a property, the computed value every engine must report, and the expected cascade entries for native diagnostics in cascade input order. An element is an id path: a document id, then ids in the open shadow root of each element before. Sheet and rule indices count in the tree scope defining the rule, and a contributor's layerOrder overrides the document's layer order for a shadow tree's layers. Author entries default to sheet 1, depth 0, not important, unlayered (layer order -1, layer name empty), no shorthand, no conditions, no var() and not the winner. A userAgent block describes the user-agent entries ahead of them, whose text is engine-specific. Values are compared with the fixture only, never across engines.",
   "layerOrder": {"imported": 0, "one.inner": 1, "one": 2, "two": 3, "": 4},
   "cases": [
     {"name": "specificity", "tieBreak": "specificity", "element": "spec", "property": "order", "computed": 1, "contributors": [
@@ -96,6 +96,32 @@
     {"name": "media and supports conditions", "tieBreak": "conditions", "element": "cond", "property": "order", "computed": 61, "contributors": [
       {"value": "61", "rule": 40, "specificity": [1, 0, 0], "conditions": ["@media", "@supports"], "winner": true}]},
     {"name": "container condition", "tieBreak": "conditions", "element": "cq", "property": "order", "computed": 62, "contributors": [
-      {"value": "62", "rule": 42, "specificity": [1, 0, 0], "conditions": ["@container"], "winner": true}]}
+      {"value": "62", "rule": 42, "specificity": [1, 0, 0], "conditions": ["@container"], "winner": true}]},
+    {"name": "host rules in the shadow tree", "tieBreak": "specificity", "element": "hh", "property": "flex-shrink", "computed": 7, "contributors": [
+      {"value": "5", "sheet": 0, "rule": 0, "specificity": [0, 1, 0], "selector": ":host", "layer": "a", "layerOrder": 0},
+      {"value": "6", "sheet": 0, "rule": 1, "specificity": [0, 1, 0], "selector": ":host"},
+      {"value": "7", "sheet": 0, "rule": 2, "specificity": [0, 2, 0], "selector": ":host(.hh)", "winner": true}]},
+    {"name": "outer rule over a host rule", "tieBreak": "shadow context", "element": "hh", "property": "order", "computed": 69, "contributors": [
+      {"value": "71", "sheet": 0, "rule": 3, "specificity": [0, 1, 0], "selector": ":host"},
+      {"value": "69", "rule": 53, "specificity": [1, 0, 0], "selector": "#hh", "winner": true}]},
+    {"name": "important host rule over an important outer rule", "tieBreak": "shadow context importance", "element": "hh", "property": "tab-size", "computed": 6, "contributors": [
+      {"value": "6", "sheet": 0, "rule": 3, "specificity": [0, 1, 0], "selector": ":host", "important": true, "winner": true},
+      {"value": "3", "rule": 53, "specificity": [1, 0, 0], "selector": "#hh", "important": true}]},
+    {"name": "slotted rules", "tieBreak": "specificity", "element": "sl", "property": "opacity", "computed": 0.25, "contributors": [
+      {"value": "0.5", "sheet": 0, "rule": 5, "specificity": [0, 0, 1], "selector": "::slotted(span)", "specificityNote": "the engine counts the argument only; css-scoping-1 adds the pseudo-element, (0, 0, 2)"},
+      {"value": "0.25", "sheet": 0, "rule": 6, "specificity": [0, 1, 0], "selector": "::slotted(.sl)", "specificityNote": "the engine counts the argument only; css-scoping-1 adds the pseudo-element, (0, 1, 1)", "winner": true}]},
+    {"name": "outer rule over a slotted rule", "tieBreak": "shadow context", "element": "sl", "property": "order", "computed": 68, "contributors": [
+      {"value": "73", "sheet": 0, "rule": 5, "specificity": [0, 0, 1], "selector": "::slotted(span)", "specificityNote": "the engine counts the argument only; css-scoping-1 adds the pseudo-element, (0, 0, 2)"},
+      {"value": "68", "rule": 54, "specificity": [1, 0, 0], "selector": "#sl", "winner": true}]},
+    {"name": "outer part rule over an inner rule", "tieBreak": "shadow context", "element": "hh/pt", "property": "order", "computed": 77, "contributors": [
+      {"value": "75", "sheet": 0, "rule": 7, "specificity": [1, 0, 0], "selector": "#pt"},
+      {"value": "77", "rule": 55, "specificity": [0, 0, 1], "selector": "::part(pp)", "winner": true}]},
+    {"name": "important inner rule over an important part rule", "tieBreak": "shadow context importance", "element": "hh/pt2", "property": "order", "computed": 76, "contributors": [
+      {"value": "76", "sheet": 0, "rule": 8, "specificity": [1, 0, 0], "selector": "#pt2", "important": true, "winner": true},
+      {"value": "78", "rule": 56, "specificity": [1, 0, 1], "selector": "#hh::part(pp2)", "important": true}]},
+    {"name": "inheritance into slotted content", "tieBreak": "inheritance", "element": "inh", "property": "color", "computed": "rgb(1, 2, 3)", "contributors": [
+      {"value": "rgb(1, 2, 3)", "sheet": 0, "rule": 4, "specificity": [0, 0, 1], "selector": "slot", "depth": 1, "winner": true}]},
+    {"name": "custom property inherited from the host", "tieBreak": "inheritance", "element": "inh", "property": "--sh", "computed": 80, "contributors": [
+      {"value": "80", "sheet": 0, "rule": 3, "specificity": [0, 1, 0], "selector": ":host", "depth": 2, "winner": true}]}
   ]
 }

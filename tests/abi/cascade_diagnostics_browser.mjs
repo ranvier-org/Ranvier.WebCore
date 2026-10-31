@@ -15,8 +15,10 @@ export function matches(expected, actual) {
   return typeof expected === 'number' ? parseFloat(actual) === expected : actual.trim() === expected;
 }
 
+// A case's element is an id path: a document id, then ids in the open shadow root of each element before.
 export function computed(cases) {
-  return cases.map(c => getComputedStyle(document.getElementById(c.element)).getPropertyValue(c.property));
+  const resolve = path => path.split('/').reduce((node, id) => (node ? node.shadowRoot : document).getElementById(id), null);
+  return cases.map(c => getComputedStyle(resolve(c.element)).getPropertyValue(c.property));
 }
 
 if (import.meta.url === `file:///${process.argv[1].replaceAll('\\', '/')}`) {

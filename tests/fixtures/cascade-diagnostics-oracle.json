@@ -286,6 +286,78 @@
       "expected": 62,
       "computed": "62",
       "matchesFixture": true
+    },
+    {
+      "name": "host rules in the shadow tree",
+      "element": "hh",
+      "property": "flex-shrink",
+      "expected": 7,
+      "computed": "7",
+      "matchesFixture": true
+    },
+    {
+      "name": "outer rule over a host rule",
+      "element": "hh",
+      "property": "order",
+      "expected": 69,
+      "computed": "69",
+      "matchesFixture": true
+    },
+    {
+      "name": "important host rule over an important outer rule",
+      "element": "hh",
+      "property": "tab-size",
+      "expected": 6,
+      "computed": "6",
+      "matchesFixture": true
+    },
+    {
+      "name": "slotted rules",
+      "element": "sl",
+      "property": "opacity",
+      "expected": 0.25,
+      "computed": "0.25",
+      "matchesFixture": true
+    },
+    {
+      "name": "outer rule over a slotted rule",
+      "element": "sl",
+      "property": "order",
+      "expected": 68,
+      "computed": "68",
+      "matchesFixture": true
+    },
+    {
+      "name": "outer part rule over an inner rule",
+      "element": "hh/pt",
+      "property": "order",
+      "expected": 77,
+      "computed": "77",
+      "matchesFixture": true
+    },
+    {
+      "name": "important inner rule over an important part rule",
+      "element": "hh/pt2",
+      "property": "order",
+      "expected": 76,
+      "computed": "76",
+      "matchesFixture": true
+    },
+    {
+      "name": "inheritance into slotted content",
+      "element": "inh",
+      "property": "color",
+      "expected": "rgb(1, 2, 3)",
+      "computed": "rgb(1, 2, 3)",
+      "matchesFixture": true
+    },
+    {
+      "name": "custom property inherited from the host",
+      "element": "inh",
+      "property": "--sh",
+      "expected": 80,
+      "computed": "80",
+      "matchesFixture": true
     }
   ],
   "unsupported": {

@@ -6,7 +6,7 @@ TEARDOWN = int(sys.argv[3])
 # The previous lane's green batch results (batch-green.json).
 BASELINE = Path(sys.argv[4])
 
-repo = Path('C:/wk/native-cascade')
+repo = Path(os.environ.get('RV_REPO', 'C:/wk/native-cascade'))
 candidate = repo / 'artifacts' / CANDIDATE / 'runtime'
 freeze = repo / 'artifacts' / (CANDIDATE + '-frozen')
 runtime = freeze / 'runtimes/win-x64/native'

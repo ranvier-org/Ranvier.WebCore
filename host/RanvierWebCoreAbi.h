@@ -1739,7 +1739,9 @@ RV_EXPORT int32_t rv_node_box_quad(RvNode* node, int32_t box, RvNode* to, int32_
  *
  * Entries are the declarations of the property in the element's cascade, in the engine's cascade input order: user
  * agent, user, then author declarations, each ordered by cascade layer, specificity and position, with presentational
- * hints first and the style attribute after the element's own rules. A logical or physical property also lists the
+ * hints first and the style attribute after the element's own rules. Rules of other tree scopes follow the shadow
+ * context order: :host() and ::slotted() rules precede the rules of the element's tree, and ::part() rules follow the
+ * style attribute; the winner reverses that order for !important. A logical or physical property also lists the
  * declarations of its counterpart under the element's writing mode. RV_CASCADE_WINNER marks the declaration the
  * engine's cascade selects, honouring !important, origin, layer and position; a level with no declaration has no
  * winner. When the level has no winner and the property inherits, or its winner is inherit (or unset on an inherited
@@ -1772,7 +1774,9 @@ enum {
     RV_CASCADE_WINNER = 6,
     /* 0 for the element, n for its nth ancestor in the composed tree. */
     RV_CASCADE_DEPTH = 7,
-    /* The rule's style sheet among the active style sheets of the element's tree scope; -1 when no active sheet holds it. */
+    /* The rule's style sheet among the active style sheets of the tree scope defining the rule: the element's, its
+     * shadow root's for :host rules, its slot's for ::slotted() rules, or a host's for ::part() rules; -1 when no
+     * active sheet holds it. RV_CASCADE_LAYER_ORDER is the order of that tree scope's layers. */
     RV_CASCADE_SHEET_INDEX = 8,
     /* The rule's position among the sheet's style rules in pre-order, an imported sheet's rules in place of its
      * @import; -1 with no sheet. */

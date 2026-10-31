@@ -149,11 +149,14 @@ struct RuleSelectors {
     std::array<uint8_t, 3> specificity { };
 };
 
-RuleSelectors selectorsOf(const StyleRule& rule, Element& element)
+// The selectors of a rule from the tree scope at ordinal, matched as the collector matches them: :host() against the
+// element's shadow tree, ::slotted() against its slot and ::part() from the host's tree.
+RuleSelectors selectorsOf(const StyleRule& rule, Element& element, Style::ScopeOrdinal ordinal)
 {
     RuleSelectors result;
     SelectorChecker checker(element.document());
     SelectorChecker::CheckingContext checking(SelectorChecker::Mode::CollectingRules);
+    checking.styleScopeOrdinal = ordinal;
     const CSSSelector* best = nullptr;
     for (auto& selector : rule.selectorList()) {
         if (!checker.match(selector, element, checking))
@@ -180,7 +183,8 @@ struct RuleLocation {
 // Locations of the style rules of a tree scope's active sheets, keyed by declaration block.
 class RuleLocations {
 public:
-    explicit RuleLocations(Style::Scope& scope)
+    RuleLocations() = default;
+    explicit RuleLocations(const Style::Scope& scope)
     {
         int32_t sheetIndex = 0;
         for (auto& sheet : scope.activeStyleSheets()) {
@@ -310,7 +314,14 @@ CascadeLevel cascadeLevel(Element& element, const CascadeQuery& query, int32_t d
     collector.setMedium(resolver.mediaQueryEvaluator());
     collector.matchAllRules(authorAndUser, true);
     auto& matchResult = collector.matchResult();
-    RuleLocations locations(Style::Scope::forNode(element));
+    // Locations by the tree scope holding the rule: the element's, or its shadow tree's, slot's or host's.
+    HashMap<const Style::Scope*, RuleLocations> locations;
+    auto locate = [&](const StyleRule& rule, Style::ScopeOrdinal ordinal) -> const RuleLocation* {
+        auto* scope = Style::Scope::forOrdinal(element, ordinal);
+        if (!scope)
+            return nullptr;
+        return locations.ensure(scope, [&] { return RuleLocations(*scope); }).iterator->value.find(rule);
+    };
 
     WritingMode writingMode;
     if (auto* style = element.existingComputedStyle())
@@ -358,7 +369,7 @@ CascadeLevel cascadeLevel(Element& element, const CascadeQuery& query, int32_t d
                 if (!declares(query, property, counterpart))
                     continue;
                 if (rule && !selectors)
-                    selectors = selectorsOf(*rule, element);
+                    selectors = selectorsOf(*rule, element, matched.styleScopeOrdinal);
                 CascadeLevel::Entry entry;
                 auto& numbers = entry.fields.numbers;
                 numbers[RV_CASCADE_ORIGIN] = origin;
@@ -374,7 +385,7 @@ CascadeLevel cascadeLevel(Element& element, const CascadeQuery& query, int32_t d
                     && matched.cascadeLayerPriority != Style::RuleSet::cascadeLayerPriorityForPresentationalHints;
                 numbers[RV_CASCADE_LAYER_ORDER] = layered ? matched.cascadeLayerPriority - Style::RuleSet::cascadeLayerPriorityForPresentationalHints - 1 : -1;
                 numbers[RV_CASCADE_DEPTH] = depth;
-                auto* location = rule ? locations.find(*rule) : nullptr;
+                auto* location = rule ? locate(*rule, matched.styleScopeOrdinal) : nullptr;
                 numbers[RV_CASCADE_SHEET_INDEX] = location ? location->sheet : -1;
                 numbers[RV_CASCADE_RULE_INDEX] = location ? location->rule : -1;
                 numbers[RV_CASCADE_DECLARATION_INDEX] = position;

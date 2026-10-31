@@ -144,6 +144,19 @@ def wait_for_import(c, host, element):
         update(host)
 
 
+def resolve(p, path):
+    """The element of an id path: a document id, then ids in the open shadow root of each element before."""
+    identifiers = path.split('/')
+    element = p.node(identifiers[0])
+    for identifier in identifiers[1:]:
+        root = p.bind('rv_element_shadow_root', p.pointer, [p.pointer])(element)
+        p.expect(bool(root), 'open shadow root of ' + path)
+        p.retained.append(('rv_node_release', root))
+        element = p.object('rv_dom_document_fragment_get_element_by_id', [p.pointer, ctypes.c_char_p, p.integer],
+                           [root, identifier.encode(), len(identifier)], 'node')
+    return element
+
+
 def check_case(c, case, rows, layer_order):
     """Asserts a case's entries against the fixture; returns its winners."""
     p, name = c.p, case['name']
@@ -179,7 +192,8 @@ def check_case(c, case, rows, layer_order):
         p.expect(row['variable'] == int(want.get('variable', False)), label + ': var() flag')
         layer = want.get('layer')
         p.expect(row['layer'] == (layer or ''), label + ': layer name ' + repr(row['layer']))
-        p.expect(row['layerOrder'] == (-1 if layer is None else layer_order[layer]), label + ': layer order ' + str(row['layerOrder']))
+        order = want.get('layerOrder', -1 if layer is None else layer_order.get(layer))
+        p.expect(row['layerOrder'] == order, label + ': layer order ' + str(row['layerOrder']))
         if origin == 'author':
             p.expect((row['sheet'], row['rule']) == (want.get('sheet', 1), want['rule']), label + ': position ' + str((row['sheet'], row['rule'])))
             p.expect((row['a'], row['b'], row['c']) == tuple(want['specificity']), label + ': specificity')
@@ -213,7 +227,7 @@ def run_once(native_directory, fixture, oracle):
             p.update()
             elements = {case['element']: None for case in fixture['cases']}
             for identifier in list(elements) + ['pend', 'probe']:
-                elements[identifier] = p.node(identifier)
+                elements[identifier] = resolve(p, identifier)
             text_node = p.object('rv_dom_node_get_first_child', [P], [elements['vt']], 'node')
             set_attribute = p.bind('rv_element_set_attribute', I, [P, ctypes.c_char_p, ctypes.c_char_p])
 
