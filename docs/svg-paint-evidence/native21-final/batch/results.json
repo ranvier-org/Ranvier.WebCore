@@ -342,7 +342,7 @@
     "logSha256": "4fee53f7e062bb018ebea3b6218dfca73e4fe5cf6a563e36e925c18650dc3731",
     "executedSources": {
       "C:\\wk\\native-svg-paint\\tests\\abi\\svg_paint_servers.py": "21d379c83f032fe67eabed8c07c48c28f67d5e3a7c5ddbd305dafaedef285c8e",
-      "C:\\wk\\native-svg-paint\\tests\\abi\\svg_paint_probe.py": "5b1298774d637ce06b7fda73495a703f4a9f682ba821320420290c87f2766da1"
+      "C:\\wk\\native-svg-paint\\tests\\abi\\svg_paint_probe.py": "ab4514e76c1678b2542c34c43f618c1ae85262c2022ef3417f48dcc80c95d838"
     },
     "executedAssets": {},
     "runtimeReceipt": "C:\\wk\\native-svg-paint\\artifacts\\native21-frozen\\runtime-receipt.json",
@@ -352,14 +352,14 @@
     "name": "svg_filters",
     "exitCode": 0,
     "log": "C:\\wk\\native-svg-paint\\artifacts\\native21-batch\\svg_filters.log",
-    "logSha256": "d590f092d81813613e5a8a2523ee5d06f83d4aa4a466685e9921e4a14aecb19e",
+    "logSha256": "540017da677ded00f3f1a8a9339768ea4fd4dcc0dbfecb4e841c7a896288cd38",
     "executedSources": {
-      "C:\\wk\\native-svg-paint\\tests\\abi\\svg_filters.py": "c8c4621357b0623f2d5c1e9f5f803183e2b3b5fbefbbe78fef9caaaa0c0ce517",
-      "C:\\wk\\native-svg-paint\\tests\\abi\\svg_paint_probe.py": "5b1298774d637ce06b7fda73495a703f4a9f682ba821320420290c87f2766da1"
+      "C:\\wk\\native-svg-paint\\tests\\abi\\svg_filters.py": "8f6daff2e22dc8a68f6bc39401f3c6f34483ef5aae46d5ab8dfa46aabc6295a4",
+      "C:\\wk\\native-svg-paint\\tests\\abi\\svg_paint_probe.py": "ab4514e76c1678b2542c34c43f618c1ae85262c2022ef3417f48dcc80c95d838"
     },
     "executedAssets": {},
     "runtimeReceipt": "C:\\wk\\native-svg-paint\\artifacts\\native21-frozen\\runtime-receipt.json",
-    "assertions": 8943
+    "assertions": 5946
   },
   {
     "name": "svg_clip_mask_marker",
@@ -368,7 +368,7 @@
     "logSha256": "e16f521e717f252b4f1ea93688bded2b355b95918481a3fe4c93e1c1770a0b55",
     "executedSources": {
       "C:\\wk\\native-svg-paint\\tests\\abi\\svg_clip_mask_marker.py": "cdc9c9e75b8d96f26a18f5b6741c1fc3fc1509e74ecc84f9cecc47e363af176c",
-      "C:\\wk\\native-svg-paint\\tests\\abi\\svg_paint_probe.py": "5b1298774d637ce06b7fda73495a703f4a9f682ba821320420290c87f2766da1"
+      "C:\\wk\\native-svg-paint\\tests\\abi\\svg_paint_probe.py": "ab4514e76c1678b2542c34c43f618c1ae85262c2022ef3417f48dcc80c95d838"
     },
     "executedAssets": {},
     "runtimeReceipt": "C:\\wk\\native-svg-paint\\artifacts\\native21-frozen\\runtime-receipt.json",
@@ -380,8 +380,8 @@
     "log": "C:\\wk\\native-svg-paint\\artifacts\\native21-batch\\svg_resources.log",
     "logSha256": "a205f7e30a24e5a88f3d18a06349efafde93d4c2217bf46e5655bf2df54683ce",
     "executedSources": {
-      "C:\\wk\\native-svg-paint\\tests\\abi\\svg_resources.py": "3833d631d08826cf5fc45faff97b46142518ad894258b273c49da1c0362dba76",
-      "C:\\wk\\native-svg-paint\\tests\\abi\\svg_paint_probe.py": "5b1298774d637ce06b7fda73495a703f4a9f682ba821320420290c87f2766da1"
+      "C:\\wk\\native-svg-paint\\tests\\abi\\svg_resources.py": "4188d2d60bf4d13fd09da68163afc29eff5c34db0f64229fe7ba8c8be54d6b96",
+      "C:\\wk\\native-svg-paint\\tests\\abi\\svg_paint_probe.py": "ab4514e76c1678b2542c34c43f618c1ae85262c2022ef3417f48dcc80c95d838"
     },
     "executedAssets": {},
     "runtimeReceipt": "C:\\wk\\native-svg-paint\\artifacts\\native21-frozen\\runtime-receipt.json",
@@ -391,9 +391,9 @@
     "name": "frames",
     "exitCode": 0,
     "log": "C:\\wk\\native-svg-paint\\artifacts\\native21-batch\\frames.log",
-    "logSha256": "630fa49cb295651bf2a9d4953885c1ac8ef582fba508574adebd60a38211e80a",
+    "logSha256": "e5e360aff74e3bc307b09bd33b32dccf95197dd65344f18dc96f63c98b2c3f98",
     "executedSources": {
-      "C:\\wk\\native-svg-paint\\tests\\abi\\svg_paint_probe.py": "5b1298774d637ce06b7fda73495a703f4a9f682ba821320420290c87f2766da1"
+      "C:\\wk\\native-svg-paint\\tests\\abi\\svg_paint_probe.py": "ab4514e76c1678b2542c34c43f618c1ae85262c2022ef3417f48dcc80c95d838"
     },
     "executedAssets": {
       "C:\\wk\\native-svg-paint\\artifacts\\native21-driver\\brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
@@ -413,8 +413,8 @@
       "C:\\wk\\native-svg-paint\\artifacts\\native21-driver\\libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
       "C:\\wk\\native-svg-paint\\artifacts\\native21-driver\\libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
       "C:\\wk\\native-svg-paint\\artifacts\\native21-driver\\RanvierWebCoreAbi.Driver.deps.json": "2826e597f87f7fb5628983d27e7fe294021913b60b1b6213bfeb6959cc0bc21a",
-      "C:\\wk\\native-svg-paint\\artifacts\\native21-driver\\RanvierWebCoreAbi.Driver.dll": "9b53c34aba2ae4135fac8d6850c9829eb926c5eaa56e003b4ad528e8398a8b43",
-      "C:\\wk\\native-svg-paint\\artifacts\\native21-driver\\RanvierWebCoreAbi.Driver.exe": "211367d496273de9b37f8f2571b2655d2592aaf535b7333c41ab1dc02a37ea2d",
+      "C:\\wk\\native-svg-paint\\artifacts\\native21-driver\\RanvierWebCoreAbi.Driver.dll": "f543602491e9d7ca8bb3799646ac69cc42a7a2922227ca6ad4a5efd351fe80ee",
+      "C:\\wk\\native-svg-paint\\artifacts\\native21-driver\\RanvierWebCoreAbi.Driver.exe": "d51a8a9e6e277be5fafe2b9b9a31c1b444d4cab8bb190fa1574e76ac6016f523",
       "C:\\wk\\native-svg-paint\\artifacts\\native21-driver\\RanvierWebCoreAbi.Driver.runtimeconfig.json": "2ca90a18bac3b48286c20acd3c1ae4f83fa38de5acf4b2f8cdd277bf90dc9bd7",
       "C:\\wk\\native-svg-paint\\artifacts\\native21-driver\\RanvierWebCoreHost.dll": "c7497f6a121d0ab3c3d2e88230cbfce87ced21b721d70d666817e0cb5f19c777",
       "C:\\wk\\native-svg-paint\\artifacts\\native21-driver\\WebCore.dll": "6b61b6a3067365221172724b0f2c7eef6b7302027c3859e33a1b9e9ca792ff3c",
@@ -439,9 +439,9 @@
     "name": "teardown",
     "exitCode": 0,
     "log": "C:\\wk\\native-svg-paint\\artifacts\\native21-batch\\teardown.log",
-    "logSha256": "2ab35ca3a3e4ff67146f55bebd25f115424c51dbea2b71b8c7e126f53d826aaa",
+    "logSha256": "af0d85abd2892e4582c3505f4cc3d23f5f5ca0a3c79ae158374c06f2cae6ed06",
     "executedSources": {
-      "C:\\wk\\native-svg-paint\\tests\\abi\\svg_paint_probe.py": "5b1298774d637ce06b7fda73495a703f4a9f682ba821320420290c87f2766da1"
+      "C:\\wk\\native-svg-paint\\tests\\abi\\svg_paint_probe.py": "ab4514e76c1678b2542c34c43f618c1ae85262c2022ef3417f48dcc80c95d838"
     },
     "executedAssets": {
       "C:\\wk\\native-svg-paint\\artifacts\\native21-driver\\brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
@@ -461,8 +461,8 @@
       "C:\\wk\\native-svg-paint\\artifacts\\native21-driver\\libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
       "C:\\wk\\native-svg-paint\\artifacts\\native21-driver\\libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
       "C:\\wk\\native-svg-paint\\artifacts\\native21-driver\\RanvierWebCoreAbi.Driver.deps.json": "2826e597f87f7fb5628983d27e7fe294021913b60b1b6213bfeb6959cc0bc21a",
-      "C:\\wk\\native-svg-paint\\artifacts\\native21-driver\\RanvierWebCoreAbi.Driver.dll": "9b53c34aba2ae4135fac8d6850c9829eb926c5eaa56e003b4ad528e8398a8b43",
-      "C:\\wk\\native-svg-paint\\artifacts\\native21-driver\\RanvierWebCoreAbi.Driver.exe": "211367d496273de9b37f8f2571b2655d2592aaf535b7333c41ab1dc02a37ea2d",
+      "C:\\wk\\native-svg-paint\\artifacts\\native21-driver\\RanvierWebCoreAbi.Driver.dll": "f543602491e9d7ca8bb3799646ac69cc42a7a2922227ca6ad4a5efd351fe80ee",
+      "C:\\wk\\native-svg-paint\\artifacts\\native21-driver\\RanvierWebCoreAbi.Driver.exe": "d51a8a9e6e277be5fafe2b9b9a31c1b444d4cab8bb190fa1574e76ac6016f523",
       "C:\\wk\\native-svg-paint\\artifacts\\native21-driver\\RanvierWebCoreAbi.Driver.runtimeconfig.json": "2ca90a18bac3b48286c20acd3c1ae4f83fa38de5acf4b2f8cdd277bf90dc9bd7",
       "C:\\wk\\native-svg-paint\\artifacts\\native21-driver\\RanvierWebCoreHost.dll": "c7497f6a121d0ab3c3d2e88230cbfce87ced21b721d70d666817e0cb5f19c777",
       "C:\\wk\\native-svg-paint\\artifacts\\native21-driver\\WebCore.dll": "6b61b6a3067365221172724b0f2c7eef6b7302027c3859e33a1b9e9ca792ff3c",

@@ -168,6 +168,30 @@
     "targetRefsAfterCollection": -1
   },
   {
+    "probe": "SVG paint handles retained past host destroy",
+    "cycleBeforeDisposal": "none",
+    "documentRefsAfterDisposal": -1,
+    "targetRefsAfterDisposal": -1,
+    "documentRefsAfterCycle": -1,
+    "targetRefsAfterCycle": -1,
+    "documentRefsAfterLongCycle": -1,
+    "targetRefsAfterLongCycle": -1,
+    "documentRefsAfterCollection": -1,
+    "targetRefsAfterCollection": -1
+  },
+  {
+    "probe": "SVG paint handles retained past document replacement",
+    "cycleBeforeDisposal": "none",
+    "documentRefsAfterDisposal": -1,
+    "targetRefsAfterDisposal": -1,
+    "documentRefsAfterCycle": -1,
+    "targetRefsAfterCycle": -1,
+    "documentRefsAfterLongCycle": -1,
+    "targetRefsAfterLongCycle": -1,
+    "documentRefsAfterCollection": -1,
+    "targetRefsAfterCollection": -1
+  },
+  {
     "probe": "control",
     "cycleBeforeDisposal": "single",
     "documentRefsAfterDisposal": -1,
@@ -336,6 +360,30 @@
     "targetRefsAfterCollection": -1
   },
   {
+    "probe": "SVG paint handles retained past host destroy",
+    "cycleBeforeDisposal": "single",
+    "documentRefsAfterDisposal": -1,
+    "targetRefsAfterDisposal": -1,
+    "documentRefsAfterCycle": -1,
+    "targetRefsAfterCycle": -1,
+    "documentRefsAfterLongCycle": -1,
+    "targetRefsAfterLongCycle": -1,
+    "documentRefsAfterCollection": -1,
+    "targetRefsAfterCollection": -1
+  },
+  {
+    "probe": "SVG paint handles retained past document replacement",
+    "cycleBeforeDisposal": "single",
+    "documentRefsAfterDisposal": -1,
+    "targetRefsAfterDisposal": -1,
+    "documentRefsAfterCycle": -1,
+    "targetRefsAfterCycle": -1,
+    "documentRefsAfterLongCycle": -1,
+    "targetRefsAfterLongCycle": -1,
+    "documentRefsAfterCollection": -1,
+    "targetRefsAfterCollection": -1
+  },
+  {
     "probe": "control",
     "cycleBeforeDisposal": "20 ms",
     "documentRefsAfterDisposal": -1,
@@ -493,6 +541,30 @@
   },
   {
     "probe": "image with a missing file source, removed",
+    "cycleBeforeDisposal": "20 ms",
+    "documentRefsAfterDisposal": -1,
+    "targetRefsAfterDisposal": -1,
+    "documentRefsAfterCycle": -1,
+    "targetRefsAfterCycle": -1,
+    "documentRefsAfterLongCycle": -1,
+    "targetRefsAfterLongCycle": -1,
+    "documentRefsAfterCollection": -1,
+    "targetRefsAfterCollection": -1
+  },
+  {
+    "probe": "SVG paint handles retained past host destroy",
+    "cycleBeforeDisposal": "20 ms",
+    "documentRefsAfterDisposal": -1,
+    "targetRefsAfterDisposal": -1,
+    "documentRefsAfterCycle": -1,
+    "targetRefsAfterCycle": -1,
+    "documentRefsAfterLongCycle": -1,
+    "targetRefsAfterLongCycle": -1,
+    "documentRefsAfterCollection": -1,
+    "targetRefsAfterCollection": -1
+  },
+  {
+    "probe": "SVG paint handles retained past document replacement",
     "cycleBeforeDisposal": "20 ms",
     "documentRefsAfterDisposal": -1,
     "targetRefsAfterDisposal": -1,

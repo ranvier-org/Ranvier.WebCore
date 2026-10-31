@@ -1,5 +1,5 @@
 {
-  "status": "coordinator-approved implementation scope;276 actual browser exposure observations; no production generation changes yet",
+  "status": "implemented in the Native21/ABI29 producer (PR132); measured browser exposure for all 276 members; group acceptance pending",
   "baselineSource": "d5471ced80c72a32e39eba210f89312703a2161a",
   "version": "unallocated; forward-merge H07 Native20 before any final cohort allocation",
   "groups": {
@@ -38296,24 +38296,46 @@
     ]
   },
   "currentImplementation": {
-    "phase": "S08/S09 focused checkpoints; S10/S11 pending",
+    "phase": "S08-S11 implemented; Native21/ABI29 private win-x64 producer frozen",
+    "pullRequest": "https://github.com/ranvier-org/Ranvier.WebCore/pull/132",
     "counts": {
-      "interfaces": 235,
-      "functions": 2414,
+      "interfaces": 248,
+      "functions": 2455,
       "roots": 50,
       "dictionaries": 22,
       "stubs": 0
     },
+    "focusedAssertions": {
+      "svg_paint_servers": 565,
+      "svg_filters": 5946,
+      "svg_clip_mask_marker": 565,
+      "svg_resources": 454
+    },
+    "sourcePatches": [
+      "0028-svg-convolve-structural-cache.patch",
+      "0029-svg-feimage-aspect-cache.patch",
+      "0030-svg-symbol-view-box-instances.patch"
+    ],
     "receipts": [
       "svg-paint-evidence/s08-evidence.json",
-      "svg-paint-evidence/s09-green/receipt.json"
-    ]
+      "svg-paint-evidence/s09-green/receipt.json",
+      "svg-paint-evidence/s10-green/receipt.json",
+      "svg-paint-evidence/s11-green/receipt.json",
+      "svg-paint-evidence/native21-final/final-evidence.json"
+    ],
+    "acceptance": "S08-S10 await shared consumers and official packages; S11 stays non-accepted until H05 (#110) owned completion/decode lands"
   },
   "qualifications": [
-    "Absent pattern viewBox: use actual authored attribute initialization before live field edits; raw absent\u2192typed-only behavior unchanged in both providers.",
+    "Absent pattern viewBox: use actual authored attribute initialization before live field edits; raw absent→typed-only behavior unchanged in both providers.",
     "Pattern SVGTests list state is exposed but mutations/authored strings do not suppress pattern paint in measured engines.",
     "SVGImage.decode remains unbound native; H05 REQUIRED S11 acceptance blocker.",
     "Native specularConstant0 is transparent over white; measured Chromium is opaque black, both nonzero spot/specular outputs blue.",
-    "Convolve half-bias oneunitquantization native127/Chrome128; no filter math rewrite."
+    "Convolve half-bias oneunitquantization native127/Chrome128; no filter math rewrite.",
+    "SVGFEGaussianBlurElement.edgeMode and SVGMarkerElement.orient: Available natively, NotExposed in measured Chromium; both states come from the capability catalogue/browser sweep",
+    "Native paints the WebCore broken-image placeholder for network errors and undecodable bytes; Chromium paints nothing (measured provider behaviour)",
+    "SVGStringList.clear leaves systemLanguage=\"\" natively; Chromium removes the attribute (measured provider behaviour)",
+    "Both engines keep cached mask paint after a style-only mask-type change until child geometry changes (measured provider behaviour)",
+    "Zero specularConstant: native transparent-over-white, Chromium opaque black (measured provider behaviour)",
+    "After a typed feImage href edit, native attribute enumeration sometimes lists href twice (lazy attribute synchronization); attribute enumeration counts as one check"
   ]
 }
