@@ -18,6 +18,10 @@ type EventCallback = delegate of context: nativeint * event: nativeint -> int
 [<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]
 type ResourceHandler = delegate of context: nativeint * load: nativeint * url: nativeint -> unit
 
+/// <summary>The <c>RvResourceCompletion</c> of the header: one terminal outcome with an image's natural size.</summary>
+[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]
+type ResourceCompletion = delegate of context: nativeint * outcome: int * width: int * height: int -> unit
+
 /// <summary>The <c>RvFrameCallback</c> of the header.</summary>
 [<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]
 type FrameCallback = delegate of context: nativeint -> unit
