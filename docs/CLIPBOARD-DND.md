@@ -97,3 +97,11 @@ int32_t rv_host_set_drag(RvHost*, int32_t style);
    for `insertReplacementText` edits with target ranges (I07, T09, T04; source patch 0041).
 5. **Next:** the Native drag style. Windows first, where WebCore's code already talks to OLE, then macOS,
    which needs a pasteboard strategy that calls NSPasteboard.
+
+## Source patch 0041
+
+`DataTransfer::allowsFileAccess` returned false on every port but Cocoa (and GTK/WPE in-memory pastes), so no
+`dataTransfer.files`, file item or `Files` type reached a page on Windows or Linux. On the remaining ports the patch
+allows file access when the pasteboard holds in-memory file contents, which the host's transfer pasteboard reports for
+app File payloads. WebCore's own pasteboards report file paths and stay hidden. `docs/data-transfer-evidence/red`
+holds the RED measurement on Native46, and `tests/abi/data_transfer.py` the files read in drops and pastes.
