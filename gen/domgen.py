@@ -1857,11 +1857,14 @@ class Generator(ComplexGeneratorMixin):
             else:
                 body.append("Ref document = impl->document();")
         body += getattr(function, 'context_checks', [])
-        body += prepare
-        expression = call
-        expression = expression.replace("{call_with}", "".join(", document.get()" for _ in call_with))
-        expression = expression.replace("{call_with_bare}", ", ".join("document.get()" for _ in call_with))
-        expression = expression.replace("{call_with_lead}", "".join("document.get(), " for _ in call_with))
+
+        def with_context(text):
+            text = text.replace("{call_with}", "".join(", document.get()" for _ in call_with))
+            text = text.replace("{call_with_bare}", ", ".join("document.get()" for _ in call_with))
+            return text.replace("{call_with_lead}", "".join("document.get(), " for _ in call_with))
+        # An enumeration setter names its getter's call in a decltype, which takes the same context.
+        body += [with_context(line) for line in prepare]
+        expression = with_context(call)
         for index, value in enumerate(passed):
             expression = expression.replace(f"{{arg{index}}}", value)
         if sink is None:

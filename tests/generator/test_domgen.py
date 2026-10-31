@@ -1417,10 +1417,12 @@ namespace DOMCSSNamespace {
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''
 interface AbstractRange {};
+enum HighlightType { "highlight", "spelling-error" };
 interface Highlight {
     constructor(AbstractRange... initialRanges);
     setlike<AbstractRange>;
     attribute long priority;
+    attribute HighlightType type;
 };
 interface HighlightRegistry { maplike<[AtomString] DOMString, Highlight>; };
 interface FrozenSet { readonly setlike<AbstractRange>; };
@@ -1468,6 +1470,8 @@ interface UnboundSet { setlike<AbstractRange>; readonly attribute long other; };
         self.assertIn('WebCore::RanvierCollectionLike::get(*impl, a0.atom())', glue)
         self.assertIn('RanvierCollectionLike::createHighlight(DomSequenceArgument<Ref<AbstractRange>>', glue)
         self.assertIn('DOMCSSNamespace::highlights(document.get())', glue)
+        self.assertIn('decltype(impl->type())', glue)
+        self.assertNotIn('{call_with', glue)
         self.assertIn('css_get_highlights', functions)
         self.assertEqual('namespace_operation', functions['css_get_highlights'].kind)
 
