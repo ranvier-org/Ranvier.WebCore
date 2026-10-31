@@ -1225,6 +1225,13 @@ type RvDomUnionBooleanOrImportNodeOptions =
     val mutable arm0: int
     val mutable arm1: nativeint
 
+/// <summary>ABI transport for Element sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequenceElementNullable =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
 /// <summary>ABI transport for DOMString sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomSequenceDOMString =
@@ -1779,6 +1786,9 @@ extern void rv_dom_union_dom_string_or_element_creation_options_release(RvDomUni
 
 [<DllImport(Lib)>]
 extern void rv_dom_union_boolean_or_import_node_options_release(RvDomUnionBooleanOrImportNodeOptions& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_sequence_element_nullable_release(RvDomSequenceElementNullable& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_dom_string_release(RvDomSequenceDOMString& value)
@@ -2888,6 +2898,12 @@ extern int rv_dom_element_get_aria_active_descendant_element(nativeint target, n
 extern int rv_dom_element_set_aria_active_descendant_element(nativeint target, nativeint value)
 
 [<DllImport(Lib)>]
+extern int rv_dom_element_get_aria_actions_elements(nativeint target, RvDomSequenceElementNullable& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_element_set_aria_actions_elements(nativeint target, [<In>] RvDomSequenceElementNullable[] value)
+
+[<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_atomic(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
@@ -2948,10 +2964,22 @@ extern int rv_dom_element_get_aria_col_span(nativeint target, byte[] buffer, int
 extern int rv_dom_element_set_aria_col_span(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
 
 [<DllImport(Lib)>]
+extern int rv_dom_element_get_aria_controls_elements(nativeint target, RvDomSequenceElementNullable& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_element_set_aria_controls_elements(nativeint target, [<In>] RvDomSequenceElementNullable[] value)
+
+[<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_current(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_set_aria_current(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_element_get_aria_described_by_elements(nativeint target, RvDomSequenceElementNullable& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_element_set_aria_described_by_elements(nativeint target, [<In>] RvDomSequenceElementNullable[] value)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_description(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -2960,16 +2988,34 @@ extern int rv_dom_element_get_aria_description(nativeint target, byte[] buffer, 
 extern int rv_dom_element_set_aria_description(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
 
 [<DllImport(Lib)>]
+extern int rv_dom_element_get_aria_details_elements(nativeint target, RvDomSequenceElementNullable& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_element_set_aria_details_elements(nativeint target, [<In>] RvDomSequenceElementNullable[] value)
+
+[<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_disabled(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_set_aria_disabled(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
 
 [<DllImport(Lib)>]
+extern int rv_dom_element_get_aria_error_message_elements(nativeint target, RvDomSequenceElementNullable& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_element_set_aria_error_message_elements(nativeint target, [<In>] RvDomSequenceElementNullable[] value)
+
+[<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_expanded(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_set_aria_expanded(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_element_get_aria_flow_to_elements(nativeint target, RvDomSequenceElementNullable& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_element_set_aria_flow_to_elements(nativeint target, [<In>] RvDomSequenceElementNullable[] value)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_has_popup(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -3000,6 +3046,12 @@ extern int rv_dom_element_get_aria_label(nativeint target, byte[] buffer, int ca
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_set_aria_label(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_element_get_aria_labelled_by_elements(nativeint target, RvDomSequenceElementNullable& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_element_set_aria_labelled_by_elements(nativeint target, [<In>] RvDomSequenceElementNullable[] value)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_level(nativeint target, byte[] buffer, int capacity, int[] length)

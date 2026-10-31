@@ -5234,6 +5234,8 @@ and [<AllowNullLiteral>] TouchEvent =
 and [<AllowNullLiteral>] ARIAMixin =
     /// <summary>ARIAMixin.ariaActiveDescendantElement.</summary>
     abstract member ariaActiveDescendantElement: Element with get, set
+    /// <summary>ARIAMixin.ariaActionsElements.</summary>
+    abstract member ariaActionsElements: (Element) array with get, set
     /// <summary>ARIAMixin.ariaAtomic.</summary>
     abstract member ariaAtomic: string with get, set
     /// <summary>ARIAMixin.ariaAutoComplete.</summary>
@@ -5254,14 +5256,24 @@ and [<AllowNullLiteral>] ARIAMixin =
     abstract member ariaColIndexText: string with get, set
     /// <summary>ARIAMixin.ariaColSpan.</summary>
     abstract member ariaColSpan: string with get, set
+    /// <summary>ARIAMixin.ariaControlsElements.</summary>
+    abstract member ariaControlsElements: (Element) array with get, set
     /// <summary>ARIAMixin.ariaCurrent.</summary>
     abstract member ariaCurrent: string with get, set
+    /// <summary>ARIAMixin.ariaDescribedByElements.</summary>
+    abstract member ariaDescribedByElements: (Element) array with get, set
     /// <summary>ARIAMixin.ariaDescription.</summary>
     abstract member ariaDescription: string with get, set
+    /// <summary>ARIAMixin.ariaDetailsElements.</summary>
+    abstract member ariaDetailsElements: (Element) array with get, set
     /// <summary>ARIAMixin.ariaDisabled.</summary>
     abstract member ariaDisabled: string with get, set
+    /// <summary>ARIAMixin.ariaErrorMessageElements.</summary>
+    abstract member ariaErrorMessageElements: (Element) array with get, set
     /// <summary>ARIAMixin.ariaExpanded.</summary>
     abstract member ariaExpanded: string with get, set
+    /// <summary>ARIAMixin.ariaFlowToElements.</summary>
+    abstract member ariaFlowToElements: (Element) array with get, set
     /// <summary>ARIAMixin.ariaHasPopup.</summary>
     abstract member ariaHasPopup: string with get, set
     /// <summary>ARIAMixin.ariaHidden.</summary>
@@ -5272,6 +5284,8 @@ and [<AllowNullLiteral>] ARIAMixin =
     abstract member ariaKeyShortcuts: string with get, set
     /// <summary>ARIAMixin.ariaLabel.</summary>
     abstract member ariaLabel: string with get, set
+    /// <summary>ARIAMixin.ariaLabelledByElements.</summary>
+    abstract member ariaLabelledByElements: (Element) array with get, set
     /// <summary>ARIAMixin.ariaLevel.</summary>
     abstract member ariaLevel: string with get, set
     /// <summary>ARIAMixin.ariaLive.</summary>

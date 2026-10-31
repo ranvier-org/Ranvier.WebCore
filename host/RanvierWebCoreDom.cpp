@@ -135,6 +135,7 @@ void rv_dom_sequence_element_release(RvDomSequenceElement* value) { ranvier_dom_
 void rv_dom_sequence_shadow_root_release(RvDomSequenceShadowRoot* value) { ranvier_dom_sequence_shadow_root_release(value); }
 void rv_dom_union_dom_string_or_element_creation_options_release(RvDomUnionDOMStringOrElementCreationOptions* value) { ranvier_dom_union_dom_string_or_element_creation_options_release(value); }
 void rv_dom_union_boolean_or_import_node_options_release(RvDomUnionBooleanOrImportNodeOptions* value) { ranvier_dom_union_boolean_or_import_node_options_release(value); }
+void rv_dom_sequence_element_nullable_release(RvDomSequenceElementNullable* value) { ranvier_dom_sequence_element_nullable_release(value); }
 void rv_dom_sequence_dom_string_release(RvDomSequenceDOMString* value) { ranvier_dom_sequence_dom_string_release(value); }
 void rv_dom_union_boolean_or_scroll_into_view_options_release(RvDomUnionBooleanOrScrollIntoViewOptions* value) { ranvier_dom_union_boolean_or_scroll_into_view_options_release(value); }
 void rv_dom_union_boolean_or_unrestricted_double_or_dom_string_nullable_release(RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable* value) { ranvier_dom_union_boolean_or_unrestricted_double_or_dom_string_nullable_release(value); }
@@ -380,6 +381,8 @@ int32_t rv_dom_element_get_role(RvNode* target, char* buffer, int32_t capacity, 
 int32_t rv_dom_element_set_role(RvNode* target, const char* value) { return ranvier_dom_element_set_role(target, value); }
 int32_t rv_dom_element_get_aria_active_descendant_element(RvNode* target, RvNode** result) { return ranvier_dom_element_get_aria_active_descendant_element(target, result); }
 int32_t rv_dom_element_set_aria_active_descendant_element(RvNode* target, RvNode* value) { return ranvier_dom_element_set_aria_active_descendant_element(target, value); }
+int32_t rv_dom_element_get_aria_actions_elements(RvNode* target, RvDomSequenceElementNullable* result) { return ranvier_dom_element_get_aria_actions_elements(target, result); }
+int32_t rv_dom_element_set_aria_actions_elements(RvNode* target, const RvDomSequenceElementNullable* value) { return ranvier_dom_element_set_aria_actions_elements(target, value); }
 int32_t rv_dom_element_get_aria_atomic(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_element_get_aria_atomic(target, buffer, capacity, length); }
 int32_t rv_dom_element_set_aria_atomic(RvNode* target, const char* value) { return ranvier_dom_element_set_aria_atomic(target, value); }
 int32_t rv_dom_element_get_aria_auto_complete(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_element_get_aria_auto_complete(target, buffer, capacity, length); }
@@ -400,14 +403,24 @@ int32_t rv_dom_element_get_aria_col_index_text(RvNode* target, char* buffer, int
 int32_t rv_dom_element_set_aria_col_index_text(RvNode* target, const char* value) { return ranvier_dom_element_set_aria_col_index_text(target, value); }
 int32_t rv_dom_element_get_aria_col_span(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_element_get_aria_col_span(target, buffer, capacity, length); }
 int32_t rv_dom_element_set_aria_col_span(RvNode* target, const char* value) { return ranvier_dom_element_set_aria_col_span(target, value); }
+int32_t rv_dom_element_get_aria_controls_elements(RvNode* target, RvDomSequenceElementNullable* result) { return ranvier_dom_element_get_aria_controls_elements(target, result); }
+int32_t rv_dom_element_set_aria_controls_elements(RvNode* target, const RvDomSequenceElementNullable* value) { return ranvier_dom_element_set_aria_controls_elements(target, value); }
 int32_t rv_dom_element_get_aria_current(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_element_get_aria_current(target, buffer, capacity, length); }
 int32_t rv_dom_element_set_aria_current(RvNode* target, const char* value) { return ranvier_dom_element_set_aria_current(target, value); }
+int32_t rv_dom_element_get_aria_described_by_elements(RvNode* target, RvDomSequenceElementNullable* result) { return ranvier_dom_element_get_aria_described_by_elements(target, result); }
+int32_t rv_dom_element_set_aria_described_by_elements(RvNode* target, const RvDomSequenceElementNullable* value) { return ranvier_dom_element_set_aria_described_by_elements(target, value); }
 int32_t rv_dom_element_get_aria_description(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_element_get_aria_description(target, buffer, capacity, length); }
 int32_t rv_dom_element_set_aria_description(RvNode* target, const char* value) { return ranvier_dom_element_set_aria_description(target, value); }
+int32_t rv_dom_element_get_aria_details_elements(RvNode* target, RvDomSequenceElementNullable* result) { return ranvier_dom_element_get_aria_details_elements(target, result); }
+int32_t rv_dom_element_set_aria_details_elements(RvNode* target, const RvDomSequenceElementNullable* value) { return ranvier_dom_element_set_aria_details_elements(target, value); }
 int32_t rv_dom_element_get_aria_disabled(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_element_get_aria_disabled(target, buffer, capacity, length); }
 int32_t rv_dom_element_set_aria_disabled(RvNode* target, const char* value) { return ranvier_dom_element_set_aria_disabled(target, value); }
+int32_t rv_dom_element_get_aria_error_message_elements(RvNode* target, RvDomSequenceElementNullable* result) { return ranvier_dom_element_get_aria_error_message_elements(target, result); }
+int32_t rv_dom_element_set_aria_error_message_elements(RvNode* target, const RvDomSequenceElementNullable* value) { return ranvier_dom_element_set_aria_error_message_elements(target, value); }
 int32_t rv_dom_element_get_aria_expanded(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_element_get_aria_expanded(target, buffer, capacity, length); }
 int32_t rv_dom_element_set_aria_expanded(RvNode* target, const char* value) { return ranvier_dom_element_set_aria_expanded(target, value); }
+int32_t rv_dom_element_get_aria_flow_to_elements(RvNode* target, RvDomSequenceElementNullable* result) { return ranvier_dom_element_get_aria_flow_to_elements(target, result); }
+int32_t rv_dom_element_set_aria_flow_to_elements(RvNode* target, const RvDomSequenceElementNullable* value) { return ranvier_dom_element_set_aria_flow_to_elements(target, value); }
 int32_t rv_dom_element_get_aria_has_popup(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_element_get_aria_has_popup(target, buffer, capacity, length); }
 int32_t rv_dom_element_set_aria_has_popup(RvNode* target, const char* value) { return ranvier_dom_element_set_aria_has_popup(target, value); }
 int32_t rv_dom_element_get_aria_hidden(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_element_get_aria_hidden(target, buffer, capacity, length); }
@@ -418,6 +431,8 @@ int32_t rv_dom_element_get_aria_key_shortcuts(RvNode* target, char* buffer, int3
 int32_t rv_dom_element_set_aria_key_shortcuts(RvNode* target, const char* value) { return ranvier_dom_element_set_aria_key_shortcuts(target, value); }
 int32_t rv_dom_element_get_aria_label(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_element_get_aria_label(target, buffer, capacity, length); }
 int32_t rv_dom_element_set_aria_label(RvNode* target, const char* value) { return ranvier_dom_element_set_aria_label(target, value); }
+int32_t rv_dom_element_get_aria_labelled_by_elements(RvNode* target, RvDomSequenceElementNullable* result) { return ranvier_dom_element_get_aria_labelled_by_elements(target, result); }
+int32_t rv_dom_element_set_aria_labelled_by_elements(RvNode* target, const RvDomSequenceElementNullable* value) { return ranvier_dom_element_set_aria_labelled_by_elements(target, value); }
 int32_t rv_dom_element_get_aria_level(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_element_get_aria_level(target, buffer, capacity, length); }
 int32_t rv_dom_element_set_aria_level(RvNode* target, const char* value) { return ranvier_dom_element_set_aria_level(target, value); }
 int32_t rv_dom_element_get_aria_live(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_element_get_aria_live(target, buffer, capacity, length); }

@@ -1,0 +1,365 @@
+{
+ "browser": "156.0.8078.4",
+ "page": "<!doctype html><body><span id=l1>First</span><span id=l2>Second</span><p id=d1>Describe</p><button id=b>Plain</button><div id=list role=listbox aria-label=Choices><div id=o1 role=option>One</div><div id=o2 role=option>Two</div></div><x-toggle id=t></x-toggle><x-plain id=p></x-plain><input id=i>",
+ "steps": [
+  {
+   "name": "define x-toggle with attachInternals",
+   "result": {
+    "hasInternals": true,
+    "internalsMembers": 52,
+    "secondAttach": "NotSupportedError",
+    "builtinElement": "NotSupportedError",
+    "undefinedCustomElement": "NotSupportedError"
+   },
+   "error": null,
+   "ax": {
+    "t": {
+     "role": "generic",
+     "name": "",
+     "activedescendant": [],
+     "controls": [],
+     "labelledby": [],
+     "describedby": [],
+     "ignored": false
+    }
+   }
+  },
+  {
+   "name": "internals.role = button, ariaLabel, ariaPressed",
+   "result": {
+    "role": "button",
+    "ariaLabel": "Toggle",
+    "hostRoleAttribute": null
+   },
+   "error": null,
+   "ax": {
+    "t": {
+     "role": "button",
+     "name": "Toggle",
+     "pressed": "true",
+     "activedescendant": [],
+     "controls": [],
+     "labelledby": [],
+     "describedby": [],
+     "ignored": false
+    }
+   }
+  },
+  {
+   "name": "host attributes override internals",
+   "result": {
+    "internalsLabel": "Toggle"
+   },
+   "error": null,
+   "ax": {
+    "t": {
+     "role": "switch",
+     "name": "Host label",
+     "activedescendant": [],
+     "controls": [],
+     "labelledby": [],
+     "describedby": [],
+     "ignored": false
+    }
+   }
+  },
+  {
+   "name": "remove host attributes",
+   "result": null,
+   "error": null,
+   "ax": {
+    "t": {
+     "role": "button",
+     "name": "Toggle",
+     "pressed": "true",
+     "activedescendant": [],
+     "controls": [],
+     "labelledby": [],
+     "describedby": [],
+     "ignored": false
+    }
+   }
+  },
+  {
+   "name": "internals.ariaLabelledByElements",
+   "result": {
+    "count": 2
+   },
+   "error": null,
+   "ax": {
+    "t": {
+     "role": "button",
+     "name": "First Second",
+     "pressed": "true",
+     "activedescendant": [],
+     "controls": [],
+     "labelledby": [
+      "l1",
+      "l2"
+     ],
+     "describedby": [],
+     "ignored": false
+    }
+   }
+  },
+  {
+   "name": "button.ariaLabelledByElements = [l2, l1]",
+   "result": {
+    "attribute": "",
+    "ids": [
+     "l2",
+     "l1"
+    ],
+    "frozen": true,
+    "sameArray": true
+   },
+   "error": null,
+   "ax": {
+    "b": {
+     "role": "button",
+     "name": "Second First",
+     "activedescendant": [],
+     "controls": [],
+     "labelledby": [
+      "l2",
+      "l1"
+     ],
+     "describedby": [],
+     "ignored": false
+    }
+   }
+  },
+  {
+   "name": "button.ariaDescribedByElements = [d1]",
+   "result": {
+    "attribute": "",
+    "ids": [
+     "d1"
+    ]
+   },
+   "error": null,
+   "ax": {
+    "b": {
+     "role": "button",
+     "name": "Second First",
+     "description": "Describe",
+     "activedescendant": [],
+     "controls": [],
+     "labelledby": [
+      "l2",
+      "l1"
+     ],
+     "describedby": [
+      "d1"
+     ],
+     "ignored": false
+    }
+   }
+  },
+  {
+   "name": "setAttribute aria-labelledby replaces the elements",
+   "result": {
+    "ids": [
+     "l1"
+    ]
+   },
+   "error": null,
+   "ax": {
+    "b": {
+     "role": "button",
+     "name": "First",
+     "description": "Describe",
+     "activedescendant": [],
+     "controls": [],
+     "labelledby": [
+      "l1"
+     ],
+     "describedby": [
+      "d1"
+     ],
+     "ignored": false
+    }
+   }
+  },
+  {
+   "name": "listbox.ariaActiveDescendantElement = o2",
+   "result": {
+    "attribute": "",
+    "id": "o2"
+   },
+   "error": null,
+   "ax": {
+    "list": {
+     "role": "listbox",
+     "name": "Choices",
+     "activedescendant": [
+      "o2"
+     ],
+     "controls": [],
+     "labelledby": [],
+     "describedby": [],
+     "ignored": false
+    }
+   }
+  },
+  {
+   "name": "input.ariaControlsElements = [list]",
+   "result": {
+    "attribute": "",
+    "ids": [
+     "list"
+    ]
+   },
+   "error": null,
+   "ax": {
+    "i": {
+     "role": "textbox",
+     "name": "",
+     "activedescendant": [],
+     "controls": [
+      "list"
+     ],
+     "labelledby": [],
+     "describedby": [],
+     "ignored": false
+    }
+   }
+  },
+  {
+   "name": "remove o2 from the document",
+   "result": {
+    "id": null
+   },
+   "error": null,
+   "ax": {
+    "list": {
+     "role": "listbox",
+     "name": "Choices",
+     "activedescendant": [],
+     "controls": [],
+     "labelledby": [],
+     "describedby": [],
+     "ignored": false
+    }
+   }
+  },
+  {
+   "name": "an element in a shadow root is hidden from the light tree",
+   "result": {
+    "ids": []
+   },
+   "error": null,
+   "ax": {
+    "b": {
+     "role": "button",
+     "name": "Plain",
+     "description": "Describe",
+     "activedescendant": [],
+     "controls": [],
+     "labelledby": [],
+     "describedby": [
+      "d1"
+     ],
+     "ignored": false
+    }
+   }
+  },
+  {
+   "name": "null clears",
+   "result": {
+    "labelled": null,
+    "attribute": null
+   },
+   "error": null,
+   "ax": {
+    "b": {
+     "role": "button",
+     "name": "Plain",
+     "activedescendant": [],
+     "controls": [],
+     "labelledby": [],
+     "describedby": [],
+     "ignored": false
+    }
+   }
+  }
+ ],
+ "members": {
+  "element": [
+   "ariaActionsElements",
+   "ariaActiveDescendantElement",
+   "ariaControlsElements",
+   "ariaDescribedByElements",
+   "ariaDetailsElements",
+   "ariaErrorMessageElements",
+   "ariaFlowToElements",
+   "ariaLabelledByElements"
+  ],
+  "internals": [
+   "form",
+   "willValidate",
+   "validity",
+   "validationMessage",
+   "labels",
+   "states",
+   "shadowRoot",
+   "role",
+   "ariaAtomic",
+   "ariaAutoComplete",
+   "ariaBusy",
+   "ariaBrailleLabel",
+   "ariaBrailleRoleDescription",
+   "ariaChecked",
+   "ariaColCount",
+   "ariaColIndex",
+   "ariaColSpan",
+   "ariaCurrent",
+   "ariaDescription",
+   "ariaDisabled",
+   "ariaExpanded",
+   "ariaHasPopup",
+   "ariaHidden",
+   "ariaInvalid",
+   "ariaKeyShortcuts",
+   "ariaLabel",
+   "ariaLevel",
+   "ariaLive",
+   "ariaModal",
+   "ariaMultiLine",
+   "ariaMultiSelectable",
+   "ariaOrientation",
+   "ariaPlaceholder",
+   "ariaPosInSet",
+   "ariaPressed",
+   "ariaReadOnly",
+   "ariaRelevant",
+   "ariaRequired",
+   "ariaRoleDescription",
+   "ariaRowCount",
+   "ariaRowIndex",
+   "ariaRowSpan",
+   "ariaSelected",
+   "ariaSetSize",
+   "ariaSort",
+   "ariaValueMax",
+   "ariaValueMin",
+   "ariaValueNow",
+   "ariaValueText",
+   "checkValidity",
+   "reportValidity",
+   "setFormValue",
+   "setValidity",
+   "ariaColIndexText",
+   "ariaRowIndexText",
+   "ariaActionsElements",
+   "ariaActiveDescendantElement",
+   "ariaControlsElements",
+   "ariaDescribedByElements",
+   "ariaDetailsElements",
+   "ariaErrorMessageElements",
+   "ariaFlowToElements",
+   "ariaLabelledByElements",
+   "constructor"
+  ]
+ }
+}

@@ -1236,6 +1236,30 @@ interface CSSStyleDeclaration { DOMString getPropertyValue(DOMString property); 
         self.assertIn('pseudo_element_length >= 0 && a1.string().isNull()', glue)
         self.assertNotIn('type Window =', generator.interfaces())
 
+    def test_element_array_reflections_bind_the_engine_element_arrays(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+partial interface Element {
+    [CustomGetter, Reflect="aria-labelledby"] attribute FrozenArray<Element>? ariaLabelledByElements;
+    [CustomGetter, Reflect="aria-owns"] attribute FrozenArray<Element>? ariaOwnsElements;
+};
+''')
+        config = dict(self.world.config)
+        config['elementArrayReflections'] = ['Element.ariaLabelledByElements']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        self.assertEqual(functions['rv_dom_element_get_aria_labelled_by_elements']['parameters'][-1],
+                         {'ctype': 'RvDomSequenceElementNullable*', 'name': 'result'})
+        self.assertEqual(functions['rv_dom_element_set_aria_labelled_by_elements']['parameters'][-1],
+                         {'ctype': 'const RvDomSequenceElementNullable*', 'name': 'value'})
+        self.assertNotIn('rv_dom_element_get_aria_owns_elements', functions)
+        glue = generator.glue()
+        self.assertIn('impl->getElementsArrayAttributeForBindings(HTMLNames::aria_labelledbyAttr)', glue)
+        self.assertIn('impl->setElementsArrayAttribute(HTMLNames::aria_labelledbyAttr, std::move(*a0))', glue)
+
     def test_event_target_objects_use_event_target_handles_and_report_detached(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''
