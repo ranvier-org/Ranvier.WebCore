@@ -5755,6 +5755,20 @@ and [<AllowNullLiteral; DomDictionary>] AddEventListenerOptions() =
     member val passive: (bool) option = None with get, set
     member val once: bool = false with get, set
 
+/// <summary>EffectTiming in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] EffectTiming() =
+    member val delay: float = 0 with get, set
+    member val endDelay: float = 0 with get, set
+    member val fill: FillMode = FillMode.Auto with get, set
+    member val iterationStart: float = 0.0 with get, set
+    member val iterations: float = 1.0 with get, set
+
+    member val duration: UnrestrictedDoubleOrCSSNumericValueOrDOMString =
+        UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString "auto" with get, set
+
+    member val direction: PlaybackDirection = PlaybackDirection.Normal with get, set
+    member val easing: string = "linear" with get, set
+
 /// <summary>KeyframeEffectOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] KeyframeEffectOptions() =
     inherit EffectTiming()
@@ -5930,20 +5944,6 @@ and [<AllowNullLiteral; DomDictionary>] URLPatternInit() =
     member val search: (string) option = None with get, set
     member val hash: (string) option = None with get, set
     member val baseURL: (string) option = None with get, set
-
-/// <summary>EffectTiming in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral; DomDictionary>] EffectTiming() =
-    member val delay: float = 0 with get, set
-    member val endDelay: float = 0 with get, set
-    member val fill: FillMode = FillMode.Auto with get, set
-    member val iterationStart: float = 0.0 with get, set
-    member val iterations: float = 1.0 with get, set
-
-    member val duration: UnrestrictedDoubleOrCSSNumericValueOrDOMString =
-        UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString "auto" with get, set
-
-    member val direction: PlaybackDirection = PlaybackDirection.Normal with get, set
-    member val easing: string = "linear" with get, set
 
 /// <summary>ComputedEffectTiming in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] ComputedEffectTiming() =

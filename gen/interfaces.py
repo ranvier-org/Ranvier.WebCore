@@ -580,7 +580,18 @@ class InterfaceEmitter:
             declarations.append((name, '[<AllowNullLiteral>]', body or ['    interface end']))
         for name, children in self.unions.items():
             declarations.append((name, '[<RequireQualifiedAccess>]', [f'    | {label(child)} of {self.type(child)}' for child in children]))
-        for name, fields in self.dictionaries.items():
+        # A derived contract dictionary is a subclass, which JavaScript defines only after its base class.
+        ordered = []
+
+        def place(name):
+            base = self.world.dictionaries[name].base
+            if name in self.world.contract_dictionary_fields and base in self.dictionaries:
+                place(base)
+            if name not in ordered:
+                ordered.append(name)
+        for name in self.dictionaries:
+            place(name)
+        for name, fields in [(name, self.dictionaries[name]) for name in ordered]:
             body = []
             base = self.world.dictionaries[name].base
             inherited = set()
