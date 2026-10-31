@@ -14,6 +14,7 @@ import sys
 import threading
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
+ABI = 41
 COMPONENTS = ['protocol', 'username', 'password', 'hostname', 'port', 'pathname', 'search', 'hash']
 FIELDS = ['href', 'origin', 'protocol', 'username', 'password', 'host', 'hostname', 'port', 'pathname', 'search', 'hash']
 
@@ -152,6 +153,7 @@ def verify(native_directory, record=None):
         expect(status == 0, f'{name}: status {status}')
         return buffer.raw[:length.value].decode('utf-8', 'surrogatepass')
 
+    expect(bind('rv_abi_version', [], integer)() == ABI, f'ABI version {ABI}')
     host = bind('rv_host_create', [integer, integer], pointer)(320, 240)
     expect(bool(host), 'host creation')
     body = bind('rv_document_body', [pointer], pointer)(host)
