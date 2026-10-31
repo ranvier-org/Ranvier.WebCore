@@ -1,0 +1,63 @@
+{
+  "comment": [
+    "Shared #144 cases: tests/abi/blob_urls_browser.mjs records Chromium's results in blob-urls-oracle.json and tests/abi/blob_urls.py replays them natively.",
+    "A part is {\"text\": USVString} or {\"hex\": bytes}. A reader hook acts in the named event listener or, for sync, right after the read call returns."
+  ],
+  "blobs": {
+    "mixed": {"parts": [{"text": "hé"}, {"hex": "ff4100"}], "type": "text/plain;charset=latin1"},
+    "x": {"parts": [{"text": "x"}], "type": ""},
+    "y": {"parts": [{"text": "y"}], "type": ""},
+    "empty": {"parts": [], "type": ""},
+    "utf16": {"parts": [{"hex": "41004200"}], "type": ""},
+    "accent": {"parts": [{"text": "hé"}], "type": ""},
+    "bomBe": {"parts": [{"hex": "feff0041"}], "type": ""},
+    "bomInvalid": {"parts": [{"hex": "efbbbf41ff"}], "type": ""},
+    "ab": {"parts": [{"text": "ab"}], "type": ""},
+    "latin1Type": {"parts": [{"text": "é"}], "type": "text/plain;charset=latin1"},
+    "abc": {"parts": [{"text": "abc"}], "type": "text/plain"},
+    "digits": {"parts": [{"text": "0123456789"}], "type": "a/b"},
+    "svg": {"parts": [{"text": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"7\" height=\"5\"><rect width=\"7\" height=\"5\" fill=\"red\"/></svg>"}], "type": "image/svg+xml"},
+    "png": {"parts": [{"hex": "89504e470d0a1a0a0000000d49484452000000030000000208060000009d74661a0000001149444154789c63f8cfc0f01f86199039009b7e0bf572b0b93c0000000049454e44ae426082"}], "type": "image/png"},
+    "pngUntyped": {"parts": [{"hex": "89504e470d0a1a0a0000000d49484452000000030000000208060000009d74661a0000001149444154789c63f8cfc0f01f86199039009b7e0bf572b0b93c0000000049454e44ae426082"}], "type": ""},
+    "garbage": {"parts": [{"text": "nope"}], "type": "image/png"},
+    "big": {"parts": [{"repeat": "a5", "count": 1048576}], "type": ""}
+  },
+  "reader": [
+    {"name": "arrayBuffer", "blob": "mixed", "method": "readAsArrayBuffer"},
+    {"name": "text", "blob": "mixed", "method": "readAsText"},
+    {"name": "textLatin1", "blob": "mixed", "method": "readAsText", "encoding": "iso-8859-1"},
+    {"name": "textUtf16", "blob": "utf16", "method": "readAsText", "encoding": "utf-16le"},
+    {"name": "textBogusLabel", "blob": "accent", "method": "readAsText", "encoding": "bogus"},
+    {"name": "textBomWins", "blob": "bomBe", "method": "readAsText", "encoding": "utf-8"},
+    {"name": "binaryString", "blob": "mixed", "method": "readAsBinaryString"},
+    {"name": "dataUrl", "blob": "mixed", "method": "readAsDataURL"},
+    {"name": "dataUrlEmpty", "blob": "empty", "method": "readAsDataURL"},
+    {"name": "empty", "blob": "empty", "method": "readAsArrayBuffer"},
+    {"name": "big", "blob": "big", "method": "readAsArrayBuffer"},
+    {"name": "abortSync", "blob": "x", "method": "readAsText", "hook": "sync", "action": "abort"},
+    {"name": "abortInLoadstart", "blob": "x", "method": "readAsText", "hook": "loadstart", "action": "abort"},
+    {"name": "abortInLoad", "blob": "x", "method": "readAsText", "hook": "load", "action": "abort"},
+    {"name": "readInLoadend", "blob": "x", "method": "readAsText", "hook": "loadend", "action": "readY"},
+    {"name": "readWhileLoading", "blob": "x", "method": "readAsText", "hook": "sync", "action": "readY"}
+  ],
+  "promises": [
+    {"name": "text", "blob": "bomInvalid", "mode": "text"},
+    {"name": "arrayBuffer", "blob": "ab", "mode": "bytes"},
+    {"name": "textLatin1Type", "blob": "latin1Type", "mode": "text"},
+    {"name": "mixedBytes", "blob": "mixed", "mode": "bytes"},
+    {"name": "emptyText", "blob": "empty", "mode": "text"},
+    {"name": "bigBytes", "blob": "big", "mode": "bytes"}
+  ],
+  "urlReads": [
+    {"name": "typed", "blob": "abc"},
+    {"name": "empty", "blob": "empty"},
+    {"name": "slice", "blob": "digits", "slice": [2, 5]},
+    {"name": "fragment", "blob": "abc", "fragment": "#frag"}
+  ],
+  "images": [
+    {"name": "svg", "blob": "svg"},
+    {"name": "png", "blob": "png"},
+    {"name": "pngUntyped", "blob": "pngUntyped"},
+    {"name": "garbage", "blob": "garbage"}
+  ]
+}

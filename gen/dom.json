@@ -244,6 +244,10 @@
       "receiver": "Document",
       "factory": "RanvierCollectionLike::createHighlight",
       "passReceiver": false
+    },
+    "FileReader": {
+      "receiver": "Document",
+      "factory": "FileReader::create"
     }
   },
   "dictionaryCppTypes": {
@@ -675,7 +679,8 @@
     "URLPattern",
     "VisualViewport",
     "Highlight",
-    "HighlightRegistry"
+    "HighlightRegistry",
+    "FileReader"
   ],
   "skipDirectories": [
     "Modules/",
@@ -986,9 +991,15 @@
       "receiver": "Document",
       "members": [
         "parse",
-        "canParse"
+        "canParse",
+        "createObjectURL",
+        "revokeObjectURL"
       ],
-      "feature": "dom-url-static"
+      "feature": "dom-url-static",
+      "memberFeatures": {
+        "createObjectURL": "blob-urls",
+        "revokeObjectURL": "blob-urls"
+      }
     }
   },
   "iterableBindings": {
@@ -1089,7 +1100,11 @@
     "CaretPosition": "Document.caretPositionFromPoint",
     "VisualViewport": "DOMWindow.visualViewport"
   },
+  "contextSettingsObjects": [
+    "FileReader"
+  ],
   "eventTargetObjects": {
+    "FileReader": {},
     "VisualViewport": {
       "attached": "impl->frame()"
     }

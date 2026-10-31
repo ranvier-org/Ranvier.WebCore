@@ -1,9 +1,15 @@
 #include "config.h"
 #include "RanvierResourceGlue.h"
+#include "Blob.h"
 #include "CSSFontFace.h"
 #include "CachedImage.h"
+#include "DOMException.h"
 #include "Document.h"
 #include "DocumentInlines.h"
+#include "File.h"
+#include "FileReader.h"
+#include "FileReaderLoader.h"
+#include "FileReaderLoaderClient.h"
 #include "FontFace.h"
 #include "FontFaceSet.h"
 #include "HTMLImageElement.h"
@@ -11,7 +17,10 @@
 #include "Image.h"
 #include "ImageLoader.h"
 #include "Node.h"
+#include "OriginAccessPatterns.h"
 #include "SVGImageElement.h"
+#include "SecurityOrigin.h"
+#include "ThreadableBlobRegistry.h"
 #include "SVGElementTypeHelpers.h"
 #include <JavaScriptCore/ArrayBuffer.h>
 #include <unordered_map>
@@ -49,6 +58,8 @@ int32_t outcomeFor(ImageDecodeResult result)
     }
     return RV_RESOURCE_LOAD_FAILED;
 }
+
+class BlobReadOperation;
 
 // One terminal outcome per operation, delivered on the owning thread; see RanvierResourceGlue.h.
 class Operation : public RefCounted<Operation>, public CanMakeSingleThreadWeakPtr<Operation> {
@@ -112,6 +123,7 @@ public:
     }
 
     virtual bool belongsTo(const Document& candidate) const { return document == &candidate; }
+    virtual BlobReadOperation* asBlobRead() { return nullptr; }
 
 protected:
     Operation(Document& document, RvResourceCompletion callback, void* context)
@@ -298,6 +310,96 @@ private:
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(FontOperation);
 
+// Reads a blob, or the blob a blob URL refers to, through the engine's FileReaderLoader, as Blob.text(),
+// arrayBuffer() and bytes() read it. The bytes, the type and the error name stay until release.
+class BlobReadOperation final : public Operation, public FileReaderLoaderClient {
+    WTF_MAKE_TZONE_ALLOCATED(BlobReadOperation);
+
+public:
+    static Ref<BlobReadOperation> create(Document& document, bool text, RvResourceCompletion callback, void* context)
+    {
+        return adoptRef(*new BlobReadOperation(document, text, callback, context));
+    }
+
+    void ref() const final { Operation::ref(); }
+    void deref() const final { Operation::deref(); }
+
+    bool text { false };
+    bool succeeded { false };
+    RefPtr<FileReaderLoader> loader;
+    Vector<uint8_t> bytes;
+    CString type;
+    CString errorName;
+
+    // Cancels a load in flight. A loader reaching its terminal calls its client last, so the reference ends on a
+    // later run-loop turn.
+    void detach() final
+    {
+        if (RefPtr current = std::exchange(loader, nullptr)) {
+            current->cancel();
+            RunLoop::mainSingleton().dispatch([current = WTF::move(current)] { });
+        }
+        Operation::detach();
+    }
+
+    BlobReadOperation* asBlobRead() final { return this; }
+
+    // A URL the document cannot request fails as an unknown one does.
+    void deny()
+    {
+        starting = true;
+        didFail(ExceptionCode::NotFoundError);
+        starting = false;
+    }
+
+    void start(Blob* blob, const URL& url)
+    {
+        starting = true;
+        Ref current = FileReaderLoader::create(text ? FileReaderLoader::ReadAsText : FileReaderLoader::ReadAsArrayBuffer, this);
+        loader = current.copyRef();
+        if (text)
+            current->setEncoding("UTF-8"_s);
+        if (blob)
+            current->start(document.get(), *blob);
+        else
+            current->start(document.get(), url);
+        starting = false;
+    }
+
+private:
+    BlobReadOperation(Document& document, bool text, RvResourceCompletion callback, void* context)
+        : Operation(document, callback, context)
+        , text(text)
+    {
+    }
+
+    void didStartLoading() final { }
+    void didReceiveData() final { }
+
+    void didFinishLoading() final
+    {
+        RefPtr current = loader;
+        if (terminal || !current)
+            return;
+        if (text)
+            bytes.append(current->stringResult().utf8(StrictConversionReplacingUnpairedSurrogatesWithFFFD).span());
+        else if (RefPtr buffer = current->arrayBufferResult())
+            bytes.append(buffer->span());
+        succeeded = true;
+        finish(RV_RESOURCE_SUCCEEDED);
+    }
+
+    void didFail(ExceptionCode code) final
+    {
+        if (terminal)
+            return;
+        errorName = String { DOMException::name(code) }.utf8();
+        finish(RV_RESOURCE_LOAD_FAILED);
+    }
+};
+
+WTF_MAKE_TZONE_ALLOCATED_IMPL(BlobReadOperation);
+
 std::unordered_map<uint64_t, Ref<Operation>>& operations()
 {
     static NeverDestroyed<std::unordered_map<uint64_t, Ref<Operation>>> values;
@@ -400,4 +502,170 @@ void ranvier_resource_invalidate_document(RvNode* handle)
         }
         releaseOperation(operation, RV_RESOURCE_INVALIDATED);
     }
+}
+
+namespace {
+
+int32_t startBlobRead(Document& document, Blob* blob, const URL& url, bool text, RvResourceCompletion callback, void* context, uint64_t* operation, bool denied = false)
+{
+    if (!nextOperation)
+        return RV_ERR_UNSUPPORTED;
+    Ref value = BlobReadOperation::create(document, text, callback, context);
+    *operation = nextOperation++;
+    operations().emplace(*operation, value.copyRef());
+    if (denied) {
+        value->deny();
+        return RV_OK;
+    }
+    value->type = (blob ? blob->type() : ThreadableBlobRegistry::blobType(url)).utf8();
+    value->start(blob, url);
+    return RV_OK;
+}
+
+BlobReadOperation* blobRead(uint64_t operation)
+{
+    auto found = operations().find(operation);
+    return found == operations().end() ? nullptr : found->second->asBlobRead();
+}
+
+int32_t copyText(std::span<const char> text, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!length || capacity < 0 || (capacity && !buffer))
+        return RV_ERR_NULL_ARGUMENT;
+    if (text.size() >= static_cast<size_t>(std::numeric_limits<int32_t>::max()))
+        return RV_ERR_UNSUPPORTED;
+    *length = static_cast<int32_t>(text.size());
+    if (capacity <= *length)
+        return RV_ERR_BUFFER_TOO_SMALL;
+    if (!text.empty())
+        std::memcpy(buffer, text.data(), text.size());
+    buffer[text.size()] = 0;
+    return RV_OK;
+}
+
+int32_t copyBytes(std::span<const uint8_t> bytes, uint8_t* buffer, int64_t capacity, int64_t* length)
+{
+    if (!length || capacity < 0 || (capacity && !buffer))
+        return RV_ERR_NULL_ARGUMENT;
+    *length = static_cast<int64_t>(bytes.size());
+    if (static_cast<uint64_t>(capacity) < bytes.size())
+        return RV_ERR_BUFFER_TOO_SMALL;
+    if (!bytes.empty())
+        std::memcpy(buffer, bytes.data(), bytes.size());
+    return RV_OK;
+}
+
+}
+
+int32_t ranvier_blob_read(RvNode* documentHandle, RvBlob* blobHandle, int32_t mode, RvResourceCompletion callback, void* context, uint64_t* operation)
+{
+    if (!documentHandle || !blobHandle || !callback || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* document = documentFromHandle(documentHandle);
+    if (!document || !document->window() || (mode != RV_BLOB_READ_TEXT && mode != RV_BLOB_READ_BYTES))
+        return RV_ERR_UNSUPPORTED;
+    Ref blob = *reinterpret_cast<Blob*>(blobHandle);
+    return startBlobRead(*document, blob.ptr(), { }, mode == RV_BLOB_READ_TEXT, callback, context, operation);
+}
+
+int32_t ranvier_blob_url_read(RvNode* documentHandle, const uint8_t* url, int32_t url_length, RvResourceCompletion callback, void* context, uint64_t* operation)
+{
+    if (!documentHandle || url_length < 0 || (url_length && !url) || !callback || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* document = documentFromHandle(documentHandle);
+    if (!document || !document->window())
+        return RV_ERR_UNSUPPORTED;
+    auto text = String::fromUTF8(std::span<const char8_t> { reinterpret_cast<const char8_t*>(url), static_cast<size_t>(url_length) });
+    if (text.isNull())
+        return RV_ERR_NULL_ARGUMENT;
+    URL parsed { text };
+    if (!parsed.isValid() || !parsed.protocolIsBlob())
+        return RV_ERR_UNSUPPORTED;
+    parsed.removeFragmentIdentifier();
+    // The blob registry is process-wide; a URL of another origin, such as another host's opaque document, reads as
+    // unknown, as an <img> load of it fails.
+    bool denied = !document->securityOrigin().canRequest(parsed, OriginAccessPatternsForWebProcess::singleton());
+    return startBlobRead(*document, nullptr, parsed, false, callback, context, operation, denied);
+}
+
+int32_t ranvier_blob_read_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length)
+{
+    if (!length || capacity < 0 || (capacity && !buffer))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* read = blobRead(operation);
+    if (!read || !read->succeeded)
+        return RV_ERR_UNSUPPORTED;
+    return copyBytes(read->bytes.span(), buffer, capacity, length);
+}
+
+int32_t ranvier_blob_read_type(uint64_t operation, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!length || capacity < 0 || (capacity && !buffer))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* read = blobRead(operation);
+    if (!read || !read->succeeded)
+        return RV_ERR_UNSUPPORTED;
+    return copyText(read->type.span(), buffer, capacity, length);
+}
+
+int32_t ranvier_blob_read_error(uint64_t operation, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!length || capacity < 0 || (capacity && !buffer))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* read = blobRead(operation);
+    if (!read || read->errorName.isNull())
+        return RV_ERR_UNSUPPORTED;
+    return copyText(read->errorName.span(), buffer, capacity, length);
+}
+
+int32_t ranvier_file_reader_result(RvEventTarget* target, int32_t* kind, uint8_t* buffer, int64_t capacity, int64_t* length)
+{
+    if (!target || !kind || !length || capacity < 0 || (capacity && !buffer))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr reader = dynamicDowncast<FileReader>(*reinterpret_cast<EventTarget*>(target));
+    if (!reader)
+        return RV_ERR_WRONG_INTERFACE;
+    auto result = reader->result();
+    if (!result) {
+        *kind = RV_FILE_READER_RESULT_NULL;
+        *length = 0;
+        return RV_OK;
+    }
+    return WTF::switchOn(*result, [&](const String& text) {
+        *kind = RV_FILE_READER_RESULT_STRING;
+        auto utf8 = text.utf8(StrictConversionReplacingUnpairedSurrogatesWithFFFD);
+        return copyBytes(byteCast<uint8_t>(utf8.span()), buffer, capacity, length);
+    }, [&](const Ref<JSC::ArrayBuffer>& bytes) {
+        *kind = RV_FILE_READER_RESULT_BYTES;
+        return copyBytes(bytes->span(), buffer, capacity, length);
+    });
+}
+
+int32_t ranvier_file_reader_error(RvEventTarget* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length || capacity < 0 || (capacity && !buffer))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr reader = dynamicDowncast<FileReader>(*reinterpret_cast<EventTarget*>(target));
+    if (!reader)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr error = reader->error();
+    if (!error) {
+        *length = -1;
+        return RV_OK;
+    }
+    return copyText(error->name().utf8().span(), buffer, capacity, length);
 }

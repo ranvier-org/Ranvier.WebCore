@@ -173,6 +173,7 @@
 #include <mutex>
 #include <pal/SessionID.h>
 #include <cstring>
+#include <filesystem>
 #include <optional>
 #include <utility>
 #include <wtf/MainThread.h>
@@ -978,7 +979,7 @@ static int32_t complete(RvResourceLoad* load, RefPtr<SharedBuffer>&& data, Strin
     return RV_OK;
 }
 
-// Hands each load to its host's resource handler on a later run loop cycle; data: URLs load in WebCore.
+// Hands each load to its host's resource handler on a later run loop cycle; data: and blob: URLs load in WebCore.
 class RvLoaderStrategy final : public LoaderStrategy {
 public:
     void loadResource(LocalFrame& frame, CachedResource& resource, ResourceRequest&& request, const ResourceLoaderOptions& options, CompletionHandler<void(RefPtr<SubresourceLoader>&&)>&& completionHandler) final
@@ -1040,9 +1041,10 @@ public:
     ResourceError pluginWillHandleLoadError(const ResourceResponse& response) const final { return hostLoadError(response.url(), "Plug-in will handle load"_s); }
 
 private:
+    // data: and blob: URLs load in WebCore: blob: through the blob registry's BlobResourceHandle.
     static void schedule(SubresourceLoader& loader)
     {
-        if (loader.request().url().protocolIsData()) {
+        if (loader.request().url().protocolIsData() || loader.request().url().protocolIsBlob()) {
             loader.start();
             return;
         }
@@ -1341,7 +1343,7 @@ static_assert(sizeof(RvScreenMetrics) == 36 && offsetof(RvScreenMetrics, avail_l
 
 static_assert(sizeof(RvWindowMetrics) == 32 && offsetof(RvWindowMetrics, outerHeight) == 16 && offsetof(RvWindowMetrics, devicePixelRatio) == 24);
 
-int32_t rv_abi_version(void) { return 51; }
+int32_t rv_abi_version(void) { return 52; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -3566,6 +3568,71 @@ int32_t rv_file_list_create(RvBlob* const* files, int32_t count, RvFileList** re
     }
     *result = reinterpret_cast<RvFileList*>(&FileList::create(WTF::move(list)).leakRef());
     return RV_OK;
+}
+
+int32_t rv_blob_read(RvHost* host, RvBlob* blob, int32_t mode, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !blob || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_blob_read(reinterpret_cast<RvNode*>(&host->document()), blob, mode, completion, context, operation);
+}
+
+int32_t rv_blob_url_read(RvHost* host, const uint8_t* url, int32_t url_length, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || url_length < 0 || (url_length && !url) || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_blob_url_read(reinterpret_cast<RvNode*>(&host->document()), url, url_length, completion, context, operation);
+}
+
+int32_t rv_blob_read_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length)
+{
+    return ranvier_blob_read_result(operation, buffer, capacity, length);
+}
+
+int32_t rv_blob_read_type(uint64_t operation, char* buffer, int32_t capacity, int32_t* length)
+{
+    return ranvier_blob_read_type(operation, buffer, capacity, length);
+}
+
+int32_t rv_blob_read_error(uint64_t operation, char* buffer, int32_t capacity, int32_t* length)
+{
+    return ranvier_blob_read_error(operation, buffer, capacity, length);
+}
+
+int32_t rv_file_create_from_path(RvHost* host, const uint8_t* path, int32_t path_length, RvBlob** result)
+{
+    if (!host || path_length < 0 || (path_length && !path) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    auto text = String::fromUTF8(std::span<const char8_t> { reinterpret_cast<const char8_t*>(path), static_cast<size_t>(path_length) });
+    if (text.isNull())
+        return RV_ERR_NULL_ARGUMENT;
+    auto native = std::filesystem::path(std::u8string_view { reinterpret_cast<const char8_t*>(path), static_cast<size_t>(path_length) });
+    if (text.isEmpty() || !native.is_absolute() || text.contains('\0'))
+        return RV_ERR_UNSUPPORTED;
+    *result = reinterpret_cast<RvBlob*>(&File::create(&host->document(), text).leakRef());
+    return RV_OK;
+}
+
+int32_t rv_file_reader_result(RvEventTarget* reader, int32_t* kind, uint8_t* buffer, int64_t capacity, int64_t* length)
+{
+    return ranvier_file_reader_result(reader, kind, buffer, capacity, length);
+}
+
+int32_t rv_file_reader_error(RvEventTarget* reader, char* buffer, int32_t capacity, int32_t* length)
+{
+    return ranvier_file_reader_error(reader, buffer, capacity, length);
 }
 
 int32_t rv_host_scroll_position(RvHost* host, int32_t* x, int32_t* y)

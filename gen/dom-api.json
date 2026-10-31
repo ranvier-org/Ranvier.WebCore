@@ -1560,6 +1560,10 @@
     {
       "name": "HighlightRegistry",
       "base": null
+    },
+    {
+      "name": "FileReader",
+      "base": "EventTarget"
     }
   ],
   "contractInterfaces": [
@@ -4143,6 +4147,15 @@
       "mixin": false,
       "contractOnly": false,
       "source": "Modules/highlight/HighlightRegistry.idl"
+    },
+    {
+      "name": "FileReader",
+      "idlName": "FileReader",
+      "base": "EventTarget",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "fileapi/FileReader.idl"
     },
     {
       "name": "HTMLUnknownElement",
@@ -146194,6 +146207,394 @@
       "stringInputs": "utf8-lengths"
     },
     {
+      "interface": "FileReader",
+      "member": "constructor",
+      "contractOwner": "FileReader",
+      "kind": "constructor",
+      "function": "rv_dom_file_reader_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvEventTarget**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "FileReader",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "FileReader",
+        "root": "EventTarget",
+        "class": "FileReader",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:FileReader",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FileReader",
+      "member": "readyState",
+      "contractOwner": "FileReader",
+      "kind": "getter",
+      "function": "rv_dom_file_reader_get_ready_state",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint16_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned short",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint16_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FileReader",
+      "member": "readAsArrayBuffer",
+      "contractOwner": "FileReader",
+      "kind": "operation",
+      "function": "rv_dom_file_reader_read_as_array_buffer",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvBlob*",
+          "name": "blob"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "blob",
+          "idlType": "Blob",
+          "idl": {
+            "name": "Blob",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "Blob",
+            "root": "Blob",
+            "class": "Blob",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FileReader",
+      "member": "readAsBinaryString",
+      "contractOwner": "FileReader",
+      "kind": "operation",
+      "function": "rv_dom_file_reader_read_as_binary_string",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvBlob*",
+          "name": "blob"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "blob",
+          "idlType": "Blob",
+          "idl": {
+            "name": "Blob",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "Blob",
+            "root": "Blob",
+            "class": "Blob",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FileReader",
+      "member": "readAsText",
+      "contractOwner": "FileReader",
+      "kind": "operation",
+      "function": "rv_dom_file_reader_read_as_text",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvBlob*",
+          "name": "blob"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "encoding"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "encoding_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "blob",
+          "idlType": "Blob",
+          "idl": {
+            "name": "Blob",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "Blob",
+            "root": "Blob",
+            "class": "Blob",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "encoding",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FileReader",
+      "member": "readAsDataURL",
+      "contractOwner": "FileReader",
+      "kind": "operation",
+      "function": "rv_dom_file_reader_read_as_data_url",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvBlob*",
+          "name": "blob"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "blob",
+          "idlType": "Blob",
+          "idl": {
+            "name": "Blob",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "Blob",
+            "root": "Blob",
+            "class": "Blob",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FileReader",
+      "member": "abort",
+      "contractOwner": "FileReader",
+      "kind": "operation",
+      "function": "rv_dom_file_reader_abort",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
       "interface": "DOMCSSNamespace",
       "member": "supports",
       "contractOwner": "CSS",
@@ -148706,6 +149107,152 @@
       },
       "receiver": "Document",
       "feature": "dom-url-static",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMURL",
+      "member": "createObjectURL",
+      "contractOwner": "URL",
+      "kind": "static_operation",
+      "function": "rv_dom_domurl_create_object_url",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvBlob*",
+          "name": "blob"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "blob",
+          "idlType": "Blob",
+          "idl": {
+            "name": "Blob",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "Blob",
+            "root": "Blob",
+            "class": "Blob",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "blob-urls",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMURL",
+      "member": "revokeObjectURL",
+      "contractOwner": "URL",
+      "kind": "static_operation",
+      "function": "rv_dom_domurl_revoke_object_url",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "url"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "url_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "url",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "blob-urls",
       "binding": "facade",
       "stringInputs": "utf8-lengths"
     },
