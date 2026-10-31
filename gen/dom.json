@@ -482,7 +482,18 @@
     "SVGFilterElement",
     "SVGComponentTransferFunctionElement",
     "SVGClipPathElement",
-    "SVGMaskElement"
+    "SVGMaskElement",
+    "SVGAElement",
+    "SVGDefsElement",
+    "SVGDescElement",
+    "SVGForeignObjectElement",
+    "SVGGElement",
+    "SVGImageElement",
+    "SVGMetadataElement",
+    "SVGScriptElement",
+    "SVGSwitchElement",
+    "SVGTitleElement",
+    "SVGUseElement"
   ],
   "skipDirectories": [
     "Modules/",

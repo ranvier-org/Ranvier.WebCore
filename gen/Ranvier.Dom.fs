@@ -4533,6 +4533,100 @@ and [<AllowNullLiteral>] SVGMaskElement =
     /// <summary>SVGMaskElement.systemLanguage.</summary>
     abstract member systemLanguage: SVGStringList with get
 
+/// <summary>SVGAElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGAElement =
+    inherit SVGGraphicsElement
+    /// <summary>SVGAElement.target.</summary>
+    abstract member target: SVGAnimatedString with get
+    /// <summary>SVGAElement.hreflang.</summary>
+    abstract member hreflang: string with get, set
+    /// <summary>SVGAElement.rel.</summary>
+    abstract member rel: string with get, set
+    /// <summary>SVGAElement.relList.</summary>
+    abstract member relList: DOMTokenList with get
+    /// <summary>SVGAElement.type.</summary>
+    abstract member ``type``: string with get, set
+    /// <summary>SVGAElement.href.</summary>
+    abstract member href: SVGAnimatedString with get
+
+/// <summary>SVGDefsElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGDefsElement =
+    inherit SVGGraphicsElement
+
+/// <summary>SVGDescElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGDescElement =
+    inherit SVGElement
+
+/// <summary>SVGForeignObjectElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGForeignObjectElement =
+    inherit SVGGraphicsElement
+    /// <summary>SVGForeignObjectElement.x.</summary>
+    abstract member x: SVGAnimatedLength with get
+    /// <summary>SVGForeignObjectElement.y.</summary>
+    abstract member y: SVGAnimatedLength with get
+    /// <summary>SVGForeignObjectElement.width.</summary>
+    abstract member width: SVGAnimatedLength with get
+    /// <summary>SVGForeignObjectElement.height.</summary>
+    abstract member height: SVGAnimatedLength with get
+
+/// <summary>SVGGElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGGElement =
+    inherit SVGGraphicsElement
+
+/// <summary>SVGImageElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGImageElement =
+    inherit SVGGraphicsElement
+    /// <summary>SVGImageElement.x.</summary>
+    abstract member x: SVGAnimatedLength with get
+    /// <summary>SVGImageElement.y.</summary>
+    abstract member y: SVGAnimatedLength with get
+    /// <summary>SVGImageElement.width.</summary>
+    abstract member width: SVGAnimatedLength with get
+    /// <summary>SVGImageElement.height.</summary>
+    abstract member height: SVGAnimatedLength with get
+    /// <summary>SVGImageElement.preserveAspectRatio.</summary>
+    abstract member preserveAspectRatio: SVGAnimatedPreserveAspectRatio with get
+    /// <summary>SVGImageElement.crossOrigin.</summary>
+    abstract member crossOrigin: string with get, set
+    /// <summary>SVGImageElement.href.</summary>
+    abstract member href: SVGAnimatedString with get
+
+/// <summary>SVGMetadataElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGMetadataElement =
+    inherit SVGElement
+
+/// <summary>SVGScriptElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGScriptElement =
+    inherit SVGElement
+    /// <summary>SVGScriptElement.type.</summary>
+    abstract member ``type``: string with get, set
+    /// <summary>SVGScriptElement.async.</summary>
+    abstract member async: bool with get, set
+    /// <summary>SVGScriptElement.href.</summary>
+    abstract member href: SVGAnimatedString with get
+
+/// <summary>SVGSwitchElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGSwitchElement =
+    inherit SVGGraphicsElement
+
+/// <summary>SVGTitleElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGTitleElement =
+    inherit SVGElement
+
+/// <summary>SVGUseElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGUseElement =
+    inherit SVGGraphicsElement
+    /// <summary>SVGUseElement.x.</summary>
+    abstract member x: SVGAnimatedLength with get
+    /// <summary>SVGUseElement.y.</summary>
+    abstract member y: SVGAnimatedLength with get
+    /// <summary>SVGUseElement.width.</summary>
+    abstract member width: SVGAnimatedLength with get
+    /// <summary>SVGUseElement.height.</summary>
+    abstract member height: SVGAnimatedLength with get
+    /// <summary>SVGUseElement.href.</summary>
+    abstract member href: SVGAnimatedString with get
+
 /// <summary>HTMLUnknownElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLUnknownElement =
     inherit HTMLElement
@@ -4584,50 +4678,6 @@ and [<AllowNullLiteral>] HTMLTrackElement =
 /// <summary>HTMLVideoElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLVideoElement =
     inherit HTMLMediaElement
-
-/// <summary>SVGAElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGAElement =
-    inherit SVGGraphicsElement
-
-/// <summary>SVGDefsElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGDefsElement =
-    inherit SVGGraphicsElement
-
-/// <summary>SVGDescElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGDescElement =
-    inherit SVGElement
-
-/// <summary>SVGForeignObjectElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGForeignObjectElement =
-    inherit SVGGraphicsElement
-
-/// <summary>SVGGElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGGElement =
-    inherit SVGGraphicsElement
-
-/// <summary>SVGImageElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGImageElement =
-    inherit SVGGraphicsElement
-
-/// <summary>SVGMetadataElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGMetadataElement =
-    inherit SVGElement
-
-/// <summary>SVGScriptElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGScriptElement =
-    inherit SVGElement
-
-/// <summary>SVGSwitchElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGSwitchElement =
-    inherit SVGGraphicsElement
-
-/// <summary>SVGTitleElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGTitleElement =
-    inherit SVGElement
-
-/// <summary>SVGUseElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGUseElement =
-    inherit SVGGraphicsElement
 
 /// <summary>AnimationEvent in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] AnimationEvent =

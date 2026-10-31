@@ -6985,6 +6985,79 @@ RV_EXPORT int32_t rv_dom_svg_mask_element_get_height(RvNode* target, RvSVGAnimat
 RV_EXPORT int32_t rv_dom_svg_mask_element_get_required_extensions(RvNode* target, RvSVGStringList** result);
 /* SVGMaskElement.systemLanguage getter: readonly attribute SVGStringList systemLanguage; *result is a new reference */
 RV_EXPORT int32_t rv_dom_svg_mask_element_get_system_language(RvNode* target, RvSVGStringList** result);
+/* SVGAElement */
+
+/* SVGAElement.target getter: readonly attribute SVGAnimatedString target; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svga_element_get_target(RvNode* target, RvSVGAnimatedString** result);
+/* SVGAElement.hreflang getter: attribute DOMString hreflang */
+RV_EXPORT int32_t rv_dom_svga_element_get_hreflang(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* SVGAElement.hreflang setter: attribute DOMString hreflang */
+RV_EXPORT int32_t rv_dom_svga_element_set_hreflang(RvNode* target, const char* value);
+/* SVGAElement.rel getter: attribute DOMString rel */
+RV_EXPORT int32_t rv_dom_svga_element_get_rel(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* SVGAElement.rel setter: attribute DOMString rel */
+RV_EXPORT int32_t rv_dom_svga_element_set_rel(RvNode* target, const char* value);
+/* SVGAElement.relList getter: readonly attribute DOMTokenList relList; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svga_element_get_rel_list(RvNode* target, RvDOMTokenList** result);
+/* SVGAElement.type getter: attribute DOMString type */
+RV_EXPORT int32_t rv_dom_svga_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* SVGAElement.type setter: attribute DOMString type */
+RV_EXPORT int32_t rv_dom_svga_element_set_type(RvNode* target, const char* value);
+/* SVGAElement.href getter: readonly attribute SVGAnimatedString href; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svga_element_get_href(RvNode* target, RvSVGAnimatedString** result);
+/* SVGForeignObjectElement */
+
+/* SVGForeignObjectElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_foreign_object_element_get_x(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGForeignObjectElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_foreign_object_element_get_y(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGForeignObjectElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_foreign_object_element_get_width(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGForeignObjectElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_foreign_object_element_get_height(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGImageElement */
+
+/* SVGImageElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_image_element_get_x(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGImageElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_image_element_get_y(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGImageElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_image_element_get_width(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGImageElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_image_element_get_height(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGImageElement.preserveAspectRatio getter: readonly attribute SVGAnimatedPreserveAspectRatio preserveAspectRatio;
+ * *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_image_element_get_preserve_aspect_ratio(RvNode* target, RvSVGAnimatedPreserveAspectRatio** result);
+/* SVGImageElement.crossOrigin getter: attribute DOMString? crossOrigin */
+RV_EXPORT int32_t rv_dom_svg_image_element_get_cross_origin(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* SVGImageElement.crossOrigin setter: attribute DOMString? crossOrigin; value may be NULL (null) */
+RV_EXPORT int32_t rv_dom_svg_image_element_set_cross_origin(RvNode* target, const char* value);
+/* SVGImageElement.href getter: readonly attribute SVGAnimatedString href; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_image_element_get_href(RvNode* target, RvSVGAnimatedString** result);
+/* SVGScriptElement */
+
+/* SVGScriptElement.type getter: attribute DOMString type */
+RV_EXPORT int32_t rv_dom_svg_script_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* SVGScriptElement.type setter: attribute DOMString type */
+RV_EXPORT int32_t rv_dom_svg_script_element_set_type(RvNode* target, const char* value);
+/* SVGScriptElement.async getter: attribute boolean async */
+RV_EXPORT int32_t rv_dom_svg_script_element_get_async(RvNode* target, int32_t* result);
+/* SVGScriptElement.async setter: attribute boolean async */
+RV_EXPORT int32_t rv_dom_svg_script_element_set_async(RvNode* target, int32_t value);
+/* SVGScriptElement.href getter: readonly attribute SVGAnimatedString href; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_script_element_get_href(RvNode* target, RvSVGAnimatedString** result);
+/* SVGUseElement */
+
+/* SVGUseElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_use_element_get_x(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGUseElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_use_element_get_y(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGUseElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_use_element_get_width(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGUseElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_use_element_get_height(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGUseElement.href getter: readonly attribute SVGAnimatedString href; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_use_element_get_href(RvNode* target, RvSVGAnimatedString** result);
 /* DOMCSSNamespace */
 
 /* CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths */

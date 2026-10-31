@@ -2559,6 +2559,37 @@ int32_t rv_dom_svg_mask_element_get_width(RvNode* target, RvSVGAnimatedLength** 
 int32_t rv_dom_svg_mask_element_get_height(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_mask_element_get_height(target, result); }
 int32_t rv_dom_svg_mask_element_get_required_extensions(RvNode* target, RvSVGStringList** result) { return ranvier_dom_svg_mask_element_get_required_extensions(target, result); }
 int32_t rv_dom_svg_mask_element_get_system_language(RvNode* target, RvSVGStringList** result) { return ranvier_dom_svg_mask_element_get_system_language(target, result); }
+int32_t rv_dom_svga_element_get_target(RvNode* target, RvSVGAnimatedString** result) { return ranvier_dom_svga_element_get_target(target, result); }
+int32_t rv_dom_svga_element_get_hreflang(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_svga_element_get_hreflang(target, buffer, capacity, length); }
+int32_t rv_dom_svga_element_set_hreflang(RvNode* target, const char* value) { return ranvier_dom_svga_element_set_hreflang(target, value); }
+int32_t rv_dom_svga_element_get_rel(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_svga_element_get_rel(target, buffer, capacity, length); }
+int32_t rv_dom_svga_element_set_rel(RvNode* target, const char* value) { return ranvier_dom_svga_element_set_rel(target, value); }
+int32_t rv_dom_svga_element_get_rel_list(RvNode* target, RvDOMTokenList** result) { return ranvier_dom_svga_element_get_rel_list(target, result); }
+int32_t rv_dom_svga_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_svga_element_get_type(target, buffer, capacity, length); }
+int32_t rv_dom_svga_element_set_type(RvNode* target, const char* value) { return ranvier_dom_svga_element_set_type(target, value); }
+int32_t rv_dom_svga_element_get_href(RvNode* target, RvSVGAnimatedString** result) { return ranvier_dom_svga_element_get_href(target, result); }
+int32_t rv_dom_svg_foreign_object_element_get_x(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_foreign_object_element_get_x(target, result); }
+int32_t rv_dom_svg_foreign_object_element_get_y(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_foreign_object_element_get_y(target, result); }
+int32_t rv_dom_svg_foreign_object_element_get_width(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_foreign_object_element_get_width(target, result); }
+int32_t rv_dom_svg_foreign_object_element_get_height(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_foreign_object_element_get_height(target, result); }
+int32_t rv_dom_svg_image_element_get_x(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_image_element_get_x(target, result); }
+int32_t rv_dom_svg_image_element_get_y(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_image_element_get_y(target, result); }
+int32_t rv_dom_svg_image_element_get_width(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_image_element_get_width(target, result); }
+int32_t rv_dom_svg_image_element_get_height(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_image_element_get_height(target, result); }
+int32_t rv_dom_svg_image_element_get_preserve_aspect_ratio(RvNode* target, RvSVGAnimatedPreserveAspectRatio** result) { return ranvier_dom_svg_image_element_get_preserve_aspect_ratio(target, result); }
+int32_t rv_dom_svg_image_element_get_cross_origin(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_svg_image_element_get_cross_origin(target, buffer, capacity, length); }
+int32_t rv_dom_svg_image_element_set_cross_origin(RvNode* target, const char* value) { return ranvier_dom_svg_image_element_set_cross_origin(target, value); }
+int32_t rv_dom_svg_image_element_get_href(RvNode* target, RvSVGAnimatedString** result) { return ranvier_dom_svg_image_element_get_href(target, result); }
+int32_t rv_dom_svg_script_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_svg_script_element_get_type(target, buffer, capacity, length); }
+int32_t rv_dom_svg_script_element_set_type(RvNode* target, const char* value) { return ranvier_dom_svg_script_element_set_type(target, value); }
+int32_t rv_dom_svg_script_element_get_async(RvNode* target, int32_t* result) { return ranvier_dom_svg_script_element_get_async(target, result); }
+int32_t rv_dom_svg_script_element_set_async(RvNode* target, int32_t value) { return ranvier_dom_svg_script_element_set_async(target, value); }
+int32_t rv_dom_svg_script_element_get_href(RvNode* target, RvSVGAnimatedString** result) { return ranvier_dom_svg_script_element_get_href(target, result); }
+int32_t rv_dom_svg_use_element_get_x(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_use_element_get_x(target, result); }
+int32_t rv_dom_svg_use_element_get_y(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_use_element_get_y(target, result); }
+int32_t rv_dom_svg_use_element_get_width(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_use_element_get_width(target, result); }
+int32_t rv_dom_svg_use_element_get_height(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_use_element_get_height(target, result); }
+int32_t rv_dom_svg_use_element_get_href(RvNode* target, RvSVGAnimatedString** result) { return ranvier_dom_svg_use_element_get_href(target, result); }
 int32_t rv_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, int32_t* result) { return ranvier_dom_css_supports_2(target, property, property_length, value, value_length, result); }
 int32_t rv_dom_css_supports_1(RvNode* target, const uint8_t* condition_text, int32_t condition_text_length, int32_t* result) { return ranvier_dom_css_supports_1(target, condition_text, condition_text_length, result); }
 int32_t rv_dom_css_register_property(RvNode* target, const RvDomDOMCSSCustomPropertyDescriptor* descriptor) { return ranvier_dom_css_register_property(target, descriptor); }

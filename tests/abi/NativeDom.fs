@@ -8873,6 +8873,99 @@ extern int rv_dom_svg_mask_element_get_required_extensions(nativeint target, nat
 extern int rv_dom_svg_mask_element_get_system_language(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_svga_element_get_target(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svga_element_get_hreflang(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svga_element_set_hreflang(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svga_element_get_rel(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svga_element_set_rel(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svga_element_get_rel_list(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svga_element_get_type(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svga_element_set_type(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svga_element_get_href(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_foreign_object_element_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_foreign_object_element_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_foreign_object_element_get_width(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_foreign_object_element_get_height(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_image_element_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_image_element_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_image_element_get_width(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_image_element_get_height(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_image_element_get_preserve_aspect_ratio(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_image_element_get_cross_origin(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_image_element_set_cross_origin(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_image_element_get_href(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_script_element_get_type(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_script_element_set_type(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_script_element_get_async(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_script_element_set_async(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_script_element_get_href(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_use_element_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_use_element_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_use_element_get_width(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_use_element_get_height(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_use_element_get_href(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_css_supports_2(nativeint target, byte[] property, int property_length, byte[] value, int value_length, int& result)
 
 [<DllImport(Lib)>]

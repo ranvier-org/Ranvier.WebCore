@@ -1228,6 +1228,50 @@
     {
       "name": "SVGMaskElement",
       "base": "SVGElement"
+    },
+    {
+      "name": "SVGAElement",
+      "base": "SVGGraphicsElement"
+    },
+    {
+      "name": "SVGDefsElement",
+      "base": "SVGGraphicsElement"
+    },
+    {
+      "name": "SVGDescElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGForeignObjectElement",
+      "base": "SVGGraphicsElement"
+    },
+    {
+      "name": "SVGGElement",
+      "base": "SVGGraphicsElement"
+    },
+    {
+      "name": "SVGImageElement",
+      "base": "SVGGraphicsElement"
+    },
+    {
+      "name": "SVGMetadataElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGScriptElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGSwitchElement",
+      "base": "SVGGraphicsElement"
+    },
+    {
+      "name": "SVGTitleElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGUseElement",
+      "base": "SVGGraphicsElement"
     }
   ],
   "contractInterfaces": [
@@ -3426,6 +3470,105 @@
       "source": "svg/SVGMaskElement.idl"
     },
     {
+      "name": "SVGAElement",
+      "idlName": "SVGAElement",
+      "base": "SVGGraphicsElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGAElement.idl"
+    },
+    {
+      "name": "SVGDefsElement",
+      "idlName": "SVGDefsElement",
+      "base": "SVGGraphicsElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGDefsElement.idl"
+    },
+    {
+      "name": "SVGDescElement",
+      "idlName": "SVGDescElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGDescElement.idl"
+    },
+    {
+      "name": "SVGForeignObjectElement",
+      "idlName": "SVGForeignObjectElement",
+      "base": "SVGGraphicsElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGForeignObjectElement.idl"
+    },
+    {
+      "name": "SVGGElement",
+      "idlName": "SVGGElement",
+      "base": "SVGGraphicsElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGGElement.idl"
+    },
+    {
+      "name": "SVGImageElement",
+      "idlName": "SVGImageElement",
+      "base": "SVGGraphicsElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGImageElement.idl"
+    },
+    {
+      "name": "SVGMetadataElement",
+      "idlName": "SVGMetadataElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGMetadataElement.idl"
+    },
+    {
+      "name": "SVGScriptElement",
+      "idlName": "SVGScriptElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGScriptElement.idl"
+    },
+    {
+      "name": "SVGSwitchElement",
+      "idlName": "SVGSwitchElement",
+      "base": "SVGGraphicsElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGSwitchElement.idl"
+    },
+    {
+      "name": "SVGTitleElement",
+      "idlName": "SVGTitleElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGTitleElement.idl"
+    },
+    {
+      "name": "SVGUseElement",
+      "idlName": "SVGUseElement",
+      "base": "SVGGraphicsElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGUseElement.idl"
+    },
+    {
       "name": "HTMLUnknownElement",
       "idlName": "HTMLUnknownElement",
       "base": "HTMLElement",
@@ -3541,105 +3684,6 @@
       "mixin": false,
       "contractOnly": true,
       "source": "html/HTMLVideoElement.idl"
-    },
-    {
-      "name": "SVGAElement",
-      "idlName": "SVGAElement",
-      "base": "SVGGraphicsElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGAElement.idl"
-    },
-    {
-      "name": "SVGDefsElement",
-      "idlName": "SVGDefsElement",
-      "base": "SVGGraphicsElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGDefsElement.idl"
-    },
-    {
-      "name": "SVGDescElement",
-      "idlName": "SVGDescElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGDescElement.idl"
-    },
-    {
-      "name": "SVGForeignObjectElement",
-      "idlName": "SVGForeignObjectElement",
-      "base": "SVGGraphicsElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGForeignObjectElement.idl"
-    },
-    {
-      "name": "SVGGElement",
-      "idlName": "SVGGElement",
-      "base": "SVGGraphicsElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGGElement.idl"
-    },
-    {
-      "name": "SVGImageElement",
-      "idlName": "SVGImageElement",
-      "base": "SVGGraphicsElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGImageElement.idl"
-    },
-    {
-      "name": "SVGMetadataElement",
-      "idlName": "SVGMetadataElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGMetadataElement.idl"
-    },
-    {
-      "name": "SVGScriptElement",
-      "idlName": "SVGScriptElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGScriptElement.idl"
-    },
-    {
-      "name": "SVGSwitchElement",
-      "idlName": "SVGSwitchElement",
-      "base": "SVGGraphicsElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGSwitchElement.idl"
-    },
-    {
-      "name": "SVGTitleElement",
-      "idlName": "SVGTitleElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGTitleElement.idl"
-    },
-    {
-      "name": "SVGUseElement",
-      "idlName": "SVGUseElement",
-      "base": "SVGGraphicsElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGUseElement.idl"
     },
     {
       "name": "AnimationEvent",
@@ -129622,6 +129666,1312 @@
         "interface": "SVGStringList",
         "root": "SVGStringList",
         "class": "SVGStringList",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGAElement",
+      "member": "target",
+      "contractOwner": "SVGAElement",
+      "kind": "getter",
+      "function": "rv_dom_svga_element_get_target",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGAElement",
+      "member": "hreflang",
+      "contractOwner": "SVGAElement",
+      "kind": "getter",
+      "function": "rv_dom_svga_element_get_hreflang",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGAElement",
+      "member": "hreflang",
+      "contractOwner": "SVGAElement",
+      "kind": "setter",
+      "function": "rv_dom_svga_element_set_hreflang",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGAElement",
+      "member": "rel",
+      "contractOwner": "SVGAElement",
+      "kind": "getter",
+      "function": "rv_dom_svga_element_get_rel",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGAElement",
+      "member": "rel",
+      "contractOwner": "SVGAElement",
+      "kind": "setter",
+      "function": "rv_dom_svga_element_set_rel",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGAElement",
+      "member": "relList",
+      "contractOwner": "SVGAElement",
+      "kind": "getter",
+      "function": "rv_dom_svga_element_get_rel_list",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDOMTokenList**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMTokenList",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMTokenList",
+        "root": "DOMTokenList",
+        "class": "DOMTokenList",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGAElement",
+      "member": "type",
+      "contractOwner": "SVGAElement",
+      "kind": "getter",
+      "function": "rv_dom_svga_element_get_type",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGAElement",
+      "member": "type",
+      "contractOwner": "SVGAElement",
+      "kind": "setter",
+      "function": "rv_dom_svga_element_set_type",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGAElement",
+      "member": "href",
+      "contractOwner": "SVGAElement",
+      "kind": "getter",
+      "function": "rv_dom_svga_element_get_href",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGForeignObjectElement",
+      "member": "x",
+      "contractOwner": "SVGForeignObjectElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_foreign_object_element_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGForeignObjectElement",
+      "member": "y",
+      "contractOwner": "SVGForeignObjectElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_foreign_object_element_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGForeignObjectElement",
+      "member": "width",
+      "contractOwner": "SVGForeignObjectElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_foreign_object_element_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGForeignObjectElement",
+      "member": "height",
+      "contractOwner": "SVGForeignObjectElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_foreign_object_element_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGImageElement",
+      "member": "x",
+      "contractOwner": "SVGImageElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_image_element_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGImageElement",
+      "member": "y",
+      "contractOwner": "SVGImageElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_image_element_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGImageElement",
+      "member": "width",
+      "contractOwner": "SVGImageElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_image_element_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGImageElement",
+      "member": "height",
+      "contractOwner": "SVGImageElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_image_element_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGImageElement",
+      "member": "preserveAspectRatio",
+      "contractOwner": "SVGImageElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_image_element_get_preserve_aspect_ratio",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedPreserveAspectRatio**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedPreserveAspectRatio",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedPreserveAspectRatio",
+        "root": "SVGAnimatedPreserveAspectRatio",
+        "class": "SVGAnimatedPreserveAspectRatio",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGImageElement",
+      "member": "crossOrigin",
+      "contractOwner": "SVGImageElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_image_element_get_cross_origin",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGImageElement",
+      "member": "crossOrigin",
+      "contractOwner": "SVGImageElement",
+      "kind": "setter",
+      "function": "rv_dom_svg_image_element_set_cross_origin",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString?",
+          "idl": {
+            "name": "DOMString",
+            "nullable": true,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": true,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGImageElement",
+      "member": "href",
+      "contractOwner": "SVGImageElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_image_element_get_href",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGScriptElement",
+      "member": "type",
+      "contractOwner": "SVGScriptElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_script_element_get_type",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGScriptElement",
+      "member": "type",
+      "contractOwner": "SVGScriptElement",
+      "kind": "setter",
+      "function": "rv_dom_svg_script_element_set_type",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGScriptElement",
+      "member": "async",
+      "contractOwner": "SVGScriptElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_script_element_get_async",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGScriptElement",
+      "member": "async",
+      "contractOwner": "SVGScriptElement",
+      "kind": "setter",
+      "function": "rv_dom_svg_script_element_set_async",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "boolean",
+          "idl": {
+            "name": "boolean",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "bool",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGScriptElement",
+      "member": "href",
+      "contractOwner": "SVGScriptElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_script_element_get_href",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGUseElement",
+      "member": "x",
+      "contractOwner": "SVGUseElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_use_element_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGUseElement",
+      "member": "y",
+      "contractOwner": "SVGUseElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_use_element_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGUseElement",
+      "member": "width",
+      "contractOwner": "SVGUseElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_use_element_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGUseElement",
+      "member": "height",
+      "contractOwner": "SVGUseElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_use_element_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGUseElement",
+      "member": "href",
+      "contractOwner": "SVGUseElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_use_element_get_href",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
         "enum": null,
         "label": null,
         "nullable": false,
