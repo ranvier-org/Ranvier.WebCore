@@ -1,0 +1,178 @@
+{
+  "checkedAtUtc": "2026-10-31T01:53:02.292007+00:00",
+  "allocation": {
+    "native": "0.1.0-preview.21",
+    "abi": 29
+  },
+  "packages": [
+    {
+      "package": "Ranvier.WebCore",
+      "version": "0.1.0-preview.21",
+      "published": false,
+      "latestListed": "0.1.0-preview.17",
+      "httpStatus": 200,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native",
+      "version": "0.1.0-preview.21",
+      "published": false,
+      "latestListed": "0.1.0-preview.17",
+      "httpStatus": 200,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.win-x64",
+      "version": "0.1.0-preview.21",
+      "published": false,
+      "latestListed": "0.1.0-preview.17",
+      "httpStatus": 200,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.win-x64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.win-arm64",
+      "version": "0.1.0-preview.21",
+      "published": false,
+      "latestListed": "0.1.0-preview.17",
+      "httpStatus": 200,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.win-arm64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.linux-x64",
+      "version": "0.1.0-preview.21",
+      "published": false,
+      "latestListed": "0.1.0-preview.17",
+      "httpStatus": 200,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.linux-x64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.linux-arm64",
+      "version": "0.1.0-preview.21",
+      "published": false,
+      "latestListed": "0.1.0-preview.17",
+      "httpStatus": 200,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.linux-arm64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.osx-arm64",
+      "version": "0.1.0-preview.21",
+      "published": false,
+      "latestListed": "0.1.0-preview.17",
+      "httpStatus": 200,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.osx-arm64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.Gpu.win-x64",
+      "version": "0.1.0-preview.21",
+      "published": false,
+      "latestListed": "0.1.0-preview.7",
+      "httpStatus": 200,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.gpu.win-x64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.Gpu.win-arm64",
+      "version": "0.1.0-preview.21",
+      "published": false,
+      "latestListed": null,
+      "httpStatus": 404,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.gpu.win-arm64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.Gpu.linux-x64",
+      "version": "0.1.0-preview.21",
+      "published": false,
+      "latestListed": null,
+      "httpStatus": 404,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.gpu.linux-x64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.Gpu.linux-arm64",
+      "version": "0.1.0-preview.21",
+      "published": false,
+      "latestListed": null,
+      "httpStatus": 404,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.gpu.linux-arm64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.Gpu.osx-arm64",
+      "version": "0.1.0-preview.21",
+      "published": false,
+      "latestListed": null,
+      "httpStatus": 404,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.gpu.osx-arm64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.Lean.win-x64",
+      "version": "0.1.0-preview.21",
+      "published": false,
+      "latestListed": null,
+      "httpStatus": 404,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.lean.win-x64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.Lean.win-arm64",
+      "version": "0.1.0-preview.21",
+      "published": false,
+      "latestListed": null,
+      "httpStatus": 404,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.lean.win-arm64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.Lean.linux-x64",
+      "version": "0.1.0-preview.21",
+      "published": false,
+      "latestListed": null,
+      "httpStatus": 404,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.lean.linux-x64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.Lean.linux-arm64",
+      "version": "0.1.0-preview.21",
+      "published": false,
+      "latestListed": null,
+      "httpStatus": 404,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.lean.linux-arm64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.Lean.osx-arm64",
+      "version": "0.1.0-preview.21",
+      "published": false,
+      "latestListed": null,
+      "httpStatus": 404,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.lean.osx-arm64/index.json"
+    }
+  ],
+  "github": {
+    "repository": "ranvier-org/Ranvier.WebCore",
+    "matchingTags": [],
+    "latestTags": [
+      "v0.1.0-preview.7",
+      "v0.1.0-preview.8",
+      "v0.1.0-preview.8^{}"
+    ],
+    "openPullRequests": [
+      {
+        "baseRefName": "codex/native-api-svg-surfaces",
+        "headRefName": "codex/native-api-capabilities",
+        "number": 130,
+        "title": "Add passive capabilities and SVG view selection (Native20/ABI28)",
+        "url": "https://github.com/ranvier-org/Ranvier.WebCore/pull/130"
+      },
+      {
+        "baseRefName": "codex/native-api-svg-geometry",
+        "headRefName": "codex/native-api-svg-surfaces",
+        "number": 129,
+        "title": "feat(svg): add shapes, text, standalone views and SMIL controls",
+        "url": "https://github.com/ranvier-org/Ranvier.WebCore/pull/129"
+      },
+      {
+        "baseRefName": "main",
+        "headRefName": "codex/native-api-svg-geometry",
+        "number": 128,
+        "title": "feat(dom): expose SVG geometry and value bindings",
+        "url": "https://github.com/ranvier-org/Ranvier.WebCore/pull/128"
+      }
+    ],
+    "openPullRequestsClaiming21orAbi29": []
+  }
+}
