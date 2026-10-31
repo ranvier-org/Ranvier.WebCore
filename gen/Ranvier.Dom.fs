@@ -5369,7 +5369,7 @@ and [<AllowNullLiteral>] EventListenerObject =
 and NodeFilter = Node -> NodeFilterResult
 
 /// <summary>NodeFilterResult in the scoped DOM interface model.</summary>
-and [<RequireQualifiedAccess>] NodeFilterResult =
+and NodeFilterResult =
     | Accept = 1
     | Reject = 2
     | Skip = 3

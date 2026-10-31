@@ -1857,5 +1857,14 @@ SVGStyleElement includes LinkStyle;
             self.assertIn('rv_dom_svg_style_element_set_' + member, functions)
 
 
+    def test_integer_enums_carry_no_require_qualified_access(self):
+        # F# enums are always qualified; the attribute on one is warning FS0842.
+        lines = (ROOT / 'gen' / 'Ranvier.Dom.fs').read_text(encoding='utf-8').splitlines()
+        for index, line in enumerate(lines[:-1]):
+            if 'RequireQualifiedAccess' in line and line.rstrip().endswith('='):
+                case = lines[index + 1].strip()
+                self.assertFalse(case.startswith('|') and '=' in case, line)
+        self.assertIn('and NodeFilterResult =', lines)
+
 if __name__ == '__main__':
     unittest.main()
