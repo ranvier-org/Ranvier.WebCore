@@ -38307,14 +38307,16 @@
     },
     "focusedAssertions": {
       "svg_paint_servers": 565,
-      "svg_filters": 5946,
+      "svg_filters": 9086,
       "svg_clip_mask_marker": 565,
       "svg_resources": 454
     },
     "sourcePatches": [
       "0028-svg-convolve-structural-cache.patch",
       "0029-svg-feimage-aspect-cache.patch",
-      "0030-svg-symbol-view-box-instances.patch"
+      "0030-svg-symbol-view-box-instances.patch",
+      "0031-svg-href-attribute-synchronization.patch",
+      "0032-svg-smil-first-interval-end.patch"
     ],
     "receipts": [
       "svg-paint-evidence/s08-evidence.json",
@@ -38336,6 +38338,6 @@
     "SVGStringList.clear leaves systemLanguage=\"\" natively; Chromium removes the attribute (measured provider behaviour)",
     "Both engines keep cached mask paint after a style-only mask-type change until child geometry changes (measured provider behaviour)",
     "Zero specularConstant: native transparent-over-white, Chromium opaque black (measured provider behaviour)",
-    "After a typed feImage href edit, native attribute enumeration sometimes lists href twice (lazy attribute synchronization); attribute enumeration counts as one check"
+    "Patch 0031: typed href edits write one attribute; for an xlink:href-only element they write xlink:href (SVG 2) while Chromium leaves it stale"
   ]
 }
