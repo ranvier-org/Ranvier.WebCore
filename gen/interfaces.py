@@ -291,16 +291,25 @@ class InterfaceEmitter:
             expression = f'$0.{member.name}(' + ', '.join(arg_expressions) + ')'
             if anonymous_property:
                 expression = self.browser_property_expression(owner, member)
-            lines += ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]',
-                      f'    abstract member {self.raw_name(member)}: {raw_params} -> {raw_result}', '#else']
+            raw_signature = f'{raw_params} -> {raw_result}'
+            raw_member = f'    abstract member {self.raw_name(member)}: {raw_signature}'
+            # Fantomas breaks a signature past the line length after the colon.
+            raw_lines = [raw_member] if len(raw_member) <= 150 else [f'    abstract member {self.raw_name(member)}:', f'        {raw_signature}']
+            lines += ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]'] + raw_lines + ['#else']
+        previous_wrapped = None
         for selected in selected_arguments:
             signature = f'{self.parameters(member.arguments, selected)} -> {result}'
-            if len(f'    abstract member {identifier(member.name)}: {signature}') > 150:
+            wrapped = len(f'    abstract member {identifier(member.name)}: {signature}') > 150
+            # Fantomas separates a multi-line overload from its neighbouring overloads with a blank line.
+            if previous_wrapped is not None and (wrapped or previous_wrapped):
+                lines += ['']
+            if wrapped:
                 # Fantomas breaks a signature past the line length after the colon, with a blank line before the member.
                 lines = ([''] if lines and lines[0] != '' else []) + lines
                 lines += [f'    abstract member {identifier(member.name)}:', f'        {signature}']
             else:
                 lines += [f'    abstract member {identifier(member.name)}: {signature}']
+            previous_wrapped = wrapped
         if needs_adapter:
             lines += ['#endif']
             self.adapters.append((owner, member))
@@ -488,7 +497,13 @@ class InterfaceEmitter:
                             expr = f'{name} = {expr}'
                         passed.append(expr)
                     raw_call = f'this.{self.raw_name(member)} (' + ', '.join(passed) + ')'
-                    lines += [f'        member this.{identifier(member.name)}(' + ', '.join(declarations) + f') : {result} =']
+                    head = f'        member this.{identifier(member.name)}(' + ', '.join(declarations) + f') : {result} ='
+                    if len(head) > 150:
+                        # Fantomas moves the parameters and the return type of a long member head onto lines of their own.
+                        lines += [f'        member this.{identifier(member.name)}', '            (' + ', '.join(declarations) + ')',
+                                  f'            : {result} =']
+                    else:
+                        lines += [head]
                     lines += guards
                     if self.union(member.type):
                         union_name = label(self.world.resolve(member.type))

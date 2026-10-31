@@ -5565,16 +5565,21 @@ and [<AllowNullLiteral>] CanvasRenderingContext2D =
     /// <summary>CanvasRenderingContext2D.drawImage.</summary>
 #if FABLE_COMPILER
     [<Fable.Core.Emit("$0.drawImage($1, $2, $3, $4, $5, $6, $7, $8, $9)")>]
-    abstract member __ranvier_drawImage: image: obj * sx: float * sy: float * sw: float * sh: float * dx: float * dy: float * dw: float * dh: float -> unit
+    abstract member __ranvier_drawImage:
+        image: obj * sx: float * sy: float * sw: float * sh: float * dx: float * dy: float * dw: float * dh: float -> unit
 #else
     abstract member drawImage:
         image: HTMLImageElement * sx: float * sy: float * sw: float * sh: float * dx: float * dy: float * dw: float * dh: float -> unit
+
     abstract member drawImage:
         image: HTMLCanvasElement * sx: float * sy: float * sw: float * sh: float * dx: float * dy: float * dw: float * dh: float -> unit
+
     abstract member drawImage:
         image: SVGImageElement * sx: float * sy: float * sw: float * sh: float * dx: float * dy: float * dw: float * dh: float -> unit
+
     abstract member drawImage:
         image: ImageBitmap * sx: float * sy: float * sw: float * sh: float * dx: float * dy: float * dw: float * dh: float -> unit
+
     abstract member drawImage:
         image: CSSImageValue * sx: float * sy: float * sw: float * sh: float * dx: float * dy: float * dw: float * dh: float -> unit
 #endif
@@ -7268,10 +7273,14 @@ module BrowserUnionAdapters =
         member this.drawImage(image: CSSImageValue, dx: float, dy: float, dw: float, dh: float) : unit =
             this.__ranvier_drawImage (box image, dx, dy, dw, dh)
 
-        member this.drawImage(image: HTMLImageElement, sx: float, sy: float, sw: float, sh: float, dx: float, dy: float, dw: float, dh: float) : unit =
+        member this.drawImage
+            (image: HTMLImageElement, sx: float, sy: float, sw: float, sh: float, dx: float, dy: float, dw: float, dh: float)
+            : unit =
             this.__ranvier_drawImage (box image, sx, sy, sw, sh, dx, dy, dw, dh)
 
-        member this.drawImage(image: HTMLCanvasElement, sx: float, sy: float, sw: float, sh: float, dx: float, dy: float, dw: float, dh: float) : unit =
+        member this.drawImage
+            (image: HTMLCanvasElement, sx: float, sy: float, sw: float, sh: float, dx: float, dy: float, dw: float, dh: float)
+            : unit =
             this.__ranvier_drawImage (box image, sx, sy, sw, sh, dx, dy, dw, dh)
 
         member this.drawImage(image: SVGImageElement, sx: float, sy: float, sw: float, sh: float, dx: float, dy: float, dw: float, dh: float) : unit =
