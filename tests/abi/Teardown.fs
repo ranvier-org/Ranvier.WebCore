@@ -1057,6 +1057,60 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
 
                 rv_event_target_release animation
                 rv_dom_animation_timeline_release held.Value
+        | "view timeline" ->
+            // A ViewTimeline whose subject is the span, an inset of 10px, and an idle animation on it must not keep the
+            // document, the div or the span alive; past host destroy its members still answer.
+            let unit = Text.Encoding.UTF8.GetBytes "px"
+            let mutable px = 0n
+
+            rv_dom_css_unit_value_create (document, 10.0, unit, unit.Length, &px)
+            |> check "CSS.px"
+
+            let mutable item = RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue()
+            item.present <- 1
+            item.tag <- 1
+            item.arm0 <- px
+            let itemPointer = Runtime.InteropServices.Marshal.AllocHGlobal(Runtime.InteropServices.Marshal.SizeOf<RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue>())
+            Runtime.InteropServices.Marshal.StructureToPtr(item, itemPointer, false)
+            let mutable inset = RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish()
+            inset.present <- 1
+            inset.tag <- 2
+            let mutable sequence = RvDomSequenceCSSNumericValueOrCSSOMKeywordish()
+            sequence.present <- 1
+            sequence.count <- 1
+            sequence.items <- itemPointer
+            inset.arm1 <- sequence
+            let insetPointer = Runtime.InteropServices.Marshal.AllocHGlobal(Runtime.InteropServices.Marshal.SizeOf<RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish>())
+            Runtime.InteropServices.Marshal.StructureToPtr(inset, insetPointer, false)
+            let mutable options = RvDomViewTimelineOptions()
+            options.size <- uint32 (Runtime.InteropServices.Marshal.SizeOf<RvDomViewTimelineOptions>())
+            options.subject <- span
+            options.inset <- insetPointer
+
+            rv_dom_view_timeline_create (document, [| options |], &held.contents)
+            |> check "ViewTimeline"
+
+            for pointer in [ insetPointer; itemPointer ] do
+                Runtime.InteropServices.Marshal.FreeHGlobal pointer
+
+            rv_dom_css_style_value_release px
+            let mutable animation = 0n
+
+            rv_dom_web_animation_create (document, 0n, held.Value, 1, &animation)
+            |> check "Animation on a ViewTimeline"
+
+            fun () ->
+                let mutable time = RvDomUnionDoubleOrCSSNumericValueNullable()
+
+                // The read succeeds; a ViewTimeline keeps the progress cached by the host's last rendering update.
+                rv_dom_animation_timeline_get_current_time (held.Value, &time)
+                |> check "ViewTimeline.currentTime after destroy"
+
+                if time.present <> 0 then
+                    rv_dom_union_double_or_css_numeric_value_nullable_release &time
+
+                rv_event_target_release animation
+                rv_dom_animation_timeline_release held.Value
         | "document timeline" ->
             // A DocumentTimeline and an idle animation on it must not keep the document alive; past host destroy the
             // timeline's current time reads as null.
@@ -1413,6 +1467,7 @@ let run (outDir: string) =
                     "web animation"
                     "document timeline"
                     "scroll timeline"
+                    "view timeline"
                 ] do
                 for remove in [ false; true ] do
                     releaseAfterDestroy kind remove

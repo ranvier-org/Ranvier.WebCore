@@ -16,9 +16,9 @@ import sys
 import threading
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from form_collections import Native, P, I, U, OK, NULL_ARGUMENT, WRONG_THREAD, WRONG_INTERFACE, ABI  # noqa: E402
+from form_collections import Native, P, I, U, OK, NULL_ARGUMENT, WRONG_THREAD, DOM_EXCEPTION, WRONG_INTERFACE, ABI  # noqa: E402
 from web_animations import (AnimationOptions, Arena, EffectOptions, KeyframeAnimationOptions, KeyframeEffectOptions, Page, Time,  # noqa: E402
-                            TimelineOptions,
+                            TimelineOptions, Span, StringInput, FILL, DIRECTION, exception_name,
                             arm_vm_entry_crash, PLAY_STATES)
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
@@ -322,6 +322,263 @@ def a07_contract(native, page):
            'ScrollTimeline.source on a DocumentTimeline')
     probe.release_timeline(document_timeline)
 
+class FlatInset(ctypes.Structure):
+    _fields_ = [('present', I), ('tag', I), ('arm0', P), ('arm1', Span), ('arm2', P)]
+
+
+class InsetSequence(ctypes.Structure):
+    _fields_ = [('present', I), ('count', I), ('items', ctypes.POINTER(FlatInset))]
+
+
+class Inset(ctypes.Structure):
+    _fields_ = [('present', I), ('tag', I), ('arm0', Span), ('arm1', InsetSequence)]
+
+
+class ViewTimelineOptions(ctypes.Structure):
+    _fields_ = [('size', U), ('subject', P), ('axis', I), ('inset', ctypes.POINTER(Inset))]
+
+
+class RangeOffset(ctypes.Structure):
+    _fields_ = [('size', U), ('range_name', StringInput), ('offset', P)]
+
+
+class Range(ctypes.Structure):
+    _fields_ = [('present', I), ('tag', I), ('arm0', ctypes.POINTER(RangeOffset)), ('arm1', P), ('arm2', P), ('arm3', Span)]
+
+
+class RangedAnimationOptions(ctypes.Structure):
+    _fields_ = KeyframeAnimationOptions._fields_ + [('range_start', ctypes.POINTER(Range)), ('range_end', ctypes.POINTER(Range))]
+
+
+RANGE_RELEASE = 'rv_dom_union_timeline_range_offset_or_css_numeric_value_or_cssom_keyword_value_or_dom_string_release'
+
+
+class ViewProbe(ScrollProbe):
+    def __init__(self, native, page, arena):
+        super().__init__(native, page)
+        self.arena = arena
+
+    def style_value(self, handle):
+        """A CSSStyleValue as the oracle's unit(): value and unit, or the keyword."""
+        if not handle:
+            return None
+        name = self.n.text('rv_dom_css_style_value_get_interface_name', [P], handle)
+        if name == 'CSSUnitValue':
+            number = D()
+            self.n.ok('rv_dom_css_unit_value_get_value', [P, ctypes.POINTER(D)], handle, ctypes.byref(number))
+            return {'value': number.value, 'unit': self.n.text('rv_dom_css_unit_value_get_unit', [P], handle)}
+        if name in ('CSSKeywordValue', 'CSSOMKeywordValue'):
+            return {'keyword': self.n.text('rv_dom_cssom_keyword_value_get_value', [P], handle)}
+        return {'other': name}
+
+    def offset(self, timeline, which):
+        handle = self.n.handle('rv_dom_view_timeline_get_' + which + '_offset', [P], timeline, nullable=False)
+        value = self.style_value(handle)
+        self.n.bind('rv_dom_css_style_value_release', None, [P])(handle)
+        return value
+
+    def unit_value(self, number, unit):
+        unit = unit.encode('utf-8')
+        return self.n.handle('rv_dom_css_unit_value_create', [P, D, ctypes.c_char_p, I], self.page.document, float(number), unit, len(unit), nullable=False)
+
+    def span(self, text):
+        data = self.arena.keep(ctypes.create_string_buffer(text.encode('utf-8')))
+        return Span(ctypes.cast(data, P), len(text.encode('utf-8')))
+
+    def inset(self, value):
+        if value is None:
+            return None
+        if isinstance(value, str):
+            return ctypes.pointer(self.arena.keep(Inset(1, 1, self.span(value), InsetSequence(0, 0, None))))
+        items = (FlatInset * len(value))()
+        for index, item in enumerate(value):
+            items[index] = FlatInset(1, 1, self.arena.keep(self.unit_value(item['px'], 'px')), Span(None, 0), None)
+        self.arena.keep(items)
+        return ctypes.pointer(self.arena.keep(Inset(1, 2, Span(None, 0), InsetSequence(1, len(value), items))))
+
+    def view_timeline(self, subject, inset=None):
+        options = ViewTimelineOptions(ctypes.sizeof(ViewTimelineOptions), subject, 0, self.inset(inset))
+        result = P()
+        status = self.n.call('rv_dom_view_timeline_create', [P, ctypes.POINTER(ViewTimelineOptions), ctypes.POINTER(P)], self.page.document,
+                             ctypes.byref(options), ctypes.byref(result))
+        return status, result.value
+
+    def range_value(self, value):
+        """The oracle's rangeValue() as the range union: a string, a keyword or percent value, or a range offset."""
+        if isinstance(value, str):
+            return ctypes.pointer(self.arena.keep(Range(1, 4, None, None, None, self.span(value))))
+        if 'keyword' in value:
+            text = value['keyword'].encode('utf-8')
+            keyword = self.arena.keep(self.n.handle('rv_dom_cssom_keyword_value_create', [P, ctypes.c_char_p, I], self.page.document, text, len(text),
+                                                    nullable=False))
+            return ctypes.pointer(self.arena.keep(Range(1, 3, None, None, keyword, Span(None, 0))))
+        if 'rangeName' in value:
+            offset = RangeOffset(ctypes.sizeof(RangeOffset), self.arena.string(value['rangeName']), self.arena.keep(self.unit_value(value['percent'], 'percent')))
+            return ctypes.pointer(self.arena.keep(Range(1, 1, ctypes.pointer(self.arena.keep(offset)), None, None, Span(None, 0))))
+        return ctypes.pointer(self.arena.keep(Range(1, 2, None, self.arena.keep(self.unit_value(value['percent'], 'percent')), None, Span(None, 0))))
+
+    def read_range(self, animation, which):
+        value = Range()
+        self.n.ok('rv_dom_web_animation_get_range_' + which, [P, ctypes.POINTER(Range)], animation, ctypes.byref(value))
+        self.n.expect(value.present == 1, 'range ' + which + ' present')
+        if value.tag == 4:
+            out = ctypes.string_at(value.arm3.data, value.arm3.length).decode('utf-8')
+        elif value.tag == 1:
+            offset = value.arm0.contents
+            name = ctypes.string_at(offset.range_name.data, offset.range_name.length).decode('utf-8') if offset.range_name.present else None
+            out = {'rangeName': name, 'offset': self.style_value(offset.offset)}
+        else:
+            out = self.style_value(value.arm1 if value.tag == 2 else value.arm2)
+        self.n.bind(RANGE_RELEASE, None, [ctypes.POINTER(Range)])(ctypes.byref(value))
+        return out
+
+    def release_values(self):
+        release = self.n.bind('rv_dom_css_style_value_release', None, [P])
+        for item in self.arena.kept:
+            if isinstance(item, int):
+                release(item)
+        self.arena.kept = [item for item in self.arena.kept if not isinstance(item, int)]
+
+
+def a08(native, spec):
+    """View timelines over the oracle's page: insets, a nested scrollport, animations with ranges and the range setters."""
+    page = Page(native, spec['viewMarkup'])
+    arena = Arena()
+    probe = ViewProbe(native, page, arena)
+    case = spec['a08']
+    try:
+        t, t2, v, vn, inner = (page.element(name) for name in ('t', 't2', 'v', 'vn', 'inner'))
+        vt = {}
+        for item in case['insets']:
+            status, vt[item['name']] = probe.view_timeline(t, item['inset'])
+            native.expect(status == OK, 'ViewTimeline inset ' + item['name'] + ': status ' + str(status))
+        status, nested = probe.view_timeline(t2)
+        native.expect(status == OK, 'nested ViewTimeline')
+        empty = P()
+        native.ok('rv_dom_view_timeline_create', [P, P, ctypes.POINTER(P)], page.document, None, ctypes.byref(empty))
+        empty = empty.value
+        bad = []
+        for value in case['badInsets']:
+            status, handle = probe.view_timeline(t, value)
+            bad.append('none' if status == OK else exception_name(native) if status == DOM_EXCEPTION else 'status ' + str(status))
+            if handle:
+                probe.release_timeline(handle)
+        anims = {}
+        for item in case['animations']:
+            options = RangedAnimationOptions()
+            options.size = ctypes.sizeof(RangedAnimationOptions)
+            options.fill, options.iterations, options.direction = FILL['both'], 1.0, DIRECTION['normal']
+            options.easing, options.id, options.pseudo_element = arena.string(None), arena.string(''), arena.string(None)
+            options.timeline = ctypes.pointer(arena.keep(P(vt['auto'])))
+            options.range_start, options.range_end = probe.range_value(item['rangeStart']), probe.range_value(item['rangeEnd'])
+            union = arena.keep(AnimationOptions(1, 2, 0.0, ctypes.cast(ctypes.pointer(arena.keep(options)), ctypes.POINTER(KeyframeAnimationOptions))))
+            result = P()
+            native.ok('rv_dom_element_animate', [P, P, P, ctypes.POINTER(P)], page.element(item['el']),
+                      arena.keyframes([{'props': {'opacity': '0'}}, {'props': {'opacity': '1'}}]), ctypes.byref(union), ctypes.byref(result))
+            anims[item['name']] = (result.value, page.element(item['el']))
+        page.guard('A08 creation')
+        probe.settle()
+        subject = native.handle('rv_dom_view_timeline_get_subject', [P], vt['auto'], nullable=False)
+        empty_subject = native.handle('rv_dom_view_timeline_get_subject', [P], empty)
+        timeline = native.handle('rv_dom_web_animation_get_timeline', [P], anims['a'][0], nullable=False)
+        result = {'subject': native.text('rv_dom_element_get_id', [P], subject), 'source': probe.source_id(vt['auto']),
+                  'axis': AXES[native.integer('rv_dom_scroll_timeline_get_axis', vt['auto'])], 'interfaceName': probe.interface_name(vt['auto']),
+                  'nestedSource': probe.source_id(nested), 'emptySubject': empty_subject, 'emptyCurrentTime': probe.unit(empty), 'badInsets': bad,
+                  'ranges': {k: {'rangeStart': probe.read_range(a, 'start'), 'rangeEnd': probe.read_range(a, 'end')} for k, (a, _) in anims.items()},
+                  'animationTimeline': timeline == vt['auto']}
+        native.bind('rv_node_release', None, [P])(subject)
+        probe.release_timeline(timeline)
+
+        def read():
+            return {'timelines': {k: {'currentTime': probe.unit(h), 'startOffset': probe.offset(h, 'start'), 'endOffset': probe.offset(h, 'end')}
+                                  for k, h in vt.items()},
+                    'animations': {k: {'currentTime': probe.unit(a, 'rv_dom_web_animation_get_current_time'), 'playState': probe.state(a),
+                                       'opacity': probe.opacity(el)} for k, (a, el) in anims.items()}}
+
+        result['points'] = []
+        for top in case['tops']:
+            probe.scroll(v, top)
+            probe.settle()
+            result['points'].append({'top': top, 'scrollTop': native.integer('rv_dom_element_get_scroll_top', v), **read()})
+        result['nested'] = []
+        for point in case['nested']:
+            probe.scroll(vn, point['outer'])
+            probe.scroll(inner, point['inner'])
+            probe.settle()
+            result['nested'].append({**point, 'currentTime': probe.unit(nested), 'startOffset': probe.offset(nested, 'start'),
+                                     'endOffset': probe.offset(nested, 'end')})
+        result['setRanges'] = []
+        animation = anims['a'][0]
+        # Each range pair is set, then read after a rendering update: WebKit resolves a set range in its next update.
+        probe.scroll(v, case['setRangesTop'])
+        for item in case['setRanges']:
+            out = {'name': item['name']}
+            for key, which in (('rangeStart', 'start'), ('rangeEnd', 'end')):
+                status = native.call('rv_dom_web_animation_set_range_' + which, [P, ctypes.POINTER(Range)], animation, probe.range_value(item[key]))
+                out[key + 'Error'] = None if status == OK else exception_name(native) if status == DOM_EXCEPTION else 'status ' + str(status)
+            probe.settle()
+            for key, which in (('rangeStart', 'start'), ('rangeEnd', 'end')):
+                out[key] = probe.read_range(animation, which)
+            out['currentTime'] = probe.unit(animation, 'rv_dom_web_animation_get_current_time')
+            result['setRanges'].append(out)
+        page.guard('A08 reads')
+        for animation, _ in anims.values():
+            native.ok('rv_dom_web_animation_cancel', [P], animation)
+            probe.release_target(animation)
+        for handle in list(vt.values()) + [nested, empty]:
+            probe.release_timeline(handle)
+        probe.release_values()
+    finally:
+        page.close()
+    return result
+
+
+def a08_contract(native, page):
+    """Null, receiver, interface and thread errors of the ViewTimeline functions and the range members."""
+    expect, arena = native.expect, Arena()
+    probe = ViewProbe(native, page, arena)
+    create = native.bind('rv_dom_view_timeline_create', I, [P, ctypes.POINTER(ViewTimelineOptions), ctypes.POINTER(P)])
+    result, element = P(), page.element('a')
+    expect(create(None, None, ctypes.byref(result)) == NULL_ARGUMENT, 'ViewTimeline NULL document')
+    expect(create(page.document, None, None) == NULL_ARGUMENT, 'ViewTimeline NULL result')
+    expect(create(element, None, ctypes.byref(result)) == WRONG_INTERFACE, 'ViewTimeline on an element receiver')
+    text = native.handle('rv_dom_document_create_text_node', [P, ctypes.c_char_p, I], page.document, b'x', 1, nullable=False)
+    options = ViewTimelineOptions(ctypes.sizeof(ViewTimelineOptions), text, 0, None)
+    expect(create(page.document, ctypes.byref(options), ctypes.byref(result)) == WRONG_INTERFACE, 'ViewTimeline subject of a text node')
+    native.bind('rv_node_release', None, [P])(text)
+    document_timeline = page.timeline()
+    for name in ('subject', 'start_offset', 'end_offset'):
+        expect(native.call('rv_dom_view_timeline_get_' + name, [P, ctypes.POINTER(P)], document_timeline, ctypes.byref(P())) == WRONG_INTERFACE,
+               'ViewTimeline.' + name + ' on a DocumentTimeline')
+    scroll = ScrollProbe(native, page).scroll_timeline()
+    expect(native.call('rv_dom_view_timeline_get_subject', [P, ctypes.POINTER(P)], scroll, ctypes.byref(P())) == WRONG_INTERFACE,
+           'ViewTimeline.subject on a ScrollTimeline')
+    probe.release_timeline(scroll)
+    status, view = probe.view_timeline(element)
+    expect(status == OK and probe.interface_name(view) == 'ViewTimeline', 'a ViewTimeline reports its interface')
+    expect(AXES[native.integer('rv_dom_scroll_timeline_get_axis', view)] == 'block', 'ScrollTimeline.axis on a ViewTimeline')
+    status = []
+    worker = threading.Thread(target=lambda: status.append(native.call('rv_dom_view_timeline_get_subject', [P, ctypes.POINTER(P)], view, ctypes.byref(P()))))
+    worker.start(); worker.join()
+    expect(status == [WRONG_THREAD], 'ViewTimeline.subject off the owning thread')
+    animation = probe.animation(element, view, None, probe.effect(element, 1000))
+    set_start = native.bind('rv_dom_web_animation_set_range_start', I, [P, ctypes.POINTER(Range)])
+    expect(set_start(animation, None) == NULL_ARGUMENT, 'rangeStart NULL value')
+    expect(set_start(animation, ctypes.byref(Range(1, 9, None, None, None, Span(None, 0)))) == UNSUPPORTED, 'rangeStart unknown arm')
+    expect(native.call('rv_dom_web_animation_get_range_start', [P, ctypes.POINTER(Range)], animation, None) == NULL_ARGUMENT, 'rangeStart NULL result')
+    keyword = native.handle('rv_dom_cssom_keyword_value_create', [P, ctypes.c_char_p, I], page.document, b'normal', 6, nullable=False)
+    offset = RangeOffset(ctypes.sizeof(RangeOffset), arena.string('cover'), keyword)
+    expect(set_start(animation, ctypes.byref(Range(1, 1, ctypes.pointer(offset), None, None, Span(None, 0)))) == WRONG_INTERFACE,
+           'rangeStart offset of a keyword value')
+    # A range offset whose size stops before offset: the offset is absent.
+    short = RangeOffset(RangeOffset.offset.offset, arena.string('cover'), keyword)
+    native.ok('rv_dom_web_animation_set_range_start', [P, ctypes.POINTER(Range)], animation, ctypes.byref(Range(1, 1, ctypes.pointer(short), None, None, Span(None, 0))))
+    native.bind('rv_dom_css_style_value_release', None, [P])(keyword)
+    native.ok('rv_dom_web_animation_cancel', [P], animation)
+    probe.release_target(animation)
+    probe.release_timeline(view)
+    probe.release_timeline(document_timeline)
+
 def a06_teardown(native, spec):
     """A second host's document timeline and a DocumentTimeline of its document, both held past rv_host_destroy."""
     page = Page(native, spec['markup'])
@@ -362,7 +619,7 @@ def contract_errors(native, page):
 
 
 def lock_free(native, page):
-    """With the VM-entry crash armed, the DocumentTimeline and ScrollTimeline constructors, the timeline members and an
+    """With the VM-entry crash armed, the DocumentTimeline, ScrollTimeline and ViewTimeline constructors, the timeline members and an
     animation constructed on a new timeline run unchanged; the effect is constructed before arming."""
     probe = Probe(native, page)
     element = page.element('a')
@@ -383,6 +640,15 @@ def lock_free(native, page):
     source = native.handle('rv_dom_scroll_timeline_get_source', [P], scrolling, nullable=False)
     native.bind('rv_node_release', None, [P])(source)
     probe.release_timeline(scrolling)
+    view_probe = ViewProbe(native, page, Arena())
+    status, view = view_probe.view_timeline(element, '10px')
+    native.expect(status == OK, 'armed: ViewTimeline constructor')
+    native.expect(view_probe.offset(view, 'start') is not None and view_probe.offset(view, 'end') is not None, 'armed: ViewTimeline offsets')
+    subject = native.handle('rv_dom_view_timeline_get_subject', [P], view, nullable=False)
+    native.expect(subject == element, 'armed: ViewTimeline subject')
+    native.bind('rv_node_release', None, [P])(subject)
+    probe.release_timeline(view)
+    view_probe.release_values()
     animation = probe.animation(element, own, 1000, effect)
     native.ok('rv_dom_web_animation_pause', [P], animation)
     native.ok('rv_dom_web_animation_set_current_time', [P, ctypes.POINTER(Time)], animation, ctypes.byref(Time(1, 1, 500.0, None)))
@@ -437,7 +703,7 @@ def verify(directory, arm=True):
     native.expect(native.bind('rv_abi_version', I, [])() == ABI, 'ABI version ' + str(ABI))
     has = native.bind('rv_abi_has', I, [ctypes.c_char_p])
     for capability in [b'dom:AnimationTimeline', b'dom:DocumentTimeline', b'dom-constructor:DocumentTimeline', b'dom:ScrollTimeline',
-                       b'dom-constructor:ScrollTimeline']:
+                       b'dom-constructor:ScrollTimeline', b'dom:ViewTimeline', b'dom-constructor:ViewTimeline']:
         native.expect(has(capability) == 1, 'rv_abi_has ' + capability.decode())
     page = Page(native, spec['markup'])
     page.directory = directory
@@ -448,6 +714,7 @@ def verify(directory, arm=True):
         actual['a06'], actual['diagnostics'] = a06(native, page, spec)
         contract_errors(native, page)
         a07_contract(native, page)
+        a08_contract(native, page)
         page.guard('contract errors')
         armed = arm and lock_free(native, page)
         if armed:
@@ -462,7 +729,8 @@ def verify(directory, arm=True):
         page.close()
     actual['a06']['teardown'] = a06_teardown(native, spec)
     actual['a07'] = a07(native, spec)
-    for group in ('a06', 'a07'):
+    actual['a08'] = a08(native, spec)
+    for group in ('a06', 'a07', 'a08'):
         compare(native, actual[group], oracle[group], failures, group)
     return native, actual, failures, oracle['browser'], armed
 

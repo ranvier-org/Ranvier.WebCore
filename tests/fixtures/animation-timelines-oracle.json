@@ -407,5 +407,843 @@
    "a": "1",
    "b": "1"
   }
+ },
+ "a08": {
+  "subject": "t",
+  "source": "v",
+  "axis": "block",
+  "interfaceName": "ViewTimeline",
+  "nestedSource": "inner",
+  "emptySubject": null,
+  "emptyCurrentTime": null,
+  "badInsets": [
+   "TypeError",
+   "TypeError"
+  ],
+  "ranges": {
+   "a": {
+    "rangeStart": {
+     "rangeName": "entry",
+     "offset": {
+      "value": 0,
+      "unit": "percent"
+     }
+    },
+    "rangeEnd": {
+     "rangeName": "exit",
+     "offset": {
+      "value": 100,
+      "unit": "percent"
+     }
+    }
+   },
+   "b": {
+    "rangeStart": {
+     "rangeName": "contain",
+     "offset": {
+      "value": 10,
+      "unit": "percent"
+     }
+    },
+    "rangeEnd": {
+     "rangeName": "contain",
+     "offset": {
+      "value": 90,
+      "unit": "percent"
+     }
+    }
+   }
+  },
+  "animationTimeline": true,
+  "points": [
+   {
+    "top": 0,
+    "scrollTop": 0,
+    "timelines": {
+     "auto": {
+      "currentTime": {
+       "value": -66.66666666666667,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 100,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 250,
+       "unit": "px"
+      }
+     },
+     "px10": {
+      "currentTime": {
+       "value": -84.6153846153846,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 110,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 240,
+       "unit": "px"
+      }
+     },
+     "pair": {
+      "currentTime": {
+       "value": -100.00000000000003,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 120,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 240,
+       "unit": "px"
+      }
+     },
+     "autoPx": {
+      "currentTime": {
+       "value": -92.3076923076923,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 120,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 250,
+       "unit": "px"
+      }
+     }
+    },
+    "animations": {
+     "a": {
+      "currentTime": {
+       "value": -66.66666666666667,
+       "unit": "percent"
+      },
+      "playState": "running",
+      "opacity": "0"
+     },
+     "b": {
+      "currentTime": {
+       "value": -103.33333333333334,
+       "unit": "percent"
+      },
+      "playState": "running",
+      "opacity": "0"
+     }
+    }
+   },
+   {
+    "top": 50,
+    "scrollTop": 50,
+    "timelines": {
+     "auto": {
+      "currentTime": {
+       "value": -33.333333333333336,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 100,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 250,
+       "unit": "px"
+      }
+     },
+     "px10": {
+      "currentTime": {
+       "value": -46.15384615384615,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 110,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 240,
+       "unit": "px"
+      }
+     },
+     "pair": {
+      "currentTime": {
+       "value": -58.333333333333336,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 120,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 240,
+       "unit": "px"
+      }
+     },
+     "autoPx": {
+      "currentTime": {
+       "value": -53.84615384615383,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 120,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 250,
+       "unit": "px"
+      }
+     }
+    },
+    "animations": {
+     "a": {
+      "currentTime": {
+       "value": -33.333333333333336,
+       "unit": "percent"
+      },
+      "playState": "running",
+      "opacity": "0"
+     },
+     "b": {
+      "currentTime": {
+       "value": -70,
+       "unit": "percent"
+      },
+      "playState": "running",
+      "opacity": "0"
+     }
+    }
+   },
+   {
+    "top": 100,
+    "scrollTop": 100,
+    "timelines": {
+     "auto": {
+      "currentTime": {
+       "value": 0,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 100,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 250,
+       "unit": "px"
+      }
+     },
+     "px10": {
+      "currentTime": {
+       "value": -7.692307692307692,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 110,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 240,
+       "unit": "px"
+      }
+     },
+     "pair": {
+      "currentTime": {
+       "value": -16.666666666666668,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 120,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 240,
+       "unit": "px"
+      }
+     },
+     "autoPx": {
+      "currentTime": {
+       "value": -15.384615384615383,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 120,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 250,
+       "unit": "px"
+      }
+     }
+    },
+    "animations": {
+     "a": {
+      "currentTime": {
+       "value": 0,
+       "unit": "percent"
+      },
+      "playState": "running",
+      "opacity": "0"
+     },
+     "b": {
+      "currentTime": {
+       "value": -36.666666666666664,
+       "unit": "percent"
+      },
+      "playState": "running",
+      "opacity": "0"
+     }
+    }
+   },
+   {
+    "top": 150,
+    "scrollTop": 150,
+    "timelines": {
+     "auto": {
+      "currentTime": {
+       "value": 33.333333333333336,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 100,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 250,
+       "unit": "px"
+      }
+     },
+     "px10": {
+      "currentTime": {
+       "value": 30.769230769230766,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 110,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 240,
+       "unit": "px"
+      }
+     },
+     "pair": {
+      "currentTime": {
+       "value": 25.000000000000007,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 120,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 240,
+       "unit": "px"
+      }
+     },
+     "autoPx": {
+      "currentTime": {
+       "value": 23.076923076923077,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 120,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 250,
+       "unit": "px"
+      }
+     }
+    },
+    "animations": {
+     "a": {
+      "currentTime": {
+       "value": 33.333333333333336,
+       "unit": "percent"
+      },
+      "playState": "running",
+      "opacity": "0.333333"
+     },
+     "b": {
+      "currentTime": {
+       "value": -3.333333333333324,
+       "unit": "percent"
+      },
+      "playState": "running",
+      "opacity": "0"
+     }
+    }
+   },
+   {
+    "top": 200,
+    "scrollTop": 200,
+    "timelines": {
+     "auto": {
+      "currentTime": {
+       "value": 66.66666666666667,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 100,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 250,
+       "unit": "px"
+      }
+     },
+     "px10": {
+      "currentTime": {
+       "value": 69.23076923076923,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 110,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 240,
+       "unit": "px"
+      }
+     },
+     "pair": {
+      "currentTime": {
+       "value": 66.66666666666667,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 120,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 240,
+       "unit": "px"
+      }
+     },
+     "autoPx": {
+      "currentTime": {
+       "value": 61.53846153846153,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 120,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 250,
+       "unit": "px"
+      }
+     }
+    },
+    "animations": {
+     "a": {
+      "currentTime": {
+       "value": 66.66666666666667,
+       "unit": "percent"
+      },
+      "playState": "running",
+      "opacity": "0.666667"
+     },
+     "b": {
+      "currentTime": {
+       "value": 26.66666666666666,
+       "unit": "percent"
+      },
+      "playState": "finished",
+      "opacity": "1"
+     }
+    }
+   },
+   {
+    "top": 250,
+    "scrollTop": 250,
+    "timelines": {
+     "auto": {
+      "currentTime": {
+       "value": 100,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 100,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 250,
+       "unit": "px"
+      }
+     },
+     "px10": {
+      "currentTime": {
+       "value": 107.69230769230766,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 110,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 240,
+       "unit": "px"
+      }
+     },
+     "pair": {
+      "currentTime": {
+       "value": 108.33333333333333,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 120,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 240,
+       "unit": "px"
+      }
+     },
+     "autoPx": {
+      "currentTime": {
+       "value": 99.99999999999997,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 120,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 250,
+       "unit": "px"
+      }
+     }
+    },
+    "animations": {
+     "a": {
+      "currentTime": {
+       "value": 100,
+       "unit": "percent"
+      },
+      "playState": "finished",
+      "opacity": "1"
+     },
+     "b": {
+      "currentTime": {
+       "value": 26.66666666666666,
+       "unit": "percent"
+      },
+      "playState": "finished",
+      "opacity": "1"
+     }
+    }
+   },
+   {
+    "top": 300,
+    "scrollTop": 300,
+    "timelines": {
+     "auto": {
+      "currentTime": {
+       "value": 133.33333333333334,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 100,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 250,
+       "unit": "px"
+      }
+     },
+     "px10": {
+      "currentTime": {
+       "value": 146.15384615384613,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 110,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 240,
+       "unit": "px"
+      }
+     },
+     "pair": {
+      "currentTime": {
+       "value": 150.00000000000003,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 120,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 240,
+       "unit": "px"
+      }
+     },
+     "autoPx": {
+      "currentTime": {
+       "value": 138.46153846153845,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 120,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 250,
+       "unit": "px"
+      }
+     }
+    },
+    "animations": {
+     "a": {
+      "currentTime": {
+       "value": 100,
+       "unit": "percent"
+      },
+      "playState": "finished",
+      "opacity": "1"
+     },
+     "b": {
+      "currentTime": {
+       "value": 26.66666666666666,
+       "unit": "percent"
+      },
+      "playState": "finished",
+      "opacity": "1"
+     }
+    }
+   },
+   {
+    "top": 400,
+    "scrollTop": 400,
+    "timelines": {
+     "auto": {
+      "currentTime": {
+       "value": 200,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 100,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 250,
+       "unit": "px"
+      }
+     },
+     "px10": {
+      "currentTime": {
+       "value": 223.07692307692304,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 110,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 240,
+       "unit": "px"
+      }
+     },
+     "pair": {
+      "currentTime": {
+       "value": 233.33333333333334,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 120,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 240,
+       "unit": "px"
+      }
+     },
+     "autoPx": {
+      "currentTime": {
+       "value": 215.38461538461533,
+       "unit": "percent"
+      },
+      "startOffset": {
+       "value": 120,
+       "unit": "px"
+      },
+      "endOffset": {
+       "value": 250,
+       "unit": "px"
+      }
+     }
+    },
+    "animations": {
+     "a": {
+      "currentTime": {
+       "value": 100,
+       "unit": "percent"
+      },
+      "playState": "finished",
+      "opacity": "1"
+     },
+     "b": {
+      "currentTime": {
+       "value": 26.66666666666666,
+       "unit": "percent"
+      },
+      "playState": "finished",
+      "opacity": "1"
+     }
+    }
+   }
+  ],
+  "nested": [
+   {
+    "outer": 0,
+    "inner": 0,
+    "currentTime": {
+     "value": 13.333333333333336,
+     "unit": "percent"
+    },
+    "startOffset": {
+     "value": -20,
+     "unit": "px"
+    },
+    "endOffset": {
+     "value": 130,
+     "unit": "px"
+    }
+   },
+   {
+    "outer": 100,
+    "inner": 40,
+    "currentTime": {
+     "value": 40,
+     "unit": "percent"
+    },
+    "startOffset": {
+     "value": -20,
+     "unit": "px"
+    },
+    "endOffset": {
+     "value": 130,
+     "unit": "px"
+    }
+   },
+   {
+    "outer": 150,
+    "inner": 120,
+    "currentTime": {
+     "value": 93.33333333333333,
+     "unit": "percent"
+    },
+    "startOffset": {
+     "value": -20,
+     "unit": "px"
+    },
+    "endOffset": {
+     "value": 130,
+     "unit": "px"
+    }
+   },
+   {
+    "outer": 300,
+    "inner": 180,
+    "currentTime": {
+     "value": 133.33333333333334,
+     "unit": "percent"
+    },
+    "startOffset": {
+     "value": -20,
+     "unit": "px"
+    },
+    "endOffset": {
+     "value": 130,
+     "unit": "px"
+    }
+   }
+  ],
+  "setRanges": [
+   {
+    "name": "string",
+    "rangeStartError": null,
+    "rangeEndError": null,
+    "rangeStart": {
+     "rangeName": "cover",
+     "offset": {
+      "value": 20,
+      "unit": "percent"
+     }
+    },
+    "rangeEnd": {
+     "rangeName": "cover",
+     "offset": {
+      "value": 80,
+      "unit": "percent"
+     }
+    },
+    "currentTime": {
+     "value": 30,
+     "unit": "percent"
+    }
+   },
+   {
+    "name": "numeric",
+    "rangeStartError": null,
+    "rangeEndError": null,
+    "rangeStart": {
+     "rangeName": "none",
+     "offset": {
+      "value": 0,
+      "unit": "percent"
+     }
+    },
+    "rangeEnd": "normal",
+    "currentTime": {
+     "value": 50,
+     "unit": "percent"
+    }
+   },
+   {
+    "name": "keyword",
+    "rangeStartError": null,
+    "rangeEndError": null,
+    "rangeStart": {
+     "rangeName": "none",
+     "offset": {
+      "value": 0,
+      "unit": "percent"
+     }
+    },
+    "rangeEnd": {
+     "rangeName": "exit",
+     "offset": {
+      "value": 1,
+      "unit": "percent"
+     }
+    },
+    "currentTime": {
+     "value": 50,
+     "unit": "percent"
+    }
+   },
+   {
+    "name": "invalid",
+    "rangeStartError": "TypeError",
+    "rangeEndError": null,
+    "rangeStart": "normal",
+    "rangeEnd": {
+     "rangeName": "exit",
+     "offset": {
+      "value": 1,
+      "unit": "percent"
+     }
+    },
+    "currentTime": {
+     "value": 50,
+     "unit": "percent"
+    }
+   }
+  ]
  }
 }

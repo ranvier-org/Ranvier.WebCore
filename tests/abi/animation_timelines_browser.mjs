@@ -1,6 +1,7 @@
 // Chromium oracle for tests/abi/animation_timelines.py: writes tests/fixtures/animation-timelines-oracle.json.
 // A06: document timeline time origins, inactive timelines, start-time synchronization, teardown and the frame-rate gates.
 // A07: scroll timeline axes, sources and progress at scroll positions, animations on them, a resize and a removed source.
+// A08: view timelines with insets, nested scrollports, animation ranges and the range setters.
 import {createRequire} from 'node:module';
 import {readFileSync, writeFileSync} from 'node:fs';
 const {chromium} = createRequire('C:/wk/ranvier-views/tests/NativeApi.Conformance/package.json')('playwright');
@@ -60,6 +61,65 @@ async function a07(tab) {
   return result;
 }
 
+// A08: view timelines over #t in #v and #t2 in #inner (nested in #vn); insets; animations with ranges; range setters.
+async function a08(tab) {
+  await tab.setContent(spec.viewMarkup);
+  await tab.evaluate((spec) => {
+    window.unit = (v) => v === null || v === undefined ? null : typeof v === 'number' ? {number: v}
+      : v instanceof CSSUnitValue ? {value: v.value, unit: v.unit} : v instanceof CSSKeywordValue ? {keyword: v.value} : {other: String(v)};
+    window.range = (v) => typeof v === 'string' ? v : v instanceof CSSStyleValue ? unit(v) : {rangeName: v.rangeName, offset: unit(v.offset)};
+    window.inset = (v) => v === null ? undefined : typeof v === 'string' ? v : v.map((x) => CSS.px(x.px));
+    window.rangeValue = (v) => typeof v === 'string' ? v : 'keyword' in v ? new CSSKeywordValue(v.keyword)
+      : 'rangeName' in v ? {rangeName: v.rangeName, offset: CSS.percent(v.percent)} : CSS.percent(v.percent);
+    const t = document.getElementById('t');
+    window.vt = Object.fromEntries(spec.a08.insets.map((i) => [i.name, new ViewTimeline(i.inset === null ? {subject: t} : {subject: t, inset: inset(i.inset)})]));
+    window.nested = new ViewTimeline({subject: document.getElementById('t2')});
+    window.empty = new ViewTimeline();
+    window.anims = Object.fromEntries(spec.a08.animations.map((x) => [x.name, document.getElementById(x.el).animate([{opacity: 0}, {opacity: 1}],
+      {timeline: vt.auto, fill: 'both', rangeStart: rangeValue(x.rangeStart), rangeEnd: rangeValue(x.rangeEnd)})]));
+  }, spec);
+  const frames = () => tab.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  await frames();
+  const result = await tab.evaluate((spec) => {
+    const bad = spec.a08.badInsets.map((value) => { try { new ViewTimeline({subject: document.getElementById('t'), inset: value}); return 'none'; } catch (e) { return e.name; } });
+    return {subject: vt.auto.subject.id, source: vt.auto.source && vt.auto.source.id, axis: vt.auto.axis, interfaceName: vt.auto.constructor.name,
+      nestedSource: nested.source && nested.source.id, emptySubject: empty.subject, emptyCurrentTime: unit(empty.currentTime), badInsets: bad,
+      ranges: Object.fromEntries(Object.entries(anims).map(([k, v]) => [k, {rangeStart: range(v.rangeStart), rangeEnd: range(v.rangeEnd)}])),
+      animationTimeline: anims.a.timeline === vt.auto};
+  }, spec);
+  const read = () => tab.evaluate(() => ({
+    timelines: Object.fromEntries(Object.entries(vt).map(([k, v]) => [k, {currentTime: unit(v.currentTime), startOffset: unit(v.startOffset), endOffset: unit(v.endOffset)}])),
+    animations: Object.fromEntries(Object.entries(anims).map(([k, v]) => [k, {currentTime: unit(v.currentTime), playState: v.playState,
+      opacity: getComputedStyle(v.effect.target).opacity}]))}));
+  result.points = [];
+  for (const top of spec.a08.tops) {
+    await tab.evaluate((top) => { document.getElementById('v').scrollTop = top; }, top);
+    await frames();
+    result.points.push({top, scrollTop: await tab.evaluate(() => document.getElementById('v').scrollTop), ...await read()});
+  }
+  result.nested = [];
+  for (const point of spec.a08.nested) {
+    await tab.evaluate((p) => { document.getElementById('vn').scrollTop = p.outer; document.getElementById('inner').scrollTop = p.inner; }, point);
+    await frames();
+    result.nested.push({...point, ...await tab.evaluate(() => ({currentTime: unit(nested.currentTime), startOffset: unit(nested.startOffset), endOffset: unit(nested.endOffset)}))});
+  }
+  result.setRanges = [];
+  await tab.evaluate((top) => { document.getElementById('v').scrollTop = top; }, spec.a08.setRangesTop);
+  for (const set of spec.a08.setRanges) {
+    const out = await tab.evaluate((set) => {
+      const a = anims.a, out = {name: set.name};
+      for (const key of ['rangeStart', 'rangeEnd']) {
+        try { a[key] = rangeValue(set[key]); out[key + 'Error'] = null; } catch (e) { out[key + 'Error'] = e.name; }
+      }
+      return out;
+    }, set);
+    await frames();
+    result.setRanges.push({...out, ...await tab.evaluate(() => ({rangeStart: range(anims.a.rangeStart), rangeEnd: range(anims.a.rangeEnd),
+      currentTime: unit(anims.a.currentTime)}))});
+  }
+  return result;
+}
+
 const browser = await chromium.launch({headless: true});
 const out = {browser: 'Chromium ' + browser.version()};
 try {
@@ -114,6 +174,7 @@ try {
   });
   out.a06 = a06;
   out.a07 = await a07(await context.newPage());
+  out.a08 = await a08(await context.newPage());
 } finally {
   await browser.close();
 }
