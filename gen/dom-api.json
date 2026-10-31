@@ -55,6 +55,7 @@
         "CSSViewTransitionRule",
         "CSSRule"
       ],
+      "extras": [],
       "parameters": [
         {
           "ctype": "RvCSSRule*",
@@ -86,6 +87,7 @@
         "CSSStyleSheet",
         "StyleSheet"
       ],
+      "extras": [],
       "parameters": [
         {
           "ctype": "RvStyleSheet*",
@@ -121,6 +123,7 @@
         "CSSStyleProperties",
         "CSSStyleDeclaration"
       ],
+      "extras": [],
       "parameters": [
         {
           "ctype": "RvCSSStyleDeclaration*",
@@ -162,6 +165,7 @@
         "CSSUnparsedValue",
         "CSSStyleValue"
       ],
+      "extras": [],
       "parameters": [
         {
           "ctype": "RvCSSStyleValue*",
@@ -193,6 +197,7 @@
         "StylePropertyMap",
         "StylePropertyMapReadOnly"
       ],
+      "extras": [],
       "parameters": [
         {
           "ctype": "RvStylePropertyMapReadOnly*",
@@ -224,6 +229,7 @@
         "DOMRect",
         "DOMRectReadOnly"
       ],
+      "extras": [],
       "parameters": [
         {
           "ctype": "RvDOMRectReadOnly*",
@@ -255,6 +261,7 @@
         "DOMPoint",
         "DOMPointReadOnly"
       ],
+      "extras": [],
       "parameters": [
         {
           "ctype": "RvDOMPointReadOnly*",
@@ -286,6 +293,7 @@
         "DOMMatrix",
         "DOMMatrixReadOnly"
       ],
+      "extras": [],
       "parameters": [
         {
           "ctype": "RvDOMMatrixReadOnly*",
@@ -331,6 +339,7 @@
         "CSSTranslate",
         "CSSTransformComponent"
       ],
+      "extras": [],
       "parameters": [
         {
           "ctype": "RvCSSTransformComponent*",
@@ -407,6 +416,9 @@
         "ToggleEvent",
         "UIEvent",
         "Event"
+      ],
+      "extras": [
+        "CustomEvent"
       ],
       "parameters": [
         {

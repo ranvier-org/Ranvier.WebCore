@@ -612,6 +612,7 @@ class Generator(ComplexGeneratorMixin):
                 "feature": f"dom-type-query:{root}",
                 "interfaces": interfaces + [root],
                 "names": [self.world.public_name(name) if public else name for name in interfaces + [root]],
+                "extras": extras,
                 "parameters": [{"ctype": f"Rv{root}*", "name": "target"}, {"ctype": "char*", "name": "buffer"},
                                {"ctype": "int32_t", "name": "capacity"}, {"ctype": "int32_t*", "name": "length"}],
             })
