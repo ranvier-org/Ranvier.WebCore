@@ -23,7 +23,7 @@ WEBCORE_EXPORT int32_t ranvier_resource_cancel(uint64_t operation);
 WEBCORE_EXPORT int32_t ranvier_resource_release(uint64_t operation);
 WEBCORE_EXPORT void ranvier_resource_invalidate_document(RvNode* document);
 WEBCORE_EXPORT int32_t ranvier_blob_read(RvNode* document, RvBlob* blob, int32_t mode, RvResourceCompletion, void* context, uint64_t* operation);
-WEBCORE_EXPORT int32_t ranvier_blob_url_read(RvNode* document, const uint8_t* url, int32_t length, RvResourceCompletion, void* context, uint64_t* operation);
+WEBCORE_EXPORT int32_t ranvier_blob_url_read(RvNode* document, const uint8_t* url, int32_t url_length, RvResourceCompletion, void* context, uint64_t* operation);
 WEBCORE_EXPORT int32_t ranvier_blob_read_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length);
 WEBCORE_EXPORT int32_t ranvier_blob_read_type(uint64_t operation, char* buffer, int32_t capacity, int32_t* length);
 WEBCORE_EXPORT int32_t ranvier_blob_read_error(uint64_t operation, char* buffer, int32_t capacity, int32_t* length);

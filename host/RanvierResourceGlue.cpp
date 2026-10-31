@@ -570,16 +570,16 @@ int32_t ranvier_blob_read(RvNode* documentHandle, RvBlob* blobHandle, int32_t mo
     return startBlobRead(*document, blob.ptr(), { }, mode == RV_BLOB_READ_TEXT, callback, context, operation);
 }
 
-int32_t ranvier_blob_url_read(RvNode* documentHandle, const uint8_t* url, int32_t length, RvResourceCompletion callback, void* context, uint64_t* operation)
+int32_t ranvier_blob_url_read(RvNode* documentHandle, const uint8_t* url, int32_t url_length, RvResourceCompletion callback, void* context, uint64_t* operation)
 {
-    if (!documentHandle || length < 0 || (length && !url) || !callback || !operation)
+    if (!documentHandle || url_length < 0 || (url_length && !url) || !callback || !operation)
         return RV_ERR_NULL_ARGUMENT;
     if (!WTF::isMainThread())
         return RV_ERR_WRONG_THREAD;
     auto* document = documentFromHandle(documentHandle);
     if (!document || !document->window())
         return RV_ERR_UNSUPPORTED;
-    auto text = String::fromUTF8(std::span<const char8_t> { reinterpret_cast<const char8_t*>(url), static_cast<size_t>(length) });
+    auto text = String::fromUTF8(std::span<const char8_t> { reinterpret_cast<const char8_t*>(url), static_cast<size_t>(url_length) });
     if (text.isNull())
         return RV_ERR_NULL_ARGUMENT;
     URL parsed { text };

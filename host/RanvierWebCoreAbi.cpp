@@ -3542,15 +3542,15 @@ int32_t rv_blob_read(RvHost* host, RvBlob* blob, int32_t mode, RvResourceComplet
     return ranvier_blob_read(reinterpret_cast<RvNode*>(&host->document()), blob, mode, completion, context, operation);
 }
 
-int32_t rv_blob_url_read(RvHost* host, const uint8_t* url, int32_t length, RvResourceCompletion completion, void* context, uint64_t* operation)
+int32_t rv_blob_url_read(RvHost* host, const uint8_t* url, int32_t url_length, RvResourceCompletion completion, void* context, uint64_t* operation)
 {
-    if (!host || length < 0 || (length && !url) || !completion || !operation)
+    if (!host || url_length < 0 || (url_length && !url) || !completion || !operation)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     if (!liveHosts.contains(host))
         return RV_ERR_UNSUPPORTED;
-    return ranvier_blob_url_read(reinterpret_cast<RvNode*>(&host->document()), url, length, completion, context, operation);
+    return ranvier_blob_url_read(reinterpret_cast<RvNode*>(&host->document()), url, url_length, completion, context, operation);
 }
 
 int32_t rv_blob_read_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length)
@@ -3568,18 +3568,18 @@ int32_t rv_blob_read_error(uint64_t operation, char* buffer, int32_t capacity, i
     return ranvier_blob_read_error(operation, buffer, capacity, length);
 }
 
-int32_t rv_file_create_from_path(RvHost* host, const uint8_t* path, int32_t length, RvBlob** result)
+int32_t rv_file_create_from_path(RvHost* host, const uint8_t* path, int32_t path_length, RvBlob** result)
 {
-    if (!host || length < 0 || (length && !path) || !result)
+    if (!host || path_length < 0 || (path_length && !path) || !result)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     if (!liveHosts.contains(host))
         return RV_ERR_UNSUPPORTED;
-    auto text = String::fromUTF8(std::span<const char8_t> { reinterpret_cast<const char8_t*>(path), static_cast<size_t>(length) });
+    auto text = String::fromUTF8(std::span<const char8_t> { reinterpret_cast<const char8_t*>(path), static_cast<size_t>(path_length) });
     if (text.isNull())
         return RV_ERR_NULL_ARGUMENT;
-    auto native = std::filesystem::path(std::u8string_view { reinterpret_cast<const char8_t*>(path), static_cast<size_t>(length) });
+    auto native = std::filesystem::path(std::u8string_view { reinterpret_cast<const char8_t*>(path), static_cast<size_t>(path_length) });
     if (text.isEmpty() || !native.is_absolute() || text.contains('\0'))
         return RV_ERR_UNSUPPORTED;
     *result = reinterpret_cast<RvBlob*>(&File::create(&host->document(), text).leakRef());

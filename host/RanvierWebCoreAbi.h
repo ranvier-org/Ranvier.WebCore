@@ -1441,10 +1441,10 @@ enum {
  * width and height are 0. A new document or rv_host_destroy delivers INVALIDATED to a read in flight. */
 RV_EXPORT int32_t rv_blob_read(RvHost*, RvBlob* blob, int32_t mode, RvResourceCompletion completion, void* context, uint64_t* operation);
 /* Reads the bytes of the blob a blob: URL refers to, as a native read of the URL in the host's current document; it is
- * not fetch(). url is length bytes of UTF-8; a fragment is ignored. LOAD_FAILED for a revoked or unknown URL. Delivery
+ * not fetch(). url is url_length bytes of UTF-8; a fragment is ignored. LOAD_FAILED for a revoked or unknown URL. Delivery
  * follows rv_blob_read; rv_blob_read_type writes the blob's type. Returns RV_ERR_UNSUPPORTED for a URL that does not
  * parse or whose scheme is not blob. */
-RV_EXPORT int32_t rv_blob_url_read(RvHost*, const uint8_t* url, int32_t length, RvResourceCompletion completion, void* context, uint64_t* operation);
+RV_EXPORT int32_t rv_blob_url_read(RvHost*, const uint8_t* url, int32_t url_length, RvResourceCompletion completion, void* context, uint64_t* operation);
 /* Copies a SUCCEEDED read's result into buffer and writes its byte count to *length, until rv_resource_release.
  * Capacity, NULL buffer and RV_ERR_BUFFER_TOO_SMALL follow rv_blob_read_bytes. RV_ERR_UNSUPPORTED for another
  * operation or outcome. */
@@ -1453,11 +1453,11 @@ RV_EXPORT int32_t rv_blob_read_result(uint64_t operation, uint8_t* buffer, int64
 RV_EXPORT int32_t rv_blob_read_type(uint64_t operation, char* buffer, int32_t capacity, int32_t* length);
 /* The DOMException name of a LOAD_FAILED read, NUL-terminated; RV_ERR_UNSUPPORTED for another outcome. */
 RV_EXPORT int32_t rv_blob_read_error(uint64_t operation, char* buffer, int32_t capacity, int32_t* length);
-/* A new File backed by the file at path, which the app supplies and trusts: length bytes of UTF-8 naming an absolute
+/* A new File backed by the file at path, which the app supplies and trusts: path_length bytes of UTF-8 naming an absolute
  * path, or RV_ERR_UNSUPPORTED for a relative one. The file is not opened: name and type come from the path, and a file
  * missing or deleted when read fails the read with "NotFoundError". rv_blob_read_bytes returns RV_ERR_UNSUPPORTED for
  * it; read it with rv_blob_read, FileReader or an object URL. */
-RV_EXPORT int32_t rv_file_create_from_path(RvHost*, const uint8_t* path, int32_t length, RvBlob** result);
+RV_EXPORT int32_t rv_file_create_from_path(RvHost*, const uint8_t* path, int32_t path_length, RvBlob** result);
 
 enum {
     RV_FILE_READER_RESULT_NULL = 0,

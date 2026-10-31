@@ -1224,7 +1224,7 @@ module Raw =
     extern int rv_blob_url_read(
         nativeint host,
         [<In>] byte[] url,
-        int length,
+        int url_length,
         nativeint completion,
         nativeint context,
         uint64& operation
@@ -1240,7 +1240,7 @@ module Raw =
     extern int rv_blob_read_error(uint64 operation, byte[] buffer, int capacity, int[] length)
 
     [<DllImport(Lib)>]
-    extern int rv_file_create_from_path(nativeint host, [<In>] byte[] path, int length, nativeint[] result)
+    extern int rv_file_create_from_path(nativeint host, [<In>] byte[] path, int path_length, nativeint[] result)
 
     [<DllImport(Lib)>]
     extern int rv_file_reader_result(
@@ -4050,13 +4050,13 @@ let rv_blob_read
         Raw.rv_blob_read (host, blob, mode, completion, context, &operation)
 
 let rv_blob_url_read
-    (host: nativeint, url: byte[], length: int, completion: nativeint, context: nativeint, operation: byref<uint64>)
+    (host: nativeint, url: byte[], url_length: int, completion: nativeint, context: nativeint, operation: byref<uint64>)
     : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
 
         let result =
-            Raw.rv_blob_url_read (host, url, length, completion, context, &operation)
+            Raw.rv_blob_url_read (host, url, url_length, completion, context, &operation)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[219] <- Calls.Counts[219] + 1L
@@ -4064,7 +4064,7 @@ let rv_blob_url_read
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_blob_url_read (host, url, length, completion, context, &operation)
+        Raw.rv_blob_url_read (host, url, url_length, completion, context, &operation)
 
 let rv_blob_read_result (operation: uint64, buffer: byte[], capacity: int64, length: byref<int64>) : int =
     if Calls.On then
@@ -4102,17 +4102,17 @@ let rv_blob_read_error (operation: uint64, buffer: byte[], capacity: int, length
     else
         Raw.rv_blob_read_error (operation, buffer, capacity, length)
 
-let rv_file_create_from_path (host: nativeint, path: byte[], length: int, result: nativeint[]) : int =
+let rv_file_create_from_path (host: nativeint, path: byte[], path_length: int, result: nativeint[]) : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_file_create_from_path (host, path, length, result)
+        let result = Raw.rv_file_create_from_path (host, path, path_length, result)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[223] <- Calls.Counts[223] + 1L
         Calls.Ticks[223] <- Calls.Ticks[223] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_file_create_from_path (host, path, length, result)
+        Raw.rv_file_create_from_path (host, path, path_length, result)
 
 let rv_file_reader_result
     (reader: nativeint, kind: byref<int>, buffer: byte[], capacity: int64, length: byref<int64>)
