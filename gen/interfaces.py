@@ -488,7 +488,7 @@ class InterfaceEmitter:
                 callback = self.world.config['callbackObjectRoots'][name]
                 result = callback['resultEnum']
                 declarations.append((name, '', ['    ' + callback['contract']]))
-                declarations.append((result['name'], '[<RequireQualifiedAccess>]',
+                declarations.append((result['name'], '',
                                      [f'    | {case} = {value}' for case, value in result['cases'].items()]))
         for name, (values, _, _) in self.world.enums.items():
             if name in self.enums:
@@ -510,11 +510,11 @@ class InterfaceEmitter:
                         body = []
                     else:
                         lines += [attrs, f'type {name} =']
-                elif body == ['    interface end'] or body == ['    class end'] or attrs == '':
+                elif body == ['    interface end'] or body == ['    class end'] or (attrs == '' and len(body) == 1):
                     lines += [f'{prefix}{" " + attrs if attrs else ""} {name} = {body[0].strip()}']
                     body = []
                 else:
-                    lines += [f'{prefix} {attrs} {name} =']
+                    lines += [f'{prefix}{" " + attrs if attrs else ""} {name} =']
             lines += body + ['']
         lines += self.extensions()
         missing_matrix_adapters = set(self.world.config.get('browserMatrixFlagAdapters', [])) - self.matrix_flag_adapters_used
