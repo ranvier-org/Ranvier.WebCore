@@ -1,0 +1,477 @@
+{
+ "browser": "156.0.8078.4",
+ "members": {
+  "filter": true,
+  "beginLayer": false,
+  "endLayer": false,
+  "reset": true,
+  "getTransform": true
+ },
+ "defaults": {
+  "transform": [
+   1,
+   0,
+   0,
+   1,
+   0,
+   0,
+   true,
+   true
+  ],
+  "globalAlpha": 1,
+  "composite": "source-over",
+  "filter": "none"
+ },
+ "translate": [
+  1,
+  0,
+  0,
+  1,
+  10,
+  5,
+  true,
+  false
+ ],
+ "scale": [
+  2,
+  0,
+  0,
+  3,
+  10,
+  5,
+  true,
+  false
+ ],
+ "rotate": [
+  0,
+  1,
+  -1,
+  0,
+  0,
+  0,
+  true,
+  false
+ ],
+ "transform": [
+  2,
+  0,
+  0,
+  2,
+  5,
+  5,
+  true,
+  false
+ ],
+ "setTransformInit": [
+  1,
+  0,
+  0,
+  1,
+  7,
+  8,
+  true,
+  false
+ ],
+ "setTransformM": [
+  1,
+  0,
+  0,
+  1,
+  3,
+  4,
+  true,
+  false
+ ],
+ "setTransformDefault": [
+  1,
+  0,
+  0,
+  1,
+  0,
+  0,
+  true,
+  true
+ ],
+ "setTransformConflict": "TypeError",
+ "nonFinite": [
+  1,
+  0,
+  0,
+  1,
+  0,
+  0,
+  true,
+  true
+ ],
+ "getTransformIsCopy": [
+  1,
+  0,
+  0,
+  1,
+  0,
+  0,
+  true,
+  true
+ ],
+ "drawTransformed": {
+  "inside": [
+   255,
+   0,
+   0,
+   255
+  ],
+  "outsideOrigin": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "beyond": [
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ "currentPathKeepsConstructionTransform": {
+  "hitTransformed": true,
+  "hitOrigin": false
+ },
+ "path2dUsesCurrentTransform": {
+  "at45": true,
+  "at5": false
+ },
+ "innerRestore": {
+  "fillStyle": "#00ff00"
+ },
+ "restored": {
+  "fillStyle": "#0000ff",
+  "alpha": 0.5,
+  "composite": "source-over",
+  "transform": [
+   1,
+   0,
+   0,
+   1,
+   5,
+   5,
+   true,
+   false
+  ]
+ },
+ "unmatchedRestore": {
+  "fillStyle": "#0000ff",
+  "transform": [
+   1,
+   0,
+   0,
+   1,
+   5,
+   5,
+   true,
+   false
+  ]
+ },
+ "clipRestored": [
+  255,
+  0,
+  0,
+  255
+ ],
+ "reset": {
+  "pixel": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "fillStyle": "#000000",
+  "alpha": 1,
+  "composite": "source-over",
+  "transform": [
+   1,
+   0,
+   0,
+   1,
+   0,
+   0,
+   true,
+   true
+  ],
+  "path": false,
+  "restoreAfterReset": "#000000"
+ },
+ "alphaPixel": [
+  255,
+  0,
+  0,
+  128
+ ],
+ "alphaAboveOne": 0.5,
+ "alphaNegative": 0.5,
+ "alphaNaN": 0.5,
+ "compositeNames": [
+  "source-over",
+  "source-in",
+  "source-out",
+  "source-atop",
+  "destination-over",
+  "destination-in",
+  "destination-out",
+  "destination-atop",
+  "lighter",
+  "copy",
+  "xor",
+  "multiply",
+  "screen",
+  "overlay",
+  "darken",
+  "lighten",
+  "color-dodge",
+  "color-burn",
+  "hard-light",
+  "soft-light",
+  "difference",
+  "exclusion",
+  "hue",
+  "saturation",
+  "color",
+  "luminosity"
+ ],
+ "compositeInvalidKept": "multiply",
+ "compositeDarker": "multiply",
+ "compositeCase": "multiply",
+ "compositePixels": {
+  "source-over": {
+   "overlap": [
+    255,
+    0,
+    0,
+    255
+   ],
+   "dst": [
+    0,
+    0,
+    255,
+    255
+   ],
+   "src": [
+    255,
+    0,
+    0,
+    255
+   ]
+  },
+  "destination-over": {
+   "overlap": [
+    0,
+    0,
+    255,
+    255
+   ],
+   "dst": [
+    0,
+    0,
+    255,
+    255
+   ],
+   "src": [
+    255,
+    0,
+    0,
+    255
+   ]
+  },
+  "xor": {
+   "overlap": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "dst": [
+    0,
+    0,
+    255,
+    255
+   ],
+   "src": [
+    255,
+    0,
+    0,
+    255
+   ]
+  },
+  "lighter": {
+   "overlap": [
+    255,
+    0,
+    255,
+    255
+   ],
+   "dst": [
+    0,
+    0,
+    255,
+    255
+   ],
+   "src": [
+    255,
+    0,
+    0,
+    255
+   ]
+  }
+ },
+ "compositePixels2": {
+  "source-in": {
+   "overlap": [
+    255,
+    0,
+    0,
+    255
+   ],
+   "dst": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "src": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  "destination-out": {
+   "overlap": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "dst": [
+    0,
+    0,
+    255,
+    255
+   ],
+   "src": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  "multiply": {
+   "overlap": [
+    0,
+    0,
+    0,
+    255
+   ],
+   "dst": [
+    0,
+    0,
+    255,
+    255
+   ],
+   "src": [
+    255,
+    0,
+    0,
+    255
+   ]
+  },
+  "screen": {
+   "overlap": [
+    255,
+    0,
+    255,
+    255
+   ],
+   "dst": [
+    0,
+    0,
+    255,
+    255
+   ],
+   "src": [
+    255,
+    0,
+    0,
+    255
+   ]
+  }
+ },
+ "compositeCopy": {
+  "overlap": [
+   255,
+   0,
+   0,
+   255
+  ],
+  "dst": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "src": [
+   255,
+   0,
+   0,
+   255
+  ]
+ },
+ "filter": {
+  "initial": "none",
+  "blur": "blur(2px)",
+  "invalidKept": "blur(2px)",
+  "invertPixel": [
+   0,
+   255,
+   255,
+   255
+  ],
+  "nonePixel": [
+   255,
+   0,
+   0,
+   255
+  ],
+  "opacityPixel": [
+   255,
+   0,
+   0,
+   127
+  ],
+  "blurPixels": {
+   "centre": [
+    255,
+    0,
+    0,
+    249
+   ],
+   "insideEdge": [
+    255,
+    0,
+    0,
+    148
+   ],
+   "outsideEdge": [
+    255,
+    0,
+    0,
+    104
+   ],
+   "far": [
+    255,
+    0,
+    0,
+    3
+   ]
+  }
+ }
+}

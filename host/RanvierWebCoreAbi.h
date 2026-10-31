@@ -1811,6 +1811,9 @@ enum {
  * without JavaScript. RanvierWebCoreDom.h holds the context's generated members and its release and retain. */
 typedef struct RvCanvasRenderingContext2D RvCanvasRenderingContext2D;
 
+/* "canvas-filters" for rv_abi_has: CanvasRenderingContext2D.filter applies CSS filter functions to drawing, as the
+ * host enables WebKit's CanvasFiltersEnabled setting. Canvas layers (beginLayer, endLayer) return RV_ERR_UNSUPPORTED. */
+
 /* Context types of rv_canvas_get_context. */
 enum {
     RV_CANVAS_CONTEXT_NONE = 0,

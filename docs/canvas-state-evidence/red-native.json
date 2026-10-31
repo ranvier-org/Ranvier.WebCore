@@ -1,0 +1,31 @@
+{
+ "abi": 55,
+ "exports": {
+  "rv_dom_canvas_rendering_context2_d_get_global_alpha": false,
+  "rv_dom_canvas_rendering_context2_d_set_global_alpha": false,
+  "rv_dom_canvas_rendering_context2_d_get_global_composite_operation": false,
+  "rv_dom_canvas_rendering_context2_d_set_global_composite_operation": false,
+  "rv_dom_canvas_rendering_context2_d_get_filter": false,
+  "rv_dom_canvas_rendering_context2_d_set_filter": false,
+  "rv_dom_canvas_rendering_context2_d_save": false,
+  "rv_dom_canvas_rendering_context2_d_restore": false,
+  "rv_dom_canvas_rendering_context2_d_reset": false,
+  "rv_dom_canvas_rendering_context2_d_begin_layer": false,
+  "rv_dom_canvas_rendering_context2_d_end_layer": false,
+  "rv_dom_canvas_rendering_context2_d_scale": false,
+  "rv_dom_canvas_rendering_context2_d_rotate": false,
+  "rv_dom_canvas_rendering_context2_d_translate": false,
+  "rv_dom_canvas_rendering_context2_d_transform": false,
+  "rv_dom_canvas_rendering_context2_d_get_transform": false,
+  "rv_dom_canvas_rendering_context2_d_set_transform_6": false,
+  "rv_dom_canvas_rendering_context2_d_set_transform_1": false,
+  "rv_dom_canvas_rendering_context2_d_reset_transform": false
+ },
+ "r02Present": true,
+ "webkitDefaults": {
+  "CanvasFiltersEnabled": false,
+  "CanvasLayersEnabled": false,
+  "source": "Source/WTF/Scripts/Preferences/UnifiedWebPreferences.yaml (status testable, WebCore default false)"
+ },
+ "red": true
+}

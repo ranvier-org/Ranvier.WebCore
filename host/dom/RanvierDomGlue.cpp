@@ -42168,6 +42168,52 @@ int32_t ranvier_dom_canvas_rendering_context2_d_get_canvas(RvCanvasRenderingCont
     return deliver([&]() -> decltype(auto) { return impl->canvas(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
 }
 
+// CanvasRenderingContext2D.globalAlpha getter: attribute unrestricted double globalAlpha
+int32_t ranvier_dom_canvas_rendering_context2_d_get_global_alpha(RvCanvasRenderingContext2D* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->globalAlpha(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// CanvasRenderingContext2D.globalAlpha setter: attribute unrestricted double globalAlpha
+int32_t ranvier_dom_canvas_rendering_context2_d_set_global_alpha(RvCanvasRenderingContext2D* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setGlobalAlpha(value); });
+}
+
+// CanvasRenderingContext2D.globalCompositeOperation getter: attribute DOMString globalCompositeOperation
+int32_t ranvier_dom_canvas_rendering_context2_d_get_global_composite_operation(RvCanvasRenderingContext2D* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->globalCompositeOperation(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// CanvasRenderingContext2D.globalCompositeOperation setter: attribute DOMString globalCompositeOperation
+int32_t ranvier_dom_canvas_rendering_context2_d_set_global_composite_operation(RvCanvasRenderingContext2D* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setGlobalCompositeOperation(a0.string()); });
+}
+
 // CanvasRenderingContext2D.fillStyle getter: attribute (DOMString or CanvasGradient or CanvasPattern) fillStyle; *result owns its contents; release with the matching rv_dom_*_release
 int32_t ranvier_dom_canvas_rendering_context2_d_get_fill_style(RvCanvasRenderingContext2D* target, RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* result)
 {
@@ -42191,6 +42237,212 @@ int32_t ranvier_dom_canvas_rendering_context2_d_set_fill_style(RvCanvasRendering
     auto a0 = decodeRvDomUnionDOMStringOrCanvasGradientOrCanvasPattern(value, status0);
     if (status0 != RV_OK) return status0;
     return invoke([&]() -> decltype(auto) { return WTF::switchOn(std::move(*a0), [&](auto&& arm) { if constexpr (std::is_same_v<std::remove_cvref_t<decltype(arm)>, String>) impl->setFillStyle(std::move(arm)); else impl->setFillStyle(RefPtr { std::move(arm) }); }); });
+}
+
+// CanvasRenderingContext2D.filter getter: attribute DOMString filter; RV_ERR_UNSUPPORTED while the setting CanvasFiltersEnabled is off
+int32_t ranvier_dom_canvas_rendering_context2_d_get_filter(RvCanvasRenderingContext2D* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    auto& settings = impl->canvas().document().settingsValues();
+    if (!(settings.canvasFiltersEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->filterString(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// CanvasRenderingContext2D.filter setter: attribute DOMString filter; RV_ERR_UNSUPPORTED while the setting CanvasFiltersEnabled is off
+int32_t ranvier_dom_canvas_rendering_context2_d_set_filter(RvCanvasRenderingContext2D* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    auto& settings = impl->canvas().document().settingsValues();
+    if (!(settings.canvasFiltersEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setFilterString(a0.string()); });
+}
+
+// CanvasRenderingContext2D.save() -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_save(RvCanvasRenderingContext2D* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->save(); });
+}
+
+// CanvasRenderingContext2D.restore() -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_restore(RvCanvasRenderingContext2D* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->restore(); });
+}
+
+// CanvasRenderingContext2D.reset() -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_reset(RvCanvasRenderingContext2D* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->reset(); });
+}
+
+// CanvasRenderingContext2D.beginLayer() -> undefined; RV_ERR_UNSUPPORTED while the setting CanvasLayersEnabled is off
+int32_t ranvier_dom_canvas_rendering_context2_d_begin_layer(RvCanvasRenderingContext2D* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    auto& settings = impl->canvas().document().settingsValues();
+    if (!(settings.canvasLayersEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->beginLayer(); });
+}
+
+// CanvasRenderingContext2D.endLayer() -> undefined; RV_ERR_UNSUPPORTED while the setting CanvasLayersEnabled is off
+int32_t ranvier_dom_canvas_rendering_context2_d_end_layer(RvCanvasRenderingContext2D* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    auto& settings = impl->canvas().document().settingsValues();
+    if (!(settings.canvasLayersEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->endLayer(); });
+}
+
+// CanvasRenderingContext2D.scale(unrestricted double x, unrestricted double y) -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_scale(RvCanvasRenderingContext2D* target, double x, double y)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->scale(x, y); });
+}
+
+// CanvasRenderingContext2D.rotate(unrestricted double angle) -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_rotate(RvCanvasRenderingContext2D* target, double angle)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->rotate(angle); });
+}
+
+// CanvasRenderingContext2D.translate(unrestricted double x, unrestricted double y) -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_translate(RvCanvasRenderingContext2D* target, double x, double y)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->translate(x, y); });
+}
+
+// CanvasRenderingContext2D.transform(unrestricted double a, unrestricted double b, unrestricted double c, unrestricted double d, unrestricted double e, unrestricted double f) -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_transform(RvCanvasRenderingContext2D* target, double a, double b, double c, double d, double e, double f)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->transform(a, b, c, d, e, f); });
+}
+
+// CanvasRenderingContext2D.getTransform() -> DOMMatrix; *result is a new reference
+int32_t ranvier_dom_canvas_rendering_context2_d_get_transform(RvCanvasRenderingContext2D* target, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->getTransform(); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// CanvasRenderingContext2D.setTransform(unrestricted double a, unrestricted double b, unrestricted double c, unrestricted double d, unrestricted double e, unrestricted double f) -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_set_transform_6(RvCanvasRenderingContext2D* target, double a, double b, double c, double d, double e, double f)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setTransform(a, b, c, d, e, f); });
+}
+
+// CanvasRenderingContext2D.setTransform(optional DOMMatrix2DInit transform = {}) -> undefined; transform defaults to {} in IDL; transform may be NULL for the IDL default
+int32_t ranvier_dom_canvas_rendering_context2_d_set_transform_1(RvCanvasRenderingContext2D* target, const RvDomDOMMatrix2DInit* transform)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    DOMMatrix2DInit a0 { };
+    if (transform) {
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, a) + sizeof(transform->a) && transform->a)
+            assignValue(a0.a, *transform->a);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, b) + sizeof(transform->b) && transform->b)
+            assignValue(a0.b, *transform->b);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, c) + sizeof(transform->c) && transform->c)
+            assignValue(a0.c, *transform->c);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, d) + sizeof(transform->d) && transform->d)
+            assignValue(a0.d, *transform->d);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, e) + sizeof(transform->e) && transform->e)
+            assignValue(a0.e, *transform->e);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, f) + sizeof(transform->f) && transform->f)
+            assignValue(a0.f, *transform->f);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m11) + sizeof(transform->m11) && transform->m11)
+            assignValue(a0.m11, *transform->m11);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m12) + sizeof(transform->m12) && transform->m12)
+            assignValue(a0.m12, *transform->m12);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m21) + sizeof(transform->m21) && transform->m21)
+            assignValue(a0.m21, *transform->m21);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m22) + sizeof(transform->m22) && transform->m22)
+            assignValue(a0.m22, *transform->m22);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m41) + sizeof(transform->m41) && transform->m41)
+            assignValue(a0.m41, *transform->m41);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m42) + sizeof(transform->m42) && transform->m42)
+            assignValue(a0.m42, *transform->m42);
+    }
+    return invoke([&]() -> decltype(auto) { return impl->setTransform(std::move(a0)); });
+}
+
+// CanvasRenderingContext2D.resetTransform() -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_reset_transform(RvCanvasRenderingContext2D* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->resetTransform(); });
 }
 
 // CanvasRenderingContext2D.clearRect(unrestricted double x, unrestricted double y, unrestricted double w, unrestricted double h) -> undefined

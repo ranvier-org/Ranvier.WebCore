@@ -148,4 +148,5 @@ with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
     run([sys.executable, '-I', '-X', 'utf8', tests / 'cascade_diagnostics.py', '--native-directory', out])
     run([sys.executable, '-I', '-X', 'utf8', tests / 'canvas_context.py', '--native-directory', out])
     run([sys.executable, '-I', '-X', 'utf8', tests / 'canvas_paths.py', '--native-directory', out])
+    run([sys.executable, '-I', '-X', 'utf8', tests / 'canvas_state.py', '--native-directory', out])
 print('abi tests passed', flush=True)

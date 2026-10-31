@@ -10316,10 +10316,67 @@ extern int rv_dom_html_canvas_element_set_height(nativeint target, uint32 value)
 extern int rv_dom_canvas_rendering_context2_d_get_canvas(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_global_alpha(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_global_alpha(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_global_composite_operation(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_global_composite_operation(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
 extern int rv_dom_canvas_rendering_context2_d_get_fill_style(nativeint target, RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_canvas_rendering_context2_d_set_fill_style(nativeint target, [<In>] RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern[] value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_filter(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_filter(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_save(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_restore(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_reset(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_begin_layer(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_end_layer(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_scale(nativeint target, float x, float y)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_rotate(nativeint target, float angle)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_translate(nativeint target, float x, float y)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_transform(nativeint target, float a, float b, float c, float d, float e, float f)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_transform(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_transform_6(nativeint target, float a, float b, float c, float d, float e, float f)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_transform_1(nativeint target, [<In>] RvDomDOMMatrix2DInit[] transform)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_reset_transform(nativeint target)
 
 [<DllImport(Lib)>]
 extern int rv_dom_canvas_rendering_context2_d_clear_rect(nativeint target, float x, float y, float w, float h)

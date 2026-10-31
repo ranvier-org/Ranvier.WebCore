@@ -2841,8 +2841,27 @@ int32_t rv_dom_html_canvas_element_set_width(RvNode* target, uint32_t value) { r
 int32_t rv_dom_html_canvas_element_get_height(RvNode* target, uint32_t* result) { return ranvier_dom_html_canvas_element_get_height(target, result); }
 int32_t rv_dom_html_canvas_element_set_height(RvNode* target, uint32_t value) { return ranvier_dom_html_canvas_element_set_height(target, value); }
 int32_t rv_dom_canvas_rendering_context2_d_get_canvas(RvCanvasRenderingContext2D* target, RvNode** result) { return ranvier_dom_canvas_rendering_context2_d_get_canvas(target, result); }
+int32_t rv_dom_canvas_rendering_context2_d_get_global_alpha(RvCanvasRenderingContext2D* target, double* result) { return ranvier_dom_canvas_rendering_context2_d_get_global_alpha(target, result); }
+int32_t rv_dom_canvas_rendering_context2_d_set_global_alpha(RvCanvasRenderingContext2D* target, double value) { return ranvier_dom_canvas_rendering_context2_d_set_global_alpha(target, value); }
+int32_t rv_dom_canvas_rendering_context2_d_get_global_composite_operation(RvCanvasRenderingContext2D* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_canvas_rendering_context2_d_get_global_composite_operation(target, buffer, capacity, length); }
+int32_t rv_dom_canvas_rendering_context2_d_set_global_composite_operation(RvCanvasRenderingContext2D* target, const uint8_t* value, int32_t value_length) { return ranvier_dom_canvas_rendering_context2_d_set_global_composite_operation(target, value, value_length); }
 int32_t rv_dom_canvas_rendering_context2_d_get_fill_style(RvCanvasRenderingContext2D* target, RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* result) { return ranvier_dom_canvas_rendering_context2_d_get_fill_style(target, result); }
 int32_t rv_dom_canvas_rendering_context2_d_set_fill_style(RvCanvasRenderingContext2D* target, const RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* value) { return ranvier_dom_canvas_rendering_context2_d_set_fill_style(target, value); }
+int32_t rv_dom_canvas_rendering_context2_d_get_filter(RvCanvasRenderingContext2D* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_canvas_rendering_context2_d_get_filter(target, buffer, capacity, length); }
+int32_t rv_dom_canvas_rendering_context2_d_set_filter(RvCanvasRenderingContext2D* target, const uint8_t* value, int32_t value_length) { return ranvier_dom_canvas_rendering_context2_d_set_filter(target, value, value_length); }
+int32_t rv_dom_canvas_rendering_context2_d_save(RvCanvasRenderingContext2D* target) { return ranvier_dom_canvas_rendering_context2_d_save(target); }
+int32_t rv_dom_canvas_rendering_context2_d_restore(RvCanvasRenderingContext2D* target) { return ranvier_dom_canvas_rendering_context2_d_restore(target); }
+int32_t rv_dom_canvas_rendering_context2_d_reset(RvCanvasRenderingContext2D* target) { return ranvier_dom_canvas_rendering_context2_d_reset(target); }
+int32_t rv_dom_canvas_rendering_context2_d_begin_layer(RvCanvasRenderingContext2D* target) { return ranvier_dom_canvas_rendering_context2_d_begin_layer(target); }
+int32_t rv_dom_canvas_rendering_context2_d_end_layer(RvCanvasRenderingContext2D* target) { return ranvier_dom_canvas_rendering_context2_d_end_layer(target); }
+int32_t rv_dom_canvas_rendering_context2_d_scale(RvCanvasRenderingContext2D* target, double x, double y) { return ranvier_dom_canvas_rendering_context2_d_scale(target, x, y); }
+int32_t rv_dom_canvas_rendering_context2_d_rotate(RvCanvasRenderingContext2D* target, double angle) { return ranvier_dom_canvas_rendering_context2_d_rotate(target, angle); }
+int32_t rv_dom_canvas_rendering_context2_d_translate(RvCanvasRenderingContext2D* target, double x, double y) { return ranvier_dom_canvas_rendering_context2_d_translate(target, x, y); }
+int32_t rv_dom_canvas_rendering_context2_d_transform(RvCanvasRenderingContext2D* target, double a, double b, double c, double d, double e, double f) { return ranvier_dom_canvas_rendering_context2_d_transform(target, a, b, c, d, e, f); }
+int32_t rv_dom_canvas_rendering_context2_d_get_transform(RvCanvasRenderingContext2D* target, RvDOMMatrixReadOnly** result) { return ranvier_dom_canvas_rendering_context2_d_get_transform(target, result); }
+int32_t rv_dom_canvas_rendering_context2_d_set_transform_6(RvCanvasRenderingContext2D* target, double a, double b, double c, double d, double e, double f) { return ranvier_dom_canvas_rendering_context2_d_set_transform_6(target, a, b, c, d, e, f); }
+int32_t rv_dom_canvas_rendering_context2_d_set_transform_1(RvCanvasRenderingContext2D* target, const RvDomDOMMatrix2DInit* transform) { return ranvier_dom_canvas_rendering_context2_d_set_transform_1(target, transform); }
+int32_t rv_dom_canvas_rendering_context2_d_reset_transform(RvCanvasRenderingContext2D* target) { return ranvier_dom_canvas_rendering_context2_d_reset_transform(target); }
 int32_t rv_dom_canvas_rendering_context2_d_clear_rect(RvCanvasRenderingContext2D* target, double x, double y, double w, double h) { return ranvier_dom_canvas_rendering_context2_d_clear_rect(target, x, y, w, h); }
 int32_t rv_dom_canvas_rendering_context2_d_fill_rect(RvCanvasRenderingContext2D* target, double x, double y, double w, double h) { return ranvier_dom_canvas_rendering_context2_d_fill_rect(target, x, y, w, h); }
 int32_t rv_dom_canvas_rendering_context2_d_stroke_rect(RvCanvasRenderingContext2D* target, double x, double y, double w, double h) { return ranvier_dom_canvas_rendering_context2_d_stroke_rect(target, x, y, w, h); }

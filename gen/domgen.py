@@ -80,7 +80,8 @@ UNMAPPED = ["Custom", "EnabledForWorld", "EnabledByQuirk", "ForwardToMapLike", "
             "PrivateIdentifier", "LegacyFactoryFunction"]
 # CallWith values the glue supplies from the node's document.
 # How the glue reaches a document for the settings of [EnabledBySetting], by the root of an interface other than a node.
-SETTINGS_DOCUMENT = {"AbstractRange": "impl->startContainer().document()", "DOMStringMap": "impl->element().document()"}
+SETTINGS_DOCUMENT = {"AbstractRange": "impl->startContainer().document()", "DOMStringMap": "impl->element().document()",
+                     "CanvasRenderingContext2D": "impl->canvas().document()"}
 # ArrayBufferView element kinds of typedArrayViewTypes: (macro suffix, JSC view, element size), indexed by value.
 TYPED_ARRAY_VIEW_KINDS = [('INT8', 'Int8Array', 1), ('UINT8', 'Uint8Array', 1), ('UINT8_CLAMPED', 'Uint8ClampedArray', 1),
                           ('INT16', 'Int16Array', 2), ('UINT16', 'Uint16Array', 2), ('INT32', 'Int32Array', 4),

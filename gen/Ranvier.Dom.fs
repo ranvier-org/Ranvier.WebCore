@@ -5138,6 +5138,36 @@ and [<AllowNullLiteral>] HTMLCanvasElement =
 and [<AllowNullLiteral>] CanvasRenderingContext2D =
     /// <summary>CanvasRenderingContext2D.canvas.</summary>
     abstract member canvas: HTMLCanvasElement with get
+    /// <summary>CanvasRenderingContext2D.save.</summary>
+    abstract member save: unit -> unit
+    /// <summary>CanvasRenderingContext2D.restore.</summary>
+    abstract member restore: unit -> unit
+    /// <summary>CanvasRenderingContext2D.reset.</summary>
+    abstract member reset: unit -> unit
+    /// <summary>CanvasRenderingContext2D.beginLayer.</summary>
+    abstract member beginLayer: unit -> unit
+    /// <summary>CanvasRenderingContext2D.endLayer.</summary>
+    abstract member endLayer: unit -> unit
+    /// <summary>CanvasRenderingContext2D.scale.</summary>
+    abstract member scale: x: float * y: float -> unit
+    /// <summary>CanvasRenderingContext2D.rotate.</summary>
+    abstract member rotate: angle: float -> unit
+    /// <summary>CanvasRenderingContext2D.translate.</summary>
+    abstract member translate: x: float * y: float -> unit
+    /// <summary>CanvasRenderingContext2D.transform.</summary>
+    abstract member transform: a: float * b: float * c: float * d: float * e: float * f: float -> unit
+    /// <summary>CanvasRenderingContext2D.getTransform.</summary>
+    abstract member getTransform: unit -> DOMMatrix
+    /// <summary>CanvasRenderingContext2D.setTransform.</summary>
+    abstract member setTransform: a: float * b: float * c: float * d: float * e: float * f: float -> unit
+    /// <summary>CanvasRenderingContext2D.setTransform.</summary>
+    abstract member setTransform: ?transform: DOMMatrix2DInit -> unit
+    /// <summary>CanvasRenderingContext2D.resetTransform.</summary>
+    abstract member resetTransform: unit -> unit
+    /// <summary>CanvasRenderingContext2D.globalAlpha.</summary>
+    abstract member globalAlpha: float with get, set
+    /// <summary>CanvasRenderingContext2D.globalCompositeOperation.</summary>
+    abstract member globalCompositeOperation: string with get, set
 
     /// <summary>CanvasRenderingContext2D.fillStyle.</summary>
 #if FABLE_COMPILER
@@ -5149,6 +5179,8 @@ and [<AllowNullLiteral>] CanvasRenderingContext2D =
 #else
     abstract member fillStyle: DOMStringOrCanvasGradientOrCanvasPattern with get, set
 #endif
+    /// <summary>CanvasRenderingContext2D.filter.</summary>
+    abstract member filter: string with get, set
     /// <summary>CanvasRenderingContext2D.clearRect.</summary>
     abstract member clearRect: x: float * y: float * w: float * h: float -> unit
     /// <summary>CanvasRenderingContext2D.fillRect.</summary>

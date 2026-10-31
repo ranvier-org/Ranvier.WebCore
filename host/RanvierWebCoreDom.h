@@ -8284,11 +8284,54 @@ RV_EXPORT int32_t rv_dom_html_canvas_element_set_height(RvNode* target, uint32_t
 
 /* CanvasRenderingContext2D.canvas getter: readonly attribute HTMLCanvasElement canvas; *result is a new reference */
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_canvas(RvCanvasRenderingContext2D* target, RvNode** result);
+/* CanvasRenderingContext2D.globalAlpha getter: attribute unrestricted double globalAlpha */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_global_alpha(RvCanvasRenderingContext2D* target, double* result);
+/* CanvasRenderingContext2D.globalAlpha setter: attribute unrestricted double globalAlpha */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_global_alpha(RvCanvasRenderingContext2D* target, double value);
+/* CanvasRenderingContext2D.globalCompositeOperation getter: attribute DOMString globalCompositeOperation */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_global_composite_operation(RvCanvasRenderingContext2D* target, char* buffer, int32_t capacity, int32_t* length);
+/* CanvasRenderingContext2D.globalCompositeOperation setter: attribute DOMString globalCompositeOperation */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_global_composite_operation(RvCanvasRenderingContext2D* target, const uint8_t* value, int32_t value_length);
 /* CanvasRenderingContext2D.fillStyle getter: attribute (DOMString or CanvasGradient or CanvasPattern) fillStyle;
  * *result owns its contents; release with the matching rv_dom_*_release */
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_fill_style(RvCanvasRenderingContext2D* target, RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* result);
 /* CanvasRenderingContext2D.fillStyle setter: attribute (DOMString or CanvasGradient or CanvasPattern) fillStyle */
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_fill_style(RvCanvasRenderingContext2D* target, const RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* value);
+/* CanvasRenderingContext2D.filter getter: attribute DOMString filter; RV_ERR_UNSUPPORTED while the setting
+ * CanvasFiltersEnabled is off */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_filter(RvCanvasRenderingContext2D* target, char* buffer, int32_t capacity, int32_t* length);
+/* CanvasRenderingContext2D.filter setter: attribute DOMString filter; RV_ERR_UNSUPPORTED while the setting
+ * CanvasFiltersEnabled is off */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_filter(RvCanvasRenderingContext2D* target, const uint8_t* value, int32_t value_length);
+/* CanvasRenderingContext2D.save() -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_save(RvCanvasRenderingContext2D* target);
+/* CanvasRenderingContext2D.restore() -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_restore(RvCanvasRenderingContext2D* target);
+/* CanvasRenderingContext2D.reset() -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_reset(RvCanvasRenderingContext2D* target);
+/* CanvasRenderingContext2D.beginLayer() -> undefined; RV_ERR_UNSUPPORTED while the setting CanvasLayersEnabled is off */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_begin_layer(RvCanvasRenderingContext2D* target);
+/* CanvasRenderingContext2D.endLayer() -> undefined; RV_ERR_UNSUPPORTED while the setting CanvasLayersEnabled is off */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_end_layer(RvCanvasRenderingContext2D* target);
+/* CanvasRenderingContext2D.scale(unrestricted double x, unrestricted double y) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_scale(RvCanvasRenderingContext2D* target, double x, double y);
+/* CanvasRenderingContext2D.rotate(unrestricted double angle) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_rotate(RvCanvasRenderingContext2D* target, double angle);
+/* CanvasRenderingContext2D.translate(unrestricted double x, unrestricted double y) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_translate(RvCanvasRenderingContext2D* target, double x, double y);
+/* CanvasRenderingContext2D.transform(unrestricted double a, unrestricted double b, unrestricted double c,
+ * unrestricted double d, unrestricted double e, unrestricted double f) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_transform(RvCanvasRenderingContext2D* target, double a, double b, double c, double d, double e, double f);
+/* CanvasRenderingContext2D.getTransform() -> DOMMatrix; *result is a new reference */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_transform(RvCanvasRenderingContext2D* target, RvDOMMatrixReadOnly** result);
+/* CanvasRenderingContext2D.setTransform(unrestricted double a, unrestricted double b, unrestricted double c,
+ * unrestricted double d, unrestricted double e, unrestricted double f) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_transform_6(RvCanvasRenderingContext2D* target, double a, double b, double c, double d, double e, double f);
+/* CanvasRenderingContext2D.setTransform(optional DOMMatrix2DInit transform = {}) -> undefined; transform defaults to
+ * {} in IDL; transform may be NULL for the IDL default */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_transform_1(RvCanvasRenderingContext2D* target, const RvDomDOMMatrix2DInit* transform);
+/* CanvasRenderingContext2D.resetTransform() -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_reset_transform(RvCanvasRenderingContext2D* target);
 /* CanvasRenderingContext2D.clearRect(unrestricted double x, unrestricted double y, unrestricted double w,
  * unrestricted double h) -> undefined */
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_clear_rect(RvCanvasRenderingContext2D* target, double x, double y, double w, double h);

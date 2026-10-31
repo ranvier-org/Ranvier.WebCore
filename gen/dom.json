@@ -1175,7 +1175,22 @@
       "stroke",
       "clip",
       "isPointInPath",
-      "isPointInStroke"
+      "isPointInStroke",
+      "save",
+      "restore",
+      "reset",
+      "scale",
+      "rotate",
+      "translate",
+      "transform",
+      "getTransform",
+      "setTransform",
+      "resetTransform",
+      "globalAlpha",
+      "globalCompositeOperation",
+      "filter",
+      "beginLayer",
+      "endLayer"
     ],
     "CanvasGradient": [],
     "CanvasPattern": []
