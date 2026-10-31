@@ -16,12 +16,17 @@
 #include "HTMLElementTypeHelpers.h"
 #include "Image.h"
 #include "ImageLoader.h"
+#include "MediaCapabilitiesNativeQuery.h"
+#include "MediaDecodingConfiguration.h"
+#include "MediaEncodingConfiguration.h"
 #include "Node.h"
 #include "OriginAccessPatterns.h"
+#include "PlatformMediaEngineConfigurationFactory.h"
 #include "SVGImageElement.h"
 #include "SecurityOrigin.h"
 #include "ThreadableBlobRegistry.h"
 #include "SVGElementTypeHelpers.h"
+#include "dom/RanvierDomGlue.h"
 #include <JavaScriptCore/ArrayBuffer.h>
 #include <unordered_map>
 #include <wtf/MainThread.h>
@@ -60,6 +65,7 @@ int32_t outcomeFor(ImageDecodeResult result)
 }
 
 class BlobReadOperation;
+class MediaQueryOperation;
 
 // One terminal outcome per operation, delivered on the owning thread; see RanvierResourceGlue.h.
 class Operation : public RefCounted<Operation>, public CanMakeSingleThreadWeakPtr<Operation> {
@@ -124,6 +130,7 @@ public:
 
     virtual bool belongsTo(const Document& candidate) const { return document == &candidate; }
     virtual BlobReadOperation* asBlobRead() { return nullptr; }
+    virtual MediaQueryOperation* asMediaQuery() { return nullptr; }
 
 protected:
     Operation(Document& document, RvResourceCompletion callback, void* context)
@@ -400,6 +407,53 @@ private:
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(BlobReadOperation);
 
+// MediaCapabilities.decodingInfo() or encodingInfo() through patch 0043. The providers can answer inside the starting
+// call, where finish() defers delivery to a later run-loop turn.
+class MediaQueryOperation final : public Operation {
+    WTF_MAKE_TZONE_ALLOCATED(MediaQueryOperation);
+
+public:
+    static Ref<MediaQueryOperation> create(Document& document, RvResourceCompletion callback, void* context)
+    {
+        return adoptRef(*new MediaQueryOperation(document, callback, context));
+    }
+
+    bool succeeded { false };
+    bool rejected { false };
+    PlatformMediaCapabilitiesInfo info;
+
+    MediaQueryOperation* asMediaQuery() final { return this; }
+
+    template<typename Result> Function<void(ExceptionOr<Result>&&)> completion()
+    {
+        return [weak = SingleThreadWeakPtr<Operation> { *this }](ExceptionOr<Result>&& result) {
+            RefPtr operation = weak.get();
+            if (!operation || operation->terminal)
+                return;
+            auto& query = *operation->asMediaQuery();
+            if (result.hasException()) {
+                // A rejected configuration is never registered and never delivered.
+                query.rejected = true;
+                query.terminal = true;
+                query.callback = nullptr;
+                return;
+            }
+            auto value = result.releaseReturnValue();
+            query.info = { value.supported, value.smooth, value.powerEfficient };
+            query.succeeded = true;
+            query.finish(RV_RESOURCE_SUCCEEDED);
+        };
+    }
+
+private:
+    MediaQueryOperation(Document& document, RvResourceCompletion callback, void* context)
+        : Operation(document, callback, context)
+    {
+    }
+};
+
+WTF_MAKE_TZONE_ALLOCATED_IMPL(MediaQueryOperation);
+
 std::unordered_map<uint64_t, Ref<Operation>>& operations()
 {
     static NeverDestroyed<std::unordered_map<uint64_t, Ref<Operation>>> values;
@@ -668,4 +722,146 @@ int32_t ranvier_file_reader_error(RvEventTarget* target, char* buffer, int32_t c
         return RV_OK;
     }
     return copyText(error->name().utf8().span(), buffer, capacity, length);
+}
+
+namespace {
+
+std::optional<String> mediaText(const uint8_t* bytes, int32_t length)
+{
+    if (length < 0 || (length && !bytes))
+        return std::nullopt;
+    if (!length)
+        return emptyString();
+    auto text = String::fromUTF8(std::span<const char8_t> { reinterpret_cast<const char8_t*>(bytes), static_cast<size_t>(length) });
+    if (text.isNull())
+        return std::nullopt;
+    return text;
+}
+
+template<typename Enum> bool mediaEnum(int32_t value, int32_t count, std::optional<Enum>& result)
+{
+    if (value == -1)
+        return true;
+    if (value < 0 || value >= count)
+        return false;
+    result = static_cast<Enum>(value);
+    return true;
+}
+
+bool mediaFlag(int32_t value, std::optional<bool>& result)
+{
+    if (value == -1)
+        return true;
+    if (value != 0 && value != 1)
+        return false;
+    result = value == 1;
+    return true;
+}
+
+bool mediaConfiguration(const RvMediaVideoConfiguration* video, const RvMediaAudioConfiguration* audio, MediaConfiguration& result)
+{
+    if (video) {
+        if (video->size != static_cast<int32_t>(sizeof(RvMediaVideoConfiguration)))
+            return false;
+        auto contentType = mediaText(video->content_type, video->content_type_length);
+        if (!contentType)
+            return false;
+        VideoConfiguration value;
+        value.contentType = *contentType;
+        value.width = video->width;
+        value.height = video->height;
+        value.bitrate = video->bitrate;
+        value.framerate = video->framerate;
+        if (!mediaFlag(video->alpha_channel, value.alphaChannel)
+            || !mediaEnum(video->hdr_metadata_type, 3, value.hdrMetadataType)
+            || !mediaEnum(video->color_gamut, 3, value.colorGamut)
+            || !mediaEnum(video->transfer_function, 3, value.transferFunction))
+            return false;
+        result.video = WTF::move(value);
+    }
+    if (audio) {
+        if (audio->size != static_cast<int32_t>(sizeof(RvMediaAudioConfiguration)))
+            return false;
+        auto contentType = mediaText(audio->content_type, audio->content_type_length);
+        if (!contentType)
+            return false;
+        AudioConfiguration value;
+        value.contentType = *contentType;
+        if (audio->channels) {
+            auto channels = mediaText(audio->channels, audio->channels_length);
+            if (!channels)
+                return false;
+            value.channels = *channels;
+        } else if (audio->channels_length)
+            return false;
+        if (audio->bitrate >= 0)
+            value.bitrate = static_cast<uint64_t>(audio->bitrate);
+        if (audio->samplerate > static_cast<int64_t>(std::numeric_limits<uint32_t>::max()))
+            return false;
+        if (audio->samplerate >= 0)
+            value.samplerate = static_cast<uint32_t>(audio->samplerate);
+        if (!mediaFlag(audio->spatial_rendering, value.spatialRendering))
+            return false;
+        result.audio = WTF::move(value);
+    }
+    return true;
+}
+
+}
+
+int32_t ranvier_media_capabilities_query(RvNode* documentHandle, int32_t encoding, int32_t type, const RvMediaVideoConfiguration* video,
+    const RvMediaAudioConfiguration* audio, RvResourceCompletion callback, void* context, uint64_t* operation)
+{
+    if (!documentHandle || !callback || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* document = documentFromHandle(documentHandle);
+    if (!document || !document->window() || !nextOperation)
+        return RV_ERR_UNSUPPORTED;
+    if (type < 0 || type >= (encoding ? 2 : 3))
+        return RV_ERR_UNSUPPORTED;
+    MediaConfiguration configuration;
+    if (!mediaConfiguration(video, audio, configuration))
+        return RV_ERR_UNSUPPORTED;
+    Ref value = MediaQueryOperation::create(*document, callback, context);
+    value->starting = true;
+    if (encoding) {
+        MediaEncodingConfiguration query { WTF::move(configuration), static_cast<MediaEncodingType>(type) };
+        queryMediaEncodingInfo(*document, WTF::move(query), value->completion<PlatformMediaCapabilitiesEncodingInfo>());
+    } else {
+        MediaDecodingConfiguration query { WTF::move(configuration), static_cast<MediaDecodingType>(type) };
+        queryMediaDecodingInfo(*document, WTF::move(query), value->completion<PlatformMediaCapabilitiesDecodingInfo>());
+    }
+    value->starting = false;
+    if (value->rejected) {
+        value->detach();
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError });
+    }
+    *operation = nextOperation++;
+    operations().emplace(*operation, WTF::move(value));
+    return RV_OK;
+}
+
+int32_t ranvier_media_capabilities_info(uint64_t operation, int32_t* supported, int32_t* smooth, int32_t* power_efficient)
+{
+    if (!supported || !smooth || !power_efficient)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto found = operations().find(operation);
+    auto* query = found == operations().end() ? nullptr : found->second->asMediaQuery();
+    if (!query || !query->succeeded)
+        return RV_ERR_UNSUPPORTED;
+    *supported = query->info.supported;
+    *smooth = query->info.smooth;
+    *power_efficient = query->info.powerEfficient;
+    return RV_OK;
+}
+
+int32_t ranvier_media_capabilities_provider(int32_t encoding)
+{
+    if (encoding)
+        return PlatformMediaEngineConfigurationFactory::hasEncodingConfigurationFactory() ? 1 : 0;
+    return PlatformMediaEngineConfigurationFactory::hasDecodingConfigurationFactory() ? 1 : 0;
 }

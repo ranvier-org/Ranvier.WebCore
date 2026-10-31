@@ -20,7 +20,7 @@ static constexpr const char* capabilityFacilityNames[] = {
     "accessibility", "accessibility-uia", "accessibility-events", "clipboard", "clipboard-read-callback",
     "clipboard-write-callback", "drop", "drag-out", "popups", "tooltip", "input", "ime", "frame", "scroll",
     "speech-synthesis", "gamepad", "spellcheck", "pdfjs", "wk-web-extensions", "notifications", "diagnostics",
-    "inspector-frontend", "cascade-diagnostics"
+    "inspector-frontend", "cascade-diagnostics", "media-capabilities", "media-decoding-provider", "media-encoding-provider"
 };
 
 static constexpr const char* capabilityHostFacilityNames[] = { "clipboard", "drop", "tooltip", "input", "ime", "scroll" };
@@ -237,6 +237,13 @@ static CapabilityResult capabilityQuery(RvHost& host, int category, const char* 
     else if (!std::strcmp(name, "cascade-diagnostics")) { result.facts[1] = 1; result.boolean(host.diagnostics); }
     // No flavor ships a developer-tools frontend (WebInspectorUI) or connects one to the page's inspector controller.
     else if (!std::strcmp(name, "inspector-frontend")) { result.facts[1] = 0; result.facts[4] = 0; }
+    else if (!std::strcmp(name, "media-capabilities")) result.facts[1] = rv_abi_has(name);
+    // A media engine configuration provider answers MediaCapabilities queries; without one every valid query is unsupported.
+    else if (!std::strcmp(name, "media-decoding-provider") || !std::strcmp(name, "media-encoding-provider")) {
+        auto provider = ranvier_media_capabilities_provider(!std::strcmp(name, "media-encoding-provider"));
+        result.facts[1] = provider;
+        result.facts[4] = provider;
+    }
     else if (capabilityContains(capabilityHostFacilityNames, name)) result.facts[1] = 1;
     if (result.kind == 1) result.facts[2] = result.number ? 1 : 0;
     return result;
