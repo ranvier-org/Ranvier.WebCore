@@ -150,6 +150,21 @@ class Runner:
         self.events.append(entry)
         return 0
 
+    def drain(self):
+        """Cycles the run loop until the queued toggle and close tasks have run: three consecutive cycles deliver
+        no event."""
+        cycle = self.p.bind('rv_run_loop_cycle', I, [I])
+        seen, quiet = len(self.events), 0
+        for _ in range(200):
+            cycle(1)
+            if len(self.events) == seen:
+                quiet += 1
+                if quiet == 3:
+                    return
+            else:
+                seen, quiet = len(self.events), 0
+        raise AssertionError('the run loop kept delivering events')
+
     def flush(self):
         for _ in range(3):
             self.p.bind('rv_run_loop_cycle', I, [I])(16)
@@ -339,8 +354,8 @@ def replay(native_directory, cases):
             steps = []
             for s in case['steps']:
                 result = runner.step(s)
-                # Chromium runs queued tasks between two page.evaluate calls; one cycle does the same here.
-                p.bind('rv_run_loop_cycle', I, [I])(0)
+                # Chromium runs queued tasks between two page.evaluate calls; draining the run loop does the same here.
+                runner.drain()
                 result['events'] = runner.events[:]
                 runner.events.clear()
                 steps.append({**s, **result})
@@ -434,11 +449,37 @@ def teardown(native_directory, cases):
 SYNCHRONOUS = ('beforetoggle', 'cancel', 'command')
 
 
+def toggle_chain(events):
+    """Per target: the close count, the last toggle's newState, and whether each toggle's oldState is the previous
+    toggle's newState (the first starts at "closed"). Coalescing changes the toggle count, never these."""
+    result = {}
+    for target in sorted({ev['target'] for ev in events}):
+        toggles = [ev for ev in events if ev['target'] == target and ev['type'] == 'toggle']
+        states = ['closed'] + [ev['newState'] for ev in toggles]
+        result[target] = {'closes': sum(1 for ev in events if ev['target'] == target and ev['type'] == 'close'),
+                          'finalState': states[-1],
+                          'chained': all(ev['oldState'] == states[i] for i, ev in enumerate(toggles)),
+                          'untrusted': [ev for ev in toggles if not ev['trusted'] or ev['cancelable']]}
+    return result
+
+
+def collapsed_order(events):
+    """Per target, the queued toggle/close order with consecutive toggles merged into one."""
+    result = {}
+    for target in sorted({ev['target'] for ev in events}):
+        order = []
+        for ev in events:
+            if ev['target'] == target and ev['type'] not in SYNCHRONOUS and not (order and order[-1] == ev['type'] == 'toggle'):
+                order.append(ev['type'])
+        result[target] = order
+    return result
+
+
 def compare(oracle, native):
     """The differences from the oracle, by kind: a step's status or value; the order and fields of the events
-    dispatched during a call (beforetoggle, cancel, command); the queued toggle and close events of a case as a
-    multiset; and the toggle/close order of each target. Queued events are compared without their step, as both
-    engines deliver them at a task boundary."""
+    dispatched during a call (beforetoggle, cancel, command); the queued toggle chain of each target; and its
+    toggle/close order. Queued events are compared without their step, as both engines deliver them at a task
+    boundary, and without their count, as a pending toggle task coalesces with the next toggle."""
     differences = []
     for expected, actual in zip(oracle['cases'], native):
         name = expected['name']
@@ -448,9 +489,8 @@ def compare(oracle, native):
                                     'chromium': [e['status'], e.get('value')], 'native': [a['status'], a.get('value')]})
         events = lambda case: [ev for s in case['steps'] for ev in s['events']]
         sync = lambda case: [ev for ev in events(case) if ev['type'] in SYNCHRONOUS]
-        queued = lambda case: sorted((ev for ev in events(case) if ev['type'] not in SYNCHRONOUS), key=lambda ev: json.dumps(ev, sort_keys=True))
-        order = lambda case: {target: [ev['type'] for ev in events(case) if ev['target'] == target and ev['type'] not in SYNCHRONOUS]
-                              for target in sorted({ev['target'] for ev in events(case)})}
+        queued = lambda case: toggle_chain([ev for ev in events(case) if ev['type'] not in SYNCHRONOUS])
+        order = lambda case: collapsed_order(events(case))
         for kind, measure in [('dispatched', sync), ('queued', queued), ('queuedOrder', order)]:
             if measure(expected) != measure(actual):
                 differences.append({'case': name, 'kind': kind, 'chromium': measure(expected), 'native': measure(actual)})
@@ -462,6 +502,7 @@ if __name__ == '__main__':
     parser.add_argument('--native-directory', required=True)
     parser.add_argument('--report')
     parser.add_argument('--measure', action='store_true', help='record native results and differences without asserting')
+    parser.add_argument('--abi', type=int, default=ABI, help='the expected ABI version of a later runtime')
     args = parser.parse_args()
     cases = json.loads((FIXTURES / 'dialog-popover-cases.json').read_text())
     oracle = json.loads((FIXTURES / 'dialog-popover-oracle.json').read_text())
@@ -484,7 +525,7 @@ if __name__ == '__main__':
         raise AssertionError('differences changed: unexpected ' + json.dumps(unexpected) + ' absent ' + json.dumps(absent))
     comparisons = sum(len(case['steps']) for case in native) + 3 * len(native)
     with SvgProbe(args.native_directory) as p:
-        p.expect(p.bind('rv_abi_version', I, [])() == ABI, 'ABI version ' + str(ABI))
+        p.expect(p.bind('rv_abi_version', I, [])() == args.abi, 'ABI version ' + str(args.abi))
         for feature in [b'dom:ToggleEvent', b'dom:CommandEvent', b'dom-constructor:ToggleEvent', b'dom-constructor:CommandEvent']:
             p.expect(p.bind('rv_abi_has', I, [ctypes.c_char_p])(feature) == 1, feature.decode() + ' advertised')
         assertions += p.assertions

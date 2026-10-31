@@ -1,124 +1,14 @@
 {
  "description": "Measured differences between the native engine and Chromium 156.0.8078.4 for tests/fixtures/dialog-popover-cases.json. tests/abi/dialog_popover.py requires exactly these; any other difference fails.",
- "native": "Native30 candidate (PopoverHintEnabled on)",
+ "native": "Native30 (PopoverHintEnabled on)",
  "browser": "156.0.8078.4",
+ "unordered": [
+  {
+   "qualification": "coalesced-toggles",
+   "reason": "A pending toggle task absorbs the next toggle of the same element (HTML \"queue a popover toggle event task\" and the dialog equivalent), so the toggle count depends on when tasks run. The probe drains the run loop after every step and compares, per element, the close count, the last newState and the oldState/newState chain, never the toggle count. With the drain the native engine coalesces nothing in these cases; Chromium coalesces the open and Escape-close of m in \"close request after user activation\" into one closed>closed toggle."
+  }
+ ],
  "differences": [
-  {
-   "qualification": "coalesced-dialog-toggles",
-   "reason": "Two showModal and two close calls run without a task boundary between the open and the close of each dialog; WebKit coalesces each dialog's queued toggle task into one closed>closed event (HTML \"queue a dialog toggle event task\" reuses a pending task). Chromium delivers open and close toggles separately because each Playwright evaluate ends a task. Native 8 events, Chromium 10.",
-   "case": "modal dialog top layer and focus",
-   "kind": "queued",
-   "chromium": [
-    {
-     "type": "toggle",
-     "target": "d",
-     "trusted": true,
-     "cancelable": false,
-     "oldState": "open",
-     "newState": "closed",
-     "source": null
-    },
-    {
-     "type": "toggle",
-     "target": "m",
-     "trusted": true,
-     "cancelable": false,
-     "oldState": "open",
-     "newState": "closed",
-     "source": null
-    },
-    {
-     "type": "toggle",
-     "target": "d",
-     "trusted": true,
-     "cancelable": false,
-     "oldState": "closed",
-     "newState": "open",
-     "source": null
-    },
-    {
-     "type": "toggle",
-     "target": "m",
-     "trusted": true,
-     "cancelable": false,
-     "oldState": "closed",
-     "newState": "open",
-     "source": null
-    },
-    {
-     "type": "close",
-     "target": "d",
-     "trusted": true,
-     "cancelable": false
-    },
-    {
-     "type": "close",
-     "target": "m",
-     "trusted": true,
-     "cancelable": false
-    }
-   ],
-   "native": [
-    {
-     "type": "toggle",
-     "target": "d",
-     "trusted": true,
-     "cancelable": false,
-     "oldState": "closed",
-     "newState": "closed",
-     "source": null
-    },
-    {
-     "type": "toggle",
-     "target": "m",
-     "trusted": true,
-     "cancelable": false,
-     "oldState": "closed",
-     "newState": "closed",
-     "source": null
-    },
-    {
-     "type": "close",
-     "target": "d",
-     "trusted": true,
-     "cancelable": false
-    },
-    {
-     "type": "close",
-     "target": "m",
-     "trusted": true,
-     "cancelable": false
-    }
-   ]
-  },
-  {
-   "qualification": "coalesced-dialog-toggles",
-   "reason": "Same coalescing: per dialog, native toggle,close; Chromium toggle,toggle,close.",
-   "case": "modal dialog top layer and focus",
-   "kind": "queuedOrder",
-   "chromium": {
-    "d": [
-     "toggle",
-     "toggle",
-     "close"
-    ],
-    "m": [
-     "toggle",
-     "toggle",
-     "close"
-    ]
-   },
-   "native": {
-    "d": [
-     "toggle",
-     "close"
-    ],
-    "m": [
-     "toggle",
-     "close"
-    ]
-   }
-  },
   {
    "qualification": "close-watcher-activation",
    "reason": "Escape after a scripted showModal: the native cancel event is not cancelable. A close watcher makes cancel cancelable only with history-action user activation. Playwright evaluate runs with a user gesture, so Chromium has activation on every step (navigator.userActivation.isActive true before each press); the native host has none. Under equal activation (trusted click first, case \"close request after user activation\") the first Escape cancel is cancelable on both.",
@@ -263,7 +153,7 @@
   },
   {
    "qualification": "toggle-before-close",
-   "reason": "On the close-request path (Escape, light dismiss, closedby) WebKit queues the dialog toggle task before the close event task; Chromium fires close first, then toggle. For close() both fire toggle first. 3 of 3 close requests differ.",
+   "reason": "On the close-request path (Escape, light dismiss, closedby) WebKit queues the dialog toggle task before the close event task; Chromium fires close first, then toggle. 3 of 3 dialogs differ; close() fires toggle first on both. Consecutive toggles are merged before the comparison.",
    "case": "close requests and closedby",
    "kind": "queuedOrder",
    "chromium": {
@@ -286,16 +176,13 @@
    "native": {
     "cb": [
      "toggle",
-     "toggle",
      "close"
     ],
     "cn": [
      "toggle",
-     "toggle",
      "close"
     ],
     "m": [
-     "toggle",
      "toggle",
      "close"
     ]
@@ -718,162 +605,15 @@
    ]
   },
   {
-   "qualification": "coalesced-dialog-toggles",
-   "reason": "Chromium coalesces the first open/close of m into one closed>closed toggle (the click, showModal and Escape run inside one task boundary); native delivers closed>open and open>closed.",
-   "case": "close request after user activation",
-   "kind": "queued",
-   "chromium": [
-    {
-     "type": "toggle",
-     "target": "m",
-     "trusted": true,
-     "cancelable": false,
-     "oldState": "closed",
-     "newState": "closed",
-     "source": null
-    },
-    {
-     "type": "toggle",
-     "target": "m",
-     "trusted": true,
-     "cancelable": false,
-     "oldState": "open",
-     "newState": "closed",
-     "source": null
-    },
-    {
-     "type": "toggle",
-     "target": "m",
-     "trusted": true,
-     "cancelable": false,
-     "oldState": "open",
-     "newState": "closed",
-     "source": null
-    },
-    {
-     "type": "toggle",
-     "target": "m",
-     "trusted": true,
-     "cancelable": false,
-     "oldState": "closed",
-     "newState": "open",
-     "source": null
-    },
-    {
-     "type": "toggle",
-     "target": "m",
-     "trusted": true,
-     "cancelable": false,
-     "oldState": "closed",
-     "newState": "open",
-     "source": null
-    },
-    {
-     "type": "close",
-     "target": "m",
-     "trusted": true,
-     "cancelable": false
-    },
-    {
-     "type": "close",
-     "target": "m",
-     "trusted": true,
-     "cancelable": false
-    },
-    {
-     "type": "close",
-     "target": "m",
-     "trusted": true,
-     "cancelable": false
-    }
-   ],
-   "native": [
-    {
-     "type": "toggle",
-     "target": "m",
-     "trusted": true,
-     "cancelable": false,
-     "oldState": "open",
-     "newState": "closed",
-     "source": null
-    },
-    {
-     "type": "toggle",
-     "target": "m",
-     "trusted": true,
-     "cancelable": false,
-     "oldState": "open",
-     "newState": "closed",
-     "source": null
-    },
-    {
-     "type": "toggle",
-     "target": "m",
-     "trusted": true,
-     "cancelable": false,
-     "oldState": "open",
-     "newState": "closed",
-     "source": null
-    },
-    {
-     "type": "toggle",
-     "target": "m",
-     "trusted": true,
-     "cancelable": false,
-     "oldState": "closed",
-     "newState": "open",
-     "source": null
-    },
-    {
-     "type": "toggle",
-     "target": "m",
-     "trusted": true,
-     "cancelable": false,
-     "oldState": "closed",
-     "newState": "open",
-     "source": null
-    },
-    {
-     "type": "toggle",
-     "target": "m",
-     "trusted": true,
-     "cancelable": false,
-     "oldState": "closed",
-     "newState": "open",
-     "source": null
-    },
-    {
-     "type": "close",
-     "target": "m",
-     "trusted": true,
-     "cancelable": false
-    },
-    {
-     "type": "close",
-     "target": "m",
-     "trusted": true,
-     "cancelable": false
-    },
-    {
-     "type": "close",
-     "target": "m",
-     "trusted": true,
-     "cancelable": false
-    }
-   ]
-  },
-  {
    "qualification": "toggle-before-close",
-   "reason": "Close-request path order: native toggle before close, Chromium close before toggle, plus the coalescing above.",
+   "reason": "Close-request path order: native fires toggle before close, Chromium close before toggle, for each of the 3 close requests.",
    "case": "close request after user activation",
    "kind": "queuedOrder",
    "chromium": {
     "m": [
      "close",
      "toggle",
-     "toggle",
      "close",
-     "toggle",
      "toggle",
      "close",
      "toggle"
@@ -882,12 +622,9 @@
    "native": {
     "m": [
      "toggle",
-     "toggle",
      "close",
      "toggle",
-     "toggle",
      "close",
-     "toggle",
      "toggle",
      "close"
     ]
