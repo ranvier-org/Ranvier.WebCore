@@ -59,7 +59,7 @@ def verify(native_directory):
         element_at = p.bind('rv_host_element_at', P, [P, I, I])
         element_rect = p.bind('rv_element_rect', I, [P] + [ctypes.POINTER(D)] * 4)
         by_id = p.bind('rv_document_get_element_by_id', P, [P, ctypes.c_char_p])
-        node_equals = p.bind('rv_node_equals', I, [P, P]) if hasattr(p.library, 'rv_node_equals') else None
+        same_node = p.bind('rv_dom_node_is_same_node', I, [P, P, ctypes.POINTER(I)])
         cycle = p.bind('rv_run_loop_cycle', I, [I])
         add = p.bind('rv_event_target_add_listener', P, [P, ctypes.c_char_p, I, CALLBACK, P])
         remove = p.bind('rv_listener_remove', I, [P])
@@ -222,12 +222,18 @@ def verify(native_directory):
             for label, x, y in [('top', 10, 10), ('low', 10, 160), ('right', expected[0] - 1, 10), ('bottom', 10, expected[1] - 1)]:
                 node = element_at(p.host, int(x), int(y))
                 hits[label] = bool(node)
+                if node and label in ('top', 'low'):
+                    same = I()
+                    p.expect(same_node(node, top if label == 'top' else low, ctypes.byref(same)) == OK, 'isSameNode')
+                    hits[label] = same.value == 1
                 if node:
                     node_release(node)
-            p.expect(hits['top'] and hits['right'] and hits['bottom'], 'insets ' + repr(insets) + ' hit inside: ' + str(hits))
+            # The top inset leaves the content in place: the box at the document's top still answers at y 10.
+            p.expect(hits['top'] and hits['right'] and hits['bottom'] and hits['low'] == (expected[1] > 160), 'insets ' + repr(insets) + ' hit inside: ' + str(hits))
             report['insets'].append({'insets': insets, 'state': state, 'window': window_values, 'events': distinct(log), 'hits': hits})
-            # Just past the unobscured area there is nothing to hit.
-            for x, y in [(10, int(expected[1])), (int(expected[0]), 10)]:
+            # The covered right and bottom areas have nothing to hit.
+            covered = [(10, int(expected[1])), (int(expected[0]), 10)] + ([(10, 239)] if insets[2] else []) + ([(319, 10)] if insets[1] else [])
+            for x, y in covered:
                 node = element_at(p.host, x, y)
                 p.expect(not node, 'insets ' + repr(insets) + ' no hit at ' + str((x, y)))
                 if node:
