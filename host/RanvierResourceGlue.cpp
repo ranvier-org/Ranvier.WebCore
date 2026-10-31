@@ -124,7 +124,7 @@ public:
     void start()
     {
         starting = true;
-        // The ImageLoader settles the waiter at the points where it settles decode() promises (patch 0031).
+        // The ImageLoader settles the waiter at the points where it settles decode() promises (patch 0032).
         Function<void(ImageDecodeResult)> waiter = [weak = SingleThreadWeakPtr<ImageOperation> { *this }](ImageDecodeResult result) {
             if (RefPtr operation = weak.get())
                 operation->finish(outcomeFor(result));
