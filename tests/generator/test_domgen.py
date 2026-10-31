@@ -1331,6 +1331,91 @@ partial interface DOMWindow {
         with self.assertRaisesRegex(SystemExit, 'not an operation or a readonly attribute'):
             domgen.Generator(domgen.World(self.source, config)).run()
 
+    def window_object_generator(self, extra, **overrides):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+[InterfaceName=Window, Exposed=Window] interface DOMWindow : EventTarget {};
+interface mixin WindowOrWorkerGlobalScope {};
+DOMWindow includes WindowOrWorkerGlobalScope;
+partial interface mixin WindowOrWorkerGlobalScope { [SameObject] readonly attribute Crypto crypto; };
+''' + extra)
+        config = dict(self.world.config)
+        config['windowObjectBindings'] = {'Crypto': {
+            'receiver': 'Document', 'accessor': 'crypto', 'members': ['getRandomValues', 'randomUUID'],
+            'feature': 'dom-crypto-random', 'stringInputs': 'utf8-lengths'}}
+        config['typedArrayViewTypes'] = ['ArrayBufferView']
+        config.update(overrides)
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        return generator
+
+    CRYPTO = '''
+[Exposed=(Window,Worker)] interface Crypto {
+    ArrayBufferView getRandomValues([ReturnValue] ArrayBufferView array);
+    [SecureContext] DOMString randomUUID();
+};
+'''
+
+    def test_window_object_binding_calls_the_member_through_the_window_accessor(self):
+        generator = self.window_object_generator(self.CRYPTO)
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        uuid = functions['rv_dom_crypto_random_uuid']
+        self.assertEqual('context_operation', uuid['kind'])
+        self.assertEqual('Document', uuid['receiver'])
+        self.assertEqual('Crypto', uuid['contractOwner'])
+        self.assertEqual('dom-crypto-random', uuid['feature'])
+        self.assertEqual('facade', uuid['binding'])
+        self.assertEqual([{'ctype': 'RvNode*', 'name': 'target'}, {'ctype': 'char*', 'name': 'buffer'},
+                          {'ctype': 'int32_t', 'name': 'capacity'}, {'ctype': 'int32_t*', 'name': 'length'}], uuid['parameters'])
+        glue = generator.glue()
+        self.assertIn('impl->window()->crypto().randomUUID()', glue)
+        self.assertIn('if (!impl->window())', glue)
+        self.assertIn('"dom-crypto-random"', glue)
+        self.assertNotIn('type Crypto =', generator.interfaces())
+
+    def test_return_value_typed_array_view_is_an_in_out_span_with_its_element_kind(self):
+        generator = self.window_object_generator(self.CRYPTO)
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        random = functions['rv_dom_crypto_get_random_values']
+        self.assertEqual([{'ctype': 'RvNode*', 'name': 'target'}, {'ctype': 'int32_t', 'name': 'array_kind'},
+                          {'ctype': 'uint8_t*', 'name': 'array'}, {'ctype': 'int32_t', 'name': 'array_length'}],
+                         random['parameters'])
+        self.assertEqual('typedarray', random['arguments'][0]['mapping']['kind'])
+        header = generator.header()
+        for name, value in [('INT8', 0), ('UINT8', 1), ('UINT8_CLAMPED', 2), ('INT16', 3), ('UINT16', 4), ('INT32', 5),
+                            ('UINT32', 6), ('FLOAT16', 7), ('FLOAT32', 8), ('FLOAT64', 9), ('BIG_INT64', 10),
+                            ('BIG_UINT64', 11), ('DATA_VIEW', 12)]:
+            self.assertIn(f'RV_DOM_ARRAY_BUFFER_VIEW_{name} = {value},', header)
+        glue = generator.glue()
+        self.assertIn('makeTypedArrayView(array_kind, array, array_length, status0)', glue)
+        self.assertIn('impl->window()->crypto().getRandomValues(*a0)', glue)
+        self.assertIn('copyTypedArrayView(*a0, array)', glue)
+        self.assertIn('"JavaScriptCore/TypedArrays.h"', glue)
+        self.assertIn('(array_length >= 0 && (array_length == 0 || array))', glue)
+        self.assertIn('byte[] array', generator.fsharp())
+
+    def test_typed_array_view_requires_a_top_level_return_value_argument(self):
+        generator = self.window_object_generator('''
+[Exposed=Window] interface Crypto {
+    undefined fill(ArrayBufferView array);
+    undefined fillAll(sequence<ArrayBufferView> arrays);
+    readonly attribute DOMString unused;
+};
+''', windowObjectBindings={})
+        names = [item.name for item in generator.functions]
+        self.assertNotIn('crypto_fill', names)
+        with self.assertRaisesRegex(SystemExit, r'Crypto.fill: typed array view argument without \[ReturnValue\]'):
+            self.window_object_generator('''
+[Exposed=Window] interface Crypto { undefined fill(ArrayBufferView array); };
+''', windowObjectBindings={'Crypto': {'receiver': 'Document', 'accessor': 'crypto', 'members': ['fill'],
+                                        'feature': 'f', 'stringInputs': 'utf8-lengths'}})
+        with self.assertRaisesRegex(SystemExit, 'Window object bindings require a readonly Window attribute'):
+            self.window_object_generator(self.CRYPTO, windowObjectBindings={'Crypto': {
+                'receiver': 'Document', 'accessor': 'missing', 'members': ['randomUUID'], 'feature': 'f',
+                'stringInputs': 'utf8-lengths'}})
+
     def test_namespace_support_queries_use_checked_document_and_complete_input_spans(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

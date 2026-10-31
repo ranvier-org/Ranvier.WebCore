@@ -39,6 +39,8 @@ result = {
     'excluded': ['VisualViewport.onresize/onscroll handler attributes (EventHandler; the managed service subscribes with listeners)',
                  'onscrollend (Chromium only; not in the pinned WebKit IDL)'],
     'sourceHeadOfBatch': receipt['sourceHead'],
+    'batchRunHead': {'head': '8ced3b8', 'note': 'b654195 plus tests/abi/crypto_random.py ABI = 45 only; the runtime is the b654195 build'},
+    'stackedOn': 'B22 c78a71a (Native36/ABI44), T06 901ced5 (Native35/ABI43), D14 23dd017 (Native34/ABI42, patch 0037), H13 3c7e8d4 (Native33/ABI41), G09 fb87eb0 (Native32/ABI40)',
     'red': {'files': ['red-chromium.json', 'red-native.json', 'red-navigation-chromium.json'],
             'native32': 'no VisualViewport exports, no page scale or obscured inset input; VisualViewportAPIEnabled off in WebCore'},
     'green': {'visualViewportAssertions': assertions, 'repeats': len(repeats), 'repeatsDistinct': sorted(set(repeats)),
@@ -72,7 +74,7 @@ result = {
     'files': {},
 }
 for path in sorted(evidence.iterdir()):
-    if path.name != 'final-evidence.json':
+    if path.is_file() and path.name != 'final-evidence.json':
         result['files'][path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
 open(evidence / 'final-evidence.json', 'w', newline='\n').write(json.dumps(result, indent=2) + '\n')
 print(result['green']['rawAssertions'], result['green']['teardownCases'], hashlib.sha256((evidence / 'final-evidence.json').read_bytes()).hexdigest())

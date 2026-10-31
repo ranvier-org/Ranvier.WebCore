@@ -650,6 +650,31 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
                     failwith "ToggleEvent.newState changed after destroy"
 
                 rv_event_release held.Value
+        | "crypto" ->
+            let filled = Array.zeroCreate<byte> 16
+            rv_dom_crypto_get_random_values (document, RV_DOM_ARRAY_BUFFER_VIEW_UINT8, filled, filled.Length)
+            |> check "crypto.getRandomValues"
+
+            if filled = Array.zeroCreate<byte> 16 then
+                failwith "crypto.getRandomValues left the bytes zero"
+
+            held.Value <- rv_node_retain document
+
+            fun () ->
+                let bytes = Array.zeroCreate<byte> 16
+                let random = rv_dom_crypto_get_random_values (held.Value, RV_DOM_ARRAY_BUFFER_VIEW_UINT8, bytes, bytes.Length)
+
+                if random <> 0 || bytes = Array.zeroCreate<byte> 16 then
+                    failwithf "crypto.getRandomValues after destroy: %d" random
+
+                let buffer = Array.zeroCreate<byte> 64
+                let length = [| 0 |]
+                let uuid = rv_dom_crypto_random_uuid (held.Value, buffer, buffer.Length, length)
+
+                if uuid <> 0 || length[0] <> 36 then
+                    failwithf "crypto.randomUUID after destroy: %d" uuid
+
+                rv_node_release held.Value
         | "caret position" ->
             rv_dom_node_set_text_content (span, "AAAA") |> check "caret text"
             rv_dom_document_caret_position_from_point (document, 2.0, 2.0, null, &held.contents)
@@ -801,6 +826,7 @@ let run (outDir: string) =
                     "toggle event"
                     "blob slice"
                     "caret position"
+                    "crypto"
                     "url values"
                     "url pattern result"
                     "visual viewport"

@@ -28,7 +28,7 @@ for repo in ['ranvier-org/Ranvier.WebCore', 'ranvier-org/Ranvier', 'ranvier-org/
     gh.append({'repository': repo, 'matchingTags': [t for t in tags if any(m in t for m in marks)], 'openPullRequests': prs})
 import glob
 local = {w: subprocess.run(['git','grep','-n','return 45;','--','host/RanvierWebCoreAbi.cpp'], cwd=w, capture_output=True, text=True).stdout.strip() for w in sorted(glob.glob('C:/wk/native-*')) if Path(w, 'host/RanvierWebCoreAbi.cpp').is_file()}
-STACKED = 'acfee48 (T06 final 901ced5 Native35/ABI43, D14 final 23dd017 Native34/ABI42, H13 final 3c7e8d4 Native33/ABI41, G09 fb87eb0 Native32/ABI40)'
+STACKED = 'B22 merge (B22 final c78a71a Native36/ABI44, T06 final 901ced5 Native35/ABI43, D14 final 23dd017 Native34/ABI42, H13 final 3c7e8d4 Native33/ABI41, G09 fb87eb0 Native32/ABI40)'
 abi = subprocess.run(['git','grep','-n','return 45;','--','host/RanvierWebCoreAbi.cpp'], cwd='C:/wk/native-vv', capture_output=True, text=True).stdout
 receipt = {'checkedAtUtc': datetime.datetime.now(datetime.UTC).isoformat(), 'purpose': 'G03 visual viewport Native37/ABI45, DOM alpha.40, Views 0.1.30, WebCore backend alpha.30 reservation (ABI42-44 belong to D14, T06, B22)', 'abi': 45, 'stackedOn': STACKED, 'abiNumberInUse': abi.strip(), 'localWorktreesReturning45': {k: v for k, v in local.items() if v}, 'packages': rows, 'github': gh}
 Path('C:/wk/native-vv/docs/visual-viewport-evidence/allocation-absence.json').write_text(json.dumps(receipt, indent=2))

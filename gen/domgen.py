@@ -81,6 +81,52 @@ UNMAPPED = ["Custom", "EnabledForWorld", "EnabledByQuirk", "ForwardToMapLike", "
 # CallWith values the glue supplies from the node's document.
 # How the glue reaches a document for the settings of [EnabledBySetting], by the root of an interface other than a node.
 SETTINGS_DOCUMENT = {"AbstractRange": "impl->startContainer().document()", "DOMStringMap": "impl->element().document()"}
+# ArrayBufferView element kinds of typedArrayViewTypes: (macro suffix, JSC view, element size), indexed by value.
+TYPED_ARRAY_VIEW_KINDS = [('INT8', 'Int8Array', 1), ('UINT8', 'Uint8Array', 1), ('UINT8_CLAMPED', 'Uint8ClampedArray', 1),
+                          ('INT16', 'Int16Array', 2), ('UINT16', 'Uint16Array', 2), ('INT32', 'Int32Array', 4),
+                          ('UINT32', 'Uint32Array', 4), ('FLOAT16', 'Float16Array', 2), ('FLOAT32', 'Float32Array', 4),
+                          ('FLOAT64', 'Float64Array', 8), ('BIG_INT64', 'BigInt64Array', 8),
+                          ('BIG_UINT64', 'BigUint64Array', 8), ('DATA_VIEW', 'DataView', 1)]
+TYPED_ARRAY_RUNTIME_HEAD = """
+namespace {
+template<typename View>
+RefPtr<JSC::ArrayBufferView> typedArrayView(RefPtr<JSC::ArrayBuffer>&& buffer, int32_t length, int32_t elementSize, int32_t& status)
+{
+    if (length % elementSize) {
+        status = Ranvier::recordException(Exception { ExceptionCode::RangeError, "The byte length is not a multiple of the element size."_s });
+        return nullptr;
+    }
+    RefPtr<JSC::ArrayBufferView> view = View::tryCreate(WTF::move(buffer), 0, static_cast<size_t>(length / elementSize));
+    if (!view)
+        status = Ranvier::recordException(Exception { ExceptionCode::RangeError, "The view could not be allocated."_s });
+    return view;
+}
+
+// A view of the kind (RV_DOM_ARRAY_BUFFER_VIEW_*) over a copy of the caller's bytes, or null with the status set.
+RefPtr<JSC::ArrayBufferView> makeTypedArrayView(int32_t kind, const uint8_t* bytes, int32_t length, int32_t& status)
+{
+    RefPtr buffer = JSC::ArrayBuffer::tryCreate(length ? std::span<const uint8_t> { bytes, static_cast<size_t>(length) } : std::span<const uint8_t> { });
+    if (!buffer) {
+        status = Ranvier::recordException(Exception { ExceptionCode::RangeError, "The array buffer could not be allocated."_s });
+        return nullptr;
+    }
+    switch (kind) {
+"""
+TYPED_ARRAY_RUNTIME_TAIL = """
+    }
+    status = RV_ERR_UNSUPPORTED;
+    return nullptr;
+}
+
+// Copies the view's bytes, which the member may have written, back to the caller's buffer.
+void copyTypedArrayView(JSC::ArrayBufferView& view, uint8_t* bytes)
+{
+    auto span = view.span();
+    if (!span.empty())
+        memcpySpan(std::span<uint8_t> { bytes, span.size() }, span);
+}
+}
+"""
 # The note a stub's comment carries.
 STUB_NOTE = "WebKit's IDL no longer has this member: a stub that returns RV_ERR_UNSUPPORTED"
 DOCUMENT_CALL_WITH = {"CurrentDocument", "RelevantDocument", "CurrentScriptExecutionContext",
@@ -410,6 +456,12 @@ class World:
             if not nested:
                 raise Unsupported(f'byte span {t.name} outside a union or sequence input')
             return Mapped('bytes', False, 'RvDomByteSpan', label=t.name)
+        if t.name in self.config.get('typedArrayViewTypes', []):
+            if t.nullable:
+                raise Unsupported(f'nullable typed array view {t.name}')
+            if nested:
+                raise Unsupported(f'typed array view {t.name} inside a union or sequence')
+            return Mapped('typedarray', False, 'uint8_t*', label=t.name)
         if t.name in self.config.get('opaqueUnionArms', []):
             return Mapped('opaque', t.nullable, interface=t.name, cls=self.cpp_class(t.name))
         if t.name in self.interfaces and not self.interfaces[t.name].mixin:
@@ -512,6 +564,7 @@ class Generator(ComplexGeneratorMixin):
         self.functions = []
         self.excluded = []  # (Interface.member, reason)
         self.constants = []  # (macro, value, comment)
+        self.typed_array_views_used = False
         self.enums_used = {}
         self.handles = []  # object handle roots
         self.headers = {"HTMLNames.h", "ElementInlines.h", "NodeInlines.h", "Exception.h", "ExceptionOr.h"}
@@ -573,6 +626,8 @@ class Generator(ComplexGeneratorMixin):
             # A list holds one binding per capability feature.
             for binding in bindings if isinstance(bindings, list) else [bindings]:
                 self.window_context(name, binding)
+        for name, binding in self.world.config.get('windowObjectBindings', {}).items():
+            self.window_object_context(name, binding)
         for name, binding in self.world.config.get("staticBindings", {}).items():
             self.static_context(name, binding)
         for name, binding in self.world.config.get('iterableBindings', {}).items():
@@ -682,6 +737,76 @@ class Generator(ComplexGeneratorMixin):
                     raise SystemExit(f'{name}.{member.name}: {error}') from error
                 generated.append(function)
         self.namespace_features.append((binding['feature'], [function.conditional for function in generated if function.conditional]))
+
+    def window_object_context(self, name, binding):
+        """The operations of the object a readonly Window attribute holds, such as Window.crypto, called through
+        the Window of a checked Document."""
+        if binding.get('receiver') != 'Document' or 'Document' not in self.world.scope:
+            raise SystemExit(f'{name}: Window object bindings require a scoped Document receiver')
+        if binding.get('stringInputs') != 'utf8-lengths':
+            raise SystemExit(f'{name}: Window object string inputs require explicit UTF-8 lengths')
+        if name not in self.world.interfaces or 'DOMWindow' not in self.world.interfaces:
+            raise SystemExit(f'{name}: configured Window object interface was not found')
+        accessor = binding.get('accessor')
+        holders = [member for member in self.world.members('DOMWindow')
+                   if member.kind == 'attribute' and member.readonly and member.name == accessor
+                   and self.world.resolve(member.type).name == name]
+        if len(holders) != 1:
+            raise SystemExit(f'{name}: Window object bindings require a readonly Window attribute of the interface')
+        self.headers.update({'LocalDOMWindow.h', f'{self.world.cpp_class(name)}.h'})
+        selected = set(binding['members'])
+        operations = {}
+        for member in self.world.members(name):
+            if member.name not in selected:
+                continue
+            reason = self.member_reason(name, member)
+            if reason or member.kind != 'operation':
+                raise SystemExit(f'{name}.{member.name}: {reason or "configured member is not an operation"}')
+            if member.attrs.get('CallWith') or member.attrs.get('ImplementedBy'):
+                raise SystemExit(f'{name}.{member.name}: Window object bindings require a direct instance member')
+            operations.setdefault(member.name, []).append(member)
+        if selected != set(operations):
+            raise SystemExit(f'{name}: missing configured Window object operations {sorted(selected - set(operations))}')
+        generated = []
+        for operation, overloads in operations.items():
+            for member in overloads:
+                suffix = '' if len(overloads) == 1 else f'_{len(member.arguments)}'
+                function = Function(name, member, 'context_operation', f'{snake(name)}_{snake(operation)}{suffix}', [],
+                                    f'Window.{accessor}.{operation}: checked Document context')
+                function.receiver = 'Document'
+                function.context_owner = name
+                function.feature = binding['feature']
+                function.string_spans = True
+                function.context_checks = ['if (!impl->window())', '    return RV_ERR_UNSUPPORTED;']
+                try:
+                    args = [self.world.map(argument.type) for argument in member.arguments]
+                    result = self.world.map(member.type)
+                    placeholders = ', '.join(f'{{arg{i}}}' for i in range(len(args)))
+                    call = f'impl->window()->{accessor}().{member.attrs.get("ImplementedAs", member.name)}({placeholders})'
+                    self.finish(function, 'Document', member, member.arguments, args, result, call, [])
+                except Unsupported as error:
+                    raise SystemExit(f'{name}.{member.name}: {error}') from error
+                generated.append(function)
+        self.namespace_features.append((binding['feature'], [function.conditional for function in generated if function.conditional]))
+
+    def use_typed_array_views(self):
+        if self.typed_array_views_used:
+            return
+        self.typed_array_views_used = True
+        self.headers.update({'JavaScriptCore/ArrayBuffer.h', 'JavaScriptCore/DataView.h', 'JavaScriptCore/TypedArrays.h'})
+        for index, (macro, view, _) in enumerate(TYPED_ARRAY_VIEW_KINDS):
+            self.constants.append((f'RV_DOM_ARRAY_BUFFER_VIEW_{macro}', str(index), f'ArrayBufferView element kind {view}'))
+
+    def typed_array_view_runtime(self):
+        if not self.typed_array_views_used:
+            return []
+        cases = []
+        for index, (_, view, size) in enumerate(TYPED_ARRAY_VIEW_KINDS):
+            if view == 'DataView':
+                cases.append(f'    case {index}: return JSC::DataView::create(WTF::move(buffer), 0, static_cast<size_t>(length));')
+            else:
+                cases.append(f'    case {index}: return typedArrayView<JSC::{view}>(WTF::move(buffer), length, {size}, status);')
+        return [TYPED_ARRAY_RUNTIME_HEAD + '\n'.join(cases) + TYPED_ARRAY_RUNTIME_TAIL]
 
     def iterable_snapshot(self, name, binding):
         if name not in self.world.scope:
@@ -1527,6 +1652,20 @@ class Generator(ComplexGeneratorMixin):
                     passed.append(f"DomSequenceArgument<{self.transport_cpp(mapped.subtypes[0])}> {{ std::move(*a{index}) }}")
                 else:
                     passed.append(f"std::move(*a{index})")
+            elif mapped.kind == 'typedarray':
+                if 'ReturnValue' not in argument.attrs or argument.optional or argument.variadic:
+                    raise Unsupported('typed array view argument without [ReturnValue]')
+                self.use_typed_array_views()
+                params += [('int32_t', f'{name}_kind'), ('uint8_t*', name), ('int32_t', f'{name}_length')]
+                checks.append(f'({name}_length >= 0 && ({name}_length == 0 || {name}))')
+                prepare += [f'int32_t status{index} = RV_OK;',
+                            f'RefPtr<JSC::ArrayBufferView> a{index} = makeTypedArrayView({name}_kind, {name}, {name}_length, status{index});',
+                            f'if (!a{index})', f'    return status{index};']
+                passed.append(f'*a{index}')
+                notes.append(f'{name}_kind is an RV_DOM_ARRAY_BUFFER_VIEW_* element kind and {name}_length the byte length; '
+                             f'the member reads and writes a copy, which returns to {name} on RV_OK; '
+                             'an unknown kind returns RV_ERR_UNSUPPORTED')
+                return_value = (index, mapped)
             elif mapped.kind in ("node", "event", "object"):
                 if mapped.interface == "EventTarget":
                     raise Unsupported(f"{mapped.interface} argument")
@@ -1559,11 +1698,15 @@ class Generator(ComplexGeneratorMixin):
         prepare += self.setter_value_checks(function, mapped_args)
         # The result.
         sink = None
-        if return_value is not None:
+        if return_value is not None and return_value[1].kind == 'typedarray':
+            sink = ('copyback', return_value[0], c_name(arguments[return_value[0]].name))
+        elif return_value is not None:
             index, mapped = return_value
             params.append((f"{mapped.handle}**", "result"))
             checks.append("result")
             sink = ("returnvalue", index)
+        elif returns.kind == 'typedarray':
+            raise Unsupported('typed array view result')
         elif returns.kind == "string":
             params += [("char*", "buffer"), ("int32_t", "capacity"), ("int32_t*", "length")]
             checks.append("length")
@@ -1682,6 +1825,11 @@ class Generator(ComplexGeneratorMixin):
             expression = expression.replace(f"{{arg{index}}}", value)
         if sink is None:
             body.append(f"return invoke([&]() -> decltype(auto) {{ return {expression}; }});")
+        elif isinstance(sink, tuple) and sink[0] == 'copyback':
+            body += [f"auto status = invoke([&]() -> decltype(auto) {{ return {expression}; }});",
+                     "if (status == RV_OK)",
+                     f"    copyTypedArrayView(*a{sink[1]}, {sink[2]});",
+                     "return status;"]
         elif isinstance(sink, tuple):
             index = sink[1]
             body += [f"auto status = invoke([&]() -> decltype(auto) {{ return {expression}; }});",
@@ -1761,7 +1909,7 @@ class Generator(ComplexGeneratorMixin):
             functions.append({
                 "interface": function.interface, "member": function.member.name,
                 "contractOwner": (function.namespace if function.kind == "namespace_operation" else
-                                  'Window' if function.kind == 'context_operation' else
+                                  getattr(function, 'context_owner', 'Window') if function.kind == 'context_operation' else
                                   self.world.contract_owner(function.interface, function.member)),
                 "kind": function.kind, "function": "rv_dom_" + function.name,
                 "conditional": function.conditional,
@@ -2027,6 +2175,7 @@ class Generator(ComplexGeneratorMixin):
         lines += ["", RUNTIME, ""]
         lines += self.tracked_handle_runtime()
         lines += self.const_getter_runtime()
+        lines += self.typed_array_view_runtime()
         for enum, (values, _, _) in sorted(self.enums_used.items()):
             quoted = ", ".join(f'"{v}"_s' for v in values)
             lines.append(f"static constexpr ASCIILiteral {enum_table(enum)}[] = {{ {quoted} }};")
@@ -2627,7 +2776,7 @@ def fsharp_param(ctype, name):
     fname = f"``{name}``" if name in FSHARP_KEYWORDS else name
     if ctype == "const char*":
         return f"[<MarshalAs(UnmanagedType.LPUTF8Str)>] string {fname}"
-    if ctype == "char*":
+    if ctype in ("char*", "uint8_t*"):
         return f"byte[] {fname}"
     if ctype == "int32_t*" and name == "length":
         return f"int[] {fname}"

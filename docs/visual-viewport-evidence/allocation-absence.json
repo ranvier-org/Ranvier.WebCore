@@ -1,8 +1,8 @@
 {
-  "checkedAtUtc": "2026-10-31T09:35:41.814433+00:00",
+  "checkedAtUtc": "2026-10-31T10:03:15.745804+00:00",
   "purpose": "G03 visual viewport Native37/ABI45, DOM alpha.40, Views 0.1.30, WebCore backend alpha.30 reservation (ABI42-44 belong to D14, T06, B22)",
   "abi": 45,
-  "stackedOn": "acfee48 (T06 final 901ced5 Native35/ABI43, D14 final 23dd017 Native34/ABI42, H13 final 3c7e8d4 Native33/ABI41, G09 fb87eb0 Native32/ABI40)",
+  "stackedOn": "B22 merge (B22 final c78a71a Native36/ABI44, T06 final 901ced5 Native35/ABI43, D14 final 23dd017 Native34/ABI42, H13 final 3c7e8d4 Native33/ABI41, G09 fb87eb0 Native32/ABI40)",
   "abiNumberInUse": "host/RanvierWebCoreAbi.cpp:1257:int32_t rv_abi_version(void) { return 45; }",
   "localWorktreesReturning45": {
     "C:/wk\\native-vv": "host/RanvierWebCoreAbi.cpp:1257:int32_t rv_abi_version(void) { return 45; }"
