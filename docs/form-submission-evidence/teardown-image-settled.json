@@ -1,0 +1,163 @@
+{
+  "probe": "tests/abi/Teardown.fs image probes (\"image with ...\", cycle before disposal none / single / 20 ms)",
+  "cause": "ImageLoader keeps the image (and so the document) while its load or error event is pending and releases it from a zero-delay timer (m_derefElementTimer); the error/load event sender is also a zero-delay timer. A fixed 20 ms post-destroy cycle can end before both fire.",
+  "fix": "imageProbe: after rv_host_destroy, cycle the run loop until the watched image reads -1 (10 s hang guard); the after-cycle read is the settled state.",
+  "runtime": "C:/wk/native-formsubmit/artifacts/native34-frozen-2 (runtime-receipt.json)",
+  "redForced": {
+    "change": "old probe (23dd017) with the post-destroy cycle forced to one RunLoop::cycle (cycleFor 0)",
+    "repeats": 1,
+    "records": [
+      [
+        "image with a data source",
+        "20 ms",
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      [
+        "image with a data source",
+        "none",
+        0,
+        1,
+        -1,
+        -1
+      ],
+      [
+        "image with a data source",
+        "single",
+        0,
+        2,
+        -1,
+        -1
+      ],
+      [
+        "image with a data source, removed",
+        "20 ms",
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      [
+        "image with a data source, removed",
+        "none",
+        0,
+        1,
+        -1,
+        -1
+      ],
+      [
+        "image with a data source, removed",
+        "single",
+        0,
+        1,
+        -1,
+        -1
+      ],
+      [
+        "image with a missing file source",
+        "20 ms",
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      [
+        "image with a missing file source",
+        "none",
+        0,
+        1,
+        -1,
+        -1
+      ],
+      [
+        "image with a missing file source",
+        "single",
+        0,
+        1,
+        -1,
+        -1
+      ],
+      [
+        "image with a missing file source, removed",
+        "20 ms",
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      [
+        "image with a missing file source, removed",
+        "none",
+        0,
+        1,
+        -1,
+        -1
+      ],
+      [
+        "image with a missing file source, removed",
+        "single",
+        0,
+        1,
+        -1,
+        -1
+      ]
+    ]
+  },
+  "greenForced": {
+    "change": "new probe with every cycle in settleImageLoad and the 20 ms cycle forced to cycleFor 0",
+    "driverDllSha256": "10d4562d471fe2d197b590adbde3fd9c4cc797dc93842dd7e04fcd4fc4bc6d7b",
+    "runtimeReceipt": "C:\\wk\\native-formsubmit\\artifacts\\native34-frozen-2\\runtime-receipt.json",
+    "only": "image with",
+    "repeats": 30,
+    "runsWithAnyUnsettledAfterCycle": 0,
+    "allAfterCollectionDestroyed": true,
+    "distinct": [
+      "[\"image with a data source\", \"20 ms\", -1, -1, -1, -1]",
+      "[\"image with a data source\", \"none\", -1, -1, -1, -1]",
+      "[\"image with a data source\", \"single\", -1, -1, -1, -1]",
+      "[\"image with a data source, removed\", \"20 ms\", -1, -1, -1, -1]",
+      "[\"image with a data source, removed\", \"none\", -1, -1, -1, -1]",
+      "[\"image with a data source, removed\", \"single\", -1, -1, -1, -1]",
+      "[\"image with a missing file source\", \"20 ms\", -1, -1, -1, -1]",
+      "[\"image with a missing file source\", \"none\", -1, -1, -1, -1]",
+      "[\"image with a missing file source\", \"single\", -1, -1, -1, -1]",
+      "[\"image with a missing file source, removed\", \"20 ms\", -1, -1, -1, -1]",
+      "[\"image with a missing file source, removed\", \"none\", -1, -1, -1, -1]",
+      "[\"image with a missing file source, removed\", \"single\", -1, -1, -1, -1]"
+    ]
+  },
+  "green": {
+    "driverDllSha256": "b1aaaeac89944c30d85ee8befc658a1d685e03037cac38f8fd4eeda15c57dcd1",
+    "runtimeReceipt": "C:\\wk\\native-formsubmit\\artifacts\\native34-frozen-2\\runtime-receipt.json",
+    "only": "image with",
+    "repeats": 100,
+    "runsWithAnyUnsettledAfterCycle": 0,
+    "allAfterCollectionDestroyed": true,
+    "distinct": [
+      "[\"image with a data source\", \"20 ms\", -1, -1, -1, -1]",
+      "[\"image with a data source\", \"none\", -1, -1, -1, -1]",
+      "[\"image with a data source\", \"single\", -1, -1, -1, -1]",
+      "[\"image with a data source, removed\", \"20 ms\", -1, -1, -1, -1]",
+      "[\"image with a data source, removed\", \"none\", -1, -1, -1, -1]",
+      "[\"image with a data source, removed\", \"single\", -1, -1, -1, -1]",
+      "[\"image with a missing file source\", \"20 ms\", -1, -1, -1, -1]",
+      "[\"image with a missing file source\", \"none\", -1, -1, -1, -1]",
+      "[\"image with a missing file source\", \"single\", -1, -1, -1, -1]",
+      "[\"image with a missing file source, removed\", \"20 ms\", -1, -1, -1, -1]",
+      "[\"image with a missing file source, removed\", \"none\", -1, -1, -1, -1]",
+      "[\"image with a missing file source, removed\", \"single\", -1, -1, -1, -1]"
+    ]
+  },
+  "fullRun": {
+    "records": 84,
+    "allAfterCollectionDestroyed": true,
+    "imageAfterCycle": [
+      [
+        -1,
+        -1
+      ]
+    ]
+  }
+}

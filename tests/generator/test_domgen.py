@@ -2174,6 +2174,54 @@ GatedElement includes GatedMixin;
         self.assertIn('ENABLE(OWN)', functions[0].conditional)
         self.assertTrue('settings.gatedEnabled' in generator.glue())
 
+    def test_event_detail_constructor_query_and_getter_expression(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+[InterfaceName=ShownEvent] interface InternalShownEvent : Event {
+    [CallWith=CurrentGlobalObject] constructor([AtomString] DOMString type, optional ShownEventInit eventInitDict = {});
+    readonly attribute DOMString label;
+    readonly attribute double when;
+};
+dictionary EventInit {
+    boolean bubbles = false;
+    boolean cancelable = false;
+    boolean composed = false;
+};
+dictionary ShownEventInit : EventInit {
+    DOMString label = "";
+};
+interface HiddenEvent : Event {
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['InternalShownEvent']
+        config['contract'] = {**config['contract'], 'aliases': {'InternalShownEvent': 'ShownEvent'}}
+        config['constructors'] = {'InternalShownEvent': {'receiver': 'Document', 'factory': 'InternalShownEvent::create',
+                                                         'passReceiver': False, 'stringInputs': 'utf8-lengths', 'globalObject': True}}
+        config['dictionaryCppTypes'] = {'ShownEventInit': 'InternalShownEvent::Init'}
+        config['getterExpressions'] = {'InternalShownEvent.when': 'impl->whenSeconds().value()'}
+        config['runtimeTypeRoots'] = ['Event']
+        config['runtimeTypePublicNames'] = ['Event']
+        config['runtimeTypeExtras'] = {'Event': ['HiddenEvent']}
+        config['eventInterfaceCasts'] = ['HiddenEvent']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        glue = generator.glue()
+        create = glue[glue.index('int32_t ranvier_dom_internal_shown_event_create('):]
+        create = create[:create.index('\n}\n')]
+        self.assertIn('auto* global = impl->globalObject(); if (!global) return Exception { ExceptionCode::InvalidStateError', create)
+        self.assertIn('InternalShownEvent::create(*global, a0.atom(), std::move(a1))', create)
+        self.assertIn('impl->whenSeconds().value()', glue)
+        query = glue[glue.index('int32_t ranvier_dom_event_get_interface_name('):]
+        query = query[:query.index('\n}\n')]
+        # The exposed name, an unscoped extra and the root, most derived first.
+        self.assertLess(query.index('"ShownEvent"_s'), query.index('return copyString("Event"_s'))
+        self.assertIn('EventInterfaceType::HiddenEvent', query)
+        self.assertNotIn('"InternalShownEvent"_s', query)
+        self.assertIn('rv_dom_event_get_interface_name(RvEvent* target', generator.header())
+
     def test_gated_event_interface_members_read_without_a_target(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

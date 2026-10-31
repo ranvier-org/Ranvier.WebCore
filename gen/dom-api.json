@@ -30,6 +30,32 @@
         "CSSViewTransitionRule",
         "CSSRule"
       ],
+      "names": [
+        "CSSContainerRule",
+        "CSSMediaRule",
+        "CSSSupportsRule",
+        "CSSConditionRule",
+        "CSSLayerBlockRule",
+        "CSSScopeRule",
+        "CSSStartingStyleRule",
+        "CSSCounterStyleRule",
+        "CSSFontFaceRule",
+        "CSSFontFeatureValuesRule",
+        "CSSFontPaletteValuesRule",
+        "CSSGroupingRule",
+        "CSSImportRule",
+        "CSSKeyframeRule",
+        "CSSKeyframesRule",
+        "CSSLayerStatementRule",
+        "CSSNamespaceRule",
+        "CSSNestedDeclarations",
+        "CSSPositionTryRule",
+        "CSSPropertyRule",
+        "CSSStyleRule",
+        "CSSViewTransitionRule",
+        "CSSRule"
+      ],
+      "extras": [],
       "parameters": [
         {
           "ctype": "RvCSSRule*",
@@ -57,6 +83,11 @@
         "CSSStyleSheet",
         "StyleSheet"
       ],
+      "names": [
+        "CSSStyleSheet",
+        "StyleSheet"
+      ],
+      "extras": [],
       "parameters": [
         {
           "ctype": "RvStyleSheet*",
@@ -86,6 +117,13 @@
         "CSSStyleProperties",
         "CSSStyleDeclaration"
       ],
+      "names": [
+        "CSSFontFaceDescriptors",
+        "CSSPositionTryDescriptors",
+        "CSSStyleProperties",
+        "CSSStyleDeclaration"
+      ],
+      "extras": [],
       "parameters": [
         {
           "ctype": "RvCSSStyleDeclaration*",
@@ -118,6 +156,16 @@
         "CSSUnparsedValue",
         "CSSStyleValue"
       ],
+      "names": [
+        "CSSUnitValue",
+        "CSSNumericValue",
+        "CSSOMKeywordValue",
+        "CSSStyleImageValue",
+        "CSSTransformValue",
+        "CSSUnparsedValue",
+        "CSSStyleValue"
+      ],
+      "extras": [],
       "parameters": [
         {
           "ctype": "RvCSSStyleValue*",
@@ -145,6 +193,11 @@
         "StylePropertyMap",
         "StylePropertyMapReadOnly"
       ],
+      "names": [
+        "StylePropertyMap",
+        "StylePropertyMapReadOnly"
+      ],
+      "extras": [],
       "parameters": [
         {
           "ctype": "RvStylePropertyMapReadOnly*",
@@ -172,6 +225,11 @@
         "DOMRect",
         "DOMRectReadOnly"
       ],
+      "names": [
+        "DOMRect",
+        "DOMRectReadOnly"
+      ],
+      "extras": [],
       "parameters": [
         {
           "ctype": "RvDOMRectReadOnly*",
@@ -199,6 +257,11 @@
         "DOMPoint",
         "DOMPointReadOnly"
       ],
+      "names": [
+        "DOMPoint",
+        "DOMPointReadOnly"
+      ],
+      "extras": [],
       "parameters": [
         {
           "ctype": "RvDOMPointReadOnly*",
@@ -226,6 +289,11 @@
         "DOMMatrix",
         "DOMMatrixReadOnly"
       ],
+      "names": [
+        "DOMMatrix",
+        "DOMMatrixReadOnly"
+      ],
+      "extras": [],
       "parameters": [
         {
           "ctype": "RvDOMMatrixReadOnly*",
@@ -260,9 +328,101 @@
         "CSSTranslate",
         "CSSTransformComponent"
       ],
+      "names": [
+        "CSSMatrixComponent",
+        "CSSPerspective",
+        "CSSRotate",
+        "CSSScale",
+        "CSSSkew",
+        "CSSSkewX",
+        "CSSSkewY",
+        "CSSTranslate",
+        "CSSTransformComponent"
+      ],
+      "extras": [],
       "parameters": [
         {
           "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ]
+    },
+    {
+      "root": "Event",
+      "function": "rv_dom_event_get_interface_name",
+      "feature": "dom-type-query:Event",
+      "interfaces": [
+        "PointerEvent",
+        "WheelEvent",
+        "CompositionEvent",
+        "FocusEvent",
+        "InputEvent",
+        "KeyboardEvent",
+        "MouseEvent",
+        "AnimationPlaybackEvent",
+        "BeforeUnloadEvent",
+        "CSSAnimationEvent",
+        "CSSTransitionEvent",
+        "CommandEvent",
+        "ContentVisibilityAutoStateChangeEvent",
+        "CustomEvent",
+        "ErrorEvent",
+        "FormDataEvent",
+        "HashChangeEvent",
+        "MediaQueryListEvent",
+        "PageTransitionEvent",
+        "PopStateEvent",
+        "ProgressEvent",
+        "SubmitEvent",
+        "ToggleEvent",
+        "UIEvent",
+        "Event"
+      ],
+      "names": [
+        "PointerEvent",
+        "WheelEvent",
+        "CompositionEvent",
+        "FocusEvent",
+        "InputEvent",
+        "KeyboardEvent",
+        "MouseEvent",
+        "AnimationPlaybackEvent",
+        "BeforeUnloadEvent",
+        "AnimationEvent",
+        "TransitionEvent",
+        "CommandEvent",
+        "ContentVisibilityAutoStateChangeEvent",
+        "CustomEvent",
+        "ErrorEvent",
+        "FormDataEvent",
+        "HashChangeEvent",
+        "MediaQueryListEvent",
+        "PageTransitionEvent",
+        "PopStateEvent",
+        "ProgressEvent",
+        "SubmitEvent",
+        "ToggleEvent",
+        "UIEvent",
+        "Event"
+      ],
+      "extras": [
+        "CustomEvent"
+      ],
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
           "name": "target"
         },
         {
@@ -923,6 +1083,50 @@
     },
     {
       "name": "CommandEvent",
+      "base": "Event"
+    },
+    {
+      "name": "ErrorEvent",
+      "base": "Event"
+    },
+    {
+      "name": "ProgressEvent",
+      "base": "Event"
+    },
+    {
+      "name": "CSSAnimationEvent",
+      "base": "Event"
+    },
+    {
+      "name": "CSSTransitionEvent",
+      "base": "Event"
+    },
+    {
+      "name": "ContentVisibilityAutoStateChangeEvent",
+      "base": "Event"
+    },
+    {
+      "name": "AnimationPlaybackEvent",
+      "base": "Event"
+    },
+    {
+      "name": "PageTransitionEvent",
+      "base": "Event"
+    },
+    {
+      "name": "HashChangeEvent",
+      "base": "Event"
+    },
+    {
+      "name": "MediaQueryListEvent",
+      "base": "Event"
+    },
+    {
+      "name": "PopStateEvent",
+      "base": "Event"
+    },
+    {
+      "name": "BeforeUnloadEvent",
       "base": "Event"
     },
     {
@@ -2862,6 +3066,105 @@
       "source": "dom/CommandEvent.idl"
     },
     {
+      "name": "ErrorEvent",
+      "idlName": "ErrorEvent",
+      "base": "Event",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/ErrorEvent.idl"
+    },
+    {
+      "name": "ProgressEvent",
+      "idlName": "ProgressEvent",
+      "base": "Event",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/ProgressEvent.idl"
+    },
+    {
+      "name": "AnimationEvent",
+      "idlName": "CSSAnimationEvent",
+      "base": "Event",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "animation/CSSAnimationEvent.idl"
+    },
+    {
+      "name": "TransitionEvent",
+      "idlName": "CSSTransitionEvent",
+      "base": "Event",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "animation/CSSTransitionEvent.idl"
+    },
+    {
+      "name": "ContentVisibilityAutoStateChangeEvent",
+      "idlName": "ContentVisibilityAutoStateChangeEvent",
+      "base": "Event",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/ContentVisibilityAutoStateChangeEvent.idl"
+    },
+    {
+      "name": "AnimationPlaybackEvent",
+      "idlName": "AnimationPlaybackEvent",
+      "base": "Event",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "animation/AnimationPlaybackEvent.idl"
+    },
+    {
+      "name": "PageTransitionEvent",
+      "idlName": "PageTransitionEvent",
+      "base": "Event",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/PageTransitionEvent.idl"
+    },
+    {
+      "name": "HashChangeEvent",
+      "idlName": "HashChangeEvent",
+      "base": "Event",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/HashChangeEvent.idl"
+    },
+    {
+      "name": "MediaQueryListEvent",
+      "idlName": "MediaQueryListEvent",
+      "base": "Event",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/MediaQueryListEvent.idl"
+    },
+    {
+      "name": "PopStateEvent",
+      "idlName": "PopStateEvent",
+      "base": "Event",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/PopStateEvent.idl"
+    },
+    {
+      "name": "BeforeUnloadEvent",
+      "idlName": "BeforeUnloadEvent",
+      "base": "Event",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/BeforeUnloadEvent.idl"
+    },
+    {
       "name": "SVGGraphicsElement",
       "idlName": "SVGGraphicsElement",
       "base": "SVGElement",
@@ -3933,33 +4236,6 @@
       "source": "html/HTMLVideoElement.idl"
     },
     {
-      "name": "AnimationEvent",
-      "idlName": "CSSAnimationEvent",
-      "base": "Event",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "animation/CSSAnimationEvent.idl"
-    },
-    {
-      "name": "TransitionEvent",
-      "idlName": "CSSTransitionEvent",
-      "base": "Event",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "animation/CSSTransitionEvent.idl"
-    },
-    {
-      "name": "BeforeUnloadEvent",
-      "idlName": "BeforeUnloadEvent",
-      "base": "Event",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "dom/BeforeUnloadEvent.idl"
-    },
-    {
       "name": "CustomElementRegistry",
       "idlName": "CustomElementRegistry",
       "base": null,
@@ -3987,15 +4263,6 @@
       "source": "dom/DragEvent.idl"
     },
     {
-      "name": "ErrorEvent",
-      "idlName": "ErrorEvent",
-      "base": "Event",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "dom/ErrorEvent.idl"
-    },
-    {
       "name": "GamepadEvent",
       "idlName": "GamepadEvent",
       "base": "Event",
@@ -4003,15 +4270,6 @@
       "mixin": false,
       "contractOnly": true,
       "source": "Modules/gamepad/GamepadEvent.idl"
-    },
-    {
-      "name": "HashChangeEvent",
-      "idlName": "HashChangeEvent",
-      "base": "Event",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "dom/HashChangeEvent.idl"
     },
     {
       "name": "MediaEncryptedEvent",
@@ -4059,15 +4317,6 @@
       "source": "dom/PageSwapEvent.idl"
     },
     {
-      "name": "PageTransitionEvent",
-      "idlName": "PageTransitionEvent",
-      "base": "Event",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "dom/PageTransitionEvent.idl"
-    },
-    {
       "name": "PictureInPictureEvent",
       "idlName": "PictureInPictureEvent",
       "base": "Event",
@@ -4075,24 +4324,6 @@
       "mixin": false,
       "contractOnly": true,
       "source": "Modules/pictureinpicture/PictureInPictureEvent.idl"
-    },
-    {
-      "name": "PopStateEvent",
-      "idlName": "PopStateEvent",
-      "base": "Event",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "dom/PopStateEvent.idl"
-    },
-    {
-      "name": "ProgressEvent",
-      "idlName": "ProgressEvent",
-      "base": "Event",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "dom/ProgressEvent.idl"
     },
     {
       "name": "PromiseRejectionEvent",
@@ -110319,6 +110550,106 @@
     },
     {
       "interface": "CompositionEvent",
+      "member": "constructor",
+      "contractOwner": "CompositionEvent",
+      "kind": "constructor",
+      "function": "rv_dom_composition_event_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "type"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "type_length"
+        },
+        {
+          "ctype": "const RvDomCompositionEventInit*",
+          "name": "event_init_dict"
+        },
+        {
+          "ctype": "RvEvent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "type",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "eventInitDict",
+          "idlType": "CompositionEventInit",
+          "idl": {
+            "name": "CompositionEventInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "CompositionEventInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "CompositionEvent",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "event",
+        "ctype": null,
+        "interface": "CompositionEvent",
+        "root": null,
+        "class": "CompositionEvent",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:CompositionEvent",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CompositionEvent",
       "member": "data",
       "contractOwner": "CompositionEvent",
       "kind": "getter",
@@ -111026,6 +111357,2049 @@
       },
       "returns": {
         "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "ErrorEvent",
+      "member": "constructor",
+      "contractOwner": "ErrorEvent",
+      "kind": "constructor",
+      "function": "rv_dom_error_event_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "type"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "type_length"
+        },
+        {
+          "ctype": "const RvDomErrorEventInit*",
+          "name": "event_init_dict"
+        },
+        {
+          "ctype": "RvEvent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "type",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "eventInitDict",
+          "idlType": "ErrorEventInit",
+          "idl": {
+            "name": "ErrorEventInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "ErrorEventInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "ErrorEvent",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "event",
+        "ctype": null,
+        "interface": "ErrorEvent",
+        "root": null,
+        "class": "ErrorEvent",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:ErrorEvent",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "ErrorEvent",
+      "member": "message",
+      "contractOwner": "ErrorEvent",
+      "kind": "getter",
+      "function": "rv_dom_error_event_get_message",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "ErrorEvent",
+      "member": "filename",
+      "contractOwner": "ErrorEvent",
+      "kind": "getter",
+      "function": "rv_dom_error_event_get_filename",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "ErrorEvent",
+      "member": "lineno",
+      "contractOwner": "ErrorEvent",
+      "kind": "getter",
+      "function": "rv_dom_error_event_get_lineno",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "ErrorEvent",
+      "member": "colno",
+      "contractOwner": "ErrorEvent",
+      "kind": "getter",
+      "function": "rv_dom_error_event_get_colno",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "ProgressEvent",
+      "member": "constructor",
+      "contractOwner": "ProgressEvent",
+      "kind": "constructor",
+      "function": "rv_dom_progress_event_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "type"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "type_length"
+        },
+        {
+          "ctype": "const RvDomProgressEventInit*",
+          "name": "event_init_dict"
+        },
+        {
+          "ctype": "RvEvent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "type",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "eventInitDict",
+          "idlType": "ProgressEventInit",
+          "idl": {
+            "name": "ProgressEventInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "ProgressEventInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "ProgressEvent",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "event",
+        "ctype": null,
+        "interface": "ProgressEvent",
+        "root": null,
+        "class": "ProgressEvent",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:ProgressEvent",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "ProgressEvent",
+      "member": "lengthComputable",
+      "contractOwner": "ProgressEvent",
+      "kind": "getter",
+      "function": "rv_dom_progress_event_get_length_computable",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "ProgressEvent",
+      "member": "loaded",
+      "contractOwner": "ProgressEvent",
+      "kind": "getter",
+      "function": "rv_dom_progress_event_get_loaded",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "ProgressEvent",
+      "member": "total",
+      "contractOwner": "ProgressEvent",
+      "kind": "getter",
+      "function": "rv_dom_progress_event_get_total",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSAnimationEvent",
+      "member": "constructor",
+      "contractOwner": "AnimationEvent",
+      "kind": "constructor",
+      "function": "rv_dom_css_animation_event_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "type"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "type_length"
+        },
+        {
+          "ctype": "const RvDomAnimationEventInit*",
+          "name": "animation_event_init_dict"
+        },
+        {
+          "ctype": "RvEvent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "type",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "animationEventInitDict",
+          "idlType": "AnimationEventInit",
+          "idl": {
+            "name": "AnimationEventInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "AnimationEventInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "CSSAnimationEvent",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "event",
+        "ctype": null,
+        "interface": "CSSAnimationEvent",
+        "root": null,
+        "class": "CSSAnimationEvent",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:CSSAnimationEvent",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CSSAnimationEvent",
+      "member": "animationName",
+      "contractOwner": "AnimationEvent",
+      "kind": "getter",
+      "function": "rv_dom_css_animation_event_get_animation_name",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSAnimationEvent",
+      "member": "elapsedTime",
+      "contractOwner": "AnimationEvent",
+      "kind": "getter",
+      "function": "rv_dom_css_animation_event_get_elapsed_time",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSAnimationEvent",
+      "member": "pseudoElement",
+      "contractOwner": "AnimationEvent",
+      "kind": "getter",
+      "function": "rv_dom_css_animation_event_get_pseudo_element",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSTransitionEvent",
+      "member": "constructor",
+      "contractOwner": "TransitionEvent",
+      "kind": "constructor",
+      "function": "rv_dom_css_transition_event_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "type"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "type_length"
+        },
+        {
+          "ctype": "const RvDomTransitionEventInit*",
+          "name": "transition_event_init_dict"
+        },
+        {
+          "ctype": "RvEvent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "type",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "transitionEventInitDict",
+          "idlType": "TransitionEventInit",
+          "idl": {
+            "name": "TransitionEventInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "TransitionEventInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "CSSTransitionEvent",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "event",
+        "ctype": null,
+        "interface": "CSSTransitionEvent",
+        "root": null,
+        "class": "CSSTransitionEvent",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:CSSTransitionEvent",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CSSTransitionEvent",
+      "member": "propertyName",
+      "contractOwner": "TransitionEvent",
+      "kind": "getter",
+      "function": "rv_dom_css_transition_event_get_property_name",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSTransitionEvent",
+      "member": "elapsedTime",
+      "contractOwner": "TransitionEvent",
+      "kind": "getter",
+      "function": "rv_dom_css_transition_event_get_elapsed_time",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSTransitionEvent",
+      "member": "pseudoElement",
+      "contractOwner": "TransitionEvent",
+      "kind": "getter",
+      "function": "rv_dom_css_transition_event_get_pseudo_element",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "ContentVisibilityAutoStateChangeEvent",
+      "member": "constructor",
+      "contractOwner": "ContentVisibilityAutoStateChangeEvent",
+      "kind": "constructor",
+      "function": "rv_dom_content_visibility_auto_state_change_event_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "type"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "type_length"
+        },
+        {
+          "ctype": "const RvDomContentVisibilityAutoStateChangeEventInit*",
+          "name": "event_init_dict"
+        },
+        {
+          "ctype": "RvEvent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "type",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "eventInitDict",
+          "idlType": "ContentVisibilityAutoStateChangeEventInit",
+          "idl": {
+            "name": "ContentVisibilityAutoStateChangeEventInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "ContentVisibilityAutoStateChangeEventInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "ContentVisibilityAutoStateChangeEvent",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "event",
+        "ctype": null,
+        "interface": "ContentVisibilityAutoStateChangeEvent",
+        "root": null,
+        "class": "ContentVisibilityAutoStateChangeEvent",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:ContentVisibilityAutoStateChangeEvent",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "ContentVisibilityAutoStateChangeEvent",
+      "member": "skipped",
+      "contractOwner": "ContentVisibilityAutoStateChangeEvent",
+      "kind": "getter",
+      "function": "rv_dom_content_visibility_auto_state_change_event_get_skipped",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "AnimationPlaybackEvent",
+      "member": "constructor",
+      "contractOwner": "AnimationPlaybackEvent",
+      "kind": "constructor",
+      "function": "rv_dom_animation_playback_event_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "type"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "type_length"
+        },
+        {
+          "ctype": "const RvDomAnimationPlaybackEventInit*",
+          "name": "event_init_dict"
+        },
+        {
+          "ctype": "RvEvent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "type",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "eventInitDict",
+          "idlType": "AnimationPlaybackEventInit",
+          "idl": {
+            "name": "AnimationPlaybackEventInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "AnimationPlaybackEventInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "AnimationPlaybackEvent",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "event",
+        "ctype": null,
+        "interface": "AnimationPlaybackEvent",
+        "root": null,
+        "class": "AnimationPlaybackEvent",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:AnimationPlaybackEvent",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "AnimationPlaybackEvent",
+      "member": "currentTime",
+      "contractOwner": "AnimationPlaybackEvent",
+      "kind": "getter",
+      "function": "rv_dom_animation_playback_event_get_current_time",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomUnionDoubleOrCSSNumericValueNullable*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "union",
+        "nullable": true,
+        "subtypes": [
+          {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "union",
+        "ctype": "RvDomUnionDoubleOrCSSNumericValueNullable",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "DoubleOrCSSNumericValue",
+        "nullable": true,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "finiteInput": true
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      }
+    },
+    {
+      "interface": "AnimationPlaybackEvent",
+      "member": "timelineTime",
+      "contractOwner": "AnimationPlaybackEvent",
+      "kind": "getter",
+      "function": "rv_dom_animation_playback_event_get_timeline_time",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomUnionDoubleOrCSSNumericValueNullable*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "union",
+        "nullable": true,
+        "subtypes": [
+          {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "union",
+        "ctype": "RvDomUnionDoubleOrCSSNumericValueNullable",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "DoubleOrCSSNumericValue",
+        "nullable": true,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "finiteInput": true
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      }
+    },
+    {
+      "interface": "PageTransitionEvent",
+      "member": "constructor",
+      "contractOwner": "PageTransitionEvent",
+      "kind": "constructor",
+      "function": "rv_dom_page_transition_event_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "type"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "type_length"
+        },
+        {
+          "ctype": "const RvDomPageTransitionEventInit*",
+          "name": "event_init_dict"
+        },
+        {
+          "ctype": "RvEvent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "type",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "eventInitDict",
+          "idlType": "PageTransitionEventInit",
+          "idl": {
+            "name": "PageTransitionEventInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "PageTransitionEventInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "PageTransitionEvent",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "event",
+        "ctype": null,
+        "interface": "PageTransitionEvent",
+        "root": null,
+        "class": "PageTransitionEvent",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:PageTransitionEvent",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "PageTransitionEvent",
+      "member": "persisted",
+      "contractOwner": "PageTransitionEvent",
+      "kind": "getter",
+      "function": "rv_dom_page_transition_event_get_persisted",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HashChangeEvent",
+      "member": "constructor",
+      "contractOwner": "HashChangeEvent",
+      "kind": "constructor",
+      "function": "rv_dom_hash_change_event_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "type"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "type_length"
+        },
+        {
+          "ctype": "const RvDomHashChangeEventInit*",
+          "name": "event_init_dict"
+        },
+        {
+          "ctype": "RvEvent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "type",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "eventInitDict",
+          "idlType": "HashChangeEventInit",
+          "idl": {
+            "name": "HashChangeEventInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "HashChangeEventInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "HashChangeEvent",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "event",
+        "ctype": null,
+        "interface": "HashChangeEvent",
+        "root": null,
+        "class": "HashChangeEvent",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:HashChangeEvent",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "HashChangeEvent",
+      "member": "oldURL",
+      "contractOwner": "HashChangeEvent",
+      "kind": "getter",
+      "function": "rv_dom_hash_change_event_get_old_url",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HashChangeEvent",
+      "member": "newURL",
+      "contractOwner": "HashChangeEvent",
+      "kind": "getter",
+      "function": "rv_dom_hash_change_event_get_new_url",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "MediaQueryListEvent",
+      "member": "constructor",
+      "contractOwner": "MediaQueryListEvent",
+      "kind": "constructor",
+      "function": "rv_dom_media_query_list_event_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "type"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "type_length"
+        },
+        {
+          "ctype": "const RvDomMediaQueryListEventInit*",
+          "name": "event_init_dict"
+        },
+        {
+          "ctype": "RvEvent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "type",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "eventInitDict",
+          "idlType": "MediaQueryListEventInit",
+          "idl": {
+            "name": "MediaQueryListEventInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "MediaQueryListEventInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "MediaQueryListEvent",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "event",
+        "ctype": null,
+        "interface": "MediaQueryListEvent",
+        "root": null,
+        "class": "MediaQueryListEvent",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:MediaQueryListEvent",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "MediaQueryListEvent",
+      "member": "media",
+      "contractOwner": "MediaQueryListEvent",
+      "kind": "getter",
+      "function": "rv_dom_media_query_list_event_get_media",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "MediaQueryListEvent",
+      "member": "matches",
+      "contractOwner": "MediaQueryListEvent",
+      "kind": "getter",
+      "function": "rv_dom_media_query_list_event_get_matches",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "PopStateEvent",
+      "member": "constructor",
+      "contractOwner": "PopStateEvent",
+      "kind": "constructor",
+      "function": "rv_dom_pop_state_event_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "type"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "type_length"
+        },
+        {
+          "ctype": "const RvDomPopStateEventInit*",
+          "name": "event_init_dict"
+        },
+        {
+          "ctype": "RvEvent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "type",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "eventInitDict",
+          "idlType": "PopStateEventInit",
+          "idl": {
+            "name": "PopStateEventInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "PopStateEventInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "PopStateEvent",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "event",
+        "ctype": null,
+        "interface": "PopStateEvent",
+        "root": null,
+        "class": "PopStateEvent",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:PopStateEvent",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "PopStateEvent",
+      "member": "hasUAVisualTransition",
+      "contractOwner": "PopStateEvent",
+      "kind": "getter",
+      "function": "rv_dom_pop_state_event_get_has_ua_visual_transition",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "BeforeUnloadEvent",
+      "member": "returnValue",
+      "contractOwner": "BeforeUnloadEvent",
+      "kind": "getter",
+      "function": "rv_dom_before_unload_event_get_return_value",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "BeforeUnloadEvent",
+      "member": "returnValue",
+      "contractOwner": "BeforeUnloadEvent",
+      "kind": "setter",
+      "function": "rv_dom_before_unload_event_set_return_value",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
         "ctype": null,
         "interface": null,
         "root": null,
@@ -143541,6 +145915,47 @@
     {
       "mapping": {
         "kind": "union",
+        "ctype": "RvDomUnionDoubleOrCSSNumericValueNullable",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "DoubleOrCSSNumericValue",
+        "nullable": true,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "finiteInput": true
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_double_or_css_numeric_value_nullable_release"
+    },
+    {
+      "mapping": {
+        "kind": "union",
         "ctype": "RvDomUnionBufferSourceOrBlobOrUSVString",
         "interface": null,
         "root": null,
@@ -145800,6 +148215,103 @@
         }
       }
     ],
+    "CompositionEventInit": [
+      {
+        "name": "bubbles",
+        "field": "bubbles",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "cancelable",
+        "field": "cancelable",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "composed",
+        "field": "composed",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "detail",
+        "field": "detail",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "data",
+        "field": "data",
+        "ctype": "const char*",
+        "required": false,
+        "default": "\"\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
     "SubmitEventInit": [
       {
         "name": "bubbles",
@@ -146158,6 +148670,1066 @@
         "mapping": {
           "kind": "string",
           "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "ErrorEventInit": [
+      {
+        "name": "bubbles",
+        "field": "bubbles",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "cancelable",
+        "field": "cancelable",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "composed",
+        "field": "composed",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "message",
+        "field": "message",
+        "ctype": "const char*",
+        "required": false,
+        "default": "\"\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "filename",
+        "field": "filename",
+        "ctype": "const char*",
+        "required": false,
+        "default": "\"\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "lineno",
+        "field": "lineno",
+        "ctype": "uint32_t",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "uint32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "colno",
+        "field": "colno",
+        "ctype": "uint32_t",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "uint32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "ProgressEventInit": [
+      {
+        "name": "bubbles",
+        "field": "bubbles",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "cancelable",
+        "field": "cancelable",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "composed",
+        "field": "composed",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "lengthComputable",
+        "field": "length_computable",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "loaded",
+        "field": "loaded",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "total",
+        "field": "total",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "AnimationEventInit": [
+      {
+        "name": "bubbles",
+        "field": "bubbles",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "cancelable",
+        "field": "cancelable",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "composed",
+        "field": "composed",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "animationName",
+        "field": "animation_name",
+        "ctype": "const char*",
+        "required": false,
+        "default": "\"\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "elapsedTime",
+        "field": "elapsed_time",
+        "ctype": "double",
+        "required": false,
+        "default": "0.0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "pseudoElement",
+        "field": "pseudo_element",
+        "ctype": "const char*",
+        "required": false,
+        "default": "\"\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "TransitionEventInit": [
+      {
+        "name": "bubbles",
+        "field": "bubbles",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "cancelable",
+        "field": "cancelable",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "composed",
+        "field": "composed",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "propertyName",
+        "field": "property_name",
+        "ctype": "const char*",
+        "required": false,
+        "default": "\"\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "elapsedTime",
+        "field": "elapsed_time",
+        "ctype": "double",
+        "required": false,
+        "default": "0.0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "pseudoElement",
+        "field": "pseudo_element",
+        "ctype": "const char*",
+        "required": false,
+        "default": "\"\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "ContentVisibilityAutoStateChangeEventInit": [
+      {
+        "name": "bubbles",
+        "field": "bubbles",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "cancelable",
+        "field": "cancelable",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "composed",
+        "field": "composed",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "skipped",
+        "field": "skipped",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "AnimationPlaybackEventInit": [
+      {
+        "name": "bubbles",
+        "field": "bubbles",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "cancelable",
+        "field": "cancelable",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "composed",
+        "field": "composed",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "currentTime",
+        "field": "current_time",
+        "ctype": "const RvDomUnionDoubleOrCSSNumericValueNullable*",
+        "required": false,
+        "default": "null",
+        "mapping": {
+          "kind": "union",
+          "ctype": "RvDomUnionDoubleOrCSSNumericValueNullable",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": "DoubleOrCSSNumericValue",
+          "nullable": true,
+          "atom": false,
+          "subtypes": [
+            {
+              "kind": "number",
+              "ctype": "double",
+              "interface": null,
+              "root": null,
+              "class": null,
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": [],
+              "finiteInput": true
+            },
+            {
+              "kind": "object",
+              "ctype": null,
+              "interface": "CSSNumericValue",
+              "root": "CSSStyleValue",
+              "class": "CSSNumericValue",
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": []
+            }
+          ]
+        }
+      },
+      {
+        "name": "timelineTime",
+        "field": "timeline_time",
+        "ctype": "const RvDomUnionDoubleOrCSSNumericValueNullable*",
+        "required": false,
+        "default": "null",
+        "mapping": {
+          "kind": "union",
+          "ctype": "RvDomUnionDoubleOrCSSNumericValueNullable",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": "DoubleOrCSSNumericValue",
+          "nullable": true,
+          "atom": false,
+          "subtypes": [
+            {
+              "kind": "number",
+              "ctype": "double",
+              "interface": null,
+              "root": null,
+              "class": null,
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": [],
+              "finiteInput": true
+            },
+            {
+              "kind": "object",
+              "ctype": null,
+              "interface": "CSSNumericValue",
+              "root": "CSSStyleValue",
+              "class": "CSSNumericValue",
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": []
+            }
+          ]
+        }
+      }
+    ],
+    "PageTransitionEventInit": [
+      {
+        "name": "bubbles",
+        "field": "bubbles",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "cancelable",
+        "field": "cancelable",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "composed",
+        "field": "composed",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "persisted",
+        "field": "persisted",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "HashChangeEventInit": [
+      {
+        "name": "bubbles",
+        "field": "bubbles",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "cancelable",
+        "field": "cancelable",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "composed",
+        "field": "composed",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "oldURL",
+        "field": "old_url",
+        "ctype": "const char*",
+        "required": false,
+        "default": "\"\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "newURL",
+        "field": "new_url",
+        "ctype": "const char*",
+        "required": false,
+        "default": "\"\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "MediaQueryListEventInit": [
+      {
+        "name": "bubbles",
+        "field": "bubbles",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "cancelable",
+        "field": "cancelable",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "composed",
+        "field": "composed",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "media",
+        "field": "media",
+        "ctype": "const char*",
+        "required": false,
+        "default": "\"\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "matches",
+        "field": "matches",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "PopStateEventInit": [
+      {
+        "name": "bubbles",
+        "field": "bubbles",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "cancelable",
+        "field": "cancelable",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "composed",
+        "field": "composed",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "hasUAVisualTransition",
+        "field": "has_ua_visual_transition",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
           "interface": null,
           "root": null,
           "class": null,

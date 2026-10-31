@@ -1,0 +1,363 @@
+{
+  "description": "Measured differences between Chromium 156 and the native runtime that tests/abi/event_details.py requires, each with its reason.",
+  "differences": [
+    {
+      "scope": "ErrorEvent attributes",
+      "field": "error",
+      "chromium": "present",
+      "native": "absent",
+      "reason": "ErrorEvent.error is of type any, deferred to the script value group"
+    },
+    {
+      "scope": "AnimationEvent attributes",
+      "field": "animation",
+      "chromium": "present",
+      "native": "absent",
+      "reason": "AnimationEvent.animation is a CSSAnimation handle, deferred to the Web Animations group"
+    },
+    {
+      "scope": "AnimationEvent attributes",
+      "field": "pseudoTarget",
+      "chromium": "present",
+      "native": "absent",
+      "reason": "Chromium-only attribute: WebKit's CSSAnimationEvent.idl has no pseudoTarget (CSSPseudoElement)"
+    },
+    {
+      "scope": "TransitionEvent attributes",
+      "field": "animation",
+      "chromium": "present",
+      "native": "absent",
+      "reason": "TransitionEvent.animation is a CSSTransition handle, deferred to the Web Animations group"
+    },
+    {
+      "scope": "TransitionEvent attributes",
+      "field": "pseudoTarget",
+      "chromium": "present",
+      "native": "absent",
+      "reason": "Chromium-only attribute: WebKit's CSSTransitionEvent.idl has no pseudoTarget (CSSPseudoElement)"
+    },
+    {
+      "scope": "PopStateEvent attributes",
+      "field": "state",
+      "chromium": "present",
+      "native": "absent",
+      "reason": "PopStateEvent.state is of type any, deferred to the script value group"
+    },
+    {
+      "scope": "load events",
+      "field": "event",
+      "chromium": null,
+      "native": {
+        "interface": "ContentVisibilityAutoStateChangeEvent",
+        "skipped": true,
+        "target": "cv",
+        "trusted": false,
+        "type": "contentvisibilityautostatechange"
+      },
+      "reason": "WebKit dispatches contentvisibilityautostatechange untrusted (ContentVisibilityDocumentState.cpp creates it with the default IsTrusted::No); Chromium dispatches it trusted"
+    },
+    {
+      "scope": "load events",
+      "field": "event",
+      "chromium": {
+        "interface": "ContentVisibilityAutoStateChangeEvent",
+        "skipped": true,
+        "target": "cv",
+        "trusted": true,
+        "type": "contentvisibilityautostatechange"
+      },
+      "native": null,
+      "reason": "WebKit dispatches contentvisibilityautostatechange untrusted (ContentVisibilityDocumentState.cpp creates it with the default IsTrusted::No); Chromium dispatches it trusted"
+    },
+    {
+      "scope": "click events",
+      "field": "sequence",
+      "chromium": [
+        {
+          "type": "pointerdown",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "button",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "mousedown",
+          "interface": "MouseEvent",
+          "trusted": true,
+          "target": "button",
+          "button": 0,
+          "detail": 1
+        },
+        {
+          "type": "focus",
+          "interface": "FocusEvent",
+          "trusted": true,
+          "target": "button"
+        },
+        {
+          "type": "focusin",
+          "interface": "FocusEvent",
+          "trusted": true,
+          "target": "button"
+        },
+        {
+          "type": "pointerup",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "button",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "mouseup",
+          "interface": "MouseEvent",
+          "trusted": true,
+          "target": "button",
+          "button": 0,
+          "detail": 1
+        },
+        {
+          "type": "click",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "button",
+          "pointerType": "mouse",
+          "isPrimary": false,
+          "button": 0
+        }
+      ],
+      "native": [
+        {
+          "type": "pointerdown",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "button",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "mousedown",
+          "interface": "MouseEvent",
+          "trusted": true,
+          "target": "button",
+          "button": 0,
+          "detail": 1
+        },
+        {
+          "type": "pointerup",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "button",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "mouseup",
+          "interface": "MouseEvent",
+          "trusted": true,
+          "target": "button",
+          "button": 0,
+          "detail": 1
+        },
+        {
+          "type": "click",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "button",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        }
+      ],
+      "reason": "WebKit does not focus a <button> on a mouse press (HTMLFormControlElement::isMouseFocusable is false off GTK/WPE), so no focus/focusin; WebKit's click PointerEvent reads isPrimary true where Chromium reads false"
+    },
+    {
+      "scope": "type events",
+      "field": "sequence",
+      "chromium": [
+        {
+          "type": "pointerdown",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "field",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "mousedown",
+          "interface": "MouseEvent",
+          "trusted": true,
+          "target": "field",
+          "button": 0,
+          "detail": 1
+        },
+        {
+          "type": "focus",
+          "interface": "FocusEvent",
+          "trusted": true,
+          "target": "field"
+        },
+        {
+          "type": "focusin",
+          "interface": "FocusEvent",
+          "trusted": true,
+          "target": "field"
+        },
+        {
+          "type": "pointerup",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "field",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "mouseup",
+          "interface": "MouseEvent",
+          "trusted": true,
+          "target": "field",
+          "button": 0,
+          "detail": 1
+        },
+        {
+          "type": "click",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "field",
+          "pointerType": "mouse",
+          "isPrimary": false,
+          "button": 0
+        },
+        {
+          "type": "keydown",
+          "interface": "KeyboardEvent",
+          "trusted": true,
+          "target": "field",
+          "key": "a",
+          "code": "KeyA"
+        },
+        {
+          "type": "beforeinput",
+          "interface": "InputEvent",
+          "trusted": true,
+          "target": "field",
+          "data": "a",
+          "inputType": "insertText"
+        },
+        {
+          "type": "input",
+          "interface": "InputEvent",
+          "trusted": true,
+          "target": "field",
+          "data": "a",
+          "inputType": "insertText"
+        },
+        {
+          "type": "keyup",
+          "interface": "KeyboardEvent",
+          "trusted": true,
+          "target": "field",
+          "key": "a",
+          "code": "KeyA"
+        }
+      ],
+      "native": [
+        {
+          "type": "pointerdown",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "field",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "mousedown",
+          "interface": "MouseEvent",
+          "trusted": true,
+          "target": "field",
+          "button": 0,
+          "detail": 1
+        },
+        {
+          "type": "focus",
+          "interface": "FocusEvent",
+          "trusted": true,
+          "target": "field"
+        },
+        {
+          "type": "focusin",
+          "interface": "FocusEvent",
+          "trusted": true,
+          "target": "field"
+        },
+        {
+          "type": "pointerup",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "field",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "mouseup",
+          "interface": "MouseEvent",
+          "trusted": true,
+          "target": "field",
+          "button": 0,
+          "detail": 1
+        },
+        {
+          "type": "click",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "field",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "keydown",
+          "interface": "KeyboardEvent",
+          "trusted": true,
+          "target": "field",
+          "key": "a",
+          "code": "KeyA"
+        },
+        {
+          "type": "beforeinput",
+          "interface": "InputEvent",
+          "trusted": true,
+          "target": "field",
+          "data": "a",
+          "inputType": "insertText"
+        },
+        {
+          "type": "input",
+          "interface": "InputEvent",
+          "trusted": true,
+          "target": "field",
+          "data": "a",
+          "inputType": "insertText"
+        },
+        {
+          "type": "keyup",
+          "interface": "KeyboardEvent",
+          "trusted": true,
+          "target": "field",
+          "key": "a",
+          "code": "KeyA"
+        }
+      ],
+      "reason": "WebKit's click PointerEvent reads isPrimary true where Chromium reads false"
+    }
+  ]
+}

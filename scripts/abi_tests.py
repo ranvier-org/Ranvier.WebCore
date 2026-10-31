@@ -138,4 +138,5 @@ with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
     run([sys.executable, '-I', tests / 'abi_layouts.py'])
     run([sys.executable, '-I', tests / 'form_navigation.py', '--native-directory', out])
     run([sys.executable, '-I', '-X', 'utf8', tests / 'form_submission.py', '--native-directory', out])
+    run([sys.executable, '-I', '-X', 'utf8', tests / 'event_details.py', '--native-directory', out])
 print('abi tests passed', flush=True)
