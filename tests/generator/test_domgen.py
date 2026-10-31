@@ -1328,6 +1328,86 @@ namespace DOMCSSNamespace {
         self.assertIn('ENABLE(PARTIAL)', feature_guard)
         self.assertNotIn('interface DOMCSSNamespace', generator.interfaces())
 
+    def collection_generator(self, setlike=True, maplike=True, extra_config=None):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface AbstractRange {};
+interface Highlight {
+    constructor(AbstractRange... initialRanges);
+    setlike<AbstractRange>;
+    attribute long priority;
+};
+interface HighlightRegistry { maplike<[AtomString] DOMString, Highlight>; };
+interface FrozenSet { readonly setlike<AbstractRange>; };
+interface UnboundSet { setlike<AbstractRange>; readonly attribute long other; };
+[InterfaceName=CSS] namespace DOMCSSNamespace {
+    [CallWith=CurrentDocument] readonly attribute HighlightRegistry highlights;
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['AbstractRange', 'Highlight', 'HighlightRegistry', 'FrozenSet', 'UnboundSet']
+        config['constructors'] = {'Highlight': {'receiver': 'Document', 'factory': 'RanvierCollectionLike::createHighlight', 'passReceiver': False}}
+        if setlike:
+            config['setlikeBindings'] = {'Highlight': {'adapter': 'RanvierCollectionLike'}, 'FrozenSet': {'adapter': 'RanvierCollectionLike'}}
+        if maplike:
+            config['maplikeBindings'] = {'HighlightRegistry': {'adapter': 'RanvierCollectionLike', 'stringInputs': 'utf8-lengths'}}
+        config['namespaceBindings'] = {'DOMCSSNamespace': {'receiver': 'Document', 'members': ['highlights'],
+                                                           'feature': 'dom-custom-highlights', 'stringInputs': 'utf8-lengths'}}
+        config.update(extra_config or {})
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        return generator
+
+    def test_configured_setlike_and_maplike_bind_ordered_engine_state_through_the_adapter(self):
+        generator = self.collection_generator()
+        functions = {item.name: item for item in generator.functions}
+        for name in ['highlight_size', 'highlight_has', 'highlight_values', 'highlight_add', 'highlight_delete', 'highlight_clear',
+                     'highlight_registry_size', 'highlight_registry_has', 'highlight_registry_get', 'highlight_registry_entries',
+                     'highlight_registry_set', 'highlight_registry_delete', 'highlight_registry_clear', 'frozen_set_values']:
+            self.assertIn(name, functions)
+            self.assertEqual('operation', functions[name].kind)
+        self.assertNotIn('frozen_set_add', functions)
+        self.assertFalse(any(name.startswith('unbound_set_') and name != 'unbound_set_get_other' for name in functions))
+        self.assertIn('snapshot copy', functions['highlight_values'].comment)
+        self.assertIn('snapshot copy', functions['highlight_registry_entries'].comment)
+        self.assertEqual([('RvHighlightRegistry*', 'target'), ('const uint8_t*', 'key'), ('int32_t', 'key_length'),
+                          ('RvHighlight**', 'result')], functions['highlight_registry_get'].params)
+        self.assertEqual(('RvHighlight*', 'value'), functions['highlight_registry_set'].params[3])
+        self.assertTrue(functions['highlight_registry_get'].returns.nullable)
+        self.assertEqual('pair', functions['highlight_registry_entries'].returns.subtypes[0].kind)
+        glue = generator.glue()
+        self.assertIn('#include "RanvierCollectionLike.h"', glue)
+        self.assertIn('WebCore::RanvierCollectionLike::remove(*impl, HandleArg<AbstractRange> { a0.get() })', glue)
+        self.assertIn('WebCore::RanvierCollectionLike::get(*impl, a0.atom())', glue)
+        self.assertIn('RanvierCollectionLike::createHighlight(DomSequenceArgument<Ref<AbstractRange>>', glue)
+        self.assertIn('DOMCSSNamespace::highlights(document.get())', glue)
+        self.assertIn('css_get_highlights', functions)
+        self.assertEqual('namespace_operation', functions['css_get_highlights'].kind)
+
+    def test_collection_declarations_without_a_binding_leave_the_output_unchanged(self):
+        bound = self.collection_generator(setlike=False, maplike=False)
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(re.sub(r'(readonly )?(setlike|maplike)<[^;]*>;', '', fixture.read_text()))
+        config = dict(bound.world.config)
+        unbound = domgen.Generator(domgen.World(self.source, config))
+        unbound.lock = {}
+        unbound.lock_structs = {}
+        unbound.run()
+        for render in ('header', 'glue', 'api_model', 'interfaces', 'report'):
+            self.assertEqual(getattr(unbound, render)(), getattr(bound, render)(), render)
+
+    def test_collection_binding_fails_closed_without_a_declaration_or_adapter(self):
+        cases = [({'setlikeBindings': {'HighlightRegistry': {'adapter': 'RanvierCollectionLike'}}}, 'requires one setlike declaration'),
+                 ({'setlikeBindings': {'Highlight': {'adapter': 'RanvierMissingAdapter'}}}, 'requires an adapter class'),
+                 ({'setlikeBindings': {'Highlight': {}}}, 'requires an adapter class'),
+                 ({'maplikeBindings': {'Absent': {'adapter': 'RanvierCollectionLike'}}}, 'requires a scoped interface')]
+        for extra, reason in cases:
+            with self.subTest(reason=reason):
+                with self.assertRaisesRegex(SystemExit, reason):
+                    self.collection_generator(setlike=False, maplike=False, extra_config=extra)
+
     def test_namespace_configuration_fails_closed_for_missing_or_unsupported_operations(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''
