@@ -20,7 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
 from utf8_inputs import Utf8
 
-ABI = 58
+ABI = 59
 OK, NULL_ARGUMENT, UNSUPPORTED = 0, -1, -9
 TWO_D = 1
 SUCCEEDED = 0

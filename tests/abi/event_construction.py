@@ -57,7 +57,7 @@ def verify(directory, evidence):
     def bind(name, returns, arguments):
         return bind_utf8(library, name, returns, arguments)
 
-    expect(bind('rv_abi_version', i32, [])() == 58, 'ABI version 58')
+    expect(bind('rv_abi_version', i32, [])() == 59, 'ABI version 59')
     has = bind('rv_abi_has', i32, [ctypes.c_char_p])
     expect(has(b'event-construction') == 1, 'event-construction advertised')
     host_create = bind('rv_host_create', p, [i32, i32])
