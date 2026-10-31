@@ -946,7 +946,7 @@ class Generator(ComplexGeneratorMixin):
                 function = Function(name, member, 'static_operation', f'{snake(name)}_{snake(operation)}{suffix}', [],
                                     f'{name}.{operation}: static operation with checked {receiver} context and UTF-8 byte lengths')
                 function.receiver = receiver
-                function.feature = binding['feature']
+                function.feature = binding.get('memberFeatures', {}).get(operation, binding['feature'])
                 function.string_spans = True
                 try:
                     args = [self.world.map(argument.type) for argument in member.arguments]
@@ -960,7 +960,9 @@ class Generator(ComplexGeneratorMixin):
                 except Unsupported as error:
                     raise SystemExit(f'{name}.{member.name}: {error}') from error
                 generated.append(function)
-        self.namespace_features.append((binding['feature'], [function.conditional for function in generated if function.conditional]))
+        for feature in dict.fromkeys(function.feature for function in generated):
+            self.namespace_features.append((feature, [function.conditional for function in generated
+                                                       if function.feature == feature and function.conditional]))
 
     def scoped_member(self, member, *scopes):
         result = member
@@ -1310,6 +1312,12 @@ class Generator(ComplexGeneratorMixin):
             document = "(*settingsDocument)"
         elif chain[-1] in SETTINGS_DOCUMENT:
             document = SETTINGS_DOCUMENT[chain[-1]]
+        elif interface in self.world.config.get("contextSettingsObjects", []):
+            # An ActiveDOMObject reaches the settings through its script execution context, a Document on the host.
+            self.headers |= {"ContextDestructionObserverInlines.h", "Document.h"}
+            lines = ["RefPtr settingsDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());",
+                     "if (!settingsDocument)", "    return RV_ERR_DETACHED;"]
+            document = "(*settingsDocument)"
         else:
             raise Unsupported(f"[EnabledBySetting={setting}] on {interface}, which has no document")
         self.headers |= {"DocumentSettingsValues.h", "Settings.h"}
