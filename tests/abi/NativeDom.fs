@@ -823,6 +823,30 @@ type RvDomFormDataEventInit =
     val mutable composed: int
     val mutable form_data: nativeint
 
+/// <summary>The IDL dictionary ToggleEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomToggleEventInit =
+    val mutable size: uint32
+    val mutable bubbles: int
+    val mutable cancelable: int
+    val mutable composed: int
+    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
+    val mutable old_state: string
+    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
+    val mutable new_state: string
+    val mutable source: nativeint
+
+/// <summary>The IDL dictionary CommandEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomCommandEventInit =
+    val mutable size: uint32
+    val mutable bubbles: int
+    val mutable cancelable: int
+    val mutable composed: int
+    val mutable source: nativeint
+    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
+    val mutable command: string
+
 /// <summary>The IDL dictionary DOMMatrix2DInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomDOMMatrix2DInit =
@@ -7618,6 +7642,27 @@ extern int rv_dom_form_data_event_create(nativeint target, byte[] ``type``, int 
 
 [<DllImport(Lib)>]
 extern int rv_dom_form_data_event_get_form_data(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_toggle_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomToggleEventInit[] event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_toggle_event_get_old_state(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_toggle_event_get_new_state(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_toggle_event_get_source(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_command_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomCommandEventInit[] event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_command_event_get_source(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_command_event_get_command(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_svg_graphics_element_get_transform(nativeint target, nativeint& result)

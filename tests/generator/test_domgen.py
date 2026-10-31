@@ -1798,6 +1798,26 @@ GatedElement includes GatedMixin;
         self.assertIn('ENABLE(OWN)', functions[0].conditional)
         self.assertTrue('settings.gatedEnabled' in generator.glue())
 
+    def test_gated_event_interface_members_read_without_a_target(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+[EnabledBySetting=GatedEnabled] interface GatedEvent : Event {
+    readonly attribute DOMString command;
+    [EnabledBySetting=OtherEnabled] readonly attribute DOMString extra;
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['GatedEvent']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        glue = generator.glue()
+        command = glue[glue.index('ranvier_dom_gated_event_get_command('):glue.index('ranvier_dom_gated_event_get_extra(')]
+        self.assertNotIn('settings.gatedEnabled', command)
+        extra = glue[glue.index('ranvier_dom_gated_event_get_extra('):]
+        self.assertIn('settings.otherEnabled', extra.split('\n}\n')[0])
+
     def test_configured_svg_mathml_shared_style_and_focus_members(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

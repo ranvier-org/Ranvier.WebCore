@@ -918,6 +918,14 @@
       "base": "Event"
     },
     {
+      "name": "ToggleEvent",
+      "base": "Event"
+    },
+    {
+      "name": "CommandEvent",
+      "base": "Event"
+    },
+    {
       "name": "SVGGraphicsElement",
       "base": "SVGElement"
     },
@@ -2804,6 +2812,24 @@
       "source": "dom/FormDataEvent.idl"
     },
     {
+      "name": "ToggleEvent",
+      "idlName": "ToggleEvent",
+      "base": "Event",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/ToggleEvent.idl"
+    },
+    {
+      "name": "CommandEvent",
+      "idlName": "CommandEvent",
+      "base": "Event",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/CommandEvent.idl"
+    },
+    {
       "name": "SVGGraphicsElement",
       "idlName": "SVGGraphicsElement",
       "base": "SVGElement",
@@ -4035,15 +4061,6 @@
       "mixin": false,
       "contractOnly": true,
       "source": "html/TimeRanges.idl"
-    },
-    {
-      "name": "ToggleEvent",
-      "idlName": "ToggleEvent",
-      "base": "Event",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "dom/ToggleEvent.idl"
     },
     {
       "name": "TouchEvent",
@@ -110052,6 +110069,410 @@
       }
     },
     {
+      "interface": "ToggleEvent",
+      "member": "constructor",
+      "contractOwner": "ToggleEvent",
+      "kind": "constructor",
+      "function": "rv_dom_toggle_event_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "type"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "type_length"
+        },
+        {
+          "ctype": "const RvDomToggleEventInit*",
+          "name": "event_init_dict"
+        },
+        {
+          "ctype": "RvEvent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "type",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "eventInitDict",
+          "idlType": "ToggleEventInit",
+          "idl": {
+            "name": "ToggleEventInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "ToggleEventInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "ToggleEvent",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "event",
+        "ctype": null,
+        "interface": "ToggleEvent",
+        "root": null,
+        "class": "ToggleEvent",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:ToggleEvent",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "ToggleEvent",
+      "member": "oldState",
+      "contractOwner": "ToggleEvent",
+      "kind": "getter",
+      "function": "rv_dom_toggle_event_get_old_state",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "ToggleEvent",
+      "member": "newState",
+      "contractOwner": "ToggleEvent",
+      "kind": "getter",
+      "function": "rv_dom_toggle_event_get_new_state",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "ToggleEvent",
+      "member": "source",
+      "contractOwner": "ToggleEvent",
+      "kind": "getter",
+      "function": "rv_dom_toggle_event_get_source",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "Element",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "Element",
+        "root": null,
+        "class": "Element",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CommandEvent",
+      "member": "constructor",
+      "contractOwner": "CommandEvent",
+      "kind": "constructor",
+      "function": "rv_dom_command_event_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "type"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "type_length"
+        },
+        {
+          "ctype": "const RvDomCommandEventInit*",
+          "name": "event_init_dict"
+        },
+        {
+          "ctype": "RvEvent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "type",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "eventInitDict",
+          "idlType": "CommandEventInit",
+          "idl": {
+            "name": "CommandEventInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "CommandEventInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "CommandEvent",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "event",
+        "ctype": null,
+        "interface": "CommandEvent",
+        "root": null,
+        "class": "CommandEvent",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:CommandEvent",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CommandEvent",
+      "member": "source",
+      "contractOwner": "CommandEvent",
+      "kind": "getter",
+      "function": "rv_dom_command_event_get_source",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "Element",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "Element",
+        "root": null,
+        "class": "Element",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CommandEvent",
+      "member": "command",
+      "contractOwner": "CommandEvent",
+      "kind": "getter",
+      "function": "rv_dom_command_event_get_command",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
       "interface": "SVGGraphicsElement",
       "member": "transform",
       "contractOwner": "SVGGraphicsElement",
@@ -139026,6 +139447,219 @@
           "interface": "DOMFormData",
           "root": "DOMFormData",
           "class": "DOMFormData",
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "ToggleEventInit": [
+      {
+        "name": "bubbles",
+        "field": "bubbles",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "cancelable",
+        "field": "cancelable",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "composed",
+        "field": "composed",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "oldState",
+        "field": "old_state",
+        "ctype": "const char*",
+        "required": false,
+        "default": "\"\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "newState",
+        "field": "new_state",
+        "ctype": "const char*",
+        "required": false,
+        "default": "\"\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "source",
+        "field": "source",
+        "ctype": "RvNode*",
+        "required": false,
+        "default": "null",
+        "mapping": {
+          "kind": "node",
+          "ctype": null,
+          "interface": "Element",
+          "root": null,
+          "class": "Element",
+          "enum": null,
+          "label": null,
+          "nullable": true,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "CommandEventInit": [
+      {
+        "name": "bubbles",
+        "field": "bubbles",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "cancelable",
+        "field": "cancelable",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "composed",
+        "field": "composed",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "source",
+        "field": "source",
+        "ctype": "RvNode*",
+        "required": false,
+        "default": "null",
+        "mapping": {
+          "kind": "node",
+          "ctype": null,
+          "interface": "Element",
+          "root": null,
+          "class": "Element",
+          "enum": null,
+          "label": null,
+          "nullable": true,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "command",
+        "field": "command",
+        "ctype": "const char*",
+        "required": false,
+        "default": "\"\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
           "enum": null,
           "label": null,
           "nullable": false,

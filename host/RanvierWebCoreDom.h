@@ -568,6 +568,29 @@ typedef struct RvDomFormDataEventInit {
     RvDOMFormData* form_data; /* DOMFormData, required */
 } RvDomFormDataEventInit;
 
+/* The IDL dictionary ToggleEventInit. size is sizeof(RvDomToggleEventInit) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomToggleEventInit {
+    uint32_t size;
+    int32_t bubbles; /* boolean, default false */
+    int32_t cancelable; /* boolean, default false */
+    int32_t composed; /* boolean, default false */
+    const char* old_state; /* DOMString, default "" */
+    const char* new_state; /* DOMString, default "" */
+    RvNode* source; /* Element?, default null */
+} RvDomToggleEventInit;
+
+/* The IDL dictionary CommandEventInit. size is sizeof(RvDomCommandEventInit) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomCommandEventInit {
+    uint32_t size;
+    int32_t bubbles; /* boolean, default false */
+    int32_t cancelable; /* boolean, default false */
+    int32_t composed; /* boolean, default false */
+    RvNode* source; /* Element?, default null */
+    const char* command; /* DOMString, default "" */
+} RvDomCommandEventInit;
+
 /* The IDL dictionary DOMMatrix2DInit. size is sizeof(RvDomDOMMatrix2DInit) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
 typedef struct RvDomDOMMatrix2DInit {
@@ -5957,6 +5980,27 @@ RV_EXPORT int32_t rv_dom_submit_event_get_submitter(RvEvent* target, RvNode** re
 RV_EXPORT int32_t rv_dom_form_data_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomFormDataEventInit* event_init_dict, RvEvent** result);
 /* FormDataEvent.formData getter: readonly attribute DOMFormData formData; *result is a new reference */
 RV_EXPORT int32_t rv_dom_form_data_event_get_form_data(RvEvent* target, RvDOMFormData** result);
+/* ToggleEvent */
+
+/* ToggleEvent.constructor: target is the Document of the constructed object; event_init_dict defaults to {} in IDL;
+ * event_init_dict may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_toggle_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomToggleEventInit* event_init_dict, RvEvent** result);
+/* ToggleEvent.oldState getter: readonly attribute DOMString oldState */
+RV_EXPORT int32_t rv_dom_toggle_event_get_old_state(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
+/* ToggleEvent.newState getter: readonly attribute DOMString newState */
+RV_EXPORT int32_t rv_dom_toggle_event_get_new_state(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
+/* ToggleEvent.source getter: readonly attribute Element? source; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_toggle_event_get_source(RvEvent* target, RvNode** result);
+/* CommandEvent */
+
+/* CommandEvent.constructor: target is the Document of the constructed object; event_init_dict defaults to {} in IDL;
+ * event_init_dict may be NULL for the IDL default; *result is a new reference; RV_ERR_UNSUPPORTED while the setting
+ * CommandAttributesEnabled is off */
+RV_EXPORT int32_t rv_dom_command_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomCommandEventInit* event_init_dict, RvEvent** result);
+/* CommandEvent.source getter: readonly attribute Element? source; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_command_event_get_source(RvEvent* target, RvNode** result);
+/* CommandEvent.command getter: readonly attribute DOMString command */
+RV_EXPORT int32_t rv_dom_command_event_get_command(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
 /* SVGGraphicsElement */
 
 /* SVGGraphicsElement.transform getter: readonly attribute SVGAnimatedTransformList transform; *result is a new
