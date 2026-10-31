@@ -3,7 +3,7 @@
   "runtime": "C:/wk/native-strings/artifacts/native43-candidate-3/runtime",
   "browser": "156.0.8078.4",
   "cases": 37,
-  "differ": 37,
+  "differ": 36,
   "byFamily": {
     "attribute": {
       "cases": 5,
@@ -15,7 +15,7 @@
     },
     "clipboard": {
       "cases": 3,
-      "differ": 3
+      "differ": 2
     },
     "ime": {
       "cases": 2,
@@ -129,7 +129,7 @@
       "family": "text",
       "op": "setStringTitleDocument",
       "observed": "a",
-      "expected": "a b"
+      "expected": "a\u0000b"
     },
     "T9": {
       "family": "text",
@@ -203,12 +203,6 @@
       "observed": "a",
       "expected": "a\u0000b"
     },
-    "C2": {
-      "family": "clipboard",
-      "op": "clipboardWrite",
-      "observed": false,
-      "expected": true
-    },
     "C3": {
       "family": "clipboard",
       "op": "dragDataAdd",
@@ -219,7 +213,7 @@
       "family": "low",
       "op": "setStyleCustom",
       "observed": "a",
-      "expected": "a\u0000b"
+      "expected": "a\ufffdb"
     },
     "L2": {
       "family": "low",

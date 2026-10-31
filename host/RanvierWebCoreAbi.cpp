@@ -2425,7 +2425,7 @@ int32_t rv_node_set_string(RvNode* target, int32_t property, const uint8_t* valu
     auto& subject = *node(target);
     switch (property) {
     case RV_STRING_TEXT_CONTENT:
-        return status(subject.setTextContent(text));
+        return status(subject.setTextContent(String { text }));
     case RV_STRING_INNER_HTML:
         if (RefPtr element = dynamicDowncast<Element>(subject))
             return status(element->setInnerHTML(Variant<Ref<TrustedHTML>, String> { text }));
@@ -2450,7 +2450,7 @@ int32_t rv_node_set_string(RvNode* target, int32_t property, const uint8_t* valu
         return RV_ERR_NOT_INPUT;
     case RV_STRING_TITLE:
         if (RefPtr document = dynamicDowncast<Document>(subject)) {
-            document->setTitle(text);
+            document->setTitle(String { text });
             return RV_OK;
         }
         if (RefPtr element = dynamicDowncast<Element>(subject))

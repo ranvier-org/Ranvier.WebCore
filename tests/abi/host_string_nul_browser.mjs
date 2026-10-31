@@ -15,7 +15,7 @@ const equivalents = {
   parseFragmentComment: 'Range.createContextualFragment', imeComposition: 'Input.imeSetComposition',
   imeCommit: 'Input.imeSetComposition then Input.insertText', axSetValueInput: 'HTMLInputElement.value',
   axSetValueTextarea: 'HTMLTextAreaElement.value', clipboardOffer: "execCommand('insertText')",
-  clipboardWrite: 'Element.outerHTML of the selected paragraph, for the copied text/html', dragDataAdd: "execCommand('insertText')",
+  clipboardWrite: 'Selection.toString of the selected paragraph, for the copied text/plain', dragDataAdd: "execCommand('insertText')",
   hostKeyChar: 'Input.insertText; a DevTools char key event carries at most four UTF-16 units, ending at U+0000', createEventType: 'Document.createEvent and Event.initEvent',
   constructEventType: 'new Event', targetListenerType: 'new EventTarget',
 };
@@ -84,7 +84,7 @@ try {
         case 'classContains': { const e = div(); e.setAttribute('class', v); return e.classList.contains(v); }
         case 'classRemove': { const e = div(); e.setAttribute('class', v + ' a'); e.classList.remove(v); return e.getAttribute('class'); }
         case 'clipboardOffer': case 'dragDataAdd': return insertInto();
-        case 'clipboardWrite': { const e = document.body.appendChild(document.createElement('p')); e.textContent = v; return e.outerHTML.includes(v); }
+        case 'clipboardWrite': { const e = document.body.appendChild(document.createElement('p')); e.textContent = v; getSelection().selectAllChildren(document.body); return getSelection().toString(); }
         case 'setStyleCustom': { const e = div(); e.style.setProperty('--x', v); return e.style.getPropertyValue('--x'); }
         case 'setStyleContent': { const e = div(); e.style.setProperty('content', v); return e.style.getPropertyValue('content'); }
         case 'nodeListenerType': return fires(div());

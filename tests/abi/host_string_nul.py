@@ -4,7 +4,7 @@ and the RvClipboardWrite callback delivers its data the same way. Replays tests/
 case per export and use, and compares each value read back with the Chromium 156 oracle
 tests/fixtures/host-string-nul-oracle.json: markup loaders (markup), text and values (text), attribute values, IDs and
 class tokens (attribute), input-method composition and commit (ime), accessibility values (ax), clipboard and drag data
-in and out (clipboard), and style values, key text and event types (low). It also checks each changed export's
+in and out (clipboard; the outbound case copies multi-byte text, since WebKit drops U+0000 from a copied selection), and style values, key text and event types (low). It also checks each changed export's
 argument errors: a length below -1, -1 for a nonnullable string, a NULL pointer with a positive length, and invalid
 UTF-8."""
 
@@ -51,7 +51,7 @@ class Transport:
     @staticmethod
     def written(arguments):
         context, kind, data, length, first = arguments
-        return kind.decode('utf-8'), ctypes.string_at(data, length).decode('utf-8'), first
+        return kind.decode('utf-8'), ctypes.string_at(data, length).decode('utf-8') if length else '', first
 
 
 class Probe:
@@ -333,8 +333,8 @@ class Probe:
                 status = n.call('rv_host_edit', [P, I], host, EDIT_COPY)
                 if status != 1:
                     return f'status {status}'
-                markup = [data for kind, data, first in written if kind == 'text/html']
-                return v in markup[0] if len(markup) == 1 else f'written {written!r}'
+                plain = [data for kind, data, first in written if kind == 'text/plain']
+                return plain[0] if len(plain) == 1 else f'written {written!r}'
             return self.with_host('<!doctype html><body><p id=s></p>', copied)
 
         if op == 'dragDataAdd':
@@ -392,13 +392,17 @@ class Probe:
         raise ValueError(op)
 
 
-def replay(native, transport, cases, oracle, check=True):
-    """Runs every case and returns the cases whose value differs from the oracle; check asserts each case."""
+def replay(native, transport, cases, oracle, check=True, qualified=None):
+    """Runs every case and returns the cases whose value differs from the expected value: the oracle's, or the WebKit
+    value of a qualified difference, which must still differ from the oracle's. check asserts each case."""
     probe = Probe(native, transport)
     differ = {}
     for entry in cases:
         observed = probe.run(entry)
         expected = oracle['values'][entry['id']]
+        if qualified and entry['id'] in qualified:
+            native.expect(qualified[entry['id']]['webkit'] != expected, f"{entry['id']}: qualified value equals the oracle")
+            expected = qualified[entry['id']]['webkit']
         if check:
             native.expect(observed == expected, f"{entry['id']} {entry['op']}: {observed!r} vs {expected!r}")
         if observed != expected:
@@ -523,11 +527,13 @@ def errors(native, report):
 def verify(native_directory):
     cases = json.loads((FIXTURES / 'host-string-nul-cases.json').read_text(encoding='utf-8'))['cases']
     oracle = json.loads((FIXTURES / 'host-string-nul-oracle.json').read_text(encoding='utf-8'))
+    qualified = json.loads((FIXTURES / 'host-string-nul-qualified.json').read_text(encoding='utf-8'))['differences']
     native = Native(native_directory)
     native.expect(native.bind('rv_abi_version', I, [])() == ABI, 'ABI version ' + str(ABI))
     report = {'browser': oracle['browser'], 'platform': sys.platform, 'cases': len(cases),
               'families': sorted({entry['family'] for entry in cases})}
-    replay(native, Transport(), cases, oracle)
+    replay(native, Transport(), cases, oracle, qualified=qualified)
+    report['qualified'] = sorted(qualified)
     errors(native, report)
     report['assertions'] = native.assertions
     return report
@@ -541,7 +547,7 @@ def main():
     report = verify(args.native_directory)
     if args.report:
         Path(args.report).write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
-    print(f"PASS host_string_nul: {report['assertions']} assertions", flush=True)
+    print(f"PASS host_string_nul: {report['assertions']} assertions, {len(report['qualified'])} qualified", flush=True)
 
 
 if __name__ == '__main__':

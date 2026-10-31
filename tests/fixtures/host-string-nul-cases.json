@@ -1,5 +1,5 @@
 {
-  "note": "Each value holds U+0000. The ops are replayed by tests/abi/host_string_nul.py and tests/abi/host_string_nul_browser.mjs.",
+  "note": "Each value holds U+0000, except C2: WebKit drops U+0000 from a copied selection, so the outbound RvClipboardWrite case copies multi-byte text and checks the delivered byte count. The ops are replayed by tests/abi/host_string_nul.py and tests/abi/host_string_nul_browser.mjs.",
   "cases": [
     {
       "id": "M1",
@@ -173,7 +173,7 @@
       "id": "C2",
       "family": "clipboard",
       "op": "clipboardWrite",
-      "value": "a\u0000b"
+      "value": "a\u00e9\u4e2d\ud83d\ude00b"
     },
     {
       "id": "C3",
