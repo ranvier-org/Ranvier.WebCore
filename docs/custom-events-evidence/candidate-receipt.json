@@ -51,7 +51,12 @@
   },
   "disallowVmEntry": "The host holds JSC::DisallowVMEntry from rv_host_create to rv_host_destroy (RvHost::noScript); JSONParse and JSONStringify ran under it.",
   "providerNotes": [
-    "MouseEvent clientX/clientY are integers in this engine",
+    "MouseEvent clientX/clientY are integers in this engine; Chromium measured the same for a constructed MouseEvent (clientX 12.5 reads 12)",
+    "Chromium reports button 0 for a constructed mouseover regardless of init; mousedown and click keep the init button",
     "At target, capture listeners run before non-capture listeners"
-  ]
+  ],
+  "chromiumMeasurement": {
+    "script": "new MouseEvent(type, init) in headless Chromium (Playwright 1.64.1)",
+    "result": "[mouseover button, click button, mouseover button, mousedown button, clientX for 12.5] = [0,2,0,2,12]"
+  }
 }
