@@ -1,0 +1,139 @@
+{
+  "group": [
+    "G09 #54"
+  ],
+  "native": "0.1.0-preview.32",
+  "abi": 40,
+  "features": [
+    "dom:CaretPosition"
+  ],
+  "members": [
+    "Document.caretPositionFromPoint",
+    "CaretPosition.offsetNode",
+    "CaretPosition.offset",
+    "CaretPosition.getClientRect",
+    "CaretPositionFromPointOptions.shadowRoots"
+  ],
+  "sourceHeadOfBatch": "1d9deee194329ec6c10aa7034d89e6ca9ff5724d",
+  "sourcePatch": {
+    "patch": "0035-caret-position-text-control-shadow-roots.patch",
+    "approvedBy": "root 2026-10-31",
+    "red": {
+      "runtime": "artifacts/native32-candidate-1 (no 0035)",
+      "file": "red-0035-candidate-1-measure.json",
+      "userAgentShadowLeaks": 9,
+      "case": "caretPositionFromPoint over <input> with shadowRoots [open, closed] returned a Text node of the input UA shadow root"
+    },
+    "green": {
+      "runtime": "artifacts/native32-candidate-2 and later",
+      "file": "green-0035-candidate-2-measure.json",
+      "case": "INPUT@1 with and without shadowRoots at device scales 1, 1.5 and 2"
+    }
+  },
+  "red": {
+    "runtime": "native-scroll/artifacts/native29-candidate-1 (Native29/ABI37)",
+    "abiVersion": 37,
+    "missingExports": [
+      "rv_dom_document_caret_position_from_point",
+      "rv_dom_caret_position_get_offset_node",
+      "rv_dom_caret_position_get_offset",
+      "rv_dom_caret_position_get_client_rect",
+      "rv_dom_caret_position_release"
+    ],
+    "legacyCaretRangeFromPoint": {
+      "1 unscrolled": "38/41",
+      "1 scrolled 50, 590": "41/41",
+      "1 scrolled 0.5, 20.5": "32/41",
+      "1.5 unscrolled": "38/41",
+      "1.5 scrolled 50, 590": "41/41",
+      "1.5 scrolled 0.5, 20.5": "32/41",
+      "2 unscrolled": "38/41",
+      "2 scrolled 50, 590": "41/41",
+      "2 scrolled 0.5, 20.5": "32/41"
+    },
+    "files": [
+      "red-measure.json",
+      "red-chromium-oracle.log"
+    ]
+  },
+  "green": {
+    "caretHitAssertions": 18251,
+    "oracleChecks": 1476,
+    "qualifiedDifferences": 90,
+    "probes": 44,
+    "allExitZero": true,
+    "rawAssertions": 67183,
+    "teardownCases": 80,
+    "teardownCasesAdded": 2,
+    "teardownAllCollected": true,
+    "repeatRuns": "30/30 on native32-candidate-2"
+  },
+  "chromiumOracle": {
+    "browser": "156.0.8078.4",
+    "headless": "new (channel chromium)",
+    "fixture": "tests/fixtures/caret-hit.html",
+    "cases": 12,
+    "points": 41,
+    "scales": [
+      1,
+      1.5,
+      2
+    ],
+    "scrolls": [
+      "unscrolled",
+      "scrolled 50, 590",
+      "scrolled 0.5, 20.5",
+      "scrolled 0, 20"
+    ]
+  },
+  "qualifications": [
+    {
+      "name": "legacy-range-shadow-retarget",
+      "count": 21,
+      "reason": "Document.caretRangeFromPoint (non-standard; CSSOM View defines only caretPositionFromPoint) retargets a hit inside a shadow tree or text control to the host element at offset 0 (WebKit Document::caretPositionFromPoint(LayoutPoint) retargetToScope). Chromium returns the host's parent at the host's index, as caretPositionFromPoint does in both engines."
+    },
+    {
+      "name": "collapsed-line-end-rect",
+      "count": 48,
+      "reason": "CaretPosition.getClientRect at a line end before a collapsed trailing space (wrap offsets 4 and 9, RTL offset 4): WebKit Range::boundingClientRect of the collapsed range gives 0x0 at (0, 0); Chromium gives the 0x20 caret box at the line end. Node and offset agree."
+    },
+    {
+      "name": "text-control-rect",
+      "count": 18,
+      "reason": "CaretPosition.getClientRect for a position in a text control (offsetNode INPUT, offset 1): WebKit measures the collapsed range (INPUT, 1), which has no layout box, and gives 0x0 at (0, 0); Chromium gives the 0x20 caret box inside the control."
+    },
+    {
+      "name": "stale-offset-rect",
+      "count": 3,
+      "reason": "A held CaretPosition whose text node was shortened below its offset (offset 7, data \"AA\"): WebKit clamps the offset and gives the 0x20 caret box at the text end (x 40); Chromium gives 0x0 at (0, 0)."
+    },
+    {
+      "name": "whole-pixel scroll (G05)",
+      "count": null,
+      "reason": "scrollTo(0.5, 20.5) leaves the native engine at (0, 20) and Chromium at (1, 21). Each runtime is checked against the oracle case at its own actual offset (the native engine against Chromium scrolled to (0, 20)); no hit differs beyond the four groups above."
+    },
+    {
+      "name": "Linux FreeType quantisation",
+      "count": null,
+      "reason": "rectangles compare within 0.01 px and qualified values round to 0.01, for the 16.16 Ahem advances on Linux"
+    }
+  ],
+  "files": {
+    "0035-proposed.diff": "092be0e292f852857b50fe01fdeb81d15f562b6ea2617d71b601aaddeb841402",
+    "absence_g09.py": "e5e81c2857d9da776831ac288f7e8c58ff0db3207034f8371501602688c76fd5",
+    "allocation-absence.json": "8d0da597230285b7c77cdc4f3ef7919368022080c3410af4fbedd8495577c83a",
+    "batch-green.json": "1b73fe16a7a02ec33869d29695c50a119cbcd44157dc59d693d09429bd876d9a",
+    "build_native32_candidate.py": "3cdeef2e59997de6438c8a14703f45293f0d3b480becae33a9a61edd1cd898c9",
+    "caret-hit-probe.log": "73ba44927eafa909305b7f69b2fc563a34e6fef5e0b8db4df0a42db61830ba1b",
+    "green-0035-candidate-2-measure.json": "93bd9da7ba324e1b61ae0eda8336cc716878955604f0684e28fa7260d3bbb963",
+    "make_native32_evidence.py": "02fcc538b69c64defadad885ee0446d4e3fb5912fd01249b8ea5e9d984e5071d",
+    "make_qualified.py": "2e8f3b5b9ffa51eec115334dd3267683d22b1b4fb4d2a53d0626d9da94854dfc",
+    "measure_caret_red.py": "145ebdc3f8cf0c8bbbee730e6060dcdbb63171ba4c09d867976342da9db3655d",
+    "red-0035-candidate-1-measure.json": "22c83534c766d92cb9b3288163b9cb4ea5e425f36399d7bec4156ee119054972",
+    "red-chromium-oracle.log": "3ee4f1c01e68b0c39a8bde61df2ee365e55347349adacc739fa95a1bc9779351",
+    "red-measure.json": "507c240beee781ff08020541d539261cd25962473a687bdef22412c665da4010",
+    "run_native32_batch.py": "15ec1c383a7722d220c1c05e1a7279b0e4dfcbb13b7e8f2b6bb961516b506c03",
+    "runtime-receipt.json": "969a7ae0b6b6dc24a964840912b4f81faec37c1005bbda8bfbcfac834a7615a1",
+    "teardown-probes.json": "319f9f23e8d54ae0ba6eafbe10b0c81615ecdc1ccf0f0be8b782e77df2d2ecf1"
+  }
+}
