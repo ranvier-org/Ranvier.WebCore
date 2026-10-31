@@ -651,6 +651,8 @@ static Ref<Page> createPage(IntSize viewportSize, RvScreenOrientationManager& or
 #endif
     page->settings().setAltitudeAngleEnabled(true);
     page->settings().setAzimuthAngleEnabled(true);
+    // CustomEffect and DocumentTimeline.animate, which the host's native callbacks drive; scripts stay disabled.
+    page->settings().setWebAnimationsCustomEffectsEnabled(true);
     // Markup arrives decoded, so the document's encoding, which form submission and URL query encoding use, is UTF-8.
     page->settings().setDefaultTextEncodingName("UTF-8"_s);
 #if ENABLE(VIDEO)
@@ -1455,7 +1457,7 @@ static_assert(sizeof(RvMediaVideoConfiguration) == 64 && offsetof(RvMediaVideoCo
 static_assert(sizeof(RvSnapshotOptions) == 64 && offsetof(RvSnapshotOptions, scale) == 8 && offsetof(RvSnapshotOptions, x) == 24 && offsetof(RvSnapshotOptions, quality) == 64 - 8);
 static_assert(sizeof(RvMediaAudioConfiguration) == 64 && offsetof(RvMediaAudioConfiguration, bitrate) == 40 && offsetof(RvMediaAudioConfiguration, spatial_rendering) == 56);
 
-int32_t rv_abi_version(void) { return 58; }
+int32_t rv_abi_version(void) { return 59; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -1482,6 +1484,8 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "font-readiness"))
         return 1;
     if (!std::strcmp(feature, "font-face-load"))
+        return 1;
+    if (!std::strcmp(feature, "animation-promises"))
         return 1;
     if (!std::strcmp(feature, "event-construction"))
         return 1;
@@ -1510,6 +1514,8 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "obscured-insets"))
         return 1;
     if (!std::strcmp(feature, "form-submission"))
+        return 1;
+    if (!std::strcmp(feature, "animation-custom-effects"))
         return 1;
     if (!std::strcmp(feature, "text-segmentation"))
         return 1;
@@ -2020,6 +2026,7 @@ void rv_host_destroy(RvHost* host)
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_notifications_drop(reinterpret_cast<RvNode*>(&host->document()));
+    ranvier_custom_effect_callbacks_revoke_document(reinterpret_cast<RvNode*>(&host->document()));
     rv_host_detach_uia(host);
     rv_host_set_accelerated_compositing(host, RV_COMPOSITING_OFF);
     host->noScript.reset();
@@ -2040,6 +2047,7 @@ int32_t rv_host_load_html(RvHost* host, const uint8_t* html, int32_t html_length
         return RV_ERR_WRONG_THREAD;
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
+    ranvier_custom_effect_callbacks_revoke_document(reinterpret_cast<RvNode*>(&host->document()));
     loadHTML(host->frame(), *markup);
     // The new document posts accessibility notifications once its cache exists.
     if (host->accessibility)
@@ -2114,6 +2122,27 @@ int32_t rv_font_face_load(RvHost* host, RvFontFace* face, RvResourceCompletion c
 int32_t rv_font_face_loaded(RvHost* host, RvFontFace* face, RvResourceCompletion completion, void* context, uint64_t* operation)
 {
     return fontFaceOperation(host, face, 0, completion, context, operation);
+}
+
+static int32_t animationPromise(RvHost* host, RvEventTarget* animation, int32_t finished, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !animation || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_animation_promise(reinterpret_cast<RvNode*>(&host->document()), animation, finished, completion, context, operation);
+}
+
+int32_t rv_animation_ready(RvHost* host, RvEventTarget* animation, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    return animationPromise(host, animation, 0, completion, context, operation);
+}
+
+int32_t rv_animation_finished(RvHost* host, RvEventTarget* animation, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    return animationPromise(host, animation, 1, completion, context, operation);
 }
 
 int32_t rv_resource_cancel(uint64_t operation)
@@ -4999,6 +5028,22 @@ RvEventTarget* rv_animation_as_event_target(RvAnimation* handle)
     if (!handle || !onOwningThread())
         return nullptr;
     return targetHandleOrNull(static_cast<EventTarget*>(animation(handle)));
+}
+
+RvCustomEffectCallback* rv_custom_effect_callback_create(RvHost* host, RvCustomEffectTick tick, void* context, RvCustomEffectRelease release)
+{
+    if (!host || !tick || !onOwningThread() || !liveHosts.contains(host))
+        return nullptr;
+    return ranvier_custom_effect_callback_create(reinterpret_cast<RvNode*>(&host->document()), tick, context, release);
+}
+
+int32_t rv_custom_effect_callback_revoke(RvCustomEffectCallback* callback)
+{
+    if (!callback)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_custom_effect_callback_revoke(callback);
 }
 
 RvNode* rv_node_retain(RvNode* target)

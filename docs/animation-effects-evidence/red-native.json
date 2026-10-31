@@ -1,0 +1,17 @@
+{
+ "abi": 54,
+ "features": {
+  "animation-custom-effects": 0,
+  "dom:CustomEffect": 0,
+  "dom:DocumentTimeline": 1,
+  "dom:WebAnimation": 1
+ },
+ "symbols": {
+  "rv_custom_effect_callback_create": false,
+  "rv_custom_effect_callback_release": false,
+  "rv_dom_custom_effect_create": false,
+  "rv_dom_document_timeline_animate": false,
+  "rv_dom_document_timeline_create": true,
+  "rv_dom_element_animate": true
+ }
+}

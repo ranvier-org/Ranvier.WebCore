@@ -14,6 +14,7 @@
 #include "BeforeUnloadEvent.h"
 #include "Blob.h"
 #include "BlobPropertyBag.h"
+#include "CSSAnimation.h"
 #include "CSSAnimationEvent.h"
 #include "CSSConditionRule.h"
 #include "CSSContainerRule.h"
@@ -58,6 +59,7 @@
 #include "CSSSupportsRule.h"
 #include "CSSTransformComponent.h"
 #include "CSSTransformValue.h"
+#include "CSSTransition.h"
 #include "CSSTransitionEvent.h"
 #include "CSSTranslate.h"
 #include "CSSUnitValue.h"
@@ -74,9 +76,13 @@
 #include "CommandEvent.h"
 #include "Comment.h"
 #include "CompositionEvent.h"
+#include "ComputedEffectTiming.h"
 #include "ContentVisibilityAutoStateChangeEvent.h"
 #include "ContextDestructionObserverInlines.h"
 #include "Crypto.h"
+#include "CustomAnimationOptions.h"
+#include "CustomEffect.h"
+#include "CustomEffectCallback.h"
 #include "CustomEvent.h"
 #include "DOMCSSCustomPropertyDescriptor.h"
 #include "DOMCSSNamespace.h"
@@ -112,6 +118,7 @@
 #include "DocumentTimelineOptions.h"
 #include "DocumentTouch.h"
 #include "DragEvent.h"
+#include "EffectTiming.h"
 #include "Element.h"
 #include "ElementCreationOptions.h"
 #include "ElementInlines.h"
@@ -227,6 +234,7 @@
 #include "NodeInlines.h"
 #include "NodeIterator.h"
 #include "NodeList.h"
+#include "OptionalEffectTiming.h"
 #include "PageTransitionEvent.h"
 #include "Path2D.h"
 #include "PointerEvent.h"
@@ -235,6 +243,7 @@
 #include "RadioNodeList.h"
 #include "Range.h"
 #include "RanvierCollectionLike.h"
+#include "RanvierCustomEffects.h"
 #include "RanvierKeyframes.h"
 #include "SVGAElement.h"
 #include "SVGAngle.h"
@@ -326,6 +335,8 @@
 #include "Screen.h"
 #include "ScreenOrientation.h"
 #include "ScrollIntoViewOptions.h"
+#include "ScrollTimeline.h"
+#include "ScrollTimelineOptions.h"
 #include "ScrollToOptions.h"
 #include "Settings.h"
 #include "ShadowRoot.h"
@@ -338,6 +349,7 @@
 #include "SubmitEvent.h"
 #include "Text.h"
 #include "TextMetrics.h"
+#include "TimelineRangeOffset.h"
 #include "ToggleEvent.h"
 #include "Touch.h"
 #include "TouchEvent.h"
@@ -351,6 +363,8 @@
 #include "URLPatternResult.h"
 #include "URLSearchParams.h"
 #include "ValidityState.h"
+#include "ViewTimeline.h"
+#include "ViewTimelineOptions.h"
 #include "VisualViewport.h"
 #include "WebAnimation.h"
 #include "WheelEvent.h"
@@ -380,6 +394,7 @@
 #include "JSScreenOrientation.h"
 #include "JSPlaybackDirection.h"
 #include "JSPredefinedColorSpace.h"
+#include "JSScrollAxis.h"
 #include "JSScrollBehavior.h"
 #include "JSScrollLogicalPosition.h"
 #include "JSShadowRootMode.h"
@@ -531,6 +546,7 @@ template<typename E, size_t N> std::optional<E> enumerationFromIndex(int32_t ind
 
 template<typename T> struct Unwrapped { using Type = T; };
 template<typename T> struct Unwrapped<std::optional<T>> { using Type = T; };
+template<typename T, typename Traits> struct Unwrapped<Markable<T, Traits>> { using Type = T; };
 
 // Copies a dictionary field into the C++ dictionary's member, which may be optional.
 template<typename T, typename V> void assignValue(T& field, V value)
@@ -776,6 +792,7 @@ static constexpr ASCIILiteral enumerationIterationCompositeOperation[] = { "repl
 static constexpr ASCIILiteral enumerationOrientationType[] = { "portrait-primary"_s, "portrait-secondary"_s, "landscape-primary"_s, "landscape-secondary"_s };
 static constexpr ASCIILiteral enumerationPlaybackDirection[] = { "normal"_s, "reverse"_s, "alternate"_s, "alternate-reverse"_s };
 static constexpr ASCIILiteral enumerationPredefinedColorSpace[] = { "srgb"_s, "srgb-linear"_s };
+static constexpr ASCIILiteral enumerationScrollAxis[] = { "block"_s, "inline"_s, "x"_s, "y"_s };
 static constexpr ASCIILiteral enumerationScrollBehavior[] = { "auto"_s, "instant"_s, "smooth"_s };
 static constexpr ASCIILiteral enumerationScrollLogicalPosition[] = { "start"_s, "center"_s, "end"_s, "nearest"_s };
 static constexpr ASCIILiteral enumerationShadowRootMode[] = { "user-agent"_s, "closed"_s, "open"_s };
@@ -800,6 +817,10 @@ template<typename T> struct DomSequenceArgument {
 };
 template<typename T> const T* resultField(const T& value) { return &value; }
 template<typename T> const T* resultField(const std::optional<T>& value) { return value ? &*value : nullptr; }
+template<typename T, typename Traits> const T* resultField(const Markable<T, Traits>& value) { return value ? &*value : nullptr; }
+// A field whose C++ type differs from its IDL type converts through a resultValueOverloads overload.
+template<typename T> const T& resultValue(const T& value) { return value; }
+CSSNumberish resultValue(const WebAnimationTime& value) { return value; }
 template<typename V, typename S, typename E> int32_t storeOptionalDictionary(V&& value, S** result, E&& encode)
 {
     *result = value ? encode(*value) : nullptr;
@@ -821,6 +842,16 @@ RvDomURLPatternInit* encodeDictRvDomURLPatternInit(const URLPatternInit& value);
 void releaseDictRvDomURLPatternInit(RvDomURLPatternInit* value);
 RvDomURLPatternComponentResult* encodeDictRvDomURLPatternComponentResult(const URLPatternComponentResult& value);
 void releaseDictRvDomURLPatternComponentResult(RvDomURLPatternComponentResult* value);
+RvDomTimelineRangeOffset* encodeDictRvDomTimelineRangeOffset(const TimelineRangeOffset& value);
+void releaseDictRvDomTimelineRangeOffset(RvDomTimelineRangeOffset* value);
+RvDomEffectTiming* encodeDictRvDomEffectTiming(const EffectTiming& value);
+void releaseDictRvDomEffectTiming(RvDomEffectTiming* value);
+RvDomComputedEffectTiming* encodeDictRvDomComputedEffectTiming(const ComputedEffectTiming& value);
+void releaseDictRvDomComputedEffectTiming(RvDomComputedEffectTiming* value);
+RvDomComputedKeyframe* encodeDictRvDomComputedKeyframe(const Ranvier::ComputedKeyframe& value);
+void releaseDictRvDomComputedKeyframe(RvDomComputedKeyframe* value);
+RvDomKeyframeProperty* encodeDictRvDomKeyframeProperty(const Ranvier::KeyframeProperty& value);
+void releaseDictRvDomKeyframeProperty(RvDomKeyframeProperty* value);
 RvDomUtf8StringSpan copyOwnedDomStringSpan(const String& value)
 {
     if (value.isNull()) return { nullptr, -1 };
@@ -1332,9 +1363,23 @@ void clearRvDomSequenceKeyframeProperty(RvDomSequenceKeyframeProperty* value)
 {
     if (!value) return;
     for (int32_t i = 0; i < value->count; ++i) {
+        releaseDictRvDomKeyframeProperty(const_cast<RvDomKeyframeProperty*>(value->items[i]));
     }
     std::free(value->items);
     *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceKeyframeProperty(V&& input, RvDomSequenceKeyframeProperty* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<const RvDomKeyframeProperty**>(std::calloc(value.size(), sizeof(const RvDomKeyframeProperty*))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        result->items[i] = encodeDictRvDomKeyframeProperty(value[i]);
+    }
+    return RV_OK;
 }
 
 std::optional<std::optional<Vector<Ranvier::Keyframe>>> decodeRvDomSequenceKeyframeNullable(const RvDomSequenceKeyframeNullable* source, int32_t& status)
@@ -1459,6 +1504,108 @@ template<typename V> int32_t encodeRvDomUnionUnrestrictedDoubleOrCSSNumericValue
     return RV_OK;
 }
 
+std::optional<Variant<TimelineRangeOffset, Ref<CSSNumericValue>, Ref<CSSOMKeywordValue>, String>> decodeRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString(const RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        TimelineRangeOffset arm0 { };
+        if (source->arm0) {
+            auto decodeFields = [&]() -> int32_t {
+                if (source->arm0->size >= offsetof(RvDomTimelineRangeOffset, range_name) + sizeof(source->arm0->range_name)) {
+                    if (source->arm0->range_name.present != 0 && source->arm0->range_name.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->arm0->range_name.present) {
+                        if (source->arm0->range_name.length < 0 || (source->arm0->range_name.length > 0 && !source->arm0->range_name.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(arm0.rangeName, source->arm0->range_name.data, source->arm0->range_name.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                if (source->arm0->size >= offsetof(RvDomTimelineRangeOffset, offset) + sizeof(source->arm0->offset) && source->arm0->offset) {
+                    RefPtr<CSSNumericValue> value = dynamicDowncast<CSSNumericValue>(*reinterpret_cast<CSSStyleValue*>(source->arm0->offset));
+                    if (!value)
+                        return RV_ERR_WRONG_INTERFACE;
+                    arm0.offset = std::move(value);
+                }
+                return RV_OK;
+            };
+            status = decodeFields();
+            if (status != RV_OK) return std::nullopt;
+        }
+        return Variant<TimelineRangeOffset, Ref<CSSNumericValue>, Ref<CSSOMKeywordValue>, String> { Variant<TimelineRangeOffset, Ref<CSSNumericValue>, Ref<CSSOMKeywordValue>, String> { WTF::InPlaceIndex<0>, std::move(arm0) } };
+    }
+    case 2: {
+        if (!source->arm1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<CSSNumericValue> arm1 = source->arm1 ? dynamicDowncast<CSSNumericValue>(*reinterpret_cast<CSSStyleValue*>(source->arm1)) : nullptr;
+        if (source->arm1 && !arm1) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<TimelineRangeOffset, Ref<CSSNumericValue>, Ref<CSSOMKeywordValue>, String> { Variant<TimelineRangeOffset, Ref<CSSNumericValue>, Ref<CSSOMKeywordValue>, String> { WTF::InPlaceIndex<1>, Ref { *arm1 } } };
+    }
+    case 3: {
+        if (!source->arm2) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<CSSOMKeywordValue> arm2 = source->arm2 ? dynamicDowncast<CSSOMKeywordValue>(*reinterpret_cast<CSSStyleValue*>(source->arm2)) : nullptr;
+        if (source->arm2 && !arm2) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<TimelineRangeOffset, Ref<CSSNumericValue>, Ref<CSSOMKeywordValue>, String> { Variant<TimelineRangeOffset, Ref<CSSNumericValue>, Ref<CSSOMKeywordValue>, String> { WTF::InPlaceIndex<2>, Ref { *arm2 } } };
+    }
+    case 4: {
+        if (source->arm3.length < 0 || (source->arm3.length > 0 && !source->arm3.data)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        String arm3 = source->arm3.length < 0 ? String() : source->arm3.length ? String::fromUTF8(std::span<const uint8_t> { source->arm3.data, static_cast<size_t>(source->arm3.length) }) : emptyString();
+        if (source->arm3.length >= 0 && arm3.isNull()) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        return Variant<TimelineRangeOffset, Ref<CSSNumericValue>, Ref<CSSOMKeywordValue>, String> { Variant<TimelineRangeOffset, Ref<CSSNumericValue>, Ref<CSSOMKeywordValue>, String> { WTF::InPlaceIndex<3>, arm3 } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString(RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        releaseDictRvDomTimelineRangeOffset(const_cast<RvDomTimelineRangeOffset*>(value->arm0));
+        break;
+    case 2:
+        if (value->arm1) reinterpret_cast<CSSStyleValue*>(value->arm1)->deref();
+        break;
+    case 3:
+        if (value->arm2) reinterpret_cast<CSSStyleValue*>(value->arm2)->deref();
+        break;
+    case 4:
+        std::free(const_cast<uint8_t*>(value->arm3.data));
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString(V&& value, RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString* result)
+{
+    if constexpr (I < 4) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                result->arm0 = encodeDictRvDomTimelineRangeOffset(std::get<I>(value));
+            }
+            else if constexpr (I == 1) {
+                storeHandle<CSSStyleValue>(std::get<I>(value), &result->arm1);
+            }
+            else if constexpr (I == 2) {
+                storeHandle<CSSStyleValue>(std::get<I>(value), &result->arm2);
+            }
+            else if constexpr (I == 3) {
+                result->arm3 = copyOwnedDomStringSpan(asString(std::get<I>(value)));
+            }
+        } else encodeArmsRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString(V&& input, RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString(value, result);
+    return RV_OK;
+}
+
 std::optional<Variant<double, KeyframeAnimationOptions>> decodeRvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions(const RvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions* source, int32_t& status)
 {
     if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
@@ -1527,6 +1674,18 @@ std::optional<Variant<double, KeyframeAnimationOptions>> decodeRvDomUnionUnrestr
                     if (*source->arm1->timeline && !value)
                         return RV_ERR_WRONG_INTERFACE;
                     arm1.timeline = std::move(value);
+                }
+                if (source->arm1->size >= offsetof(RvDomKeyframeAnimationOptions, range_start) + sizeof(source->arm1->range_start) && source->arm1->range_start) {
+                    int32_t status = RV_OK;
+                    auto value = decodeRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString(source->arm1->range_start, status);
+                    if (status != RV_OK) return status;
+                    arm1.rangeStart = std::move(*value);
+                }
+                if (source->arm1->size >= offsetof(RvDomKeyframeAnimationOptions, range_end) + sizeof(source->arm1->range_end) && source->arm1->range_end) {
+                    int32_t status = RV_OK;
+                    auto value = decodeRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString(source->arm1->range_end, status);
+                    if (status != RV_OK) return status;
+                    arm1.rangeEnd = std::move(*value);
                 }
                 return RV_OK;
             };
@@ -3508,6 +3667,59 @@ template<typename V> int32_t encodeRvDomUnionUnsignedLongOrAnimationFrameRatePre
     return RV_OK;
 }
 
+std::optional<Variant<double, String>> decodeRvDomUnionUnrestrictedDoubleOrDOMString(const RvDomUnionUnrestrictedDoubleOrDOMString* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        return Variant<double, String> { Variant<double, String> { WTF::InPlaceIndex<0>, static_cast<double>(source->arm0) } };
+    }
+    case 2: {
+        if (source->arm1.length < 0 || (source->arm1.length > 0 && !source->arm1.data)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        String arm1 = source->arm1.length < 0 ? String() : source->arm1.length ? String::fromUTF8(std::span<const uint8_t> { source->arm1.data, static_cast<size_t>(source->arm1.length) }) : emptyString();
+        if (source->arm1.length >= 0 && arm1.isNull()) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        return Variant<double, String> { Variant<double, String> { WTF::InPlaceIndex<1>, arm1 } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionUnrestrictedDoubleOrDOMString(RvDomUnionUnrestrictedDoubleOrDOMString* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        break;
+    case 2:
+        std::free(const_cast<uint8_t*>(value->arm1.data));
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionUnrestrictedDoubleOrDOMString(V&& value, RvDomUnionUnrestrictedDoubleOrDOMString* result)
+{
+    if constexpr (I < 2) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                result->arm0 = static_cast<double>(std::get<I>(value));
+            }
+            else if constexpr (I == 1) {
+                result->arm1 = copyOwnedDomStringSpan(asString(std::get<I>(value)));
+            }
+        } else encodeArmsRvDomUnionUnrestrictedDoubleOrDOMString<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionUnrestrictedDoubleOrDOMString(V&& input, RvDomUnionUnrestrictedDoubleOrDOMString* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionUnrestrictedDoubleOrDOMString(value, result);
+    return RV_OK;
+}
+
 std::optional<Variant<double, KeyframeEffectOptions>> decodeRvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions(const RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions* source, int32_t& status)
 {
     if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
@@ -3582,6 +3794,280 @@ void clearRvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions(RvDomUnionUnrestri
         break;
     }
     *value = { };
+}
+
+void clearRvDomSequenceComputedKeyframe(RvDomSequenceComputedKeyframe* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        releaseDictRvDomComputedKeyframe(const_cast<RvDomComputedKeyframe*>(value->items[i]));
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceComputedKeyframe(V&& input, RvDomSequenceComputedKeyframe* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<const RvDomComputedKeyframe**>(std::calloc(value.size(), sizeof(const RvDomComputedKeyframe*))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        result->items[i] = encodeDictRvDomComputedKeyframe(value[i]);
+    }
+    return RV_OK;
+}
+
+std::optional<Variant<double, EffectTiming>> decodeRvDomUnionUnrestrictedDoubleOrEffectTiming(const RvDomUnionUnrestrictedDoubleOrEffectTiming* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        return Variant<double, EffectTiming> { Variant<double, EffectTiming> { WTF::InPlaceIndex<0>, static_cast<double>(source->arm0) } };
+    }
+    case 2: {
+        EffectTiming arm1 { };
+        if (source->arm1) {
+            auto decodeFields = [&]() -> int32_t {
+                if (source->arm1->size >= offsetof(RvDomEffectTiming, delay) + sizeof(source->arm1->delay))
+                    assignValue(arm1.delay, source->arm1->delay);
+                if (source->arm1->size >= offsetof(RvDomEffectTiming, end_delay) + sizeof(source->arm1->end_delay))
+                    assignValue(arm1.endDelay, source->arm1->end_delay);
+                if (source->arm1->size >= offsetof(RvDomEffectTiming, fill) + sizeof(source->arm1->fill) && !assignEnumeration(arm1.fill, source->arm1->fill, enumerationFillMode))
+                    return RV_ERR_UNSUPPORTED;
+                if (source->arm1->size >= offsetof(RvDomEffectTiming, iteration_start) + sizeof(source->arm1->iteration_start))
+                    assignValue(arm1.iterationStart, source->arm1->iteration_start);
+                if (source->arm1->size >= offsetof(RvDomEffectTiming, iterations) + sizeof(source->arm1->iterations))
+                    assignValue(arm1.iterations, source->arm1->iterations);
+                if (source->arm1->size >= offsetof(RvDomEffectTiming, duration) + sizeof(source->arm1->duration) && source->arm1->duration) {
+                    int32_t status = RV_OK;
+                    auto value = decodeRvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString(source->arm1->duration, status);
+                    if (status != RV_OK) return status;
+                    arm1.duration = std::move(*value);
+                }
+                if (source->arm1->size >= offsetof(RvDomEffectTiming, direction) + sizeof(source->arm1->direction) && !assignEnumeration(arm1.direction, source->arm1->direction, enumerationPlaybackDirection))
+                    return RV_ERR_UNSUPPORTED;
+                if (source->arm1->size >= offsetof(RvDomEffectTiming, easing) + sizeof(source->arm1->easing)) {
+                    if (source->arm1->easing.present != 0 && source->arm1->easing.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->arm1->easing.present) {
+                        if (source->arm1->easing.length < 0 || (source->arm1->easing.length > 0 && !source->arm1->easing.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(arm1.easing, source->arm1->easing.data, source->arm1->easing.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                return RV_OK;
+            };
+            status = decodeFields();
+            if (status != RV_OK) return std::nullopt;
+        }
+        return Variant<double, EffectTiming> { Variant<double, EffectTiming> { WTF::InPlaceIndex<1>, std::move(arm1) } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionUnrestrictedDoubleOrEffectTiming(RvDomUnionUnrestrictedDoubleOrEffectTiming* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        break;
+    case 2:
+        releaseDictRvDomEffectTiming(const_cast<RvDomEffectTiming*>(value->arm1));
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionUnrestrictedDoubleOrEffectTiming(V&& value, RvDomUnionUnrestrictedDoubleOrEffectTiming* result)
+{
+    if constexpr (I < 2) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                result->arm0 = static_cast<double>(std::get<I>(value));
+            }
+            else if constexpr (I == 1) {
+                result->arm1 = encodeDictRvDomEffectTiming(std::get<I>(value));
+            }
+        } else encodeArmsRvDomUnionUnrestrictedDoubleOrEffectTiming<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionUnrestrictedDoubleOrEffectTiming(V&& input, RvDomUnionUnrestrictedDoubleOrEffectTiming* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionUnrestrictedDoubleOrEffectTiming(value, result);
+    return RV_OK;
+}
+
+std::optional<Variant<double, CustomAnimationOptions>> decodeRvDomUnionUnrestrictedDoubleOrCustomAnimationOptions(const RvDomUnionUnrestrictedDoubleOrCustomAnimationOptions* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        return Variant<double, CustomAnimationOptions> { Variant<double, CustomAnimationOptions> { WTF::InPlaceIndex<0>, static_cast<double>(source->arm0) } };
+    }
+    case 2: {
+        CustomAnimationOptions arm1 { };
+        if (source->arm1) {
+            auto decodeFields = [&]() -> int32_t {
+                if (source->arm1->size >= offsetof(RvDomCustomAnimationOptions, delay) + sizeof(source->arm1->delay))
+                    assignValue(arm1.delay, source->arm1->delay);
+                if (source->arm1->size >= offsetof(RvDomCustomAnimationOptions, end_delay) + sizeof(source->arm1->end_delay))
+                    assignValue(arm1.endDelay, source->arm1->end_delay);
+                if (source->arm1->size >= offsetof(RvDomCustomAnimationOptions, fill) + sizeof(source->arm1->fill) && !assignEnumeration(arm1.fill, source->arm1->fill, enumerationFillMode))
+                    return RV_ERR_UNSUPPORTED;
+                if (source->arm1->size >= offsetof(RvDomCustomAnimationOptions, iteration_start) + sizeof(source->arm1->iteration_start))
+                    assignValue(arm1.iterationStart, source->arm1->iteration_start);
+                if (source->arm1->size >= offsetof(RvDomCustomAnimationOptions, iterations) + sizeof(source->arm1->iterations))
+                    assignValue(arm1.iterations, source->arm1->iterations);
+                if (source->arm1->size >= offsetof(RvDomCustomAnimationOptions, duration) + sizeof(source->arm1->duration) && source->arm1->duration) {
+                    int32_t status = RV_OK;
+                    auto value = decodeRvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString(source->arm1->duration, status);
+                    if (status != RV_OK) return status;
+                    arm1.duration = std::move(*value);
+                }
+                if (source->arm1->size >= offsetof(RvDomCustomAnimationOptions, direction) + sizeof(source->arm1->direction) && !assignEnumeration(arm1.direction, source->arm1->direction, enumerationPlaybackDirection))
+                    return RV_ERR_UNSUPPORTED;
+                if (source->arm1->size >= offsetof(RvDomCustomAnimationOptions, easing) + sizeof(source->arm1->easing)) {
+                    if (source->arm1->easing.present != 0 && source->arm1->easing.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->arm1->easing.present) {
+                        if (source->arm1->easing.length < 0 || (source->arm1->easing.length > 0 && !source->arm1->easing.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(arm1.easing, source->arm1->easing.data, source->arm1->easing.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                if (source->arm1->size >= offsetof(RvDomCustomAnimationOptions, id) + sizeof(source->arm1->id)) {
+                    if (source->arm1->id.present != 0 && source->arm1->id.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->arm1->id.present) {
+                        if (source->arm1->id.length < 0 || (source->arm1->id.length > 0 && !source->arm1->id.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(arm1.id, source->arm1->id.data, source->arm1->id.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                return RV_OK;
+            };
+            status = decodeFields();
+            if (status != RV_OK) return std::nullopt;
+        }
+        return Variant<double, CustomAnimationOptions> { Variant<double, CustomAnimationOptions> { WTF::InPlaceIndex<1>, std::move(arm1) } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionUnrestrictedDoubleOrCustomAnimationOptions(RvDomUnionUnrestrictedDoubleOrCustomAnimationOptions* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        break;
+    case 2:
+        break;
+    }
+    *value = { };
+}
+
+std::optional<Vector<Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>>>> decodeRvDomSequenceCSSNumericValueOrCSSOMKeywordish(const RvDomSequenceCSSNumericValueOrCSSOMKeywordish* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    Vector<Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>>> result;
+    result.reserveInitialCapacity(source->count);
+    for (int32_t i = 0; i < source->count; ++i) {
+        auto item = decodeRvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue(&source->items[i], status);
+        if (status != RV_OK) return std::nullopt;
+        result.append(std::move(*item));
+    }
+    return Vector<Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>>> { std::move(result) };
+}
+
+void clearRvDomSequenceCSSNumericValueOrCSSOMKeywordish(RvDomSequenceCSSNumericValueOrCSSOMKeywordish* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        clearRvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue(&value->items[i]);
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceCSSNumericValueOrCSSOMKeywordish(V&& input, RvDomSequenceCSSNumericValueOrCSSOMKeywordish* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue*>(std::calloc(value.size(), sizeof(RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        encodeRvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+
+std::optional<Variant<String, Vector<Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>>>>> decodeRvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish(const RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        if (source->arm0.length < 0 || (source->arm0.length > 0 && !source->arm0.data)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        String arm0 = source->arm0.length < 0 ? String() : source->arm0.length ? String::fromUTF8(std::span<const uint8_t> { source->arm0.data, static_cast<size_t>(source->arm0.length) }) : emptyString();
+        if (source->arm0.length >= 0 && arm0.isNull()) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        return Variant<String, Vector<Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>>>> { Variant<String, Vector<Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>>>> { WTF::InPlaceIndex<0>, arm0 } };
+    }
+    case 2: {
+        auto arm1 = decodeRvDomSequenceCSSNumericValueOrCSSOMKeywordish(&source->arm1, status);
+        if (status != RV_OK) return std::nullopt;
+        return Variant<String, Vector<Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>>>> { Variant<String, Vector<Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>>>> { WTF::InPlaceIndex<1>, std::move(*arm1) } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish(RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        std::free(const_cast<uint8_t*>(value->arm0.data));
+        break;
+    case 2:
+        clearRvDomSequenceCSSNumericValueOrCSSOMKeywordish(&value->arm1);
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish(V&& value, RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish* result)
+{
+    if constexpr (I < 2) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                result->arm0 = copyOwnedDomStringSpan(asString(std::get<I>(value)));
+            }
+            else if constexpr (I == 1) {
+                encodeRvDomSequenceCSSNumericValueOrCSSOMKeywordish(std::get<I>(value), &result->arm1);
+            }
+        } else encodeArmsRvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish(V&& input, RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish(value, result);
+    return RV_OK;
 }
 
 std::optional<Variant<String, Ref<CanvasGradient>, Ref<CanvasPattern>>> decodeRvDomUnionDOMStringOrCanvasGradientOrCanvasPattern(const RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* source, int32_t& status)
@@ -4015,7 +4501,7 @@ RvDomURLPatternResult* encodeDictRvDomURLPatternResult(const URLPatternResult& v
     if (auto* field = resultField(value.inputs)) {
         auto* container = static_cast<RvDomSequenceUSVStringOrURLPatternInit*>(std::calloc(1, sizeof(RvDomSequenceUSVStringOrURLPatternInit)));
         RELEASE_ASSERT(container);
-        encodeRvDomSequenceUSVStringOrURLPatternInit(*field, container);
+        encodeRvDomSequenceUSVStringOrURLPatternInit(resultValue(*field), container);
         result->inputs = container;
     }
     if (auto* field = resultField(value.protocol)) {
@@ -4122,7 +4608,7 @@ RvDomURLPatternComponentResult* encodeDictRvDomURLPatternComponentResult(const U
     if (auto* field = resultField(value.groups)) {
         auto* container = static_cast<RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString*>(std::calloc(1, sizeof(RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString)));
         RELEASE_ASSERT(container);
-        encodeRvDomSequencePairUSVStringAndUnionUndefinedOrUSVString(*field, container);
+        encodeRvDomSequencePairUSVStringAndUnionUndefinedOrUSVString(resultValue(*field), container);
         result->groups = container;
     }
     return result;
@@ -4136,6 +4622,217 @@ void releaseDictRvDomURLPatternComponentResult(RvDomURLPatternComponentResult* v
     std::free(const_cast<RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString*>(value->groups));
     std::free(value);
 }
+
+RvDomTimelineRangeOffset* encodeDictRvDomTimelineRangeOffset(const TimelineRangeOffset& value)
+{
+    auto* result = static_cast<RvDomTimelineRangeOffset*>(std::calloc(1, sizeof(RvDomTimelineRangeOffset)));
+    RELEASE_ASSERT(result);
+    result->size = sizeof(RvDomTimelineRangeOffset);
+    if (auto* field = resultField(value.rangeName)) {
+        result->range_name = copyOwnedDomStringInput(asString(*field));
+    }
+    if (auto* field = resultField(value.offset)) {
+        if (*field)
+            storeHandle<CSSStyleValue>(*field, &result->offset);
+    }
+    return result;
+}
+
+void releaseDictRvDomTimelineRangeOffset(RvDomTimelineRangeOffset* value)
+{
+    if (!value) return;
+    std::free(const_cast<uint8_t*>(value->range_name.data));
+if (value->offset) reinterpret_cast<CSSStyleValue*>(value->offset)->deref();
+    std::free(value);
+}
+
+RvDomEffectTiming* encodeDictRvDomEffectTiming(const EffectTiming& value)
+{
+    auto* result = static_cast<RvDomEffectTiming*>(std::calloc(1, sizeof(RvDomEffectTiming)));
+    RELEASE_ASSERT(result);
+    result->size = sizeof(RvDomEffectTiming);
+    if (auto* field = resultField(value.delay)) {
+        result->delay = static_cast<double>(*field);
+    }
+    if (auto* field = resultField(value.endDelay)) {
+        result->end_delay = static_cast<double>(*field);
+    }
+    if (auto* field = resultField(value.fill)) {
+        storeEnumeration(*field, &result->fill, enumerationFillMode);
+    }
+    if (auto* field = resultField(value.iterationStart)) {
+        result->iteration_start = static_cast<double>(*field);
+    }
+    if (auto* field = resultField(value.iterations)) {
+        result->iterations = static_cast<double>(*field);
+    }
+    if (auto* field = resultField(value.duration)) {
+        auto* container = static_cast<RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString*>(std::calloc(1, sizeof(RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString)));
+        RELEASE_ASSERT(container);
+        encodeRvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString(resultValue(*field), container);
+        result->duration = container;
+    }
+    if (auto* field = resultField(value.direction)) {
+        storeEnumeration(*field, &result->direction, enumerationPlaybackDirection);
+    }
+    if (auto* field = resultField(value.easing)) {
+        result->easing = copyOwnedDomStringInput(asString(*field));
+    }
+    return result;
+}
+
+void releaseDictRvDomEffectTiming(RvDomEffectTiming* value)
+{
+    if (!value) return;
+    clearRvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString(const_cast<RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString*>(value->duration));
+    std::free(const_cast<RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString*>(value->duration));
+    std::free(const_cast<uint8_t*>(value->easing.data));
+    std::free(value);
+}
+
+RvDomComputedEffectTiming* encodeDictRvDomComputedEffectTiming(const ComputedEffectTiming& value)
+{
+    auto* result = static_cast<RvDomComputedEffectTiming*>(std::calloc(1, sizeof(RvDomComputedEffectTiming)));
+    RELEASE_ASSERT(result);
+    result->size = sizeof(RvDomComputedEffectTiming);
+    if (auto* field = resultField(value.delay)) {
+        result->delay = static_cast<double>(*field);
+    }
+    if (auto* field = resultField(value.endDelay)) {
+        result->end_delay = static_cast<double>(*field);
+    }
+    if (auto* field = resultField(value.fill)) {
+        storeEnumeration(*field, &result->fill, enumerationFillMode);
+    }
+    if (auto* field = resultField(value.iterationStart)) {
+        result->iteration_start = static_cast<double>(*field);
+    }
+    if (auto* field = resultField(value.iterations)) {
+        result->iterations = static_cast<double>(*field);
+    }
+    if (auto* field = resultField(value.duration)) {
+        auto* container = static_cast<RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString*>(std::calloc(1, sizeof(RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString)));
+        RELEASE_ASSERT(container);
+        encodeRvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString(resultValue(*field), container);
+        result->duration = container;
+    }
+    if (auto* field = resultField(value.direction)) {
+        storeEnumeration(*field, &result->direction, enumerationPlaybackDirection);
+    }
+    if (auto* field = resultField(value.easing)) {
+        result->easing = copyOwnedDomStringInput(asString(*field));
+    }
+    if (auto* field = resultField(value.endTime)) {
+        auto* container = static_cast<RvDomUnionDoubleOrCSSNumericValue*>(std::calloc(1, sizeof(RvDomUnionDoubleOrCSSNumericValue)));
+        RELEASE_ASSERT(container);
+        encodeRvDomUnionDoubleOrCSSNumericValue(resultValue(*field), container);
+        result->end_time = container;
+    }
+    if (auto* field = resultField(value.activeDuration)) {
+        auto* container = static_cast<RvDomUnionDoubleOrCSSNumericValue*>(std::calloc(1, sizeof(RvDomUnionDoubleOrCSSNumericValue)));
+        RELEASE_ASSERT(container);
+        encodeRvDomUnionDoubleOrCSSNumericValue(resultValue(*field), container);
+        result->active_duration = container;
+    }
+    if (auto* field = resultField(value.localTime)) {
+        auto* container = static_cast<RvDomUnionDoubleOrCSSNumericValueNullable*>(std::calloc(1, sizeof(RvDomUnionDoubleOrCSSNumericValueNullable)));
+        RELEASE_ASSERT(container);
+        encodeRvDomUnionDoubleOrCSSNumericValueNullable(std::make_optional(resultValue(*field)), container);
+        result->local_time = container;
+    }
+    if (auto* field = resultField(value.progress)) {
+        auto* scalar = static_cast<double*>(std::malloc(sizeof(double)));
+        RELEASE_ASSERT(scalar);
+        *scalar = static_cast<double>(*field);
+        result->progress = scalar;
+    }
+    if (auto* field = resultField(value.currentIteration)) {
+        auto* scalar = static_cast<double*>(std::malloc(sizeof(double)));
+        RELEASE_ASSERT(scalar);
+        *scalar = static_cast<double>(*field);
+        result->current_iteration = scalar;
+    }
+    return result;
+}
+
+void releaseDictRvDomComputedEffectTiming(RvDomComputedEffectTiming* value)
+{
+    if (!value) return;
+    clearRvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString(const_cast<RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString*>(value->duration));
+    std::free(const_cast<RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString*>(value->duration));
+    std::free(const_cast<uint8_t*>(value->easing.data));
+    clearRvDomUnionDoubleOrCSSNumericValue(const_cast<RvDomUnionDoubleOrCSSNumericValue*>(value->end_time));
+    std::free(const_cast<RvDomUnionDoubleOrCSSNumericValue*>(value->end_time));
+    clearRvDomUnionDoubleOrCSSNumericValue(const_cast<RvDomUnionDoubleOrCSSNumericValue*>(value->active_duration));
+    std::free(const_cast<RvDomUnionDoubleOrCSSNumericValue*>(value->active_duration));
+    clearRvDomUnionDoubleOrCSSNumericValueNullable(const_cast<RvDomUnionDoubleOrCSSNumericValueNullable*>(value->local_time));
+    std::free(const_cast<RvDomUnionDoubleOrCSSNumericValueNullable*>(value->local_time));
+    std::free(const_cast<double*>(value->progress));
+    std::free(const_cast<double*>(value->current_iteration));
+    std::free(value);
+}
+
+RvDomComputedKeyframe* encodeDictRvDomComputedKeyframe(const Ranvier::ComputedKeyframe& value)
+{
+    auto* result = static_cast<RvDomComputedKeyframe*>(std::calloc(1, sizeof(RvDomComputedKeyframe)));
+    RELEASE_ASSERT(result);
+    result->size = sizeof(RvDomComputedKeyframe);
+    if (auto* field = resultField(value.offset)) {
+        auto* scalar = static_cast<double*>(std::malloc(sizeof(double)));
+        RELEASE_ASSERT(scalar);
+        *scalar = static_cast<double>(*field);
+        result->offset = scalar;
+    }
+    if (auto* field = resultField(value.computedOffset)) {
+        result->computed_offset = static_cast<double>(*field);
+    }
+    if (auto* field = resultField(value.easing)) {
+        result->easing = copyOwnedDomStringInput(asString(*field));
+    }
+    if (auto* field = resultField(value.composite)) {
+        result->composite = copyOwnedDomStringInput(asString(*field));
+    }
+    if (auto* field = resultField(value.properties)) {
+        auto* container = static_cast<RvDomSequenceKeyframeProperty*>(std::calloc(1, sizeof(RvDomSequenceKeyframeProperty)));
+        RELEASE_ASSERT(container);
+        encodeRvDomSequenceKeyframeProperty(resultValue(*field), container);
+        result->properties = container;
+    }
+    return result;
+}
+
+void releaseDictRvDomComputedKeyframe(RvDomComputedKeyframe* value)
+{
+    if (!value) return;
+    std::free(const_cast<double*>(value->offset));
+    std::free(const_cast<uint8_t*>(value->easing.data));
+    std::free(const_cast<uint8_t*>(value->composite.data));
+    clearRvDomSequenceKeyframeProperty(const_cast<RvDomSequenceKeyframeProperty*>(value->properties));
+    std::free(const_cast<RvDomSequenceKeyframeProperty*>(value->properties));
+    std::free(value);
+}
+
+RvDomKeyframeProperty* encodeDictRvDomKeyframeProperty(const Ranvier::KeyframeProperty& value)
+{
+    auto* result = static_cast<RvDomKeyframeProperty*>(std::calloc(1, sizeof(RvDomKeyframeProperty)));
+    RELEASE_ASSERT(result);
+    result->size = sizeof(RvDomKeyframeProperty);
+    if (auto* field = resultField(value.name)) {
+        result->name = copyOwnedDomStringInput(asString(*field));
+    }
+    if (auto* field = resultField(value.value)) {
+        result->value = copyOwnedDomStringInput(asString(*field));
+    }
+    return result;
+}
+
+void releaseDictRvDomKeyframeProperty(RvDomKeyframeProperty* value)
+{
+    if (!value) return;
+    std::free(const_cast<uint8_t*>(value->name.data));
+    std::free(const_cast<uint8_t*>(value->value.data));
+    std::free(value);
+}
 }
 
 using namespace WebCore;
@@ -4146,7 +4843,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:Touch", "dom:TouchList", "dom:TouchEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:ErrorEvent", "dom:ProgressEvent", "dom:CSSAnimationEvent", "dom:CSSTransitionEvent", "dom:ContentVisibilityAutoStateChangeEvent", "dom:AnimationPlaybackEvent", "dom:PageTransitionEvent", "dom:HashChangeEvent", "dom:MediaQueryListEvent", "dom:PopStateEvent", "dom:BeforeUnloadEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom:Blob", "dom:File", "dom:FileList", "dom:CaretPosition", "dom:DOMURL", "dom:URLSearchParams", "dom:URLPattern", "dom:VisualViewport", "dom:Highlight", "dom:HighlightRegistry", "dom:FileReader", "dom:FontFace", "dom:FontFaceSet", "dom:WebAnimation", "dom:AnimationEffect", "dom:KeyframeEffect", "dom:AnimationTimeline", "dom:DocumentTimeline", "dom:DataTransfer", "dom:DataTransferItemList", "dom:DataTransferItem", "dom:ClipboardEvent", "dom:DragEvent", "dom:HTMLCanvasElement", "dom:CanvasRenderingContext2D", "dom:CanvasGradient", "dom:CanvasPattern", "dom:ImageData", "dom:Path2D", "dom:ImageBitmap", "dom:ImageBitmapRenderingContext", "dom:TextMetrics", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-type-query:Event", "dom-type-query:AnimationEffect", "dom-type-query:AnimationTimeline", "dom-constructor:Text", "dom-constructor:Comment", "dom-constructor:DocumentFragment", "dom-constructor:Document", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:StaticRange", "dom-constructor:Range", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:PointerEvent", "dom-constructor:WheelEvent", "dom-constructor:InputEvent", "dom-constructor:CompositionEvent", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-constructor:ErrorEvent", "dom-constructor:ProgressEvent", "dom-constructor:CSSAnimationEvent", "dom-constructor:CSSTransitionEvent", "dom-constructor:ContentVisibilityAutoStateChangeEvent", "dom-constructor:AnimationPlaybackEvent", "dom-constructor:PageTransitionEvent", "dom-constructor:HashChangeEvent", "dom-constructor:MediaQueryListEvent", "dom-constructor:PopStateEvent", "dom-constructor:Blob", "dom-constructor:File", "dom-constructor:DOMURL", "dom-constructor:URLSearchParams", "dom-constructor:URLPattern", "dom-constructor:URLPattern", "dom-constructor:Highlight", "dom-constructor:FileReader", "dom-constructor:FontFace", "dom-constructor:WebAnimation", "dom-constructor:KeyframeEffect", "dom-constructor:KeyframeEffect", "dom-constructor:DocumentTimeline", "dom-constructor:DataTransfer", "dom-constructor:Path2D", "dom-constructor:Path2D", "dom-constructor:Path2D", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:Touch", "dom:TouchList", "dom:TouchEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:ErrorEvent", "dom:ProgressEvent", "dom:CSSAnimationEvent", "dom:CSSTransitionEvent", "dom:ContentVisibilityAutoStateChangeEvent", "dom:AnimationPlaybackEvent", "dom:PageTransitionEvent", "dom:HashChangeEvent", "dom:MediaQueryListEvent", "dom:PopStateEvent", "dom:BeforeUnloadEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom:Blob", "dom:File", "dom:FileList", "dom:CaretPosition", "dom:DOMURL", "dom:URLSearchParams", "dom:URLPattern", "dom:VisualViewport", "dom:Highlight", "dom:HighlightRegistry", "dom:FileReader", "dom:FontFace", "dom:FontFaceSet", "dom:WebAnimation", "dom:AnimationEffect", "dom:KeyframeEffect", "dom:CustomEffect", "dom:AnimationTimeline", "dom:DocumentTimeline", "dom:ScrollTimeline", "dom:ViewTimeline", "dom:CSSAnimation", "dom:CSSTransition", "dom:DataTransfer", "dom:DataTransferItemList", "dom:DataTransferItem", "dom:ClipboardEvent", "dom:DragEvent", "dom:HTMLCanvasElement", "dom:CanvasRenderingContext2D", "dom:CanvasGradient", "dom:CanvasPattern", "dom:ImageData", "dom:Path2D", "dom:ImageBitmap", "dom:ImageBitmapRenderingContext", "dom:TextMetrics", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-type-query:Event", "dom-type-query:AnimationEffect", "dom-type-query:AnimationTimeline", "dom-type-query:WebAnimation", "dom-constructor:Text", "dom-constructor:Comment", "dom-constructor:DocumentFragment", "dom-constructor:Document", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:StaticRange", "dom-constructor:Range", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:PointerEvent", "dom-constructor:WheelEvent", "dom-constructor:InputEvent", "dom-constructor:CompositionEvent", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-constructor:ErrorEvent", "dom-constructor:ProgressEvent", "dom-constructor:CSSAnimationEvent", "dom-constructor:CSSTransitionEvent", "dom-constructor:ContentVisibilityAutoStateChangeEvent", "dom-constructor:AnimationPlaybackEvent", "dom-constructor:PageTransitionEvent", "dom-constructor:HashChangeEvent", "dom-constructor:MediaQueryListEvent", "dom-constructor:PopStateEvent", "dom-constructor:Blob", "dom-constructor:File", "dom-constructor:DOMURL", "dom-constructor:URLSearchParams", "dom-constructor:URLPattern", "dom-constructor:URLPattern", "dom-constructor:Highlight", "dom-constructor:FileReader", "dom-constructor:FontFace", "dom-constructor:WebAnimation", "dom-constructor:KeyframeEffect", "dom-constructor:KeyframeEffect", "dom-constructor:CustomEffect", "dom-constructor:DocumentTimeline", "dom-constructor:ScrollTimeline", "dom-constructor:ViewTimeline", "dom-constructor:DataTransfer", "dom-constructor:Path2D", "dom-constructor:Path2D", "dom-constructor:Path2D", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -4274,6 +4971,11 @@ void ranvier_dom_sequence_keyframe_nullable_release(RvDomSequenceKeyframeNullabl
 void ranvier_dom_union_unrestricted_double_or_css_numeric_value_or_dom_string_release(RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString* value)
 {
     if (isMainThread()) clearRvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString(value);
+}
+
+void ranvier_dom_union_timeline_range_offset_or_css_numeric_value_or_cssom_keyword_value_or_dom_string_release(RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString* value)
+{
+    if (isMainThread()) clearRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString(value);
 }
 
 void ranvier_dom_union_unrestricted_double_or_keyframe_animation_options_release(RvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions* value)
@@ -4501,9 +5203,39 @@ void ranvier_dom_union_unsigned_long_or_animation_frame_rate_preset_release(RvDo
     if (isMainThread()) clearRvDomUnionUnsignedLongOrAnimationFrameRatePreset(value);
 }
 
+void ranvier_dom_union_unrestricted_double_or_dom_string_release(RvDomUnionUnrestrictedDoubleOrDOMString* value)
+{
+    if (isMainThread()) clearRvDomUnionUnrestrictedDoubleOrDOMString(value);
+}
+
 void ranvier_dom_union_unrestricted_double_or_keyframe_effect_options_release(RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions* value)
 {
     if (isMainThread()) clearRvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions(value);
+}
+
+void ranvier_dom_sequence_computed_keyframe_release(RvDomSequenceComputedKeyframe* value)
+{
+    if (isMainThread()) clearRvDomSequenceComputedKeyframe(value);
+}
+
+void ranvier_dom_union_unrestricted_double_or_effect_timing_release(RvDomUnionUnrestrictedDoubleOrEffectTiming* value)
+{
+    if (isMainThread()) clearRvDomUnionUnrestrictedDoubleOrEffectTiming(value);
+}
+
+void ranvier_dom_union_unrestricted_double_or_custom_animation_options_release(RvDomUnionUnrestrictedDoubleOrCustomAnimationOptions* value)
+{
+    if (isMainThread()) clearRvDomUnionUnrestrictedDoubleOrCustomAnimationOptions(value);
+}
+
+void ranvier_dom_sequence_css_numeric_value_or_cssom_keywordish_release(RvDomSequenceCSSNumericValueOrCSSOMKeywordish* value)
+{
+    if (isMainThread()) clearRvDomSequenceCSSNumericValueOrCSSOMKeywordish(value);
+}
+
+void ranvier_dom_union_dom_string_or_sequence_of_css_numeric_value_or_cssom_keywordish_release(RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish* value)
+{
+    if (isMainThread()) clearRvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish(value);
 }
 
 void ranvier_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release(RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* value)
@@ -4584,6 +5316,31 @@ void ranvier_dom_url_pattern_init_release(RvDomURLPatternInit* value)
 void ranvier_dom_url_pattern_component_result_release(RvDomURLPatternComponentResult* value)
 {
     if (isMainThread()) releaseDictRvDomURLPatternComponentResult(value);
+}
+
+void ranvier_dom_timeline_range_offset_release(RvDomTimelineRangeOffset* value)
+{
+    if (isMainThread()) releaseDictRvDomTimelineRangeOffset(value);
+}
+
+void ranvier_dom_effect_timing_release(RvDomEffectTiming* value)
+{
+    if (isMainThread()) releaseDictRvDomEffectTiming(value);
+}
+
+void ranvier_dom_computed_effect_timing_release(RvDomComputedEffectTiming* value)
+{
+    if (isMainThread()) releaseDictRvDomComputedEffectTiming(value);
+}
+
+void ranvier_dom_computed_keyframe_release(RvDomComputedKeyframe* value)
+{
+    if (isMainThread()) releaseDictRvDomComputedKeyframe(value);
+}
+
+void ranvier_dom_keyframe_property_release(RvDomKeyframeProperty* value)
+{
+    if (isMainThread()) releaseDictRvDomKeyframeProperty(value);
 }
 
 void ranvier_dom_dom_implementation_release(RvDOMImplementation* handle)
@@ -5675,6 +6432,20 @@ RvTextMetrics* ranvier_dom_text_metrics_retain(RvTextMetrics* handle)
     if (!handle || !isMainThread())
         return nullptr;
     reinterpret_cast<TextMetrics*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_custom_effect_callback_release(RvCustomEffectCallback* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<CustomEffectCallback*>(handle)->deref();
+}
+
+RvCustomEffectCallback* ranvier_dom_custom_effect_callback_retain(RvCustomEffectCallback* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<CustomEffectCallback*>(handle)->ref();
     return handle;
 }
 
@@ -44569,6 +45340,64 @@ int32_t ranvier_dom_web_animation_set_current_time(RvEventTarget* target, const 
     return invoke([&]() -> decltype(auto) { return [&](auto&& time) { return impl->setBindingsCurrentTime(time ? std::optional<WebAnimationTime> { WebAnimationTime { *time } } : std::nullopt); }(std::move(*a0)); });
 }
 
+// WebAnimation.rangeStart getter: attribute (TimelineRangeOffset or CSSNumericValue or CSSOMKeywordValue or DOMString) rangeStart; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_web_animation_get_range_start(RvEventTarget* target, RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->bindingsRangeStart(); }, [&](auto&& value) { return encodeRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString(value, result); });
+}
+
+// WebAnimation.rangeStart setter: attribute (TimelineRangeOffset or CSSNumericValue or CSSOMKeywordValue or DOMString) rangeStart
+int32_t ranvier_dom_web_animation_set_range_start(RvEventTarget* target, const RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString(value, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->setBindingsRangeStart(std::move(*a0)); });
+}
+
+// WebAnimation.rangeEnd getter: attribute (TimelineRangeOffset or CSSNumericValue or CSSOMKeywordValue or DOMString) rangeEnd; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_web_animation_get_range_end(RvEventTarget* target, RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->bindingsRangeEnd(); }, [&](auto&& value) { return encodeRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString(value, result); });
+}
+
+// WebAnimation.rangeEnd setter: attribute (TimelineRangeOffset or CSSNumericValue or CSSOMKeywordValue or DOMString) rangeEnd
+int32_t ranvier_dom_web_animation_set_range_end(RvEventTarget* target, const RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString(value, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->setBindingsRangeEnd(std::move(*a0)); });
+}
+
 // WebAnimation.playbackRate getter: attribute double playbackRate
 int32_t ranvier_dom_web_animation_get_playback_rate(RvEventTarget* target, double* result)
 {
@@ -44751,6 +45580,76 @@ int32_t ranvier_dom_web_animation_commit_styles(RvEventTarget* target)
     return invoke([&]() -> decltype(auto) { return impl->commitStyles(); });
 }
 
+// AnimationEffect.getTiming() -> EffectTiming; *result is owned; release it with rv_dom_effect_timing_release
+int32_t ranvier_dom_animation_effect_get_timing(RvAnimationEffect* target, RvDomEffectTiming** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<AnimationEffect> impl = reinterpret_cast<AnimationEffect*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->getBindingsTiming(); }, [&](auto&& value) { return (*result = encodeDictRvDomEffectTiming(value), RV_OK); });
+}
+
+// AnimationEffect.getComputedTiming() -> ComputedEffectTiming; *result is owned; release it with rv_dom_computed_effect_timing_release
+int32_t ranvier_dom_animation_effect_get_computed_timing(RvAnimationEffect* target, RvDomComputedEffectTiming** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<AnimationEffect> impl = reinterpret_cast<AnimationEffect*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->getBindingsComputedTiming(); }, [&](auto&& value) { return (*result = encodeDictRvDomComputedEffectTiming(value), RV_OK); });
+}
+
+// AnimationEffect.updateTiming(optional OptionalEffectTiming timing = {}) -> undefined; context is an explicit checked Document for the operation; timing defaults to {} in IDL; timing may be NULL for the IDL default; RV_ERR_WRONG_HOST for a context other than the object's document
+int32_t ranvier_dom_animation_effect_update_timing(RvAnimationEffect* target, RvNode* context, const RvDomOptionalEffectTiming* timing)
+{
+    if (!target || !context)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<AnimationEffect> impl = reinterpret_cast<AnimationEffect*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));
+    if (!contextDocument)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = contextDocument.releaseNonNull();
+    if (auto* own = [&]() -> Document* { auto* effect = dynamicDowncast<KeyframeEffect>(impl.get()); return effect ? effect->document() : nullptr; }(); own && own != document.ptr())
+        return RV_ERR_WRONG_HOST;
+    OptionalEffectTiming a0 { };
+    if (timing) {
+        if (timing->size >= offsetof(RvDomOptionalEffectTiming, delay) + sizeof(timing->delay) && timing->delay)
+            assignValue(a0.delay, *timing->delay);
+        if (timing->size >= offsetof(RvDomOptionalEffectTiming, end_delay) + sizeof(timing->end_delay) && timing->end_delay)
+            assignValue(a0.endDelay, *timing->end_delay);
+        if (timing->size >= offsetof(RvDomOptionalEffectTiming, fill) + sizeof(timing->fill) && timing->fill && !assignEnumeration(a0.fill, *timing->fill, enumerationFillMode))
+            return RV_ERR_UNSUPPORTED;
+        if (timing->size >= offsetof(RvDomOptionalEffectTiming, iteration_start) + sizeof(timing->iteration_start) && timing->iteration_start)
+            assignValue(a0.iterationStart, *timing->iteration_start);
+        if (timing->size >= offsetof(RvDomOptionalEffectTiming, iterations) + sizeof(timing->iterations) && timing->iterations)
+            assignValue(a0.iterations, *timing->iterations);
+        if (timing->size >= offsetof(RvDomOptionalEffectTiming, duration) + sizeof(timing->duration) && timing->duration) {
+            int32_t status = RV_OK;
+            auto value = decodeRvDomUnionUnrestrictedDoubleOrDOMString(timing->duration, status);
+            if (status != RV_OK) return status;
+            a0.duration = std::move(*value);
+        }
+        if (timing->size >= offsetof(RvDomOptionalEffectTiming, direction) + sizeof(timing->direction) && timing->direction && !assignEnumeration(a0.direction, *timing->direction, enumerationPlaybackDirection))
+            return RV_ERR_UNSUPPORTED;
+        if (timing->size >= offsetof(RvDomOptionalEffectTiming, easing) + sizeof(timing->easing)) {
+            if (timing->easing.present != 0 && timing->easing.present != 1)
+                return RV_ERR_NULL_ARGUMENT;
+            if (timing->easing.present) {
+                if (timing->easing.length < 0 || (timing->easing.length > 0 && !timing->easing.data))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (!assignString(a0.easing, timing->easing.data, timing->easing.length))
+                    return RV_ERR_NULL_ARGUMENT;
+            }
+        }
+    }
+    return invoke([&]() -> decltype(auto) { return impl->bindingsUpdateTiming(document.get(), std::move(a0)); });
+}
+
 // KeyframeEffect.constructor: target is the Document of the constructed object; target_ may be NULL; options defaults to {} in IDL; keyframes NULL or present 0 is null; WebKit processes the keyframes as a script-built array of objects, and an error it leaves on the VM returns RV_ERR_DOM_EXCEPTION with its WebIDL name; *result is a new reference; RV_ERR_DOM_EXCEPTION (InvalidStateError) for a document without a global object
 int32_t ranvier_dom_keyframe_effect_create_3(RvNode* target, RvNode* target_, const RvDomSequenceKeyframeNullable* keyframes, const RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions* options, RvAnimationEffect** result)
 {
@@ -44909,7 +45808,20 @@ int32_t ranvier_dom_keyframe_effect_set_composite(RvAnimationEffect* target, int
     return invoke([&]() -> decltype(auto) { return impl->setBindingsComposite(*a0); });
 }
 
-// KeyframeEffect.setKeyframes(sequence<Keyframe>? keyframes) -> undefined; context is an explicit checked Document for the operation; keyframes NULL or present 0 is null; WebKit processes the keyframes as a script-built array of objects, and an error it leaves on the VM returns RV_ERR_DOM_EXCEPTION with its WebIDL name; RV_ERR_DOM_EXCEPTION (InvalidStateError) for a document without a global object
+// KeyframeEffect.getKeyframes() -> sequence<ComputedKeyframe>; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_keyframe_effect_get_keyframes(RvAnimationEffect* target, RvDomSequenceComputedKeyframe* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<KeyframeEffect>(*reinterpret_cast<AnimationEffect*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return Ranvier::computedKeyframes(*impl); }, [&](auto&& value) { return encodeRvDomSequenceComputedKeyframe(value, result); });
+}
+
+// KeyframeEffect.setKeyframes(sequence<Keyframe>? keyframes) -> undefined; context is an explicit checked Document for the operation; keyframes NULL or present 0 is null; WebKit processes the keyframes as a script-built array of objects, and an error it leaves on the VM returns RV_ERR_DOM_EXCEPTION with its WebIDL name; RV_ERR_WRONG_HOST for a context other than the object's document; RV_ERR_DOM_EXCEPTION (InvalidStateError) for a document without a global object
 int32_t ranvier_dom_keyframe_effect_set_keyframes(RvAnimationEffect* target, RvNode* context, const RvDomSequenceKeyframeNullable* keyframes)
 {
     if (!target || !context)
@@ -44923,6 +45835,8 @@ int32_t ranvier_dom_keyframe_effect_set_keyframes(RvAnimationEffect* target, RvN
     if (!contextDocument)
         return RV_ERR_WRONG_INTERFACE;
     Ref document = contextDocument.releaseNonNull();
+    if (auto* own = impl->document(); own && own != document.ptr())
+        return RV_ERR_WRONG_HOST;
     auto* global = document->globalObject();
     if (!global)
         return Ranvier::recordException(Exception { ExceptionCode::InvalidStateError, "The document has no global object."_s });
@@ -44930,6 +45844,29 @@ int32_t ranvier_dom_keyframe_effect_set_keyframes(RvAnimationEffect* target, RvN
     auto a0 = decodeRvDomSequenceKeyframeNullable(keyframes, status0);
     if (status0 != RV_OK) return status0;
     return invoke([&]() -> decltype(auto) { return Ranvier::keyframesCall(*global, std::move(*a0), [&](JSC::Strong<JSC::JSObject>&& keyframesObject) { return impl->setBindingsKeyframes(*global, document.get(), std::move(keyframesObject)); }); });
+}
+
+// CustomEffect.constructor: target is the Document of the constructed object; RV_ERR_WRONG_HOST for a callback of another host's document; options defaults to {} in IDL; *result is a new reference; RV_ERR_UNSUPPORTED while the setting WebAnimationsCustomEffectsEnabled is off
+int32_t ranvier_dom_custom_effect_create(RvNode* target, RvCustomEffectCallback* callback, const RvDomUnionUnrestrictedDoubleOrEffectTiming* options, RvAnimationEffect** result)
+{
+    if (!target || !callback || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.webAnimationsCustomEffectsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    RefPtr<CustomEffectCallback> a0 = reinterpret_cast<CustomEffectCallback*>(callback);
+    if (a0 && !Ranvier::customEffectCallbackMatches(*a0, *impl))
+        return RV_ERR_WRONG_HOST;
+    int32_t status1 = RV_OK;
+    auto a1 = decodeRvDomUnionUnrestrictedDoubleOrEffectTiming(options, status1);
+    if (!options) { a1 = Variant<double, EffectTiming> { WTF::InPlaceIndex<1>, EffectTiming { } }; status1 = RV_OK; }
+    if (status1 != RV_OK) return status1;
+    return deliver([&]() -> decltype(auto) { return CustomEffect::create(*impl, HandleArg<CustomEffectCallback> { a0.get() }, std::move(*a1)); }, [&](auto&& value) { return storeHandle<AnimationEffect>(value, result); });
 }
 
 // AnimationTimeline.currentTime getter: readonly attribute CSSNumberish? currentTime; *result owns its contents; release with the matching rv_dom_*_release
@@ -44970,6 +45907,181 @@ int32_t ranvier_dom_document_timeline_create(RvNode* target, const RvDomDocument
             assignValue(a0.originTime, options->origin_time);
     }
     return deliver([&]() -> decltype(auto) { return DocumentTimeline::create(*impl, std::move(a0)); }, [&](auto&& value) { return storeHandle<AnimationTimeline>(value, result); });
+}
+
+// DocumentTimeline.animate(CustomEffectCallback callback, optional (unrestricted double or CustomAnimationOptions) options = {}) -> WebAnimation; RV_ERR_WRONG_HOST for a callback of another host's document; options defaults to {} in IDL; *result is a new reference; RV_ERR_UNSUPPORTED while the setting WebAnimationsCustomEffectsEnabled is off
+int32_t ranvier_dom_document_timeline_animate(RvAnimationTimeline* target, RvCustomEffectCallback* callback, const RvDomUnionUnrestrictedDoubleOrCustomAnimationOptions* options, RvEventTarget** result)
+{
+    if (!target || !callback || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<DocumentTimeline>(*reinterpret_cast<AnimationTimeline*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<Document> settingsDocument = impl->document();
+    if (!settingsDocument)
+        return RV_ERR_DETACHED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.webAnimationsCustomEffectsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    RefPtr<CustomEffectCallback> a0 = reinterpret_cast<CustomEffectCallback*>(callback);
+    if (a0 && !Ranvier::customEffectCallbackMatches(*a0, *impl))
+        return RV_ERR_WRONG_HOST;
+    int32_t status1 = RV_OK;
+    auto a1 = decodeRvDomUnionUnrestrictedDoubleOrCustomAnimationOptions(options, status1);
+    if (!options) { a1 = Variant<double, CustomAnimationOptions> { WTF::InPlaceIndex<1>, CustomAnimationOptions { } }; status1 = RV_OK; }
+    if (status1 != RV_OK) return status1;
+    return deliver([&]() -> decltype(auto) { return impl->animate(HandleArg<CustomEffectCallback> { a0.get() }, std::move(*a1)); }, [&](auto&& value) { return storeHandle<EventTarget>(value, result); });
+}
+
+// ScrollTimeline.constructor: target is the Document of the constructed object; options defaults to {} in IDL; options may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_scroll_timeline_create(RvNode* target, const RvDomScrollTimelineOptions* options, RvAnimationTimeline** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    ScrollTimelineOptions a0 { };
+    if (options) {
+        if (options->size >= offsetof(RvDomScrollTimelineOptions, source) + sizeof(options->source) && options->source) {
+            RefPtr<Element> value;
+            if (*options->source) {
+                value = dynamicDowncast<Element>(*nodeOf(*options->source));
+                if (!value)
+                    return RV_ERR_WRONG_INTERFACE;
+            }
+            a0.source = std::move(value);
+        }
+        if (options->size >= offsetof(RvDomScrollTimelineOptions, axis) + sizeof(options->axis) && !assignEnumeration(a0.axis, options->axis, enumerationScrollAxis))
+            return RV_ERR_UNSUPPORTED;
+    }
+    return deliver([&]() -> decltype(auto) { return ScrollTimeline::create(*impl, std::move(a0)); }, [&](auto&& value) { return storeHandle<AnimationTimeline>(value, result); });
+}
+
+// ScrollTimeline.source getter: readonly attribute Element? source; *result is a new reference, or NULL
+int32_t ranvier_dom_scroll_timeline_get_source(RvAnimationTimeline* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<ScrollTimeline>(*reinterpret_cast<AnimationTimeline*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->bindingsSource(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// ScrollTimeline.axis getter: readonly attribute ScrollAxis axis
+int32_t ranvier_dom_scroll_timeline_get_axis(RvAnimationTimeline* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<ScrollTimeline>(*reinterpret_cast<AnimationTimeline*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->axis(); }, [&](auto&& value) { return storeEnumeration(value, result, enumerationScrollAxis); });
+}
+
+// ViewTimeline.constructor: target is the Document of the constructed object; options defaults to {} in IDL; options may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_view_timeline_create(RvNode* target, const RvDomViewTimelineOptions* options, RvAnimationTimeline** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    ViewTimelineOptions a0 { };
+    a0.inset = String { "auto"_s };
+    if (options) {
+        if (options->size >= offsetof(RvDomViewTimelineOptions, subject) + sizeof(options->subject) && options->subject) {
+            RefPtr value = dynamicDowncast<Element>(*nodeOf(options->subject));
+            if (!value)
+                return RV_ERR_WRONG_INTERFACE;
+            a0.subject = value.get();
+        }
+        if (options->size >= offsetof(RvDomViewTimelineOptions, axis) + sizeof(options->axis) && !assignEnumeration(a0.axis, options->axis, enumerationScrollAxis))
+            return RV_ERR_UNSUPPORTED;
+        if (options->size >= offsetof(RvDomViewTimelineOptions, inset) + sizeof(options->inset) && options->inset) {
+            int32_t status = RV_OK;
+            auto value = decodeRvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish(options->inset, status);
+            if (status != RV_OK) return status;
+            a0.inset = std::move(*value);
+        }
+    }
+    return deliver([&]() -> decltype(auto) { return ViewTimeline::create(*impl, std::move(a0)); }, [&](auto&& value) { return storeHandle<AnimationTimeline>(value, result); });
+}
+
+// ViewTimeline.subject getter: readonly attribute Element? subject; *result is a new reference, or NULL
+int32_t ranvier_dom_view_timeline_get_subject(RvAnimationTimeline* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<ViewTimeline>(*reinterpret_cast<AnimationTimeline*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return RefPtr<Element> { const_cast<Element*>(impl->subject()) }; }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// ViewTimeline.startOffset getter: readonly attribute CSSNumericValue startOffset; *result is a new reference
+int32_t ranvier_dom_view_timeline_get_start_offset(RvAnimationTimeline* target, RvCSSStyleValue** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<ViewTimeline>(*reinterpret_cast<AnimationTimeline*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->startOffset(); }, [&](auto&& value) { return storeHandle<CSSStyleValue>(value, result); });
+}
+
+// ViewTimeline.endOffset getter: readonly attribute CSSNumericValue endOffset; *result is a new reference
+int32_t ranvier_dom_view_timeline_get_end_offset(RvAnimationTimeline* target, RvCSSStyleValue** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<ViewTimeline>(*reinterpret_cast<AnimationTimeline*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->endOffset(); }, [&](auto&& value) { return storeHandle<CSSStyleValue>(value, result); });
+}
+
+// CSSAnimation.animationName getter: readonly attribute CSSOMString animationName
+int32_t ranvier_dom_css_animation_get_animation_name(RvEventTarget* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = ([&]() -> CSSAnimation* { auto* base = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target)); return base ? dynamicDowncast<CSSAnimation>(*base) : nullptr; }());
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->animationName(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// CSSTransition.transitionProperty getter: readonly attribute CSSOMString transitionProperty
+int32_t ranvier_dom_css_transition_get_transition_property(RvEventTarget* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = ([&]() -> CSSTransition* { auto* base = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target)); return base ? dynamicDowncast<CSSTransition>(*base) : nullptr; }());
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->transitionProperty(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // DataTransfer.constructor: target is the Document of the constructed object; *result is a new reference
@@ -48512,6 +49624,8 @@ int32_t ranvier_dom_animation_effect_get_interface_name(RvAnimationEffect* targe
     if (!isMainThread())
         return RV_ERR_WRONG_THREAD;
     auto* impl = reinterpret_cast<AnimationEffect*>(target);
+    if (dynamicDowncast<CustomEffect>(*impl))
+        return copyString("CustomEffect"_s, buffer, capacity, length);
     if (dynamicDowncast<KeyframeEffect>(*impl))
         return copyString("KeyframeEffect"_s, buffer, capacity, length);
     return copyString("AnimationEffect"_s, buffer, capacity, length);
@@ -48524,9 +49638,29 @@ int32_t ranvier_dom_animation_timeline_get_interface_name(RvAnimationTimeline* t
     if (!isMainThread())
         return RV_ERR_WRONG_THREAD;
     auto* impl = reinterpret_cast<AnimationTimeline*>(target);
+    if (dynamicDowncast<ViewTimeline>(*impl))
+        return copyString("ViewTimeline"_s, buffer, capacity, length);
     if (dynamicDowncast<DocumentTimeline>(*impl))
         return copyString("DocumentTimeline"_s, buffer, capacity, length);
+    if (dynamicDowncast<ScrollTimeline>(*impl))
+        return copyString("ScrollTimeline"_s, buffer, capacity, length);
     return copyString("AnimationTimeline"_s, buffer, capacity, length);
+}
+
+int32_t ranvier_dom_web_animation_get_interface_name(RvEventTarget* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (dynamicDowncast<CSSAnimation>(*impl))
+        return copyString("CSSAnimation"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSTransition>(*impl))
+        return copyString("CSSTransition"_s, buffer, capacity, length);
+    return copyString("WebAnimation"_s, buffer, capacity, length);
 }
 
 } // extern "C"

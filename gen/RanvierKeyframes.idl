@@ -17,3 +17,15 @@ dictionary Keyframe {
     DOMString composite;
     sequence<KeyframeProperty> properties = [];
 };
+
+// Synthetic: no WebKit IDL defines it. It mirrors one object of KeyframeEffect.getKeyframes() (Web Animations
+// §6.6, the computed keyframe: BaseComputedKeyframe plus its property values), which WebKit's [Custom] binding builds
+// from KeyframeEffect::getKeyframes(). properties holds each property as an IDL attribute name, and custom properties
+// by name, with its string value.
+dictionary ComputedKeyframe {
+    double? offset = null;
+    required double computedOffset;
+    required DOMString easing;
+    required DOMString composite;
+    sequence<KeyframeProperty> properties = [];
+};

@@ -103,6 +103,40 @@ interface SVGTransformList { SVGTransform createSVGTransformFromMatrix(''' + arg
             with self.subTest(argument=argument), self.assertRaisesRegex(SystemExit, 'one nonnullable DOMMatrix2DInit matrix argument'):
                 self.svg_matrix_generator(argument=argument).run()
 
+    def test_callback_function_roots_bind_host_handles_with_host_and_settings_checks(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+callback TickCallback = undefined (double progress);
+callback UnlistedCallback = undefined (double progress);
+interface Timeline {
+    [EnabledBySetting=TicksEnabled] Node tick(TickCallback callback);
+    Node unlisted(UnlistedCallback callback);
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['Timeline']
+        config['callbackObjectRoots'] = {'TickCallback': {'contract': 'float -> unit'}}
+        config['settingsDocuments'] = {'Timeline': 'impl->document()'}
+        config['argumentHostChecks'] = {'TickCallback': {'check': 'Ranvier::tickMatches', 'header': 'RanvierTicks.h'}}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        glue, header = generator.glue(), generator.header()
+        # A callback function root is a handle the host creates: release and retain only, no typedef of its own.
+        self.assertIn('RV_EXPORT void rv_dom_tick_callback_release(RvTickCallback*);', header)
+        self.assertNotIn('typedef struct RvTickCallback RvTickCallback;', header)
+        self.assertIn('RvTickCallback* callback', header)
+        self.assertIn('reinterpret_cast<TickCallback*>(handle)->deref();', glue)
+        self.assertIn('if (a0 && !Ranvier::tickMatches(*a0, *impl))', glue)
+        self.assertIn('    return RV_ERR_WRONG_HOST;', glue)
+        self.assertIn('#include "RanvierTicks.h"', glue)
+        self.assertIn('RefPtr<Document> settingsDocument = impl->document();', glue)
+        self.assertIn('settings.ticksEnabled', glue)
+        # A callback function outside callbackObjectRoots stays unsupported.
+        self.assertNotIn('rv_dom_timeline_unlisted', header)
+        self.assertIn('and TickCallback = float -> unit', generator.interfaces())
+
     def test_existing_atom_string_inputs_use_lookup_without_interning(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''
@@ -1393,6 +1427,41 @@ partial interface Element {
         self.assertIn('storeHandle<EventTarget>(value, result)', glue)
         self.assertNotIn('settings.viewportApi', glue.split('ranvier_dom_viewport_get_width', 1)[1].split(chr(10) + '}', 1)[0])
 
+    def test_event_target_object_subtypes_cast_through_their_base_and_answer_a_type_query(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface Motion : EventTarget { readonly attribute DOMString label; };
+interface CssMotion : Motion { readonly attribute DOMString motionName; };
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['Motion', 'CssMotion']
+        config['eventTargetObjects'] = {'Motion': {}}
+        config['runtimeTypeRoots'] = ['Motion']
+        missing = dict(config)
+        with self.assertRaisesRegex(SystemExit, 'CssMotion: a subtype of an event target object needs castVia'):
+            generator = domgen.Generator(domgen.World(self.source, missing))
+            generator.lock, generator.lock_structs = {}, {}
+            generator.run()
+        config['castVia'] = dict(config.get('castVia', {}), CssMotion='Motion')
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        self.assertEqual(functions['rv_dom_css_motion_get_motion_name']['parameters'][0], {'ctype': 'RvEventTarget*', 'name': 'target'})
+        self.assertNotIn('CssMotion', generator.handles)
+        self.assertNotIn('Motion', generator.handles)
+        glue = generator.glue()
+        self.assertIn('auto* base = dynamicDowncast<Motion>(*reinterpret_cast<EventTarget*>(target)); '
+                      'return base ? dynamicDowncast<CssMotion>(*base) : nullptr;', glue)
+        query = glue.split('int32_t ranvier_dom_motion_get_interface_name', 1)[1].split(chr(10) + '}', 1)[0]
+        self.assertIn('RefPtr impl = dynamicDowncast<Motion>(*reinterpret_cast<EventTarget*>(target));', query)
+        self.assertIn('if (!impl)' + chr(10) + '        return RV_ERR_WRONG_INTERFACE;', query)
+        self.assertIn('return copyString("CssMotion"_s, buffer, capacity, length);', query)
+        self.assertIn('return copyString("Motion"_s, buffer, capacity, length);', query)
+        self.assertIn('RV_EXPORT int32_t rv_dom_motion_get_interface_name(RvEventTarget* target, char* buffer, int32_t capacity, int32_t* length);',
+                      generator.header())
+
     def test_window_bindings_list_reads_readonly_attributes_and_overloads_per_feature(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''
@@ -2138,7 +2207,7 @@ interface Matcher {
                      'result->size = sizeof(RvDomMatchResult);',
                      'result->part = encodeDictRvDomPartResult(*field);',
                      'releaseDictRvDomPartResult(const_cast<RvDomPartResult*>(value->part));',
-                     'encodeRvDomSequenceUSVStringOrPartInit(*field, container);',
+                     'encodeRvDomSequenceUSVStringOrPartInit(resultValue(*field), container);',
                      'clearRvDomSequenceUSVStringOrPartInit(const_cast<RvDomSequenceUSVStringOrPartInit*>(value->inputs));',
                      'result->input = copyOwnedDomStringInput(asString(*field));',
                      'std::free(const_cast<uint8_t*>(value->input.data));',
@@ -2560,6 +2629,121 @@ partial interface Element {
         self.assertIn('!std::isfinite(y)', body['element_pick'])
         self.assertNotIn('isfinite', body['element_near'])
         config['creationGatedInterfaces'] = {'Pick': 'Element.near'}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        with self.assertRaises(SystemExit):
+            generator.run()
+
+    def test_optional_node_member_keeps_absent_and_null_distinct(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+dictionary TrackOptions { Element? source; Mode mode = "open"; };
+dictionary RequiredTrackOptions { required Element? source; };
+partial interface Element {
+    boolean track(optional TrackOptions options = {});
+    boolean trackRequired(RequiredTrackOptions options);
+};
+''')
+        config = dict(self.world.config)
+        config['exclude'] = list(config['exclude']) + ['Element.trackRequired']
+        config['optionalObjectMembers'] = ['TrackOptions.source']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        self.assertIn('RvNode* const* source; /* Element?, NULL for absent, a pointer to NULL for null */', generator.header())
+        body = {item.name: chr(10).join(item.body) for item in generator.functions}['element_track']
+        # NULL leaves the C++ optional disengaged; a pointer to NULL engages it with null; a node of another interface fails.
+        self.assertIn('options->source) {', body)
+        self.assertIn('if (*options->source) {', body)
+        self.assertIn('value = dynamicDowncast<Element>(*nodeOf(*options->source));', body)
+        self.assertIn('return RV_ERR_WRONG_INTERFACE;', body)
+        self.assertIn('a0.source = std::move(value);', body)
+        config['exclude'] = [name for name in config['exclude'] if name != 'Element.trackRequired']
+        config['optionalObjectMembers'] = ['TrackOptions.source', 'RequiredTrackOptions.source']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        with self.assertRaises(SystemExit):
+            generator.run()
+
+    def test_absent_object_member_is_null_for_absent_in_inputs_and_results(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+dictionary RangeOffset { DOMString rangeName; DOMStringMap offset; };
+dictionary NullableOffset { DOMStringMap? offset; };
+partial interface Element {
+    attribute (RangeOffset or DOMString) range;
+    undefined place(optional RangeOffset where = {});
+    undefined placeNullable(optional NullableOffset where = {});
+};
+''')
+        config = dict(self.world.config)
+        config['exclude'] = list(config['exclude']) + ['Element.placeNullable']
+        config['absentObjectMembers'] = ['RangeOffset.offset']
+        config['resultDictionaries'] = ['RangeOffset']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        self.assertIn('RvDOMStringMap* offset; /* DOMStringMap, NULL for absent */', generator.header())
+        body = {item.name: chr(10).join(item.body) for item in generator.functions}
+        # Input: NULL leaves the member absent; a handle of another interface fails.
+        self.assertIn('where->offset) {', body['element_place'])
+        self.assertIn('a0.offset = std::move(value);', body['element_place'])
+        self.assertIn('element_get_range', body)
+        self.assertIn('element_set_range', body)
+        # Result: the dictionary arm owns a new reference, NULL for absent, dropped by its release.
+        glue = generator.glue()
+        self.assertIn('if (*field)', glue)
+        self.assertIn('storeHandle<DOMStringMap>(*field, &result->offset);', glue)
+        self.assertIn('if (value->offset) reinterpret_cast<DOMStringMap*>(value->offset)->deref();', glue)
+        # Fable: the dictionary arm of the result union is told apart from the string arm by a plain-object predicate.
+        self.assertIn('let private isRangeOffset (_: obj) : bool =', generator.interfaces())
+        config['exclude'] = [name for name in config['exclude'] if name != 'Element.placeNullable']
+        config['absentObjectMembers'] = ['RangeOffset.offset', 'NullableOffset.offset']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        with self.assertRaises(SystemExit):
+            generator.run()
+
+    def test_sequence_of_a_union_with_a_typedef_union_uses_the_registered_flat_transport(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+typedef (DOMString or Mode) Modish;
+partial interface Element {
+    undefined flat((Node or DOMString or Mode) value);
+    undefined nested(sequence<(Node or Modish)> values);
+};
+''')
+        generator = domgen.Generator(domgen.World(self.source, dict(self.world.config)))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        glue = generator.glue()
+        # One C transport for both spellings, and one C++ alternative list: the decoder's.
+        self.assertIn('Vector<Variant<Ref<Node>, String, Mode>>', glue)
+        self.assertNotIn('Variant<Ref<Node>, Variant<String, Mode>>', glue)
+
+    def test_union_field_default_applies_before_the_options_are_read(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+dictionary PadOptions { (DOMString or sequence<DOMString>) inset = "auto"; DOMString label = "x"; };
+partial interface Element { undefined pad(optional PadOptions options = {}); };
+''')
+        config = dict(self.world.config)
+        config['unionFieldDefaults'] = ['PadOptions.inset']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        body = {item.name: chr(10).join(item.body) for item in generator.functions}['element_pad']
+        # The default holds for NULL options and for a size that stops before the field; a present field replaces it.
+        self.assertIn('a0.inset = String { "auto"_s };', body)
+        self.assertLess(body.index('a0.inset = String { "auto"_s };'), body.index('if (options) {'))
+        config['unionFieldDefaults'] = ['PadOptions.label']
         generator = domgen.Generator(domgen.World(self.source, config))
         generator.lock = {}
         generator.lock_structs = {}

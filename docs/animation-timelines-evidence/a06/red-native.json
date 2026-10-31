@@ -1,0 +1,81 @@
+{
+ "abi": 54,
+ "exports": {
+  "A06": {
+   "rv_dom_document_get_timeline": true,
+   "rv_dom_document_timeline_create": true,
+   "rv_dom_animation_timeline_get_current_time": true,
+   "rv_dom_animation_timeline_get_duration": true,
+   "rv_dom_document_timeline_get_maximum_frame_rate": false,
+   "rv_dom_document_timeline_animate": false,
+   "rv_dom_web_animation_get_frame_rate": false,
+   "rv_dom_web_animation_set_frame_rate": false
+  },
+  "A07": {
+   "rv_dom_scroll_timeline_create": false,
+   "rv_dom_scroll_timeline_get_source": false,
+   "rv_dom_scroll_timeline_get_axis": false
+  },
+  "A08": {
+   "rv_dom_view_timeline_create": false,
+   "rv_dom_view_timeline_get_subject": false,
+   "rv_dom_view_timeline_get_start_offset": false,
+   "rv_dom_view_timeline_get_end_offset": false,
+   "rv_dom_web_animation_get_range_start": false,
+   "rv_dom_web_animation_set_range_start": false,
+   "rv_dom_web_animation_get_range_end": false,
+   "rv_dom_web_animation_set_range_end": false
+  }
+ },
+ "features": {
+  "dom:AnimationTimeline": 1,
+  "dom:DocumentTimeline": 1,
+  "dom:ScrollTimeline": 0,
+  "dom:ViewTimeline": 0,
+  "dom-constructor:DocumentTimeline": 1,
+  "dom-constructor:ScrollTimeline": 0,
+  "dom-constructor:ViewTimeline": 0
+ },
+ "a06": {
+  "currentTime": {
+   "number": 42.0
+  },
+  "duration": null,
+  "ownMinusOrigin": true,
+  "defaultEqual": true,
+  "futureNegative": true,
+  "ownDuration": null,
+  "detachedCurrentTime": null,
+  "detachedAnimation": {
+   "playState": 3,
+   "currentTime": {
+    "number": 0.0
+   },
+   "startTime": null
+  },
+  "afterHostDestroy": null
+ },
+ "missing": {
+  "A06": [
+   "rv_dom_document_timeline_get_maximum_frame_rate",
+   "rv_dom_document_timeline_animate",
+   "rv_dom_web_animation_get_frame_rate",
+   "rv_dom_web_animation_set_frame_rate"
+  ],
+  "A07": [
+   "rv_dom_scroll_timeline_create",
+   "rv_dom_scroll_timeline_get_source",
+   "rv_dom_scroll_timeline_get_axis"
+  ],
+  "A08": [
+   "rv_dom_view_timeline_create",
+   "rv_dom_view_timeline_get_subject",
+   "rv_dom_view_timeline_get_start_offset",
+   "rv_dom_view_timeline_get_end_offset",
+   "rv_dom_web_animation_get_range_start",
+   "rv_dom_web_animation_set_range_start",
+   "rv_dom_web_animation_get_range_end",
+   "rv_dom_web_animation_set_range_end"
+  ]
+ }
+}

@@ -1,0 +1,75 @@
+diff --git a/Source/WebCore/dom/EventLoop.cpp b/Source/WebCore/dom/EventLoop.cpp
+index 3abc026..60fef17 100644
+--- a/Source/WebCore/dom/EventLoop.cpp
++++ b/Source/WebCore/dom/EventLoop.cpp
+@@ -26,13 +26,17 @@
+ #include "config.h"
+ #include "EventLoop.h"
+ 
++#include "CommonVM.h"
+ #include "Microtasks.h"
+ #include "ScriptExecutionContextInlines.h"
+ #include <JavaScriptCore/JSGlobalObject.h>
+ #include <JavaScriptCore/JSMicrotaskDispatcher.h>
+ #include <JavaScriptCore/MicrotaskQueueInlines.h>
++#include <wtf/NeverDestroyed.h>
+ #include <wtf/RefCountedAndCanMakeWeakPtr.h>
++#include <wtf/RunLoop.h>
+ #include <wtf/TZoneMallocInlines.h>
++#include <wtf/WeakHashSet.h>
+ 
+ #if PLATFORM(WPE)
+ #include <wtf/SystemTracing.h>
+@@ -561,6 +565,30 @@ private:
+ 
+ WTF_MAKE_COMPACT_TZONE_ALLOCATED_IMPL(EventLoopFunctionMicrotaskDispatcher);
+ 
++// The main-thread event loops with checkpoint tasks queued while VM entry was disallowed.
++static WeakHashSet<EventLoop>& eventLoopsAwaitingCheckpoint()
++{
++    static NeverDestroyed<WeakHashSet<EventLoop>> eventLoops;
++    return eventLoops;
++}
++
++// Performs a microtask checkpoint on the event loop from a later main run-loop iteration. Requests made before that
++// iteration share one dispatch; a request made during it is dispatched to the iteration after.
++static void requestCheckpointForDisallowedVMEntry(EventLoop& eventLoop)
++{
++    ASSERT(isMainThread());
++    auto& eventLoops = eventLoopsAwaitingCheckpoint();
++    bool dispatched = !eventLoops.isEmptyIgnoringNullReferences();
++    eventLoops.add(eventLoop);
++    if (dispatched)
++        return;
++    RunLoop::mainSingleton().dispatch([] {
++        auto eventLoops = std::exchange(eventLoopsAwaitingCheckpoint(), { });
++        for (Ref eventLoop : eventLoops)
++            eventLoop->performMicrotaskCheckpoint(commonVM());
++    });
++}
++
+ void EventLoopTaskGroup::queueMicrotask(JSC::VM& vm, EventLoop::TaskFunction&& function)
+ {
+     // FIXME: Queueing microtask during GC destruction is not allowed. This is a workaround posting
+@@ -570,6 +598,21 @@ void EventLoopTaskGroup::queueMicrotask(JSC::VM& vm, EventLoop::TaskFunction&& f
+         queueTask(TaskSource::InternalAsyncTask, WTF::move(function));
+         return;
+     }
++    // While VM entry is disallowed, the JavaScript microtask queue stays undrained. A C++ microtask then runs as a
++    // checkpoint task, which every microtask checkpoint performs in queueing order without entering the VM. On the main
++    // thread a run-loop dispatch performs the checkpoint and leaves the event loop's timer and scheduled state unchanged.
++    if (vm.disallowVMEntryCount) [[unlikely]] {
++        if (m_state == State::Stopped || !m_eventLoop)
++            return;
++        if (isMainThread()) {
++            runAtEndOfMicrotaskCheckpoint(WTF::move(function));
++            requestCheckpointForDisallowedVMEntry(*protect(m_eventLoop));
++            return;
++        }
++        runAtEndOfMicrotaskCheckpoint(WTF::move(function));
++        protect(m_eventLoop)->scheduleToRunIfNeeded();
++        return;
++    }
+     JSC::JSLockHolder locker(vm);
+     auto* cell = JSC::JSMicrotaskDispatcher::create(vm, EventLoopFunctionMicrotaskDispatcher::create(*this, WTF::move(function)));
+     queueMicrotask(JSC::QueuedTask { cell });

@@ -1,0 +1,169 @@
+{
+ "browser": "156.0.8078.4",
+ "cases": {
+  "animation iterations": [
+   {
+    "type": "animationstart",
+    "interface": "AnimationEvent",
+    "target": "css",
+    "name": "spin",
+    "elapsedTime": 0,
+    "pseudoElement": ""
+   },
+   {
+    "type": "animationiteration",
+    "interface": "AnimationEvent",
+    "target": "css",
+    "name": "spin",
+    "elapsedTime": 0.08,
+    "pseudoElement": ""
+   },
+   {
+    "type": "animationend",
+    "interface": "AnimationEvent",
+    "target": "css",
+    "name": "spin",
+    "elapsedTime": 0.16,
+    "pseudoElement": ""
+   }
+  ],
+  "animation ::before": [
+   {
+    "type": "animationstart",
+    "interface": "AnimationEvent",
+    "target": "pse",
+    "name": "spin",
+    "elapsedTime": 0,
+    "pseudoElement": "::before"
+   },
+   {
+    "type": "animationend",
+    "interface": "AnimationEvent",
+    "target": "pse",
+    "name": "spin",
+    "elapsedTime": 0.08,
+    "pseudoElement": "::before"
+   }
+  ],
+  "animation cancel": [
+   {
+    "type": "animationstart",
+    "interface": "AnimationEvent",
+    "target": "cc",
+    "name": "spin",
+    "elapsedTime": 0,
+    "pseudoElement": ""
+   },
+   {
+    "type": "animationcancel",
+    "interface": "AnimationEvent",
+    "target": "cc",
+    "name": "spin",
+    "elapsedTime": "number",
+    "pseudoElement": ""
+   }
+  ],
+  "transition": [
+   {
+    "type": "transitionrun",
+    "interface": "TransitionEvent",
+    "target": "tr",
+    "name": "opacity",
+    "elapsedTime": 0,
+    "pseudoElement": ""
+   },
+   {
+    "type": "transitionstart",
+    "interface": "TransitionEvent",
+    "target": "tr",
+    "name": "opacity",
+    "elapsedTime": 0,
+    "pseudoElement": ""
+   },
+   {
+    "type": "transitionend",
+    "interface": "TransitionEvent",
+    "target": "tr",
+    "name": "opacity",
+    "elapsedTime": 0.08,
+    "pseudoElement": ""
+   }
+  ],
+  "transition ::after": [
+   {
+    "type": "transitionrun",
+    "interface": "TransitionEvent",
+    "target": "trp",
+    "name": "opacity",
+    "elapsedTime": 0,
+    "pseudoElement": "::after"
+   },
+   {
+    "type": "transitionstart",
+    "interface": "TransitionEvent",
+    "target": "trp",
+    "name": "opacity",
+    "elapsedTime": 0,
+    "pseudoElement": "::after"
+   },
+   {
+    "type": "transitionend",
+    "interface": "TransitionEvent",
+    "target": "trp",
+    "name": "opacity",
+    "elapsedTime": 0.08,
+    "pseudoElement": "::after"
+   }
+  ],
+  "transition cancel": [
+   {
+    "type": "transitionrun",
+    "interface": "TransitionEvent",
+    "target": "tc",
+    "name": "opacity",
+    "elapsedTime": 0,
+    "pseudoElement": ""
+   },
+   {
+    "type": "transitionstart",
+    "interface": "TransitionEvent",
+    "target": "tc",
+    "name": "opacity",
+    "elapsedTime": 0,
+    "pseudoElement": ""
+   },
+   {
+    "type": "transitioncancel",
+    "interface": "TransitionEvent",
+    "target": "tc",
+    "name": "opacity",
+    "elapsedTime": "number",
+    "pseudoElement": ""
+   }
+  ]
+ },
+ "playback": {
+  "playback finish": [
+   {
+    "type": "finish",
+    "interface": "AnimationPlaybackEvent",
+    "currentTime": 80,
+    "timelineTime": "number",
+    "timelineAfterCurrent": true
+   }
+  ],
+  "playback cancel": [
+   {
+    "type": "cancel",
+    "interface": "AnimationPlaybackEvent",
+    "currentTime": null,
+    "timelineTime": "number",
+    "timelineAfterCurrent": null
+   }
+  ]
+ },
+ "generic": [
+  "capture:animationstart:1",
+  "bubble:animationstart:3"
+ ]
+}

@@ -15,8 +15,12 @@ arguments and custom constructors"):
 The Promises `ready` and `finished` are not mapped. The `finish`, `cancel` and `remove` events reach
 `rv_event_target_add_listener`. `rv_animation_as_event_target` maps a CSS-animation `RvAnimation` to its `RvEventTarget`.
 
-A02 adds getTiming, getComputedTiming, updateTiming and getKeyframes; A05 adds CSSAnimation, CSSTransition and their
-metadata; A04 verifies commitStyles.
+A02 adds getTiming and getComputedTiming (owned `RvDomEffectTiming` and `RvDomComputedEffectTiming` results), updateTiming
+(with a checked context Document) and getKeyframes (an owned `RvDomSequenceComputedKeyframe`); `tests/abi/web_animation_effects.py`
+replays its oracle. A05 adds CSSAnimation.animationName, CSSTransition.transitionProperty and the Animation runtime type
+query; `tests/abi/web_animation_discovery.py` correlates document, element and subtree getAnimations, the effect, target
+and timeline links and handle identity (also through `rv_animation_as_event_target`). A04's `tests/abi/web_animation_commit.py`
+verifies commitStyles; `tests/fixtures/web-animation-commit-qualified.json` records two engine differences.
 
 ## Evidence (A01)
 

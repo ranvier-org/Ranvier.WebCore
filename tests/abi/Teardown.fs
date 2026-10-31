@@ -396,6 +396,15 @@ let private grantDelegate = WakeLockPolicy(fun _ _ _ -> 1)
 let private grantPolicy =
     System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate grantDelegate
 
+let mutable private customEffectTicks = 0
+let mutable private customEffectReleases = 0
+
+let private customEffectTickDelegate =
+    CustomEffectTick(fun _ _ -> customEffectTicks <- customEffectTicks + 1)
+
+let private customEffectReleaseDelegate =
+    CustomEffectRelease(fun _ -> customEffectReleases <- customEffectReleases + 1)
+
 /// Appends a div with a child span, takes one extra handle of the kind from the div (removing the div first when
 /// <c>remove</c> is set), destroys the host, then releases that handle. The document and the div must be destroyed
 /// after collection whatever the destroy order.
@@ -1155,6 +1164,124 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
 
                 if rv_diagnostic_live_count () <> live then
                     failwith "cascade snapshot leaked"
+        | "scroll timeline" ->
+            // A ScrollTimeline whose source is the div, and an idle animation on it, must not keep the document or the
+            // div alive; past host destroy the timeline reads no source and no current time.
+            let cell = Runtime.InteropServices.Marshal.AllocHGlobal IntPtr.Size
+            Runtime.InteropServices.Marshal.WriteIntPtr(cell, div)
+            let mutable options = RvDomScrollTimelineOptions()
+            options.size <- uint32 (Runtime.InteropServices.Marshal.SizeOf<RvDomScrollTimelineOptions>())
+            options.source <- cell
+            options.axis <- RV_DOM_SCROLL_AXIS_INLINE
+
+            rv_dom_scroll_timeline_create (document, [| options |], &held.contents)
+            |> check "ScrollTimeline"
+
+            Runtime.InteropServices.Marshal.FreeHGlobal cell
+            let mutable animation = 0n
+
+            rv_dom_web_animation_create (document, 0n, held.Value, 1, &animation)
+            |> check "Animation on a ScrollTimeline"
+
+            fun () ->
+                let mutable time = RvDomUnionDoubleOrCSSNumericValueNullable()
+
+                rv_dom_animation_timeline_get_current_time (held.Value, &time)
+                |> check "ScrollTimeline.currentTime after destroy"
+
+                if time.present <> 0 then
+                    failwith "ScrollTimeline.currentTime resolved after host destroy"
+
+                let mutable axis = -1
+
+                rv_dom_scroll_timeline_get_axis (held.Value, &axis)
+                |> check "ScrollTimeline.axis after destroy"
+
+                if axis <> RV_DOM_SCROLL_AXIS_INLINE then
+                    failwith "ScrollTimeline.axis changed after host destroy"
+
+                rv_event_target_release animation
+                rv_dom_animation_timeline_release held.Value
+        | "view timeline" ->
+            // A ViewTimeline whose subject is the span, an inset of 10px, and an idle animation on it must not keep the
+            // document, the div or the span alive; past host destroy its members still answer.
+            let unit = Text.Encoding.UTF8.GetBytes "px"
+            let mutable px = 0n
+
+            rv_dom_css_unit_value_create (document, 10.0, unit, unit.Length, &px)
+            |> check "CSS.px"
+
+            let mutable item = RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue()
+            item.present <- 1
+            item.tag <- 1
+            item.arm0 <- px
+            let itemPointer = Runtime.InteropServices.Marshal.AllocHGlobal(Runtime.InteropServices.Marshal.SizeOf<RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue>())
+            Runtime.InteropServices.Marshal.StructureToPtr(item, itemPointer, false)
+            let mutable inset = RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish()
+            inset.present <- 1
+            inset.tag <- 2
+            let mutable sequence = RvDomSequenceCSSNumericValueOrCSSOMKeywordish()
+            sequence.present <- 1
+            sequence.count <- 1
+            sequence.items <- itemPointer
+            inset.arm1 <- sequence
+            let insetPointer = Runtime.InteropServices.Marshal.AllocHGlobal(Runtime.InteropServices.Marshal.SizeOf<RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish>())
+            Runtime.InteropServices.Marshal.StructureToPtr(inset, insetPointer, false)
+            let mutable options = RvDomViewTimelineOptions()
+            options.size <- uint32 (Runtime.InteropServices.Marshal.SizeOf<RvDomViewTimelineOptions>())
+            options.subject <- span
+            options.inset <- insetPointer
+
+            rv_dom_view_timeline_create (document, [| options |], &held.contents)
+            |> check "ViewTimeline"
+
+            for pointer in [ insetPointer; itemPointer ] do
+                Runtime.InteropServices.Marshal.FreeHGlobal pointer
+
+            rv_dom_css_style_value_release px
+            let mutable animation = 0n
+
+            rv_dom_web_animation_create (document, 0n, held.Value, 1, &animation)
+            |> check "Animation on a ViewTimeline"
+
+            fun () ->
+                let mutable time = RvDomUnionDoubleOrCSSNumericValueNullable()
+
+                // The read succeeds; a ViewTimeline keeps the progress cached by the host's last rendering update.
+                rv_dom_animation_timeline_get_current_time (held.Value, &time)
+                |> check "ViewTimeline.currentTime after destroy"
+
+                if time.present <> 0 then
+                    rv_dom_union_double_or_css_numeric_value_nullable_release &time
+
+                rv_event_target_release animation
+                rv_dom_animation_timeline_release held.Value
+        | "document timeline" ->
+            // A DocumentTimeline and an idle animation on it must not keep the document alive; past host destroy the
+            // timeline's current time reads as null.
+            let mutable options = RvDomDocumentTimelineOptions()
+            options.size <- uint32 (Runtime.InteropServices.Marshal.SizeOf<RvDomDocumentTimelineOptions>())
+            options.origin_time <- 100.0
+
+            rv_dom_document_timeline_create (document, [| options |], &held.contents)
+            |> check "DocumentTimeline"
+
+            let mutable animation = 0n
+
+            rv_dom_web_animation_create (document, 0n, held.Value, 1, &animation)
+            |> check "Animation on a DocumentTimeline"
+
+            fun () ->
+                let mutable time = RvDomUnionDoubleOrCSSNumericValueNullable()
+
+                rv_dom_animation_timeline_get_current_time (held.Value, &time)
+                |> check "DocumentTimeline.currentTime after destroy"
+
+                if time.present <> 0 then
+                    failwith "DocumentTimeline.currentTime resolved after host destroy"
+
+                rv_event_target_release animation
+                rv_dom_animation_timeline_release held.Value
         | "web animation" ->
             // Element.animate builds its keyframes as JavaScript objects in the document's global object; the
             // animation, its effect and those objects must not keep the document or the div alive.
@@ -1321,6 +1448,108 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
 
                 rv_dom_path2_d_release path
                 rv_dom_canvas_rendering_context2_d_release held.Value
+        | "animation discovery" ->
+            // A CSS transition of the div, listed by getAnimations, and the list's handles, held past host destroy.
+            rv_element_set_style (div, "transition", utf8 "opacity 100s linear", utf8Length "opacity 100s linear", 0) |> check "transition"
+            let buffer = Array.zeroCreate<byte> 64
+            rv_element_computed_style (div, "opacity", buffer, buffer.Length, [| 0 |]) |> check "opacity before"
+            rv_element_set_style (div, "opacity", utf8 "0.2", utf8Length "0.2", 0) |> check "opacity change"
+            let mutable listed = RvDomSequenceWebAnimation()
+            rv_dom_element_get_animations (div, null, &listed) |> check "Element.getAnimations"
+
+            let handles =
+                Array.init listed.count (fun index ->
+                    rv_event_target_retain (Runtime.InteropServices.Marshal.ReadIntPtr(listed.items, index * IntPtr.Size)))
+
+            rv_dom_sequence_web_animation_release &listed
+
+            if handles.Length <> 1 then
+                failwithf "expected one CSS transition, got %d" handles.Length
+
+            let name = Array.zeroCreate<byte> 64
+            let nameLength = [| 0 |]
+            rv_dom_web_animation_get_interface_name (handles[0], name, name.Length, nameLength)
+            |> check "interface name"
+
+            if System.Text.Encoding.UTF8.GetString(name, 0, nameLength[0]) <> "CSSTransition" then
+                failwith "getAnimations listed no CSSTransition"
+
+            held.Value <- handles[0]
+
+            fun () ->
+                for handle in handles do
+                    rv_event_target_release handle
+        | "animation promise" ->
+            // Pending ready and finished operations hold the animation; the host's destroy invalidates them, and
+            // neither the operations nor the animation keep the document or the div alive.
+            let mutable duration = RvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions()
+            duration.present <- 1
+            duration.tag <- 1
+            duration.arm0 <- 100000.0
+            let mutable keyframes = RvDomSequenceKeyframeNullable()
+            keyframes.present <- 1
+            keyframes.count <- 0
+
+            rv_dom_element_animate (div, [| keyframes |], [| duration |], &held.contents)
+            |> check "Element.animate"
+
+            rv_dom_web_animation_pause held.Value |> check "Animation.pause"
+            let outcomes = Collections.Generic.List<int>()
+            let completion = ResourceCompletion(fun _ outcome _ _ -> outcomes.Add outcome)
+            let pointer = Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate completion
+            let mutable finished = 0UL
+            rv_animation_finished (host, held.Value, pointer, 0n, &finished) |> check "rv_animation_finished"
+            let mutable ready = 0UL
+            rv_animation_ready (host, held.Value, pointer, 0n, &ready) |> check "rv_animation_ready"
+
+            fun () ->
+                // INVALIDATED for both pending promises, delivered by the destroy.
+                if List.ofSeq outcomes <> [ 4; 4 ] then
+                    failwithf "animation promises at destroy: %A" (List.ofSeq outcomes)
+
+                rv_resource_release finished |> check "release finished"
+                rv_resource_release ready |> check "release ready"
+                GC.KeepAlive completion
+                rv_event_target_release held.Value
+        | "custom effect" ->
+            // A playing DocumentTimeline.animate effect with a tick queued by an update: host destroy revokes the callback,
+            // so the queued tick never runs, revoke after destroy still succeeds, and the effect keeps no document alive.
+            let callback =
+                rv_custom_effect_callback_create (
+                    host,
+                    System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate customEffectTickDelegate,
+                    0n,
+                    System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate customEffectReleaseDelegate
+                )
+
+            if callback = 0n then
+                failwith "rv_custom_effect_callback_create returned NULL"
+
+            let mutable timeline = 0n
+            rv_dom_document_get_timeline (document, &timeline) |> check "Document.timeline"
+            let mutable options = RvDomUnionUnrestrictedDoubleOrCustomAnimationOptions()
+            options.present <- 1
+            options.tag <- 1
+            options.arm0 <- 1000.0
+
+            rv_dom_document_timeline_animate (timeline, callback, [| options |], &held.contents)
+            |> check "DocumentTimeline.animate"
+
+            rv_dom_animation_timeline_release timeline
+            rv_host_update host |> check "update"
+            let ticksAtDestroy = customEffectTicks
+            let releasesAtDestroy = customEffectReleases
+
+            fun () ->
+                if customEffectTicks <> ticksAtDestroy then
+                    failwith "a custom effect tick ran after host destroy"
+
+                rv_custom_effect_callback_revoke callback |> check "revoke after destroy"
+                rv_dom_custom_effect_callback_release callback
+                rv_event_target_release held.Value
+
+                if customEffectReleases - releasesAtDestroy > 1 then
+                    failwith "the custom effect release callback ran twice"
         | "crypto" ->
             let filled = Array.zeroCreate<byte> 16
 
@@ -1625,6 +1854,12 @@ let run (outDir: string) =
                     "canvas path"
                     "canvas gradient"
                     "canvas text metrics"
+                    "animation discovery"
+                    "animation promise"
+                    "document timeline"
+                    "scroll timeline"
+                    "view timeline"
+                    "custom effect"
                 ] do
                 for remove in [ false; true ] do
                     releaseAfterDestroy kind remove

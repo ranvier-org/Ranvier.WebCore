@@ -1430,6 +1430,8 @@ enum {
     RV_RESOURCE_DECODE_FAILED = 2,
     RV_RESOURCE_CANCELLED = 3,
     RV_RESOURCE_INVALIDATED = 4,
+    /* The engine rejected the operation with AbortError. */
+    RV_RESOURCE_ABORTED = 5,
 };
 
 /* Receives exactly one terminal outcome per operation on the owning thread. width and height are the image's natural
@@ -1594,6 +1596,37 @@ RV_EXPORT int32_t rv_event_target_equals(RvEventTarget* left, RvEventTarget* rig
  * off the owning thread. It equals (rv_event_target_equals) the handle rv_dom_element_get_animations returns for the
  * same animation; release it with rv_event_target_release. */
 RV_EXPORT RvEventTarget* rv_animation_as_event_target(RvAnimation*);
+/* Animation.ready and Animation.finished without JavaScript ("animation-promises"). animation is a Web Animations
+ * animation handle (rv_dom_element_animate, rv_dom_web_animation_create, rv_animation_as_event_target). Each writes an
+ * operation token that observes the animation's promise current at the call, as the ready or finished attribute
+ * returns it: SUCCEEDED once that promise resolves, also when it is already resolved at the call; ABORTED once the
+ * engine rejects it with AbortError (cancel(), or a reset of the pending tasks). width and height are 0. The
+ * completion is called only from rv_run_loop_cycle, except that rv_resource_cancel and rv_resource_release deliver
+ * CANCELLED before they return. rv_host_destroy and a new document deliver INVALIDATED. A terminal operation holds no
+ * animation. Returns RV_ERR_WRONG_INTERFACE for an event target that is not an animation, and RV_ERR_WRONG_HOST for an
+ * animation of another document than the host's current one. */
+RV_EXPORT int32_t rv_animation_ready(RvHost*, RvEventTarget* animation, RvResourceCompletion completion, void* context, uint64_t* operation);
+RV_EXPORT int32_t rv_animation_finished(RvHost*, RvEventTarget* animation, RvResourceCompletion completion, void* context, uint64_t* operation);
+
+/* Web Animations custom effects ("animation-custom-effects"): the CustomEffectCallback that rv_dom_custom_effect_create
+ * and rv_dom_document_timeline_animate take, implemented by the application. */
+typedef struct RvCustomEffectCallback RvCustomEffectCallback;
+/* Receives the progress a rendering update (rv_host_update) computed for a custom effect, on the host thread from
+ * rv_run_loop_cycle after that update has returned: updates in order, and within an update in the timeline's
+ * animation order. An update where the effect's progress is null calls nothing. The tick may call any function of
+ * this ABI; the ticks of an update it runs are delivered on a later run-loop turn. */
+typedef void (*RvCustomEffectTick)(void* context, double progress);
+/* Runs once with the context, on the owning thread, when the engine drops its last reference to the callback. */
+typedef void (*RvCustomEffectRelease)(void* context);
+/* Creates a CustomEffectCallback of the host's current document that calls tick(context, progress). The caller owns
+ * the returned reference and drops it with rv_dom_custom_effect_callback_release; each effect holds its own. release,
+ * when not NULL, runs after the last reference is dropped. Effects of another document return RV_ERR_WRONG_HOST.
+ * Returns NULL for a NULL host or tick, a destroyed host, or the wrong thread. */
+RV_EXPORT RvCustomEffectCallback* rv_custom_effect_callback_create(RvHost*, RvCustomEffectTick tick, void* context,
+    RvCustomEffectRelease release);
+/* Stops the callback: no tick runs after this returns, including ticks already queued. A second call does nothing.
+ * rv_host_load_html and rv_host_destroy revoke every callback of the host. */
+RV_EXPORT int32_t rv_custom_effect_callback_revoke(RvCustomEffectCallback*);
 /* rv_node_add_event_listener for any EventTarget; remove the listener with rv_listener_remove. */
 RV_EXPORT RvListener* rv_event_target_add_listener(RvEventTarget*, const uint8_t* type, int32_t type_length, int32_t flags, RvEventCallback callback, void* context);
 /* rv_node_dispatch for any EventTarget. */

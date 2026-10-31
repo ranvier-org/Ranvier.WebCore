@@ -12,7 +12,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
 
-ABI = 58
+ABI = 59
 OK, NULL_ARGUMENT, UNSUPPORTED, WRONG_INTERFACE = 0, -1, -9, -11
 NONE, TWO_D, BITMAP_RENDERER, WEBGL, WEBGL2, WEBGPU = range(6)
 WHITE = [255, 255, 255, 255]

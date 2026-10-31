@@ -490,7 +490,7 @@ and [<AllowNullLiteral>] Element =
 
     /// <summary>Element.animate.</summary>
 #if FABLE_COMPILER
-    [<Fable.Core.Emit("$0.animate(((k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;}))($1), ((o)=>{if(o==null||typeof o!=='object')return o;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing', 'iterationComposite', 'composite', 'pseudoElement', 'id', 'timeline'])if(o[k]!==undefined)r[k]=o[k];const d=o.duration;r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;return r;})($2))")>]
+    [<Fable.Core.Emit("$0.animate(((k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;}))($1), ((o)=>{if(o==null||typeof o!=='object')return o;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing', 'iterationComposite', 'composite', 'pseudoElement', 'id', 'timeline'])if(o[k]!==undefined)r[k]=o[k];const d=o.duration;r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;for(const k of ['rangeStart','rangeEnd']){const u=o[k];if(u!==undefined)r[k]=u!=null&&typeof u==='object'&&Array.isArray(u.fields)?u.fields[0]:u;}return r;})($2))")>]
     abstract member __ranvier_animate: keyframes: (Keyframe) array * ?options: obj -> WebAnimation
 #else
     abstract member animate: keyframes: (Keyframe) array -> WebAnimation
@@ -5274,6 +5274,28 @@ and [<AllowNullLiteral>] WebAnimation =
 #else
     abstract member currentTime: (DoubleOrCSSNumericValue) option with get, set
 #endif
+
+    /// <summary>WebAnimation.rangeStart.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.rangeStart")>]
+    abstract member __ranvier_get_rangeStart: unit -> obj
+
+    [<Fable.Core.Emit("$0.rangeStart = $1")>]
+    abstract member __ranvier_set_rangeStart: value: obj -> unit
+#else
+    abstract member rangeStart: TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString with get, set
+#endif
+
+    /// <summary>WebAnimation.rangeEnd.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.rangeEnd")>]
+    abstract member __ranvier_get_rangeEnd: unit -> obj
+
+    [<Fable.Core.Emit("$0.rangeEnd = $1")>]
+    abstract member __ranvier_set_rangeEnd: value: obj -> unit
+#else
+    abstract member rangeEnd: TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString with get, set
+#endif
     /// <summary>WebAnimation.playbackRate.</summary>
     abstract member playbackRate: float with get, set
     /// <summary>WebAnimation.overallProgress.</summary>
@@ -5302,7 +5324,29 @@ and [<AllowNullLiteral>] WebAnimation =
     abstract member commitStyles: unit -> unit
 
 /// <summary>AnimationEffect in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] AnimationEffect = interface end
+and [<AllowNullLiteral>] AnimationEffect =
+
+    /// <summary>AnimationEffect.getTiming.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.getTiming()")>]
+    abstract member __ranvier_getTiming: unit -> obj
+#else
+    abstract member getTiming: unit -> EffectTiming
+#endif
+
+    /// <summary>AnimationEffect.getComputedTiming.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.getComputedTiming()")>]
+    abstract member __ranvier_getComputedTiming: unit -> obj
+#else
+    abstract member getComputedTiming: unit -> ComputedEffectTiming
+#endif
+
+    /// <summary>AnimationEffect.updateTiming.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("((o,a0)=>o.updateTiming(((t)=>{if(t==null)return t;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing'])if(t[k]!==undefined)r[k]=t[k];const d=t.duration;if(d!==undefined)r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;return r;})(a0)))($0,$1)")>]
+#endif
+    abstract member updateTiming: ?timing: OptionalEffectTiming -> unit
 
 /// <summary>KeyframeEffect in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] KeyframeEffect =
@@ -5316,11 +5360,21 @@ and [<AllowNullLiteral>] KeyframeEffect =
     /// <summary>KeyframeEffect.composite.</summary>
     abstract member composite: CompositeOperation with get, set
 
+    /// <summary>KeyframeEffect.getKeyframes.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("((o)=>((l)=>l.map((k)=>({offset:k.offset,computedOffset:k.computedOffset,easing:k.easing,composite:k.composite,properties:Object.keys(k).filter((n)=>!['offset','computedOffset','easing','composite'].includes(n)).map((n)=>({name:n,value:k[n]}))})))(o.getKeyframes()))($0)")>]
+#endif
+    abstract member getKeyframes: unit -> (ComputedKeyframe) array
+
     /// <summary>KeyframeEffect.setKeyframes.</summary>
 #if FABLE_COMPILER
     [<Fable.Core.Emit("((o,a0)=>o.setKeyframes(((k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;}))(a0)))($0,$1)")>]
 #endif
     abstract member setKeyframes: keyframes: (Keyframe) array -> unit
+
+/// <summary>CustomEffect in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CustomEffect =
+    inherit AnimationEffect
 
 /// <summary>AnimationTimeline in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] AnimationTimeline =
@@ -5344,6 +5398,46 @@ and [<AllowNullLiteral>] AnimationTimeline =
 /// <summary>DocumentTimeline in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] DocumentTimeline =
     inherit AnimationTimeline
+
+    /// <summary>DocumentTimeline.animate.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.animate($1, $2)")>]
+    abstract member __ranvier_animate: callback: CustomEffectCallback * ?options: obj -> WebAnimation
+#else
+    abstract member animate: callback: CustomEffectCallback -> WebAnimation
+    abstract member animate: callback: CustomEffectCallback * options: float -> WebAnimation
+    abstract member animate: callback: CustomEffectCallback * options: CustomAnimationOptions -> WebAnimation
+#endif
+
+/// <summary>ScrollTimeline in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ScrollTimeline =
+    inherit AnimationTimeline
+    /// <summary>ScrollTimeline.source.</summary>
+    abstract member source: Element with get
+    /// <summary>ScrollTimeline.axis.</summary>
+    abstract member axis: ScrollAxis with get
+
+/// <summary>ViewTimeline in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ViewTimeline =
+    inherit ScrollTimeline
+    /// <summary>ViewTimeline.subject.</summary>
+    abstract member subject: Element with get
+    /// <summary>ViewTimeline.startOffset.</summary>
+    abstract member startOffset: CSSNumericValue with get
+    /// <summary>ViewTimeline.endOffset.</summary>
+    abstract member endOffset: CSSNumericValue with get
+
+/// <summary>CSSAnimation in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSAnimation =
+    inherit WebAnimation
+    /// <summary>CSSAnimation.animationName.</summary>
+    abstract member animationName: string with get
+
+/// <summary>CSSTransition in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSTransition =
+    inherit WebAnimation
+    /// <summary>CSSTransition.transitionProperty.</summary>
+    abstract member transitionProperty: string with get
 
 /// <summary>DataTransfer in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] DataTransfer =
@@ -6128,6 +6222,13 @@ and [<RequireQualifiedAccess>] BooleanOrScrollIntoViewOptions =
     | Boolean of bool
     | ScrollIntoViewOptions of ScrollIntoViewOptions
 
+/// <summary>TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString =
+    | TimelineRangeOffset of TimelineRangeOffset
+    | CSSNumericValue of CSSNumericValue
+    | CSSOMKeywordValue of CSSKeywordValue
+    | DOMString of string
+
 /// <summary>UnrestrictedDoubleOrKeyframeAnimationOptions in the scoped DOM interface model.</summary>
 and [<RequireQualifiedAccess>] UnrestrictedDoubleOrKeyframeAnimationOptions =
     | UnrestrictedDouble of float
@@ -6205,6 +6306,16 @@ and [<RequireQualifiedAccess>] USVStringOrURLPatternInit =
     | USVString of string
     | URLPatternInit of URLPatternInit
 
+/// <summary>UnrestrictedDoubleOrDOMString in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] UnrestrictedDoubleOrDOMString =
+    | UnrestrictedDouble of float
+    | DOMString of string
+
+/// <summary>UnrestrictedDoubleOrCustomAnimationOptions in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] UnrestrictedDoubleOrCustomAnimationOptions =
+    | UnrestrictedDouble of float
+    | CustomAnimationOptions of CustomAnimationOptions
+
 /// <summary>DOMStringOrCanvasGradientOrCanvasPattern in the scoped DOM interface model.</summary>
 and [<RequireQualifiedAccess>] DOMStringOrCanvasGradientOrCanvasPattern =
     | DOMString of string
@@ -6240,8 +6351,8 @@ and [<AllowNullLiteral; DomDictionary>] AddEventListenerOptions() =
     member val passive: (bool) option = None with get, set
     member val once: bool = false with get, set
 
-/// <summary>KeyframeEffectOptions in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral; DomDictionary>] KeyframeEffectOptions() =
+/// <summary>EffectTiming in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] EffectTiming() =
     member val delay: float = 0 with get, set
     member val endDelay: float = 0 with get, set
     member val fill: FillMode = FillMode.Auto with get, set
@@ -6253,6 +6364,10 @@ and [<AllowNullLiteral; DomDictionary>] KeyframeEffectOptions() =
 
     member val direction: PlaybackDirection = PlaybackDirection.Normal with get, set
     member val easing: string = "linear" with get, set
+
+/// <summary>KeyframeEffectOptions in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] KeyframeEffectOptions() =
+    inherit EffectTiming()
     member val iterationComposite: IterationCompositeOperation = IterationCompositeOperation.Replace with get, set
     member val composite: CompositeOperation = CompositeOperation.Replace with get, set
     member val pseudoElement: string = null with get, set
@@ -6345,6 +6460,18 @@ and [<AllowNullLiteral; DomDictionary>] KeyframeAnimationOptions() =
     member val id: string = "" with get, set
     member val timeline: (AnimationTimeline) option = None with get, set
 
+    member val rangeStart: TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString =
+        TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString.DOMString "normal" with get, set
+
+    member val rangeEnd: TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString =
+        TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString.DOMString "normal" with get, set
+
+
+/// <summary>TimelineRangeOffset in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] TimelineRangeOffset() =
+    member val rangeName: (string) option = None with get, set
+    member val offset: (CSSNumericValue) option = None with get, set
+
 /// <summary>GetAnimationsOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] GetAnimationsOptions() =
     member val subtree: bool = false with get, set
@@ -6426,6 +6553,59 @@ and [<AllowNullLiteral; DomDictionary>] URLPatternInit() =
     member val hash: (string) option = None with get, set
     member val baseURL: (string) option = None with get, set
 
+/// <summary>ComputedEffectTiming in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] ComputedEffectTiming() =
+    member val delay: float = 0 with get, set
+    member val endDelay: float = 0 with get, set
+    member val fill: FillMode = FillMode.Auto with get, set
+    member val iterationStart: float = 0.0 with get, set
+    member val iterations: float = 1.0 with get, set
+
+    member val duration: UnrestrictedDoubleOrCSSNumericValueOrDOMString =
+        UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString "auto" with get, set
+
+    member val direction: PlaybackDirection = PlaybackDirection.Normal with get, set
+    member val easing: string = "linear" with get, set
+    member val endTime: (DoubleOrCSSNumericValue) option = None with get, set
+    member val activeDuration: (DoubleOrCSSNumericValue) option = None with get, set
+    member val localTime: (DoubleOrCSSNumericValue) option = None with get, set
+    member val progress: (float) option = None with get, set
+    member val currentIteration: (float) option = None with get, set
+
+/// <summary>OptionalEffectTiming in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] OptionalEffectTiming() =
+    member val delay: (float) option = None with get, set
+    member val endDelay: (float) option = None with get, set
+    member val fill: (FillMode) option = None with get, set
+    member val iterationStart: (float) option = None with get, set
+    member val iterations: (float) option = None with get, set
+    member val duration: (UnrestrictedDoubleOrDOMString) option = None with get, set
+    member val direction: (PlaybackDirection) option = None with get, set
+    member val easing: (string) option = None with get, set
+
+/// <summary>ComputedKeyframe in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] ComputedKeyframe() =
+    member val offset: (float) option = None with get, set
+    member val computedOffset: float = Unchecked.defaultof<_> with get, set
+    member val easing: string = Unchecked.defaultof<_> with get, set
+    member val composite: string = Unchecked.defaultof<_> with get, set
+    member val properties: (KeyframeProperty) array = [||] with get, set
+
+/// <summary>CustomAnimationOptions in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] CustomAnimationOptions() =
+    member val delay: float = 0 with get, set
+    member val endDelay: float = 0 with get, set
+    member val fill: FillMode = FillMode.Auto with get, set
+    member val iterationStart: float = 0.0 with get, set
+    member val iterations: float = 1.0 with get, set
+
+    member val duration: UnrestrictedDoubleOrCSSNumericValueOrDOMString =
+        UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString "auto" with get, set
+
+    member val direction: PlaybackDirection = PlaybackDirection.Normal with get, set
+    member val easing: string = "linear" with get, set
+    member val id: string = "" with get, set
+
 /// <summary>ImageDataSettings in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] ImageDataSettings() = class end
 
@@ -6433,6 +6613,9 @@ and [<AllowNullLiteral; DomDictionary>] ImageDataSettings() = class end
 and [<AllowNullLiteral; DomDictionary>] FocusOptions() =
     member val preventScroll: bool = false with get, set
     member val focusVisible: (bool) option = None with get, set
+
+/// <summary>CustomEffectCallback in the scoped DOM interface model.</summary>
+and CustomEffectCallback = float -> unit
 
 /// <summary>EventListener in the scoped DOM interface model.</summary>
 and EventListener = Event -> unit
@@ -6475,6 +6658,13 @@ and [<DomStringEnum; RequireQualifiedAccess>] PlaybackDirection =
     | [<CompiledName("reverse")>] Reverse
     | [<CompiledName("alternate")>] Alternate
     | [<CompiledName("alternate-reverse")>] AlternateReverse
+
+/// <summary>ScrollAxis in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] ScrollAxis =
+    | [<CompiledName("block")>] Block
+    | [<CompiledName("inline")>] Inline
+    | [<CompiledName("x")>] X
+    | [<CompiledName("y")>] Y
 
 /// <summary>AnimationPlayState in the scoped DOM interface model.</summary>
 and [<DomStringEnum; RequireQualifiedAccess>] AnimationPlayState =
@@ -6611,6 +6801,10 @@ module BrowserUnionAdapters =
     let private normalizeUSVString (_: string) : string =
         Fable.Core.Util.jsNative
 
+    [<Fable.Core.Emit("((v)=>{if(v==null||typeof v!=='object'||v.nodeType!==undefined)return false;try{globalThis.CSSStyleValue.prototype.toString.call(v);return false;}catch{return true;}})($0)")>]
+    let private isTimelineRangeOffset (_: obj) : bool =
+        Fable.Core.Util.jsNative
+
     [<Fable.Core.Emit("((v)=>{if(v==null)return false;try{globalThis.CSSNumericValue.prototype.type.call(v);return true;}catch{return false;}})($0)")>]
     let private isCSSNumericValue (_: obj) : bool =
         Fable.Core.Util.jsNative
@@ -6654,6 +6848,13 @@ module BrowserUnionAdapters =
         | UnrestrictedDoubleOrCSSNumericValueOrDOMString.CSSNumericValue value -> box value
         | UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString value -> box value
 
+    let private unboxUnrestrictedDoubleOrCSSNumericValueOrDOMString (value: obj) : UnrestrictedDoubleOrCSSNumericValueOrDOMString =
+        match value with
+        | :? float as arm -> UnrestrictedDoubleOrCSSNumericValueOrDOMString.UnrestrictedDouble arm
+        | arm when isCSSNumericValue arm -> UnrestrictedDoubleOrCSSNumericValueOrDOMString.CSSNumericValue (unbox<CSSNumericValue> arm)
+        | :? string as arm -> UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString arm
+        | _ -> failwith "Unexpected DOM union result"
+
     let private boxDOMStringOrElementCreationOptions (value: DOMStringOrElementCreationOptions) : obj =
         match value with
         | DOMStringOrElementCreationOptions.DOMString value -> box value
@@ -6668,6 +6869,28 @@ module BrowserUnionAdapters =
         match value with
         | BooleanOrScrollIntoViewOptions.Boolean value -> box value
         | BooleanOrScrollIntoViewOptions.ScrollIntoViewOptions value -> box value
+
+    let private boxTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString
+        (value: TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString)
+        : obj =
+        match value with
+        | TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString.TimelineRangeOffset value -> box value
+        | TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString.CSSNumericValue value -> box value
+        | TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString.CSSOMKeywordValue value -> box value
+        | TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString.DOMString value -> box value
+
+    let private unboxTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString
+        (value: obj)
+        : TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString =
+        match value with
+        | arm when isTimelineRangeOffset arm ->
+            TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString.TimelineRangeOffset (unbox<TimelineRangeOffset> arm)
+        | arm when isCSSNumericValue arm ->
+            TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString.CSSNumericValue (unbox<CSSNumericValue> arm)
+        | arm when isCSSOMKeywordValue arm ->
+            TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString.CSSOMKeywordValue (unbox<CSSKeywordValue> arm)
+        | :? string as arm -> TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString.DOMString arm
+        | _ -> failwith "Unexpected DOM union result"
 
     let private boxUnrestrictedDoubleOrKeyframeAnimationOptions (value: UnrestrictedDoubleOrKeyframeAnimationOptions) : obj =
         match value with
@@ -6851,6 +7074,16 @@ module BrowserUnionAdapters =
         | USVStringOrURLPatternInit.USVString value -> box (normalizeUSVString value)
         | USVStringOrURLPatternInit.URLPatternInit value -> box value
 
+    let private boxUnrestrictedDoubleOrDOMString (value: UnrestrictedDoubleOrDOMString) : obj =
+        match value with
+        | UnrestrictedDoubleOrDOMString.UnrestrictedDouble value -> box value
+        | UnrestrictedDoubleOrDOMString.DOMString value -> box value
+
+    let private boxUnrestrictedDoubleOrCustomAnimationOptions (value: UnrestrictedDoubleOrCustomAnimationOptions) : obj =
+        match value with
+        | UnrestrictedDoubleOrCustomAnimationOptions.UnrestrictedDouble value -> box value
+        | UnrestrictedDoubleOrCustomAnimationOptions.CustomAnimationOptions value -> box value
+
     let private boxDOMStringOrCanvasGradientOrCanvasPattern (value: DOMStringOrCanvasGradientOrCanvasPattern) : obj =
         match value with
         | DOMStringOrCanvasGradientOrCanvasPattern.DOMString value -> box value
@@ -6883,6 +7116,44 @@ module BrowserUnionAdapters =
         match value with
         | NodeOrDOMString.Node value -> box value
         | NodeOrDOMString.DOMString value -> box value
+
+    [<Fable.Core.Emit("$0[$1]")>]
+    let private rawField (_: obj) (_: string) : obj =
+        Fable.Core.Util.jsNative
+
+    let private resultDictEffectTiming (raw: obj) : EffectTiming =
+        let value = unbox<EffectTiming> raw
+        value.duration <- unboxUnrestrictedDoubleOrCSSNumericValueOrDOMString (rawField raw "duration")
+        value
+
+    let private resultDictComputedEffectTiming (raw: obj) : ComputedEffectTiming =
+        let value = unbox<ComputedEffectTiming> raw
+        value.duration <- unboxUnrestrictedDoubleOrCSSNumericValueOrDOMString (rawField raw "duration")
+        let endTimeField = rawField raw "endTime"
+
+        value.endTime <-
+            (if isNull endTimeField then
+                 None
+             else
+                 Some (unboxDoubleOrCSSNumericValue endTimeField))
+
+        let activeDurationField = rawField raw "activeDuration"
+
+        value.activeDuration <-
+            (if isNull activeDurationField then
+                 None
+             else
+                 Some (unboxDoubleOrCSSNumericValue activeDurationField))
+
+        let localTimeField = rawField raw "localTime"
+
+        value.localTime <-
+            (if isNull localTimeField then
+                 None
+             else
+                 Some (unboxDoubleOrCSSNumericValue localTimeField))
+
+        value
 
     type Document with
         member this.createElement(localName: string) : Element =
@@ -7196,6 +7467,28 @@ module BrowserUnionAdapters =
                     |> Option.defaultValue null
                 )
 
+        member this.rangeStart
+            with get (): TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString =
+                let value = this.__ranvier_get_rangeStart ()
+                unboxTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString value
+            and set (value: TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString) =
+                this.__ranvier_set_rangeStart (boxTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString value)
+
+        member this.rangeEnd
+            with get (): TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString =
+                let value = this.__ranvier_get_rangeEnd ()
+                unboxTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString value
+            and set (value: TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString) =
+                this.__ranvier_set_rangeEnd (boxTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString value)
+
+
+    type AnimationEffect with
+        member this.getTiming() : EffectTiming =
+            resultDictEffectTiming (this.__ranvier_getTiming ())
+
+        member this.getComputedTiming() : ComputedEffectTiming =
+            resultDictComputedEffectTiming (this.__ranvier_getComputedTiming ())
+
 
     type AnimationTimeline with
         member this.currentTime: (DoubleOrCSSNumericValue) option =
@@ -7213,6 +7506,17 @@ module BrowserUnionAdapters =
                 None
             else
                 Some (unboxDoubleOrCSSNumericValue value)
+
+
+    type DocumentTimeline with
+        member this.animate(callback: CustomEffectCallback) : WebAnimation =
+            this.__ranvier_animate (callback, ?options = None)
+
+        member this.animate(callback: CustomEffectCallback, options: float) : WebAnimation =
+            this.__ranvier_animate (callback, ?options = Some (box options))
+
+        member this.animate(callback: CustomEffectCallback, options: CustomAnimationOptions) : WebAnimation =
+            this.__ranvier_animate (callback, ?options = Some (box options))
 
 
     type CanvasRenderingContext2D with

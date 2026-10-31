@@ -273,6 +273,7 @@ class World:
             self.callbacks |= document.callbacks
         # syntheticIdl names repository IDL files that define dictionaries only: native transports of a JavaScript
         # object argument, such as the keyframe sequence of Element.animate. They merge after WebKit's files.
+        synthetic = set()
         for relative in config.get("syntheticIdl", []):
             document = idl.parse((ROOT / relative).read_text(encoding="utf-8"), pathlib.PurePosixPath(relative).name)
             if document.interfaces or document.namespaces or document.includes or document.enums or document.callbacks:
@@ -281,7 +282,10 @@ class World:
                 if name in self.dictionaries:
                     raise SystemExit(f"{relative}: dictionary {name} already exists in WebKit's IDL")
                 self.dictionaries[name] = dictionary
+                synthetic.add(name)
             self.add_typedefs(pathlib.PurePosixPath(relative).name, document.typedefs)
+        if synthetic != set(config.get("syntheticDictionaries", [])):
+            raise SystemExit(f"syntheticDictionaries must list exactly the dictionaries of syntheticIdl: {sorted(synthetic)}")
         # customConstructors replaces a [Custom] IDL constructor with the signature its custom binding implements.
         for name, custom in config.get("customConstructors", {}).items():
             interface = self.interfaces[name]
@@ -293,6 +297,20 @@ class World:
                      if member.kind == "constructor" and "Custom" in member.attrs]
             if len(found) != 1:
                 raise SystemExit(f"customConstructors: {name} has no single [Custom] constructor")
+            replacement.file = interface.file
+            interface.members[found[0]] = replacement
+        # customOperations replaces a [Custom] IDL operation with the signature its native binding implements; its
+        # callExpressions entry names the C++ that computes the result.
+        for key, custom in config.get("customOperations", {}).items():
+            name, operation = key.split(".")
+            interface = self.interfaces[name]
+            replacement = idl.Parser(custom["idl"], interface.file).member(name)
+            if replacement is None or replacement.kind != "operation" or replacement.name != operation:
+                raise SystemExit(f"customOperations: {key} needs an operation declaration of that name")
+            found = [index for index, member in enumerate(interface.members)
+                     if member.kind == "operation" and member.name == operation and "Custom" in member.attrs]
+            if len(found) != 1:
+                raise SystemExit(f"customOperations: {key} has no single [Custom] operation")
             replacement.file = interface.file
             interface.members[found[0]] = replacement
         # argumentTypes retypes an argument, keyed Interface.member.argument by the declaring interface or mixin:
@@ -352,6 +370,13 @@ class World:
         self.contract_dictionary_fields = {name: self.dictionary_fields(name)
                                            for name in self.contract_config.get("dictionaries", [])}
 
+    def event_target_object(self, name):
+        """An interface whose handle is an RvEventTarget: an eventTargetObjects interface or a scoped subtype of one."""
+        chain = self.chain(name)
+        objects = self.config.get("eventTargetObjects", {})
+        return (chain[-1] == "EventTarget" and any(item in objects for item in chain[:-1])
+                and all(item in self.scope for item in chain[:-1]))
+
     def public_name(self, name):
         return self.contract_aliases.get(name, name)
 
@@ -389,6 +414,8 @@ class World:
         return found
 
     def cpp_class(self, name):
+        if name not in self.interfaces and name in self.callbacks:
+            return name  # a callback function names its WebCore callback class
         interface = self.interfaces[name]
         return interface.attrs.get("ImplementedAs", name) if isinstance(interface.attrs.get("ImplementedAs"), str) else name
 
@@ -522,10 +549,16 @@ class World:
                             and f"{name}.{member.name}" in self.config.get("dictionaryEventTargetMembers", []))
             optional_object = f"{name}.{member.name}" in self.config.get("optionalObjectMembers", [])
             if optional_object:
-                # Rv<Root>* const*: NULL for absent, a pointer to NULL for null, else the handle.
-                if mapped.kind != "object" or member.required or member.default is not None or not mapped.nullable:
-                    raise SystemExit(f"{name}.{member.name}: optional object members must be optional nullable object handles without a default")
+                # Rv<Root>* const* (or RvNode* const*): NULL for absent, a pointer to NULL for null, else the handle.
+                if mapped.kind not in ("object", "node") or member.required or member.default is not None or not mapped.nullable:
+                    raise SystemExit(f"{name}.{member.name}: optional object members must be optional nullable object or node handles without a default")
                 mapped.optional_handle = True
+                configured_object = True
+            if f"{name}.{member.name}" in self.config.get("absentObjectMembers", []):
+                # Rv<Root>*: NULL for absent, else the handle; the IDL member is optional, nonnullable and has no default.
+                if mapped.kind != "object" or member.required or member.default is not None or mapped.nullable:
+                    raise SystemExit(f"{name}.{member.name}: absent object members must be optional nonnullable object handles without a default")
+                mapped.absent_handle = True
                 configured_object = True
             if (mapped.kind in ("object", "event") and not configured_object) or (mapped.interface == "EventTarget" and not event_target):
                 raise Unsupported(f"dictionary {name}: member {member.name} of type {member.type}")
@@ -591,7 +624,7 @@ class World:
                     raise Unsupported(f"interface {t.name} outside gen/dom.json")
                 return Mapped("event", t.nullable, interface=t.name, cls=self.cpp_class(t.name))
             root = chain[-1]
-            if root not in self.scope and not (root == "EventTarget" and t.name in self.config.get("eventTargetObjects", {})):
+            if root not in self.scope and not (root == "EventTarget" and self.event_target_object(t.name)):
                 raise Unsupported(f"interface {t.name} outside gen/dom.json")
             return Mapped("object", t.nullable, interface=t.name, root=root, cls=self.cpp_class(t.name))
         if t.name == "union":
@@ -643,6 +676,9 @@ class World:
         if t.name in self.dictionaries:
             self.dictionary_fields(t.name)
             return Mapped("dict", t.nullable, interface=t.name)
+        if t.name in self.callbacks and t.name in self.config.get("callbackObjectRoots", {}):
+            # A callback function root is a refcounted handle of the host's native implementation.
+            return Mapped("object", t.nullable, interface=t.name, root=t.name, cls=t.name)
         if t.name in self.callbacks or t.name in ("EventHandler", "OnErrorEventHandler", "OnBeforeUnloadEventHandler"):
             raise Unsupported(f"callback {t.name}")
         raise Unsupported(f"type {t}")
@@ -740,15 +776,24 @@ class Generator(ComplexGeneratorMixin):
             chain = self.world.chain(name)
             if "Node" not in chain and "Event" not in chain:
                 root = chain[-1]
-                if root == "EventTarget" and name in self.world.config.get("eventTargetObjects", {}):
-                    # An event target handle is the RvEventTarget of the hand-written event ABI.
-                    if chain != [name, root]:
-                        raise SystemExit(f"{name}: an event target object must derive directly from EventTarget")
+                if root == "EventTarget" and self.world.event_target_object(name):
+                    # An event target handle is the RvEventTarget of the hand-written event ABI. A subtype of an
+                    # eventTargetObjects interface (CSSAnimation of WebAnimation) casts through it (castVia).
+                    objects = self.world.config.get("eventTargetObjects", {})
+                    if name not in objects and self.world.config.get("castVia", {}).get(name) not in objects:
+                        raise SystemExit(f"{name}: a subtype of an event target object needs castVia to it")
+                elif root == "EventTarget" and name in self.world.config.get("eventTargetObjects", {}):
+                    raise SystemExit(f"{name}: an event target object must derive directly from EventTarget")
                 elif root not in self.world.scope:
                     raise SystemExit(f"{name}: gen/dom.json lists an interface without its base {root}, which names the handle")
                 if root == name:
                     self.handles.append(name)
             self.interface(name)
+        for name in self.world.config.get("callbackObjectRoots", {}):
+            if name in self.world.callbacks and name not in self.world.interfaces:
+                # A callback function root has no interface of its own: only the handle's release and retain.
+                self.headers.add(f"{name}.h")
+                self.handles.append(name)
         for name, binding in self.world.config.get("namespaceBindings", {}).items():
             self.namespace(name, binding)
         for name, bindings in self.world.config.get("windowBindings", {}).items():
@@ -787,7 +832,8 @@ class Generator(ComplexGeneratorMixin):
         self.runtime_queries = []
         for root in self.world.config.get("runtimeTypeRoots", []):
             # An Event root reads an RvEvent handle; every other root is a scoped object handle.
-            if root not in self.handles and root != "Event":
+            event_target = root in self.world.config.get("eventTargetObjects", {})
+            if root not in self.handles and root != "Event" and not event_target:
                 raise SystemExit(f"{root}: runtime type query requires a scoped object-handle root")
             # Extras are interfaces outside the scope that the query still names, such as CustomEvent.
             extras = self.world.config.get("runtimeTypeExtras", {}).get(root, [])
@@ -807,7 +853,7 @@ class Generator(ComplexGeneratorMixin):
                 "interfaces": interfaces + [root],
                 "names": [self.world.public_name(name) if public else name for name in interfaces + [root]],
                 "extras": extras,
-                "parameters": [{"ctype": f"Rv{root}*", "name": "target"}, {"ctype": "char*", "name": "buffer"},
+                "parameters": [{"ctype": "RvEventTarget*" if event_target else f"Rv{root}*", "name": "target"}, {"ctype": "char*", "name": "buffer"},
                                {"ctype": "int32_t", "name": "capacity"}, {"ctype": "int32_t*", "name": "length"}],
             })
 
@@ -1353,7 +1399,7 @@ class Generator(ComplexGeneratorMixin):
             return (f"([&]() -> {cls}* {{ auto& event = {value}; return event.interfaceType() == EventInterfaceType::{cls} "
                     f"? static_cast<{cls}*>(&event) : nullptr; }}())")
         via = self.world.config.get("castVia", {}).get(cls)
-        if via:
+        if via and via != root:
             self.headers.add(f"{via}.h")
             return (f"([&]() -> {cls}* {{ auto* base = dynamicDowncast<{via}>({value}); "
                     f"return base ? dynamicDowncast<{cls}>(*base) : nullptr; }}())")
@@ -1448,6 +1494,12 @@ class Generator(ComplexGeneratorMixin):
             document = "(*settingsDocument)"
         elif chain[-1] in SETTINGS_DOCUMENT:
             document = SETTINGS_DOCUMENT[chain[-1]]
+        elif interface in self.world.config.get("settingsDocuments", {}):
+            # An object that holds its document weakly: a destroyed document detaches it.
+            self.headers.add("Document.h")
+            lines = [f"RefPtr<Document> settingsDocument = {self.world.config['settingsDocuments'][interface]};",
+                     "if (!settingsDocument)", "    return RV_ERR_DETACHED;"]
+            document = "(*settingsDocument)"
         elif interface in self.world.config.get("contextSettingsObjects", []):
             # An ActiveDOMObject reaches the settings through its script execution context, a Document on the host.
             self.headers |= {"ContextDestructionObserverInlines.h", "Document.h"}
@@ -1564,6 +1616,24 @@ class Generator(ComplexGeneratorMixin):
         covered = f"{pointer}->size >= offsetof({struct}, {field}) + sizeof({pointer}->{field})"
         ctype = self.field_ctype(member, mapped, dictionary)
         lines = []
+        if getattr(mapped, "absent_handle", False):
+            self.headers.add(f"{mapped.cls}.h")
+            root = self.world.cpp_class(mapped.root)
+            source = f"reinterpret_cast<{root}*>({pointer}->{field})"
+            cast = source if root == mapped.cls else self.cast_expression(mapped.cls, root, f"*{source}")
+            lines += [f"if ({covered} && {pointer}->{field}) {{", f"    RefPtr<{mapped.cls}> value = {cast};", "    if (!value)",
+                      "        return RV_ERR_WRONG_INTERFACE;", f"    {target}.{cpp_field} = std::move(value);", "}"]
+            return lines
+        if getattr(mapped, "optional_handle", False) and mapped.kind == "node":
+            self.headers.add(f"{mapped.cls}.h")
+            lines += [f"if ({covered} && {pointer}->{field}) {{", f"    RefPtr<{mapped.cls}> value;", f"    if (*{pointer}->{field}) {{"]
+            if mapped.cls == "Node":
+                lines.append(f"        value = nodeOf(*{pointer}->{field});")
+            else:
+                lines += [f"        value = dynamicDowncast<{mapped.cls}>(*nodeOf(*{pointer}->{field}));", "        if (!value)",
+                          "            return RV_ERR_WRONG_INTERFACE;"]
+            lines += ["    }", f"    {target}.{cpp_field} = std::move(value);", "}"]
+            return lines
         if getattr(mapped, "optional_handle", False):
             self.headers.add(f"{mapped.cls}.h")
             root = self.world.cpp_class(mapped.root)
@@ -1778,7 +1848,10 @@ class Generator(ComplexGeneratorMixin):
         name = member.attrs.get("ImplementedAs", member.name)
         implemented_by = member.attrs.get("ImplementedBy")
         placeholders = ", ".join(f"{{arg{i}}}" for i in range(len(args)))
-        if implemented_by:
+        expression = self.world.config.get("callExpressions", {}).get(f"{interface}.{member.name}")
+        if expression:
+            call = expression
+        elif implemented_by:
             self.headers.add(f"{implemented_by}.h")
             call = f"WebCore::{implemented_by}::{name}(*impl{{call_with}}{', ' if placeholders else ''}{placeholders})"
         else:
@@ -1897,7 +1970,8 @@ class Generator(ComplexGeneratorMixin):
                     notes.append(f"{name} may be NULL for the IDL default")
                 cpp = self.dictionary_cpp(mapped.interface)
                 objects = [(field_member, field_mapped) for field_member, field_mapped in fields
-                           if field_mapped.kind == "object" and not getattr(field_mapped, "optional_handle", False)]
+                           if field_mapped.kind == "object" and not getattr(field_mapped, "optional_handle", False)
+                           and not getattr(field_mapped, "absent_handle", False)]
                 reference = mapped.interface in self.world.config.get("referenceDictionaries", [])
                 target = f"a{index}"
                 if reference:
@@ -1919,9 +1993,19 @@ class Generator(ComplexGeneratorMixin):
                     prepare.append(f"{cpp} a{index} {{ }};")
                     if mapped.interface in self.world.config.get("idlDefaultDictionaries", []):
                         prepare += self.idl_defaults(mapped.interface, f"a{index}")
+                for field_member, field_mapped in fields:
+                    label = f"{mapped.interface}.{field_member.name}"
+                    if label in self.world.config.get("unionFieldDefaults", []):
+                        # The C++ struct leaves the member empty; the IDL default applies whether or not options is NULL.
+                        default = field_member.default or ""
+                        if (field_mapped.kind != "union" or not default.startswith('"')
+                                or not any(child.kind == "string" for child in field_mapped.subtypes)):
+                            raise SystemExit(f"{label}: unionFieldDefaults takes a union member with a string arm and a string default")
+                        prepare.append(f"{target}.{field_member.attrs.get('ImplementedAs', field_member.name)} = String {{ {default}_s }};")
                 prepare.append(f"if ({name}) {{")
                 for field_member, field_mapped in fields:
-                    if field_mapped.kind == "object" and not getattr(field_mapped, "optional_handle", False):
+                    if (field_mapped.kind == "object" and not getattr(field_mapped, "optional_handle", False)
+                            and not getattr(field_mapped, "absent_handle", False)):
                         continue
                     prepare += ["    " + line for line in self.dictionary_field(name, struct, target, field_member, field_mapped, mapped.interface)]
                 prepare.append("}")
@@ -2022,6 +2106,13 @@ class Generator(ComplexGeneratorMixin):
                     prepare.append(f"RefPtr<{mapped.cls}> a{index} = {name} ? {cast} : nullptr;")
                     prepare.append(f"if ({name} && !a{index})")
                     prepare.append("    return RV_ERR_WRONG_INTERFACE;")
+                host_check = self.world.config.get("argumentHostChecks", {}).get(mapped.root) if mapped.kind == "object" else None
+                if host_check:
+                    # The argument belongs to one host's document: a receiver of another host returns RV_ERR_WRONG_HOST.
+                    self.headers.add(host_check["header"])
+                    prepare.append(f"if (a{index} && !{host_check['check']}(*a{index}, *impl))")
+                    prepare.append("    return RV_ERR_WRONG_HOST;")
+                    notes.append(f"RV_ERR_WRONG_HOST for a {name} of another host's document")
                 presence = f"{function.interface}.{member.name}.{argument.name}" in self.world.config.get("presenceArguments", [])
                 if presence:
                     # An optional nullable argument whose absence differs from null: name_present 0 is absent.
@@ -2176,6 +2267,11 @@ class Generator(ComplexGeneratorMixin):
                 body += ['RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));',
                          'if (!contextDocument)', '    return RV_ERR_WRONG_INTERFACE;',
                          'Ref document = contextDocument.releaseNonNull();']
+                # contextDocuments names the object's own document: a context of another document is the wrong host.
+                own = self.world.config.get("contextDocuments", {}).get(interface)
+                if own:
+                    body += [f'if (auto* own = {own}; own && own != document.ptr())', '    return RV_ERR_WRONG_HOST;']
+                    notes.append("RV_ERR_WRONG_HOST for a context other than the object's document")
             else:
                 body.append("Ref document = impl->document();")
             if "global" in call_with:
@@ -2644,6 +2740,10 @@ class Generator(ComplexGeneratorMixin):
                       "    if (!target || !length)", "        return RV_ERR_NULL_ARGUMENT;",
                       "    if (!isMainThread())", "        return RV_ERR_WRONG_THREAD;",
                       f"    auto* impl = reinterpret_cast<{self.world.cpp_class(root)}*>(target);"]
+            if root in self.world.config.get("eventTargetObjects", {}):
+                # An event target of another interface is not this root: RV_ERR_WRONG_INTERFACE.
+                lines[-1] = f"    RefPtr impl = dynamicDowncast<{self.world.cpp_class(root)}>(*reinterpret_cast<EventTarget*>(target));"
+                lines += ["    if (!impl)", "        return RV_ERR_WRONG_INTERFACE;"]
             for interface, exposed in zip(query['interfaces'][:-1], query['names']):
                 conditional = self.conditional(self.world.interfaces[interface])
                 if conditional:
@@ -2995,6 +3095,7 @@ template<typename E, size_t N> std::optional<E> enumerationFromIndex(int32_t ind
 
 template<typename T> struct Unwrapped { using Type = T; };
 template<typename T> struct Unwrapped<std::optional<T>> { using Type = T; };
+template<typename T, typename Traits> struct Unwrapped<Markable<T, Traits>> { using Type = T; };
 
 // Copies a dictionary field into the C++ dictionary's member, which may be optional.
 template<typename T, typename V> void assignValue(T& field, V value)

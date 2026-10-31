@@ -1,0 +1,42 @@
+{
+ "runtime": "C:/wk/native-batch-6/artifacts/batch6-candidate-1-frozen/runtimes/win-x64/native",
+ "step2ArmedPauseCancel": {
+  "exitCode": 0,
+  "survived": true,
+  "stdout": [
+   "ARMED True",
+   "PAUSED pending True",
+   "CANCELLED",
+   "{\"armed\": true, \"pendingAfterPause\": true, \"afterCancel\": {\"playState\": \"idle\", \"pending\": false, \"replaceState\": \"active\", \"currentTime\": null, \"startTime\": null, \"playbackRate\": 1}}",
+   "PAUSE_CANCEL_SURVIVED"
+  ],
+  "stderrTail": []
+ },
+ "step4AnimateCancel": {
+  "samples": [
+   326094848,
+   326250496,
+   326393856
+  ],
+  "checked": true,
+  "round": 1000,
+  "bound": 16777216
+ },
+ "step4PauseCancel": {
+  "samples": [
+   326467584,
+   326774784,
+   326787072
+  ],
+  "pendingPauses": [
+   1000,
+   1000,
+   1000
+  ],
+  "statusesOk": true,
+  "round": 1000,
+  "bound": 16777216,
+  "flat": true
+ },
+ "assertions": 11
+}

@@ -1,0 +1,72 @@
+{
+ "browser": "Chromium 156.0.8078.4",
+ "cases": [
+  {
+   "name": "opacity and transform",
+   "committed": "color: rgb(1, 2, 3) !important; margin-top: 0px; transform: translateX(50px); opacity: 0.5;",
+   "afterCancel": "color: rgb(1, 2, 3) !important; margin-top: 0px; transform: translateX(50px); opacity: 0.5;",
+   "inline": {
+    "opacity": [
+     "0.5",
+     ""
+    ],
+    "transform": [
+     "translateX(50px)",
+     ""
+    ],
+    "color": [
+     "rgb(1, 2, 3)",
+     "important"
+    ],
+    "margin-top": [
+     "0px",
+     ""
+    ]
+   },
+   "computed": {
+    "opacity": "0.5",
+    "transform": "matrix(1, 0, 0, 1, 50, 0)",
+    "color": "rgb(1, 2, 3)",
+    "margin-top": "0px"
+   },
+   "playState": "idle"
+  },
+  {
+   "name": "over an important inline value",
+   "committed": "opacity: 0.2;",
+   "afterCancel": "opacity: 0.2;",
+   "inline": {
+    "opacity": [
+     "0.2",
+     ""
+    ]
+   },
+   "computed": {
+    "opacity": "0.2"
+   },
+   "playState": "idle"
+  },
+  {
+   "name": "composite add over a stylesheet value",
+   "committed": "margin-left: 5px;",
+   "afterCancel": "margin-left: 5px;",
+   "inline": {
+    "margin-left": [
+     "5px",
+     ""
+    ]
+   },
+   "computed": {
+    "margin-left": "5px"
+   },
+   "playState": "idle"
+  }
+ ],
+ "errors": {
+  "detached element": "InvalidStateError",
+  "element not rendered": "InvalidStateError",
+  "no target": "NoModificationAllowedError",
+  "pseudo-element target": "NoModificationAllowedError",
+  "no effect": "NoModificationAllowedError"
+ }
+}

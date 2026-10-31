@@ -88,7 +88,7 @@ def run(name, command, expected=None, environment=None, executed=None, timeout=3
 
 # The baseline batch's probes in its order, each with its exact assertion count; then the probes this group adds.
 baseline = [item for item in json.loads(BASELINE.read_text()) if item['name'] not in ('frames', 'teardown')]
-probes = [(item['name'], item.get('assertions')) for item in baseline] + [('web_animations', None)]
+probes = [(item['name'], item.get('assertions')) for item in baseline] + [(name, None) for name in os.environ.get('WAAPI_PROBES', 'web_animations').split(',')]
 for name, expected in probes:
     arguments = ['C:/Python314/python.exe', '-I', '-X', 'utf8', str(repo / 'tests/abi' / (name + '.py')), '--native-directory', str(runtime)]
     if name == 'abi_layouts':

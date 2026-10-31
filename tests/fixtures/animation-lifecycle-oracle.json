@@ -1,0 +1,351 @@
+{
+ "browser": "156.0.8078.4",
+ "states": [
+  {
+   "label": "animate",
+   "playState": "running",
+   "pending": true,
+   "replaceState": "active",
+   "currentTime": 0,
+   "startTime": null,
+   "playbackRate": 1
+  },
+  {
+   "label": "pause while pending",
+   "playState": "paused",
+   "pending": true,
+   "replaceState": "active",
+   "currentTime": 0,
+   "startTime": null,
+   "playbackRate": 1,
+   "sameReady": true
+  },
+  {
+   "label": "play while pending",
+   "playState": "running",
+   "pending": true,
+   "replaceState": "active",
+   "currentTime": 0,
+   "startTime": null,
+   "playbackRate": 1,
+   "sameReady": true
+  },
+  {
+   "label": "updatePlaybackRate(2) pending",
+   "playState": "running",
+   "pending": true,
+   "replaceState": "active",
+   "currentTime": 0,
+   "startTime": null,
+   "playbackRate": 1
+  },
+  {
+   "label": "after ready",
+   "playState": "running",
+   "pending": false,
+   "replaceState": "active",
+   "currentTime": "number",
+   "startTime": "number",
+   "playbackRate": 2
+  },
+  {
+   "label": "pause running",
+   "playState": "paused",
+   "pending": true,
+   "replaceState": "active",
+   "currentTime": 500,
+   "startTime": "number",
+   "playbackRate": 2
+  },
+  {
+   "label": "paused ready",
+   "playState": "paused",
+   "pending": false,
+   "replaceState": "active",
+   "currentTime": "number",
+   "startTime": null,
+   "playbackRate": 2
+  },
+  {
+   "label": "reverse paused",
+   "playState": "running",
+   "pending": true,
+   "replaceState": "active",
+   "currentTime": "number",
+   "startTime": null,
+   "playbackRate": 2
+  },
+  {
+   "label": "reverse ready",
+   "playState": "running",
+   "pending": false,
+   "replaceState": "active",
+   "currentTime": "number",
+   "startTime": "number",
+   "playbackRate": -2
+  },
+  {
+   "label": "finish (rate -2)",
+   "playState": "finished",
+   "pending": false,
+   "replaceState": "active",
+   "currentTime": 0,
+   "startTime": "number",
+   "playbackRate": -2
+  },
+  {
+   "label": "play from finished",
+   "playState": "running",
+   "pending": true,
+   "replaceState": "active",
+   "currentTime": 1000,
+   "startTime": null,
+   "playbackRate": -2,
+   "sameFinished": false
+  },
+  {
+   "label": "cancel",
+   "playState": "idle",
+   "pending": false,
+   "replaceState": "active",
+   "currentTime": null,
+   "startTime": null,
+   "playbackRate": -2
+  },
+  {
+   "label": "cancel idle",
+   "playState": "idle",
+   "pending": false,
+   "replaceState": "active",
+   "currentTime": null,
+   "startTime": null,
+   "playbackRate": -2
+  },
+  {
+   "label": "play rate 0",
+   "playState": "running",
+   "pending": true,
+   "replaceState": "active",
+   "currentTime": 0,
+   "startTime": null,
+   "playbackRate": 0
+  },
+  {
+   "label": "persist",
+   "playState": "idle",
+   "pending": false,
+   "replaceState": "persisted",
+   "currentTime": null,
+   "startTime": null,
+   "playbackRate": 1
+  }
+ ],
+ "scenarios": {
+  "finish()": {
+   "promises": [
+    "b:ready",
+    "b:finished"
+   ],
+   "events": [
+    "b:finish:number:number"
+   ],
+   "merged": [
+    "promise b:ready",
+    "promise b:finished",
+    "event b:finish:number:number"
+   ],
+   "states": {
+    "b": {
+     "playState": "finished",
+     "pending": false,
+     "replaceState": "active",
+     "currentTime": 1000,
+     "startTime": "number",
+     "playbackRate": 1
+    }
+   }
+  },
+  "cancel pending": {
+   "promises": [
+    "c:ready:AbortError",
+    "c:finished:AbortError"
+   ],
+   "events": [
+    "c:cancel:null:number"
+   ],
+   "merged": [
+    "promise c:ready:AbortError",
+    "promise c:finished:AbortError",
+    "event c:cancel:null:number"
+   ],
+   "states": {
+    "c": {
+     "playState": "idle",
+     "pending": false,
+     "replaceState": "active",
+     "currentTime": null,
+     "startTime": null,
+     "playbackRate": 1
+    }
+   }
+  },
+  "cancel running": {
+   "promises": [
+    "d:ready",
+    "d:finished:AbortError"
+   ],
+   "events": [
+    "d:cancel:null:number"
+   ],
+   "merged": [
+    "promise d:ready",
+    "promise d:finished:AbortError",
+    "event d:cancel:null:number"
+   ],
+   "states": {
+    "d": {
+     "playState": "idle",
+     "pending": false,
+     "replaceState": "active",
+     "currentTime": null,
+     "startTime": null,
+     "playbackRate": 1
+    }
+   }
+  },
+  "cancel in listener": {
+   "promises": [
+    "e:ready",
+    "f:ready",
+    "e:finished",
+    "f:finished:AbortError"
+   ],
+   "events": [
+    "e:finish:number:number",
+    "f:cancel:null:number"
+   ],
+   "merged": [
+    "promise e:ready",
+    "promise f:ready",
+    "promise e:finished",
+    "event e:finish:number:number",
+    "promise f:finished:AbortError",
+    "event f:cancel:null:number"
+   ],
+   "states": {
+    "e": {
+     "playState": "finished",
+     "pending": false,
+     "replaceState": "active",
+     "currentTime": 1000,
+     "startTime": "number",
+     "playbackRate": 1
+    },
+    "f": {
+     "playState": "idle",
+     "pending": false,
+     "replaceState": "active",
+     "currentTime": null,
+     "startTime": null,
+     "playbackRate": 1
+    }
+   }
+  },
+  "cancel in ready": {
+   "promises": [
+    "g:ready",
+    "g:finished:AbortError"
+   ],
+   "events": [
+    "g:cancel:null:number"
+   ],
+   "merged": [
+    "promise g:ready",
+    "promise g:finished:AbortError",
+    "event g:cancel:null:number"
+   ],
+   "states": {
+    "g": {
+     "playState": "idle",
+     "pending": false,
+     "replaceState": "active",
+     "currentTime": null,
+     "startTime": null,
+     "playbackRate": 1
+    }
+   }
+  },
+  "replace": {
+   "promises": [
+    "x:ready",
+    "y:ready",
+    "x:finished",
+    "y:finished"
+   ],
+   "events": [
+    "x:finish:number:number",
+    "y:finish:number:number",
+    "x:remove:number:number"
+   ],
+   "merged": [
+    "promise x:ready",
+    "promise y:ready",
+    "promise x:finished",
+    "promise y:finished",
+    "event x:finish:number:number",
+    "event y:finish:number:number",
+    "event x:remove:number:number"
+   ],
+   "states": {
+    "x": {
+     "playState": "finished",
+     "pending": false,
+     "replaceState": "removed",
+     "currentTime": "number",
+     "startTime": "number",
+     "playbackRate": 1
+    },
+    "y": {
+     "playState": "finished",
+     "pending": false,
+     "replaceState": "active",
+     "currentTime": "number",
+     "startTime": "number",
+     "playbackRate": 1
+    },
+    "xPersisted": {
+     "playState": "finished",
+     "pending": false,
+     "replaceState": "persisted",
+     "currentTime": "number",
+     "startTime": "number",
+     "playbackRate": 1
+    }
+   }
+  },
+  "rewind finished": {
+   "promises": [
+    "z:ready",
+    "z:finished",
+    "z2:ready"
+   ],
+   "events": [],
+   "merged": [
+    "promise z:ready",
+    "promise z:finished",
+    "promise z2:ready"
+   ],
+   "states": {
+    "z": {
+     "playState": "running",
+     "pending": false,
+     "replaceState": "active",
+     "currentTime": "number",
+     "startTime": "number",
+     "playbackRate": 1
+    },
+    "finishedReplaced": true
+   }
+  }
+ }
+}
