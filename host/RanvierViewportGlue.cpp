@@ -14,6 +14,8 @@
 #include "RenderBoxInlines.h"
 #include "RenderObjectInlines.h"
 #include "RenderView.h"
+#include "ResizeObserver.h"
+#include "ResizeObserverOptions.h"
 #include <cmath>
 #include <cstring>
 
@@ -272,4 +274,9 @@ int32_t ranvier_box_quad(RvNode* node, int32_t box, RvNode* to, int32_t toSpace,
         return status;
     std::copy(std::begin(points), std::end(points), quad);
     return RV_OK;
+}
+
+void ranvier_resize_observe_box(ResizeObserver& observer, Element& element, bool border)
+{
+    observer.observe(element, ResizeObserverOptions { border ? ResizeObserverBoxOptions::BorderBox : ResizeObserverBoxOptions::ContentBox });
 }

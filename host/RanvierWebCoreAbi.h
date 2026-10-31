@@ -710,6 +710,59 @@ RV_EXPORT int32_t rv_observer_unobserve(RvObserver*, RvNode* element);
 /* Disconnects the observer and frees it, before rv_host_destroy. Its callback will not run after this returns. */
 RV_EXPORT void rv_observer_release(RvObserver*);
 
+/* v56: "resize-entries" for rv_abi_has. A ResizeObserver delivering ResizeObserverEntry data: the content rectangle and
+ * the logical content and border box sizes. */
+typedef struct RvResizeEntry {
+    /* sizeof(RvResizeEntry). */
+    int32_t size;
+    /* 1 when devicePixelInlineSize and devicePixelBlockSize hold the device-pixel content box. Always 0: the engine
+     * has no device-pixel-content-box (webkit.org/b/219005, Ranvier.WebCore#146). */
+    int32_t hasDevicePixel;
+    /* The observed element, valid for the callback; rv_node_retain keeps it. */
+    RvNode* target;
+    /* ResizeObserverEntry.contentRect in CSS pixels: the content box at its offset inside the padding box. */
+    double contentX;
+    double contentY;
+    double contentWidth;
+    double contentHeight;
+    /* contentBoxSize[0] and borderBoxSize[0] in CSS pixels, in the element's writing mode: inline is the width of a
+     * horizontal writing mode and the height of a vertical one. */
+    double contentInlineSize;
+    double contentBlockSize;
+    double borderInlineSize;
+    double borderBlockSize;
+    /* devicePixelContentBoxSize[0] in device pixels when hasDevicePixel is 1, else 0. */
+    double devicePixelInlineSize;
+    double devicePixelBlockSize;
+} RvResizeEntry;
+
+/* Box options of rv_observer_observe_box: ResizeObserverOptions.box. */
+enum {
+    RV_RESIZE_BOX_CONTENT = 0,
+    RV_RESIZE_BOX_BORDER = 1,
+    RV_RESIZE_BOX_DEVICE_PIXEL_CONTENT = 2,
+};
+
+/* Called on the host thread during rv_host_update, once per observer with pending notifications, before intersection
+ * observers. entries holds count entries in observation order; the array, its entries and their targets are valid only
+ * during the call, so the callback copies what it keeps. Each target is reported when first observed, also at 0 by 0,
+ * and again when its observed box changes size. Observers deliver in the order of their first observation. The
+ * callback may call any function of this ABI. A size change it makes to an element deeper than the shallowest
+ * delivered target is reported in the same rv_host_update; a shallower one is reported in the next, after the
+ * window's error event "ResizeObserver loop completed with undelivered notifications.". */
+typedef void (*RvResizeEntriesCallback)(void* context, RvObserver* observer, const RvResizeEntry* entries, int32_t count);
+/* A ResizeObserver delivering entries, observed with rv_observer_observe (content box) or rv_observer_observe_box,
+ * stopped with rv_observer_unobserve and freed with rv_observer_release. NULL for a NULL host or callback. */
+RV_EXPORT RvObserver* rv_host_observe_resize_entries(RvHost*, RvResizeEntriesCallback callback, void* context);
+/* ResizeObserver.observe(element, { box }). Observing an observed element with another box replaces its observation
+ * and reports it again; with the same box it changes nothing. RV_ERR_UNSUPPORTED for
+ * RV_RESIZE_BOX_DEVICE_PIXEL_CONTENT, which the engine lacks (Ranvier.WebCore#146), for another box value, and for an
+ * intersection observer. */
+RV_EXPORT int32_t rv_observer_observe_box(RvObserver*, RvNode* element, int32_t box);
+/* ResizeObserver.disconnect() or IntersectionObserver.disconnect(): unobserves every target and drops pending
+ * notifications. The observer stays valid, observes again, and is freed with rv_observer_release. */
+RV_EXPORT int32_t rv_observer_disconnect(RvObserver*);
+
 /* Paints the element and its descendants alone, without what lies behind or over them, at the host's device
  * scale, into unpremultiplied RGBA8, such as for a drag image. Writes the image's size in device pixels to
  * *width and *height; when length is below width * height * 4 it returns RV_ERR_BUFFER_TOO_SMALL with the
