@@ -4,10 +4,12 @@
 #include "RanvierSvgViewGlue.h"
 #include "RanvierResourceGlue.h"
 #include "RanvierEventGlue.h"
+#include "RanvierViewportGlue.h"
 #include <JavaScriptCore/DisallowVMEntry.h>
 #include <JavaScriptCore/InitializeThreading.h>
 #include <WebCore/Document.h>
 #include <WebCore/DocumentParser.h>
+#include <WebCore/LocalDOMWindow.h>
 #include <WebCore/AXCoreObject.h>
 #include <WebCore/AXNotifications.h>
 #include <WebCore/AXObjectCache.h>
@@ -1159,7 +1161,7 @@ static int32_t fail(const Exception& exception) { return Ranvier::recordExceptio
 
 template<typename T> static int32_t status(const ExceptionOr<T>& result) { return result.hasException() ? fail(result.exception()) : RV_OK; }
 
-int32_t rv_abi_version(void) { return 33; }
+int32_t rv_abi_version(void) { return 35; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -1182,6 +1184,8 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "font-load"))
         return 1;
     if (!std::strcmp(feature, "event-construction"))
+        return 1;
+    if (!std::strcmp(feature, "viewport"))
         return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "accessibility-uia"))
@@ -2237,6 +2241,66 @@ RvEventTarget* rv_event_get_related_target(RvEvent* subject)
     if (!subject || !onOwningThread())
         return nullptr;
     return targetHandleOrNull(event(subject)->relatedTarget());
+}
+
+//FOR-REVIEW Stand-in for I12's ABI34 export; the I12 forward merge replaces it.
+RvEventTarget* rv_host_window_event_target(RvHost* host)
+{
+    if (!host || !onOwningThread())
+        return nullptr;
+    return targetHandleOrNull(host->document().window());
+}
+
+int32_t rv_host_window_metrics(RvHost* host, RvWindowMetrics* metrics)
+{
+    if (!host || !metrics)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (metrics->size < static_cast<int32_t>(sizeof(RvWindowMetrics)))
+        return RV_ERR_UNSUPPORTED;
+    auto status = ranvier_window_metrics(reinterpret_cast<RvNode*>(&host->document()), metrics);
+    if (status != RV_OK)
+        return status;
+    // The window of a host is its viewport: the chrome client has no window rectangle of its own.
+    metrics->outerWidth = host->size.width();
+    metrics->outerHeight = host->size.height();
+    return RV_OK;
+}
+
+int32_t rv_host_set_visible(RvHost* host, int32_t visible)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    host->page->setIsVisible(!!visible);
+    return RV_OK;
+}
+
+RvEventTarget* rv_host_match_media(RvHost* host, const char* query)
+{
+    if (!host || !query || !onOwningThread())
+        return nullptr;
+    return ranvier_match_media(reinterpret_cast<RvNode*>(&host->document()), query);
+}
+
+int32_t rv_media_query_matches(RvEventTarget* target, int32_t* matches)
+{
+    if (!target || !matches)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_media_query_matches(target, matches);
+}
+
+int32_t rv_media_query_media(RvEventTarget* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_media_query_media(target, buffer, capacity, length);
 }
 
 RvEvent* rv_host_create_event(RvHost* host, int32_t eventInterface, const char* type, int32_t bubbles, int32_t cancelable)

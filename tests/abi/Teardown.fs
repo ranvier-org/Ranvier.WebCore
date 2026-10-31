@@ -36,11 +36,10 @@ let private cycleFor (milliseconds: int) =
     if rv_run_loop_cycle milliseconds < 0 then
         failwith "run_loop_cycle failed"
 
-let private cycle () =
-    cycleFor cycleMilliseconds
+let private cycle () = cycleFor cycleMilliseconds
 
 /// Checks that run once the watched nodes are collected, then release the value handles they hold.
-let private afterCollection = ResizeArray<unit -> unit> ()
+let private afterCollection = ResizeArray<unit -> unit>()
 
 /// A one-pixel GIF.
 let private gif =
@@ -66,8 +65,7 @@ type ProbeResult =
 let private probe (name: string) (cycleBefore: string) (action: nativeint -> nativeint -> nativeint -> nativeint) =
     let host = rv_host_create (64, 64)
 
-    rv_host_load_html (host, html)
-    |> check "load_html"
+    rv_host_load_html (host, html) |> check "load_html"
 
     let document = rv_host_document host
     let body = rv_document_body host
@@ -126,7 +124,7 @@ let private probe (name: string) (cycleBefore: string) (action: nativeint -> nat
     for check in afterCollection do
         check ()
 
-    afterCollection.Clear ()
+    afterCollection.Clear()
     rv_watch_release documentWatch
 
     if targetWatch <> 0n then
@@ -138,8 +136,7 @@ let private probe (name: string) (cycleBefore: string) (action: nativeint -> nat
 let private focused (tag: string) (host: nativeint) (_: nativeint) (body: nativeint) =
     let element = rv_document_create_element (host, tag)
 
-    rv_node_append_child (body, element)
-    |> check "append_child"
+    rv_node_append_child (body, element) |> check "append_child"
 
     rv_element_focus element |> check "focus"
     element
@@ -153,17 +150,14 @@ let rec private inRemovedContainer (valueAttribute: bool) (host: nativeint) (doc
 and private removedFrom (focus: bool) (valueAttribute: bool) (host: nativeint) (_: nativeint) (body: nativeint) =
     let container = rv_document_create_element (host, "div")
 
-    rv_node_append_child (body, container)
-    |> check "append_child"
+    rv_node_append_child (body, container) |> check "append_child"
 
     let input = rv_document_create_element (host, "input")
 
     if valueAttribute then
-        rv_element_set_attribute (input, "value", "x")
-        |> check "set_attribute"
+        rv_element_set_attribute (input, "value", "x") |> check "set_attribute"
 
-    rv_node_append_child (container, input)
-    |> check "append_child"
+    rv_node_append_child (container, input) |> check "append_child"
 
     if focus then
         rv_element_focus input |> check "focus"
@@ -176,11 +170,9 @@ and private removedFrom (focus: bool) (valueAttribute: bool) (host: nativeint) (
 let private image (source: string) (remove: bool) (host: nativeint) (_: nativeint) (body: nativeint) =
     let element = rv_document_create_element (host, "img")
 
-    rv_element_set_attribute (element, "src", source)
-    |> check "set_attribute"
+    rv_element_set_attribute (element, "src", source) |> check "set_attribute"
 
-    rv_node_append_child (body, element)
-    |> check "append_child"
+    rv_node_append_child (body, element) |> check "append_child"
 
     if remove then
         rv_node_remove element |> check "remove"
@@ -222,20 +214,41 @@ let private svgPaintHandles (replace: bool) (host: nativeint) (_: nativeint) (_:
     let gradient = take "gradient"
     let ids = [ "pattern"; "blur"; "clip"; "mask"; "marker"; "use"; "image" ]
     let nodes = ids |> List.map take
+
     let pattern, blur, clip, mask, marker, useNode, image =
         match nodes with
         | [ a; b; c; d; e; f; g ] -> a, b, c, d, e, f, g
         | _ -> failwith "SVG paint nodes"
 
-    let x1 = handleOf "gradient x1" (fun t r -> rv_dom_svg_linear_gradient_element_get_x1 (t, &r.contents)) gradient
-    let width = handleOf "pattern width" (fun t r -> rv_dom_svg_pattern_element_get_width (t, &r.contents)) pattern
-    let deviation = handleOf "blur stdDeviationX" (fun t r -> rv_dom_svgfe_gaussian_blur_element_get_std_deviation_x (t, &r.contents)) blur
-    let units = handleOf "clipPathUnits" (fun t r -> rv_dom_svg_clip_path_element_get_clip_path_units (t, &r.contents)) clip
-    let maskX = handleOf "mask x" (fun t r -> rv_dom_svg_mask_element_get_x (t, &r.contents)) mask
-    let angle = handleOf "marker orientAngle" (fun t r -> rv_dom_svg_marker_element_get_orient_angle (t, &r.contents)) marker
-    let useX = handleOf "use x" (fun t r -> rv_dom_svg_use_element_get_x (t, &r.contents)) useNode
-    let href = handleOf "image href" (fun t r -> rv_dom_svg_image_element_get_href (t, &r.contents)) image
-    let x1Base = handleOf "gradient x1 baseVal" (fun t r -> rv_dom_svg_animated_length_get_base_val (t, &r.contents)) x1
+    let x1 =
+        handleOf "gradient x1" (fun t r -> rv_dom_svg_linear_gradient_element_get_x1 (t, &r.contents)) gradient
+
+    let width =
+        handleOf "pattern width" (fun t r -> rv_dom_svg_pattern_element_get_width (t, &r.contents)) pattern
+
+    let deviation =
+        handleOf
+            "blur stdDeviationX"
+            (fun t r -> rv_dom_svgfe_gaussian_blur_element_get_std_deviation_x (t, &r.contents))
+            blur
+
+    let units =
+        handleOf "clipPathUnits" (fun t r -> rv_dom_svg_clip_path_element_get_clip_path_units (t, &r.contents)) clip
+
+    let maskX =
+        handleOf "mask x" (fun t r -> rv_dom_svg_mask_element_get_x (t, &r.contents)) mask
+
+    let angle =
+        handleOf "marker orientAngle" (fun t r -> rv_dom_svg_marker_element_get_orient_angle (t, &r.contents)) marker
+
+    let useX =
+        handleOf "use x" (fun t r -> rv_dom_svg_use_element_get_x (t, &r.contents)) useNode
+
+    let href =
+        handleOf "image href" (fun t r -> rv_dom_svg_image_element_get_href (t, &r.contents)) image
+
+    let x1Base =
+        handleOf "gradient x1 baseVal" (fun t r -> rv_dom_svg_animated_length_get_base_val (t, &r.contents)) x1
 
     for node in nodes do
         rv_node_release node
@@ -244,24 +257,37 @@ let private svgPaintHandles (replace: bool) (host: nativeint) (_: nativeint) (_:
         rv_host_load_html (host, html) |> check "replace SVG paint document"
         cycle ()
 
-    afterCollection.Add (fun () ->
-        rv_dom_svg_length_set_value (x1Base, 7.0f) |> check "retained gradient length write"
+    afterCollection.Add(fun () ->
+        rv_dom_svg_length_set_value (x1Base, 7.0f)
+        |> check "retained gradient length write"
+
         let mutable value = 0.0f
-        rv_dom_svg_length_get_value (x1Base, &value) |> check "retained gradient length read"
+
+        rv_dom_svg_length_get_value (x1Base, &value)
+        |> check "retained gradient length read"
 
         if value <> 7.0f then
             failwithf "retained gradient length reads %f" value
 
-        rv_dom_svg_animated_number_set_base_val (deviation, 3.0f) |> check "retained blur write"
+        rv_dom_svg_animated_number_set_base_val (deviation, 3.0f)
+        |> check "retained blur write"
+
         let mutable deviationValue = 0.0f
-        rv_dom_svg_animated_number_get_base_val (deviation, &deviationValue) |> check "retained blur read"
+
+        rv_dom_svg_animated_number_get_base_val (deviation, &deviationValue)
+        |> check "retained blur read"
 
         if deviationValue <> 3.0f then
             failwithf "retained blur reads %f" deviationValue
 
         let mutable unitValue = 0us
-        rv_dom_svg_animated_enumeration_get_base_val (units, &unitValue) |> check "retained clip units read"
-        rv_dom_svg_animated_string_set_base_val (href, "data:,") |> check "retained image href write"
+
+        rv_dom_svg_animated_enumeration_get_base_val (units, &unitValue)
+        |> check "retained clip units read"
+
+        rv_dom_svg_animated_string_set_base_val (href, "data:,")
+        |> check "retained image href write"
+
         rv_dom_svg_length_release x1Base
 
         for animated in [ x1; width; maskX; useX ] do
@@ -279,7 +305,14 @@ let private svgPaintHandles (replace: bool) (host: nativeint) (_: nativeint) (_:
 [<System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)>]
 let private hostFilterTraversal (kind: string) (document: nativeint) (target: nativeint) =
     let owner = obj ()
-    let filter = fun (_: nativeint) -> (if isNull owner then Traversal.FilterResult.Skip else Traversal.FilterResult.Accept)
+
+    let filter =
+        fun (_: nativeint) ->
+            (if isNull owner then
+                 Traversal.FilterResult.Skip
+             else
+                 Traversal.FilterResult.Accept)
+
     use handle = Traversal.NodeFilter.Create(target, filter)
     let mutable traversal = 0n
 
@@ -291,6 +324,16 @@ let private hostFilterTraversal (kind: string) (document: nativeint) (target: na
         |> check "create_node_iterator"
 
     traversal, WeakReference filter
+
+let mutable private viewportCalls = 0
+
+let private viewportDelegate =
+    EventCallback(fun _ _ ->
+        viewportCalls <- viewportCalls + 1
+        0)
+
+let private viewportCallback =
+    System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate viewportDelegate
 
 /// Appends a div with a child span, takes one extra handle of the kind from the div (removing the div first when
 /// <c>remove</c> is set), destroys the host, then releases that handle. The document and the div must be destroyed
@@ -330,8 +373,36 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
 
                 if weak.IsAlive then
                     failwithf "%s filter function alive after the traversal was released" kind
+        | "window target"
+        | "media query list" ->
+            held.Value <-
+                if kind = "window target" then
+                    rv_host_window_event_target host
+                else
+                    rv_host_match_media (host, "(min-width: 10px)")
+
+            let listener =
+                rv_event_target_add_listener (
+                    held.Value,
+                    (if kind = "window target" then "resize" else "change"),
+                    0,
+                    viewportCallback,
+                    0n
+                )
+
+            if listener = 0n then
+                failwithf "no %s listener" kind
+
+            fun () ->
+                rv_listener_remove listener |> check "listener removal after destroy"
+                rv_event_target_release held.Value
+
+                if viewportCalls <> 0 then
+                    failwithf "%s listener ran after host destroy" kind
         | _ ->
-            rv_dom_html_element_get_attribute_style_map (div, &held.contents) |> check "attributeStyleMap"
+            rv_dom_html_element_get_attribute_style_map (div, &held.contents)
+            |> check "attributeStyleMap"
+
             fun () -> rv_dom_style_property_map_read_only_release held.Value
 
     if held.Value = 0n then
@@ -361,7 +432,10 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
 
     let result =
         {
-            probe = (if remove then "removed div, " else "div, ") + kind + " released after host destroy"
+            probe =
+                (if remove then "removed div, " else "div, ")
+                + kind
+                + " released after host destroy"
             cycleBeforeDisposal = "none"
             documentRefsAfterDisposal = documentAfterDisposal
             targetRefsAfterDisposal = divAfterDisposal
@@ -386,8 +460,7 @@ let run (outDir: string) =
                 probe "control" cycleBefore (fun _ _ _ -> 0n)
 
                 probe "document title" cycleBefore (fun _ document _ ->
-                    rv_node_set_string (document, titleProperty, "Probe")
-                    |> check "set title"
+                    rv_node_set_string (document, titleProperty, "Probe") |> check "set title"
 
                     0n)
 
@@ -398,8 +471,7 @@ let run (outDir: string) =
                 probe "focused input, value written" cycleBefore (fun host document body ->
                     let input = focused "input" host document body
 
-                    rv_node_set_string (input, valueProperty, "x")
-                    |> check "set value"
+                    rv_node_set_string (input, valueProperty, "x") |> check "set value"
 
                     input)
 
@@ -415,17 +487,31 @@ let run (outDir: string) =
                 probe "image with a data source" cycleBefore (image gif false)
                 probe "image with a data source, removed" cycleBefore (image gif true)
                 probe "image with a missing file source" cycleBefore (image "file:///C:/ranvier-missing.png" false)
-                probe "image with a missing file source, removed" cycleBefore (image "file:///C:/ranvier-missing.png" true)
+
+                probe
+                    "image with a missing file source, removed"
+                    cycleBefore
+                    (image "file:///C:/ranvier-missing.png" true)
+
                 probe "SVG paint handles retained past host destroy" cycleBefore (svgPaintHandles false)
                 probe "SVG paint handles retained past document replacement" cycleBefore (svgPaintHandles true)
 
-            for kind in [ "node"; "dataset"; "style map"; "tree walker"; "node iterator" ] do
+            for kind in
+                [
+                    "node"
+                    "dataset"
+                    "style map"
+                    "tree walker"
+                    "node iterator"
+                    "window target"
+                    "media query list"
+                ] do
                 for remove in [ false; true ] do
                     releaseAfterDestroy kind remove
         ]
 
     let json =
-        JsonSerializer.Serialize (results, JsonSerializerOptions (WriteIndented = true))
+        JsonSerializer.Serialize(results, JsonSerializerOptions(WriteIndented = true))
 
-    File.WriteAllText (Path.Combine (outDir, "teardown-probes.json"), json)
+    File.WriteAllText(Path.Combine(outDir, "teardown-probes.json"), json)
     printfn "RANVIER_TEARDOWN_PROBES %s" (JsonSerializer.Serialize results)

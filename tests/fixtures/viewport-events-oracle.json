@@ -1,0 +1,295 @@
+{
+  "browser": "156.0.8078.4",
+  "metrics": [
+    {
+      "width": 320,
+      "height": 240,
+      "scale": 1,
+      "innerWidth": 320,
+      "innerHeight": 240,
+      "devicePixelRatio": 1,
+      "paintWidth": 320,
+      "paintHeight": 240
+    },
+    {
+      "width": 320,
+      "height": 240,
+      "scale": 1.25,
+      "innerWidth": 320,
+      "innerHeight": 240,
+      "devicePixelRatio": 1.25,
+      "paintWidth": 400,
+      "paintHeight": 300
+    },
+    {
+      "width": 320,
+      "height": 240,
+      "scale": 1.5,
+      "innerWidth": 320,
+      "innerHeight": 240,
+      "devicePixelRatio": 1.5,
+      "paintWidth": 480,
+      "paintHeight": 360
+    },
+    {
+      "width": 320,
+      "height": 240,
+      "scale": 2,
+      "innerWidth": 320,
+      "innerHeight": 240,
+      "devicePixelRatio": 2,
+      "paintWidth": 640,
+      "paintHeight": 480
+    },
+    {
+      "width": 320,
+      "height": 240,
+      "scale": 0.75,
+      "innerWidth": 320,
+      "innerHeight": 240,
+      "devicePixelRatio": 0.75,
+      "paintWidth": 240,
+      "paintHeight": 180
+    },
+    {
+      "width": 333,
+      "height": 221,
+      "scale": 1,
+      "innerWidth": 333,
+      "innerHeight": 221,
+      "devicePixelRatio": 1,
+      "paintWidth": 333,
+      "paintHeight": 221
+    },
+    {
+      "width": 333,
+      "height": 221,
+      "scale": 1.25,
+      "innerWidth": 333,
+      "innerHeight": 221,
+      "devicePixelRatio": 1.25,
+      "paintWidth": 416,
+      "paintHeight": 276
+    },
+    {
+      "width": 333,
+      "height": 221,
+      "scale": 1.5,
+      "innerWidth": 333,
+      "innerHeight": 221,
+      "devicePixelRatio": 1.5,
+      "paintWidth": 500,
+      "paintHeight": 332
+    },
+    {
+      "width": 333,
+      "height": 221,
+      "scale": 2,
+      "innerWidth": 333,
+      "innerHeight": 221,
+      "devicePixelRatio": 2,
+      "paintWidth": 666,
+      "paintHeight": 442
+    },
+    {
+      "width": 333,
+      "height": 221,
+      "scale": 0.75,
+      "innerWidth": 333,
+      "innerHeight": 221,
+      "devicePixelRatio": 0.75,
+      "paintWidth": 250,
+      "paintHeight": 166
+    }
+  ],
+  "steps": [
+    {
+      "name": "resize 400x300",
+      "events": [
+        {
+          "source": "window",
+          "type": "resize",
+          "target": "window",
+          "innerWidth": 400,
+          "innerHeight": 300,
+          "devicePixelRatio": 1,
+          "scrollX": 0,
+          "scrollY": 0,
+          "visibilityState": "visible",
+          "hasFocus": true
+        }
+      ],
+      "after": {
+        "devicePixelRatio": 1,
+        "innerWidth": 400,
+        "innerHeight": 300,
+        "matchesOneDppx": true
+      }
+    },
+    {
+      "name": "scroll 0,100",
+      "events": [
+        {
+          "source": "window",
+          "type": "scroll",
+          "target": "document",
+          "innerWidth": 400,
+          "innerHeight": 300,
+          "devicePixelRatio": 1,
+          "scrollX": 0,
+          "scrollY": 100,
+          "visibilityState": "visible",
+          "hasFocus": true
+        },
+        {
+          "source": "window",
+          "type": "scrollend",
+          "target": "document",
+          "innerWidth": 400,
+          "innerHeight": 300,
+          "devicePixelRatio": 1,
+          "scrollX": 0,
+          "scrollY": 100,
+          "visibilityState": "visible",
+          "hasFocus": true
+        }
+      ],
+      "after": {
+        "devicePixelRatio": 1,
+        "innerWidth": 400,
+        "innerHeight": 300,
+        "matchesOneDppx": true
+      }
+    },
+    {
+      "name": "scale 1.25",
+      "events": [],
+      "after": {
+        "devicePixelRatio": 1.25,
+        "innerWidth": 400,
+        "innerHeight": 300,
+        "matchesOneDppx": false
+      }
+    },
+    {
+      "name": "resize 401x300 at 1.25",
+      "events": [
+        {
+          "source": "window",
+          "type": "resize",
+          "target": "window",
+          "innerWidth": 401,
+          "innerHeight": 300,
+          "devicePixelRatio": 1.25,
+          "scrollX": 0,
+          "scrollY": 100,
+          "visibilityState": "visible",
+          "hasFocus": true
+        },
+        {
+          "source": "media:(resolution: 1dppx)",
+          "type": "change",
+          "target": "other",
+          "innerWidth": 401,
+          "innerHeight": 300,
+          "devicePixelRatio": 1.25,
+          "scrollX": 0,
+          "scrollY": 100,
+          "visibilityState": "visible",
+          "hasFocus": true
+        }
+      ],
+      "after": {
+        "devicePixelRatio": 1.25,
+        "innerWidth": 401,
+        "innerHeight": 300,
+        "matchesOneDppx": false
+      }
+    },
+    {
+      "name": "resize 401x301 and scale 1.5",
+      "events": [
+        {
+          "source": "window",
+          "type": "resize",
+          "target": "window",
+          "innerWidth": 401,
+          "innerHeight": 301,
+          "devicePixelRatio": 1.5,
+          "scrollX": 0,
+          "scrollY": 100,
+          "visibilityState": "visible",
+          "hasFocus": true
+        },
+        {
+          "source": "media:(resolution: 1.25dppx)",
+          "type": "change",
+          "target": "other",
+          "innerWidth": 401,
+          "innerHeight": 301,
+          "devicePixelRatio": 1.5,
+          "scrollX": 0,
+          "scrollY": 100,
+          "visibilityState": "visible",
+          "hasFocus": true
+        }
+      ],
+      "after": {
+        "devicePixelRatio": 1.5,
+        "innerWidth": 401,
+        "innerHeight": 301,
+        "matchesOneDppx": false
+      }
+    },
+    {
+      "name": "blur",
+      "events": [
+        {
+          "source": "window",
+          "type": "blur",
+          "target": "window",
+          "innerWidth": 401,
+          "innerHeight": 301,
+          "devicePixelRatio": 1.5,
+          "scrollX": 0,
+          "scrollY": 100,
+          "visibilityState": "visible",
+          "hasFocus": false
+        }
+      ],
+      "after": {
+        "devicePixelRatio": 1.5,
+        "innerWidth": 401,
+        "innerHeight": 301,
+        "matchesOneDppx": false
+      }
+    },
+    {
+      "name": "focus",
+      "events": [
+        {
+          "source": "window",
+          "type": "focus",
+          "target": "window",
+          "innerWidth": 401,
+          "innerHeight": 301,
+          "devicePixelRatio": 1.5,
+          "scrollX": 0,
+          "scrollY": 100,
+          "visibilityState": "visible",
+          "hasFocus": true
+        }
+      ],
+      "after": {
+        "devicePixelRatio": 1.5,
+        "innerWidth": 401,
+        "innerHeight": 301,
+        "matchesOneDppx": false
+      }
+    }
+  ],
+  "platformNotes": [
+    "Headless Chromium keeps visibilityState visible across window minimize, tab activation and lifecycle freeze; visibility is not driven here.",
+    "Chromium device-metrics emulation updates devicePixelRatio on a scale-only change but reports the resolution media query change only with the next viewport resize, after its resize event."
+  ]
+}
