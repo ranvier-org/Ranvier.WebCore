@@ -1,0 +1,7 @@
+teachings-only tree C:/wk/fontface-artifacts/gencheck (aabf041 + this tree's gen/domgen.py, gen/domtypes.py): write leaves every output content-identical (git diff --ignore-cr-at-eol lists only domgen.py and domtypes.py)
+ 2 files changed, 31 insertions(+), 7 deletions(-)
+windows check C:/wk/fontface-artifacts/gencheck exit=0
+windows check C:/wk/native-fontface exit=0
+wsl-ubuntu check /mnt/c/wk/fontface-artifacts/gencheck exit=0
+wsl-ubuntu check /mnt/c/wk/native-fontface exit=0
+Ubuntu 24.04.4 LTS
