@@ -1,0 +1,905 @@
+{
+ "browser": "156.0.8078.4",
+ "page": "<!doctype html><style>html,body{margin:0}body{width:2000px;height:3000px}</style><body><iframe id=f style=\"width:100px;height:80px;border:0\" srcdoc=\"<body style=margin:0>x\"></iframe>",
+ "viewport": [
+  320,
+  240
+ ],
+ "steps": [
+  {
+   "name": "initial",
+   "error": null,
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 0,
+    "pageTop": 0,
+    "width": 320,
+    "height": 240,
+    "scale": 1,
+    "scrollX": 0,
+    "scrollY": 0,
+    "innerWidth": 320,
+    "innerHeight": 240,
+    "clientWidth": 320,
+    "clientHeight": 240,
+    "dpr": 1
+   },
+   "log": [
+    {
+     "type": "window-resize"
+    },
+    {
+     "type": "resize",
+     "offsetLeft": 0,
+     "offsetTop": 0,
+     "pageLeft": 0,
+     "pageTop": 0,
+     "width": 320,
+     "height": 240,
+     "scale": 1,
+     "scrollX": 0,
+     "scrollY": 0,
+     "innerWidth": 320,
+     "innerHeight": 240,
+     "clientWidth": 320,
+     "clientHeight": 240,
+     "dpr": 1
+    }
+   ],
+   "handlers": [
+    "onresize"
+   ],
+   "sub": {
+    "scale": 1,
+    "width": 100,
+    "height": 80,
+    "offsetLeft": 0,
+    "pageLeft": 0
+   }
+  },
+  {
+   "name": "scrollTo(10.5, 20.5)",
+   "error": null,
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 11,
+    "pageTop": 21,
+    "width": 320,
+    "height": 240,
+    "scale": 1,
+    "scrollX": 11,
+    "scrollY": 21,
+    "innerWidth": 320,
+    "innerHeight": 240,
+    "clientWidth": 320,
+    "clientHeight": 240,
+    "dpr": 1
+   },
+   "log": [
+    {
+     "type": "window-scroll"
+    }
+   ],
+   "handlers": [],
+   "sub": {
+    "scale": 1,
+    "width": 100,
+    "height": 80,
+    "offsetLeft": 0,
+    "pageLeft": 0
+   }
+  },
+  {
+   "name": "scrollTo(0, 0)",
+   "error": null,
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 0,
+    "pageTop": 0,
+    "width": 320,
+    "height": 240,
+    "scale": 1,
+    "scrollX": 0,
+    "scrollY": 0,
+    "innerWidth": 320,
+    "innerHeight": 240,
+    "clientWidth": 320,
+    "clientHeight": 240,
+    "dpr": 1
+   },
+   "log": [
+    {
+     "type": "window-scroll"
+    }
+   ],
+   "handlers": [],
+   "sub": {
+    "scale": 1,
+    "width": 100,
+    "height": 80,
+    "offsetLeft": 0,
+    "pageLeft": 0
+   }
+  },
+  {
+   "name": "resize 300x200",
+   "error": null,
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 0,
+    "pageTop": 0,
+    "width": 300,
+    "height": 200,
+    "scale": 1,
+    "scrollX": 0,
+    "scrollY": 0,
+    "innerWidth": 300,
+    "innerHeight": 200,
+    "clientWidth": 300,
+    "clientHeight": 200,
+    "dpr": 1
+   },
+   "log": [
+    {
+     "type": "window-resize"
+    },
+    {
+     "type": "resize",
+     "offsetLeft": 0,
+     "offsetTop": 0,
+     "pageLeft": 0,
+     "pageTop": 0,
+     "width": 300,
+     "height": 200,
+     "scale": 1,
+     "scrollX": 0,
+     "scrollY": 0,
+     "innerWidth": 300,
+     "innerHeight": 200,
+     "clientWidth": 300,
+     "clientHeight": 200,
+     "dpr": 1
+    }
+   ],
+   "handlers": [
+    "onresize"
+   ],
+   "sub": {
+    "scale": 1,
+    "width": 100,
+    "height": 80,
+    "offsetLeft": 0,
+    "pageLeft": 0
+   }
+  },
+  {
+   "name": "device scale 2",
+   "error": null,
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 0,
+    "pageTop": 0,
+    "width": 300,
+    "height": 200,
+    "scale": 1,
+    "scrollX": 0,
+    "scrollY": 0,
+    "innerWidth": 300,
+    "innerHeight": 200,
+    "clientWidth": 300,
+    "clientHeight": 200,
+    "dpr": 2
+   },
+   "log": [],
+   "handlers": [],
+   "sub": {
+    "scale": 1,
+    "width": 100,
+    "height": 80,
+    "offsetLeft": 0,
+    "pageLeft": 0
+   }
+  },
+  {
+   "name": "device scale 1.5",
+   "error": null,
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 0,
+    "pageTop": 0,
+    "width": 300,
+    "height": 200,
+    "scale": 1,
+    "scrollX": 0,
+    "scrollY": 0,
+    "innerWidth": 300,
+    "innerHeight": 200,
+    "clientWidth": 300,
+    "clientHeight": 200,
+    "dpr": 1.5
+   },
+   "log": [],
+   "handlers": [],
+   "sub": {
+    "scale": 1,
+    "width": 100,
+    "height": 80,
+    "offsetLeft": 0,
+    "pageLeft": 0
+   }
+  },
+  {
+   "name": "device scale 1",
+   "error": null,
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 0,
+    "pageTop": 0,
+    "width": 300,
+    "height": 200,
+    "scale": 1,
+    "scrollX": 0,
+    "scrollY": 0,
+    "innerWidth": 300,
+    "innerHeight": 200,
+    "clientWidth": 300,
+    "clientHeight": 200,
+    "dpr": 1
+   },
+   "log": [],
+   "handlers": [],
+   "sub": {
+    "scale": 1,
+    "width": 100,
+    "height": 80,
+    "offsetLeft": 0,
+    "pageLeft": 0
+   }
+  },
+  {
+   "name": "Emulation.setPageScaleFactor 2",
+   "error": null,
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 0,
+    "pageTop": 0,
+    "width": 150,
+    "height": 100,
+    "scale": 2,
+    "scrollX": 0,
+    "scrollY": 0,
+    "innerWidth": 300,
+    "innerHeight": 200,
+    "clientWidth": 300,
+    "clientHeight": 200,
+    "dpr": 1
+   },
+   "log": [
+    {
+     "type": "resize",
+     "offsetLeft": 0,
+     "offsetTop": 0,
+     "pageLeft": 0,
+     "pageTop": 0,
+     "width": 150,
+     "height": 100,
+     "scale": 2,
+     "scrollX": 0,
+     "scrollY": 0,
+     "innerWidth": 300,
+     "innerHeight": 200,
+     "clientWidth": 300,
+     "clientHeight": 200,
+     "dpr": 1
+    }
+   ],
+   "handlers": [
+    "onresize"
+   ],
+   "sub": {
+    "scale": 1,
+    "width": 100,
+    "height": 80,
+    "offsetLeft": 0,
+    "pageLeft": 0
+   }
+  },
+  {
+   "name": "scrollTo(100, 50) at page scale 2",
+   "error": null,
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 100,
+    "pageTop": 50,
+    "width": 150,
+    "height": 100,
+    "scale": 2,
+    "scrollX": 100,
+    "scrollY": 50,
+    "innerWidth": 300,
+    "innerHeight": 200,
+    "clientWidth": 300,
+    "clientHeight": 200,
+    "dpr": 1
+   },
+   "log": [
+    {
+     "type": "window-scroll"
+    }
+   ],
+   "handlers": [],
+   "sub": {
+    "scale": 1,
+    "width": 100,
+    "height": 80,
+    "offsetLeft": 0,
+    "pageLeft": 0
+   }
+  },
+  {
+   "name": "wheel 30,40 at page scale 2",
+   "error": null,
+   "state": {
+    "offsetLeft": 15,
+    "offsetTop": 20,
+    "pageLeft": 115,
+    "pageTop": 70,
+    "width": 150,
+    "height": 100,
+    "scale": 2,
+    "scrollX": 100,
+    "scrollY": 50,
+    "innerWidth": 300,
+    "innerHeight": 200,
+    "clientWidth": 300,
+    "clientHeight": 200,
+    "dpr": 1
+   },
+   "log": [
+    {
+     "type": "scroll",
+     "offsetLeft": 15,
+     "offsetTop": 20,
+     "pageLeft": 115,
+     "pageTop": 70,
+     "width": 150,
+     "height": 100,
+     "scale": 2,
+     "scrollX": 100,
+     "scrollY": 50,
+     "innerWidth": 300,
+     "innerHeight": 200,
+     "clientWidth": 300,
+     "clientHeight": 200,
+     "dpr": 1
+    }
+   ],
+   "handlers": [
+    "onscroll"
+   ],
+   "sub": {
+    "scale": 1,
+    "width": 100,
+    "height": 80,
+    "offsetLeft": 0,
+    "pageLeft": 0
+   }
+  },
+  {
+   "name": "Emulation.setPageScaleFactor 1",
+   "error": null,
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 100,
+    "pageTop": 50,
+    "width": 300,
+    "height": 200,
+    "scale": 1,
+    "scrollX": 100,
+    "scrollY": 50,
+    "innerWidth": 300,
+    "innerHeight": 200,
+    "clientWidth": 300,
+    "clientHeight": 200,
+    "dpr": 1
+   },
+   "log": [
+    {
+     "type": "resize",
+     "offsetLeft": 0,
+     "offsetTop": 0,
+     "pageLeft": 100,
+     "pageTop": 50,
+     "width": 300,
+     "height": 200,
+     "scale": 1,
+     "scrollX": 100,
+     "scrollY": 50,
+     "innerWidth": 300,
+     "innerHeight": 200,
+     "clientWidth": 300,
+     "clientHeight": 200,
+     "dpr": 1
+    },
+    {
+     "type": "scroll",
+     "offsetLeft": 0,
+     "offsetTop": 0,
+     "pageLeft": 100,
+     "pageTop": 50,
+     "width": 300,
+     "height": 200,
+     "scale": 1,
+     "scrollX": 100,
+     "scrollY": 50,
+     "innerWidth": 300,
+     "innerHeight": 200,
+     "clientWidth": 300,
+     "clientHeight": 200,
+     "dpr": 1
+    }
+   ],
+   "handlers": [
+    "onresize",
+    "onscroll"
+   ],
+   "sub": {
+    "scale": 1,
+    "width": 100,
+    "height": 80,
+    "offsetLeft": 0,
+    "pageLeft": 0
+   }
+  },
+  {
+   "name": "scrollTo(0, 0) again",
+   "error": null,
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 0,
+    "pageTop": 0,
+    "width": 300,
+    "height": 200,
+    "scale": 1,
+    "scrollX": 0,
+    "scrollY": 0,
+    "innerWidth": 300,
+    "innerHeight": 200,
+    "clientWidth": 300,
+    "clientHeight": 200,
+    "dpr": 1
+   },
+   "log": [
+    {
+     "type": "window-scroll"
+    }
+   ],
+   "handlers": [],
+   "sub": {
+    "scale": 1,
+    "width": 100,
+    "height": 80,
+    "offsetLeft": 0,
+    "pageLeft": 0
+   }
+  },
+  {
+   "name": "pinch 2x at 150,100",
+   "error": null,
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 0,
+    "pageTop": 0,
+    "width": 300,
+    "height": 200,
+    "scale": 1,
+    "scrollX": 0,
+    "scrollY": 0,
+    "innerWidth": 300,
+    "innerHeight": 200,
+    "clientWidth": 300,
+    "clientHeight": 200,
+    "dpr": 1
+   },
+   "log": [],
+   "handlers": [],
+   "sub": {
+    "scale": 1,
+    "width": 100,
+    "height": 80,
+    "offsetLeft": 0,
+    "pageLeft": 0
+   }
+  },
+  {
+   "name": "pinch 0.5x at 150,100",
+   "error": null,
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 0,
+    "pageTop": 0,
+    "width": 300,
+    "height": 200,
+    "scale": 1,
+    "scrollX": 0,
+    "scrollY": 0,
+    "innerWidth": 300,
+    "innerHeight": 200,
+    "clientWidth": 300,
+    "clientHeight": 200,
+    "dpr": 1
+   },
+   "log": [],
+   "handlers": [],
+   "sub": {
+    "scale": 1,
+    "width": 100,
+    "height": 80,
+    "offsetLeft": 0,
+    "pageLeft": 0
+   }
+  },
+  {
+   "name": "setDeviceMetricsOverride viewport scale 2 (visible-area override)",
+   "error": null,
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 0,
+    "pageTop": 0,
+    "width": 300,
+    "height": 200,
+    "scale": 1,
+    "scrollX": 0,
+    "scrollY": 0,
+    "innerWidth": 300,
+    "innerHeight": 200,
+    "clientWidth": 300,
+    "clientHeight": 200,
+    "dpr": 1
+   },
+   "log": [],
+   "handlers": [],
+   "sub": {
+    "scale": 1,
+    "width": 100,
+    "height": 80,
+    "offsetLeft": 0,
+    "pageLeft": 0
+   }
+  },
+  {
+   "name": "clear override",
+   "error": null,
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 0,
+    "pageTop": 0,
+    "width": 320,
+    "height": 240,
+    "scale": 1,
+    "scrollX": 0,
+    "scrollY": 0,
+    "innerWidth": 320,
+    "innerHeight": 240,
+    "clientWidth": 320,
+    "clientHeight": 240,
+    "dpr": 1
+   },
+   "log": [
+    {
+     "type": "window-resize"
+    },
+    {
+     "type": "resize",
+     "offsetLeft": 0,
+     "offsetTop": 0,
+     "pageLeft": 0,
+     "pageTop": 0,
+     "width": 320,
+     "height": 240,
+     "scale": 1,
+     "scrollX": 0,
+     "scrollY": 0,
+     "innerWidth": 320,
+     "innerHeight": 240,
+     "clientWidth": 320,
+     "clientHeight": 240,
+     "dpr": 1
+    }
+   ],
+   "handlers": [
+    "onresize"
+   ],
+   "sub": {
+    "scale": 1,
+    "width": 100,
+    "height": 80,
+    "offsetLeft": 0,
+    "pageLeft": 0
+   }
+  },
+  {
+   "name": "mobile metrics page scale 2",
+   "error": null,
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 0,
+    "pageTop": 0,
+    "width": 150,
+    "height": 100,
+    "scale": 2,
+    "scrollX": 0,
+    "scrollY": 0,
+    "innerWidth": 1200,
+    "innerHeight": 800,
+    "clientWidth": 980,
+    "clientHeight": 653,
+    "dpr": 1
+   },
+   "log": [
+    {
+     "type": "window-resize"
+    },
+    {
+     "type": "resize",
+     "offsetLeft": 0,
+     "offsetTop": 0,
+     "pageLeft": 0,
+     "pageTop": 0,
+     "width": 300,
+     "height": 200,
+     "scale": 1,
+     "scrollX": 0,
+     "scrollY": 0,
+     "innerWidth": 300,
+     "innerHeight": 200,
+     "clientWidth": 300,
+     "clientHeight": 200,
+     "dpr": 1
+    },
+    {
+     "type": "window-resize"
+    },
+    {
+     "type": "resize",
+     "offsetLeft": 0,
+     "offsetTop": 0,
+     "pageLeft": 0,
+     "pageTop": 0,
+     "width": 1200,
+     "height": 800,
+     "scale": 0.25,
+     "scrollX": 0,
+     "scrollY": 0,
+     "innerWidth": 1200,
+     "innerHeight": 800,
+     "clientWidth": 980,
+     "clientHeight": 653,
+     "dpr": 1
+    },
+    {
+     "type": "resize",
+     "offsetLeft": 0,
+     "offsetTop": 0,
+     "pageLeft": 0,
+     "pageTop": 0,
+     "width": 150,
+     "height": 100,
+     "scale": 2,
+     "scrollX": 0,
+     "scrollY": 0,
+     "innerWidth": 1200,
+     "innerHeight": 800,
+     "clientWidth": 980,
+     "clientHeight": 653,
+     "dpr": 1
+    }
+   ],
+   "handlers": [
+    "onresize",
+    "onresize",
+    "onresize"
+   ],
+   "sub": {
+    "scale": 1,
+    "width": 100,
+    "height": 80,
+    "offsetLeft": 0,
+    "pageLeft": 0
+   }
+  },
+  {
+   "name": "mobile scrollTo(40, 60)",
+   "error": null,
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 40,
+    "pageTop": 60,
+    "width": 150,
+    "height": 100,
+    "scale": 2,
+    "scrollX": 40,
+    "scrollY": 60,
+    "innerWidth": 1200,
+    "innerHeight": 800,
+    "clientWidth": 980,
+    "clientHeight": 653,
+    "dpr": 1
+   },
+   "log": [
+    {
+     "type": "window-scroll"
+    }
+   ],
+   "handlers": [],
+   "sub": {
+    "scale": 1,
+    "width": 100,
+    "height": 80,
+    "offsetLeft": 0,
+    "pageLeft": 0
+   }
+  },
+  {
+   "name": "mobile pageScale 1",
+   "error": null,
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 40,
+    "pageTop": 60,
+    "width": 300,
+    "height": 200,
+    "scale": 1,
+    "scrollX": 40,
+    "scrollY": 60,
+    "innerWidth": 1200,
+    "innerHeight": 800,
+    "clientWidth": 980,
+    "clientHeight": 653,
+    "dpr": 1
+   },
+   "log": [
+    {
+     "type": "resize",
+     "offsetLeft": 0,
+     "offsetTop": 0,
+     "pageLeft": 40,
+     "pageTop": 60,
+     "width": 300,
+     "height": 200,
+     "scale": 1,
+     "scrollX": 40,
+     "scrollY": 60,
+     "innerWidth": 1200,
+     "innerHeight": 800,
+     "clientWidth": 980,
+     "clientHeight": 653,
+     "dpr": 1
+    }
+   ],
+   "handlers": [
+    "onresize"
+   ],
+   "sub": {
+    "scale": 1,
+    "width": 100,
+    "height": 80,
+    "offsetLeft": 0,
+    "pageLeft": 0
+   }
+  },
+  {
+   "name": "remove listeners and handlers, then resize",
+   "error": null,
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 40,
+    "pageTop": 60,
+    "width": 280,
+    "height": 190,
+    "scale": 1,
+    "scrollX": 40,
+    "scrollY": 60,
+    "innerWidth": 280,
+    "innerHeight": 190,
+    "clientWidth": 280,
+    "clientHeight": 190,
+    "dpr": 1
+   },
+   "log": [
+    {
+     "type": "window-resize"
+    },
+    {
+     "type": "resize",
+     "offsetLeft": 0,
+     "offsetTop": 0,
+     "pageLeft": 40,
+     "pageTop": 60,
+     "width": 320,
+     "height": 240,
+     "scale": 1,
+     "scrollX": 40,
+     "scrollY": 60,
+     "innerWidth": 320,
+     "innerHeight": 240,
+     "clientWidth": 320,
+     "clientHeight": 240,
+     "dpr": 1
+    },
+    {
+     "type": "window-resize"
+    },
+    {
+     "type": "resize",
+     "offsetLeft": 0,
+     "offsetTop": 0,
+     "pageLeft": 40,
+     "pageTop": 60,
+     "width": 280,
+     "height": 190,
+     "scale": 1,
+     "scrollX": 40,
+     "scrollY": 60,
+     "innerWidth": 280,
+     "innerHeight": 190,
+     "clientWidth": 280,
+     "clientHeight": 190,
+     "dpr": 1
+    }
+   ],
+   "handlers": [],
+   "sub": {
+    "scale": 1,
+    "width": 100,
+    "height": 80,
+    "offsetLeft": 0,
+    "pageLeft": 0
+   }
+  }
+ ],
+ "detached": {
+  "width": 0,
+  "height": 0,
+  "scale": 0,
+  "offsetLeft": 0,
+  "pageTop": 0,
+  "windowVisualViewport": "[object VisualViewport]"
+ },
+ "handlerTypes": {
+  "onresize": "object",
+  "onscroll": "function",
+  "proto": [
+   "offsetLeft",
+   "offsetTop",
+   "pageLeft",
+   "pageTop",
+   "width",
+   "height",
+   "scale",
+   "onresize",
+   "onscroll",
+   "onscrollend",
+   "constructor"
+  ]
+ }
+}
