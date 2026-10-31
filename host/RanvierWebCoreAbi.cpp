@@ -6,6 +6,7 @@
 #include "RanvierEventGlue.h"
 #include "RanvierViewportGlue.h"
 #include "RanvierInspectGlue.h"
+#include "RanvierWakeLockGlue.h"
 #include <atomic>
 #include <string>
 #include <vector>
@@ -713,6 +714,8 @@ struct RvHost {
     void* resourceContext { nullptr };
     RvFormSubmissionHandler formSubmissionHandler { nullptr };
     void* formSubmissionContext { nullptr };
+    RvWakeLockPolicy wakeLockPolicy { nullptr };
+    void* wakeLockContext { nullptr };
 #if RANVIER_COMPOSITING
     // rv_host_create sets RV_COMPOSITING_WHEN_NEEDED.
     int32_t compositingMode { RV_COMPOSITING_OFF };
@@ -860,6 +863,11 @@ void RvChromeClient::wantUpdate()
 static bool onOwningThread() { return isMainThread(); }
 
 static bool segmentationInitialized;
+
+// The first rv_host_create installed the process's SleepDisablerClient.
+static bool sleepDisablersInstalled;
+// rv_set_sleep_disabler_callback set a callback.
+static bool sleepDisablerCallbackSet;
 
 // The hosts alive on the owning thread, for routing a page's loads to its host.
 static Vector<RvHost*> liveHosts;
@@ -1367,6 +1375,8 @@ int32_t rv_abi_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "cascade-diagnostics"))
         return 1;
+    if (!std::strcmp(feature, "wake-locks"))
+        return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "accessibility-uia"))
         return 1;
@@ -1669,6 +1679,8 @@ RvHost* rv_host_create(int32_t width, int32_t height)
 #endif
         initialized = true;
         segmentationInitialized = true;
+        ranvier_sleep_disabler_install();
+        sleepDisablersInstalled = true;
     }
     if (!onOwningThread() || width <= 0 || height <= 0)
         return nullptr;
@@ -3110,6 +3122,71 @@ int32_t rv_host_set_form_submission_handler(RvHost* host, RvFormSubmissionHandle
         return RV_ERR_WRONG_THREAD;
     host->formSubmissionHandler = handler;
     host->formSubmissionContext = handler ? context : nullptr;
+    return RV_OK;
+}
+
+int32_t rv_host_set_wake_lock_policy(RvHost* host, RvWakeLockPolicy policy, void* context)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    host->wakeLockPolicy = policy;
+    host->wakeLockContext = policy ? context : nullptr;
+    return RV_OK;
+}
+
+int32_t rv_wake_lock_request(RvHost* host, int32_t type, RvEventTarget** sentinel)
+{
+    if (!host || !sentinel)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    struct Decision {
+        RvHost* host;
+        int32_t type;
+    } decision { host, type };
+    auto decide = [](void* context) -> int32_t {
+        auto& decision = *static_cast<Decision*>(context);
+        auto* policy = decision.host->wakeLockPolicy;
+        return policy ? policy(decision.host->wakeLockContext, decision.host, decision.type) : 0;
+    };
+    return ranvier_wake_lock_request(reinterpret_cast<RvNode*>(&host->document()), type, decide, &decision, sentinel);
+}
+
+int32_t rv_wake_lock_release(RvEventTarget* sentinel)
+{
+    if (!sentinel)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_wake_lock_release(sentinel);
+}
+
+int32_t rv_wake_lock_state(RvEventTarget* sentinel, int32_t* released, int32_t* type)
+{
+    if (!sentinel || !released || !type)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_wake_lock_state(sentinel, released, type);
+}
+
+int32_t rv_host_release_wake_locks(RvHost* host)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_wake_lock_release_all(reinterpret_cast<RvNode*>(&host->document()));
+}
+
+int32_t rv_set_sleep_disabler_callback(RvSleepDisablerCallback callback, void* context)
+{
+    if (!sleepDisablersInstalled || !onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    ranvier_sleep_disabler_set_callback(callback, callback ? context : nullptr);
+    sleepDisablerCallbackSet = !!callback;
     return RV_OK;
 }
 

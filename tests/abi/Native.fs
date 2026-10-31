@@ -368,6 +368,12 @@ module Calls =
             "rv_node_convert_points"
             "rv_node_box_quad"
             "rv_host_inspect_cascade"
+            "rv_host_set_wake_lock_policy"
+            "rv_wake_lock_request"
+            "rv_wake_lock_release"
+            "rv_wake_lock_state"
+            "rv_host_release_wake_locks"
+            "rv_set_sleep_disabler_callback"
         |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
@@ -1336,8 +1342,33 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_node_box_quad(nativeint node, int box, nativeint ``to``, int toSpace, double& quad)
+
     [<DllImport(Lib)>]
-    extern int rv_host_inspect_cascade(nativeint host, nativeint element, [<In>] byte[] property, int property_length, nativeint[] diagnostic)
+    extern int rv_host_inspect_cascade(
+        nativeint host,
+        nativeint element,
+        [<In>] byte[] property,
+        int property_length,
+        nativeint[] diagnostic
+    )
+
+    [<DllImport(Lib)>]
+    extern int rv_host_set_wake_lock_policy(nativeint host, nativeint policy, nativeint context)
+
+    [<DllImport(Lib)>]
+    extern int rv_wake_lock_request(nativeint host, int ``type``, nativeint[] sentinel)
+
+    [<DllImport(Lib)>]
+    extern int rv_wake_lock_release(nativeint sentinel)
+
+    [<DllImport(Lib)>]
+    extern int rv_wake_lock_state(nativeint sentinel, int& released, int& ``type``)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_release_wake_locks(nativeint host)
+
+    [<DllImport(Lib)>]
+    extern int rv_set_sleep_disabler_callback(nativeint callback, nativeint context)
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -4389,8 +4420,8 @@ let rv_node_convert_points
             Raw.rv_node_convert_points (from, fromSpace, ``to``, toSpace, &xy, count)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[236] <- Calls.Counts[236] + 1L
-        Calls.Ticks[236] <- Calls.Ticks[236] + spent
+        Calls.Counts[244] <- Calls.Counts[244] + 1L
+        Calls.Ticks[244] <- Calls.Ticks[244] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -4401,17 +4432,22 @@ let rv_node_box_quad (node: nativeint, box: int, ``to``: nativeint, toSpace: int
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_node_box_quad (node, box, ``to``, toSpace, &quad)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[237] <- Calls.Counts[237] + 1L
-        Calls.Ticks[237] <- Calls.Ticks[237] + spent
+        Calls.Counts[245] <- Calls.Counts[245] + 1L
+        Calls.Ticks[245] <- Calls.Ticks[245] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
         Raw.rv_node_box_quad (node, box, ``to``, toSpace, &quad)
 
-let rv_host_inspect_cascade (host: nativeint, element: nativeint, property: byte[], property_length: int, diagnostic: nativeint[]) : int =
+let rv_host_inspect_cascade
+    (host: nativeint, element: nativeint, property: byte[], property_length: int, diagnostic: nativeint[])
+    : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_host_inspect_cascade (host, element, property, property_length, diagnostic)
+
+        let result =
+            Raw.rv_host_inspect_cascade (host, element, property, property_length, diagnostic)
+
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[246] <- Calls.Counts[246] + 1L
         Calls.Ticks[246] <- Calls.Ticks[246] + spent
@@ -4419,6 +4455,78 @@ let rv_host_inspect_cascade (host: nativeint, element: nativeint, property: byte
         result
     else
         Raw.rv_host_inspect_cascade (host, element, property, property_length, diagnostic)
+
+let rv_host_set_wake_lock_policy (host: nativeint, policy: nativeint, context: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_set_wake_lock_policy (host, policy, context)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[247] <- Calls.Counts[247] + 1L
+        Calls.Ticks[247] <- Calls.Ticks[247] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_set_wake_lock_policy (host, policy, context)
+
+let rv_wake_lock_request (host: nativeint, ``type``: int, sentinel: nativeint[]) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_wake_lock_request (host, ``type``, sentinel)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[248] <- Calls.Counts[248] + 1L
+        Calls.Ticks[248] <- Calls.Ticks[248] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_wake_lock_request (host, ``type``, sentinel)
+
+let rv_wake_lock_release (sentinel: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_wake_lock_release (sentinel)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[249] <- Calls.Counts[249] + 1L
+        Calls.Ticks[249] <- Calls.Ticks[249] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_wake_lock_release (sentinel)
+
+let rv_wake_lock_state (sentinel: nativeint, released: byref<int>, ``type``: byref<int>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_wake_lock_state (sentinel, &released, &``type``)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[250] <- Calls.Counts[250] + 1L
+        Calls.Ticks[250] <- Calls.Ticks[250] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_wake_lock_state (sentinel, &released, &``type``)
+
+let rv_host_release_wake_locks (host: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_release_wake_locks (host)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[251] <- Calls.Counts[251] + 1L
+        Calls.Ticks[251] <- Calls.Ticks[251] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_release_wake_locks (host)
+
+let rv_set_sleep_disabler_callback (callback: nativeint, context: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_set_sleep_disabler_callback (callback, context)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[252] <- Calls.Counts[252] + 1L
+        Calls.Ticks[252] <- Calls.Ticks[252] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_set_sleep_disabler_callback (callback, context)
 
 // END GENERATED
 

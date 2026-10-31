@@ -376,6 +376,7 @@ static constexpr const char* capabilityAbiNames[] = {
     "text-segmentation",
     "diagnostics",
     "cascade-diagnostics",
+    "wake-locks",
     "accessibility-uia",
     "resize",
     "input",
