@@ -56,7 +56,7 @@ def verify(directory, evidence):
         function.restype, function.argtypes = returns, arguments
         return function
 
-    expect(bind('rv_abi_version', i32, [])() == 47, 'ABI version 47')
+    expect(bind('rv_abi_version', i32, [])() == 51, 'ABI version 51')
     expect(bind('rv_abi_has', i32, [ctypes.c_char_p])(b'input-state') == 1, 'input-state advertised')
     window_target = bind('rv_host_window_event_target', p, [p])
     max_touch_points = bind('rv_host_max_touch_points', i32, [p, ctypes.POINTER(i32)])

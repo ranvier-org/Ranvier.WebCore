@@ -1,4 +1,4 @@
-"""Native39/ABI47 I08 event detail probe against an actual runtime directory: the constructors and getters of the event
+"""Native39/ABI51 I08 event detail probe against an actual runtime directory: the constructors and getters of the event
 detail interfaces, rv_dom_event_get_interface_name, engine-dispatched payloads and teardown, compared with the Chromium
 oracle tests/fixtures/event-details-oracle.json. Every difference must be listed in tests/fixtures/event-details-qualified.json."""
 import argparse
@@ -12,7 +12,7 @@ import sys
 import threading
 import time
 
-ABI = 47
+ABI = 51
 OK, NULL_ARGUMENT, WRONG_THREAD, DOM_EXCEPTION, BUFFER_TOO_SMALL, UNSUPPORTED, WRONG_INTERFACE = 0, -1, -2, -3, -6, -9, -11
 TRUSTED = 16
 MOUSE_MOVE, MOUSE_DOWN, MOUSE_UP, BUTTON_LEFT, BUTTON_NONE = 0, 1, 2, 0, -1
