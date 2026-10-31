@@ -61,6 +61,7 @@
 #include "CommandEvent.h"
 #include "Comment.h"
 #include "CompositionEvent.h"
+#include "Crypto.h"
 #include "DOMCSSCustomPropertyDescriptor.h"
 #include "DOMCSSNamespace.h"
 #include "DOMCSSRegisterCustomProperty.h"
@@ -170,6 +171,8 @@
 #include "InputEvent.h"
 #include "JavaScriptCore/ArrayBuffer.h"
 #include "JavaScriptCore/ArrayBufferView.h"
+#include "JavaScriptCore/DataView.h"
+#include "JavaScriptCore/TypedArrays.h"
 #include "KeyboardEvent.h"
 #include "LiveNodeList.h"
 #include "LocalDOMWindow.h"
@@ -630,6 +633,57 @@ int32_t storeConstGetter(V&& value, Handle** result)
     return RV_OK;
 }
 } // namespace
+
+
+namespace {
+template<typename View>
+RefPtr<JSC::ArrayBufferView> typedArrayView(RefPtr<JSC::ArrayBuffer>&& buffer, int32_t length, int32_t elementSize, int32_t& status)
+{
+    if (length % elementSize) {
+        status = Ranvier::recordException(Exception { ExceptionCode::RangeError, "The byte length is not a multiple of the element size."_s });
+        return nullptr;
+    }
+    RefPtr<JSC::ArrayBufferView> view = View::tryCreate(WTF::move(buffer), 0, static_cast<size_t>(length / elementSize));
+    if (!view)
+        status = Ranvier::recordException(Exception { ExceptionCode::RangeError, "The view could not be allocated."_s });
+    return view;
+}
+
+// A view of the kind (RV_DOM_ARRAY_BUFFER_VIEW_*) over a copy of the caller's bytes, or null with the status set.
+RefPtr<JSC::ArrayBufferView> makeTypedArrayView(int32_t kind, const uint8_t* bytes, int32_t length, int32_t& status)
+{
+    RefPtr buffer = JSC::ArrayBuffer::tryCreate(length ? std::span<const uint8_t> { bytes, static_cast<size_t>(length) } : std::span<const uint8_t> { });
+    if (!buffer) {
+        status = Ranvier::recordException(Exception { ExceptionCode::RangeError, "The array buffer could not be allocated."_s });
+        return nullptr;
+    }
+    switch (kind) {
+    case 0: return typedArrayView<JSC::Int8Array>(WTF::move(buffer), length, 1, status);
+    case 1: return typedArrayView<JSC::Uint8Array>(WTF::move(buffer), length, 1, status);
+    case 2: return typedArrayView<JSC::Uint8ClampedArray>(WTF::move(buffer), length, 1, status);
+    case 3: return typedArrayView<JSC::Int16Array>(WTF::move(buffer), length, 2, status);
+    case 4: return typedArrayView<JSC::Uint16Array>(WTF::move(buffer), length, 2, status);
+    case 5: return typedArrayView<JSC::Int32Array>(WTF::move(buffer), length, 4, status);
+    case 6: return typedArrayView<JSC::Uint32Array>(WTF::move(buffer), length, 4, status);
+    case 7: return typedArrayView<JSC::Float16Array>(WTF::move(buffer), length, 2, status);
+    case 8: return typedArrayView<JSC::Float32Array>(WTF::move(buffer), length, 4, status);
+    case 9: return typedArrayView<JSC::Float64Array>(WTF::move(buffer), length, 8, status);
+    case 10: return typedArrayView<JSC::BigInt64Array>(WTF::move(buffer), length, 8, status);
+    case 11: return typedArrayView<JSC::BigUint64Array>(WTF::move(buffer), length, 8, status);
+    case 12: return JSC::DataView::create(WTF::move(buffer), 0, static_cast<size_t>(length));
+    }
+    status = RV_ERR_UNSUPPORTED;
+    return nullptr;
+}
+
+// Copies the view's bytes, which the member may have written, back to the caller's buffer.
+void copyTypedArrayView(JSC::ArrayBufferView& view, uint8_t* bytes)
+{
+    auto span = view.span();
+    if (!span.empty())
+        memcpySpan(std::span<uint8_t> { bytes, span.size() }, span);
+}
+}
 
 static constexpr ASCIILiteral enumerationAriaNotificationInterrupt[] = { "none"_s, "all"_s, "pending"_s };
 static constexpr ASCIILiteral enumerationAriaNotificationPriority[] = { "normal"_s, "high"_s };
@@ -2369,6 +2423,8 @@ int32_t ranvier_dom_has(const char* feature)
     if (!std::strcmp(feature, "dom-computed-style"))
         return 1;
     if (!std::strcmp(feature, "dom-window-scrolling"))
+        return 1;
+    if (!std::strcmp(feature, "dom-crypto-random"))
         return 1;
     if (!std::strcmp(feature, "dom-geometry-matrix-readonly"))
         return 1;
@@ -38509,6 +38565,43 @@ int32_t ranvier_dom_window_scroll_by_2(RvNode* target, double x, double y)
     if (!impl->window())
         return RV_ERR_UNSUPPORTED;
     return invoke([&]() -> decltype(auto) { return impl->window()->scrollBy(x, y); });
+}
+
+// Window.crypto.getRandomValues: checked Document context; array_kind is an RV_DOM_ARRAY_BUFFER_VIEW_* element kind and array_length the byte length; the member reads and writes a copy, which returns to array on RV_OK; an unknown kind returns RV_ERR_UNSUPPORTED
+int32_t ranvier_dom_crypto_get_random_values(RvNode* target, int32_t array_kind, uint8_t* array, int32_t array_length)
+{
+    if (!target || !(array_length >= 0 && (array_length == 0 || array)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!impl->window())
+        return RV_ERR_UNSUPPORTED;
+    int32_t status0 = RV_OK;
+    RefPtr<JSC::ArrayBufferView> a0 = makeTypedArrayView(array_kind, array, array_length, status0);
+    if (!a0)
+        return status0;
+    auto status = invoke([&]() -> decltype(auto) { return impl->window()->crypto().getRandomValues(*a0); });
+    if (status == RV_OK)
+        copyTypedArrayView(*a0, array);
+    return status;
+}
+
+// Window.crypto.randomUUID: checked Document context
+int32_t ranvier_dom_crypto_random_uuid(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!impl->window())
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->window()->crypto().randomUUID(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // DOMMatrixReadOnly.fromMatrix: static operation with checked Document context and UTF-8 byte lengths; other defaults to {} in IDL; other may be NULL for the IDL default; *result is a new reference

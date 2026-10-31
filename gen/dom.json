@@ -8,7 +8,10 @@
     "Members whose types or extended attributes the generator does not map are left out on their own and listed",
     "in gen/dom-report.txt.",
     "callbackObjectRoots lists callback interfaces passed as refcounted object handles; contract names the shared",
-    "contract's function type, and resultEnum the integer enumeration it returns."
+    "contract's function type, and resultEnum the integer enumeration it returns.",
+    "typedArrayViewTypes lists the IDL types passed as an in/out typed array: an element kind, a writable buffer and its",
+    "byte length; only a [ReturnValue] argument maps. windowObjectBindings binds the operations of the object a readonly",
+    "Window attribute (accessor) holds, called through the Window of a checked Document."
   ],
   "attributeBridges": {
     "Document.adoptedStyleSheets": {
@@ -898,5 +901,20 @@
   },
   "byteSpanTypes": [
     "BufferSource"
-  ]
+  ],
+  "typedArrayViewTypes": [
+    "ArrayBufferView"
+  ],
+  "windowObjectBindings": {
+    "Crypto": {
+      "receiver": "Document",
+      "accessor": "crypto",
+      "members": [
+        "getRandomValues",
+        "randomUUID"
+      ],
+      "feature": "dom-crypto-random",
+      "stringInputs": "utf8-lengths"
+    }
+  }
 }

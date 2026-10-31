@@ -319,6 +319,19 @@ enum {
     RV_DOM_NODE_FILTER_SHOW_DOCUMENT_TYPE = 0x00000200, /* NodeFilter.SHOW_DOCUMENT_TYPE */
     RV_DOM_NODE_FILTER_SHOW_DOCUMENT_FRAGMENT = 0x00000400, /* NodeFilter.SHOW_DOCUMENT_FRAGMENT */
     RV_DOM_NODE_FILTER_SHOW_NOTATION = 0x00000800, /* NodeFilter.SHOW_NOTATION */
+    RV_DOM_ARRAY_BUFFER_VIEW_INT8 = 0, /* ArrayBufferView element kind Int8Array */
+    RV_DOM_ARRAY_BUFFER_VIEW_UINT8 = 1, /* ArrayBufferView element kind Uint8Array */
+    RV_DOM_ARRAY_BUFFER_VIEW_UINT8_CLAMPED = 2, /* ArrayBufferView element kind Uint8ClampedArray */
+    RV_DOM_ARRAY_BUFFER_VIEW_INT16 = 3, /* ArrayBufferView element kind Int16Array */
+    RV_DOM_ARRAY_BUFFER_VIEW_UINT16 = 4, /* ArrayBufferView element kind Uint16Array */
+    RV_DOM_ARRAY_BUFFER_VIEW_INT32 = 5, /* ArrayBufferView element kind Int32Array */
+    RV_DOM_ARRAY_BUFFER_VIEW_UINT32 = 6, /* ArrayBufferView element kind Uint32Array */
+    RV_DOM_ARRAY_BUFFER_VIEW_FLOAT16 = 7, /* ArrayBufferView element kind Float16Array */
+    RV_DOM_ARRAY_BUFFER_VIEW_FLOAT32 = 8, /* ArrayBufferView element kind Float32Array */
+    RV_DOM_ARRAY_BUFFER_VIEW_FLOAT64 = 9, /* ArrayBufferView element kind Float64Array */
+    RV_DOM_ARRAY_BUFFER_VIEW_BIG_INT64 = 10, /* ArrayBufferView element kind BigInt64Array */
+    RV_DOM_ARRAY_BUFFER_VIEW_BIG_UINT64 = 11, /* ArrayBufferView element kind BigUint64Array */
+    RV_DOM_ARRAY_BUFFER_VIEW_DATA_VIEW = 12, /* ArrayBufferView element kind DataView */
 };
 
 #define RV_DOM_NODE_FILTER_SHOW_ALL 0xFFFFFFFFu /* NodeFilter.SHOW_ALL */
@@ -7479,6 +7492,14 @@ RV_EXPORT int32_t rv_dom_window_scroll_to_2(RvNode* target, double x, double y);
 RV_EXPORT int32_t rv_dom_window_scroll_by_1(RvNode* target, const RvDomScrollToOptions* option);
 /* Window.scrollBy: checked Document context; nullable string byte length -1 means null */
 RV_EXPORT int32_t rv_dom_window_scroll_by_2(RvNode* target, double x, double y);
+/* Crypto */
+
+/* Window.crypto.getRandomValues: checked Document context; array_kind is an RV_DOM_ARRAY_BUFFER_VIEW_* element kind
+ * and array_length the byte length; the member reads and writes a copy, which returns to array on RV_OK; an unknown
+ * kind returns RV_ERR_UNSUPPORTED */
+RV_EXPORT int32_t rv_dom_crypto_get_random_values(RvNode* target, int32_t array_kind, uint8_t* array, int32_t array_length);
+/* Window.crypto.randomUUID: checked Document context */
+RV_EXPORT int32_t rv_dom_crypto_random_uuid(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* DOMMatrixReadOnly */
 
 /* DOMMatrixReadOnly.fromMatrix: static operation with checked Document context and UTF-8 byte lengths; other defaults

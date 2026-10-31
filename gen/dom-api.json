@@ -136338,6 +136338,129 @@
       "stringInputs": "utf8-lengths-nullable"
     },
     {
+      "interface": "Crypto",
+      "member": "getRandomValues",
+      "contractOwner": "Crypto",
+      "kind": "context_operation",
+      "function": "rv_dom_crypto_get_random_values",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "array_kind"
+        },
+        {
+          "ctype": "uint8_t*",
+          "name": "array"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "array_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "array",
+          "idlType": "ArrayBufferView",
+          "idl": {
+            "name": "ArrayBufferView",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "typedarray",
+            "ctype": "uint8_t*",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "ArrayBufferView",
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "ArrayBufferView",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "typedarray",
+        "ctype": "uint8_t*",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "ArrayBufferView",
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "context": "Window",
+      "feature": "dom-crypto-random",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths-nullable"
+    },
+    {
+      "interface": "Crypto",
+      "member": "randomUUID",
+      "contractOwner": "Crypto",
+      "kind": "context_operation",
+      "function": "rv_dom_crypto_random_uuid",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "context": "Window",
+      "feature": "dom-crypto-random",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths-nullable"
+    },
+    {
       "interface": "DOMMatrixReadOnly",
       "member": "fromMatrix",
       "contractOwner": "DOMMatrixReadOnly",
