@@ -1,0 +1,380 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+scale 1 unscrolled scroll 0 0
+   wrap line 1 glyph 0 left half        wrap#0@document:0            {"x":0,"y":0,"width":0,"height":20}  shadow wrap#0@document:0  range wrap#0@document:0
+   wrap line 1 glyph 0 right half       wrap#0@document:1            {"x":20,"y":0,"width":0,"height":20}  shadow wrap#0@document:1  range wrap#0@document:1
+   wrap line 1 glyph 1 boundary         wrap#0@document:1            {"x":20,"y":0,"width":0,"height":20}  shadow wrap#0@document:1  range wrap#0@document:1
+   wrap line 1 last glyph right half    wrap#0@document:4            {"x":80,"y":0,"width":0,"height":20}  shadow wrap#0@document:4  range wrap#0@document:4
+   wrap line 1 past end inside box      wrap#0@document:4            {"x":80,"y":0,"width":0,"height":20}  shadow wrap#0@document:4  range wrap#0@document:4
+   wrap line 1 past box                 BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap line 2 start                    wrap#0@document:5            {"x":0,"y":20,"width":0,"height":20}  shadow wrap#0@document:5  range wrap#0@document:5
+   wrap line 2 middle                   wrap#0@document:7            {"x":40,"y":20,"width":0,"height":20}  shadow wrap#0@document:7  range wrap#0@document:7
+   wrap line 3 end                      wrap#0@document:14           {"x":80,"y":40,"width":0,"height":20}  shadow wrap#0@document:14  range wrap#0@document:14
+   wrap below last line                 BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap fractional 10.5, 10.25          wrap#0@document:1            {"x":20,"y":0,"width":0,"height":20}  shadow wrap#0@document:1  range wrap#0@document:0
+   wrap fractional 9.99                 wrap#0@document:0            {"x":0,"y":0,"width":0,"height":20}  shadow wrap#0@document:0  range wrap#0@document:0
+   wrap fractional 10.01                wrap#0@document:0            {"x":0,"y":0,"width":0,"height":20}  shadow wrap#0@document:0  range wrap#0@document:0
+   inline AA|BB left                    inline#0@document:2          {"x":40,"y":80,"width":0,"height":20}  shadow inline#0@document:2  range inline#0@document:2
+   inline AA|BB right                   b#0@document:0               {"x":40,"y":80,"width":0,"height":20}  shadow b#0@document:0  range b#0@document:0
+   inline BB|CC                         i#0@document:0               {"x":80,"y":80,"width":0,"height":20}  shadow i#0@document:0  range i#0@document:0
+   inline CC|DD                         i#0@document:2               {"x":120,"y":80,"width":0,"height":20}  shadow i#0@document:2  range i#0@document:2
+   inline end                           inline#3@document:2          {"x":160,"y":80,"width":0,"height":20}  shadow inline#3@document:2  range inline#3@document:2
+   bidi ltr before bdo                  bidi#0@document:2            {"x":40,"y":110,"width":0,"height":20}  shadow bidi#0@document:2  range bidi#0@document:2
+   bidi bdo visual left                 bdo#0@document:0             {"x":120,"y":110,"width":0,"height":20}  shadow bdo#0@document:0  range bdo#0@document:0
+   bidi bdo visual middle               bdo#0@document:2             {"x":80,"y":110,"width":0,"height":20}  shadow bdo#0@document:2  range bdo#0@document:2
+   bidi bdo visual right                bdo#0@document:4             {"x":40,"y":110,"width":0,"height":20}  shadow bdo#0@document:4  range bdo#0@document:4
+   bidi after bdo                       bidi#2@document:0            {"x":120,"y":110,"width":0,"height":20}  shadow bidi#2@document:0  range bidi#2@document:0
+   rtl line 1 right edge                rtl#0@document:0             {"x":220,"y":140,"width":0,"height":20}  shadow rtl#0@document:0  range rtl#0@document:0
+   rtl line 1 left edge                 rtl#0@document:4             {"x":300,"y":140,"width":0,"height":20}  shadow rtl#0@document:4  range rtl#0@document:4
+   rtl line 2 middle                    rtl#0@document:6             {"x":240,"y":160,"width":0,"height":20}  shadow rtl#0@document:6  range rtl#0@document:6
+   rtl left of line 1                   rtl#0@document:4             {"x":300,"y":140,"width":0,"height":20}  shadow rtl#0@document:4  range rtl#0@document:4
+   open shadow text                     BODY@document:4              {"x":0,"y":0,"width":0,"height":0}  shadow s#0@open:1  range BODY@document:4
+   closed shadow text                   BODY@document:5              {"x":0,"y":0,"width":0,"height":0}  shadow t#0@closed:1  range BODY@document:5
+   text control                         INPUT#field@document:1       {"x":20,"y":220,"width":0,"height":20}  shadow INPUT#field@document:1  range BODY@document:6
+   empty box                            DIV#empty@document:0         {"x":0,"y":0,"width":0,"height":0}  shadow DIV#empty@document:0  range DIV#empty@document:0
+   body beside text control             BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   negative x                           null                           shadow null  range null
+   negative y                           null                           shadow null  range null
+   past viewport x                      null                           shadow null  range null
+   past viewport y                      null                           shadow null  range null
+   viewport last pixel                  BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   huge                                 null                           shadow null  range null
+   NaN x                                throws TypeError               shadow throws TypeError  range wrap#0@document:0
+   Infinity y                           throws TypeError               shadow throws TypeError  range wrap#0@document:0
+   -Infinity x                          throws TypeError               shadow throws TypeError  range wrap#0@document:0
+scale 1 scrolled 50, 590 scroll 50 590
+   wrap line 1 glyph 0 left half        far#0@document:3             {"x":10,"y":10,"width":0,"height":20}  shadow far#0@document:3  range far#0@document:3
+   wrap line 1 glyph 0 right half       far#0@document:3             {"x":10,"y":10,"width":0,"height":20}  shadow far#0@document:3  range far#0@document:3
+   wrap line 1 glyph 1 boundary         far#0@document:3             {"x":10,"y":10,"width":0,"height":20}  shadow far#0@document:3  range far#0@document:3
+   wrap line 1 last glyph right half    BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap line 1 past end inside box      BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap line 1 past box                 BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap line 2 start                    BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap line 2 middle                   BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap line 3 end                      BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap below last line                 BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap fractional 10.5, 10.25          far#0@document:3             {"x":10,"y":10,"width":0,"height":20}  shadow far#0@document:3  range far#0@document:3
+   wrap fractional 9.99                 far#0@document:3             {"x":10,"y":10,"width":0,"height":20}  shadow far#0@document:3  range far#0@document:3
+   wrap fractional 10.01                far#0@document:3             {"x":10,"y":10,"width":0,"height":20}  shadow far#0@document:3  range far#0@document:3
+   inline AA|BB left                    BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   inline AA|BB right                   BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   inline BB|CC                         BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   inline CC|DD                         BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   inline end                           BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi ltr before bdo                  BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi bdo visual left                 BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi bdo visual middle               BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi bdo visual right                BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi after bdo                       BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   rtl line 1 right edge                BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   rtl line 1 left edge                 BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   rtl line 2 middle                    BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   rtl left of line 1                   BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   open shadow text                     BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   closed shadow text                   BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   text control                         BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   empty box                            BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   body beside text control             BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   negative x                           null                           shadow null  range null
+   negative y                           null                           shadow null  range null
+   past viewport x                      null                           shadow null  range null
+   past viewport y                      null                           shadow null  range null
+   viewport last pixel                  BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   huge                                 null                           shadow null  range null
+   NaN x                                throws TypeError               shadow throws TypeError  range far#0@document:2
+   Infinity y                           throws TypeError               shadow throws TypeError  range BODY@document:0
+   -Infinity x                          throws TypeError               shadow throws TypeError  range far#0@document:2
+scale 1 scrolled 0.5, 20.5 scroll 1 21
+   wrap line 1 glyph 0 left half        wrap#0@document:5            {"x":-1,"y":-1,"width":0,"height":20}  shadow wrap#0@document:5  range wrap#0@document:5
+   wrap line 1 glyph 0 right half       wrap#0@document:6            {"x":19,"y":-1,"width":0,"height":20}  shadow wrap#0@document:6  range wrap#0@document:6
+   wrap line 1 glyph 1 boundary         wrap#0@document:6            {"x":19,"y":-1,"width":0,"height":20}  shadow wrap#0@document:6  range wrap#0@document:6
+   wrap line 1 last glyph right half    wrap#0@document:9            {"x":79,"y":-1,"width":0,"height":20}  shadow wrap#0@document:9  range wrap#0@document:9
+   wrap line 1 past end inside box      wrap#0@document:9            {"x":79,"y":-1,"width":0,"height":20}  shadow wrap#0@document:9  range wrap#0@document:9
+   wrap line 1 past box                 BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap line 2 start                    wrap#0@document:10           {"x":-1,"y":19,"width":0,"height":20}  shadow wrap#0@document:10  range wrap#0@document:10
+   wrap line 2 middle                   wrap#0@document:12           {"x":39,"y":19,"width":0,"height":20}  shadow wrap#0@document:12  range wrap#0@document:12
+   wrap line 3 end                      BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap below last line                 inline#0@document:1          {"x":19,"y":59,"width":0,"height":20}  shadow inline#0@document:1  range inline#0@document:1
+   wrap fractional 10.5, 10.25          wrap#0@document:6            {"x":19,"y":-1,"width":0,"height":20}  shadow wrap#0@document:6  range wrap#0@document:6
+   wrap fractional 9.99                 wrap#0@document:6            {"x":19,"y":-1,"width":0,"height":20}  shadow wrap#0@document:6  range wrap#0@document:5
+   wrap fractional 10.01                wrap#0@document:6            {"x":19,"y":-1,"width":0,"height":20}  shadow wrap#0@document:6  range wrap#0@document:6
+   inline AA|BB left                    bdo#0@document:0             {"x":119,"y":89,"width":0,"height":20}  shadow bdo#0@document:0  range bdo#0@document:0
+   inline AA|BB right                   bdo#0@document:0             {"x":119,"y":89,"width":0,"height":20}  shadow bdo#0@document:0  range bdo#0@document:0
+   inline BB|CC                         bdo#0@document:2             {"x":79,"y":89,"width":0,"height":20}  shadow bdo#0@document:2  range bdo#0@document:2
+   inline CC|DD                         bidi#2@document:0            {"x":119,"y":89,"width":0,"height":20}  shadow bidi#2@document:0  range bidi#2@document:0
+   inline end                           BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi ltr before bdo                  BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi bdo visual left                 BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi bdo visual middle               BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi bdo visual right                BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi after bdo                       BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   rtl line 1 right edge                rtl#0@document:5             {"x":219,"y":139,"width":0,"height":20}  shadow rtl#0@document:5  range rtl#0@document:5
+   rtl line 1 left edge                 rtl#0@document:9             {"x":299,"y":139,"width":0,"height":20}  shadow rtl#0@document:9  range rtl#0@document:9
+   rtl line 2 middle                    BODY@document:5              {"x":0,"y":0,"width":0,"height":0}  shadow t#0@closed:3  range BODY@document:5
+   rtl left of line 1                   rtl#0@document:9             {"x":299,"y":139,"width":0,"height":20}  shadow rtl#0@document:9  range rtl#0@document:9
+   open shadow text                     INPUT#field@document:1       {"x":19,"y":199,"width":0,"height":20}  shadow INPUT#field@document:1  range BODY@document:6
+   closed shadow text                   BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   text control                         BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   empty box                            DIV#empty@document:0         {"x":0,"y":0,"width":0,"height":0}  shadow DIV#empty@document:0  range DIV#empty@document:0
+   body beside text control             BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   negative x                           null                           shadow null  range null
+   negative y                           null                           shadow null  range null
+   past viewport x                      null                           shadow null  range null
+   past viewport y                      null                           shadow null  range null
+   viewport last pixel                  BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   huge                                 null                           shadow null  range null
+   NaN x                                throws TypeError               shadow throws TypeError  range wrap#0@document:5
+   Infinity y                           throws TypeError               shadow throws TypeError  range wrap#0@document:6
+   -Infinity x                          throws TypeError               shadow throws TypeError  range wrap#0@document:5
+scale 1.5 unscrolled scroll 0 0
+   wrap line 1 glyph 0 left half        wrap#0@document:0            {"x":0,"y":0,"width":0,"height":20}  shadow wrap#0@document:0  range wrap#0@document:0
+   wrap line 1 glyph 0 right half       wrap#0@document:1            {"x":20,"y":0,"width":0,"height":20}  shadow wrap#0@document:1  range wrap#0@document:1
+   wrap line 1 glyph 1 boundary         wrap#0@document:1            {"x":20,"y":0,"width":0,"height":20}  shadow wrap#0@document:1  range wrap#0@document:1
+   wrap line 1 last glyph right half    wrap#0@document:4            {"x":80,"y":0,"width":0,"height":20}  shadow wrap#0@document:4  range wrap#0@document:4
+   wrap line 1 past end inside box      wrap#0@document:4            {"x":80,"y":0,"width":0,"height":20}  shadow wrap#0@document:4  range wrap#0@document:4
+   wrap line 1 past box                 BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap line 2 start                    wrap#0@document:5            {"x":0,"y":20,"width":0,"height":20}  shadow wrap#0@document:5  range wrap#0@document:5
+   wrap line 2 middle                   wrap#0@document:7            {"x":40,"y":20,"width":0,"height":20}  shadow wrap#0@document:7  range wrap#0@document:7
+   wrap line 3 end                      wrap#0@document:14           {"x":80,"y":40,"width":0,"height":20}  shadow wrap#0@document:14  range wrap#0@document:14
+   wrap below last line                 BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap fractional 10.5, 10.25          wrap#0@document:1            {"x":20,"y":0,"width":0,"height":20}  shadow wrap#0@document:1  range wrap#0@document:0
+   wrap fractional 9.99                 wrap#0@document:0            {"x":0,"y":0,"width":0,"height":20}  shadow wrap#0@document:0  range wrap#0@document:0
+   wrap fractional 10.01                wrap#0@document:0            {"x":0,"y":0,"width":0,"height":20}  shadow wrap#0@document:0  range wrap#0@document:0
+   inline AA|BB left                    inline#0@document:2          {"x":40,"y":80,"width":0,"height":20}  shadow inline#0@document:2  range inline#0@document:2
+   inline AA|BB right                   b#0@document:0               {"x":40,"y":80,"width":0,"height":20}  shadow b#0@document:0  range b#0@document:0
+   inline BB|CC                         i#0@document:0               {"x":80,"y":80,"width":0,"height":20}  shadow i#0@document:0  range i#0@document:0
+   inline CC|DD                         i#0@document:2               {"x":120,"y":80,"width":0,"height":20}  shadow i#0@document:2  range i#0@document:2
+   inline end                           inline#3@document:2          {"x":160,"y":80,"width":0,"height":20}  shadow inline#3@document:2  range inline#3@document:2
+   bidi ltr before bdo                  bidi#0@document:2            {"x":40,"y":110,"width":0,"height":20}  shadow bidi#0@document:2  range bidi#0@document:2
+   bidi bdo visual left                 bdo#0@document:0             {"x":120,"y":110,"width":0,"height":20}  shadow bdo#0@document:0  range bdo#0@document:0
+   bidi bdo visual middle               bdo#0@document:2             {"x":80,"y":110,"width":0,"height":20}  shadow bdo#0@document:2  range bdo#0@document:2
+   bidi bdo visual right                bdo#0@document:4             {"x":40,"y":110,"width":0,"height":20}  shadow bdo#0@document:4  range bdo#0@document:4
+   bidi after bdo                       bidi#2@document:0            {"x":120,"y":110,"width":0,"height":20}  shadow bidi#2@document:0  range bidi#2@document:0
+   rtl line 1 right edge                rtl#0@document:0             {"x":220,"y":140,"width":0,"height":20}  shadow rtl#0@document:0  range rtl#0@document:0
+   rtl line 1 left edge                 rtl#0@document:4             {"x":300,"y":140,"width":0,"height":20}  shadow rtl#0@document:4  range rtl#0@document:4
+   rtl line 2 middle                    rtl#0@document:6             {"x":240,"y":160,"width":0,"height":20}  shadow rtl#0@document:6  range rtl#0@document:6
+   rtl left of line 1                   rtl#0@document:4             {"x":300,"y":140,"width":0,"height":20}  shadow rtl#0@document:4  range rtl#0@document:4
+   open shadow text                     BODY@document:4              {"x":0,"y":0,"width":0,"height":0}  shadow s#0@open:1  range BODY@document:4
+   closed shadow text                   BODY@document:5              {"x":0,"y":0,"width":0,"height":0}  shadow t#0@closed:1  range BODY@document:5
+   text control                         INPUT#field@document:1       {"x":20,"y":220,"width":0,"height":20}  shadow INPUT#field@document:1  range BODY@document:6
+   empty box                            DIV#empty@document:0         {"x":0,"y":0,"width":0,"height":0}  shadow DIV#empty@document:0  range DIV#empty@document:0
+   body beside text control             BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   negative x                           null                           shadow null  range null
+   negative y                           null                           shadow null  range null
+   past viewport x                      null                           shadow null  range null
+   past viewport y                      null                           shadow null  range null
+   viewport last pixel                  BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   huge                                 null                           shadow null  range null
+   NaN x                                throws TypeError               shadow throws TypeError  range wrap#0@document:0
+   Infinity y                           throws TypeError               shadow throws TypeError  range wrap#0@document:0
+   -Infinity x                          throws TypeError               shadow throws TypeError  range wrap#0@document:0
+scale 1.5 scrolled 50, 590 scroll 50 590
+   wrap line 1 glyph 0 left half        far#0@document:3             {"x":10,"y":10,"width":0,"height":20}  shadow far#0@document:3  range far#0@document:3
+   wrap line 1 glyph 0 right half       far#0@document:3             {"x":10,"y":10,"width":0,"height":20}  shadow far#0@document:3  range far#0@document:3
+   wrap line 1 glyph 1 boundary         far#0@document:3             {"x":10,"y":10,"width":0,"height":20}  shadow far#0@document:3  range far#0@document:3
+   wrap line 1 last glyph right half    BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap line 1 past end inside box      BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap line 1 past box                 BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap line 2 start                    BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap line 2 middle                   BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap line 3 end                      BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap below last line                 BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap fractional 10.5, 10.25          far#0@document:3             {"x":10,"y":10,"width":0,"height":20}  shadow far#0@document:3  range far#0@document:3
+   wrap fractional 9.99                 far#0@document:3             {"x":10,"y":10,"width":0,"height":20}  shadow far#0@document:3  range far#0@document:3
+   wrap fractional 10.01                far#0@document:3             {"x":10,"y":10,"width":0,"height":20}  shadow far#0@document:3  range far#0@document:3
+   inline AA|BB left                    BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   inline AA|BB right                   BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   inline BB|CC                         BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   inline CC|DD                         BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   inline end                           BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi ltr before bdo                  BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi bdo visual left                 BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi bdo visual middle               BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi bdo visual right                BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi after bdo                       BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   rtl line 1 right edge                BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   rtl line 1 left edge                 BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   rtl line 2 middle                    BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   rtl left of line 1                   BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   open shadow text                     BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   closed shadow text                   BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   text control                         BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   empty box                            BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   body beside text control             BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   negative x                           null                           shadow null  range null
+   negative y                           null                           shadow null  range null
+   past viewport x                      null                           shadow null  range null
+   past viewport y                      null                           shadow null  range null
+   viewport last pixel                  BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   huge                                 null                           shadow null  range null
+   NaN x                                throws TypeError               shadow throws TypeError  range far#0@document:2
+   Infinity y                           throws TypeError               shadow throws TypeError  range BODY@document:0
+   -Infinity x                          throws TypeError               shadow throws TypeError  range far#0@document:2
+scale 1.5 scrolled 0.5, 20.5 scroll 1 21
+   wrap line 1 glyph 0 left half        wrap#0@document:5            {"x":-1,"y":-1,"width":0,"height":20}  shadow wrap#0@document:5  range wrap#0@document:5
+   wrap line 1 glyph 0 right half       wrap#0@document:6            {"x":19,"y":-1,"width":0,"height":20}  shadow wrap#0@document:6  range wrap#0@document:6
+   wrap line 1 glyph 1 boundary         wrap#0@document:6            {"x":19,"y":-1,"width":0,"height":20}  shadow wrap#0@document:6  range wrap#0@document:6
+   wrap line 1 last glyph right half    wrap#0@document:9            {"x":79,"y":-1,"width":0,"height":20}  shadow wrap#0@document:9  range wrap#0@document:9
+   wrap line 1 past end inside box      wrap#0@document:9            {"x":79,"y":-1,"width":0,"height":20}  shadow wrap#0@document:9  range wrap#0@document:9
+   wrap line 1 past box                 BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap line 2 start                    wrap#0@document:10           {"x":-1,"y":19,"width":0,"height":20}  shadow wrap#0@document:10  range wrap#0@document:10
+   wrap line 2 middle                   wrap#0@document:12           {"x":39,"y":19,"width":0,"height":20}  shadow wrap#0@document:12  range wrap#0@document:12
+   wrap line 3 end                      BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap below last line                 inline#0@document:1          {"x":19,"y":59,"width":0,"height":20}  shadow inline#0@document:1  range inline#0@document:1
+   wrap fractional 10.5, 10.25          wrap#0@document:6            {"x":19,"y":-1,"width":0,"height":20}  shadow wrap#0@document:6  range wrap#0@document:6
+   wrap fractional 9.99                 wrap#0@document:6            {"x":19,"y":-1,"width":0,"height":20}  shadow wrap#0@document:6  range wrap#0@document:5
+   wrap fractional 10.01                wrap#0@document:6            {"x":19,"y":-1,"width":0,"height":20}  shadow wrap#0@document:6  range wrap#0@document:6
+   inline AA|BB left                    bdo#0@document:0             {"x":119,"y":89,"width":0,"height":20}  shadow bdo#0@document:0  range bdo#0@document:0
+   inline AA|BB right                   bdo#0@document:0             {"x":119,"y":89,"width":0,"height":20}  shadow bdo#0@document:0  range bdo#0@document:0
+   inline BB|CC                         bdo#0@document:2             {"x":79,"y":89,"width":0,"height":20}  shadow bdo#0@document:2  range bdo#0@document:2
+   inline CC|DD                         bidi#2@document:0            {"x":119,"y":89,"width":0,"height":20}  shadow bidi#2@document:0  range bidi#2@document:0
+   inline end                           BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi ltr before bdo                  BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi bdo visual left                 BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi bdo visual middle               BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi bdo visual right                BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi after bdo                       BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   rtl line 1 right edge                rtl#0@document:5             {"x":219,"y":139,"width":0,"height":20}  shadow rtl#0@document:5  range rtl#0@document:5
+   rtl line 1 left edge                 rtl#0@document:9             {"x":299,"y":139,"width":0,"height":20}  shadow rtl#0@document:9  range rtl#0@document:9
+   rtl line 2 middle                    BODY@document:5              {"x":0,"y":0,"width":0,"height":0}  shadow t#0@closed:3  range BODY@document:5
+   rtl left of line 1                   rtl#0@document:9             {"x":299,"y":139,"width":0,"height":20}  shadow rtl#0@document:9  range rtl#0@document:9
+   open shadow text                     INPUT#field@document:1       {"x":19,"y":199,"width":0,"height":20}  shadow INPUT#field@document:1  range BODY@document:6
+   closed shadow text                   BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   text control                         BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   empty box                            DIV#empty@document:0         {"x":0,"y":0,"width":0,"height":0}  shadow DIV#empty@document:0  range DIV#empty@document:0
+   body beside text control             BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   negative x                           null                           shadow null  range null
+   negative y                           null                           shadow null  range null
+   past viewport x                      null                           shadow null  range null
+   past viewport y                      null                           shadow null  range null
+   viewport last pixel                  BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   huge                                 null                           shadow null  range null
+   NaN x                                throws TypeError               shadow throws TypeError  range wrap#0@document:5
+   Infinity y                           throws TypeError               shadow throws TypeError  range wrap#0@document:6
+   -Infinity x                          throws TypeError               shadow throws TypeError  range wrap#0@document:5
+scale 2 unscrolled scroll 0 0
+   wrap line 1 glyph 0 left half        wrap#0@document:0            {"x":0,"y":0,"width":0,"height":20}  shadow wrap#0@document:0  range wrap#0@document:0
+   wrap line 1 glyph 0 right half       wrap#0@document:1            {"x":20,"y":0,"width":0,"height":20}  shadow wrap#0@document:1  range wrap#0@document:1
+   wrap line 1 glyph 1 boundary         wrap#0@document:1            {"x":20,"y":0,"width":0,"height":20}  shadow wrap#0@document:1  range wrap#0@document:1
+   wrap line 1 last glyph right half    wrap#0@document:4            {"x":80,"y":0,"width":0,"height":20}  shadow wrap#0@document:4  range wrap#0@document:4
+   wrap line 1 past end inside box      wrap#0@document:4            {"x":80,"y":0,"width":0,"height":20}  shadow wrap#0@document:4  range wrap#0@document:4
+   wrap line 1 past box                 BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap line 2 start                    wrap#0@document:5            {"x":0,"y":20,"width":0,"height":20}  shadow wrap#0@document:5  range wrap#0@document:5
+   wrap line 2 middle                   wrap#0@document:7            {"x":40,"y":20,"width":0,"height":20}  shadow wrap#0@document:7  range wrap#0@document:7
+   wrap line 3 end                      wrap#0@document:14           {"x":80,"y":40,"width":0,"height":20}  shadow wrap#0@document:14  range wrap#0@document:14
+   wrap below last line                 BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap fractional 10.5, 10.25          wrap#0@document:1            {"x":20,"y":0,"width":0,"height":20}  shadow wrap#0@document:1  range wrap#0@document:0
+   wrap fractional 9.99                 wrap#0@document:0            {"x":0,"y":0,"width":0,"height":20}  shadow wrap#0@document:0  range wrap#0@document:0
+   wrap fractional 10.01                wrap#0@document:0            {"x":0,"y":0,"width":0,"height":20}  shadow wrap#0@document:0  range wrap#0@document:0
+   inline AA|BB left                    inline#0@document:2          {"x":40,"y":80,"width":0,"height":20}  shadow inline#0@document:2  range inline#0@document:2
+   inline AA|BB right                   b#0@document:0               {"x":40,"y":80,"width":0,"height":20}  shadow b#0@document:0  range b#0@document:0
+   inline BB|CC                         i#0@document:0               {"x":80,"y":80,"width":0,"height":20}  shadow i#0@document:0  range i#0@document:0
+   inline CC|DD                         i#0@document:2               {"x":120,"y":80,"width":0,"height":20}  shadow i#0@document:2  range i#0@document:2
+   inline end                           inline#3@document:2          {"x":160,"y":80,"width":0,"height":20}  shadow inline#3@document:2  range inline#3@document:2
+   bidi ltr before bdo                  bidi#0@document:2            {"x":40,"y":110,"width":0,"height":20}  shadow bidi#0@document:2  range bidi#0@document:2
+   bidi bdo visual left                 bdo#0@document:0             {"x":120,"y":110,"width":0,"height":20}  shadow bdo#0@document:0  range bdo#0@document:0
+   bidi bdo visual middle               bdo#0@document:2             {"x":80,"y":110,"width":0,"height":20}  shadow bdo#0@document:2  range bdo#0@document:2
+   bidi bdo visual right                bdo#0@document:4             {"x":40,"y":110,"width":0,"height":20}  shadow bdo#0@document:4  range bdo#0@document:4
+   bidi after bdo                       bidi#2@document:0            {"x":120,"y":110,"width":0,"height":20}  shadow bidi#2@document:0  range bidi#2@document:0
+   rtl line 1 right edge                rtl#0@document:0             {"x":220,"y":140,"width":0,"height":20}  shadow rtl#0@document:0  range rtl#0@document:0
+   rtl line 1 left edge                 rtl#0@document:4             {"x":300,"y":140,"width":0,"height":20}  shadow rtl#0@document:4  range rtl#0@document:4
+   rtl line 2 middle                    rtl#0@document:6             {"x":240,"y":160,"width":0,"height":20}  shadow rtl#0@document:6  range rtl#0@document:6
+   rtl left of line 1                   rtl#0@document:4             {"x":300,"y":140,"width":0,"height":20}  shadow rtl#0@document:4  range rtl#0@document:4
+   open shadow text                     BODY@document:4              {"x":0,"y":0,"width":0,"height":0}  shadow s#0@open:1  range BODY@document:4
+   closed shadow text                   BODY@document:5              {"x":0,"y":0,"width":0,"height":0}  shadow t#0@closed:1  range BODY@document:5
+   text control                         INPUT#field@document:1       {"x":20,"y":220,"width":0,"height":20}  shadow INPUT#field@document:1  range BODY@document:6
+   empty box                            DIV#empty@document:0         {"x":0,"y":0,"width":0,"height":0}  shadow DIV#empty@document:0  range DIV#empty@document:0
+   body beside text control             BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   negative x                           null                           shadow null  range null
+   negative y                           null                           shadow null  range null
+   past viewport x                      null                           shadow null  range null
+   past viewport y                      null                           shadow null  range null
+   viewport last pixel                  BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   huge                                 null                           shadow null  range null
+   NaN x                                throws TypeError               shadow throws TypeError  range wrap#0@document:0
+   Infinity y                           throws TypeError               shadow throws TypeError  range wrap#0@document:0
+   -Infinity x                          throws TypeError               shadow throws TypeError  range wrap#0@document:0
+scale 2 scrolled 50, 590 scroll 50 590
+   wrap line 1 glyph 0 left half        far#0@document:3             {"x":10,"y":10,"width":0,"height":20}  shadow far#0@document:3  range far#0@document:3
+   wrap line 1 glyph 0 right half       far#0@document:3             {"x":10,"y":10,"width":0,"height":20}  shadow far#0@document:3  range far#0@document:3
+   wrap line 1 glyph 1 boundary         far#0@document:3             {"x":10,"y":10,"width":0,"height":20}  shadow far#0@document:3  range far#0@document:3
+   wrap line 1 last glyph right half    BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap line 1 past end inside box      BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap line 1 past box                 BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap line 2 start                    BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap line 2 middle                   BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap line 3 end                      BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap below last line                 BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap fractional 10.5, 10.25          far#0@document:3             {"x":10,"y":10,"width":0,"height":20}  shadow far#0@document:3  range far#0@document:3
+   wrap fractional 9.99                 far#0@document:3             {"x":10,"y":10,"width":0,"height":20}  shadow far#0@document:3  range far#0@document:3
+   wrap fractional 10.01                far#0@document:3             {"x":10,"y":10,"width":0,"height":20}  shadow far#0@document:3  range far#0@document:3
+   inline AA|BB left                    BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   inline AA|BB right                   BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   inline BB|CC                         BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   inline CC|DD                         BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   inline end                           BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi ltr before bdo                  BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi bdo visual left                 BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi bdo visual middle               BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi bdo visual right                BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi after bdo                       BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   rtl line 1 right edge                BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   rtl line 1 left edge                 BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   rtl line 2 middle                    BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   rtl left of line 1                   BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   open shadow text                     BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   closed shadow text                   BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   text control                         BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   empty box                            BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   body beside text control             BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   negative x                           null                           shadow null  range null
+   negative y                           null                           shadow null  range null
+   past viewport x                      null                           shadow null  range null
+   past viewport y                      null                           shadow null  range null
+   viewport last pixel                  BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   huge                                 null                           shadow null  range null
+   NaN x                                throws TypeError               shadow throws TypeError  range far#0@document:2
+   Infinity y                           throws TypeError               shadow throws TypeError  range BODY@document:0
+   -Infinity x                          throws TypeError               shadow throws TypeError  range far#0@document:2
+scale 2 scrolled 0.5, 20.5 scroll 1 21
+   wrap line 1 glyph 0 left half        wrap#0@document:5            {"x":-1,"y":-1,"width":0,"height":20}  shadow wrap#0@document:5  range wrap#0@document:5
+   wrap line 1 glyph 0 right half       wrap#0@document:6            {"x":19,"y":-1,"width":0,"height":20}  shadow wrap#0@document:6  range wrap#0@document:6
+   wrap line 1 glyph 1 boundary         wrap#0@document:6            {"x":19,"y":-1,"width":0,"height":20}  shadow wrap#0@document:6  range wrap#0@document:6
+   wrap line 1 last glyph right half    wrap#0@document:9            {"x":79,"y":-1,"width":0,"height":20}  shadow wrap#0@document:9  range wrap#0@document:9
+   wrap line 1 past end inside box      wrap#0@document:9            {"x":79,"y":-1,"width":0,"height":20}  shadow wrap#0@document:9  range wrap#0@document:9
+   wrap line 1 past box                 BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap line 2 start                    wrap#0@document:10           {"x":-1,"y":19,"width":0,"height":20}  shadow wrap#0@document:10  range wrap#0@document:10
+   wrap line 2 middle                   wrap#0@document:12           {"x":39,"y":19,"width":0,"height":20}  shadow wrap#0@document:12  range wrap#0@document:12
+   wrap line 3 end                      BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   wrap below last line                 inline#0@document:1          {"x":19,"y":59,"width":0,"height":20}  shadow inline#0@document:1  range inline#0@document:1
+   wrap fractional 10.5, 10.25          wrap#0@document:6            {"x":19,"y":-1,"width":0,"height":20}  shadow wrap#0@document:6  range wrap#0@document:6
+   wrap fractional 9.99                 wrap#0@document:6            {"x":19,"y":-1,"width":0,"height":20}  shadow wrap#0@document:6  range wrap#0@document:5
+   wrap fractional 10.01                wrap#0@document:6            {"x":19,"y":-1,"width":0,"height":20}  shadow wrap#0@document:6  range wrap#0@document:6
+   inline AA|BB left                    bdo#0@document:0             {"x":119,"y":89,"width":0,"height":20}  shadow bdo#0@document:0  range bdo#0@document:0
+   inline AA|BB right                   bdo#0@document:0             {"x":119,"y":89,"width":0,"height":20}  shadow bdo#0@document:0  range bdo#0@document:0
+   inline BB|CC                         bdo#0@document:2             {"x":79,"y":89,"width":0,"height":20}  shadow bdo#0@document:2  range bdo#0@document:2
+   inline CC|DD                         bidi#2@document:0            {"x":119,"y":89,"width":0,"height":20}  shadow bidi#2@document:0  range bidi#2@document:0
+   inline end                           BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi ltr before bdo                  BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi bdo visual left                 BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi bdo visual middle               BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi bdo visual right                BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   bidi after bdo                       BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   rtl line 1 right edge                rtl#0@document:5             {"x":219,"y":139,"width":0,"height":20}  shadow rtl#0@document:5  range rtl#0@document:5
+   rtl line 1 left edge                 rtl#0@document:9             {"x":299,"y":139,"width":0,"height":20}  shadow rtl#0@document:9  range rtl#0@document:9
+   rtl line 2 middle                    BODY@document:5              {"x":0,"y":0,"width":0,"height":0}  shadow t#0@closed:3  range BODY@document:5
+   rtl left of line 1                   rtl#0@document:9             {"x":299,"y":139,"width":0,"height":20}  shadow rtl#0@document:9  range rtl#0@document:9
+   open shadow text                     INPUT#field@document:1       {"x":19,"y":199,"width":0,"height":20}  shadow INPUT#field@document:1  range BODY@document:6
+   closed shadow text                   BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   text control                         BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   empty box                            DIV#empty@document:0         {"x":0,"y":0,"width":0,"height":0}  shadow DIV#empty@document:0  range DIV#empty@document:0
+   body beside text control             BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   negative x                           null                           shadow null  range null
+   negative y                           null                           shadow null  range null
+   past viewport x                      null                           shadow null  range null
+   past viewport y                      null                           shadow null  range null
+   viewport last pixel                  BODY@document:0              {"x":0,"y":0,"width":0,"height":0}  shadow BODY@document:0  range BODY@document:0
+   huge                                 null                           shadow null  range null
+   NaN x                                throws TypeError               shadow throws TypeError  range wrap#0@document:5
+   Infinity y                           throws TypeError               shadow throws TypeError  range wrap#0@document:6
+   -Infinity x                          throws TypeError               shadow throws TypeError  range wrap#0@document:5
+[{"scale":1,"before":{"offset":7,"connected":true,"data":"AAAA BBBB CCCC","rect":{"x":40,"y":20,"width":0,"height":20}},"shortened":{"offset":7,"connected":true,"data":"AA","rect":{"x":0,"y":0,"width":0,"height":0}},"removed":{"offset":7,"connected":false,"data":"AA","rect":{"x":0,"y":0,"width":0,"height":0}},"detachedDocument":null},{"scale":1.5,"before":{"offset":7,"connected":true,"data":"AAAA BBBB CCCC","rect":{"x":40,"y":20,"width":0,"height":20}},"shortened":{"offset":7,"connected":true,"data":"AA","rect":{"x":0,"y":0,"width":0,"height":0}},"removed":{"offset":7,"connected":false,"data":"AA","rect":{"x":0,"y":0,"width":0,"height":0}},"detachedDocument":null},{"scale":2,"before":{"offset":7,"connected":true,"data":"AAAA BBBB CCCC","rect":{"x":40,"y":20,"width":0,"height":20}},"shortened":{"offset":7,"connected":true,"data":"AA","rect":{"x":0,"y":0,"width":0,"height":0}},"removed":{"offset":7,"connected":false,"data":"AA","rect":{"x":0,"y":0,"width":0,"height":0}},"detachedDocument":null}]

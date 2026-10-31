@@ -216,7 +216,13 @@ check it when they expose the member: `A&B` needs both settings, `A|B` either. W
 function returns `RV_ERR_UNSUPPORTED` and leaves the DOM unchanged. The glue reads the settings of the target's
 document; for an event, of its target node's document, so an event that has no node target returns
 `RV_ERR_UNSUPPORTED`; for a range, of its start container's document; for a `DOMStringMap`, of its element's.
-A gated member of another interface without a document is left out.
+A gated member of another interface without a document is left out, unless `creationGatedInterfaces` maps the
+interface to the factory member that creates its objects (`CaretPosition` to `Document.caretPositionFromPoint`): the
+factory checks the setting, so the interface's members check only settings beyond the interface's own. The generator
+stops when the named factory does not carry the setting.
+
+`finiteNumberInputs` names interfaces, or single `Interface.member` operations, whose restricted `double` and `float`
+arguments reject NaN and infinities with a `TypeError`, as WebIDL conversion does.
 
 ## How the glue calls a member
 
