@@ -334,6 +334,7 @@ static constexpr const char* capabilityAbiNames[] = {
     "input-state",
     "viewport",
     "dom-binary-values",
+    "accessibility-relations",
     "page-scale",
     "obscured-insets",
     "form-submission",

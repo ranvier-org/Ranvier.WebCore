@@ -1284,6 +1284,8 @@ int32_t rv_abi_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "dom-binary-values"))
         return 1;
+    if (!std::strcmp(feature, "accessibility-relations"))
+        return 1;
     if (!std::strcmp(feature, "page-scale"))
         return 1;
     if (!std::strcmp(feature, "obscured-insets"))
@@ -5098,6 +5100,29 @@ int32_t rv_ax_children(RvAxNode* handle, RvAxNode** nodes, int32_t capacity, int
         return RV_ERR_BUFFER_TOO_SMALL;
     for (size_t i = 0; i < children.size(); ++i)
         nodes[i] = axHandle(children[i].ptr());
+    return RV_OK;
+}
+
+int32_t rv_ax_relations(RvAxNode* handle, int32_t kind, RvAxNode** nodes, int32_t capacity, int32_t* count)
+{
+    if (!count)
+        return RV_ERR_NULL_ARGUMENT;
+    if (auto status = axStatus(handle))
+        return status;
+    static constexpr AXRelation relations[] = { AXRelation::ActiveDescendant, AXRelation::ControllerFor, AXRelation::DescribedBy,
+        AXRelation::Details, AXRelation::ErrorMessage, AXRelation::FlowsTo, AXRelation::LabeledBy, AXRelation::OwnerFor };
+    if (kind < 0 || kind >= static_cast<int32_t>(std::size(relations)))
+        return RV_ERR_UNSUPPORTED;
+    Ref object = *axObject(handle);
+    updatedCache(object->document());
+    if (isGone(object))
+        return RV_ERR_DETACHED;
+    auto targets = object->relatedObjects(relations[kind]);
+    *count = static_cast<int32_t>(targets.size());
+    if (!nodes || capacity < *count)
+        return RV_ERR_BUFFER_TOO_SMALL;
+    for (size_t i = 0; i < targets.size(); ++i)
+        nodes[i] = axHandle(targets[i].ptr());
     return RV_OK;
 }
 

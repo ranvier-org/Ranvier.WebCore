@@ -9,7 +9,8 @@
     "in gen/dom-report.txt.",
     "callbackObjectRoots lists callback interfaces passed as refcounted object handles; contract names the shared",
     "contract's function type, and resultEnum the integer enumeration it returns.",
-    "eventTargetObjects lists interfaces derived directly from EventTarget whose handles are RvEventTarget references; attached is the C++ condition under which their members answer, else RV_ERR_DETACHED."
+    "eventTargetObjects lists interfaces derived directly from EventTarget whose handles are RvEventTarget references; attached is the C++ condition under which their members answer, else RV_ERR_DETACHED.",
+    "elementArrayReflections lists [Reflect] FrozenArray<Element>? attributes bound to the engine's element array reflection: the getter returns a snapshot sequence, or none for null; the setter takes a sequence, or none to clear."
   ],
   "attributeBridges": {
     "Document.adoptedStyleSheets": {
@@ -609,6 +610,15 @@
   ],
   "customGetters": [
     "Node.nodeType"
+  ],
+  "elementArrayReflections": [
+    "Element.ariaActionsElements",
+    "Element.ariaControlsElements",
+    "Element.ariaDescribedByElements",
+    "Element.ariaDetailsElements",
+    "Element.ariaErrorMessageElements",
+    "Element.ariaFlowToElements",
+    "Element.ariaLabelledByElements"
   ],
   "contract": {
     "htmlTags": "html/HTMLTagNames.in",
