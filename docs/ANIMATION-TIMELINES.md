@@ -31,3 +31,34 @@ The timeline calls run with JSC's crash on a disallowed VM entry armed. The evid
   as Chromium and the specification give. `tests/fixtures/animation-timelines-qualified.json` records both values.
 - **Cancel with a pending pause task.** Cancelling rejects the ready promise, which attempts a VM entry (A03). The
   armed scope settles the pause with `finish` first.
+
+## A07: scroll timelines
+
+The DOM generator produces `ScrollTimeline` from WebKit's IDL; the pinned WebKit enables it without a setting.
+
+| Function | Contract |
+|---|---|
+| `rv_dom_scroll_timeline_create(document, options, result)` | `new ScrollTimeline(options)`; `options` may be NULL for every default |
+| `rv_dom_scroll_timeline_get_source` | the source element, a new `RvNode` reference, or NULL |
+| `rv_dom_scroll_timeline_get_axis` | `RV_DOM_SCROLL_AXIS_BLOCK`, `_INLINE`, `_X` or `_Y` |
+
+`RvDomScrollTimelineOptions.source` is `RvNode* const*`: NULL for absent, which follows the document's scrolling element,
+and a pointer to NULL for a null source, which gives an inactive timeline. A source of another node type is
+`RV_ERR_WRONG_INTERFACE`; an axis outside the enumeration is `RV_ERR_UNSUPPORTED`. `currentTime` and `duration` are the
+`CSSNumericValue` arm of the time union: a `CSSUnitValue` in `percent` of the source's scroll range, or absent while
+the source has no scrollable box. The progress reads the value cached by the last rendering update (`rv_host_update`).
+
+The probe compares, after two rendering updates as the oracle after two frames: the four axes; element, nested, root,
+unscrollable, null and default sources; progress at the start, quarter, middle and end of the scroll range; animations
+created by `Element.animate` with the `timeline` option and by the Animation constructor; a content resize; and a
+removed source. Teardown kind "scroll timeline" proves a held timeline and an animation on it keep no document alive.
+
+### Qualifications
+
+- **Single precision.** WebKit computes scroll progress in single precision; the probe compares percentages to within
+  1e-4.
+- **Scroll anchoring.** Chromium anchors the root scroll position when content above it is removed, and WebKit does not.
+  The scroll page sets `overflow-anchor: none`.
+- **Removed source.** Once the source leaves the tree, both engines read a null current time. The pinned WebKit keeps
+  the last effect value until the target's style is next invalidated; Chromium drops it at once. The probe asserts both
+  values and that a restyle matches Chromium.
