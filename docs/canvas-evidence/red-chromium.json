@@ -1,0 +1,179 @@
+{
+ "browser": "156.0.8078.4",
+ "defaults": {
+  "width": 300,
+  "height": 150
+ },
+ "blockCanvasWithoutContext": [
+  300,
+  150
+ ],
+ "members": {
+  "getContext": "function",
+  "isContextLost": true,
+  "reset": true,
+  "getContextAttributes": true
+ },
+ "identity": {
+  "same": true,
+  "canvas": true,
+  "ignoresLaterSettings": true
+ },
+ "otherTypesAfter2d": {
+  "webgl": null,
+  "webgl2": null,
+  "bitmaprenderer": null,
+  "webgpu": null,
+  "bogus": null,
+  "2D": null,
+  "": null
+ },
+ "unknownOnFresh": {
+  "bogus": null,
+  "then2d": true
+ },
+ "attributes": {
+  "defaults": {
+   "alpha": true,
+   "colorSpace": "srgb",
+   "colorType": "unorm8",
+   "desynchronized": false,
+   "toneMapping": {
+    "mode": "standard"
+   },
+   "willReadFrequently": false
+  },
+  "willRead": {
+   "alpha": true,
+   "colorSpace": "srgb",
+   "colorType": "unorm8",
+   "desynchronized": false,
+   "toneMapping": {
+    "mode": "standard"
+   },
+   "willReadFrequently": true
+  },
+  "p3": {
+   "alpha": false,
+   "colorSpace": "display-p3",
+   "colorType": "unorm8",
+   "desynchronized": false,
+   "toneMapping": {
+    "mode": "standard"
+   },
+   "willReadFrequently": false
+  }
+ },
+ "initialFillStyle": "#000000",
+ "initialPixel": [
+  0,
+  0,
+  0,
+  0
+ ],
+ "fillStyleHex": "#ff0000",
+ "fillStyleInvalidKept": "#ff0000",
+ "fillStyleRgba": "rgba(0, 0, 255, 0.5)",
+ "fillStyleNamed": "#00ff00",
+ "drawn": {
+  "left": [
+   255,
+   0,
+   0,
+   255
+  ],
+  "right": [
+   0,
+   0,
+   255,
+   255
+  ]
+ },
+ "cleared": {
+  "inside": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "outside": [
+   255,
+   0,
+   0,
+   255
+  ]
+ },
+ "nonFiniteIgnored": [
+  0,
+  0,
+  0,
+  0
+ ],
+ "halfAlphaOverRed": [
+  127,
+  128,
+  0,
+  255
+ ],
+ "halfAlphaOverBlue": [
+  0,
+  128,
+  127,
+  255
+ ],
+ "resetSameWidth": {
+  "pixel": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "fillStyle": "#000000",
+  "width": 40,
+  "same": true
+ },
+ "resetHeight": {
+  "pixel": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "fillStyle": "#000000",
+  "height": 30
+ },
+ "attributeWidth": {
+  "width": 50,
+  "pixel": [
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ "hugeWidth": 300,
+ "zeroWidth": {
+  "width": 0,
+  "attributes": {
+   "alpha": true,
+   "colorSpace": "srgb",
+   "colorType": "unorm8",
+   "desynchronized": false,
+   "toneMapping": {
+    "mode": "standard"
+   },
+   "willReadFrequently": false
+  }
+ },
+ "detached": {
+  "pixel": [
+   255,
+   0,
+   255,
+   255
+  ],
+  "canvasConnected": false,
+  "same": true
+ },
+ "screenshotBytes": 119
+}

@@ -458,7 +458,9 @@ class World:
             configured_object = f"{name}.{member.name}" in self.config.get("dictionaryObjectMembers", [])
             if configured_object and (mapped.kind != "object" or not member.required or mapped.nullable):
                 raise SystemExit(f"{name}.{member.name}: dictionary object members must be required nonnullable object handles")
-            if (mapped.kind in ("object", "event") and not configured_object) or mapped.interface == "EventTarget":
+            event_target = (mapped.interface == "EventTarget"
+                            and f"{name}.{member.name}" in self.config.get("dictionaryEventTargetMembers", []))
+            if (mapped.kind in ("object", "event") and not configured_object) or (mapped.interface == "EventTarget" and not event_target):
                 raise Unsupported(f"dictionary {name}: member {member.name} of type {member.type}")
             found.append((member, mapped))
         return found
@@ -485,6 +487,13 @@ class World:
             if not nested:
                 raise Unsupported(f'byte span {t.name} outside a union or sequence input')
             return Mapped('bytes', False, 'RvDomByteSpan', label=t.name)
+        if t.name in self.config.get('typedArrayInputTypes', []):
+            element = {'Float32Array': 'float', 'Float64Array': 'double'}.get(t.name)
+            if element is None:
+                raise SystemExit(f'typedArrayInputTypes: {t.name} has no C element type')
+            if t.nullable or nested:
+                raise Unsupported(f'typed array input {t.name} that is nullable or inside a union or sequence')
+            return Mapped('typedinput', False, element, label=t.name)
         if t.name in self.config.get('typedArrayViewTypes', []):
             if t.nullable:
                 raise Unsupported(f'nullable typed array view {t.name}')
@@ -1173,6 +1182,9 @@ class Generator(ComplexGeneratorMixin):
         label = f"{interface}.{member.name}"
         if label in self.exclude or member.name in self.exclude:
             return "excluded by gen/dom.json"
+        selection = self.world.config.get("memberSelections", {}).get(interface)
+        if selection is not None and member.name not in selection:
+            return "outside the gen/dom.json memberSelections"
         if member.kind == 'operation' and member.special == 'stringifier' and interface not in self.world.config.get('stringifiers', []):
             return 'stringifier outside configured binding'
         if not member.name:
@@ -1301,11 +1313,16 @@ class Generator(ComplexGeneratorMixin):
             return "impl->getNameAttribute()"
         return f"impl->attributeWithoutSynchronization({attribute})"
 
-    def setting_check(self, interface, chain, setting):
+    def setting_check(self, interface, chain, setting, context=False):
         """The glue that returns RV_ERR_UNSUPPORTED while a setting of [EnabledBySetting] is off, as WebKit's
-        bindings hide the member then: A&B needs both, A|B either."""
+        bindings hide the member then: A&B needs both, A|B either. context is whether the member takes the
+        checked Document of objectContexts, whose settings then apply."""
         lines = []
-        if "Node" in chain:
+        if context:
+            lines = ["RefPtr settingsDocument = dynamicDowncast<Document>(*nodeOf(context));", "if (!settingsDocument)",
+                     "    return RV_ERR_WRONG_INTERFACE;"]
+            document = "(*settingsDocument)"
+        elif "Node" in chain:
             document = "impl->document()"
         elif "Event" in chain:
             # An event reaches the settings through its target's document; one without a node target has none.
@@ -1390,6 +1407,8 @@ class Generator(ComplexGeneratorMixin):
         absent = mapped.nullable or (not member.required and member.default is None)
         if mapped.kind == "string":
             return "RvDomUtf8StringInput"
+        if mapped.kind == "node" and mapped.interface == "EventTarget":
+            return "RvEventTarget*"
         if mapped.kind in ("node", "object"):
             return f"{mapped.handle}*"
         if mapped.kind == "dict":
@@ -1398,6 +1417,23 @@ class Generator(ComplexGeneratorMixin):
             return f"const {mapped.ctype}*"
         ctype = mapped.ctype
         return f"const {ctype}*" if absent else ctype
+
+    def idl_defaults(self, dictionary, target):
+        """Assigns the IDL defaults of the dictionary's own members where the C++ struct defaults differ from them."""
+        lines = []
+        for member in self.world.dictionaries[dictionary].members:
+            default = member.default
+            if default is None or "Conditional" in member.attrs or "EnabledBySetting" in member.attrs:
+                continue
+            cpp_field = member.attrs.get("ImplementedAs", member.name)
+            mapped = self.world.map(member.type)
+            if mapped.kind == "string" and default == '""':
+                lines.append(f"{target}.{cpp_field} = emptyString();")
+            elif mapped.kind == "string" and default.startswith('"'):
+                lines.append(f"{target}.{cpp_field} = {default}_s;")
+            elif mapped.kind in ("number", "bool") and re.fullmatch(r"-?[0-9.]+|true|false", default):
+                lines.append(f"{target}.{cpp_field} = {default};")
+        return lines
 
     def dictionary_object_prefix(self, pointer, struct, cpp, target, dictionary, objects, argument):
         """Reads a dictionary's one required object member first: its C++ struct holds a Ref and has no default."""
@@ -1444,7 +1480,10 @@ class Generator(ComplexGeneratorMixin):
         elif mapped.kind == "node":
             self.headers.add(f"{mapped.cls}.h")
             lines.append(f"if ({covered} && {pointer}->{field}) {{")
-            if mapped.cls == "Node":
+            if mapped.cls == "EventTarget":
+                # An RvEventTarget is the EventTarget pointer of the hand-written event ABI.
+                lines.append(f"    {target}.{cpp_field} = reinterpret_cast<EventTarget*>({pointer}->{field});")
+            elif mapped.cls == "Node":
                 lines.append(f"    {target}.{cpp_field} = nodeOf({pointer}->{field});")
             else:
                 lines.append(f"    RefPtr value = dynamicDowncast<{mapped.cls}>(*nodeOf({pointer}->{field}));")
@@ -1495,6 +1534,10 @@ class Generator(ComplexGeneratorMixin):
             if implemented_by:
                 self.headers.add(f"{implemented_by}.h")
                 return f"WebCore::{implemented_by}::{name}(*impl{{call_with}}, {value})"
+            if f"{interface}.{member.name}" in self.world.config.get("unionSetterOverloads", []):
+                # The C++ setter is overloaded per union arm, String&& or RefPtr<T>&&: call the overload of the held arm.
+                return (f"WTF::switchOn({value}, [&](auto&& arm) {{ if constexpr (std::is_same_v<std::remove_cvref_t<decltype(arm)>, String>) "
+                        f"impl->{name}(std::move(arm)); else impl->{name}(RefPtr {{ std::move(arm) }}); }})")
             return f"impl->{name}({{call_with_lead}}{value})"
         t = self.world.resolve(member.type).name
         if t == "boolean":
@@ -1720,16 +1763,45 @@ class Generator(ComplexGeneratorMixin):
                     notes.append(f"{name} may be NULL for the IDL default")
                 cpp = self.dictionary_cpp(mapped.interface)
                 objects = [(field_member, field_mapped) for field_member, field_mapped in fields if field_mapped.kind == "object"]
-                if objects:
+                reference = mapped.interface in self.world.config.get("referenceDictionaries", [])
+                target = f"a{index}"
+                if reference:
+                    # The C++ struct holds a Ref per required node, so the fields are read into a stage first.
+                    if objects or argument.optional or self.world.dictionaries[mapped.interface].base:
+                        raise SystemExit(f"{mapped.interface}: a reference dictionary must be a required argument with no base or object member")
+                    target = f"stage{index}"
+                    prepare.append("struct {")
+                    for field_member, field_mapped in fields:
+                        cpp_field = field_member.attrs.get("ImplementedAs", field_member.name)
+                        if field_mapped.kind == "node":
+                            prepare.append(f"    RefPtr<{field_mapped.cls}> {cpp_field};")
+                        else:
+                            prepare.append(f"    std::remove_cvref_t<decltype(std::declval<{cpp}&>().{cpp_field})> {cpp_field} {{ }};")
+                    prepare.append(f"}} {target};")
+                elif objects:
                     prepare += self.dictionary_object_prefix(name, struct, cpp, f"a{index}", mapped.interface, objects, argument)
                 else:
                     prepare.append(f"{cpp} a{index} {{ }};")
+                    if mapped.interface in self.world.config.get("idlDefaultDictionaries", []):
+                        prepare += self.idl_defaults(mapped.interface, f"a{index}")
                 prepare.append(f"if ({name}) {{")
                 for field_member, field_mapped in fields:
                     if field_mapped.kind == "object":
                         continue
-                    prepare += ["    " + line for line in self.dictionary_field(name, struct, f"a{index}", field_member, field_mapped, mapped.interface)]
+                    prepare += ["    " + line for line in self.dictionary_field(name, struct, target, field_member, field_mapped, mapped.interface)]
                 prepare.append("}")
+                if reference:
+                    values = []
+                    for field_member, field_mapped in fields:
+                        cpp_field = field_member.attrs.get("ImplementedAs", field_member.name)
+                        if field_mapped.kind == "node":
+                            if not field_member.required or field_mapped.nullable:
+                                raise SystemExit(f"{mapped.interface}.{field_member.name}: reference dictionary nodes must be required")
+                            prepare += [f"if (!{target}.{cpp_field})", "    return RV_ERR_NULL_ARGUMENT;"]
+                            values.append(f".{cpp_field} = {target}.{cpp_field}.releaseNonNull()")
+                        else:
+                            values.append(f".{cpp_field} = std::move({target}.{cpp_field})")
+                    prepare.append(f"{cpp} a{index} {{ {', '.join(values)} }};")
                 if svg_matrix_binding:
                     prepare += [f'auto matrixValidation{index} = DOMMatrixReadOnly::validateAndFixup(a{index});',
                                 f'if (matrixValidation{index}.hasException())',
@@ -1762,6 +1834,18 @@ class Generator(ComplexGeneratorMixin):
                     passed.append(f"DomSequenceArgument<{self.transport_cpp(mapped.subtypes[0])}> {{ std::move(*a{index}) }}")
                 else:
                     passed.append(f"std::move(*a{index})")
+            elif mapped.kind == 'typedinput':
+                if argument.optional or argument.variadic:
+                    raise Unsupported('optional or variadic typed array input')
+                params += [(f'const {mapped.ctype}*', name), ('int32_t', f'{name}_count')]
+                checks.append(f'({name}_count >= 0 && ({name}_count == 0 || {name}))')
+                bytes = f'std::span<const uint8_t> {{ reinterpret_cast<const uint8_t*>({name}), static_cast<size_t>({name}_count) * sizeof({mapped.ctype}) }}'
+                prepare += [f'RefPtr buffer{index} = JSC::ArrayBuffer::tryCreate({name}_count ? {bytes} : std::span<const uint8_t> {{ }});',
+                            f'RefPtr a{index} = buffer{index} ? JSC::{mapped.label}::tryCreate(WTF::move(buffer{index}), 0, static_cast<size_t>({name}_count)) : nullptr;',
+                            f'if (!a{index})',
+                            f'    return Ranvier::recordException(Exception {{ ExceptionCode::RangeError, "The array could not be allocated."_s }});']
+                passed.append(f'a{index}.releaseNonNull()')
+                notes.append(f'{name} holds {name}_count elements, copied into a new {mapped.label}')
             elif mapped.kind == 'typedarray':
                 if 'ReturnValue' not in argument.attrs or argument.optional or argument.variadic:
                     raise Unsupported('typed array view argument without [ReturnValue]')
@@ -1817,6 +1901,8 @@ class Generator(ComplexGeneratorMixin):
             sink = ("returnvalue", index)
         elif returns.kind == 'typedarray':
             raise Unsupported('typed array view result')
+        elif returns.kind == 'typedinput':
+            raise Unsupported(f'type {returns.label}')
         elif returns.kind == "string":
             params += [("char*", "buffer"), ("int32_t", "capacity"), ("int32_t*", "length")]
             checks.append("length")
@@ -1910,7 +1996,7 @@ class Generator(ComplexGeneratorMixin):
                 raise SystemExit(f"creationGatedInterfaces: {factory} does not check [EnabledBySetting={setting}]")
             setting = None
         if setting:
-            body += self.setting_check(interface, chain, setting)
+            body += self.setting_check(interface, chain, setting, bool(call_with and "Node" not in chain and context_receiver))
             notes.append(f"RV_ERR_UNSUPPORTED while the setting {setting} is off")
         if call_with:
             if "Node" not in chain:

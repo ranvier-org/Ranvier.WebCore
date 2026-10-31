@@ -39,3 +39,5 @@
 0038-platform-screen-win-embedder-screen-data.patch
 0039-element-array-attribute-empty-relations.patch
 0040-empty-chrome-client-pointer-overridable.patch
+0041-data-transfer-in-memory-file-access.patch
+0042-canvas-renders-embedder-context.patch

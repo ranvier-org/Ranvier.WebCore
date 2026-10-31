@@ -18,7 +18,7 @@ from utf8_inputs import Utf8
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, WRONG_THREAD, UNSUPPORTED, WRONG_INTERFACE = 0, -1, -2, -9, -11
 CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_void_p)
-ABI = 55
+ABI = 56
 BEHAVIOR = {None: 0, 'auto': 0, 'instant': 1, 'smooth': 2}
 # Steps where the engine's truncation toward zero gives another whole pixel than Chromium's rounding to nearest, at
 # every scale and on every scroller (the qualification in docs/viewport-scroll-evidence).
@@ -74,6 +74,7 @@ def verify(native_directory):
         element_pair = {op: p.bind('rv_dom_element_' + op, I, [P, D, D]) for op in ['scroll', 'scroll_to', 'scroll_by']}
         element_options = {op: p.bind('rv_dom_element_' + op + '_1', I, [P, ctypes.POINTER(ScrollToOptions)]) for op in ['scroll', 'scroll_to', 'scroll_by']}
         host_position = p.bind('rv_host_scroll_position', I, [P, ctypes.POINTER(I), ctypes.POINTER(I)])
+        host_update = p.bind('rv_host_update', I, [P])
         cycle = p.bind('rv_run_loop_cycle', I, [I])
         add = p.bind('rv_event_target_add_listener', P, [P, Utf8, I, CALLBACK, P])
         remove = p.bind('rv_listener_remove', I, [P])
@@ -133,12 +134,12 @@ def verify(native_directory):
 
         def settle(smooth=False):
             for _ in range(200 if smooth else 4):
-                p.update()
+                host_update(p.host)
                 cycle(16 if smooth else 20)
                 if smooth and 'scrollend' in ''.join(log):
                     break
             for _ in range(3):
-                p.update()
+                host_update(p.host)
                 cycle(20)
 
         def run_step(route, step):

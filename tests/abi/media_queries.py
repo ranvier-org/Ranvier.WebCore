@@ -17,7 +17,7 @@ from svg_paint_probe import SvgProbe
 from utf8_inputs import Utf8
 
 OK, NULL_ARGUMENT, WRONG_THREAD, UNSUPPORTED = 0, -1, -2, -9
-ABI = 55
+ABI = 56
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_void_p)
 VALUES = {

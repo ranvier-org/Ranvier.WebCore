@@ -18,11 +18,14 @@ static constexpr const char* capabilityFacilityNames[] = {
     "shared-worker", "websocket", "webtransport", "file-system", "push", "inspector", "remote-inspector",
     "jsc-inspector", "jit", "dfg-jit", "ftl-jit", "webassembly", "webassembly-bbq-jit", "webassembly-omg-jit",
     "accessibility", "accessibility-uia", "accessibility-events", "clipboard", "clipboard-read-callback",
-    "clipboard-write-callback", "drop", "drag-out", "popups", "tooltip", "input", "ime", "frame", "scroll",
+    "clipboard-write-callback", "clipboard-file-write-callback", "clipboard-files", "drop", "drag-out", "data-transfer-files",
+    "range-replacement", "popups", "tooltip", "input", "ime", "frame", "scroll",
     "speech-synthesis", "gamepad", "spellcheck", "pdfjs", "wk-web-extensions", "notifications", "diagnostics",
     "inspector-frontend", "cascade-diagnostics", "media-preferences", "media-color-scheme", "media-reduced-motion",
     "media-contrast", "media-pointer", "media-hover", "media-text-scale", "media-forced-colors", "media-contrast-less",
-    "media-reduced-transparency", "media-reduced-data"
+    "media-reduced-transparency", "media-reduced-data",
+    "screen-wake-lock", "sleep-disabler-callback",
+    "notification-presenter"
 };
 
 static constexpr const char* capabilityHostFacilityNames[] = { "clipboard", "drop", "tooltip", "input", "ime", "scroll" };
@@ -229,6 +232,9 @@ static CapabilityResult capabilityQuery(RvHost& host, int category, const char* 
     if (!std::strcmp(name, "resource-callback")) { result.facts[1] = 1; result.boolean(!!host.resourceHandler); }
     else if (!std::strcmp(name, "clipboard-read-callback")) { result.facts[1] = 1; result.boolean(!!host.clipboardRead); }
     else if (!std::strcmp(name, "clipboard-write-callback")) { result.facts[1] = 1; result.boolean(!!host.clipboardWrite); }
+    else if (!std::strcmp(name, "clipboard-file-write-callback")) { result.facts[1] = 1; result.boolean(!!host.clipboardWriteFile); }
+    else if (!std::strcmp(name, "clipboard-files") || !std::strcmp(name, "data-transfer-files") || !std::strcmp(name, "range-replacement"))
+        result.facts[1] = rv_abi_has(name);
     else if (!std::strcmp(name, "popups")) { result.facts[1] = 1; result.boolean(!!host.popupCallback); }
     else if (!std::strcmp(name, "drag-out")) { result.facts[1] = 1; result.boolean(!!host.dragStartCallback); }
     else if (!std::strcmp(name, "frame")) { result.facts[1] = 1; result.boolean(!!host.frameCallback); }
@@ -252,6 +258,10 @@ static CapabilityResult capabilityQuery(RvHost& host, int category, const char* 
     // reduced-data feature.
     else if (!std::strcmp(name, "media-forced-colors") || !std::strcmp(name, "media-contrast-less")
         || !std::strcmp(name, "media-reduced-transparency") || !std::strcmp(name, "media-reduced-data")) result.facts[1] = 0;
+    // Granted only by an application policy; the display stays awake only through a sleep disabler callback.
+    else if (!std::strcmp(name, "screen-wake-lock")) { result.facts[1] = 1; result.boolean(!!host.wakeLockPolicy); }
+    else if (!std::strcmp(name, "sleep-disabler-callback")) { result.facts[1] = 1; result.boolean(sleepDisablerCallbackSet); }
+    else if (!std::strcmp(name, "notification-presenter")) { result.facts[1] = 1; result.boolean(!!host.notificationPresenter); }
     // No flavor ships a developer-tools frontend (WebInspectorUI) or connects one to the page's inspector controller.
     else if (!std::strcmp(name, "inspector-frontend")) { result.facts[1] = 0; result.facts[4] = 0; }
     else if (capabilityContains(capabilityHostFacilityNames, name)) result.facts[1] = 1;

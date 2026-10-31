@@ -389,6 +389,13 @@ let private viewportDelegate =
 let private viewportCallback =
     System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate viewportDelegate
 
+type private WakeLockPolicy = delegate of context: nativeint * host: nativeint * kind: int -> int
+
+let private grantDelegate = WakeLockPolicy(fun _ _ _ -> 1)
+
+let private grantPolicy =
+    System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate grantDelegate
+
 /// Appends a div with a child span, takes one extra handle of the kind from the div (removing the div first when
 /// <c>remove</c> is set), destroys the host, then releases that handle. The document and the div must be destroyed
 /// after collection whatever the destroy order.
@@ -489,6 +496,73 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
 
                 if viewportCalls <> 0 then
                     failwith "scroll listener ran after host destroy"
+        | "wake lock sentinel" ->
+            rv_host_set_wake_lock_policy (host, grantPolicy, 0n) |> check "wake lock policy"
+            let sentinel = [| 0n |]
+            rv_wake_lock_request (host, 0, sentinel) |> check "wake lock request"
+            held.Value <- sentinel[0]
+
+            let listener =
+                rv_event_target_add_listener (held.Value, utf8 "release", utf8Length "release", 0, viewportCallback, 0n)
+
+            if listener = 0n then
+                failwith "no release listener"
+
+            fun () ->
+                let mutable released = -1
+                let mutable wakeType = -1
+
+                rv_wake_lock_state (held.Value, &released, &wakeType)
+                |> check "wake lock state after destroy"
+
+                if released <> 1 then
+                    failwithf "wake lock released %d after destroy" released
+
+                rv_wake_lock_release held.Value |> check "wake lock release after destroy"
+                rv_listener_remove listener |> check "release listener removal after destroy"
+                rv_event_target_release held.Value
+
+                if viewportCalls <> 0 then
+                    failwith "release listener ran after host destroy"
+        | "notification" ->
+            let mutable options = NotificationOptions()
+            options.size <- 64
+            options.dir <- 0
+            options.silent <- -1
+            options.body_length <- -1
+            options.tag_length <- -1
+            options.lang_length <- -1
+            options.icon_length <- -1
+            let title = Text.Encoding.UTF8.GetBytes "kept"
+            let created = [| 0n |]
+
+            rv_notification_create (host, title, title.Length, &options, created)
+            |> check "notification create"
+
+            held.Value <- created[0]
+
+            let listener =
+                rv_event_target_add_listener (held.Value, utf8 "click", utf8Length "click", 0, viewportCallback, 0n)
+
+            if listener = 0n then
+                failwith "no notification listener"
+
+            fun () ->
+                let buffer = Array.zeroCreate<byte> 16
+                let length = [| -1 |]
+
+                rv_notification_string (held.Value, 0, buffer, buffer.Length, length)
+                |> check "notification title after destroy"
+
+                if Text.Encoding.UTF8.GetString (buffer, 0, length[0]) <> "kept" then
+                    failwith "notification title changed after destroy"
+
+                rv_notification_close held.Value |> check "notification close after destroy"
+                rv_listener_remove listener |> check "notification listener removal after destroy"
+                rv_event_target_release held.Value
+
+                if viewportCalls <> 0 then
+                    failwith "notification listener ran after host destroy"
         | "coordinate spaces" ->
             rv_element_set_style (div, "width", utf8 "40px", utf8Length "40px", 0) |> check "div width"
             rv_element_set_style (div, "height", utf8 "20px", utf8Length "20px", 0) |> check "div height"
@@ -1379,6 +1453,8 @@ let run (outDir: string) =
                     "string results"
                     "aria relations"
                     "coordinate spaces"
+                    "wake lock sentinel"
+                    "notification"
                 ] do
                 for remove in [ false; true ] do
                     releaseAfterDestroy kind remove

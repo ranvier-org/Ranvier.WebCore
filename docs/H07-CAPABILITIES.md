@@ -21,6 +21,9 @@ The explicit host implementation allowlist describes these bounded facilities:
 
 - Clipboard: RvEditorClient and rv_host_set_clipboard DOM clipboard integration.
 - Drop: native drag event dispatch and text insertion through the host drag client.
+- Clipboard and drop files (clipboard-files, data-transfer-files): app File payloads through the host transfer
+  pasteboard, and page files through clipboard-file-write-callback and rv_drag_file.
+- Range replacement: rv_host_replace_range insertReplacementText edits.
 - Tooltip: RvChromeClient tooltip state and rv_host_tooltip retrieval.
 - Input: rv_host_mouse/rv_host_key event handling and editor dispatch.
 - IME: rv_host_ime_set_composition/commit/cancel/rect editor operations.

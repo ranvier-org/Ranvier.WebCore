@@ -1,0 +1,14 @@
+diff --git a/Source/WebCore/dom/DataTransfer.cpp b/Source/WebCore/dom/DataTransfer.cpp
+--- a/Source/WebCore/dom/DataTransfer.cpp
++++ b/Source/WebCore/dom/DataTransfer.cpp
+@@ -271,8 +271,8 @@
+     // In-memory image paste does not access files on disk, so it is safe to allow.
+     return !forDrag() && m_pasteboard && m_pasteboard->fileContentState() == Pasteboard::FileContentState::InMemoryImage;
+ #else
+-    // Check https://webkit.org/b/271957 before allowing file access for your port.
+-    return false;
++    // In-memory file contents expose no file system path (https://webkit.org/b/271957), in a paste or a drop.
++    return m_pasteboard && m_pasteboard->fileContentState() == Pasteboard::FileContentState::InMemoryImage;
+ #endif
+ }
+ 

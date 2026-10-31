@@ -4,8 +4,12 @@
 #include "RanvierSvgViewGlue.h"
 #include "RanvierResourceGlue.h"
 #include "RanvierEventGlue.h"
+#include "RanvierTransferGlue.h"
 #include "RanvierViewportGlue.h"
+#include "RanvierCanvasGlue.h"
 #include "RanvierInspectGlue.h"
+#include "RanvierWakeLockGlue.h"
+#include "RanvierNotificationGlue.h"
 #include <atomic>
 #include <string>
 #include <vector>
@@ -101,6 +105,7 @@
 #include <WebCore/SharedBuffer.h>
 #include <WebCore/SubresourceLoader.h>
 #include <WebCore/Chrome.h>
+#include <WebCore/AbstractRange.h>
 #include <WebCore/ClipboardEvent.h>
 #include <WebCore/DragActions.h>
 #include <WebCore/DragClient.h>
@@ -505,6 +510,31 @@ private:
 // The host whose rv_host_mouse call is running; the drag client reads it, having no page of its own.
 static RvHost* inputHost;
 
+// The dragstart event's data transfer of the drag being started. WebCore moves its data, image and effects into the
+// drag's own data transfer, but not its item list, which holds the Files dragstart listeners added.
+static RefPtr<DataTransfer>& dragStartTransfer()
+{
+    static NeverDestroyed<RefPtr<DataTransfer>> transfer;
+    return transfer;
+}
+
+class RvDragStartCapture final : public EventListener {
+public:
+    static Ref<RvDragStartCapture> create() { return adoptRef(*new RvDragStartCapture); }
+
+private:
+    RvDragStartCapture()
+        : EventListener(CPPEventListenerType)
+    {
+    }
+
+    void handleEvent(ScriptExecutionContext&, Event& event) final
+    {
+        if (auto* drag = dynamicDowncast<DragEvent>(event))
+            dragStartTransfer() = drag->dataTransfer();
+    }
+};
+
 // Hands drags out of the page to the app's drag start callback, in the App drag style.
 class RvDragClient final : public DragClient {
     void willPerformDragDestinationAction(DragDestinationAction, const DragData&) final { }
@@ -590,6 +620,7 @@ static Ref<Page> createPage(IntSize viewportSize, RvScreenOrientationManager& or
     page->settings().setScreenOrientationAPIEnabled(true);
     page->settings().setVisualViewportAPIEnabled(true);
     page->settings().setInteractiveFormValidationEnabled(true);
+    page->settings().setDataTransferItemsEnabled(true);
     // Markup arrives decoded, so the document's encoding, which form submission and URL query encoding use, is UTF-8.
     page->settings().setDefaultTextEncodingName("UTF-8"_s);
 #if ENABLE(VIDEO)
@@ -719,6 +750,11 @@ struct RvHost {
     void* resourceContext { nullptr };
     RvFormSubmissionHandler formSubmissionHandler { nullptr };
     void* formSubmissionContext { nullptr };
+    RvWakeLockPolicy wakeLockPolicy { nullptr };
+    void* wakeLockContext { nullptr };
+    RvNotificationPresenter notificationPresenter { nullptr };
+    void* notificationContext { nullptr };
+    int32_t notificationPermission { RV_NOTIFICATION_DEFAULT };
 #if RANVIER_COMPOSITING
     // rv_host_create sets RV_COMPOSITING_WHEN_NEEDED.
     int32_t compositingMode { RV_COMPOSITING_OFF };
@@ -746,6 +782,8 @@ struct RvHost {
     RvClipboardWrite clipboardWrite { nullptr };
     RvClipboardRead clipboardRead { nullptr };
     void* clipboardContext { nullptr };
+    RvClipboardWriteFile clipboardWriteFile { nullptr };
+    void* clipboardWriteFileContext { nullptr };
     int32_t dragStyle { RV_DRAG_DOM };
     // The element under a drag from outside, which received dragenter.
     RefPtr<Element> dragTarget;
@@ -753,6 +791,8 @@ struct RvHost {
     IntPoint pressPoint;
     RvDragStartCallback dragStartCallback { nullptr };
     void* dragStartContext { nullptr };
+    // The document whose dragstart events the host captures, for the files listeners add to the item list.
+    WeakPtr<Document, WeakPtrImplWithEventTargetData> dragStartDocument;
     bool accessibility { false };
     // rv_host_set_diagnostics: the rv_host_inspect_* calls read the document only while set.
     bool diagnostics { false };
@@ -868,6 +908,11 @@ void RvChromeClient::wantUpdate()
 static bool onOwningThread() { return isMainThread(); }
 
 static bool segmentationInitialized;
+
+// The first rv_host_create installed the process's SleepDisablerClient.
+static bool sleepDisablersInstalled;
+// rv_set_sleep_disabler_callback set a callback.
+static bool sleepDisablerCallbackSet;
 
 // The hosts alive on the owning thread, for routing a page's loads to its host.
 static Vector<RvHost*> liveHosts;
@@ -1352,9 +1397,11 @@ static_assert(sizeof(RvScreenMetrics) == 36 && offsetof(RvScreenMetrics, avail_l
 static_assert(sizeof(RvIntersectionEntry) == 136 && offsetof(RvIntersectionEntry, target) == 8 && offsetof(RvIntersectionEntry, time) == 16
     && offsetof(RvIntersectionEntry, hasRootBounds) == 24 && offsetof(RvIntersectionEntry, rootX) == 32 && offsetof(RvIntersectionEntry, intersectionRatio) == 128);
 static_assert(sizeof(RvResizeEntry) == 96 && offsetof(RvResizeEntry, target) == 8 && offsetof(RvResizeEntry, contentX) == 16 && offsetof(RvResizeEntry, devicePixelBlockSize) == 88);
+static_assert(sizeof(void*) != 8 || (sizeof(RvNotificationOptions) == 64 && offsetof(RvNotificationOptions, reserved) == 28
+    && offsetof(RvNotificationOptions, body) == 32 && offsetof(RvNotificationOptions, icon) == 56));
 static_assert(sizeof(RvWindowMetrics) == 32 && offsetof(RvWindowMetrics, outerHeight) == 16 && offsetof(RvWindowMetrics, devicePixelRatio) == 24);
 
-int32_t rv_abi_version(void) { return 55; }
+int32_t rv_abi_version(void) { return 56; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -1378,6 +1425,8 @@ int32_t rv_abi_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "font-load"))
         return 1;
+    if (!std::strcmp(feature, "font-readiness"))
+        return 1;
     if (!std::strcmp(feature, "event-construction"))
         return 1;
     if (!std::strcmp(feature, "input-state"))
@@ -1400,18 +1449,29 @@ int32_t rv_abi_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "diagnostics"))
         return 1;
+    if (!std::strcmp(feature, "canvas-context"))
+        return 1;
     if (!std::strcmp(feature, "cascade-diagnostics"))
         return 1;
     if (!std::strcmp(feature, "media-preferences"))
+        return 1;
+    if (!std::strcmp(feature, "wake-locks"))
+        return 1;
+    if (!std::strcmp(feature, "notifications"))
         return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "accessibility-uia"))
         return 1;
 #endif
-    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop", "drag-out", "accessibility", "accessibility-text", "svg-document", "resize-entries", "intersection-entries" }) {
+    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop", "drag-out", "clipboard-files", "range-replacement", "accessibility", "accessibility-text", "svg-document", "resize-entries", "intersection-entries" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
+#if !PLATFORM(GTK) && !PLATFORM(WPE)
+    // GTK and WPE keep file access out of drops (DataTransfer::allowsFileAccess); a paste carries files everywhere.
+    if (!std::strcmp(feature, "data-transfer-files"))
+        return 1;
+#endif
 #if RANVIER_COMPOSITING
     if (!std::strcmp(feature, "compositing"))
         return 1;
@@ -1787,6 +1847,8 @@ RvHost* rv_host_create(int32_t width, int32_t height)
 #endif
         initialized = true;
         segmentationInitialized = true;
+        ranvier_sleep_disabler_install();
+        sleepDisablersInstalled = true;
     }
     if (!onOwningThread() || width <= 0 || height <= 0)
         return nullptr;
@@ -1797,6 +1859,7 @@ RvHost* rv_host_create(int32_t width, int32_t height)
     static PlatformDisplayID nextDisplayID = 0x52560000;
     host->displayID = ++nextDisplayID;
     ranvier_page_set_display(reinterpret_cast<RvNode*>(&host->document()), host->displayID);
+    ranvier_notifications_attach(reinterpret_cast<RvNode*>(&host->document()));
     host->noScript.emplace(host->document().vm());
 #if RANVIER_COMPOSITING
     applyCompositingMode(*host, RV_COMPOSITING_WHEN_NEEDED);
@@ -1854,6 +1917,7 @@ void rv_host_destroy(RvHost* host)
         return;
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
+    ranvier_notifications_drop(reinterpret_cast<RvNode*>(&host->document()));
     rv_host_detach_uia(host);
     rv_host_set_accelerated_compositing(host, RV_COMPOSITING_OFF);
     host->noScript.reset();
@@ -1936,6 +2000,67 @@ int32_t rv_resource_cancel(uint64_t operation)
 int32_t rv_resource_release(uint64_t operation)
 {
     return ranvier_resource_release(operation);
+}
+
+int32_t rv_fonts_status(RvHost* host, int32_t* status)
+{
+    if (!host || !status)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_fonts_status(reinterpret_cast<RvNode*>(&host->document()), status);
+}
+
+int32_t rv_fonts_check(RvHost* host, const uint8_t* font, int32_t font_length, const uint8_t* text, int32_t text_length, int32_t* loaded)
+{
+    if (!host || !font || font_length < 0 || text_length < 0 || (text_length && !text) || !loaded)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_fonts_check(reinterpret_cast<RvNode*>(&host->document()), font, font_length, text, text_length, loaded);
+}
+
+int32_t rv_fonts_load(RvHost* host, const uint8_t* font, int32_t font_length, const uint8_t* text, int32_t text_length, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !font || font_length < 0 || text_length < 0 || (text_length && !text) || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_fonts_load(reinterpret_cast<RvNode*>(&host->document()), font, font_length, text, text_length, completion, context, operation);
+}
+
+int32_t rv_fonts_ready(RvHost* host, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_fonts_ready(reinterpret_cast<RvNode*>(&host->document()), completion, context, operation);
+}
+
+int32_t rv_fonts_watch(RvHost* host, RvFontsEventCallback callback, void* context, RvFontsWatch** watch)
+{
+    if (!host || !callback || !watch)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_fonts_watch(reinterpret_cast<RvNode*>(&host->document()), callback, context, watch);
+}
+
+void rv_fonts_unwatch(RvFontsWatch* watch)
+{
+    if (onOwningThread())
+        ranvier_fonts_unwatch(watch);
 }
 
 int32_t rv_host_scripts_enabled(RvHost* host)
@@ -3159,6 +3284,21 @@ void rv_collect_garbage_eden(void)
         commonVM().heap.collectNow(JSC::Sync, JSC::CollectionScope::Eden);
 }
 
+// Hands each live host's queued notification requests to its presenter; a host without one drops them. A presenter
+// may destroy any host, so each host is looked up again before its next request.
+static void deliverNotificationRequests()
+{
+    for (auto* host : Vector<RvHost*> { liveHosts }) {
+        int32_t request = 0;
+        RvEventTarget* target = nullptr;
+        while (liveHosts.contains(host) && ranvier_notifications_take(reinterpret_cast<RvNode*>(&host->document()), &request, &target)) {
+            if (auto presenter = host->notificationPresenter)
+                presenter(host->notificationContext, host, target, request);
+            rv_event_target_release(target);
+        }
+    }
+}
+
 int32_t rv_run_loop_cycle(int32_t milliseconds)
 {
     if (milliseconds < 0)
@@ -3170,6 +3310,7 @@ int32_t rv_run_loop_cycle(int32_t milliseconds)
     do {
         RunLoop::cycle();
         ++cycles;
+        deliverNotificationRequests();
         if (MonotonicTime::now() < deadline)
             WTF::sleep(1_ms);
     } while (MonotonicTime::now() < deadline);
@@ -3243,6 +3384,150 @@ int32_t rv_host_set_form_submission_handler(RvHost* host, RvFormSubmissionHandle
     host->formSubmissionHandler = handler;
     host->formSubmissionContext = handler ? context : nullptr;
     return RV_OK;
+}
+
+int32_t rv_host_set_wake_lock_policy(RvHost* host, RvWakeLockPolicy policy, void* context)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    host->wakeLockPolicy = policy;
+    host->wakeLockContext = policy ? context : nullptr;
+    return RV_OK;
+}
+
+int32_t rv_wake_lock_request(RvHost* host, int32_t type, RvEventTarget** sentinel)
+{
+    if (!host || !sentinel)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    struct Decision {
+        RvHost* host;
+        int32_t type;
+    } decision { host, type };
+    auto decide = [](void* context) -> int32_t {
+        auto& decision = *static_cast<Decision*>(context);
+        auto* policy = decision.host->wakeLockPolicy;
+        return policy ? policy(decision.host->wakeLockContext, decision.host, decision.type) : 0;
+    };
+    return ranvier_wake_lock_request(reinterpret_cast<RvNode*>(&host->document()), type, decide, &decision, sentinel);
+}
+
+int32_t rv_wake_lock_release(RvEventTarget* sentinel)
+{
+    if (!sentinel)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_wake_lock_release(sentinel);
+}
+
+int32_t rv_wake_lock_state(RvEventTarget* sentinel, int32_t* released, int32_t* type)
+{
+    if (!sentinel || !released || !type)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_wake_lock_state(sentinel, released, type);
+}
+
+int32_t rv_host_release_wake_locks(RvHost* host)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_wake_lock_release_all(reinterpret_cast<RvNode*>(&host->document()));
+}
+
+int32_t rv_set_sleep_disabler_callback(RvSleepDisablerCallback callback, void* context)
+{
+    if (!sleepDisablersInstalled || !onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    ranvier_sleep_disabler_set_callback(callback, callback ? context : nullptr);
+    sleepDisablerCallbackSet = !!callback;
+    return RV_OK;
+}
+
+int32_t rv_host_set_notification_presenter(RvHost* host, RvNotificationPresenter presenter, void* context)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    host->notificationPresenter = presenter;
+    host->notificationContext = presenter ? context : nullptr;
+    ranvier_notifications_configure(reinterpret_cast<RvNode*>(&host->document()), host->notificationPermission, !!presenter);
+    return RV_OK;
+}
+
+int32_t rv_host_set_notification_permission(RvHost* host, int32_t permission)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (permission < RV_NOTIFICATION_DEFAULT || permission > RV_NOTIFICATION_GRANTED)
+        return RV_ERR_UNSUPPORTED;
+    host->notificationPermission = permission;
+    ranvier_notifications_configure(reinterpret_cast<RvNode*>(&host->document()), permission, !!host->notificationPresenter);
+    return RV_OK;
+}
+
+int32_t rv_host_notification_permission(RvHost* host, int32_t* permission)
+{
+    if (!host || !permission)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_notifications_permission(reinterpret_cast<RvNode*>(&host->document()), permission);
+}
+
+int32_t rv_notification_create(RvHost* host, const uint8_t* title, int32_t title_length, const RvNotificationOptions* options, RvEventTarget** notification)
+{
+    if (!host || !notification)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_notification_create(reinterpret_cast<RvNode*>(&host->document()), title, title_length, options, notification);
+}
+
+int32_t rv_notification_close(RvEventTarget* notification)
+{
+    if (!notification)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_notification_close(notification);
+}
+
+int32_t rv_notification_report(RvEventTarget* notification, int32_t event)
+{
+    if (!notification)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_notification_report(notification, event);
+}
+
+int32_t rv_notification_string(RvEventTarget* notification, int32_t field, uint8_t* buffer, int32_t capacity, int32_t* length)
+{
+    if (!notification || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_notification_string(notification, field, buffer, capacity, length);
+}
+
+int32_t rv_notification_flags(RvEventTarget* notification, int32_t* dir, int32_t* silent)
+{
+    if (!notification || !dir || !silent)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_notification_flags(notification, dir, silent);
 }
 
 int32_t rv_host_set_resource_handler(RvHost* host, RvResourceHandler handler, void* context)
@@ -3399,8 +3684,15 @@ int32_t rv_host_mouse(RvHost* host, int32_t action, int32_t x, int32_t y, int32_
     PlatformMouseEvent mouse(position, position, button == RV_BUTTON_NONE ? MouseButton::None : static_cast<MouseButton>(button),
         types[action], clickCount, platformModifiers(modifiers), MonotonicTime::now(), 0, SyntheticClickType::NoTap, MouseEventInputSource::UserDriven);
     Ref frame = host->frame();
-    if (action == RV_MOUSE_DOWN)
+    if (action == RV_MOUSE_DOWN) {
         host->pressPoint = { x, y };
+        if (host->dragStyle == RV_DRAG_APP && host->dragStartCallback && host->dragStartDocument.get() != &host->document()) {
+            AddEventListenerOptions capture;
+            capture.capture = true;
+            host->document().addEventListener(eventNames().dragstartEvent, RvDragStartCapture::create(), capture);
+            host->dragStartDocument = host->document();
+        }
+    }
     // The drag client finds the host of a drag that starts during this call here.
     SetForScope dragHost { inputHost, host };
     return handleInput(*host, [&] {
@@ -3678,6 +3970,39 @@ int32_t rv_blob_read_bytes(RvBlob* handle, uint8_t* buffer, int64_t capacity, in
         buffer += count;
     }
     return RV_OK;
+}
+
+// The bytes of an in-memory blob, or nullopt for one backed by a file on disk.
+static std::optional<Vector<uint8_t>> blobBytes(Blob& blob)
+{
+    auto* handle = reinterpret_cast<RvBlob*>(&blob);
+    int64_t length = 0;
+    auto status = rv_blob_read_bytes(handle, nullptr, 0, &length);
+    if (status != RV_OK && status != RV_ERR_BUFFER_TOO_SMALL)
+        return std::nullopt;
+    Vector<uint8_t> bytes(static_cast<size_t>(length));
+    if (length && rv_blob_read_bytes(handle, bytes.mutableSpan().data(), length, &length) != RV_OK)
+        return std::nullopt;
+    return bytes;
+}
+
+// The contents of a File handle for a drop or a paste: RV_ERR_WRONG_INTERFACE for a Blob that is not a File.
+static int32_t transferFile(RvBlob* handle, RanvierTransferFile& result)
+{
+    auto& blob = *reinterpret_cast<Blob*>(handle);
+    if (!blob.isFile())
+        return RV_ERR_WRONG_INTERFACE;
+    auto bytes = blobBytes(blob);
+    if (!bytes)
+        return RV_ERR_UNSUPPORTED;
+    result = { static_cast<File&>(blob).name(), blob.type(), WTF::move(*bytes) };
+    return RV_OK;
+}
+
+// Whether a string payload names the type the engine reserves for files.
+static bool reservedTransferType(const String& type)
+{
+    return equalLettersIgnoringASCIICase(type, "files"_s);
 }
 
 int32_t rv_file_list_create(RvBlob* const* files, int32_t count, RvFileList** result)
@@ -4737,6 +5062,8 @@ int32_t rv_host_tooltip(RvHost* host, char* buffer, int32_t capacity, int32_t* l
 
 struct RvClipboardRequest {
     Vector<std::pair<String, String>> items;
+    Vector<RanvierTransferFile> files;
+    bool denied { false };
 };
 
 int32_t rv_host_set_clipboard(RvHost* host, int32_t style, RvClipboardWrite write, RvClipboardRead read, void* context)
@@ -4765,7 +5092,44 @@ int32_t rv_clipboard_offer(RvClipboardRequest* request, const char* type, const 
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
-    request->items.append({ utf8(type), WTF::move(*input) });
+    auto name = utf8(type);
+    if (reservedTransferType(name))
+        return RV_ERR_UNSUPPORTED;
+    request->items.append({ WTF::move(name), WTF::move(*input) });
+    return RV_OK;
+}
+
+int32_t rv_clipboard_offer_file(RvClipboardRequest* request, RvBlob* file)
+{
+    if (!request || !file)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RanvierTransferFile contents;
+    if (auto status = transferFile(file, contents); status != RV_OK)
+        return status;
+    request->files.append(WTF::move(contents));
+    return RV_OK;
+}
+
+int32_t rv_clipboard_deny(RvClipboardRequest* request)
+{
+    if (!request)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    request->denied = true;
+    return RV_OK;
+}
+
+int32_t rv_host_set_clipboard_file_write(RvHost* host, RvClipboardWriteFile write, void* context)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    host->clipboardWriteFile = write;
+    host->clipboardWriteFileContext = write ? context : nullptr;
     return RV_OK;
 }
 
@@ -4790,10 +5154,17 @@ static int32_t copyOrCut(RvHost& host, bool cut)
     Ref event = ClipboardEvent::create(cut ? eventNames().cutEvent : eventNames().copyEvent, dataTransfer.copyRef());
     target->dispatchEvent(event);
     Vector<std::pair<String, String>> items;
-    if (event->defaultPrevented()) {
-        for (auto& type : dataTransfer->types(document))
-            items.append({ type, dataTransfer->getData(document, type) });
-    } else {
+    Vector<Ref<File>> files;
+    bool cancelled = event->defaultPrevented();
+    if (cancelled) {
+        for (auto& type : dataTransfer->types(document)) {
+            if (!reservedTransferType(type))
+                items.append({ type, dataTransfer->getData(document, type) });
+        }
+        files = ranvierTransferFiles(dataTransfer, document);
+    }
+    dataTransfer->makeInvalidForSecurity();
+    if (!cancelled) {
         auto range = frame->selection().selection().toNormalizedRange();
         if (!range || !(cut ? editor.canCut() : editor.canCopy()))
             return 0;
@@ -4810,6 +5181,12 @@ static int32_t copyOrCut(RvHost& host, bool cut)
                 static_cast<int32_t>(bytes.length()), first ? 1 : 0);
             first = false;
         }
+        if (host.clipboardWriteFile) {
+            for (auto& file : files) {
+                host.clipboardWriteFile(host.clipboardWriteFileContext, reinterpret_cast<RvBlob*>(file.ptr()), first ? 1 : 0);
+                first = false;
+            }
+        }
     }
     return 1;
 }
@@ -4822,13 +5199,15 @@ static int32_t paste(RvHost& host, bool plain)
     RvClipboardRequest request;
     if (host.clipboardStyle == RV_CLIPBOARD_APP && host.clipboardRead)
         host.clipboardRead(host.clipboardContext, &request);
-    auto pasteboard = makeUnique<StaticPasteboard>();
+    if (request.denied)
+        return fail(Exception { ExceptionCode::NotAllowedError, "The app denied access to its clipboard."_s });
+    Vector<std::pair<String, String>> strings;
     String text;
     String html;
     for (auto& [type, data] : request.items) {
         if (plain && type != "text/plain"_s)
             continue;
-        pasteboard->writeString(type, data);
+        strings.append({ type, data });
         if (type == "text/plain"_s)
             text = data;
         else if (type == "text/html"_s)
@@ -4837,9 +5216,11 @@ static int32_t paste(RvHost& host, bool plain)
     RefPtr target = clipboardTarget(document);
     if (!target)
         return 0;
+    auto pasteboard = ranvierTransferPasteboard(strings, plain ? Vector<RanvierTransferFile> { } : request.files);
     Ref dataTransfer = DataTransfer::createForCopyAndPaste(document, DataTransfer::StoreMode::Readonly, WTF::move(pasteboard));
     Ref event = ClipboardEvent::create(eventNames().pasteEvent, dataTransfer.copyRef());
     target->dispatchEvent(event);
+    dataTransfer->makeInvalidForSecurity();
     if (event->defaultPrevented())
         return 1;
     auto& editor = frame->editor();
@@ -4908,6 +5289,7 @@ int32_t rv_host_edit(RvHost* host, int32_t command)
 
 struct RvDragData {
     Vector<std::pair<String, String>> items;
+    Vector<RanvierTransferFile> files;
 };
 
 int32_t rv_host_set_drag(RvHost* host, int32_t style)
@@ -4933,7 +5315,23 @@ int32_t rv_drag_data_add(RvDragData* data, const char* type, const uint8_t* valu
     auto input = requiredUtf8(value, value_length);
     if (!data || !type || !input)
         return RV_ERR_NULL_ARGUMENT;
-    data->items.append({ utf8(type), WTF::move(*input) });
+    auto name = utf8(type);
+    if (reservedTransferType(name))
+        return RV_ERR_UNSUPPORTED;
+    data->items.append({ WTF::move(name), WTF::move(*input) });
+    return RV_OK;
+}
+
+int32_t rv_drag_data_add_file(RvDragData* data, RvBlob* file)
+{
+    if (!data || !file)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RanvierTransferFile contents;
+    if (auto status = transferFile(file, contents); status != RV_OK)
+        return status;
+    data->files.append(WTF::move(contents));
     return RV_OK;
 }
 
@@ -4977,14 +5375,12 @@ static String dragItem(const RvDragData* data, ASCIILiteral type)
     return { };
 }
 
-static Ref<DataTransfer> dropTransfer(Document& document, const RvDragData* data, int32_t allowed)
+// The data transfer of a drag event from outside: protected for dragenter, dragover and dragleave, read-only for drop.
+static Ref<DataTransfer> dropTransfer(Document& document, const RvDragData* data, int32_t allowed, bool drop = false)
 {
-    auto pasteboard = makeUnique<StaticPasteboard>();
-    if (data) {
-        for (auto& [type, value] : data->items)
-            pasteboard->writeString(type, value);
-    }
-    return DataTransfer::createForDrop(document, WTF::move(pasteboard), dragOperations(allowed), false);
+    if (!data)
+        return ranvierDropTransfer(document, { }, { }, allowed, drop);
+    return ranvierDropTransfer(document, data->items, data->files, allowed, drop);
 }
 
 // Fires a trusted drag event at the target and returns whether a listener cancelled it.
@@ -4996,6 +5392,9 @@ static bool fireDrag(Document& document, Element& target, const AtomString& type
         Event::IsComposed::Yes, MonotonicTime::now(), document.windowProxy(), 0, point, point, 0, 0, platformModifiers(modifiers),
         MouseButton::Left, 1, related, 0, SyntheticClickType::NoTap, dataTransfer);
     target.dispatchEvent(event);
+    // As in WebCore's EventHandler: the data store is unreadable once its event is over.
+    if (dataTransfer)
+        dataTransfer->makeInvalidForSecurity();
     return event->defaultPrevented();
 }
 
@@ -5044,10 +5443,10 @@ int32_t rv_host_drag(RvHost* host, int32_t action, int32_t x, int32_t y, int32_t
             return;
         host->dragTarget = nullptr;
         if (operation == RV_DROP_NONE) {
-            fireDrag(document, *target, eventNames().dragleaveEvent, over.ptr(), point, modifiers);
+            fireDrag(document, *target, eventNames().dragleaveEvent, dropTransfer(document, data, allowed).ptr(), point, modifiers);
             return;
         }
-        if (fireDrag(document, *target, eventNames().dropEvent, dropTransfer(document, data, allowed).ptr(), point, modifiers))
+        if (fireDrag(document, *target, eventNames().dropEvent, dropTransfer(document, data, allowed, true).ptr(), point, modifiers))
             return;
         if (!editableForDrop(*target) || !hasText) {
             operation = RV_DROP_NONE;
@@ -5070,9 +5469,14 @@ int32_t rv_host_drag(RvHost* host, int32_t action, int32_t x, int32_t y, int32_t
 struct RvDrag {
     RvHost* host;
     Vector<std::pair<String, String>> items;
+    // The Files dragstart listeners added to the item list.
+    Vector<Ref<File>> files;
     // The dragged element; null for a selection.
     RefPtr<Element> source;
     IntPoint start;
+    // The element and offset of setDragImage, when a dragstart listener called it.
+    RefPtr<Element> image;
+    IntPoint imageOffset;
 };
 
 static int32_t dropMask(OptionSet<DragOperation> operations)
@@ -5105,10 +5509,12 @@ void RvDragClient::startDrag(DragItem item, DataTransfer& dataTransfer, Frame&, 
     auto* host = inputHost;
     if (!host || !host->dragStartCallback)
         return;
-    auto* drag = new RvDrag { host, { }, nullptr, host->pressPoint };
+    auto* drag = new RvDrag { host, { }, { }, nullptr, host->pressPoint, nullptr, { } };
     // The DataTransfer is no longer readable; its pasteboard holds the page's data and WebCore's own.
     auto& pasteboard = dataTransfer.pasteboard();
     for (auto& type : pasteboard.typesForLegacyUnsafeBindings()) {
+        if (reservedTransferType(type))
+            continue;
         auto value = pasteboard.readString(type);
         if (value.isEmpty())
             value = pasteboard.readStringInCustomData(type);
@@ -5126,6 +5532,9 @@ void RvDragClient::startDrag(DragItem item, DataTransfer& dataTransfer, Frame&, 
     }
     if (item.sourceAction != DragSourceAction::Selection)
         drag->source = dragSource(host->document(), host->pressPoint);
+    if (RefPtr started = std::exchange(dragStartTransfer(), nullptr))
+        drag->files = ranvierTransferFiles(*started, host->document());
+    ranvierTransferDragImage(dataTransfer, drag->image, drag->imageOffset);
     host->dragStartCallback(host->dragStartContext, reinterpret_cast<RvDrag*>(drag), drag->start.x(), drag->start.y(),
         dropMask(dataTransfer.sourceOperationMask()));
 }
@@ -5170,7 +5579,35 @@ RvDragData* rv_drag_data(RvDrag* drag)
 {
     if (!drag)
         return nullptr;
-    return new RvDragData { drag->items };
+    if (!onOwningThread())
+        return nullptr;
+    auto* data = new RvDragData { drag->items, { } };
+    for (auto& file : drag->files) {
+        RanvierTransferFile contents;
+        if (transferFile(reinterpret_cast<RvBlob*>(file.ptr()), contents) == RV_OK)
+            data->files.append(WTF::move(contents));
+    }
+    return data;
+}
+
+int32_t rv_drag_file_count(RvDrag* drag)
+{
+    if (!drag)
+        return RV_ERR_NULL_ARGUMENT;
+    return static_cast<int32_t>(drag->files.size());
+}
+
+int32_t rv_drag_file(RvDrag* drag, int32_t index, RvBlob** result)
+{
+    if (!drag || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (index < 0 || static_cast<size_t>(index) >= drag->files.size())
+        return RV_ERR_UNSUPPORTED;
+    Ref file = drag->files[index];
+    *result = reinterpret_cast<RvBlob*>(&file.leakRef());
+    return RV_OK;
 }
 
 int32_t rv_drag_image(RvDrag* drag, uint8_t* rgba, int32_t length, int32_t* width, int32_t* height, int32_t* offsetX, int32_t* offsetY)
@@ -5179,10 +5616,15 @@ int32_t rv_drag_image(RvDrag* drag, uint8_t* rgba, int32_t length, int32_t* widt
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
+    auto scale = drag->host->deviceScale;
+    if (drag->image) {
+        *offsetX = static_cast<int32_t>(drag->imageOffset.x() * scale);
+        *offsetY = static_cast<int32_t>(drag->imageOffset.y() * scale);
+        return rv_element_snapshot(reinterpret_cast<RvNode*>(drag->image.get()), rgba, length, width, height);
+    }
     if (!drag->source)
         return RV_ERR_UNSUPPORTED;
     auto rect = drag->source->boundingClientRect();
-    auto scale = drag->host->deviceScale;
     *offsetX = static_cast<int32_t>((drag->start.x() - rect.x()) * scale);
     *offsetY = static_cast<int32_t>((drag->start.y() - rect.y()) * scale);
     return rv_element_snapshot(reinterpret_cast<RvNode*>(drag->source.get()), rgba, length, width, height);
@@ -5207,6 +5649,25 @@ int32_t rv_drag_end(RvDrag* drag, int32_t x, int32_t y, int32_t operation)
     });
     host.document().updateStyleIfNeeded();
     return status;
+}
+
+int32_t rv_host_replace_range(RvHost* host, RvAbstractRange* range, const uint8_t* text, int32_t text_length)
+{
+    auto input = requiredUtf8(text, text_length);
+    if (!host || !range || !input)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    auto& abstract = *reinterpret_cast<AbstractRange*>(range);
+    if (&abstract.startContainer().document() != &host->document() || &abstract.endContainer().document() != &host->document())
+        return RV_ERR_WRONG_HOST;
+    auto bytes = input->utf8();
+    int32_t result = 0;
+    auto status = dispatchCountingFailures([&] {
+        result = ranvier_replace_range(range, reinterpret_cast<const uint8_t*>(bytes.data()), static_cast<int32_t>(bytes.length()));
+    });
+    host->document().updateStyleIfNeeded();
+    return status == RV_OK ? result : status;
 }
 
 // Accessibility: the tree of WebCore's accessibility objects, as docs/ACCESSIBILITY.md describes.
@@ -6351,4 +6812,22 @@ void rv_text_segments_release(RvTextSegments* segments)
     std::free(segments->word_like);
     std::free(segments->locale);
     *segments = { };
+}
+
+int32_t rv_canvas_get_context(RvNode* canvas, int32_t type, const RvCanvas2DSettings* settings, RvCanvasRenderingContext2D** context)
+{
+    if (!canvas || !context)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_canvas_get_context(canvas, type, settings, context);
+}
+
+int32_t rv_canvas_context_2d_attributes(RvCanvasRenderingContext2D* context, RvCanvas2DSettings* settings)
+{
+    if (!context || !settings)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_canvas_context_2d_attributes(context, settings);
 }

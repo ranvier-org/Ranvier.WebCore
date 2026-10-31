@@ -1,0 +1,482 @@
+{
+ "chromium": "156.0.8078.4",
+ "constructed": {
+  "initial": {
+   "dropEffect": "none",
+   "effectAllowed": "none",
+   "types": []
+  },
+  "bogus": [
+   "none",
+   "none"
+  ],
+  "link": [
+   "none",
+   "none"
+  ],
+  "types": [
+   "text/plain",
+   "text/html",
+   "application/x-custom"
+  ],
+  "text": "a",
+  "url": "",
+  "afterFile": {
+   "types": [
+    "text/plain",
+    "text/html",
+    "application/x-custom",
+    "Files"
+   ],
+   "items": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ],
+    [
+     "string",
+     "application/x-custom"
+    ],
+    [
+     "file",
+     "text/plain"
+    ]
+   ],
+   "files": [
+    "z.txt"
+   ]
+  },
+  "dup": "NotSupportedError",
+  "removed": [
+   "text/html",
+   "application/x-custom",
+   "Files"
+  ],
+  "cleared": [
+   "application/x-custom",
+   "Files"
+  ],
+  "clearAll": {
+   "types": [
+    "Files"
+   ],
+   "files": 1
+  },
+  "itemsClear": {
+   "types": [],
+   "files": 0
+  }
+ },
+ "drop": {
+  "log": [
+   {
+    "interface": "DragEvent",
+    "dt": {
+     "types": [
+      "text/plain",
+      "text/html",
+      "Files"
+     ],
+     "text": "",
+     "html": "",
+     "uri": "",
+     "files": [],
+     "items": [
+      [
+       "string",
+       "text/plain"
+      ],
+      [
+       "string",
+       "text/html"
+      ],
+      [
+       "file",
+       "text/plain"
+      ],
+      [
+       "file",
+       "text/csv"
+      ]
+     ],
+     "dropEffect": "copy",
+     "effectAllowed": "copy"
+    },
+    "type": "dragenter"
+   },
+   {
+    "interface": "DragEvent",
+    "dt": {
+     "types": [
+      "text/plain",
+      "text/html",
+      "Files"
+     ],
+     "text": "",
+     "html": "",
+     "uri": "",
+     "files": [],
+     "items": [
+      [
+       "string",
+       "text/plain"
+      ],
+      [
+       "string",
+       "text/html"
+      ],
+      [
+       "file",
+       "text/plain"
+      ],
+      [
+       "file",
+       "text/csv"
+      ]
+     ],
+     "dropEffect": "copy",
+     "effectAllowed": "copy"
+    },
+    "write": {
+     "setData": false,
+     "itemsAdd": false
+    },
+    "type": "dragover"
+   },
+   {
+    "interface": "DragEvent",
+    "dt": {
+     "types": [
+      "text/plain",
+      "text/html",
+      "Files"
+     ],
+     "text": "",
+     "html": "",
+     "uri": "",
+     "files": [],
+     "items": [
+      [
+       "string",
+       "text/plain"
+      ],
+      [
+       "string",
+       "text/html"
+      ],
+      [
+       "file",
+       "text/plain"
+      ],
+      [
+       "file",
+       "text/csv"
+      ]
+     ],
+     "dropEffect": "copy",
+     "effectAllowed": "copy"
+    },
+    "write": {
+     "setData": false,
+     "itemsAdd": false
+    },
+    "type": "dragover"
+   },
+   {
+    "interface": "DragEvent",
+    "dt": {
+     "types": [
+      "text/plain",
+      "text/html",
+      "Files"
+     ],
+     "text": "XY",
+     "html": "<i>X</i>Y",
+     "uri": "",
+     "files": [
+      [
+       "note.txt",
+       "text/plain",
+       10
+      ],
+      [
+       "table.csv",
+       "text/csv",
+       3
+      ]
+     ],
+     "items": [
+      [
+       "string",
+       "text/plain"
+      ],
+      [
+       "string",
+       "text/html"
+      ],
+      [
+       "file",
+       "text/plain"
+      ],
+      [
+       "file",
+       "text/csv"
+      ]
+     ],
+     "dropEffect": "copy",
+     "effectAllowed": "copy"
+    },
+    "write": {
+     "setData": false,
+     "itemsAdd": false
+    },
+    "type": "drop"
+   }
+  ],
+  "after": {
+   "dragenter": {
+    "types": [],
+    "text": "",
+    "html": "",
+    "uri": "",
+    "files": [],
+    "items": [],
+    "dropEffect": "copy",
+    "effectAllowed": "copy"
+   },
+   "dragover": {
+    "types": [],
+    "text": "",
+    "html": "",
+    "uri": "",
+    "files": [],
+    "items": [],
+    "dropEffect": "copy",
+    "effectAllowed": "copy"
+   },
+   "drop": {
+    "types": [],
+    "text": "",
+    "html": "",
+    "uri": "",
+    "files": [],
+    "items": [],
+    "dropEffect": "copy",
+    "effectAllowed": "copy"
+   }
+  }
+ },
+ "paste": {
+  "log": [
+   {
+    "interface": "ClipboardEvent",
+    "dt": {
+     "types": [
+      "text/plain",
+      "text/html",
+      "Files"
+     ],
+     "text": "PQ",
+     "html": "<html><head></head><body><u>P</u>Q</body></html>",
+     "uri": "",
+     "files": [
+      [
+       "image.png",
+       "image/png",
+       88
+      ]
+     ],
+     "items": [
+      [
+       "string",
+       "text/plain"
+      ],
+      [
+       "string",
+       "text/html"
+      ],
+      [
+       "file",
+       "image/png"
+      ]
+     ],
+     "dropEffect": "none",
+     "effectAllowed": "uninitialized"
+    },
+    "write": {
+     "setData": false,
+     "itemsAdd": false
+    },
+    "type": "paste"
+   },
+   {
+    "interface": "InputEvent",
+    "dt": {
+     "types": [
+      "text/plain",
+      "text/html",
+      "Files"
+     ],
+     "text": "PQ",
+     "html": "<html><head></head><body><u>P</u>Q</body></html>",
+     "uri": "",
+     "files": [
+      [
+       "image.png",
+       "image/png",
+       88
+      ]
+     ],
+     "items": [
+      [
+       "string",
+       "text/plain"
+      ],
+      [
+       "string",
+       "text/html"
+      ],
+      [
+       "file",
+       "image/png"
+      ]
+     ],
+     "dropEffect": "none",
+     "effectAllowed": "uninitialized"
+    },
+    "inputType": "insertFromPaste",
+    "data": null,
+    "ranges": [
+     [
+      0,
+      2
+     ]
+    ],
+    "type": "beforeinput"
+   },
+   {
+    "interface": "InputEvent",
+    "dt": {
+     "types": [
+      "text/plain",
+      "text/html",
+      "Files"
+     ],
+     "text": "PQ",
+     "html": "<html><head></head><body><u>P</u>Q</body></html>",
+     "uri": "",
+     "files": [
+      [
+       "image.png",
+       "image/png",
+       88
+      ]
+     ],
+     "items": [
+      [
+       "string",
+       "text/plain"
+      ],
+      [
+       "string",
+       "text/html"
+      ],
+      [
+       "file",
+       "image/png"
+      ]
+     ],
+     "dropEffect": "none",
+     "effectAllowed": "uninitialized"
+    },
+    "inputType": "insertFromPaste",
+    "data": null,
+    "ranges": [],
+    "type": "input"
+   }
+  ],
+  "after": {
+   "paste": {
+    "types": [],
+    "text": "",
+    "html": "",
+    "uri": "",
+    "files": [],
+    "items": [],
+    "dropEffect": "none",
+    "effectAllowed": "uninitialized"
+   },
+   "beforeinput": {
+    "types": [
+     "text/plain",
+     "text/html",
+     "Files"
+    ],
+    "text": "PQ",
+    "html": "<html><head></head><body><u>P</u>Q</body></html>",
+    "uri": "",
+    "files": [
+     [
+      "image.png",
+      "image/png",
+      88
+     ]
+    ],
+    "items": [
+     [
+      "string",
+      "text/plain"
+     ],
+     [
+      "string",
+      "text/html"
+     ],
+     [
+      "file",
+      "image/png"
+     ]
+    ],
+    "dropEffect": "none",
+    "effectAllowed": "uninitialized"
+   },
+   "input": {
+    "types": [
+     "text/plain",
+     "text/html",
+     "Files"
+    ],
+    "text": "PQ",
+    "html": "<html><head></head><body><u>P</u>Q</body></html>",
+    "uri": "",
+    "files": [
+     [
+      "image.png",
+      "image/png",
+      88
+     ]
+    ],
+    "items": [
+     [
+      "string",
+      "text/plain"
+     ],
+     [
+      "string",
+      "text/html"
+     ],
+     [
+      "file",
+      "image/png"
+     ]
+    ],
+    "dropEffect": "none",
+    "effectAllowed": "uninitialized"
+   }
+  },
+  "html": "<u>P</u>Q"
+ }
+}

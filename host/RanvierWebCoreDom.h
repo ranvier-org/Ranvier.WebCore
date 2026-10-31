@@ -90,6 +90,12 @@ typedef struct RvURLSearchParams RvURLSearchParams;
 typedef struct RvURLPattern RvURLPattern;
 typedef struct RvHighlight RvHighlight;
 typedef struct RvHighlightRegistry RvHighlightRegistry;
+typedef struct RvDataTransfer RvDataTransfer;
+typedef struct RvDataTransferItemList RvDataTransferItemList;
+typedef struct RvDataTransferItem RvDataTransferItem;
+typedef struct RvCanvasRenderingContext2D RvCanvasRenderingContext2D;
+typedef struct RvCanvasGradient RvCanvasGradient;
+typedef struct RvCanvasPattern RvCanvasPattern;
 typedef struct RvDomUnionNodeOrDOMString RvDomUnionNodeOrDOMString;
 typedef struct RvDomSequenceNodeOrDOMString RvDomSequenceNodeOrDOMString;
 typedef struct RvDomSequenceCSSStyleSheet RvDomSequenceCSSStyleSheet;
@@ -142,6 +148,7 @@ typedef struct RvDomUnionUndefinedOrUSVString RvDomUnionUndefinedOrUSVString;
 typedef struct RvDomPairUSVStringAndUnionUndefinedOrUSVString RvDomPairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequenceAbstractRange RvDomSequenceAbstractRange;
+typedef struct RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
@@ -572,6 +579,16 @@ typedef struct RvDomCSSMatrixComponentOptions {
     const int32_t* is2_d; /* boolean, NULL for absent */
 } RvDomCSSMatrixComponentOptions;
 
+/* The IDL dictionary StaticRangeInit. size is sizeof(RvDomStaticRangeInit) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomStaticRangeInit {
+    uint32_t size;
+    RvNode* start_container; /* Node, required */
+    uint32_t start_offset; /* unsigned long, required */
+    RvNode* end_container; /* Node, required */
+    uint32_t end_offset; /* unsigned long, required */
+} RvDomStaticRangeInit;
+
 /* The IDL dictionary GetComposedRangesOptions. size is sizeof(RvDomGetComposedRangesOptions) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
 typedef struct RvDomGetComposedRangesOptions {
@@ -617,6 +634,87 @@ typedef struct RvDomDOMPointInit {
     double z; /* unrestricted double, default 0 */
     double w; /* unrestricted double, default 1 */
 } RvDomDOMPointInit;
+
+/* The IDL dictionary PointerEventInit. size is sizeof(RvDomPointerEventInit) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomPointerEventInit {
+    uint32_t size;
+    int32_t bubbles; /* boolean, default false */
+    int32_t cancelable; /* boolean, default false */
+    int32_t composed; /* boolean, default false */
+    int32_t detail; /* long, default 0 */
+    int32_t ctrl_key; /* boolean, default false */
+    int32_t shift_key; /* boolean, default false */
+    int32_t alt_key; /* boolean, default false */
+    int32_t meta_key; /* boolean, default false */
+    int32_t modifier_alt_graph; /* boolean, default false */
+    int32_t modifier_caps_lock; /* boolean, default false */
+    double screen_x; /* unrestricted double, default 0 */
+    double screen_y; /* unrestricted double, default 0 */
+    double client_x; /* unrestricted double, default 0 */
+    double client_y; /* unrestricted double, default 0 */
+    int16_t button; /* short, default 0 */
+    uint16_t buttons; /* unsigned short, default 0 */
+    RvEventTarget* related_target; /* EventTarget?, default null */
+    double movement_x; /* double, default 0 */
+    double movement_y; /* double, default 0 */
+    int32_t pointer_id; /* long, default 0 */
+    double width; /* double, default 1 */
+    double height; /* double, default 1 */
+    float pressure; /* float, default 0 */
+    float tangential_pressure; /* float, default 0 */
+    const int32_t* tilt_x; /* long, NULL for absent */
+    const int32_t* tilt_y; /* long, NULL for absent */
+    int32_t twist; /* long, default 0 */
+    RvDomUtf8StringInput pointer_type; /* DOMString, default "" */
+    int32_t is_primary; /* boolean, default false */
+    const RvDomSequencePointerEvent* coalesced_events; /* sequence<PointerEvent>, default [] */
+    const RvDomSequencePointerEvent* predicted_events; /* sequence<PointerEvent>, default [] */
+} RvDomPointerEventInit;
+
+/* The IDL dictionary WheelEventInit. size is sizeof(RvDomWheelEventInit) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomWheelEventInit {
+    uint32_t size;
+    int32_t bubbles; /* boolean, default false */
+    int32_t cancelable; /* boolean, default false */
+    int32_t composed; /* boolean, default false */
+    int32_t detail; /* long, default 0 */
+    int32_t ctrl_key; /* boolean, default false */
+    int32_t shift_key; /* boolean, default false */
+    int32_t alt_key; /* boolean, default false */
+    int32_t meta_key; /* boolean, default false */
+    int32_t modifier_alt_graph; /* boolean, default false */
+    int32_t modifier_caps_lock; /* boolean, default false */
+    double screen_x; /* unrestricted double, default 0 */
+    double screen_y; /* unrestricted double, default 0 */
+    double client_x; /* unrestricted double, default 0 */
+    double client_y; /* unrestricted double, default 0 */
+    int16_t button; /* short, default 0 */
+    uint16_t buttons; /* unsigned short, default 0 */
+    RvEventTarget* related_target; /* EventTarget?, default null */
+    double movement_x; /* double, default 0 */
+    double movement_y; /* double, default 0 */
+    double delta_x; /* double, default 0.0 */
+    double delta_y; /* double, default 0.0 */
+    double delta_z; /* double, default 0.0 */
+    uint32_t delta_mode; /* unsigned long, default 0 */
+    int32_t wheel_delta_x; /* long, default 0 */
+    int32_t wheel_delta_y; /* long, default 0 */
+} RvDomWheelEventInit;
+
+/* The IDL dictionary InputEventInit. size is sizeof(RvDomInputEventInit) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomInputEventInit {
+    uint32_t size;
+    int32_t bubbles; /* boolean, default false */
+    int32_t cancelable; /* boolean, default false */
+    int32_t composed; /* boolean, default false */
+    int32_t detail; /* long, default 0 */
+    RvDomUtf8StringInput data; /* DOMString?, default null */
+    int32_t is_composing; /* boolean, default false */
+    RvDomUtf8StringInput input_type; /* DOMString, default "" */
+} RvDomInputEventInit;
 
 /* The IDL dictionary CompositionEventInit. size is sizeof(RvDomCompositionEventInit) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
@@ -961,6 +1059,7 @@ typedef struct RvDomUnionUndefinedOrUSVString RvDomUnionUndefinedOrUSVString;
 typedef struct RvDomPairUSVStringAndUnionUndefinedOrUSVString RvDomPairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequenceAbstractRange RvDomSequenceAbstractRange;
+typedef struct RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
@@ -1525,6 +1624,21 @@ struct RvDomSequenceAbstractRange {
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_DOM_STRING_OR_CANVAS_GRADIENT_OR_CANVAS_PATTERN_STRING = 1,
+    RV_DOM_UNION_DOM_STRING_OR_CANVAS_GRADIENT_OR_CANVAS_PATTERN_CANVAS_GRADIENT = 2,
+    RV_DOM_UNION_DOM_STRING_OR_CANVAS_GRADIENT_OR_CANVAS_PATTERN_CANVAS_PATTERN = 3,
+};
+struct RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern {
+    int32_t present;
+    int32_t tag;
+    RvDomUtf8StringSpan arm0;
+    RvCanvasGradient* arm1;
+    RvCanvasPattern* arm2;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
 struct RvDomSequenceCSSStyleValue {
     int32_t present;
     int32_t count;
@@ -1630,6 +1744,7 @@ RV_EXPORT void rv_dom_union_undefined_or_usv_string_release(RvDomUnionUndefinedO
 RV_EXPORT void rv_dom_pair_usv_string_and_union_undefined_or_usv_string_release(RvDomPairUSVStringAndUnionUndefinedOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string_release(RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange* value);
+RV_EXPORT void rv_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release(RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* value);
 RV_EXPORT void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value);
 RV_EXPORT void rv_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* value);
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* value);
@@ -1891,6 +2006,30 @@ RV_EXPORT RvHighlight* rv_dom_highlight_retain(RvHighlight*);
 RV_EXPORT void rv_dom_highlight_registry_release(RvHighlightRegistry*);
 /* Adds a reference to a HighlightRegistry and returns it. */
 RV_EXPORT RvHighlightRegistry* rv_dom_highlight_registry_retain(RvHighlightRegistry*);
+/* Releases a handle to a DataTransfer. */
+RV_EXPORT void rv_dom_data_transfer_release(RvDataTransfer*);
+/* Adds a reference to a DataTransfer and returns it. */
+RV_EXPORT RvDataTransfer* rv_dom_data_transfer_retain(RvDataTransfer*);
+/* Releases a handle to a DataTransferItemList. */
+RV_EXPORT void rv_dom_data_transfer_item_list_release(RvDataTransferItemList*);
+/* Adds a reference to a DataTransferItemList and returns it. */
+RV_EXPORT RvDataTransferItemList* rv_dom_data_transfer_item_list_retain(RvDataTransferItemList*);
+/* Releases a handle to a DataTransferItem. */
+RV_EXPORT void rv_dom_data_transfer_item_release(RvDataTransferItem*);
+/* Adds a reference to a DataTransferItem and returns it. */
+RV_EXPORT RvDataTransferItem* rv_dom_data_transfer_item_retain(RvDataTransferItem*);
+/* Releases a handle to a CanvasRenderingContext2D. */
+RV_EXPORT void rv_dom_canvas_rendering_context2_d_release(RvCanvasRenderingContext2D*);
+/* Adds a reference to a CanvasRenderingContext2D and returns it. */
+RV_EXPORT RvCanvasRenderingContext2D* rv_dom_canvas_rendering_context2_d_retain(RvCanvasRenderingContext2D*);
+/* Releases a handle to a CanvasGradient. */
+RV_EXPORT void rv_dom_canvas_gradient_release(RvCanvasGradient*);
+/* Adds a reference to a CanvasGradient and returns it. */
+RV_EXPORT RvCanvasGradient* rv_dom_canvas_gradient_retain(RvCanvasGradient*);
+/* Releases a handle to a CanvasPattern. */
+RV_EXPORT void rv_dom_canvas_pattern_release(RvCanvasPattern*);
+/* Adds a reference to a CanvasPattern and returns it. */
+RV_EXPORT RvCanvasPattern* rv_dom_canvas_pattern_retain(RvCanvasPattern*);
 /* Concrete scoped interface name of a CSSRule handle; borrows target. */
 RV_EXPORT int32_t rv_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* Concrete scoped interface name of a StyleSheet handle; borrows target. */
@@ -2011,14 +2150,24 @@ RV_EXPORT int32_t rv_dom_character_data_replace_with(RvNode* target, const RvDom
 RV_EXPORT int32_t rv_dom_character_data_remove(RvNode* target);
 /* Text */
 
+/* Text.constructor: target is the Document of the constructed object; data defaults to "" in IDL; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_text_create(RvNode* target, const uint8_t* data, int32_t data_length, RvNode** result);
 /* Text.wholeText getter: readonly attribute DOMString wholeText */
 RV_EXPORT int32_t rv_dom_text_get_whole_text(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* Text.assignedSlot getter: readonly attribute HTMLSlotElement? assignedSlot; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_text_get_assigned_slot(RvNode* target, RvNode** result);
 /* Text.splitText(unsigned long offset) -> Text; *result is a new reference */
 RV_EXPORT int32_t rv_dom_text_split_text(RvNode* target, uint32_t offset, RvNode** result);
+/* Comment */
+
+/* Comment.constructor: target is the Document of the constructed object; data defaults to "" in IDL; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_comment_create(RvNode* target, const uint8_t* data, int32_t data_length, RvNode** result);
 /* DocumentFragment */
 
+/* DocumentFragment.constructor: target is the Document of the constructed object; *result is a new reference */
+RV_EXPORT int32_t rv_dom_document_fragment_create(RvNode* target, RvNode** result);
 /* DocumentFragment.children getter: readonly attribute HTMLCollection children; *result is a new reference */
 RV_EXPORT int32_t rv_dom_document_fragment_get_children(RvNode* target, RvHTMLCollection** result);
 /* DocumentFragment.firstElementChild getter: readonly attribute Element? firstElementChild; *result is a new
@@ -2096,6 +2245,8 @@ RV_EXPORT int32_t rv_dom_shadow_root_set_html_unsafe(RvNode* target, const uint8
 RV_EXPORT int32_t rv_dom_shadow_root_get_html(RvNode* target, const RvDomGetHTMLOptions* options, char* buffer, int32_t capacity, int32_t* length);
 /* Document */
 
+/* Document.constructor: target is the Document of the constructed object; *result is a new reference */
+RV_EXPORT int32_t rv_dom_document_create(RvNode* target, RvNode** result);
 /* Document.implementation getter: readonly attribute DOMImplementation implementation; *result is a new reference */
 RV_EXPORT int32_t rv_dom_document_get_implementation(RvNode* target, RvDOMImplementation** result);
 /* Document.compatMode getter: readonly attribute DOMString compatMode */
@@ -5770,8 +5921,14 @@ RV_EXPORT int32_t rv_dom_abstract_range_get_end_container(RvAbstractRange* targe
 RV_EXPORT int32_t rv_dom_abstract_range_get_end_offset(RvAbstractRange* target, uint32_t* result);
 /* AbstractRange.collapsed getter: readonly attribute boolean collapsed */
 RV_EXPORT int32_t rv_dom_abstract_range_get_collapsed(RvAbstractRange* target, int32_t* result);
+/* StaticRange */
+
+/* StaticRange.constructor: target is the Document of the constructed object; *result is a new reference */
+RV_EXPORT int32_t rv_dom_static_range_create(RvNode* target, const RvDomStaticRangeInit* init, RvAbstractRange** result);
 /* Range */
 
+/* Range.constructor: target is the Document of the constructed object; *result is a new reference */
+RV_EXPORT int32_t rv_dom_range_create(RvNode* target, RvAbstractRange** result);
 /* Range.commonAncestorContainer getter: readonly attribute Node? commonAncestorContainer; *result is a new reference,
  * or NULL */
 RV_EXPORT int32_t rv_dom_range_get_common_ancestor_container(RvAbstractRange* target, RvNode** result);
@@ -6425,6 +6582,9 @@ RV_EXPORT int32_t rv_dom_mouse_event_get_to_element(RvEvent* target, RvNode** re
 RV_EXPORT int32_t rv_dom_mouse_event_get_modifier_state(RvEvent* target, const uint8_t* key_arg, int32_t key_arg_length, int32_t* result);
 /* PointerEvent */
 
+/* PointerEvent.constructor: target is the Document of the constructed object; event_init_dict defaults to {} in IDL;
+ * event_init_dict may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_pointer_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomPointerEventInit* event_init_dict, RvEvent** result);
 /* PointerEvent.pointerId getter: readonly attribute long pointerId */
 RV_EXPORT int32_t rv_dom_pointer_event_get_pointer_id(RvEvent* target, int32_t* result);
 /* PointerEvent.width getter: readonly attribute double width */
@@ -6459,6 +6619,9 @@ RV_EXPORT int32_t rv_dom_pointer_event_get_coalesced_events(RvEvent* target, RvD
 RV_EXPORT int32_t rv_dom_pointer_event_get_predicted_events(RvEvent* target, RvDomSequencePointerEvent* result);
 /* WheelEvent */
 
+/* WheelEvent.constructor: target is the Document of the constructed object; event_init_dict defaults to {} in IDL;
+ * event_init_dict may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_wheel_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomWheelEventInit* event_init_dict, RvEvent** result);
 /* WheelEvent.deltaX getter: readonly attribute double deltaX */
 RV_EXPORT int32_t rv_dom_wheel_event_get_delta_x(RvEvent* target, double* result);
 /* WheelEvent.deltaY getter: readonly attribute double deltaY */
@@ -6507,12 +6670,17 @@ RV_EXPORT int32_t rv_dom_keyboard_event_get_modifier_state(RvEvent* target, cons
 RV_EXPORT int32_t rv_dom_focus_event_get_related_target(RvEvent* target, RvNode** result);
 /* InputEvent */
 
+/* InputEvent.constructor: target is the Document of the constructed object; event_init_dict defaults to {} in IDL;
+ * event_init_dict may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_input_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomInputEventInit* event_init_dict, RvEvent** result);
 /* InputEvent.inputType getter: readonly attribute DOMString inputType */
 RV_EXPORT int32_t rv_dom_input_event_get_input_type(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
 /* InputEvent.data getter: readonly attribute USVString? data */
 RV_EXPORT int32_t rv_dom_input_event_get_data(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
 /* InputEvent.isComposing getter: readonly attribute boolean isComposing */
 RV_EXPORT int32_t rv_dom_input_event_get_is_composing(RvEvent* target, int32_t* result);
+/* InputEvent.dataTransfer getter: readonly attribute DataTransfer? dataTransfer; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_input_event_get_data_transfer(RvEvent* target, RvDataTransfer** result);
 /* InputEvent.getTargetRanges() -> sequence<StaticRange>; *result owns its contents; release with the matching
  * rv_dom_*_release */
 RV_EXPORT int32_t rv_dom_input_event_get_target_ranges(RvEvent* target, RvDomSequenceStaticRange* result);
@@ -8199,6 +8367,93 @@ RV_EXPORT int32_t rv_dom_file_reader_read_as_text(RvEventTarget* target, RvBlob*
 RV_EXPORT int32_t rv_dom_file_reader_read_as_data_url(RvEventTarget* target, RvBlob* blob);
 /* FileReader.abort() -> undefined; RV_ERR_UNSUPPORTED while the setting FileReaderAPIEnabled is off */
 RV_EXPORT int32_t rv_dom_file_reader_abort(RvEventTarget* target);
+/* DataTransfer */
+
+/* DataTransfer.constructor: target is the Document of the constructed object; *result is a new reference */
+RV_EXPORT int32_t rv_dom_data_transfer_create(RvNode* target, RvDataTransfer** result);
+/* DataTransfer.dropEffect getter: attribute DOMString dropEffect */
+RV_EXPORT int32_t rv_dom_data_transfer_get_drop_effect(RvDataTransfer* target, char* buffer, int32_t capacity, int32_t* length);
+/* DataTransfer.dropEffect setter: attribute DOMString dropEffect */
+RV_EXPORT int32_t rv_dom_data_transfer_set_drop_effect(RvDataTransfer* target, const uint8_t* value, int32_t value_length);
+/* DataTransfer.effectAllowed getter: attribute DOMString effectAllowed */
+RV_EXPORT int32_t rv_dom_data_transfer_get_effect_allowed(RvDataTransfer* target, char* buffer, int32_t capacity, int32_t* length);
+/* DataTransfer.effectAllowed setter: attribute DOMString effectAllowed */
+RV_EXPORT int32_t rv_dom_data_transfer_set_effect_allowed(RvDataTransfer* target, const uint8_t* value, int32_t value_length);
+/* DataTransfer.items getter: readonly attribute DataTransferItemList items; context is an explicit checked Document
+ * for the operation; *result is a new reference; RV_ERR_UNSUPPORTED while the setting DataTransferItemsEnabled is off */
+RV_EXPORT int32_t rv_dom_data_transfer_get_items(RvDataTransfer* target, RvNode* context, RvDataTransferItemList** result);
+/* DataTransfer.types getter: readonly attribute FrozenArray<DOMString> types; context is an explicit checked Document
+ * for the operation; *result owns its contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_data_transfer_get_types(RvDataTransfer* target, RvNode* context, RvDomSequenceDOMString* result);
+/* DataTransfer.files getter: readonly attribute FileList files; context is an explicit checked Document for the
+ * operation; *result is a new reference */
+RV_EXPORT int32_t rv_dom_data_transfer_get_files(RvDataTransfer* target, RvNode* context, RvFileList** result);
+/* DataTransfer.setDragImage(Element image, long x, long y) -> undefined */
+RV_EXPORT int32_t rv_dom_data_transfer_set_drag_image(RvDataTransfer* target, RvNode* image, int32_t x, int32_t y);
+/* DataTransfer.getData(DOMString format) -> DOMString; context is an explicit checked Document for the operation */
+RV_EXPORT int32_t rv_dom_data_transfer_get_data(RvDataTransfer* target, RvNode* context, const uint8_t* format, int32_t format_length, char* buffer, int32_t capacity, int32_t* length);
+/* DataTransfer.setData(DOMString format, DOMString data) -> undefined; context is an explicit checked Document for
+ * the operation */
+RV_EXPORT int32_t rv_dom_data_transfer_set_data(RvDataTransfer* target, RvNode* context, const uint8_t* format, int32_t format_length, const uint8_t* data, int32_t data_length);
+/* DataTransfer.clearData(optional DOMString format) -> undefined; format_length -1 means absent */
+RV_EXPORT int32_t rv_dom_data_transfer_clear_data(RvDataTransfer* target, const uint8_t* format, int32_t format_length);
+/* DataTransferItemList */
+
+/* DataTransferItemList.length getter: readonly attribute long length */
+RV_EXPORT int32_t rv_dom_data_transfer_item_list_get_length(RvDataTransferItemList* target, int32_t* result);
+/* DataTransferItemList.item(unsigned long index) -> DataTransferItem?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_data_transfer_item_list_item(RvDataTransferItemList* target, uint32_t index, RvDataTransferItem** result);
+/* DataTransferItemList.add(DOMString data, DOMString type) -> DataTransferItem?; context is an explicit checked
+ * Document for the operation; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_data_transfer_item_list_add_2(RvDataTransferItemList* target, RvNode* context, const uint8_t* data, int32_t data_length, const uint8_t* type, int32_t type_length, RvDataTransferItem** result);
+/* DataTransferItemList.add(File file) -> DataTransferItem?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_data_transfer_item_list_add_1(RvDataTransferItemList* target, RvBlob* file, RvDataTransferItem** result);
+/* DataTransferItemList.remove(unsigned long index) -> undefined */
+RV_EXPORT int32_t rv_dom_data_transfer_item_list_remove(RvDataTransferItemList* target, uint32_t index);
+/* DataTransferItemList.clear() -> undefined */
+RV_EXPORT int32_t rv_dom_data_transfer_item_list_clear(RvDataTransferItemList* target);
+/* DataTransferItem */
+
+/* DataTransferItem.kind getter: readonly attribute DOMString kind */
+RV_EXPORT int32_t rv_dom_data_transfer_item_get_kind(RvDataTransferItem* target, char* buffer, int32_t capacity, int32_t* length);
+/* DataTransferItem.type getter: readonly attribute DOMString type */
+RV_EXPORT int32_t rv_dom_data_transfer_item_get_type(RvDataTransferItem* target, char* buffer, int32_t capacity, int32_t* length);
+/* DataTransferItem.getAsFile() -> File?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_data_transfer_item_get_as_file(RvDataTransferItem* target, RvBlob** result);
+/* ClipboardEvent */
+
+/* ClipboardEvent.clipboardData getter: readonly attribute DataTransfer? clipboardData; *result is a new reference, or
+ * NULL */
+RV_EXPORT int32_t rv_dom_clipboard_event_get_clipboard_data(RvEvent* target, RvDataTransfer** result);
+/* DragEvent */
+
+/* DragEvent.dataTransfer getter: readonly attribute DataTransfer? dataTransfer; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_drag_event_get_data_transfer(RvEvent* target, RvDataTransfer** result);
+/* HTMLCanvasElement */
+
+/* HTMLCanvasElement.width getter: attribute unsigned long width */
+RV_EXPORT int32_t rv_dom_html_canvas_element_get_width(RvNode* target, uint32_t* result);
+/* HTMLCanvasElement.width setter: attribute unsigned long width */
+RV_EXPORT int32_t rv_dom_html_canvas_element_set_width(RvNode* target, uint32_t value);
+/* HTMLCanvasElement.height getter: attribute unsigned long height */
+RV_EXPORT int32_t rv_dom_html_canvas_element_get_height(RvNode* target, uint32_t* result);
+/* HTMLCanvasElement.height setter: attribute unsigned long height */
+RV_EXPORT int32_t rv_dom_html_canvas_element_set_height(RvNode* target, uint32_t value);
+/* CanvasRenderingContext2D */
+
+/* CanvasRenderingContext2D.canvas getter: readonly attribute HTMLCanvasElement canvas; *result is a new reference */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_canvas(RvCanvasRenderingContext2D* target, RvNode** result);
+/* CanvasRenderingContext2D.fillStyle getter: attribute (DOMString or CanvasGradient or CanvasPattern) fillStyle;
+ * *result owns its contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_fill_style(RvCanvasRenderingContext2D* target, RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* result);
+/* CanvasRenderingContext2D.fillStyle setter: attribute (DOMString or CanvasGradient or CanvasPattern) fillStyle */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_fill_style(RvCanvasRenderingContext2D* target, const RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* value);
+/* CanvasRenderingContext2D.clearRect(unrestricted double x, unrestricted double y, unrestricted double w,
+ * unrestricted double h) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_clear_rect(RvCanvasRenderingContext2D* target, double x, double y, double w, double h);
+/* CanvasRenderingContext2D.fillRect(unrestricted double x, unrestricted double y, unrestricted double w, unrestricted
+ * double h) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_fill_rect(RvCanvasRenderingContext2D* target, double x, double y, double w, double h);
 /* DOMCSSNamespace */
 
 /* CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths */
@@ -8275,11 +8530,23 @@ RV_EXPORT int32_t rv_dom_screen_orientation_get_angle(RvNode* target, uint16_t* 
 /* DOMMatrixReadOnly.fromMatrix: static operation with checked Document context and UTF-8 byte lengths; other defaults
  * to {} in IDL; other may be NULL for the IDL default; *result is a new reference */
 RV_EXPORT int32_t rv_dom_dom_matrix_read_only_from_matrix(RvNode* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result);
+/* DOMMatrixReadOnly.fromFloat32Array: static operation with checked Document context and UTF-8 byte lengths; array32
+ * holds array32_count elements, copied into a new Float32Array; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_from_float32_array(RvNode* target, const float* array32, int32_t array32_count, RvDOMMatrixReadOnly** result);
+/* DOMMatrixReadOnly.fromFloat64Array: static operation with checked Document context and UTF-8 byte lengths; array64
+ * holds array64_count elements, copied into a new Float64Array; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_from_float64_array(RvNode* target, const double* array64, int32_t array64_count, RvDOMMatrixReadOnly** result);
 /* DOMMatrix */
 
 /* DOMMatrix.fromMatrix: static operation with checked Document context and UTF-8 byte lengths; other defaults to {}
  * in IDL; other may be NULL for the IDL default; *result is a new reference */
 RV_EXPORT int32_t rv_dom_dom_matrix_from_matrix(RvNode* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result);
+/* DOMMatrix.fromFloat32Array: static operation with checked Document context and UTF-8 byte lengths; array32 holds
+ * array32_count elements, copied into a new Float32Array; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_from_float32_array(RvNode* target, const float* array32, int32_t array32_count, RvDOMMatrixReadOnly** result);
+/* DOMMatrix.fromFloat64Array: static operation with checked Document context and UTF-8 byte lengths; array64 holds
+ * array64_count elements, copied into a new Float64Array; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_from_float64_array(RvNode* target, const double* array64, int32_t array64_count, RvDOMMatrixReadOnly** result);
 /* DOMRectReadOnly */
 
 /* DOMRectReadOnly.fromRect: static operation with checked Document context and UTF-8 byte lengths; other defaults to
@@ -8327,6 +8594,11 @@ RV_EXPORT int32_t rv_dom_domurl_can_parse(RvNode* target, const uint8_t* url, in
 RV_EXPORT int32_t rv_dom_domurl_create_object_url(RvNode* target, RvBlob* blob, char* buffer, int32_t capacity, int32_t* length);
 /* DOMURL.revokeObjectURL: static operation with checked Document context and UTF-8 byte lengths */
 RV_EXPORT int32_t rv_dom_domurl_revoke_object_url(RvNode* target, const uint8_t* url, int32_t url_length);
+/* Document */
+
+/* Document.parseHTMLUnsafe: static operation with checked Document context and UTF-8 byte lengths; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_document_parse_html_unsafe(RvNode* target, const uint8_t* html, int32_t html_length, RvNode** result);
 /* StylePropertyMapReadOnly */
 
 /* StylePropertyMapReadOnly.entries: owned snapshot of the engine key/value iterable; context is an explicit checked

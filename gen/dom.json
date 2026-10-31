@@ -17,7 +17,8 @@
     "browserWellFormedUnions and browserWellFormedSetters list the unions and interfaces whose USVString inputs the",
     "Fable browser provider converts to well-formed strings. Every generated string input is UTF-8 with an explicit byte",
     "length; sequenceStringSpans only names the string sequences of its interfaces Utf8.",
-    "elementArrayReflections lists [Reflect] FrozenArray<Element>? attributes bound to the engine's element array reflection: the getter returns a snapshot sequence, or none for null; the setter takes a sequence, or none to clear."
+    "elementArrayReflections lists [Reflect] FrozenArray<Element>? attributes bound to the engine's element array reflection: the getter returns a snapshot sequence, or none for null; the setter takes a sequence, or none to clear.",
+    "browserIndexedGetters lists named IDL getters that browsers expose only as an indexed property; the Fable binding reads $0[index], null when absent."
   ],
   "attributeBridges": {
     "Document.adoptedStyleSheets": {
@@ -248,6 +249,51 @@
     "FileReader": {
       "receiver": "Document",
       "factory": "FileReader::create"
+    },
+    "Text": {
+      "receiver": "Document",
+      "factory": "Text::create"
+    },
+    "Comment": {
+      "receiver": "Document",
+      "factory": "Comment::create"
+    },
+    "DocumentFragment": {
+      "receiver": "Document",
+      "factory": "DocumentFragment::create"
+    },
+    "Range": {
+      "receiver": "Document",
+      "factory": "Range::create"
+    },
+    "Document": {
+      "receiver": "Document",
+      "factory": "Document::create"
+    },
+    "StaticRange": {
+      "receiver": "Document",
+      "factory": "StaticRange::create",
+      "passReceiver": false
+    },
+    "InputEvent": {
+      "receiver": "Document",
+      "factory": "InputEvent::create",
+      "passReceiver": false
+    },
+    "WheelEvent": {
+      "receiver": "Document",
+      "factory": "WheelEvent::create",
+      "passReceiver": false
+    },
+    "PointerEvent": {
+      "receiver": "Document",
+      "factory": "PointerEvent::create",
+      "passReceiver": false
+    },
+    "DataTransfer": {
+      "receiver": "Document",
+      "factory": "DataTransfer::create",
+      "passReceiver": false
     }
   },
   "dictionaryCppTypes": {
@@ -266,7 +312,11 @@
     "HashChangeEventInit": "HashChangeEvent::Init",
     "MediaQueryListEventInit": "MediaQueryListEvent::Init",
     "PopStateEventInit": "PopStateEvent::Init",
-    "CompositionEventInit": "CompositionEvent::Init"
+    "CompositionEventInit": "CompositionEvent::Init",
+    "InputEventInit": "InputEvent::Init",
+    "WheelEventInit": "WheelEvent::Init",
+    "PointerEventInit": "PointerEvent::Init",
+    "StaticRangeInit": "StaticRange::Init"
   },
   "dictionaryObjectMembers": [
     "FormDataEventInit.formData"
@@ -380,7 +430,10 @@
     "StylePropertyMap": "Document",
     "DOMMatrix": "Document",
     "DOMFormData": "Document",
-    "URLSearchParams": "Document"
+    "URLSearchParams": "Document",
+    "DataTransfer": "Document",
+    "DataTransferItemList": "Document",
+    "DataTransferItem": "Document"
   },
   "finiteNumberInputs": [
     "CSSUnitValue",
@@ -680,7 +733,16 @@
     "VisualViewport",
     "Highlight",
     "HighlightRegistry",
-    "FileReader"
+    "FileReader",
+    "DataTransfer",
+    "DataTransferItemList",
+    "DataTransferItem",
+    "ClipboardEvent",
+    "DragEvent",
+    "HTMLCanvasElement",
+    "CanvasRenderingContext2D",
+    "CanvasGradient",
+    "CanvasPattern"
   ],
   "skipDirectories": [
     "Modules/",
@@ -716,8 +778,6 @@
       "CSSStyleSheet",
       "CSSStyleProperties",
       "CustomElementRegistry",
-      "ClipboardEvent",
-      "DragEvent",
       "ErrorEvent",
       "FormDataEvent",
       "GamepadEvent",
@@ -815,7 +875,8 @@
     "HashChangeEvent",
     "MediaQueryListEvent",
     "PopStateEvent",
-    "CustomEvent"
+    "CustomEvent",
+    "ClipboardEvent"
   ],
   "castVia": {
     "SVGAnimationElement": "SVGElement",
@@ -911,7 +972,9 @@
     "AnimationEventInit.animation",
     "CSSTransitionEvent.animation",
     "TransitionEventInit.animation",
-    "UIEventInit.view"
+    "UIEventInit.view",
+    "DataTransferItem.getAsString",
+    "DataTransferItem.webkitGetAsEntry"
   ],
   "namespaceBindings": {
     "DOMCSSNamespace": {
@@ -932,14 +995,18 @@
     "DOMMatrixReadOnly": {
       "receiver": "Document",
       "members": [
-        "fromMatrix"
+        "fromMatrix",
+        "fromFloat32Array",
+        "fromFloat64Array"
       ],
       "feature": "dom-geometry-matrix-readonly"
     },
     "DOMMatrix": {
       "receiver": "Document",
       "members": [
-        "fromMatrix"
+        "fromMatrix",
+        "fromFloat32Array",
+        "fromFloat64Array"
       ],
       "feature": "dom-geometry-matrix"
     },
@@ -1000,6 +1067,13 @@
         "createObjectURL": "blob-urls",
         "revokeObjectURL": "blob-urls"
       }
+    },
+    "Document": {
+      "receiver": "Document",
+      "members": [
+        "parseHTMLUnsafe"
+      ],
+      "feature": "dom-document-parse-html"
     }
   },
   "iterableBindings": {
@@ -1098,7 +1172,9 @@
   },
   "creationGatedInterfaces": {
     "CaretPosition": "Document.caretPositionFromPoint",
-    "VisualViewport": "DOMWindow.visualViewport"
+    "VisualViewport": "DOMWindow.visualViewport",
+    "DataTransferItemList": "DataTransfer.items",
+    "DataTransferItem": "DataTransferItemList.item"
   },
   "contextSettingsObjects": [
     "FileReader"
@@ -1138,5 +1214,38 @@
     "HighlightRegistry": {
       "adapter": "RanvierCollectionLike"
     }
-  }
+  },
+  "memberSelections": {
+    "HTMLCanvasElement": [
+      "width",
+      "height"
+    ],
+    "CanvasRenderingContext2D": [
+      "canvas",
+      "fillStyle",
+      "fillRect",
+      "clearRect"
+    ],
+    "CanvasGradient": [],
+    "CanvasPattern": []
+  },
+  "unionSetterOverloads": [
+    "CanvasRenderingContext2D.fillStyle"
+  ],
+  "dictionaryEventTargetMembers": [
+    "MouseEventInit.relatedTarget"
+  ],
+  "referenceDictionaries": [
+    "StaticRangeInit"
+  ],
+  "typedArrayInputTypes": [
+    "Float32Array",
+    "Float64Array"
+  ],
+  "idlDefaultDictionaries": [
+    "PointerEventInit"
+  ],
+  "browserIndexedGetters": [
+    "DataTransferItemList.item"
+  ]
 }

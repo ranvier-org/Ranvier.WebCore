@@ -22,6 +22,12 @@ WEBCORE_EXPORT int32_t ranvier_resource_load_font(RvNode* document, const char* 
 WEBCORE_EXPORT int32_t ranvier_resource_cancel(uint64_t operation);
 WEBCORE_EXPORT int32_t ranvier_resource_release(uint64_t operation);
 WEBCORE_EXPORT void ranvier_resource_invalidate_document(RvNode* document);
+WEBCORE_EXPORT int32_t ranvier_fonts_status(RvNode* document, int32_t* status);
+WEBCORE_EXPORT int32_t ranvier_fonts_check(RvNode* document, const uint8_t* font, int32_t fontLength, const uint8_t* text, int32_t textLength, int32_t* loaded);
+WEBCORE_EXPORT int32_t ranvier_fonts_load(RvNode* document, const uint8_t* font, int32_t fontLength, const uint8_t* text, int32_t textLength, RvResourceCompletion, void* context, uint64_t* operation);
+WEBCORE_EXPORT int32_t ranvier_fonts_ready(RvNode* document, RvResourceCompletion, void* context, uint64_t* operation);
+WEBCORE_EXPORT int32_t ranvier_fonts_watch(RvNode* document, RvFontsEventCallback, void* context, RvFontsWatch** watch);
+WEBCORE_EXPORT void ranvier_fonts_unwatch(RvFontsWatch*);
 WEBCORE_EXPORT int32_t ranvier_blob_read(RvNode* document, RvBlob* blob, int32_t mode, RvResourceCompletion, void* context, uint64_t* operation);
 WEBCORE_EXPORT int32_t ranvier_blob_url_read(RvNode* document, const uint8_t* url, int32_t url_length, RvResourceCompletion, void* context, uint64_t* operation);
 WEBCORE_EXPORT int32_t ranvier_blob_read_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length);

@@ -1,0 +1,37 @@
+{
+  "abi": 32,
+  "runtime": "C:\\wk\\i02-private\\native24-candidate\\runtime",
+  "exportsPresent": {
+    "rv_dom_text_create": false,
+    "rv_dom_comment_create": false,
+    "rv_dom_document_fragment_create": false,
+    "rv_dom_range_create": false,
+    "rv_dom_static_range_create": false,
+    "rv_dom_document_create": false,
+    "rv_dom_document_parse_html_unsafe": false,
+    "rv_dom_input_event_create": false,
+    "rv_dom_wheel_event_create": false,
+    "rv_dom_pointer_event_create": false,
+    "rv_dom_dom_matrix_from_float32_array": false,
+    "rv_dom_dom_matrix_from_float64_array": false,
+    "rv_dom_dom_matrix_read_only_from_float32_array": false,
+    "rv_dom_dom_matrix_read_only_from_float64_array": false
+  },
+  "leftOut": {
+    "Text.constructor": "constructor",
+    "Comment.constructor": "constructor",
+    "DocumentFragment.constructor": "constructor",
+    "Range.constructor": "constructor",
+    "StaticRange.constructor": "constructor",
+    "Document.constructor": "constructor",
+    "Document.parseHTMLUnsafe": "static",
+    "InputEvent.constructor": "constructor",
+    "WheelEvent.constructor": "constructor",
+    "PointerEvent.constructor": "constructor",
+    "DOMMatrix.fromFloat32Array": "static",
+    "DOMMatrix.fromFloat64Array": "static",
+    "DOMMatrixReadOnly.fromFloat32Array": "static",
+    "DOMMatrixReadOnly.fromFloat64Array": "static"
+  },
+  "red": true
+}

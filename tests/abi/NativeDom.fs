@@ -842,6 +842,15 @@ type RvDomCSSMatrixComponentOptions =
     val mutable size: uint32
     val mutable is2_d: nativeint
 
+/// <summary>The IDL dictionary StaticRangeInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomStaticRangeInit =
+    val mutable size: uint32
+    val mutable start_container: nativeint
+    val mutable start_offset: uint32
+    val mutable end_container: nativeint
+    val mutable end_offset: uint32
+
 /// <summary>The IDL dictionary GetComposedRangesOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomGetComposedRangesOptions =
@@ -884,6 +893,84 @@ type RvDomDOMPointInit =
     val mutable y: float
     val mutable z: float
     val mutable w: float
+
+/// <summary>The IDL dictionary PointerEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomPointerEventInit =
+    val mutable size: uint32
+    val mutable bubbles: int
+    val mutable cancelable: int
+    val mutable composed: int
+    val mutable detail: int
+    val mutable ctrl_key: int
+    val mutable shift_key: int
+    val mutable alt_key: int
+    val mutable meta_key: int
+    val mutable modifier_alt_graph: int
+    val mutable modifier_caps_lock: int
+    val mutable screen_x: float
+    val mutable screen_y: float
+    val mutable client_x: float
+    val mutable client_y: float
+    val mutable button: int16
+    val mutable buttons: uint16
+    val mutable related_target: nativeint
+    val mutable movement_x: float
+    val mutable movement_y: float
+    val mutable pointer_id: int
+    val mutable width: float
+    val mutable height: float
+    val mutable pressure: float32
+    val mutable tangential_pressure: float32
+    val mutable tilt_x: nativeint
+    val mutable tilt_y: nativeint
+    val mutable twist: int
+    val mutable pointer_type: RvDomUtf8StringInput
+    val mutable is_primary: int
+    val mutable coalesced_events: nativeint
+    val mutable predicted_events: nativeint
+
+/// <summary>The IDL dictionary WheelEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomWheelEventInit =
+    val mutable size: uint32
+    val mutable bubbles: int
+    val mutable cancelable: int
+    val mutable composed: int
+    val mutable detail: int
+    val mutable ctrl_key: int
+    val mutable shift_key: int
+    val mutable alt_key: int
+    val mutable meta_key: int
+    val mutable modifier_alt_graph: int
+    val mutable modifier_caps_lock: int
+    val mutable screen_x: float
+    val mutable screen_y: float
+    val mutable client_x: float
+    val mutable client_y: float
+    val mutable button: int16
+    val mutable buttons: uint16
+    val mutable related_target: nativeint
+    val mutable movement_x: float
+    val mutable movement_y: float
+    val mutable delta_x: float
+    val mutable delta_y: float
+    val mutable delta_z: float
+    val mutable delta_mode: uint32
+    val mutable wheel_delta_x: int
+    val mutable wheel_delta_y: int
+
+/// <summary>The IDL dictionary InputEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomInputEventInit =
+    val mutable size: uint32
+    val mutable bubbles: int
+    val mutable cancelable: int
+    val mutable composed: int
+    val mutable detail: int
+    val mutable data: RvDomUtf8StringInput
+    val mutable is_composing: int
+    val mutable input_type: RvDomUtf8StringInput
 
 /// <summary>The IDL dictionary CompositionEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
@@ -1710,6 +1797,24 @@ type RvDomSequenceAbstractRange =
     val mutable count: int
     val mutable items: nativeint
 
+[<Literal>]
+let RV_DOM_UNION_DOM_STRING_OR_CANVAS_GRADIENT_OR_CANVAS_PATTERN_STRING = 1
+
+[<Literal>]
+let RV_DOM_UNION_DOM_STRING_OR_CANVAS_GRADIENT_OR_CANVAS_PATTERN_CANVAS_GRADIENT = 2
+
+[<Literal>]
+let RV_DOM_UNION_DOM_STRING_OR_CANVAS_GRADIENT_OR_CANVAS_PATTERN_CANVAS_PATTERN = 3
+
+/// <summary>ABI transport for DOMStringOrCanvasGradientOrCanvasPattern; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: RvDomUtf8StringSpan
+    val mutable arm1: nativeint
+    val mutable arm2: nativeint
+
 /// <summary>ABI transport for CSSStyleValue sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomSequenceCSSStyleValue =
@@ -1914,6 +2019,9 @@ extern void rv_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string_re
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release(RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue& value)
@@ -2318,6 +2426,42 @@ extern void rv_dom_highlight_registry_release(nativeint handle)
 extern nativeint rv_dom_highlight_registry_retain(nativeint handle)
 
 [<DllImport(Lib)>]
+extern void rv_dom_data_transfer_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_data_transfer_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_data_transfer_item_list_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_data_transfer_item_list_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_data_transfer_item_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_data_transfer_item_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_canvas_rendering_context2_d_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_canvas_rendering_context2_d_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_canvas_gradient_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_canvas_gradient_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_canvas_pattern_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_canvas_pattern_retain(nativeint handle)
+
+[<DllImport(Lib)>]
 extern int rv_dom_css_rule_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
@@ -2483,6 +2627,9 @@ extern int rv_dom_character_data_replace_with(nativeint target, [<In>] RvDomSequ
 extern int rv_dom_character_data_remove(nativeint target)
 
 [<DllImport(Lib)>]
+extern int rv_dom_text_create(nativeint target, byte[] data, int data_length, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_text_get_whole_text(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
@@ -2490,6 +2637,12 @@ extern int rv_dom_text_get_assigned_slot(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_text_split_text(nativeint target, uint32 offset, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_comment_create(nativeint target, byte[] data, int data_length, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_document_fragment_create(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_fragment_get_children(nativeint target, nativeint& result)
@@ -2583,6 +2736,9 @@ extern int rv_dom_shadow_root_set_html_unsafe(nativeint target, byte[] html, int
 
 [<DllImport(Lib)>]
 extern int rv_dom_shadow_root_get_html(nativeint target, [<In>] RvDomGetHTMLOptions[] options, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_document_create(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_get_implementation(nativeint target, nativeint& result)
@@ -7268,6 +7424,12 @@ extern int rv_dom_abstract_range_get_end_offset(nativeint target, uint32& result
 extern int rv_dom_abstract_range_get_collapsed(nativeint target, int& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_static_range_create(nativeint target, [<In>] RvDomStaticRangeInit[] init, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_create(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_range_get_common_ancestor_container(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
@@ -8093,6 +8255,9 @@ extern int rv_dom_mouse_event_get_to_element(nativeint target, nativeint& result
 extern int rv_dom_mouse_event_get_modifier_state(nativeint target, byte[] key_arg, int key_arg_length, int& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_pointer_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomPointerEventInit[] event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_pointer_event_get_pointer_id(nativeint target, int& result)
 
 [<DllImport(Lib)>]
@@ -8133,6 +8298,9 @@ extern int rv_dom_pointer_event_get_coalesced_events(nativeint target, RvDomSequ
 
 [<DllImport(Lib)>]
 extern int rv_dom_pointer_event_get_predicted_events(nativeint target, RvDomSequencePointerEvent& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_wheel_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomWheelEventInit[] event_init_dict, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_wheel_event_get_delta_x(nativeint target, float& result)
@@ -8198,6 +8366,9 @@ extern int rv_dom_keyboard_event_get_modifier_state(nativeint target, byte[] key
 extern int rv_dom_focus_event_get_related_target(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_input_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomInputEventInit[] event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_input_event_get_input_type(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
@@ -8205,6 +8376,9 @@ extern int rv_dom_input_event_get_data(nativeint target, byte[] buffer, int capa
 
 [<DllImport(Lib)>]
 extern int rv_dom_input_event_get_is_composing(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_input_event_get_data_transfer(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_input_event_get_target_ranges(nativeint target, RvDomSequenceStaticRange& result)
@@ -10223,6 +10397,102 @@ extern int rv_dom_file_reader_read_as_data_url(nativeint target, nativeint blob)
 extern int rv_dom_file_reader_abort(nativeint target)
 
 [<DllImport(Lib)>]
+extern int rv_dom_data_transfer_create(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_get_drop_effect(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_set_drop_effect(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_get_effect_allowed(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_set_effect_allowed(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_get_items(nativeint target, nativeint context, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_get_types(nativeint target, nativeint context, RvDomSequenceDOMString& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_get_files(nativeint target, nativeint context, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_set_drag_image(nativeint target, nativeint image, int x, int y)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_get_data(nativeint target, nativeint context, byte[] format, int format_length, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_set_data(nativeint target, nativeint context, byte[] format, int format_length, byte[] data, int data_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_clear_data(nativeint target, byte[] format, int format_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_item_list_get_length(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_item_list_item(nativeint target, uint32 index, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_item_list_add_2(nativeint target, nativeint context, byte[] data, int data_length, byte[] ``type``, int type_length, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_item_list_add_1(nativeint target, nativeint file, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_item_list_remove(nativeint target, uint32 index)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_item_list_clear(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_item_get_kind(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_item_get_type(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_item_get_as_file(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_clipboard_event_get_clipboard_data(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_drag_event_get_data_transfer(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_canvas_element_get_width(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_canvas_element_set_width(nativeint target, uint32 value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_canvas_element_get_height(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_canvas_element_set_height(nativeint target, uint32 value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_canvas(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_fill_style(nativeint target, RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_fill_style(nativeint target, [<In>] RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern[] value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_clear_rect(nativeint target, float x, float y, float w, float h)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_fill_rect(nativeint target, float x, float y, float w, float h)
+
+[<DllImport(Lib)>]
 extern int rv_dom_css_supports_2(nativeint target, byte[] property, int property_length, byte[] value, int value_length, int& result)
 
 [<DllImport(Lib)>]
@@ -10304,7 +10574,19 @@ extern int rv_dom_screen_orientation_get_angle(nativeint target, uint16& result)
 extern int rv_dom_dom_matrix_read_only_from_matrix(nativeint target, [<In>] RvDomDOMMatrixInit[] other, nativeint& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_from_float32_array(nativeint target, float32[] array32, int array32_count, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_from_float64_array(nativeint target, float[] array64, int array64_count, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_dom_matrix_from_matrix(nativeint target, [<In>] RvDomDOMMatrixInit[] other, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_from_float32_array(nativeint target, float32[] array32, int array32_count, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_from_float64_array(nativeint target, float[] array64, int array64_count, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_dom_rect_read_only_from_rect(nativeint target, [<In>] RvDomDOMRectInit[] other, nativeint& result)
@@ -10341,6 +10623,9 @@ extern int rv_dom_domurl_create_object_url(nativeint target, nativeint blob, byt
 
 [<DllImport(Lib)>]
 extern int rv_dom_domurl_revoke_object_url(nativeint target, byte[] url, int url_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_document_parse_html_unsafe(nativeint target, byte[] html, int html_length, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_style_property_map_read_only_entries(nativeint target, nativeint context, RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement& result)

@@ -118,15 +118,19 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
         return ("int[]", "") if name == "length" else ("int&", "")
     if ctype in ("const RvScreenMetrics*", "const RvMediaPreferences*"):
         return "nativeint", ""
+    if ctype == "const RvCanvas2DSettings*":
+        return "nativeint", ""
     if ctype == "const RvEventInit*":
         return "EventInit&", ""
+    if ctype == "const RvNotificationOptions*":
+        return "NotificationOptions&", ""
     if ctype == "const uint16_t*":
         return "uint16[]", "[<In>] "
     if ctype == "RvTextSegments*":
         return "TextSegments&", ""
     if ctype == "void**":
         return "nativeint&", ""
-    if ctype == "RvGpuFrame**":
+    if ctype in ("RvGpuFrame**", "RvCanvasRenderingContext2D**"):
         return "nativeint&", ""
     if re.fullmatch(r"Rv\w+\*\*", ctype):
         return "nativeint[]", ""
@@ -174,6 +178,22 @@ def generated(header: str) -> str:
         "    val mutable relatedTarget: nativeint",
         "    val mutable customDetailJson: nativeint",
         "",
+        "/// <summary>The <c>RvNotificationOptions</c> of the header; strings are caller-owned UTF-8 bytes with lengths.</summary>",
+        "[<Struct; StructLayout(LayoutKind.Sequential)>]",
+        "type NotificationOptions =",
+        "    val mutable size: int",
+        "    val mutable dir: int",
+        "    val mutable silent: int",
+        "    val mutable body_length: int",
+        "    val mutable tag_length: int",
+        "    val mutable lang_length: int",
+        "    val mutable icon_length: int",
+        "    val mutable reserved: int",
+        "    val mutable body: nativeint",
+        "    val mutable tag: nativeint",
+        "    val mutable lang: nativeint",
+        "    val mutable icon: nativeint",
+        "",
         "/// <summary>The <c>RvTextSegments</c> of the header: owned until <c>rv_text_segments_release</c>.</summary>",
         "[<Struct; StructLayout(LayoutKind.Sequential)>]",
         "type TextSegments =",
@@ -206,6 +226,14 @@ def generated(header: str) -> str:
         "/// <summary>The <c>RvResourceCompletion</c> of the header: one terminal outcome with an image's natural size.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
         "type ResourceCompletion = delegate of context: nativeint * outcome: int * width: int * height: int -> unit",
+        "",
+        "/// <summary>",
+        "/// The <c>RvFontsEventCallback</c> of the header: <c>families</c> and <c>familyLengths</c> point to <c>count</c> UTF-8",
+        "/// family names and their byte counts, valid only during the call.",
+        "/// </summary>",
+        "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+        "type FontsEventCallback =",
+        "    delegate of context: nativeint * kind: int * families: nativeint * familyLengths: nativeint * count: int -> unit",
         "",
         "/// <summary>The <c>RvFrameCallback</c> of the header.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
@@ -279,6 +307,10 @@ def generated(header: str) -> str:
         "/// <summary>The <c>RvClipboardRead</c> of the header.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
         "type ClipboardRead = delegate of context: nativeint * request: nativeint -> unit",
+        "",
+        "/// <summary>The <c>RvClipboardWriteFile</c> of the header; <c>file</c> is a borrowed File handle.</summary>",
+        "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+        "type ClipboardWriteFile = delegate of context: nativeint * file: nativeint * first: int -> unit",
         "",
         "/// <summary>The <c>RvDragStartCallback</c> of the header.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",

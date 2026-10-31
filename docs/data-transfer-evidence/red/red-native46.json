@@ -1,0 +1,127 @@
+{
+ "runtime": "C:\\wk\\native-cascade-shadow\\artifacts\\native46-candidate-6\\runtime",
+ "abi": 54,
+ "runtimeSha256": {
+  "RanvierWebCoreHost.dll": "30d05791c6c94a62adaa449b8d1f544c5f85f1ffab4b128c01dbc5e1ccf0000c",
+  "WebCore.dll": "ea706c26e8286a80119e9e28edb983c2c5045b3d1c59aa6ebdedfee84166f001",
+  "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+ },
+ "missingExports": {
+  "rv_dom_drag_event_get_data_transfer": false,
+  "rv_dom_clipboard_event_get_clipboard_data": false,
+  "rv_dom_input_event_get_data_transfer": false,
+  "rv_dom_data_transfer_get_types": false,
+  "rv_dom_data_transfer_get_data": false,
+  "rv_dom_data_transfer_set_data": false,
+  "rv_dom_data_transfer_get_files": false,
+  "rv_dom_data_transfer_get_items": false,
+  "rv_dom_data_transfer_get_drop_effect": false,
+  "rv_dom_data_transfer_get_effect_allowed": false,
+  "rv_dom_data_transfer_set_drag_image": false,
+  "rv_dom_data_transfer_item_list_get_length": false,
+  "rv_dom_data_transfer_item_get_kind": false,
+  "rv_dom_data_transfer_item_get_as_file": false,
+  "rv_dom_data_transfer_create": false,
+  "rv_dom_drag_event_create": false,
+  "rv_dom_clipboard_event_create": false
+ },
+ "existingExports": {
+  "rv_host_drag": true,
+  "rv_drag_data_add": true,
+  "rv_clipboard_offer": true,
+  "rv_drag_item_value": true,
+  "rv_drag_image": true,
+  "rv_dom_input_event_get_target_ranges": true,
+  "rv_dom_file_create": true,
+  "rv_file_list_create": true
+ },
+ "capabilities": {
+  "clipboard": 1,
+  "drop": 1,
+  "drag-out": 1,
+  "dom:DataTransfer": 0,
+  "dom:DataTransferItem": 0,
+  "dom:DataTransferItemList": 0,
+  "dom:DragEvent": 0,
+  "dom:ClipboardEvent": 0,
+  "dom:InputEvent": 1,
+  "dom-type-query:Event": 1
+ },
+ "payloadBuilders": {
+  "rv_drag_data_add": "(RvDragData*, const char* type, const char* data)",
+  "rv_clipboard_offer": "(RvClipboardRequest*, const char* type, const char* data)",
+  "fileBuilders": {
+   "rv_drag_data_add_file": false,
+   "rv_clipboard_offer_file": false,
+   "rv_drag_file": false
+  }
+ },
+ "paste": {
+  "status": 1,
+  "offerStatus": [
+   0,
+   0,
+   0
+  ],
+  "events": [
+   {
+    "type": "paste",
+    "interface": "Event"
+   },
+   {
+    "type": "beforeinput",
+    "interface": "InputEvent",
+    "inputType": "insertFromPaste",
+    "data": null,
+    "targetRanges": 1
+   },
+   {
+    "type": "input",
+    "interface": "InputEvent",
+    "inputType": "insertFromPaste",
+    "data": null,
+    "targetRanges": 0
+   }
+  ],
+  "html": "<i>X</i>Y"
+ },
+ "drop": {
+  "overOperation": 1,
+  "dropOperation": 1,
+  "events": [
+   {
+    "type": "dragover",
+    "interface": "MouseEvent"
+   },
+   {
+    "type": "dragover",
+    "interface": "MouseEvent"
+   },
+   {
+    "type": "drop",
+    "interface": "MouseEvent"
+   }
+  ]
+ },
+ "engineFileAccess": {
+  "file": "Source/WebCore/dom/DataTransfer.cpp",
+  "sha256": "0e4a60ae96eb9c13703556200311c2184512c380be9d2faecd7074c05498d886",
+  "lines": "265-277",
+  "text": [
+   "bool DataTransfer::allowsFileAccess() const",
+   "{",
+   "#if PLATFORM(COCOA)",
+   "    return !forDrag() || forFileDrag();",
+   "#elif PLATFORM(GTK) || PLATFORM(WPE)",
+   "    // File drag access is disabled until https://webkit.org/b/271957 is resolved for GTK/WPE ports.",
+   "    // In-memory image paste does not access files on disk, so it is safe to allow.",
+   "    return !forDrag() && m_pasteboard && m_pasteboard->fileContentState() == Pasteboard::FileContentState::InMemoryImage;",
+   "#else",
+   "    // Check https://webkit.org/b/271957 before allowing file access for your port.",
+   "    return false;",
+   "#endif",
+   "}"
+  ]
+ },
+ "assertions": 45
+}

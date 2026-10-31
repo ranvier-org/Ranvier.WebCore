@@ -1,0 +1,239 @@
+{
+  "group": [
+    "R01 #90"
+  ],
+  "status": "green (private Windows x64 slim; not accepted)",
+  "native": "0.1.0-preview.46",
+  "abi": 55,
+  "abiNote": "placeholder ABI55 on batch-1 ABI54; root assigns NativeNN/ABI at integration",
+  "features": [
+    "canvas-context",
+    "dom:HTMLCanvasElement",
+    "dom:CanvasRenderingContext2D",
+    "dom:CanvasGradient",
+    "dom:CanvasPattern"
+  ],
+  "members": [
+    "rv_canvas_get_context",
+    "rv_canvas_context_2d_attributes",
+    "RvCanvas2DSettings",
+    "RV_CANVAS_CONTEXT_*",
+    "RV_CANVAS_COLOR_SPACE_*",
+    "RV_CANVAS_COLOR_TYPE_*",
+    "rv_dom_html_canvas_element_get/set_width/height",
+    "rv_dom_canvas_rendering_context2_d_get_canvas",
+    "rv_dom_canvas_rendering_context2_d_get/set_fill_style",
+    "rv_dom_canvas_rendering_context2_d_fill_rect",
+    "rv_dom_canvas_rendering_context2_d_clear_rect",
+    "rv_dom_canvas_rendering_context2_d_release/retain",
+    "rv_dom_canvas_gradient_release/retain",
+    "rv_dom_canvas_pattern_release/retain",
+    "rv_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release"
+  ],
+  "engine": "HTMLCanvasElement::getContext2d and CanvasRenderingContext2DBase from host/RanvierCanvasGlue.cpp (compiled into WebCore); generated members from gen/domgen.py memberSelections; WebKit patch 0042 renders a context-bearing canvas without script",
+  "sourcePatch": {
+    "patch": "0042-canvas-renders-embedder-context.patch",
+    "units": [
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-6.cpp.obj"
+    ],
+    "privateProofDisassemblyEqual": true,
+    "patch0040": {
+      "emptyClientsDiffSha256": "8e525884bd48af05c39783b1932877b4118ab82c8b9bc71fd43f65d520d3c08a",
+      "emptyClientsDiffLines": 77,
+      "recompiledUnitIncludes": {
+        "000-RanvierDomGlue.cpp.obj.log": false,
+        "001-UnifiedSource-html-6.cpp.obj.log": false,
+        "090-RanvierCanvasGlue.cpp.obj.log": false
+      },
+      "note": "final -> override, vtable unchanged; postdates the parent objects"
+    }
+  },
+  "sourceHeadOfBatch": "dd5002e9a80862e0bb716e6807ffabb4213ce7a1",
+  "batchRunHead": "7f1fda5",
+  "red": {
+    "exports": {
+      "rv_canvas_get_context_2d": false,
+      "rv_canvas_get_context": false,
+      "rv_canvas_context_type": false,
+      "rv_canvas_context_2d_attributes": false,
+      "rv_dom_html_canvas_element_get_width": false,
+      "rv_dom_html_canvas_element_set_width": false,
+      "rv_dom_html_canvas_element_get_height": false,
+      "rv_dom_html_canvas_element_set_height": false,
+      "rv_dom_canvas_rendering_context2_d_get_canvas": false,
+      "rv_dom_canvas_rendering_context2_d_get_fill_style": false,
+      "rv_dom_canvas_rendering_context2_d_set_fill_style": false,
+      "rv_dom_canvas_rendering_context2_d_fill_rect": false,
+      "rv_dom_canvas_rendering_context2_d_clear_rect": false,
+      "rv_dom_canvas_rendering_context2_d_release": false,
+      "rv_dom_canvas_rendering_context2_d_retain": false
+    },
+    "abi": 30,
+    "nonReplacedLayout": {
+      "canvasDisplayBlockNoCssSize": [
+        320,
+        160
+      ],
+      "chromium": [
+        300,
+        150
+      ]
+    },
+    "fallbackRendering": {
+      "debug": "[bufferCreated=1, getImageDataStatus=0, r,g,b,a at (5,5)=255,0,0,255, hasRenderer=1, (unused), hasAcceleratedCompositing=0]",
+      "hostPaint(5,5)": "[255,255,255,255] white page: canvas bitmap not painted",
+      "elementSnapshot(5,5)": "[0,0,0,0]"
+    },
+    "cause": "HTMLCanvasElement::createElementRenderer and isReplaced return a RenderHTMLCanvas only when frame->script().canExecuteScripts(); the host sets setScriptEnabled(false), so a canvas renders its fallback content (RenderBlockFlow) and never paints its bitmap (spec: scripting disabled -> fallback content)."
+  },
+  "green": {
+    "canvasContextAssertions": 205,
+    "repeats": 30,
+    "repeatsDistinct": [
+      "PASS: canvas_context 205 assertions"
+    ],
+    "probes": 62,
+    "allExitZero": true,
+    "rawAssertions": 90948,
+    "baselineRawAssertions": 90743,
+    "baselineProbesChanged": {},
+    "teardownCases": 104,
+    "teardownAllCollected": true
+  },
+  "measured": {
+    "fallback": {
+      "rect": [
+        0.0,
+        60.0,
+        10.0,
+        10.0
+      ],
+      "pixel": [
+        0,
+        0,
+        255,
+        255
+      ]
+    },
+    "defaults": [
+      300,
+      150
+    ],
+    "attributes": {
+      "alpha": 1,
+      "desynchronized": 0,
+      "willReadFrequently": 0,
+      "colorSpace": 0,
+      "colorType": 0
+    },
+    "requestedAttributes": {
+      "alpha": 1,
+      "desynchronized": 1,
+      "willReadFrequently": 1,
+      "colorSpace": 0,
+      "colorType": 0
+    },
+    "fillStyle": {
+      "initial": "#000000",
+      "#ff0000": "#ff0000",
+      "not a colour": "#ff0000",
+      "rgba(0, 0, 255, 0.5)": "rgba(0, 0, 255, 0.5)",
+      "lime": "#00ff00"
+    },
+    "drawn": [
+      [
+        255,
+        0,
+        0,
+        255
+      ],
+      [
+        0,
+        0,
+        255,
+        255
+      ],
+      [
+        255,
+        255,
+        255,
+        255
+      ]
+    ],
+    "cleared": [
+      [
+        255,
+        255,
+        255,
+        255
+      ],
+      [
+        255,
+        0,
+        0,
+        255
+      ]
+    ],
+    "halfAlpha": [
+      [
+        127,
+        128,
+        0,
+        255
+      ],
+      [
+        0,
+        128,
+        127,
+        255
+      ]
+    ],
+    "switched": {
+      "rect": [
+        0.0,
+        60.0,
+        300.0,
+        150.0
+      ],
+      "pixel": [
+        255,
+        255,
+        255,
+        255
+      ]
+    },
+    "hugeWidth": 300,
+    "assertions": 205
+  },
+  "chromiumOracle": {
+    "browser": "156.0.8078.4",
+    "file": "red-chromium.json"
+  },
+  "qualifications": [
+    "Profile: 2D contexts only, alpha true, sRGB, unorm8; other types and settings return RV_ERR_UNSUPPORTED on every provider.",
+    "WebKit ignores the alpha setting (FIXME in CanvasRenderingContext2DSettings.idl) and draws a float16 colorType into an 8-bit buffer while reporting float16; the ABI rejects both requests instead of reporting them.",
+    "display-p3 needs ENABLE_PREDEFINED_COLOR_SPACE_DISPLAY_P3 (OFF on the slim build).",
+    "BITMAP_RENDERER is deferred to R07; WebGL/WebGL2/WebGPU are Unsupported (ENABLE_WEBGL OFF, GPU paused).",
+    "WebKit has no CanvasRenderingContext2D.isContextLost; R01 does not expose it.",
+    "Pixels are read from the host software paint and rv_element_snapshot; R01 has no getImageData (R06)."
+  ],
+  "files": {
+    "batch-green.json": "01384ea94c9576939d1d231555676780ec4475fb3f6bbbb2d7571a48cd4b467f",
+    "build_canvas_candidate.py": "6ebb69fc8f668e8378dd421e601ec95daaf74899bdd41a11ce3ae7883c57e634",
+    "canvas-context-probe.log": "9e43401e2758d65fec9cd561f1c53aae8fa31ebbed9d5fe6644c57a57a0e4e46",
+    "canvas-context-repeat30.txt": "b80e6ea529ed395969dd0d8cad90d9c7ea6abe3456c71c837c762fe346f504ff",
+    "canvas-context-report.json": "68f909123c0916df8cc98d169390f7a3445e01bb78dce07b10537b9518bb8386",
+    "make_canvas_evidence.py": "7e58a5ec3c2b3776760f697bb89e92f111f8e6134690aa5685e73a23bef56d6c",
+    "proposed-canvas-renders-embedder-context.diff": "6ddbf63ddd42456ec303adb2a9c512be99a0c482d31df010bbff8e051192a08d",
+    "red-chromium.json": "93ac4bacf94c717f53c5f7355451a595057577046086cda5ecf1ed3018bee3a9",
+    "red-fallback-rendering.json": "8d49d1c03c1cb2b8424f417673e760bdb3386586f4028818dfcc53508cd8db2a",
+    "red-native.json": "775ae7ccad45fc82b68743c5bbe9dcad6ab6dc6eb1639a8afb08e0b5df7e062b",
+    "red_chromium.mjs": "b7c1c9fe58f78d99c4ef182e4596c9fcec595e9f4dc700a94b92f321daa9e857",
+    "red_native.py": "cb137c6bfda19848ec44b8afda75a49976fb5ce40c11ef7b9018217b48d4c5f7",
+    "repeat30.sh": "061cfeb3e5a00f3f5ef88027e03259c23cb571c6ef3136fc2528abd741393c87",
+    "run_canvas_full_batch.py": "b6e50a37aa2af1b69e35a6ee900906c7d2d5cb4eba3551e09218e9965ae4631a",
+    "runtime-receipt.json": "da0249583be1ac0381c4741f531972364965a3c1da9dd4aa59d2deb48a85d4e5",
+    "source-patches.json": "1c3ae9562f80015531e6f1fe6293e9d9ae74edf99b9f7753c7eb279a2b40e6c9",
+    "teardown-probes.json": "5483c939d925c8cc0f30c1cba7ddaad63258da92a314e64be68ea35fcde86432"
+  }
+}

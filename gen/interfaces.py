@@ -232,6 +232,12 @@ class InterfaceEmitter:
         if anonymous_property and not needs_adapter:
             expression = self.browser_property_expression(owner, member)
             lines += ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif']
+        # A getter WebKit's IDL names, which browsers expose only as an indexed property.
+        indexed = f'{owner}.{member.name}' in self.world.config.get('browserIndexedGetters', [])
+        if indexed:
+            if member.special != 'getter' or needs_adapter or len(member.arguments) != 1:
+                raise SystemExit(f'{owner}.{member.name}: browserIndexedGetters requires a one-argument named getter')
+            lines = ([''] if lines[0] != '' else []) + lines + ['#if FABLE_COMPILER', '    [<Fable.Core.Emit("($0[$1] ?? null)")>]', '#endif']
         matrix_adapter = f'{owner}.{member.name}'
         if matrix_adapter in self.generator.svg_matrix_bindings:
             expression = ("((v,d)=>{const n=globalThis.DOMMatrix.fromMatrix(d??{});"
@@ -270,7 +276,7 @@ class InterfaceEmitter:
         if needs_adapter:
             lines += ['#endif']
             self.adapters.append((owner, member))
-        if anonymous_property or matrix_adapter in self.generator.svg_matrix_bindings or (wide and not needs_adapter and lines[-1] != ''):
+        if anonymous_property or indexed or matrix_adapter in self.generator.svg_matrix_bindings or (wide and not needs_adapter and lines[-1] != ''):
             lines += ['']
         return lines
 
@@ -370,7 +376,7 @@ class InterfaceEmitter:
                     else:
                         head = f'        | arm when is{resolved.name} arm ->'
                         value = f'{name}.{label(child)} (unbox<{ftype}> arm)'
-                        lines += [head, f'            {value}'] if name not in self.world.config.get('validatedReferenceUnions', []) and len(head + ' ' + value) > 120 else [head + ' ' + value]
+                        lines += [head, f'            {value}'] if name not in self.world.config.get('validatedReferenceUnions', []) and len(head + ' ' + value) > 150 else [head + ' ' + value]
                 lines += ['        | _ -> failwith "Unexpected DOM union result"']
         for owner in dict.fromkeys(owner for owner, _ in self.adapters):
             lines += ['', f'    type {owner} with']
