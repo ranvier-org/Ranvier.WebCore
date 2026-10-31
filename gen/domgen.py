@@ -765,8 +765,8 @@ class Generator(ComplexGeneratorMixin):
         for member in self.world.members(name):
             if member.name not in selected:
                 continue
-            member = self.scoped_member(member, *[{key: attrs[key] for key in ('EnabledBySetting', 'Conditional') if key in attrs}
-                                                   for attrs in gates])
+            member = self.scoped_member(member, *[{key: attrs[key] for key in ('EnabledBySetting', 'Conditional')
+                                                    if key in attrs and attrs[key] != member.attrs.get(key)} for attrs in gates])
             reason = self.member_reason(name, member)
             readonly_attribute = member.kind == 'attribute' and member.readonly
             if reason or (member.kind != 'operation' and not readonly_attribute):

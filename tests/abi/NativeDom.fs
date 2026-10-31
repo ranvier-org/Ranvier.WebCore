@@ -651,6 +651,18 @@ let RV_DOM_ENDING_TYPE_TRANSPARENT = 0
 let RV_DOM_ENDING_TYPE_NATIVE = 1
 
 [<Literal>]
+let RV_DOM_ORIENTATION_TYPE_PORTRAIT_PRIMARY = 0
+
+[<Literal>]
+let RV_DOM_ORIENTATION_TYPE_PORTRAIT_SECONDARY = 1
+
+[<Literal>]
+let RV_DOM_ORIENTATION_TYPE_LANDSCAPE_PRIMARY = 2
+
+[<Literal>]
+let RV_DOM_ORIENTATION_TYPE_LANDSCAPE_SECONDARY = 3
+
+[<Literal>]
 let RV_DOM_SCROLL_BEHAVIOR_AUTO = 0
 
 [<Literal>]
@@ -9851,6 +9863,36 @@ extern int rv_dom_crypto_get_random_values(nativeint target, int array_kind, byt
 
 [<DllImport(Lib)>]
 extern int rv_dom_crypto_random_uuid(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_screen_get_height(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_screen_get_width(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_screen_get_color_depth(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_screen_get_pixel_depth(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_screen_get_avail_left(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_screen_get_avail_top(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_screen_get_avail_height(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_screen_get_avail_width(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_screen_orientation_get_type(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_screen_orientation_get_angle(nativeint target, uint16& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_dom_matrix_read_only_from_matrix(nativeint target, [<In>] RvDomDOMMatrixInit[] other, nativeint& result)

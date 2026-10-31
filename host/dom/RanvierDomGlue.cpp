@@ -279,6 +279,8 @@
 #include "SVGUseElement.h"
 #include "SVGViewElement.h"
 #include "SVGViewSpec.h"
+#include "Screen.h"
+#include "ScreenOrientation.h"
 #include "ScrollIntoViewOptions.h"
 #include "ScrollToOptions.h"
 #include "Settings.h"
@@ -308,6 +310,7 @@
 #include "JSAriaNotifyOptions.h"
 #include "JSDocument.h"
 #include "JSEndingType.h"
+#include "JSScreenOrientation.h"
 #include "JSScrollBehavior.h"
 #include "JSScrollLogicalPosition.h"
 #include "JSShadowRootMode.h"
@@ -697,6 +700,7 @@ static constexpr ASCIILiteral enumerationAriaNotificationInterrupt[] = { "none"_
 static constexpr ASCIILiteral enumerationAriaNotificationPriority[] = { "normal"_s, "high"_s };
 static constexpr ASCIILiteral enumerationDocumentReadyState[] = { "loading"_s, "interactive"_s, "complete"_s };
 static constexpr ASCIILiteral enumerationEndingType[] = { "transparent"_s, "native"_s };
+static constexpr ASCIILiteral enumerationOrientationType[] = { "portrait-primary"_s, "portrait-secondary"_s, "landscape-primary"_s, "landscape-secondary"_s };
 static constexpr ASCIILiteral enumerationScrollBehavior[] = { "auto"_s, "instant"_s, "smooth"_s };
 static constexpr ASCIILiteral enumerationScrollLogicalPosition[] = { "start"_s, "center"_s, "end"_s, "nearest"_s };
 static constexpr ASCIILiteral enumerationShadowRootMode[] = { "user-agent"_s, "closed"_s, "open"_s };
@@ -3113,6 +3117,10 @@ int32_t ranvier_dom_has(const char* feature)
     if (!std::strcmp(feature, "dom-window-scrolling"))
         return 1;
     if (!std::strcmp(feature, "dom-crypto-random"))
+        return 1;
+    if (!std::strcmp(feature, "dom-screen"))
+        return 1;
+    if (!std::strcmp(feature, "dom-screen-orientation"))
         return 1;
     if (!std::strcmp(feature, "dom-geometry-matrix-readonly"))
         return 1;
@@ -40081,6 +40089,162 @@ int32_t ranvier_dom_crypto_random_uuid(RvNode* target, char* buffer, int32_t cap
     if (!impl->window())
         return RV_ERR_UNSUPPORTED;
     return deliver([&]() -> decltype(auto) { return impl->window()->crypto().randomUUID(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// Window.screen.height getter: checked Document context
+int32_t ranvier_dom_screen_get_height(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!impl->window())
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->window()->screen().height(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// Window.screen.width getter: checked Document context
+int32_t ranvier_dom_screen_get_width(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!impl->window())
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->window()->screen().width(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// Window.screen.colorDepth getter: checked Document context
+int32_t ranvier_dom_screen_get_color_depth(RvNode* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!impl->window())
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->window()->screen().colorDepth(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// Window.screen.pixelDepth getter: checked Document context
+int32_t ranvier_dom_screen_get_pixel_depth(RvNode* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!impl->window())
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->window()->screen().colorDepth(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// Window.screen.availLeft getter: checked Document context
+int32_t ranvier_dom_screen_get_avail_left(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!impl->window())
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->window()->screen().availLeft(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// Window.screen.availTop getter: checked Document context
+int32_t ranvier_dom_screen_get_avail_top(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!impl->window())
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->window()->screen().availTop(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// Window.screen.availHeight getter: checked Document context
+int32_t ranvier_dom_screen_get_avail_height(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!impl->window())
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->window()->screen().availHeight(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// Window.screen.availWidth getter: checked Document context
+int32_t ranvier_dom_screen_get_avail_width(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!impl->window())
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->window()->screen().availWidth(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// Window.screen.orientation.type getter: checked Document context; RV_ERR_UNSUPPORTED while the setting ScreenOrientationAPIEnabled is off
+int32_t ranvier_dom_screen_orientation_get_type(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.screenOrientationAPIEnabled))
+        return RV_ERR_UNSUPPORTED;
+    if (!impl->window())
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->window()->screen().orientation().type(); }, [&](auto&& value) { return storeEnumeration(value, result, enumerationOrientationType); });
+}
+
+// Window.screen.orientation.angle getter: checked Document context; RV_ERR_UNSUPPORTED while the setting ScreenOrientationAPIEnabled is off
+int32_t ranvier_dom_screen_orientation_get_angle(RvNode* target, uint16_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.screenOrientationAPIEnabled))
+        return RV_ERR_UNSUPPORTED;
+    if (!impl->window())
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->window()->screen().orientation().angle(); }, [&](auto&& value) { return store<uint16_t>(value, result); });
 }
 
 // DOMMatrixReadOnly.fromMatrix: static operation with checked Document context and UTF-8 byte lengths; other defaults to {} in IDL; other may be NULL for the IDL default; *result is a new reference

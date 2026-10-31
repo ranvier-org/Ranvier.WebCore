@@ -962,6 +962,32 @@
       ],
       "feature": "dom-crypto-random",
       "stringInputs": "utf8-lengths"
+    },
+    "Screen": {
+      "receiver": "Document",
+      "accessor": "screen",
+      "members": [
+        "width",
+        "height",
+        "availLeft",
+        "availTop",
+        "availWidth",
+        "availHeight",
+        "colorDepth",
+        "pixelDepth"
+      ],
+      "feature": "dom-screen",
+      "stringInputs": "utf8-lengths"
+    },
+    "ScreenOrientation": {
+      "receiver": "Document",
+      "accessor": "screen.orientation",
+      "members": [
+        "type",
+        "angle"
+      ],
+      "feature": "dom-screen-orientation",
+      "stringInputs": "utf8-lengths"
     }
   },
   "creationGatedInterfaces": {
