@@ -1,0 +1,4 @@
+cascade diagnostics PASS: 6693 assertions, 44 conformance cases with Chromium computed values, 141 snapshots held past destroy, 1 run(s)
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+
+EXIT_CODE=0

@@ -1,5 +1,6 @@
 import json
 import pathlib
+import re
 import sys
 import tempfile
 import unittest
@@ -576,7 +577,7 @@ partial interface Node { undefined takeQuad(optional DOMQuadInit quad = {}); };
         self.assertEqual([field['ctype'] for field in model['dictionaries']['DOMQuadInit']],
                          ['const RvDomDOMPointInit*', 'const RvDomDOMPointInit*'])
         self.assertEqual([field['default'] for field in model['dictionaries']['DOMPointInit']], ['0', '1'])
-        self.assertIn('const char* label;', generator.header())
+        self.assertIn('RvDomUtf8StringInput label;', generator.header())
         self.assertLess(generator.header().index('typedef struct RvDomDOMPointInit {'),
                         generator.header().index('typedef struct RvDomDOMQuadInit {'))
         glue = generator.glue()
@@ -613,7 +614,7 @@ interface StylePropertyMap { undefined set(USVString property, (CSSStyleValue or
 ''')
         config = dict(self.world.config)
         config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'StylePropertyMap']
-        config['complexStringSpans'] = ['CSSStyleValueOrUSVString']
+        config['browserWellFormedUnions'] = ['CSSStyleValueOrUSVString']
         generator = domgen.Generator(domgen.World(self.source, config))
         generator.lock = {}
         generator.lock_structs = {}
@@ -660,6 +661,73 @@ interface StylePropertyMapReadOnly {
         operation = next(item for item in model['functions'] if item['function'] == 'rv_dom_style_property_map_read_only_entries')
         self.assertEqual('facade', operation['binding'])
         self.assertEqual('iterable', operation['sourceKind'])
+
+    def form_data_generator(self, extra=''):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+dictionary EventInit { boolean bubbles = false; [ImplementedAs=trustedForBindingsOnly] boolean trusted = false; };
+interface File {};
+typedef (File or USVString) FormDataEntryValue;
+interface DOMFormData {
+    undefined append(USVString name, USVString value);
+    FormDataEntryValue? get(USVString name);
+    sequence<FormDataEntryValue> getAll(USVString name);
+    iterable<USVString, FormDataEntryValue>;
+};
+dictionary FormDataEventInit : EventInit { required DOMFormData formData; };
+interface FormDataEvent : Event {
+    constructor([AtomString] DOMString type, FormDataEventInit eventInitDict);
+    readonly attribute DOMFormData formData;
+};
+''' + extra)
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['DOMFormData', 'FormDataEvent']
+        config['exclude'] = list(config['exclude']) + ['EventInit.trusted']
+        config['opaqueUnionArms'] = ['File']
+        config['browserWellFormedUnions'] = ['FileOrUSVString']
+        config['browserWellFormedSetters'] = ['DOMFormData']
+        config['objectContexts'] = {'DOMFormData': 'Document'}
+        config['iterableBindings'] = {'DOMFormData': {'feature': 'dom-form-data-entries'}}
+        config['dictionaryObjectMembers'] = ['FormDataEventInit.formData']
+        config['dictionaryCppTypes'] = {'FormDataEventInit': 'FormDataEvent::Init'}
+        config['eventInterfaceCasts'] = ['FormDataEvent']
+        config['constructors'] = {'FormDataEvent': {'receiver': 'Document', 'factory': 'FormDataEvent::create',
+                                                    'passReceiver': False}}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        return generator
+
+    def test_opaque_union_arm_returns_a_tag_with_a_null_payload_and_no_decoder(self):
+        generator = self.form_data_generator()
+        names = {function.name for function in generator.functions}
+        self.assertTrue({'dom_form_data_get', 'dom_form_data_get_all', 'dom_form_data_entries'} <= names)
+        header = generator.header()
+        self.assertIn('void* arm0; /* File: NULL; the tag identifies the arm */', header)
+        self.assertIn('RvDomUtf8StringSpan arm1;', header)
+        glue = generator.glue()
+        self.assertNotIn('decodeRvDomUnionFileOrUSVString', glue)
+        self.assertIn('result->arm0 = nullptr;', glue)
+
+    def test_opaque_union_arm_is_refused_as_an_input_or_a_bare_result(self):
+        generator = self.form_data_generator('''
+partial interface DOMFormData { undefined take(FormDataEntryValue value); File file(); };
+''')
+        names = {function.name for function in generator.functions}
+        self.assertNotIn('dom_form_data_take', names)
+        self.assertNotIn('dom_form_data_file', names)
+        reasons = dict(generator.excluded)
+        self.assertEqual('an opaque interface is a union result arm only', reasons['DOMFormData.take'])
+        self.assertEqual('an opaque interface is a union result arm only', reasons['DOMFormData.file'])
+
+    def test_required_dictionary_object_member_builds_the_init_with_its_reference(self):
+        generator = self.form_data_generator()
+        self.assertIn('RvDOMFormData* form_data; /* DOMFormData, required */', generator.header())
+        self.assertNotIn('trusted', generator.header().split('RvDomFormDataEventInit {')[1].split('}')[0])
+        glue = generator.glue()
+        self.assertIn('FormDataEvent::Init a1 { { }, a1form_data.releaseNonNull() };', glue)
+        self.assertIn('event.interfaceType() == EventInterfaceType::FormDataEvent', glue)
 
     def test_selected_nullable_sequence_elements_do_not_reuse_the_nonnullable_container(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
@@ -762,7 +830,7 @@ interface CSSUnparsedValue : CSSStyleValue { setter undefined (unsigned long ind
 ''')
         config = dict(self.world.config)
         config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'CSSOMVariableReferenceValue', 'CSSUnparsedValue']
-        config['complexStringSpans'] = ['USVStringOrCSSOMVariableReferenceValue']
+        config['browserWellFormedUnions'] = ['USVStringOrCSSOMVariableReferenceValue']
         config['contract'] = {'aliases': {'CSSOMVariableReferenceValue': 'CSSVariableReferenceValue'}}
         generator = domgen.Generator(domgen.World(self.source, config))
         generator.lock = {}
@@ -791,7 +859,6 @@ interface CSSUnitValue : CSSNumericValue {
         config['finiteNumberInputs'] = ['CSSUnitValue']
         config['constructors'] = {'CSSUnitValue': {
             'receiver': 'Document', 'factory': 'CSSUnitValue::create', 'passReceiver': False,
-            'stringInputs': 'utf8-lengths',
         }}
         generator = domgen.Generator(domgen.World(self.source, config))
         generator.lock = {}
@@ -813,7 +880,7 @@ interface CSSOMKeywordValue : CSSStyleValue { attribute USVString value; };
 ''')
         config = dict(self.world.config)
         config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'CSSOMKeywordValue']
-        config['interfaceStringInputs'] = {'CSSOMKeywordValue': 'utf8-lengths'}
+        config['browserWellFormedSetters'] = ['CSSOMKeywordValue']
         generator = domgen.Generator(domgen.World(self.source, config))
         generator.lock = {}
         generator.lock_structs = {}
@@ -830,7 +897,7 @@ interface CSSUnparsedValue : CSSStyleValue { setter undefined (unsigned long ind
 ''')
         config = dict(self.world.config)
         config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'CSSOMVariableReferenceValue', 'CSSUnparsedValue']
-        config['complexStringSpans'] = ['USVStringOrCSSOMVariableReferenceValue']
+        config['browserWellFormedUnions'] = ['USVStringOrCSSOMVariableReferenceValue']
         generator = domgen.Generator(domgen.World(self.source, config))
         generator.lock = {}
         generator.lock_structs = {}
@@ -859,7 +926,7 @@ interface CSSUnparsedValue : CSSStyleValue { getter CSSUnparsedSegment? (unsigne
         self.assertTrue('[object CSSVariableReferenceValue]' in interfaces)
         self.assertTrue('let private isCSSOMVariableReferenceValue' in interfaces)
 
-    def test_selected_value_setters_use_string_spans_while_old_setters_keep_their_signatures(self):
+    def test_every_setter_takes_a_length_delimited_string(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''
 interface CSSStyleValue {};
@@ -867,7 +934,7 @@ interface CSSOMKeywordValue : CSSStyleValue { attribute USVString value; };
 ''')
         config = dict(self.world.config)
         config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'CSSOMKeywordValue']
-        config['interfaceStringInputs'] = {'CSSOMKeywordValue': 'utf8-lengths'}
+        config['browserWellFormedSetters'] = ['CSSOMKeywordValue']
         generator = domgen.Generator(domgen.World(self.source, config))
         generator.lock = {}
         generator.lock_structs = {}
@@ -879,9 +946,11 @@ interface CSSOMKeywordValue : CSSStyleValue { attribute USVString value; };
             {'ctype': 'int32_t', 'name': 'value_length'},
         ])
         self.assertEqual(setter['stringInputs'], 'utf8-lengths')
-        self.assertEqual(functions['rv_dom_element_set_id']['parameters'][1], {'ctype': 'const char*', 'name': 'value'})
+        self.assertEqual(functions['rv_dom_element_set_id']['parameters'][1:],
+                         [{'ctype': 'const uint8_t*', 'name': 'value'}, {'ctype': 'int32_t', 'name': 'value_length'}])
+        self.assertEqual(functions['rv_dom_element_set_id']['stringInputs'], 'utf8-lengths')
 
-    def test_selected_unparsed_segment_transport_preserves_string_lengths_without_changing_old_unions(self):
+    def test_union_string_arms_carry_byte_lengths(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''
 typedef (USVString or CSSOMVariableReferenceValue) CSSUnparsedSegment;
@@ -896,7 +965,7 @@ interface CSSUnparsedValue : CSSStyleValue {
 ''')
         config = dict(self.world.config)
         config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'CSSOMVariableReferenceValue', 'CSSUnparsedValue']
-        config['complexStringSpans'] = ['USVStringOrCSSOMVariableReferenceValue']
+        config['browserWellFormedUnions'] = ['USVStringOrCSSOMVariableReferenceValue']
         config['constructors'] = {'CSSUnparsedValue': {
             'receiver': 'Document', 'factory': 'CSSUnparsedValue::create', 'passReceiver': False,
         }}
@@ -906,14 +975,14 @@ interface CSSUnparsedValue : CSSStyleValue {
         generator.run()
         header = generator.header()
         self.assertTrue('RvDomUtf8StringSpan arm0;' in header)
-        self.assertTrue('const char* arm1;' in header)
+        self.assertNotIn('const char* arm', header)
         model = json.loads(generator.api_model())
         functions = {item['function']: item for item in model['functions']}
         item = functions['rv_dom_css_unparsed_value_item']
         self.assertTrue(item['returns']['nullable'])
         self.assertEqual(item['returns']['subtypes'][0]['stringTransport'], 'utf8-lengths')
-        old = functions['rv_dom_node_get_state']['returns']['subtypes'][1]
-        self.assertNotIn('stringTransport', old)
+        other = functions['rv_dom_node_get_state']['returns']['subtypes'][1]
+        self.assertEqual(other['stringTransport'], 'utf8-lengths')
         glue = generator.glue()
         self.assertTrue('source->arm0.length < 0' in glue)
         self.assertTrue('source->arm0.length > 0 && !source->arm0.data' in glue)
@@ -933,7 +1002,7 @@ interface CSSOMKeywordValue : CSSStyleValue { constructor(USVString value); };
         config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'CSSOMKeywordValue']
         config['constructors'] = {'CSSOMKeywordValue': {
             'receiver': 'Document', 'factory': 'CSSOMKeywordValue::create',
-            'passReceiver': False, 'stringInputs': 'utf8-lengths',
+            'passReceiver': False,
         }}
         generator = domgen.Generator(domgen.World(self.source, config))
         generator.lock = {}
@@ -984,7 +1053,7 @@ interface CSSStyleValue {
         config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue']
         config['staticBindings'] = {'CSSStyleValue': {
             'receiver': 'Document', 'members': ['parse', 'parseAll'],
-            'feature': 'dom-css-style-values', 'stringInputs': 'utf8-lengths',
+            'feature': 'dom-css-style-values',
         }}
         generator = domgen.Generator(domgen.World(self.source, config))
         generator.lock = {}
@@ -1040,11 +1109,9 @@ interface CSSPropertyRule : CSSRule {
 ''')
         config = dict(self.world.config)
         config['interfaces'] = list(config['interfaces']) + ['CSSRule', 'CSSPropertyRule']
-        config['dictionaryStringInputs'] = {'DOMCSSCustomPropertyDescriptor': 'utf8-lengths-presence'}
         config['namespaceBindings'] = {'DOMCSSNamespace': {
             'receiver': 'Document', 'members': ['supports', 'registerProperty'],
             'feature': 'dom-css-supports', 'memberFeatures': {'registerProperty': 'dom-css-register-property'},
-            'stringInputs': 'utf8-lengths',
         }}
         generator = domgen.Generator(domgen.World(self.source, config))
         generator.lock = {}
@@ -1062,7 +1129,7 @@ interface CSSPropertyRule : CSSRule {
         self.assertIn('int32_t present;', header)
         self.assertIn('const uint8_t* data;', header)
         self.assertIn('int32_t length;', header)
-        self.assertIn('const char* label;', header)
+        self.assertIn('RvDomUtf8StringInput label;', header)
         glue = generator.glue()
         self.assertIn('DOMCSSRegisterCustomProperty::registerProperty(document.get(), std::move(a0))', glue)
         self.assertIn('descriptor->name.present != 1', glue)
@@ -1137,7 +1204,7 @@ interface CSSStyleDeclaration { DOMString getPropertyValue(DOMString property); 
         config['interfaces'] = list(config['interfaces']) + ['CSSStyleDeclaration']
         config['windowBindings'] = {'DOMWindow': {
             'receiver': 'Document', 'members': ['getComputedStyle'],
-            'feature': 'dom-computed-style', 'stringInputs': 'utf8-lengths',
+            'feature': 'dom-computed-style',
         }}
         generator = domgen.Generator(domgen.World(self.source, config))
         generator.lock = {}
@@ -1168,6 +1235,237 @@ interface CSSStyleDeclaration { DOMString getPropertyValue(DOMString property); 
         self.assertIn('pseudo_element_length >= 0 && a1.string().isNull()', glue)
         self.assertNotIn('type Window =', generator.interfaces())
 
+    def test_element_array_reflections_bind_the_engine_element_arrays(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+partial interface Element {
+    [CustomGetter, Reflect="aria-labelledby"] attribute FrozenArray<Element>? ariaLabelledByElements;
+    [CustomGetter, Reflect="aria-owns"] attribute FrozenArray<Element>? ariaOwnsElements;
+};
+''')
+        config = dict(self.world.config)
+        config['elementArrayReflections'] = ['Element.ariaLabelledByElements']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        self.assertEqual(functions['rv_dom_element_get_aria_labelled_by_elements']['parameters'][-1],
+                         {'ctype': 'RvDomSequenceElementNullable*', 'name': 'result'})
+        self.assertEqual(functions['rv_dom_element_set_aria_labelled_by_elements']['parameters'][-1],
+                         {'ctype': 'const RvDomSequenceElementNullable*', 'name': 'value'})
+        self.assertNotIn('rv_dom_element_get_aria_owns_elements', functions)
+        glue = generator.glue()
+        self.assertIn('impl->getElementsArrayAttributeForBindings(HTMLNames::aria_labelledbyAttr)', glue)
+        self.assertIn('impl->setElementsArrayAttribute(HTMLNames::aria_labelledbyAttr, std::move(*a0))', glue)
+
+    def test_event_target_objects_use_event_target_handles_and_report_detached(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+[EnabledBySetting=ViewportApi] interface Viewport : EventTarget {
+    readonly attribute double width;
+    attribute EventHandler onresize;
+};
+[InterfaceName=Window, Exposed=Window] interface DOMWindow : EventTarget {};
+[EnabledBySetting=ViewportApi] partial interface DOMWindow {
+    [SameObject] readonly attribute Viewport viewport;
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['Viewport']
+        config['creationGatedInterfaces'] = {'Viewport': 'DOMWindow.viewport'}
+        config['eventTargetObjects'] = {'Viewport': {'attached': 'impl->frame()'}}
+        config['windowBindings'] = {'DOMWindow': [{'receiver': 'Document', 'members': ['viewport'], 'feature': 'viewport-object'}]}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        self.assertEqual(functions['rv_dom_viewport_get_width']['parameters'], [{'ctype': 'RvEventTarget*', 'name': 'target'}, {'ctype': 'double*', 'name': 'result'}])
+        self.assertEqual(functions['rv_dom_window_get_viewport']['parameters'][-1], {'ctype': 'RvEventTarget**', 'name': 'result'})
+        self.assertNotIn('Viewport', generator.handles)
+        glue = generator.glue()
+        self.assertIn('dynamicDowncast<Viewport>(*reinterpret_cast<EventTarget*>(target))', glue)
+        self.assertIn('if (!(impl->frame()))' + chr(10) + '        return RV_ERR_DETACHED;', glue)
+        self.assertIn('storeHandle<EventTarget>(value, result)', glue)
+        self.assertNotIn('settings.viewportApi', glue.split('ranvier_dom_viewport_get_width', 1)[1].split(chr(10) + '}', 1)[0])
+
+    def test_window_bindings_list_reads_readonly_attributes_and_overloads_per_feature(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+typedef USVString CSSOMString;
+interface CSSStyleDeclaration { DOMString getPropertyValue(DOMString property); };
+[InterfaceName=Window, Exposed=Window] interface DOMWindow : EventTarget {};
+partial interface DOMWindow {
+    [NewObject] CSSStyleDeclaration getComputedStyle(Element element, optional CSSOMString? pseudoElement = null);
+    [Replaceable] readonly attribute double scrollX;
+    [Replaceable, ImplementedAs=scrollX] readonly attribute double pageXOffset;
+    undefined scrollTo(unrestricted double x, unrestricted double y);
+    undefined scrollBy(unrestricted double x, unrestricted double y);
+    [ImplementedAs=scrollTo] undefined scroll(unrestricted double x, unrestricted double y);
+    attribute DOMString name;
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleDeclaration']
+        computed = {'receiver': 'Document', 'members': ['getComputedStyle'], 'feature': 'dom-computed-style'}
+        scrolling = {'receiver': 'Document', 'members': ['scrollX', 'pageXOffset', 'scrollTo', 'scroll'], 'feature': 'dom-window-scrolling'}
+        config['windowBindings'] = {'DOMWindow': [computed, scrolling]}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        self.assertEqual(functions['rv_dom_window_get_computed_style']['feature'], 'dom-computed-style')
+        for name in ['rv_dom_window_get_scroll_x', 'rv_dom_window_get_page_x_offset', 'rv_dom_window_scroll_to', 'rv_dom_window_scroll']:
+            self.assertEqual(functions[name]['feature'], 'dom-window-scrolling', name)
+            self.assertEqual(functions[name]['contractOwner'], 'Window', name)
+        self.assertNotIn('rv_dom_window_scroll_by', functions)
+        self.assertEqual(functions['rv_dom_window_get_scroll_x']['parameters'], [{'ctype': 'RvNode*', 'name': 'target'}, {'ctype': 'double*', 'name': 'result'}])
+        glue = generator.glue()
+        self.assertEqual(glue.count('impl->window()->scrollX(); }'), 2)
+        self.assertIn('impl->window()->scrollTo(x, y)', glue)
+        self.assertIn('"dom-window-scrolling"', glue)
+        config['windowBindings'] = {'DOMWindow': {'receiver': 'Document', 'members': ['name'], 'feature': 'f'}}
+        with self.assertRaisesRegex(SystemExit, 'not an operation or a readonly attribute'):
+            domgen.Generator(domgen.World(self.source, config)).run()
+
+    def window_object_generator(self, extra, **overrides):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+[InterfaceName=Window, Exposed=Window] interface DOMWindow : EventTarget {};
+interface mixin WindowOrWorkerGlobalScope {};
+DOMWindow includes WindowOrWorkerGlobalScope;
+partial interface mixin WindowOrWorkerGlobalScope { [SameObject] readonly attribute Crypto crypto; };
+''' + extra)
+        config = dict(self.world.config)
+        config['windowObjectBindings'] = {'Crypto': {
+            'receiver': 'Document', 'accessor': 'crypto', 'members': ['getRandomValues', 'randomUUID'],
+            'feature': 'dom-crypto-random'}}
+        config['typedArrayViewTypes'] = ['ArrayBufferView']
+        config.update(overrides)
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        return generator
+
+    CRYPTO = '''
+[Exposed=(Window,Worker)] interface Crypto {
+    ArrayBufferView getRandomValues([ReturnValue] ArrayBufferView array);
+    [SecureContext] DOMString randomUUID();
+};
+'''
+
+    def test_window_object_binding_calls_the_member_through_the_window_accessor(self):
+        generator = self.window_object_generator(self.CRYPTO)
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        uuid = functions['rv_dom_crypto_random_uuid']
+        self.assertEqual('context_operation', uuid['kind'])
+        self.assertEqual('Document', uuid['receiver'])
+        self.assertEqual('Crypto', uuid['contractOwner'])
+        self.assertEqual('dom-crypto-random', uuid['feature'])
+        self.assertEqual('facade', uuid['binding'])
+        self.assertEqual([{'ctype': 'RvNode*', 'name': 'target'}, {'ctype': 'char*', 'name': 'buffer'},
+                          {'ctype': 'int32_t', 'name': 'capacity'}, {'ctype': 'int32_t*', 'name': 'length'}], uuid['parameters'])
+        glue = generator.glue()
+        self.assertIn('impl->window()->crypto().randomUUID()', glue)
+        self.assertIn('if (!impl->window())', glue)
+        self.assertIn('"dom-crypto-random"', glue)
+        self.assertNotIn('type Crypto =', generator.interfaces())
+
+    def test_return_value_typed_array_view_is_an_in_out_span_with_its_element_kind(self):
+        generator = self.window_object_generator(self.CRYPTO)
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        random = functions['rv_dom_crypto_get_random_values']
+        self.assertEqual([{'ctype': 'RvNode*', 'name': 'target'}, {'ctype': 'int32_t', 'name': 'array_kind'},
+                          {'ctype': 'uint8_t*', 'name': 'array'}, {'ctype': 'int32_t', 'name': 'array_length'}],
+                         random['parameters'])
+        self.assertEqual('typedarray', random['arguments'][0]['mapping']['kind'])
+        header = generator.header()
+        for name, value in [('INT8', 0), ('UINT8', 1), ('UINT8_CLAMPED', 2), ('INT16', 3), ('UINT16', 4), ('INT32', 5),
+                            ('UINT32', 6), ('FLOAT16', 7), ('FLOAT32', 8), ('FLOAT64', 9), ('BIG_INT64', 10),
+                            ('BIG_UINT64', 11), ('DATA_VIEW', 12)]:
+            self.assertIn(f'RV_DOM_ARRAY_BUFFER_VIEW_{name} = {value},', header)
+        glue = generator.glue()
+        self.assertIn('makeTypedArrayView(array_kind, array, array_length, status0)', glue)
+        self.assertIn('impl->window()->crypto().getRandomValues(*a0)', glue)
+        self.assertIn('copyTypedArrayView(*a0, array)', glue)
+        self.assertIn('"JavaScriptCore/TypedArrays.h"', glue)
+        self.assertIn('(array_length >= 0 && (array_length == 0 || array))', glue)
+        self.assertIn('byte[] array', generator.fsharp())
+
+    SCREEN = '''
+[Exposed=Window] interface Screen {
+    readonly attribute long width;
+    readonly attribute unsigned long colorDepth;
+    [ImplementedAs=colorDepth] readonly attribute unsigned long pixelDepth;
+    [SameObject, EnabledBySetting=ScreenOrientationAPIEnabled] readonly attribute ScreenOrientation orientation;
+};
+enum OrientationType { "portrait-primary", "portrait-secondary", "landscape-primary", "landscape-secondary" };
+[Exposed=Window, EnabledBySetting=ScreenOrientationAPIEnabled] interface ScreenOrientation : EventTarget {
+    readonly attribute OrientationType type;
+    readonly attribute unsigned short angle;
+};
+partial interface mixin WindowOrWorkerGlobalScope { [SameObject] readonly attribute Screen screen; };
+'''
+
+    def screen_generator(self, **overrides):
+        return self.window_object_generator(self.CRYPTO + self.SCREEN, **{'windowObjectBindings': {
+            'Screen': {'receiver': 'Document', 'accessor': 'screen', 'members': ['width', 'colorDepth', 'pixelDepth'],
+                       'feature': 'dom-screen'},
+            'ScreenOrientation': {'receiver': 'Document', 'accessor': 'screen.orientation', 'members': ['type', 'angle'],
+                                  'feature': 'dom-screen-orientation'}}, **overrides})
+
+    def test_window_object_bindings_read_readonly_attributes_through_the_accessor(self):
+        generator = self.screen_generator()
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        width = functions['rv_dom_screen_get_width']
+        self.assertEqual('context_operation', width['kind'])
+        self.assertEqual('Screen', width['contractOwner'])
+        self.assertEqual('dom-screen', width['feature'])
+        self.assertEqual([{'ctype': 'RvNode*', 'name': 'target'}, {'ctype': 'int32_t*', 'name': 'result'}], width['parameters'])
+        glue = generator.glue()
+        self.assertIn('impl->window()->screen().width()', glue)
+        self.assertEqual(2, glue.count('impl->window()->screen().colorDepth()'))
+        self.assertIn('rv_dom_screen_get_pixel_depth', functions)
+
+    def test_a_dotted_accessor_reaches_a_nested_object_and_keeps_its_setting_gate(self):
+        generator = self.screen_generator()
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        kind = functions['rv_dom_screen_orientation_get_type']
+        self.assertEqual('ScreenOrientation', kind['contractOwner'])
+        self.assertEqual([{'ctype': 'RvNode*', 'name': 'target'}, {'ctype': 'int32_t*', 'name': 'result'}], kind['parameters'])
+        glue = generator.glue()
+        self.assertIn('impl->window()->screen().orientation().type()', glue)
+        self.assertIn('impl->window()->screen().orientation().angle()', glue)
+        self.assertIn('ScreenOrientationAPIEnabled', glue)
+        self.assertIn('RV_DOM_ORIENTATION_TYPE_LANDSCAPE_PRIMARY', generator.header())
+
+    def test_a_dotted_accessor_requires_each_step_to_be_a_readonly_attribute_of_the_next_interface(self):
+        with self.assertRaisesRegex(SystemExit, 'Window object bindings require a readonly Window attribute'):
+            self.screen_generator(windowObjectBindings={'ScreenOrientation': {
+                'receiver': 'Document', 'accessor': 'screen.missing', 'members': ['type'], 'feature': 'f'}})
+
+    def test_typed_array_view_requires_a_top_level_return_value_argument(self):
+        generator = self.window_object_generator('''
+[Exposed=Window] interface Crypto {
+    undefined fill(ArrayBufferView array);
+    undefined fillAll(sequence<ArrayBufferView> arrays);
+    readonly attribute DOMString unused;
+};
+''', windowObjectBindings={})
+        names = [item.name for item in generator.functions]
+        self.assertNotIn('crypto_fill', names)
+        with self.assertRaisesRegex(SystemExit, r'Crypto.fill: typed array view argument without \[ReturnValue\]'):
+            self.window_object_generator('''
+[Exposed=Window] interface Crypto { undefined fill(ArrayBufferView array); };
+''', windowObjectBindings={'Crypto': {'receiver': 'Document', 'accessor': 'crypto', 'members': ['fill'],
+                                        'feature': 'f'}})
+        with self.assertRaisesRegex(SystemExit, 'Window object bindings require a readonly Window attribute'):
+            self.window_object_generator(self.CRYPTO, windowObjectBindings={'Crypto': {
+                'receiver': 'Document', 'accessor': 'missing', 'members': ['randomUUID'], 'feature': 'f'}})
+
     def test_namespace_support_queries_use_checked_document_and_complete_input_spans(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''
@@ -1184,7 +1482,6 @@ namespace DOMCSSNamespace {
         config = dict(self.world.config)
         config['namespaceBindings'] = {'DOMCSSNamespace': {
             'receiver': 'Document', 'members': ['supports'], 'feature': 'dom-css-supports',
-            'stringInputs': 'utf8-lengths',
         }}
         generator = domgen.Generator(domgen.World(self.source, config))
         generator.lock = {}
@@ -1220,21 +1517,103 @@ namespace DOMCSSNamespace {
         self.assertIn('ENABLE(PARTIAL)', feature_guard)
         self.assertNotIn('interface DOMCSSNamespace', generator.interfaces())
 
+    def collection_generator(self, setlike=True, maplike=True, extra_config=None):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface AbstractRange {};
+enum HighlightType { "highlight", "spelling-error" };
+interface Highlight {
+    constructor(AbstractRange... initialRanges);
+    setlike<AbstractRange>;
+    attribute long priority;
+    attribute HighlightType type;
+};
+interface HighlightRegistry { maplike<[AtomString] DOMString, Highlight>; };
+interface FrozenSet { readonly setlike<AbstractRange>; };
+interface UnboundSet { setlike<AbstractRange>; readonly attribute long other; };
+[InterfaceName=CSS] namespace DOMCSSNamespace {
+    [CallWith=CurrentDocument] readonly attribute HighlightRegistry highlights;
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['AbstractRange', 'Highlight', 'HighlightRegistry', 'FrozenSet', 'UnboundSet']
+        config['constructors'] = {'Highlight': {'receiver': 'Document', 'factory': 'RanvierCollectionLike::createHighlight', 'passReceiver': False}}
+        if setlike:
+            config['setlikeBindings'] = {'Highlight': {'adapter': 'RanvierCollectionLike'}, 'FrozenSet': {'adapter': 'RanvierCollectionLike'}}
+        if maplike:
+            config['maplikeBindings'] = {'HighlightRegistry': {'adapter': 'RanvierCollectionLike'}}
+        config['namespaceBindings'] = {'DOMCSSNamespace': {'receiver': 'Document', 'members': ['highlights'],
+                                                           'feature': 'dom-custom-highlights'}}
+        config.update(extra_config or {})
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        return generator
+
+    def test_configured_setlike_and_maplike_bind_ordered_engine_state_through_the_adapter(self):
+        generator = self.collection_generator()
+        functions = {item.name: item for item in generator.functions}
+        for name in ['highlight_size', 'highlight_has', 'highlight_values', 'highlight_add', 'highlight_delete', 'highlight_clear',
+                     'highlight_registry_size', 'highlight_registry_has', 'highlight_registry_get', 'highlight_registry_entries',
+                     'highlight_registry_set', 'highlight_registry_delete', 'highlight_registry_clear', 'frozen_set_values']:
+            self.assertIn(name, functions)
+            self.assertEqual('operation', functions[name].kind)
+        self.assertNotIn('frozen_set_add', functions)
+        self.assertFalse(any(name.startswith('unbound_set_') and name != 'unbound_set_get_other' for name in functions))
+        self.assertIn('snapshot copy', functions['highlight_values'].comment)
+        self.assertIn('snapshot copy', functions['highlight_registry_entries'].comment)
+        self.assertEqual([('RvHighlightRegistry*', 'target'), ('const uint8_t*', 'key'), ('int32_t', 'key_length'),
+                          ('RvHighlight**', 'result')], functions['highlight_registry_get'].params)
+        self.assertEqual(('RvHighlight*', 'value'), functions['highlight_registry_set'].params[3])
+        self.assertTrue(functions['highlight_registry_get'].returns.nullable)
+        self.assertEqual('pair', functions['highlight_registry_entries'].returns.subtypes[0].kind)
+        glue = generator.glue()
+        self.assertIn('#include "RanvierCollectionLike.h"', glue)
+        self.assertIn('WebCore::RanvierCollectionLike::remove(*impl, HandleArg<AbstractRange> { a0.get() })', glue)
+        self.assertIn('WebCore::RanvierCollectionLike::get(*impl, a0.atom())', glue)
+        self.assertIn('RanvierCollectionLike::createHighlight(DomSequenceArgument<Ref<AbstractRange>>', glue)
+        self.assertIn('DOMCSSNamespace::highlights(document.get())', glue)
+        self.assertIn('decltype(impl->type())', glue)
+        self.assertNotIn('{call_with', glue)
+        self.assertIn('css_get_highlights', functions)
+        self.assertEqual('namespace_operation', functions['css_get_highlights'].kind)
+
+    def test_collection_declarations_without_a_binding_leave_the_output_unchanged(self):
+        bound = self.collection_generator(setlike=False, maplike=False)
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(re.sub(r'(readonly )?(setlike|maplike)<[^;]*>;', '', fixture.read_text()))
+        config = dict(bound.world.config)
+        unbound = domgen.Generator(domgen.World(self.source, config))
+        unbound.lock = {}
+        unbound.lock_structs = {}
+        unbound.run()
+        for render in ('header', 'glue', 'api_model', 'interfaces', 'report'):
+            self.assertEqual(getattr(unbound, render)(), getattr(bound, render)(), render)
+
+    def test_collection_binding_fails_closed_without_a_declaration_or_adapter(self):
+        cases = [({'setlikeBindings': {'HighlightRegistry': {'adapter': 'RanvierCollectionLike'}}}, 'requires one setlike declaration'),
+                 ({'setlikeBindings': {'Highlight': {'adapter': 'RanvierMissingAdapter'}}}, 'requires an adapter class'),
+                 ({'setlikeBindings': {'Highlight': {}}}, 'requires an adapter class'),
+                 ({'maplikeBindings': {'Absent': {'adapter': 'RanvierCollectionLike'}}}, 'requires a scoped interface')]
+        for extra, reason in cases:
+            with self.subTest(reason=reason):
+                with self.assertRaisesRegex(SystemExit, reason):
+                    self.collection_generator(setlike=False, maplike=False, extra_config=extra)
+
     def test_namespace_configuration_fails_closed_for_missing_or_unsupported_operations(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''
 [InterfaceName=CSS] namespace DOMCSSNamespace {
-    [CallWith=CurrentDocument] boolean supports(optional DOMString conditionText);
+    [CallWith=CurrentDocument] boolean supports(optional DOMString? conditionText);
 };
 ''')
         binding = {'receiver': 'Document', 'members': ['supports'],
-                   'feature': 'dom-css-supports', 'stringInputs': 'utf8-lengths'}
+                   'feature': 'dom-css-supports'}
         cases = [
             ('AbsentNamespace', binding, 'configured IDL namespace was not found'),
             ('DOMCSSNamespace', dict(binding, receiver='Event'), 'receiver must be a scoped node'),
-            ('DOMCSSNamespace', dict(binding, stringInputs='cstring'), 'require explicit UTF-8 lengths'),
             ('DOMCSSNamespace', dict(binding, members=['missing']), 'missing configured namespace operations'),
-            ('DOMCSSNamespace', binding, 'optional or nullable namespace strings need an explicit presence'),
         ]
         for name, configured, reason in cases:
             with self.subTest(reason=reason):
@@ -1245,6 +1624,58 @@ namespace DOMCSSNamespace {
                 generator.lock_structs = {}
                 with self.assertRaisesRegex(SystemExit, reason):
                     generator.run()
+
+    def test_a_nullable_optional_namespace_string_is_length_minus_one_for_null(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+[InterfaceName=CSS] namespace DOMCSSNamespace {
+    [CallWith=CurrentDocument] boolean supports(optional DOMString? conditionText);
+};
+''')
+        config = dict(self.world.config)
+        config['namespaceBindings'] = {'DOMCSSNamespace': {'receiver': 'Document', 'members': ['supports'],
+                                                           'feature': 'dom-css-supports'}}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        supports = next(item for item in generator.functions if item.name == 'css_supports')
+        self.assertEqual(supports.params[1:3], [('const uint8_t*', 'condition_text'), ('int32_t', 'condition_text_length')])
+        self.assertIn('(condition_text_length >= -1 && (condition_text_length <= 0 || condition_text))', generator.glue())
+
+    def test_legacy_null_to_empty_string_arguments_are_marked_in_the_contract(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+partial interface Node { attribute [LegacyNullToEmptyString] DOMString emptyForNull; attribute DOMString plainText; };
+''')
+        generator = domgen.Generator(domgen.World(self.source, dict(self.world.config)))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        self.assertTrue(functions['rv_dom_node_set_empty_for_null']['arguments'][0]['legacyNullToEmptyString'])
+        self.assertNotIn('legacyNullToEmptyString', functions['rv_dom_node_set_plain_text']['arguments'][0])
+
+    def test_retired_string_transport_keys_fail_the_run(self):
+        for key, value in [('complexStringSpans', []), ('interfaceStringInputs', {}), ('dictionaryStringInputs', {})]:
+            with self.subTest(key=key):
+                config = dict(self.world.config)
+                config[key] = value
+                with self.assertRaisesRegex(SystemExit, f'gen/dom.json.{key}'):
+                    domgen.World(self.source, config)
+        config = dict(self.world.config)
+        config['constructors'] = {'Node': {'receiver': 'Document', 'stringInputs': 'utf8-lengths'}}
+        with self.assertRaisesRegex(SystemExit, r'gen/dom.json.constructors.Node.stringInputs'):
+            domgen.World(self.source, config)
+
+    def test_no_generated_input_is_a_nul_terminated_string(self):
+        generator = domgen.Generator(self.world)
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        for function in generator.functions:
+            self.assertNotIn('const char*', [ctype for ctype, _ in function.params], function.name)
+        self.assertNotIn('const char*', generator.header())
 
     def test_namespace_compound_gates_preserve_all_enclosing_conditions(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
@@ -1257,7 +1688,6 @@ namespace DOMCSSNamespace {
         config = dict(self.world.config)
         config['namespaceBindings'] = {'DOMCSSNamespace': {
             'receiver': 'Document', 'members': ['supports'], 'feature': 'dom-css-supports',
-            'stringInputs': 'utf8-lengths',
         }}
         generator = domgen.Generator(domgen.World(self.source, config))
         generator.lock = {}
@@ -1438,6 +1868,208 @@ interface CSSFontFaceDescriptors : CSSStyleDeclaration {
         config = json.loads((ROOT / 'gen/dom.json').read_text())
         self.assertIn('HTMLAreaElement', config['interfaces'])
         self.assertIn('HTMLAreaElement.ping', config['exclude'])
+
+    def value_object_generator(self, extra, interfaces, **overrides):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + extra)
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + interfaces
+        config.update(overrides)
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        return generator
+
+    def test_buffer_source_arm_is_a_copied_byte_span_decoding_to_the_flattened_array_buffer(self):
+        generator = self.value_object_generator('''
+typedef (BufferSource or Bytes or USVString) BytesPart;
+interface Bytes {
+    constructor(optional sequence<BytesPart> parts);
+    readonly attribute unsigned long long size;
+};
+''', ['Bytes'], constructors={'Bytes': {'receiver': 'Document', 'factory': 'Bytes::create'}},
+            byteSpanTypes=['BufferSource'], browserWellFormedUnions=['BufferSourceOrBytesOrUSVString'])
+        function = next(item for item in generator.functions if item.name == 'bytes_create')
+        union = function.arguments[0][1].subtypes[0]
+        self.assertEqual(['bytes', 'object', 'string'], [child.kind for child in union.subtypes])
+        header = generator.header()
+        self.assertIn('typedef struct RvDomByteSpan {', header)
+        self.assertIn('    RvDomByteSpan arm0;', header)
+        glue = generator.glue()
+        self.assertIn('Variant<Ref<JSC::ArrayBufferView>, Ref<JSC::ArrayBuffer>, Ref<Bytes>, String>', glue)
+        self.assertIn('WTF::InPlaceIndex<1>, arm0.releaseNonNull()', glue)
+        self.assertIn('WTF::InPlaceIndex<2>', glue)
+        self.assertIn('WTF::InPlaceIndex<3>', glue)
+        self.assertIn('JSC::ArrayBuffer::tryCreate(', glue)
+        self.assertIn('"JavaScriptCore/ArrayBuffer.h"', glue)
+        self.assertNotIn('encodeRvDomUnionBufferSourceOrBytesOrUSVString', glue)
+
+    def test_byte_span_results_are_unsupported(self):
+        generator = self.value_object_generator('''
+interface Bytes { readonly attribute BufferSource data; };
+''', ['Bytes'], byteSpanTypes=['BufferSource'])
+        self.assertNotIn('bytes_get_data', [item.name for item in generator.functions])
+
+    def test_locked_plain_overload_matches_length_delimited_string_parameters(self):
+        generator = self.value_object_generator('''
+interface Pairs {
+    undefined append(USVString name, USVString value);
+    undefined append(USVString name, Pairs other, optional USVString label);
+};
+''', ['Pairs'], browserWellFormedSetters=['Pairs'])
+        generator.lock = {'pairs_append': {'params': [['RvPairs*', 'target'], ['const uint8_t*', 'name'],
+                                                      ['int32_t', 'name_length'], ['const uint8_t*', 'value'],
+                                                      ['int32_t', 'value_length']], 'comment': 'Pairs.append'}}
+        self.assertEqual(0, generator.plain_overload('Pairs', 'append', [
+            (type('M', (), {'arguments': [type('A', (), {'name': 'name'}), type('A', (), {'name': 'value'})]}), None, None),
+            (type('M', (), {'arguments': [type('A', (), {'name': 'name'}), type('A', (), {'name': 'other'}),
+                                          type('A', (), {'name': 'label'})]}), None, None)]))
+
+    def test_value_object_constructor_and_static_take_an_absent_optional_string_as_length_minus_one(self):
+        generator = self.value_object_generator('''
+interface ValueURL {
+    constructor(USVString url, optional USVString base);
+    static ValueURL? parse(USVString url, optional USVString base);
+    readonly attribute USVString href;
+};
+''', ['ValueURL'],
+            constructors={'ValueURL': {'receiver': 'Document', 'factory': 'ValueURL::create', 'passReceiver': False}},
+            staticBindings={'ValueURL': {'receiver': 'Document', 'members': ['parse'], 'feature': 'dom-value-url-static'}})
+        for name in ('value_url_create', 'value_url_parse'):
+            function = next(item for item in generator.functions if item.name == name)
+            self.assertEqual([('RvNode*', 'target'), ('const uint8_t*', 'url'), ('int32_t', 'url_length'),
+                              ('const uint8_t*', 'base'), ('int32_t', 'base_length'), ('RvValueURL**', 'result')],
+                             function.params)
+            self.assertIn('base_length -1 means absent', function.comment)
+            body = '\n'.join(function.body)
+            self.assertIn('(base_length >= -1 && (base_length <= 0 || base))', body)
+            self.assertIn('(url_length >= 0 && (url_length <= 0 || url))', body)
+            self.assertIn('if (base_length >= 0 && a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;', body)
+        self.assertIn('ValueURL', generator.handles)
+
+    def test_record_arguments_use_the_entry_sequence_transport_of_their_cpp_vector(self):
+        generator = self.value_object_generator('''
+interface Params {
+    constructor(optional (sequence<sequence<USVString>> or record<USVString, USVString> or USVString) init = "");
+};
+''', ['Params'], constructors={'Params': {'receiver': 'Document', 'factory': 'Params::create', 'passReceiver': False}})
+        function = next(item for item in generator.functions if item.name == 'params_create')
+        union = function.arguments[0][1]
+        self.assertEqual(['sequence', 'sequence', 'string'], [child.kind for child in union.subtypes])
+        record = union.subtypes[1]
+        self.assertEqual('pair', record.subtypes[0].kind)
+        self.assertEqual('RvDomSequencePairUSVStringAndUSVString', record.ctype)
+        self.assertTrue(all(child.string_spans for child in record.subtypes[0].subtypes))
+        glue = generator.glue()
+        self.assertIn('Variant<Vector<Vector<String>>, Vector<KeyValuePair<String, String>>, String>', glue)
+        self.assertIn('decodeRvDomSequencePairUSVStringAndUSVString', glue)
+
+    def dictionary_result_idl(self):
+        return '''
+dictionary PartInit { USVString name; };
+dictionary PartResult { USVString input; record<USVString, (undefined or USVString)> groups; };
+dictionary MatchResult { sequence<(USVString or PartInit)> inputs; PartResult part; };
+interface Matcher {
+    MatchResult? exec(optional (USVString or PartInit) input = {});
+    MatchResult match();
+};
+'''
+
+    def test_configured_dictionary_results_are_owned_structs_with_one_paired_release(self):
+        presence = 'utf8-lengths-presence'
+        generator = self.value_object_generator(
+            self.dictionary_result_idl(), ['Matcher'],
+            resultDictionaries=['MatchResult', 'PartResult', 'PartInit'])
+        nullable = next(item for item in generator.functions if item.name == 'matcher_exec')
+        required = next(item for item in generator.functions if item.name == 'matcher_match')
+        self.assertEqual(('RvDomMatchResult**', 'result'), nullable.params[-1])
+        self.assertEqual(('RvDomMatchResult**', 'result'), required.params[-1])
+        self.assertIn('storeOptionalDictionary(value, result', '\n'.join(nullable.body))
+        self.assertIn('*result is NULL for null', nullable.comment)
+        self.assertIn('(*result = encodeDictRvDomMatchResult(value), RV_OK)', '\n'.join(required.body))
+        self.assertIn('rv_dom_match_result_release', required.comment)
+        self.assertEqual({'MatchResult': 'RvDomMatchResult', 'PartResult': 'RvDomPartResult', 'PartInit': 'RvDomPartInit'},
+                         generator.result_dicts)
+        glue = generator.glue()
+        for line in ['RvDomMatchResult* encodeDictRvDomMatchResult(const MatchResult& value);',
+                     'result->size = sizeof(RvDomMatchResult);',
+                     'result->part = encodeDictRvDomPartResult(*field);',
+                     'releaseDictRvDomPartResult(const_cast<RvDomPartResult*>(value->part));',
+                     'encodeRvDomSequenceUSVStringOrPartInit(*field, container);',
+                     'clearRvDomSequenceUSVStringOrPartInit(const_cast<RvDomSequenceUSVStringOrPartInit*>(value->inputs));',
+                     'result->input = copyOwnedDomStringInput(asString(*field));',
+                     'std::free(const_cast<uint8_t*>(value->input.data));',
+                     'releaseDictRvDomPartInit(const_cast<RvDomPartInit*>(value->arm1));',
+                     'result->arm1 = encodeDictRvDomPartInit(std::get<I>(value));',
+                     'if (source->arm1->name.present != 0 && source->arm1->name.present != 1)',
+                     'void ranvier_dom_match_result_release(RvDomMatchResult* value)',
+                     '    if (isMainThread()) releaseDictRvDomMatchResult(value);']:
+            self.assertIn(line, glue)
+        self.assertLess(glue.index('void releaseDictRvDomPartResult(RvDomPartResult* value);'),
+                        glue.index('void clearRvDomSequenceUSVStringOrPartInit('))
+        header = generator.header()
+        self.assertIn('RV_EXPORT void rv_dom_match_result_release(RvDomMatchResult* value);', header)
+        self.assertIn('RV_EXPORT void rv_dom_part_init_release(RvDomPartInit* value);', header)
+        self.assertIn('void rv_dom_match_result_release(RvDomMatchResult* value) { ranvier_dom_match_result_release(value); }',
+                      generator.host())
+        self.assertIn('extern void rv_dom_match_result_release(nativeint value)', generator.fsharp())
+        contract = generator.interfaces()
+        self.assertNotIn('MatchResult()', contract)
+        self.assertNotIn('PartResult()', contract)
+        self.assertIn('PartInit()', contract)
+        model = json.loads(generator.api_model())
+        self.assertEqual({'struct': 'RvDomMatchResult', 'releaseFunction': 'rv_dom_match_result_release'},
+                         model['resultDictionaries']['MatchResult'])
+
+    def test_an_omitted_optional_union_omits_the_later_optional_arguments_in_the_contract(self):
+        generator = self.value_object_generator('''
+dictionary PartInit { USVString name; };
+interface Matcher { boolean test(optional (USVString or PartInit) input = {}, optional USVString baseURL); };
+''', ['Matcher'], resultDictionaries=['PartInit'])
+        contract = generator.interfaces()
+        self.assertIn('abstract member test: unit -> bool', contract)
+        self.assertIn('abstract member test: input: string * ?baseURL: string -> bool', contract)
+        self.assertNotIn('abstract member test: ?baseURL: string -> bool', contract)
+        self.assertIn('this.__ranvier_test (?input = None, ?baseURL = None)', contract)
+
+    def test_sequence_string_spans_name_their_sequences_utf8(self):
+        idl = '''
+interface Params {
+    constructor(optional (sequence<sequence<USVString>> or USVString) init = "");
+    sequence<USVString> getAll(USVString name);
+};
+interface Other { sequence<USVString> names(); };
+'''
+        generator = self.value_object_generator(idl, ['Params', 'Other'], sequenceStringSpans=['Params'],
+            constructors={'Params': {'receiver': 'Document', 'factory': 'Params::create', 'passReceiver': False}})
+        get_all = next(item for item in generator.functions if item.name == 'params_get_all')
+        names = next(item for item in generator.functions if item.name == 'other_names')
+        self.assertEqual('RvDomSequenceUSVStringUtf8', get_all.returns.ctype)
+        self.assertTrue(get_all.returns.subtypes[0].string_spans)
+        self.assertEqual('RvDomSequenceUSVString', names.returns.ctype)
+        self.assertTrue(names.returns.subtypes[0].string_spans)
+        create = next(item for item in generator.functions if item.name == 'params_create')
+        self.assertEqual('RvDomSequenceSequenceOfUSVStringUtf8', create.arguments[0][1].subtypes[0].ctype)
+        header = generator.header()
+        self.assertIn('RvDomUtf8StringSpan* items;', header.split('struct RvDomSequenceUSVStringUtf8 {')[1].split('};')[0])
+
+    def test_unconfigured_dictionary_results_stay_left_out(self):
+        generator = self.value_object_generator(self.dictionary_result_idl(), ['Matcher'])
+        excluded = dict(generator.excluded)
+        self.assertIn('Matcher.exec', excluded)
+        self.assertIn('Matcher.match', excluded)
+        self.assertEqual({}, generator.result_dicts)
+        self.assertNotIn('encodeDict', generator.glue())
+
+    def test_result_dictionaries_reject_handle_members(self):
+        fixture_idl = '''
+interface Item {};
+dictionary Holder { Item item; };
+interface Source { Holder read(); };
+'''
+        generator = self.value_object_generator(fixture_idl, ['Item', 'Source'], resultDictionaries=['Holder'])
+        self.assertIn('Source.read', dict(generator.excluded))
 
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -1690,6 +2322,108 @@ GatedElement includes GatedMixin;
         self.assertIn('ENABLE(OWN)', functions[0].conditional)
         self.assertTrue('settings.gatedEnabled' in generator.glue())
 
+    def test_event_detail_constructor_query_and_getter_expression(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+[InterfaceName=ShownEvent] interface InternalShownEvent : Event {
+    [CallWith=CurrentGlobalObject] constructor([AtomString] DOMString type, optional ShownEventInit eventInitDict = {});
+    readonly attribute DOMString label;
+    readonly attribute double when;
+};
+dictionary EventInit {
+    boolean bubbles = false;
+    boolean cancelable = false;
+    boolean composed = false;
+};
+dictionary ShownEventInit : EventInit {
+    DOMString label = "";
+};
+interface HiddenEvent : Event {
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['InternalShownEvent']
+        config['contract'] = {**config['contract'], 'aliases': {'InternalShownEvent': 'ShownEvent'}}
+        config['constructors'] = {'InternalShownEvent': {'receiver': 'Document', 'factory': 'InternalShownEvent::create',
+                                                         'passReceiver': False, 'globalObject': True}}
+        config['dictionaryCppTypes'] = {'ShownEventInit': 'InternalShownEvent::Init'}
+        config['getterExpressions'] = {'InternalShownEvent.when': 'impl->whenSeconds().value()'}
+        config['runtimeTypeRoots'] = ['Event']
+        config['runtimeTypePublicNames'] = ['Event']
+        config['runtimeTypeExtras'] = {'Event': ['HiddenEvent']}
+        config['eventInterfaceCasts'] = ['HiddenEvent']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        glue = generator.glue()
+        create = glue[glue.index('int32_t ranvier_dom_internal_shown_event_create('):]
+        create = create[:create.index('\n}\n')]
+        self.assertIn('auto* global = impl->globalObject(); if (!global) return Exception { ExceptionCode::InvalidStateError', create)
+        self.assertIn('InternalShownEvent::create(*global, a0.atom(), std::move(a1))', create)
+        self.assertIn('impl->whenSeconds().value()', glue)
+        query = glue[glue.index('int32_t ranvier_dom_event_get_interface_name('):]
+        query = query[:query.index('\n}\n')]
+        # The exposed name, an unscoped extra and the root, most derived first.
+        self.assertLess(query.index('"ShownEvent"_s'), query.index('return copyString("Event"_s'))
+        self.assertIn('EventInterfaceType::HiddenEvent', query)
+        self.assertNotIn('"InternalShownEvent"_s', query)
+        self.assertIn('rv_dom_event_get_interface_name(RvEvent* target', generator.header())
+
+    def test_gated_event_interface_members_read_without_a_target(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+[EnabledBySetting=GatedEnabled] interface GatedEvent : Event {
+    readonly attribute DOMString command;
+    [EnabledBySetting=OtherEnabled] readonly attribute DOMString extra;
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['GatedEvent']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        glue = generator.glue()
+        command = glue[glue.index('ranvier_dom_gated_event_get_command('):glue.index('ranvier_dom_gated_event_get_extra(')]
+        self.assertNotIn('settings.gatedEnabled', command)
+        extra = glue[glue.index('ranvier_dom_gated_event_get_extra('):]
+        self.assertIn('settings.otherEnabled', extra.split('\n}\n')[0])
+
+    def test_creation_gated_interface_members_skip_the_check_their_factory_makes(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+[EnabledBySetting=PickEnabled] interface Pick {
+    readonly attribute unsigned long offset;
+    [EnabledBySetting=OtherEnabled] readonly attribute unsigned long extra;
+};
+partial interface Element {
+    [EnabledBySetting=PickEnabled] Pick? pick(double x, double y);
+    boolean near(double x);
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['Pick']
+        config['creationGatedInterfaces'] = {'Pick': 'Element.pick'}
+        config['finiteNumberInputs'] = ['Element.pick']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        body = {item.name: chr(10).join(item.body) for item in generator.functions}
+        self.assertNotIn('settings.pickEnabled', body['pick_get_offset'])
+        self.assertNotIn('pick_get_extra', body)
+        self.assertIn('settings.pickEnabled', body['element_pick'])
+        self.assertIn('!std::isfinite(x)', body['element_pick'])
+        self.assertIn('!std::isfinite(y)', body['element_pick'])
+        self.assertNotIn('isfinite', body['element_near'])
+        config['creationGatedInterfaces'] = {'Pick': 'Element.near'}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        with self.assertRaises(SystemExit):
+            generator.run()
+
     def test_configured_svg_mathml_shared_style_and_focus_members(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''
@@ -1789,6 +2523,66 @@ SVGStyleElement includes LinkStyle;
             self.assertIn('rv_dom_svg_style_element_get_' + member, functions)
             self.assertIn('rv_dom_svg_style_element_set_' + member, functions)
 
+
+    def test_integer_enums_carry_no_require_qualified_access(self):
+        # F# enums are always qualified; the attribute on one is warning FS0842.
+        lines = (ROOT / 'gen' / 'Ranvier.Dom.fs').read_text(encoding='utf-8').splitlines()
+        for index, line in enumerate(lines[:-1]):
+            if 'RequireQualifiedAccess' in line and line.rstrip().endswith('='):
+                case = lines[index + 1].strip()
+                self.assertFalse(case.startswith('|') and '=' in case, line)
+        self.assertIn('and NodeFilterResult =', lines)
+
+    def test_fable_reads_wide_integers_as_bigint_and_passes_them_as_numbers(self):
+        # Fable represents int64 and uint64 as BigInt; a browser reads and takes them as numbers.
+        source = (ROOT / 'gen' / 'Ranvier.Dom.fs').read_text(encoding='utf-8').replace('\r\n', '\n')
+        for member in ['size: uint64 with get', 'lastModified: int64 with get']:
+            name = member.split(':')[0]
+            self.assertIn(f'#if FABLE_COMPILER\n    [<Fable.Core.Emit("BigInt($0.{name})")>]\n#endif\n    abstract member {member}', source)
+        self.assertIn('o.slice(a0===void 0?void 0:Number(a0),a1===void 0?void 0:Number(a1),a2))($0,$1,$2,$3)', source)
+
+    def test_fable_adapters_are_not_shadowed_by_inherited_intrinsic_members(self):
+        # F# prefers an intrinsic member to an extension, so a Fable adapter extension on an interface is unreachable
+        # while an ancestor declares an intrinsic member of the same name.
+        fable, keep, stack = [], True, []
+        for line in (ROOT / 'gen' / 'Ranvier.Dom.fs').read_text(encoding='utf-8').splitlines():
+            directive = line.strip()
+            if directive == '#if FABLE_COMPILER':
+                stack.append(keep)
+            elif directive.startswith('#if '):
+                stack.append(keep)
+                keep = keep and directive != '#if !FABLE_COMPILER'
+            elif directive == '#else':
+                keep = stack[-1] and not keep
+            elif directive == '#endif':
+                keep = stack.pop()
+            elif keep:
+                fable.append(line)
+        bases, intrinsic, extensions, current = {}, {}, {}, None
+        for line in fable:
+            declared = re.match(r'(?:type|and) (?:\[<[^>]*>\] )*(\w+) =$', line)
+            extended = re.match(r'    type (\w+) with$', line)
+            if declared:
+                current = ('interface', declared.group(1))
+                bases.setdefault(current[1], [])
+            elif extended:
+                current = ('extension', extended.group(1))
+            elif current and current[0] == 'interface' and (match := re.match(r'    inherit (\w+)$', line)):
+                bases[current[1]].append(match.group(1))
+            elif current and current[0] == 'interface' and (match := re.match(r'    abstract member (\w+)', line)):
+                intrinsic.setdefault(current[1], set()).add(match.group(1))
+            elif current and current[0] == 'extension' and (match := re.match(r'        member this\.(\w+)', line)):
+                extensions.setdefault(current[1], set()).add(match.group(1))
+
+        def ancestors(name):
+            for base in bases.get(name, []):
+                yield base
+                yield from ancestors(base)
+
+        shadowed = sorted((owner, member, ancestor) for owner, members in extensions.items() for member in members
+                          for ancestor in ancestors(owner) if member in intrinsic.get(ancestor, set()))
+        self.assertEqual([], shadowed)
+        self.assertIn('namedItem', extensions['HTMLFormControlsCollection'])
 
 if __name__ == '__main__':
     unittest.main()

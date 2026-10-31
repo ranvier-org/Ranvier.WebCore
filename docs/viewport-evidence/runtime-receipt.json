@@ -1,0 +1,155 @@
+{
+  "sourceHead": "7668176140673a074d3755d4a92bc12329e9488a",
+  "nativeVersion": "0.1.0-preview.27",
+  "abiVersion": 35,
+  "platform": "private win-x64 slim",
+  "buildScript": "artifacts/build_viewport_candidate.py",
+  "buildHead": "7668176140673a074d3755d4a92bc12329e9488a",
+  "sourcePatches": "0000-0034 (unchanged from Native25)",
+  "buildRuntimeSha256": {
+    "brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
+    "brotlidec.dll": "d42e2160f76f29a91f8be01b009b585c45496219794e16eab90b3599b6f70a7f",
+    "harfbuzz-icu.dll": "27662b477f7cb0c20cee64543a06296a48a00a17b6c7b57629bb166a30d5b164",
+    "harfbuzz.dll": "b519b2abc7f446ca45bff77aae1708f45afc9f557698bcd7295837cce0f12bfa",
+    "icudt77.dll": "b00d2fb856f548608c137e771257a70d0722654535c6c00b371c0fab3e2b802c",
+    "icuin77.dll": "e3785739e1fcf2e38053bbb85ef5f0f5dab63f865cbda762da5258566085a240",
+    "icuuc77.dll": "189c623f996c41488c262867bae04a5bb33dd485bd423e0a8bec05c455a90902",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+    "jpeg62.dll": "394811c1b1bf1fd914248a145ba3fcad1f5f27c7009754ce08e48ccb0266b785",
+    "libpng16.dll": "8b46592c5ea338dd6b23ca380d6db64a7849c2a534fc465a006ec668645d8185",
+    "libsharpyuv.dll": "df165de83480692f494c23061ef9c40c10abe19a89b1fa9fae2f1cd5152c07a7",
+    "libwebp.dll": "550c5a4860f61d32a274fdd7b5c8cbe266eee28b3a3ca888195248ea1d5e0f71",
+    "libwebpdemux.dll": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163",
+    "libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
+    "libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
+    "RanvierWebCoreHost.dll": "6ed38437660b92fb83b7a5d3e67cec50d3348a543d6681033f264e87144a472a",
+    "RanvierWebCoreHost.lib": "e1a3f69381d1de3476c46c78d9780b0e162f9cf9481f8e60bd5299175dbd53ba",
+    "RanvierWebCoreHost.pdb": "34ce11a93ffec9670b9461c5d68a7bddcdce4792cc3b330a43d14d01ce468f5b",
+    "WebCore.dll": "35c2ca6f67357f94839d478c66d3edf372a68e7380d6bdd800a11b7c17604553",
+    "WebCore.lib": "9a71530b2979fec9b6b6fd654de86daa6525d976a39be8497efcddcae9ad4b0b",
+    "WebCore.pdb": "fb4cb828a3909c98f7197d1ca83839d0f05d7b210bd687175ce165b794552425",
+    "zlib1.dll": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93"
+  },
+  "shippingFiles": [
+    {
+      "name": "brotlicommon.dll",
+      "bytes": 137728,
+      "sha256": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8"
+    },
+    {
+      "name": "brotlidec.dll",
+      "bytes": 52224,
+      "sha256": "d42e2160f76f29a91f8be01b009b585c45496219794e16eab90b3599b6f70a7f"
+    },
+    {
+      "name": "harfbuzz-icu.dll",
+      "bytes": 13824,
+      "sha256": "27662b477f7cb0c20cee64543a06296a48a00a17b6c7b57629bb166a30d5b164"
+    },
+    {
+      "name": "harfbuzz.dll",
+      "bytes": 1185280,
+      "sha256": "b519b2abc7f446ca45bff77aae1708f45afc9f557698bcd7295837cce0f12bfa"
+    },
+    {
+      "name": "icudt77.dll",
+      "bytes": 7195136,
+      "sha256": "b00d2fb856f548608c137e771257a70d0722654535c6c00b371c0fab3e2b802c"
+    },
+    {
+      "name": "icuin77.dll",
+      "bytes": 2997760,
+      "sha256": "e3785739e1fcf2e38053bbb85ef5f0f5dab63f865cbda762da5258566085a240"
+    },
+    {
+      "name": "icuuc77.dll",
+      "bytes": 1834496,
+      "sha256": "189c623f996c41488c262867bae04a5bb33dd485bd423e0a8bec05c455a90902"
+    },
+    {
+      "name": "JavaScriptCore.dll",
+      "bytes": 15795712,
+      "sha256": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+    },
+    {
+      "name": "jpeg62.dll",
+      "bytes": 718336,
+      "sha256": "394811c1b1bf1fd914248a145ba3fcad1f5f27c7009754ce08e48ccb0266b785"
+    },
+    {
+      "name": "libpng16.dll",
+      "bytes": 196096,
+      "sha256": "8b46592c5ea338dd6b23ca380d6db64a7849c2a534fc465a006ec668645d8185"
+    },
+    {
+      "name": "libsharpyuv.dll",
+      "bytes": 24576,
+      "sha256": "df165de83480692f494c23061ef9c40c10abe19a89b1fa9fae2f1cd5152c07a7"
+    },
+    {
+      "name": "libwebp.dll",
+      "bytes": 381440,
+      "sha256": "550c5a4860f61d32a274fdd7b5c8cbe266eee28b3a3ca888195248ea1d5e0f71"
+    },
+    {
+      "name": "libwebpdemux.dll",
+      "bytes": 19968,
+      "sha256": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163"
+    },
+    {
+      "name": "libwebpmux.dll",
+      "bytes": 41472,
+      "sha256": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29"
+    },
+    {
+      "name": "libxml2.dll",
+      "bytes": 1216000,
+      "sha256": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5"
+    },
+    {
+      "name": "RanvierWebCoreHost.dll",
+      "bytes": 666112,
+      "sha256": "6ed38437660b92fb83b7a5d3e67cec50d3348a543d6681033f264e87144a472a"
+    },
+    {
+      "name": "WebCore.dll",
+      "bytes": 46707200,
+      "sha256": "35c2ca6f67357f94839d478c66d3edf372a68e7380d6bdd800a11b7c17604553"
+    },
+    {
+      "name": "zlib1.dll",
+      "bytes": 333312,
+      "sha256": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93"
+    },
+    {
+      "name": "WebKit.resources/icons/missingImage.png",
+      "bytes": 449,
+      "sha256": "c13b9dcf2f6a41033e540d85de3d1e30054bd3b54c0b35229b5a77bd403a7229"
+    },
+    {
+      "name": "WebKit.resources/icons/missingImage@2x.png",
+      "bytes": 755,
+      "sha256": "40b23dc2728d8499608654a4b89cfd5ad4bd04a09b5b27e4927004e167d41bf7"
+    },
+    {
+      "name": "WebKit.resources/icons/missingImage@3x.png",
+      "bytes": 1172,
+      "sha256": "99e0c1a9d026c61ea3ed12a7ad14087b0ceeac04b08caba7ab648c0ae8be5ed4"
+    },
+    {
+      "name": "WebKit.resources/icons/panIcon.png",
+      "bytes": 140,
+      "sha256": "1f0018318f073a57aa89ae175bec415a2aef08404c72e535b8fefeb428590329"
+    },
+    {
+      "name": "WebKit.resources/icons/textAreaResizeCorner.png",
+      "bytes": 86,
+      "sha256": "16d9c626d3faf3907a10819493d53d43ab4a09a0eeafec92e1492afbb03c4c8b"
+    },
+    {
+      "name": "WebKit.resources/icons/textAreaResizeCorner@2x.png",
+      "bytes": 167,
+      "sha256": "4557192b829da5e271abf02024cc0a7e1ae2153b79b98682a330bfa48c1e57bf"
+    }
+  ]
+}

@@ -5,6 +5,9 @@ from pathlib import Path
 import sys
 import threading
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
+
 
 def verify(native_directory):
     directory = Path(native_directory).resolve()
@@ -28,9 +31,7 @@ def verify(native_directory):
         _fields_ = [('present', integer), ('count', integer), ('items', ctypes.POINTER(Entry))]
 
     def bind(name, result, arguments):
-        function = getattr(library, name)
-        function.restype, function.argtypes = result, arguments
-        return function
+        return bind_utf8(library, name, result, arguments)
 
     entries = bind('rv_dom_style_property_map_read_only_entries', integer, [pointer, pointer, ctypes.POINTER(Entries)])
     release = bind('rv_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release', None, [ctypes.POINTER(Entries)])
@@ -133,7 +134,7 @@ def verify(native_directory):
         expect(text(independent) == '20px', 'independent value survives complete snapshot release')
 
         markup = '<style id="entry-sheet">.entry{height:8px;animation-name:first,second;--c13-π:var(--other, red)}</style>'
-        call('rv_dom_element_set_inner_html', [pointer, string], body, markup.encode('utf-8'))
+        call('rv_dom_element_set_inner_html', [pointer, Utf8], body, markup.encode('utf-8'))
         style = bind('rv_document_get_element_by_id', pointer, [pointer, string])(host, b'entry-sheet')
         expect(bool(style), 'declared entry fixture style')
         retained.append(('rv_node_release', style))
@@ -146,7 +147,7 @@ def verify(native_directory):
             original = decoded(captured)
             expect(original == [('height', ['8px']), ('animation-name', ['first', 'second']), ('--c13-π', ['var(--other, red)'])], 'declared entries preserve canonical order and structure')
             declaration = handle('rv_dom_css_style_rule_get_style', [pointer], [rule], 'rv_dom_css_style_declaration_release')
-            call('rv_dom_css_style_declaration_set_property', [pointer, string, string, string], declaration, b'height', b'9px', b'')
+            call('rv_dom_css_style_declaration_set_property', [pointer, Utf8, Utf8, Utf8], declaration, b'height', b'9px', b'')
             expect(decoded(captured) == original, 'declared snapshot survives later CSSOM mutation')
             current = snapshot(declared, document)
             try:

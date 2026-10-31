@@ -1,0 +1,4420 @@
+{
+  "browser": "156.0.8078.4",
+  "cases": [
+    {
+      "case": "viewport@1 window",
+      "maximum": {
+        "width": 1680,
+        "height": 1761
+      },
+      "steps": [
+        {
+          "name": "scrollTo(10.25, 20.5)",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            10,
+            21
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(10.75, 20.75)",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            11,
+            21
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollTo(10.4, 20.4) from 10.75, 20.75",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            10,
+            20
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollTo({left: 3.3, top: 7.7, behavior: instant})",
+          "native": [
+            3,
+            7
+          ],
+          "chromium": [
+            3,
+            8
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo({top: 9.6}) keeps left",
+          "native": [
+            3,
+            9
+          ],
+          "chromium": [
+            3,
+            10
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scroll(5.5, 6.5)",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollBy(0.4, 0.4)",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy(0.4, 0.4) again",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy({top: 0.6})",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            8
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy(-0.3, -0.3)",
+          "native": [
+            4,
+            5
+          ],
+          "chromium": [
+            6,
+            8
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(-5.5, -5.5) clamps to 0",
+          "native": [
+            0,
+            0
+          ],
+          "chromium": [
+            0,
+            0
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(1e6, 1e6) clamps to the maximum",
+          "native": [
+            1680,
+            1761
+          ],
+          "chromium": [
+            1680,
+            1761
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollBy(-0.5, -0.5) from the maximum",
+          "native": [
+            1679,
+            1760
+          ],
+          "chromium": [
+            1680,
+            1761
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTop = 33.3, scrollLeft = 11.6",
+          "native": [
+            11,
+            33
+          ],
+          "chromium": [
+            12,
+            33
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo({left: 0.5, top: 50.5, behavior: smooth})",
+          "native": [
+            0,
+            50
+          ],
+          "chromium": [
+            1,
+            51
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scroll",
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(0, 0)",
+          "native": [
+            0,
+            0
+          ],
+          "chromium": [
+            0,
+            0
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "viewport@1 scrollingElement",
+      "maximum": {
+        "width": 1680,
+        "height": 1761
+      },
+      "steps": [
+        {
+          "name": "scrollTo(10.25, 20.5)",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            10,
+            21
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(10.75, 20.75)",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            11,
+            21
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollTo(10.4, 20.4) from 10.75, 20.75",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            10,
+            20
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollTo({left: 3.3, top: 7.7, behavior: instant})",
+          "native": [
+            3,
+            7
+          ],
+          "chromium": [
+            3,
+            8
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo({top: 9.6}) keeps left",
+          "native": [
+            3,
+            9
+          ],
+          "chromium": [
+            3,
+            10
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scroll(5.5, 6.5)",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollBy(0.4, 0.4)",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy(0.4, 0.4) again",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy({top: 0.6})",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            8
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy(-0.3, -0.3)",
+          "native": [
+            4,
+            5
+          ],
+          "chromium": [
+            6,
+            8
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(-5.5, -5.5) clamps to 0",
+          "native": [
+            0,
+            0
+          ],
+          "chromium": [
+            0,
+            0
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(1e6, 1e6) clamps to the maximum",
+          "native": [
+            1680,
+            1761
+          ],
+          "chromium": [
+            1680,
+            1761
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollBy(-0.5, -0.5) from the maximum",
+          "native": [
+            1679,
+            1760
+          ],
+          "chromium": [
+            1680,
+            1761
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTop = 33.3, scrollLeft = 11.6",
+          "native": [
+            11,
+            33
+          ],
+          "chromium": [
+            12,
+            33
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo({left: 0.5, top: 50.5, behavior: smooth})",
+          "native": [
+            0,
+            50
+          ],
+          "chromium": [
+            1,
+            51
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scroll",
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(0, 0)",
+          "native": [
+            0,
+            0
+          ],
+          "chromium": [
+            0,
+            0
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "box@1 box",
+      "maximum": {
+        "width": 900,
+        "height": 901
+      },
+      "steps": [
+        {
+          "name": "scrollTo(10.25, 20.5)",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            10,
+            21
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(10.75, 20.75)",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            11,
+            21
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollTo(10.4, 20.4) from 10.75, 20.75",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            10,
+            20
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollTo({left: 3.3, top: 7.7, behavior: instant})",
+          "native": [
+            3,
+            7
+          ],
+          "chromium": [
+            3,
+            8
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo({top: 9.6}) keeps left",
+          "native": [
+            3,
+            9
+          ],
+          "chromium": [
+            3,
+            10
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scroll(5.5, 6.5)",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollBy(0.4, 0.4)",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy(0.4, 0.4) again",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy({top: 0.6})",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            8
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy(-0.3, -0.3)",
+          "native": [
+            4,
+            5
+          ],
+          "chromium": [
+            6,
+            8
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(-5.5, -5.5) clamps to 0",
+          "native": [
+            0,
+            0
+          ],
+          "chromium": [
+            0,
+            0
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(1e6, 1e6) clamps to the maximum",
+          "native": [
+            900,
+            901
+          ],
+          "chromium": [
+            900,
+            901
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollBy(-0.5, -0.5) from the maximum",
+          "native": [
+            899,
+            900
+          ],
+          "chromium": [
+            900,
+            901
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTop = 33.3, scrollLeft = 11.6",
+          "native": [
+            11,
+            33
+          ],
+          "chromium": [
+            12,
+            33
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo({left: 0.5, top: 50.5, behavior: smooth})",
+          "native": [
+            0,
+            50
+          ],
+          "chromium": [
+            1,
+            51
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scroll",
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(0, 0)",
+          "native": [
+            0,
+            0
+          ],
+          "chromium": [
+            0,
+            0
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "viewport@1.5 window",
+      "maximum": {
+        "width": 1680,
+        "height": 1761
+      },
+      "steps": [
+        {
+          "name": "scrollTo(10.25, 20.5)",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            10,
+            21
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(10.75, 20.75)",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            11,
+            21
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollTo(10.4, 20.4) from 10.75, 20.75",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            10,
+            20
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollTo({left: 3.3, top: 7.7, behavior: instant})",
+          "native": [
+            3,
+            7
+          ],
+          "chromium": [
+            3,
+            8
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo({top: 9.6}) keeps left",
+          "native": [
+            3,
+            9
+          ],
+          "chromium": [
+            3,
+            10
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scroll(5.5, 6.5)",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollBy(0.4, 0.4)",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy(0.4, 0.4) again",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy({top: 0.6})",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            8
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy(-0.3, -0.3)",
+          "native": [
+            4,
+            5
+          ],
+          "chromium": [
+            6,
+            8
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(-5.5, -5.5) clamps to 0",
+          "native": [
+            0,
+            0
+          ],
+          "chromium": [
+            0,
+            0
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(1e6, 1e6) clamps to the maximum",
+          "native": [
+            1680,
+            1761
+          ],
+          "chromium": [
+            1680,
+            1761
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollBy(-0.5, -0.5) from the maximum",
+          "native": [
+            1679,
+            1760
+          ],
+          "chromium": [
+            1680,
+            1761
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTop = 33.3, scrollLeft = 11.6",
+          "native": [
+            11,
+            33
+          ],
+          "chromium": [
+            12,
+            33
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo({left: 0.5, top: 50.5, behavior: smooth})",
+          "native": [
+            0,
+            50
+          ],
+          "chromium": [
+            1,
+            51
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scroll",
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(0, 0)",
+          "native": [
+            0,
+            0
+          ],
+          "chromium": [
+            0,
+            0
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "viewport@1.5 scrollingElement",
+      "maximum": {
+        "width": 1680,
+        "height": 1761
+      },
+      "steps": [
+        {
+          "name": "scrollTo(10.25, 20.5)",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            10,
+            21
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(10.75, 20.75)",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            11,
+            21
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollTo(10.4, 20.4) from 10.75, 20.75",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            10,
+            20
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollTo({left: 3.3, top: 7.7, behavior: instant})",
+          "native": [
+            3,
+            7
+          ],
+          "chromium": [
+            3,
+            8
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo({top: 9.6}) keeps left",
+          "native": [
+            3,
+            9
+          ],
+          "chromium": [
+            3,
+            10
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scroll(5.5, 6.5)",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollBy(0.4, 0.4)",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy(0.4, 0.4) again",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy({top: 0.6})",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            8
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy(-0.3, -0.3)",
+          "native": [
+            4,
+            5
+          ],
+          "chromium": [
+            6,
+            8
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(-5.5, -5.5) clamps to 0",
+          "native": [
+            0,
+            0
+          ],
+          "chromium": [
+            0,
+            0
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(1e6, 1e6) clamps to the maximum",
+          "native": [
+            1680,
+            1761
+          ],
+          "chromium": [
+            1680,
+            1761
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollBy(-0.5, -0.5) from the maximum",
+          "native": [
+            1679,
+            1760
+          ],
+          "chromium": [
+            1680,
+            1761
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTop = 33.3, scrollLeft = 11.6",
+          "native": [
+            11,
+            33
+          ],
+          "chromium": [
+            12,
+            33
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo({left: 0.5, top: 50.5, behavior: smooth})",
+          "native": [
+            0,
+            50
+          ],
+          "chromium": [
+            1,
+            51
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scroll",
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(0, 0)",
+          "native": [
+            0,
+            0
+          ],
+          "chromium": [
+            0,
+            0
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "box@1.5 box",
+      "maximum": {
+        "width": 900,
+        "height": 901
+      },
+      "steps": [
+        {
+          "name": "scrollTo(10.25, 20.5)",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            10,
+            21
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(10.75, 20.75)",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            11,
+            21
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollTo(10.4, 20.4) from 10.75, 20.75",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            10,
+            20
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollTo({left: 3.3, top: 7.7, behavior: instant})",
+          "native": [
+            3,
+            7
+          ],
+          "chromium": [
+            3,
+            8
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo({top: 9.6}) keeps left",
+          "native": [
+            3,
+            9
+          ],
+          "chromium": [
+            3,
+            10
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scroll(5.5, 6.5)",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollBy(0.4, 0.4)",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy(0.4, 0.4) again",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy({top: 0.6})",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            8
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy(-0.3, -0.3)",
+          "native": [
+            4,
+            5
+          ],
+          "chromium": [
+            6,
+            8
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(-5.5, -5.5) clamps to 0",
+          "native": [
+            0,
+            0
+          ],
+          "chromium": [
+            0,
+            0
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(1e6, 1e6) clamps to the maximum",
+          "native": [
+            900,
+            901
+          ],
+          "chromium": [
+            900,
+            901
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollBy(-0.5, -0.5) from the maximum",
+          "native": [
+            899,
+            900
+          ],
+          "chromium": [
+            900,
+            901
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTop = 33.3, scrollLeft = 11.6",
+          "native": [
+            11,
+            33
+          ],
+          "chromium": [
+            12,
+            33
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo({left: 0.5, top: 50.5, behavior: smooth})",
+          "native": [
+            0,
+            50
+          ],
+          "chromium": [
+            1,
+            51
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scroll",
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(0, 0)",
+          "native": [
+            0,
+            0
+          ],
+          "chromium": [
+            0,
+            0
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "viewport@2 window",
+      "maximum": {
+        "width": 1680,
+        "height": 1761
+      },
+      "steps": [
+        {
+          "name": "scrollTo(10.25, 20.5)",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            10,
+            21
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(10.75, 20.75)",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            11,
+            21
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollTo(10.4, 20.4) from 10.75, 20.75",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            10,
+            20
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollTo({left: 3.3, top: 7.7, behavior: instant})",
+          "native": [
+            3,
+            7
+          ],
+          "chromium": [
+            3,
+            8
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo({top: 9.6}) keeps left",
+          "native": [
+            3,
+            9
+          ],
+          "chromium": [
+            3,
+            10
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scroll(5.5, 6.5)",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollBy(0.4, 0.4)",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy(0.4, 0.4) again",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy({top: 0.6})",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            8
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy(-0.3, -0.3)",
+          "native": [
+            4,
+            5
+          ],
+          "chromium": [
+            6,
+            8
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(-5.5, -5.5) clamps to 0",
+          "native": [
+            0,
+            0
+          ],
+          "chromium": [
+            0,
+            0
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(1e6, 1e6) clamps to the maximum",
+          "native": [
+            1680,
+            1761
+          ],
+          "chromium": [
+            1680,
+            1761
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollBy(-0.5, -0.5) from the maximum",
+          "native": [
+            1679,
+            1760
+          ],
+          "chromium": [
+            1680,
+            1761
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTop = 33.3, scrollLeft = 11.6",
+          "native": [
+            11,
+            33
+          ],
+          "chromium": [
+            12,
+            33
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo({left: 0.5, top: 50.5, behavior: smooth})",
+          "native": [
+            0,
+            50
+          ],
+          "chromium": [
+            1,
+            51
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scroll",
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(0, 0)",
+          "native": [
+            0,
+            0
+          ],
+          "chromium": [
+            0,
+            0
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "viewport@2 scrollingElement",
+      "maximum": {
+        "width": 1680,
+        "height": 1761
+      },
+      "steps": [
+        {
+          "name": "scrollTo(10.25, 20.5)",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            10,
+            21
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(10.75, 20.75)",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            11,
+            21
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollTo(10.4, 20.4) from 10.75, 20.75",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            10,
+            20
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollTo({left: 3.3, top: 7.7, behavior: instant})",
+          "native": [
+            3,
+            7
+          ],
+          "chromium": [
+            3,
+            8
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo({top: 9.6}) keeps left",
+          "native": [
+            3,
+            9
+          ],
+          "chromium": [
+            3,
+            10
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scroll(5.5, 6.5)",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollBy(0.4, 0.4)",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy(0.4, 0.4) again",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy({top: 0.6})",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            8
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy(-0.3, -0.3)",
+          "native": [
+            4,
+            5
+          ],
+          "chromium": [
+            6,
+            8
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(-5.5, -5.5) clamps to 0",
+          "native": [
+            0,
+            0
+          ],
+          "chromium": [
+            0,
+            0
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(1e6, 1e6) clamps to the maximum",
+          "native": [
+            1680,
+            1761
+          ],
+          "chromium": [
+            1680,
+            1761
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollBy(-0.5, -0.5) from the maximum",
+          "native": [
+            1679,
+            1760
+          ],
+          "chromium": [
+            1680,
+            1761
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTop = 33.3, scrollLeft = 11.6",
+          "native": [
+            11,
+            33
+          ],
+          "chromium": [
+            12,
+            33
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo({left: 0.5, top: 50.5, behavior: smooth})",
+          "native": [
+            0,
+            50
+          ],
+          "chromium": [
+            1,
+            51
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scroll",
+            "window:scroll",
+            "window:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(0, 0)",
+          "native": [
+            0,
+            0
+          ],
+          "chromium": [
+            0,
+            0
+          ],
+          "nativeEvents": [
+            "window:scroll",
+            "window:scrollend"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "box@2 box",
+      "maximum": {
+        "width": 900,
+        "height": 901
+      },
+      "steps": [
+        {
+          "name": "scrollTo(10.25, 20.5)",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            10,
+            21
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(10.75, 20.75)",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            11,
+            21
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollTo(10.4, 20.4) from 10.75, 20.75",
+          "native": [
+            10,
+            20
+          ],
+          "chromium": [
+            10,
+            20
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollTo({left: 3.3, top: 7.7, behavior: instant})",
+          "native": [
+            3,
+            7
+          ],
+          "chromium": [
+            3,
+            8
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo({top: 9.6}) keeps left",
+          "native": [
+            3,
+            9
+          ],
+          "chromium": [
+            3,
+            10
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scroll(5.5, 6.5)",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollBy(0.4, 0.4)",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy(0.4, 0.4) again",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            7
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy({top: 0.6})",
+          "native": [
+            5,
+            6
+          ],
+          "chromium": [
+            6,
+            8
+          ],
+          "nativeEvents": []
+        },
+        {
+          "name": "scrollBy(-0.3, -0.3)",
+          "native": [
+            4,
+            5
+          ],
+          "chromium": [
+            6,
+            8
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(-5.5, -5.5) clamps to 0",
+          "native": [
+            0,
+            0
+          ],
+          "chromium": [
+            0,
+            0
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(1e6, 1e6) clamps to the maximum",
+          "native": [
+            900,
+            901
+          ],
+          "chromium": [
+            900,
+            901
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollBy(-0.5, -0.5) from the maximum",
+          "native": [
+            899,
+            900
+          ],
+          "chromium": [
+            900,
+            901
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTop = 33.3, scrollLeft = 11.6",
+          "native": [
+            11,
+            33
+          ],
+          "chromium": [
+            12,
+            33
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo({left: 0.5, top: 50.5, behavior: smooth})",
+          "native": [
+            0,
+            50
+          ],
+          "chromium": [
+            1,
+            51
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scroll",
+            "box:scroll",
+            "box:scrollend"
+          ]
+        },
+        {
+          "name": "scrollTo(0, 0)",
+          "native": [
+            0,
+            0
+          ],
+          "chromium": [
+            0,
+            0
+          ],
+          "nativeEvents": [
+            "box:scroll",
+            "box:scrollend"
+          ]
+        }
+      ]
+    }
+  ],
+  "qualified": [
+    {
+      "case": "viewport@1 window",
+      "step": "scrollTo(10.25, 20.5)",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        10,
+        21
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1 window",
+      "step": "scrollTo(10.75, 20.75)",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        11,
+        21
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1 window",
+      "step": "scrollTo(10.4, 20.4) from 10.75, 20.75",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        10,
+        20
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1 window",
+      "step": "scrollTo({left: 3.3, top: 7.7, behavior: instant})",
+      "native": [
+        3,
+        7
+      ],
+      "chromium": [
+        3,
+        8
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1 window",
+      "step": "scrollTo({top: 9.6}) keeps left",
+      "native": [
+        3,
+        9
+      ],
+      "chromium": [
+        3,
+        10
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1 window",
+      "step": "scroll(5.5, 6.5)",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1 window",
+      "step": "scrollBy(0.4, 0.4)",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": []
+    },
+    {
+      "case": "viewport@1 window",
+      "step": "scrollBy(0.4, 0.4) again",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": []
+    },
+    {
+      "case": "viewport@1 window",
+      "step": "scrollBy({top: 0.6})",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        8
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1 window",
+      "step": "scrollBy(-0.3, -0.3)",
+      "native": [
+        4,
+        5
+      ],
+      "chromium": [
+        6,
+        8
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": []
+    },
+    {
+      "case": "viewport@1 window",
+      "step": "scrollBy(-0.5, -0.5) from the maximum",
+      "native": [
+        1679,
+        1760
+      ],
+      "chromium": [
+        1680,
+        1761
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": []
+    },
+    {
+      "case": "viewport@1 window",
+      "step": "scrollTop = 33.3, scrollLeft = 11.6",
+      "native": [
+        11,
+        33
+      ],
+      "chromium": [
+        12,
+        33
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1 window",
+      "step": "scrollTo({left: 0.5, top: 50.5, behavior: smooth})",
+      "native": [
+        0,
+        50
+      ],
+      "chromium": [
+        1,
+        51
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1 scrollingElement",
+      "step": "scrollTo(10.25, 20.5)",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        10,
+        21
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1 scrollingElement",
+      "step": "scrollTo(10.75, 20.75)",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        11,
+        21
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1 scrollingElement",
+      "step": "scrollTo(10.4, 20.4) from 10.75, 20.75",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        10,
+        20
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1 scrollingElement",
+      "step": "scrollTo({left: 3.3, top: 7.7, behavior: instant})",
+      "native": [
+        3,
+        7
+      ],
+      "chromium": [
+        3,
+        8
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1 scrollingElement",
+      "step": "scrollTo({top: 9.6}) keeps left",
+      "native": [
+        3,
+        9
+      ],
+      "chromium": [
+        3,
+        10
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1 scrollingElement",
+      "step": "scroll(5.5, 6.5)",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1 scrollingElement",
+      "step": "scrollBy(0.4, 0.4)",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": []
+    },
+    {
+      "case": "viewport@1 scrollingElement",
+      "step": "scrollBy(0.4, 0.4) again",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": []
+    },
+    {
+      "case": "viewport@1 scrollingElement",
+      "step": "scrollBy({top: 0.6})",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        8
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1 scrollingElement",
+      "step": "scrollBy(-0.3, -0.3)",
+      "native": [
+        4,
+        5
+      ],
+      "chromium": [
+        6,
+        8
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": []
+    },
+    {
+      "case": "viewport@1 scrollingElement",
+      "step": "scrollBy(-0.5, -0.5) from the maximum",
+      "native": [
+        1679,
+        1760
+      ],
+      "chromium": [
+        1680,
+        1761
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": []
+    },
+    {
+      "case": "viewport@1 scrollingElement",
+      "step": "scrollTop = 33.3, scrollLeft = 11.6",
+      "native": [
+        11,
+        33
+      ],
+      "chromium": [
+        12,
+        33
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1 scrollingElement",
+      "step": "scrollTo({left: 0.5, top: 50.5, behavior: smooth})",
+      "native": [
+        0,
+        50
+      ],
+      "chromium": [
+        1,
+        51
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "box@1 box",
+      "step": "scrollTo(10.25, 20.5)",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        10,
+        21
+      ],
+      "nativeEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "box@1 box",
+      "step": "scrollTo(10.75, 20.75)",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        11,
+        21
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "box@1 box",
+      "step": "scrollTo(10.4, 20.4) from 10.75, 20.75",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        10,
+        20
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "box@1 box",
+      "step": "scrollTo({left: 3.3, top: 7.7, behavior: instant})",
+      "native": [
+        3,
+        7
+      ],
+      "chromium": [
+        3,
+        8
+      ],
+      "nativeEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "box@1 box",
+      "step": "scrollTo({top: 9.6}) keeps left",
+      "native": [
+        3,
+        9
+      ],
+      "chromium": [
+        3,
+        10
+      ],
+      "nativeEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "box@1 box",
+      "step": "scroll(5.5, 6.5)",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "box@1 box",
+      "step": "scrollBy(0.4, 0.4)",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": []
+    },
+    {
+      "case": "box@1 box",
+      "step": "scrollBy(0.4, 0.4) again",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": []
+    },
+    {
+      "case": "box@1 box",
+      "step": "scrollBy({top: 0.6})",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        8
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "box@1 box",
+      "step": "scrollBy(-0.3, -0.3)",
+      "native": [
+        4,
+        5
+      ],
+      "chromium": [
+        6,
+        8
+      ],
+      "nativeEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromiumEvents": []
+    },
+    {
+      "case": "box@1 box",
+      "step": "scrollBy(-0.5, -0.5) from the maximum",
+      "native": [
+        899,
+        900
+      ],
+      "chromium": [
+        900,
+        901
+      ],
+      "nativeEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromiumEvents": []
+    },
+    {
+      "case": "box@1 box",
+      "step": "scrollTop = 33.3, scrollLeft = 11.6",
+      "native": [
+        11,
+        33
+      ],
+      "chromium": [
+        12,
+        33
+      ],
+      "nativeEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "box@1 box",
+      "step": "scrollTo({left: 0.5, top: 50.5, behavior: smooth})",
+      "native": [
+        0,
+        50
+      ],
+      "chromium": [
+        1,
+        51
+      ],
+      "nativeEvents": [
+        "box:scroll",
+        "box:scroll",
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scroll",
+        "box:scroll",
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1.5 window",
+      "step": "scrollTo(10.25, 20.5)",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        10,
+        21
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1.5 window",
+      "step": "scrollTo(10.75, 20.75)",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        11,
+        21
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1.5 window",
+      "step": "scrollTo(10.4, 20.4) from 10.75, 20.75",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        10,
+        20
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1.5 window",
+      "step": "scrollTo({left: 3.3, top: 7.7, behavior: instant})",
+      "native": [
+        3,
+        7
+      ],
+      "chromium": [
+        3,
+        8
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1.5 window",
+      "step": "scrollTo({top: 9.6}) keeps left",
+      "native": [
+        3,
+        9
+      ],
+      "chromium": [
+        3,
+        10
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1.5 window",
+      "step": "scroll(5.5, 6.5)",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1.5 window",
+      "step": "scrollBy(0.4, 0.4)",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": []
+    },
+    {
+      "case": "viewport@1.5 window",
+      "step": "scrollBy(0.4, 0.4) again",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": []
+    },
+    {
+      "case": "viewport@1.5 window",
+      "step": "scrollBy({top: 0.6})",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        8
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1.5 window",
+      "step": "scrollBy(-0.3, -0.3)",
+      "native": [
+        4,
+        5
+      ],
+      "chromium": [
+        6,
+        8
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": []
+    },
+    {
+      "case": "viewport@1.5 window",
+      "step": "scrollBy(-0.5, -0.5) from the maximum",
+      "native": [
+        1679,
+        1760
+      ],
+      "chromium": [
+        1680,
+        1761
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": []
+    },
+    {
+      "case": "viewport@1.5 window",
+      "step": "scrollTop = 33.3, scrollLeft = 11.6",
+      "native": [
+        11,
+        33
+      ],
+      "chromium": [
+        12,
+        33
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1.5 window",
+      "step": "scrollTo({left: 0.5, top: 50.5, behavior: smooth})",
+      "native": [
+        0,
+        50
+      ],
+      "chromium": [
+        1,
+        51
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1.5 scrollingElement",
+      "step": "scrollTo(10.25, 20.5)",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        10,
+        21
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1.5 scrollingElement",
+      "step": "scrollTo(10.75, 20.75)",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        11,
+        21
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1.5 scrollingElement",
+      "step": "scrollTo(10.4, 20.4) from 10.75, 20.75",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        10,
+        20
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1.5 scrollingElement",
+      "step": "scrollTo({left: 3.3, top: 7.7, behavior: instant})",
+      "native": [
+        3,
+        7
+      ],
+      "chromium": [
+        3,
+        8
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1.5 scrollingElement",
+      "step": "scrollTo({top: 9.6}) keeps left",
+      "native": [
+        3,
+        9
+      ],
+      "chromium": [
+        3,
+        10
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1.5 scrollingElement",
+      "step": "scroll(5.5, 6.5)",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1.5 scrollingElement",
+      "step": "scrollBy(0.4, 0.4)",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": []
+    },
+    {
+      "case": "viewport@1.5 scrollingElement",
+      "step": "scrollBy(0.4, 0.4) again",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": []
+    },
+    {
+      "case": "viewport@1.5 scrollingElement",
+      "step": "scrollBy({top: 0.6})",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        8
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1.5 scrollingElement",
+      "step": "scrollBy(-0.3, -0.3)",
+      "native": [
+        4,
+        5
+      ],
+      "chromium": [
+        6,
+        8
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": []
+    },
+    {
+      "case": "viewport@1.5 scrollingElement",
+      "step": "scrollBy(-0.5, -0.5) from the maximum",
+      "native": [
+        1679,
+        1760
+      ],
+      "chromium": [
+        1680,
+        1761
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": []
+    },
+    {
+      "case": "viewport@1.5 scrollingElement",
+      "step": "scrollTop = 33.3, scrollLeft = 11.6",
+      "native": [
+        11,
+        33
+      ],
+      "chromium": [
+        12,
+        33
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1.5 scrollingElement",
+      "step": "scrollTo({left: 0.5, top: 50.5, behavior: smooth})",
+      "native": [
+        0,
+        50
+      ],
+      "chromium": [
+        1,
+        51
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "box@1.5 box",
+      "step": "scrollTo(10.25, 20.5)",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        10,
+        21
+      ],
+      "nativeEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "box@1.5 box",
+      "step": "scrollTo(10.75, 20.75)",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        11,
+        21
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "box@1.5 box",
+      "step": "scrollTo(10.4, 20.4) from 10.75, 20.75",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        10,
+        20
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "box@1.5 box",
+      "step": "scrollTo({left: 3.3, top: 7.7, behavior: instant})",
+      "native": [
+        3,
+        7
+      ],
+      "chromium": [
+        3,
+        8
+      ],
+      "nativeEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "box@1.5 box",
+      "step": "scrollTo({top: 9.6}) keeps left",
+      "native": [
+        3,
+        9
+      ],
+      "chromium": [
+        3,
+        10
+      ],
+      "nativeEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "box@1.5 box",
+      "step": "scroll(5.5, 6.5)",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "box@1.5 box",
+      "step": "scrollBy(0.4, 0.4)",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": []
+    },
+    {
+      "case": "box@1.5 box",
+      "step": "scrollBy(0.4, 0.4) again",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": []
+    },
+    {
+      "case": "box@1.5 box",
+      "step": "scrollBy({top: 0.6})",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        8
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "box@1.5 box",
+      "step": "scrollBy(-0.3, -0.3)",
+      "native": [
+        4,
+        5
+      ],
+      "chromium": [
+        6,
+        8
+      ],
+      "nativeEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromiumEvents": []
+    },
+    {
+      "case": "box@1.5 box",
+      "step": "scrollBy(-0.5, -0.5) from the maximum",
+      "native": [
+        899,
+        900
+      ],
+      "chromium": [
+        900,
+        901
+      ],
+      "nativeEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromiumEvents": []
+    },
+    {
+      "case": "box@1.5 box",
+      "step": "scrollTop = 33.3, scrollLeft = 11.6",
+      "native": [
+        11,
+        33
+      ],
+      "chromium": [
+        12,
+        33
+      ],
+      "nativeEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "box@1.5 box",
+      "step": "scrollTo({left: 0.5, top: 50.5, behavior: smooth})",
+      "native": [
+        0,
+        50
+      ],
+      "chromium": [
+        1,
+        51
+      ],
+      "nativeEvents": [
+        "box:scroll",
+        "box:scroll",
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scroll",
+        "box:scroll",
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@2 window",
+      "step": "scrollTo(10.25, 20.5)",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        10,
+        21
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@2 window",
+      "step": "scrollTo(10.75, 20.75)",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        11,
+        21
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@2 window",
+      "step": "scrollTo(10.4, 20.4) from 10.75, 20.75",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        10,
+        20
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@2 window",
+      "step": "scrollTo({left: 3.3, top: 7.7, behavior: instant})",
+      "native": [
+        3,
+        7
+      ],
+      "chromium": [
+        3,
+        8
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@2 window",
+      "step": "scrollTo({top: 9.6}) keeps left",
+      "native": [
+        3,
+        9
+      ],
+      "chromium": [
+        3,
+        10
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@2 window",
+      "step": "scroll(5.5, 6.5)",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@2 window",
+      "step": "scrollBy(0.4, 0.4)",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": []
+    },
+    {
+      "case": "viewport@2 window",
+      "step": "scrollBy(0.4, 0.4) again",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": []
+    },
+    {
+      "case": "viewport@2 window",
+      "step": "scrollBy({top: 0.6})",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        8
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@2 window",
+      "step": "scrollBy(-0.3, -0.3)",
+      "native": [
+        4,
+        5
+      ],
+      "chromium": [
+        6,
+        8
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": []
+    },
+    {
+      "case": "viewport@2 window",
+      "step": "scrollBy(-0.5, -0.5) from the maximum",
+      "native": [
+        1679,
+        1760
+      ],
+      "chromium": [
+        1680,
+        1761
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": []
+    },
+    {
+      "case": "viewport@2 window",
+      "step": "scrollTop = 33.3, scrollLeft = 11.6",
+      "native": [
+        11,
+        33
+      ],
+      "chromium": [
+        12,
+        33
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@2 window",
+      "step": "scrollTo({left: 0.5, top: 50.5, behavior: smooth})",
+      "native": [
+        0,
+        50
+      ],
+      "chromium": [
+        1,
+        51
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@2 scrollingElement",
+      "step": "scrollTo(10.25, 20.5)",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        10,
+        21
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@2 scrollingElement",
+      "step": "scrollTo(10.75, 20.75)",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        11,
+        21
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@2 scrollingElement",
+      "step": "scrollTo(10.4, 20.4) from 10.75, 20.75",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        10,
+        20
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@2 scrollingElement",
+      "step": "scrollTo({left: 3.3, top: 7.7, behavior: instant})",
+      "native": [
+        3,
+        7
+      ],
+      "chromium": [
+        3,
+        8
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@2 scrollingElement",
+      "step": "scrollTo({top: 9.6}) keeps left",
+      "native": [
+        3,
+        9
+      ],
+      "chromium": [
+        3,
+        10
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@2 scrollingElement",
+      "step": "scroll(5.5, 6.5)",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@2 scrollingElement",
+      "step": "scrollBy(0.4, 0.4)",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": []
+    },
+    {
+      "case": "viewport@2 scrollingElement",
+      "step": "scrollBy(0.4, 0.4) again",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": []
+    },
+    {
+      "case": "viewport@2 scrollingElement",
+      "step": "scrollBy({top: 0.6})",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        8
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@2 scrollingElement",
+      "step": "scrollBy(-0.3, -0.3)",
+      "native": [
+        4,
+        5
+      ],
+      "chromium": [
+        6,
+        8
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": []
+    },
+    {
+      "case": "viewport@2 scrollingElement",
+      "step": "scrollBy(-0.5, -0.5) from the maximum",
+      "native": [
+        1679,
+        1760
+      ],
+      "chromium": [
+        1680,
+        1761
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": []
+    },
+    {
+      "case": "viewport@2 scrollingElement",
+      "step": "scrollTop = 33.3, scrollLeft = 11.6",
+      "native": [
+        11,
+        33
+      ],
+      "chromium": [
+        12,
+        33
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@2 scrollingElement",
+      "step": "scrollTo({left: 0.5, top: 50.5, behavior: smooth})",
+      "native": [
+        0,
+        50
+      ],
+      "chromium": [
+        1,
+        51
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "box@2 box",
+      "step": "scrollTo(10.25, 20.5)",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        10,
+        21
+      ],
+      "nativeEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "box@2 box",
+      "step": "scrollTo(10.75, 20.75)",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        11,
+        21
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "box@2 box",
+      "step": "scrollTo(10.4, 20.4) from 10.75, 20.75",
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        10,
+        20
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "box@2 box",
+      "step": "scrollTo({left: 3.3, top: 7.7, behavior: instant})",
+      "native": [
+        3,
+        7
+      ],
+      "chromium": [
+        3,
+        8
+      ],
+      "nativeEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "box@2 box",
+      "step": "scrollTo({top: 9.6}) keeps left",
+      "native": [
+        3,
+        9
+      ],
+      "chromium": [
+        3,
+        10
+      ],
+      "nativeEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "box@2 box",
+      "step": "scroll(5.5, 6.5)",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "box@2 box",
+      "step": "scrollBy(0.4, 0.4)",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": []
+    },
+    {
+      "case": "box@2 box",
+      "step": "scrollBy(0.4, 0.4) again",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": []
+    },
+    {
+      "case": "box@2 box",
+      "step": "scrollBy({top: 0.6})",
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        8
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "box@2 box",
+      "step": "scrollBy(-0.3, -0.3)",
+      "native": [
+        4,
+        5
+      ],
+      "chromium": [
+        6,
+        8
+      ],
+      "nativeEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromiumEvents": []
+    },
+    {
+      "case": "box@2 box",
+      "step": "scrollBy(-0.5, -0.5) from the maximum",
+      "native": [
+        899,
+        900
+      ],
+      "chromium": [
+        900,
+        901
+      ],
+      "nativeEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromiumEvents": []
+    },
+    {
+      "case": "box@2 box",
+      "step": "scrollTop = 33.3, scrollLeft = 11.6",
+      "native": [
+        11,
+        33
+      ],
+      "chromium": [
+        12,
+        33
+      ],
+      "nativeEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "box@2 box",
+      "step": "scrollTo({left: 0.5, top: 50.5, behavior: smooth})",
+      "native": [
+        0,
+        50
+      ],
+      "chromium": [
+        1,
+        51
+      ],
+      "nativeEvents": [
+        "box:scroll",
+        "box:scroll",
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromiumEvents": [
+        "box:scroll",
+        "box:scroll",
+        "box:scroll",
+        "box:scroll",
+        "box:scrollend"
+      ]
+    }
+  ],
+  "smooth": [
+    {
+      "case": "viewport@1 window",
+      "native": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromium": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1 scrollingElement",
+      "native": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromium": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "box@1 box",
+      "native": [
+        "box:scroll",
+        "box:scroll",
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromium": [
+        "box:scroll",
+        "box:scroll",
+        "box:scroll",
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1.5 window",
+      "native": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromium": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@1.5 scrollingElement",
+      "native": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromium": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "box@1.5 box",
+      "native": [
+        "box:scroll",
+        "box:scroll",
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromium": [
+        "box:scroll",
+        "box:scroll",
+        "box:scroll",
+        "box:scroll",
+        "box:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@2 window",
+      "native": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromium": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "viewport@2 scrollingElement",
+      "native": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromium": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ]
+    },
+    {
+      "case": "box@2 box",
+      "native": [
+        "box:scroll",
+        "box:scroll",
+        "box:scroll",
+        "box:scrollend"
+      ],
+      "chromium": [
+        "box:scroll",
+        "box:scroll",
+        "box:scroll",
+        "box:scroll",
+        "box:scrollend"
+      ]
+    }
+  ],
+  "assertions": 3232
+}

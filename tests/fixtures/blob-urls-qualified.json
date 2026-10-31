@@ -1,0 +1,7 @@
+{
+  "comment": "Differences between Chromium 156 and the native engine that tests/abi/blob_urls.py records instead of failing. Approved by root for #144.",
+  "differences": {
+    "reader.text.final.result.value": "readAsText without an encoding: WebKit decodes with the blob type's charset parameter (latin1 here), as the File API's 'get an encoding' step specifies; Chromium decodes UTF-8. With an explicit encoding both agree (textLatin1, textUtf16, textBogusLabel, textBomWins).",
+    "teardown.promise": "A blob read in flight when its document goes away: the native read delivers RV_RESOURCE_INVALIDATED, the H05 operation contract; Chromium leaves the removed document's Blob.text() promise pending."
+  }
+}

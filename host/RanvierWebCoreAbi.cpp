@@ -3,6 +3,12 @@
 #include "dom/RanvierDomGlue.h"
 #include "RanvierSvgViewGlue.h"
 #include "RanvierResourceGlue.h"
+#include "RanvierEventGlue.h"
+#include "RanvierViewportGlue.h"
+#include "RanvierInspectGlue.h"
+#include <atomic>
+#include <string>
+#include <vector>
 #include <JavaScriptCore/DisallowVMEntry.h>
 #include <JavaScriptCore/InitializeThreading.h>
 #include <WebCore/Document.h>
@@ -47,6 +53,7 @@
 #include <WebCore/MemoryRelease.h>
 #include <WebCore/ScriptWrappableInlines.h>
 #include <WebCore/NodeDocument.h>
+#include <WebCore/NodeFilter.h>
 #include <WebCore/NodeInlines.h>
 #include <WebCore/NodeList.h>
 #include <WebCore/Page.h>
@@ -63,8 +70,22 @@
 #include <WebCore/FrameLoader.h>
 #include <WebCore/LocalFrameInlines.h>
 #include <WebCore/PageConfiguration.h>
+#include <WebCore/PlatformScreen.h>
+#include <WebCore/ScreenOrientationManager.h>
+#include <WebCore/ScreenOrientationType.h>
+#include <WebCore/ScreenProperties.h>
+#include <WebCore/EmptyFrameLoaderClient.h>
+#include <WebCore/FormData.h>
+#include <WebCore/FormState.h>
+#include <WebCore/FormSubmission.h>
+#include <WebCore/HTMLFormElement.h>
 #include <WebCore/ProcessWarming.h>
+#include <WebCore/Blob.h>
+#include <WebCore/BlobData.h>
 #include <WebCore/BlobRegistry.h>
+#include <WebCore/BlobRegistryImpl.h>
+#include <WebCore/File.h>
+#include <WebCore/FileList.h>
 #include <WebCore/CachedResource.h>
 #include <WebCore/HTTPHeaderNames.h>
 #include <WebCore/HTTPParsers.h>
@@ -87,6 +108,7 @@
 #include <WebCore/DragItem.h>
 #include <WebCore/HTMLNames.h>
 #include <wtf/SetForScope.h>
+#include <wtf/HashMap.h>
 #include <WebCore/DragEvent.h>
 #include <WebCore/VisiblePosition.h>
 #include <WebCore/DataTransfer.h>
@@ -137,6 +159,7 @@
 #include <WebCore/HandleUserInputEventResult.h>
 #include <WebCore/InputEvent.h>
 #include <WebCore/MouseEvent.h>
+#include <WebCore/EventTargetInlines.h>
 #include <WebCore/MouseEventTypes.h>
 #include <WebCore/PlatformKeyboardEvent.h>
 #include <WebCore/PlatformMouseEvent.h>
@@ -146,9 +169,14 @@
 #if PLATFORM(COCOA)
 #include <WebCore/AttributedString.h>
 #endif
+#if PLATFORM(MAC)
+#include <WebCore/DeprecatedGlobalSettings.h>
+#endif
+#include <cmath>
 #include <mutex>
 #include <pal/SessionID.h>
 #include <cstring>
+#include <filesystem>
 #include <optional>
 #include <utility>
 #include <wtf/MainThread.h>
@@ -156,6 +184,11 @@
 #include <wtf/RunLoop.h>
 #include <wtf/HexNumber.h>
 #include <wtf/text/MakeString.h>
+#include <wtf/text/TextBreakIterator.h>
+#include <unicode/ubrk.h>
+#include <unicode/uloc.h>
+#include <unicode/uchar.h>
+#include <unicode/uversion.h>
 
 #if PLATFORM(GTK) || PLATFORM(WPE)
 #include <WebCore/PlatformDisplaySurfaceless.h>
@@ -477,8 +510,55 @@ class RvDragClient final : public DragClient {
     void startDrag(DragItem, DataTransfer&, Frame&, const std::optional<NodeIdentifier>&) final;
 };
 
+// Hands each form submission to the host's form submission handler instead of scheduling it, so the document is never
+// navigated or unloaded; every other navigation keeps the empty client's behaviour.
+class RvFrameLoaderClient final : public EmptyFrameLoaderClient {
+public:
+    explicit RvFrameLoaderClient(FrameLoader& loader)
+        : EmptyFrameLoaderClient(loader)
+    {
+    }
+
+private:
+    bool shouldScheduleFormSubmission(FormSubmission&) final;
+};
+
 // createPage and loadHTML follow WebCore's testing/TestPage.cpp (Copyright (C) 2026 Apple Inc., BSD-2-Clause).
-static Ref<Page> createPage(IntSize viewportSize)
+// The orientation a host's screen reports, which rv_host_set_screen sets. Locking is not supported: the page's
+// ScreenOrientationLockingAPIEnabled setting stays off, and a lock that reaches the manager fails.
+class RvScreenOrientationManager final : public ScreenOrientationManager, public RefCounted<RvScreenOrientationManager> {
+    WTF_MAKE_TZONE_ALLOCATED_INLINE(RvScreenOrientationManager);
+public:
+    static Ref<RvScreenOrientationManager> create() { return adoptRef(*new RvScreenOrientationManager); }
+    void ref() const final { RefCounted::ref(); }
+    void deref() const final { RefCounted::deref(); }
+
+    void setOrientation(ScreenOrientationType orientation)
+    {
+        if (orientation == m_orientation)
+            return;
+        m_orientation = orientation;
+        for (auto& weakObserver : copyToVector(m_observers)) {
+            if (RefPtr observer = weakObserver.get())
+                observer->screenOrientationDidChange(orientation);
+        }
+    }
+
+private:
+    ScreenOrientationType currentOrientation() final { return m_orientation; }
+    void lock(ScreenOrientationLockType, CompletionHandler<void(std::optional<Exception>&&)>&& completion) final
+    {
+        completion(Exception { ExceptionCode::NotSupportedError, "Screen orientation locking is not supported."_s });
+    }
+    void unlock() final { }
+    void addObserver(ScreenOrientationManagerObserver& observer) final { m_observers.add(observer); }
+    void removeObserver(ScreenOrientationManagerObserver& observer) final { m_observers.remove(observer); }
+
+    ScreenOrientationType m_orientation { ScreenOrientationType::LandscapePrimary };
+    WeakHashSet<ScreenOrientationManagerObserver> m_observers;
+};
+
+static Ref<Page> createPage(IntSize viewportSize, RvScreenOrientationManager& orientation)
 {
     static bool prewarmed = [] {
         ProcessWarming::prewarmGlobally();
@@ -486,9 +566,14 @@ static Ref<Page> createPage(IntSize viewportSize)
     }();
     UNUSED_VARIABLE(prewarmed);
     auto configuration = pageConfigurationWithEmptyClients(std::nullopt, PAL::SessionID::defaultSessionID());
+    // The empty clients' sandbox, except that forms may submit: a submission reaches RvFrameLoaderClient.
+    configuration.mainFrameCreationParameters = PageConfiguration::LocalMainFrameCreationParameters { CompletionHandler<UniqueRef<LocalFrameLoaderClient>(LocalFrame&, FrameLoader&)> { [](auto&, auto& loader) -> UniqueRef<LocalFrameLoaderClient> {
+        return makeUniqueRefWithoutRefCountedCheck<RvFrameLoaderClient>(loader);
+    } }, SandboxFlags::all() - SandboxFlag::Forms, ReferrerPolicy::EmptyString };
     configuration.chromeClient = makeUniqueRef<RvChromeClient>();
     configuration.editorClient = makeUniqueRef<RvEditorClient>();
     configuration.dragClient = makeUnique<RvDragClient>();
+    configuration.screenOrientationManager = orientation;
     Ref page = Page::create(WTF::move(configuration));
     page->settings().setScriptEnabled(false);
     page->settings().setScrollAnimatorEnabled(false);
@@ -498,6 +583,12 @@ static Ref<Page> createPage(IntSize viewportSize)
     page->settings().setDownloadAttributeEnabled(true);
     page->settings().setCSSFontFaceMetricOverrideDescriptorsEnabled(true);
     page->settings().setCSSAnchorPositioningEnabled(true);
+    page->settings().setPopoverHintEnabled(true);
+    page->settings().setScreenOrientationAPIEnabled(true);
+    page->settings().setVisualViewportAPIEnabled(true);
+    page->settings().setInteractiveFormValidationEnabled(true);
+    // Markup arrives decoded, so the document's encoding, which form submission and URL query encoding use, is UTF-8.
+    page->settings().setDefaultTextEncodingName("UTF-8"_s);
 #if ENABLE(VIDEO)
     page->settings().setMediaEnabled(false);
 #endif
@@ -623,6 +714,8 @@ struct RvHost {
     std::optional<JSC::DisallowVMEntry> noScript;
     RvResourceHandler resourceHandler { nullptr };
     void* resourceContext { nullptr };
+    RvFormSubmissionHandler formSubmissionHandler { nullptr };
+    void* formSubmissionContext { nullptr };
 #if RANVIER_COMPOSITING
     // rv_host_create sets RV_COMPOSITING_WHEN_NEEDED.
     int32_t compositingMode { RV_COMPOSITING_OFF };
@@ -658,6 +751,8 @@ struct RvHost {
     RvDragStartCallback dragStartCallback { nullptr };
     void* dragStartContext { nullptr };
     bool accessibility { false };
+    // rv_host_set_diagnostics: the rv_host_inspect_* calls read the document only while set.
+    bool diagnostics { false };
     RvAxCallback axCallback { nullptr };
     void* axContext { nullptr };
     // Accessibility events posted since the last delivery, and whether a delivery is scheduled.
@@ -666,6 +761,12 @@ struct RvHost {
 
     Document& document() { return *page->localTopDocument(); }
     LocalFrame& frame() { return *page->localMainFrame(); }
+
+    RefPtr<RvScreenOrientationManager> orientation;
+    // The display the page's screen data belongs to, unique to the host.
+    PlatformDisplayID displayID { 0 };
+    // The app's screen, from rv_host_set_screen; until then the screen follows the host size.
+    std::optional<ScreenData> screen;
 
     void requestFrame()
     {
@@ -761,6 +862,8 @@ void RvChromeClient::wantUpdate()
 
 static bool onOwningThread() { return isMainThread(); }
 
+static bool segmentationInitialized;
+
 // The hosts alive on the owning thread, for routing a page's loads to its host.
 static Vector<RvHost*> liveHosts;
 
@@ -771,6 +874,46 @@ static RvHost* hostForPage(const Page* page)
             return host;
     }
     return nullptr;
+}
+
+// Each form's planned submission: a later submission of the form replaces a pending one, as a later planned navigation
+// replaces an earlier one. A pending task holds its form, so the address identifies the form until the task runs.
+static HashMap<const HTMLFormElement*, uint64_t>& plannedSubmissions()
+{
+    static NeverDestroyed<HashMap<const HTMLFormElement*, uint64_t>> planned;
+    return planned;
+}
+
+// Copies the submission and posts it to the host's handler, so the submitting call returns before any app code runs.
+bool RvFrameLoaderClient::shouldScheduleFormSubmission(FormSubmission& submission)
+{
+    RefPtr state = submission.state();
+    if (!state)
+        return false;
+    static uint64_t lastPlan;
+    uint64_t plan = ++lastPlan;
+    plannedSubmissions().set(&state->form(), plan);
+    bool post = submission.method() == FormSubmission::Method::Post;
+    auto contentType = !post ? String { } : submission.boundary().isEmpty() ? submission.contentType() : makeString(submission.contentType(), "; boundary="_s, submission.boundary());
+    // FormSubmission::requestURL, which WebCore does not export; a GET entry list is ASCII.
+    URL url = submission.action();
+    if (!post && !url.protocolIsJavaScript())
+        url.setQuery(String { byteCast<Latin1Character>(submission.data().flatten().span()) });
+    RunLoop::mainSingleton().dispatch([document = Ref { state->sourceDocument() }, form = Ref { state->form() }, submitter = RefPtr<Element> { state->submitter() },
+        method = CString { post ? "POST" : "GET" }, url = url.string().utf8(), target = submission.target().string().utf8(),
+        contentType = contentType.utf8(), hasContentType = post, bytes = post ? submission.data().flatten() : Vector<uint8_t> { }, plan] {
+        auto planned = plannedSubmissions().find(form.ptr());
+        if (planned == plannedSubmissions().end() || planned->value != plan)
+            return;
+        plannedSubmissions().remove(planned);
+        auto* host = hostForPage(document->page());
+        if (!host || !host->formSubmissionHandler || &host->document() != document.ptr())
+            return;
+        RvFormSubmission copy { sizeof(RvFormSubmission), method.data(), url.data(), target.data(), hasContentType ? contentType.data() : nullptr,
+            bytes.span().data(), static_cast<int32_t>(bytes.size()), reinterpret_cast<RvNode*>(form.ptr()), reinterpret_cast<RvNode*>(submitter.get()) };
+        host->formSubmissionHandler(host->formSubmissionContext, &copy);
+    });
+    return false;
 }
 
 // A load handed to the host. loader is null once WebCore removes the loader: on completion,
@@ -839,7 +982,7 @@ static int32_t complete(RvResourceLoad* load, RefPtr<SharedBuffer>&& data, Strin
     return RV_OK;
 }
 
-// Hands each load to its host's resource handler on a later run loop cycle; data: URLs load in WebCore.
+// Hands each load to its host's resource handler on a later run loop cycle; data: and blob: URLs load in WebCore.
 class RvLoaderStrategy final : public LoaderStrategy {
 public:
     void loadResource(LocalFrame& frame, CachedResource& resource, ResourceRequest&& request, const ResourceLoaderOptions& options, CompletionHandler<void(RefPtr<SubresourceLoader>&&)>&& completionHandler) final
@@ -901,9 +1044,10 @@ public:
     ResourceError pluginWillHandleLoadError(const ResourceResponse& response) const final { return hostLoadError(response.url(), "Plug-in will handle load"_s); }
 
 private:
+    // data: and blob: URLs load in WebCore: blob: through the blob registry's BlobResourceHandle.
     static void schedule(SubresourceLoader& loader)
     {
-        if (loader.request().url().protocolIsData()) {
+        if (loader.request().url().protocolIsData() || loader.request().url().protocolIsBlob()) {
             loader.start();
             return;
         }
@@ -986,20 +1130,31 @@ public:
 #endif
 };
 
+// The blob registry follows WebKitLegacy's WebBlobRegistry (Source/WebKitLegacy/mac/WebCoreSupport/
+// WebPlatformStrategies.mm, Copyright (C) 2010-2026 Apple Inc., BSD-2-Clause): the in-process BlobRegistryImpl
+// holds every blob's data on the main thread.
 class RvBlobRegistry final : public BlobRegistry {
+    WTF_MAKE_TZONE_ALLOCATED(RvBlobRegistry);
+    WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(RvBlobRegistry);
 public:
-    void registerInternalFileBlobURL(const URL&, Ref<BlobDataFileReference>&&, const String&, const String&) final { }
-    void registerInternalBlobURL(const URL&, Vector<BlobPart>&&, const String&) final { }
-    void registerBlobURL(const URL&, const URL&, const PolicyContainer&, const std::optional<SecurityOriginData>&) final { }
-    void registerInternalBlobURLOptionallyFileBacked(const URL&, const URL&, RefPtr<BlobDataFileReference>&&, const String&) final { }
-    void registerInternalBlobURLForSlice(const URL&, const URL&, long long, long long, const String&) final { }
-    void unregisterBlobURL(const URL&, const std::optional<SecurityOriginData>&) final { }
-    void registerBlobURLHandle(const URL&, const std::optional<SecurityOriginData>&) final { }
-    void unregisterBlobURLHandle(const URL&, const std::optional<SecurityOriginData>&) final { }
-    String blobType(const URL&) final { return emptyString(); }
-    unsigned long long blobSize(const URL&) final { return 0; }
-    void writeBlobsToTemporaryFilesForIndexedDB(const Vector<String>&, CompletionHandler<void(Vector<String>&&)>&&) final { }
+    void registerInternalFileBlobURL(const URL& url, Ref<BlobDataFileReference>&& reference, const String&, const String& contentType) final { m_registry.registerInternalFileBlobURL(url, WTF::move(reference), contentType); }
+    void registerInternalBlobURL(const URL& url, Vector<BlobPart>&& parts, const String& contentType) final { m_registry.registerInternalBlobURL(url, WTF::move(parts), contentType); }
+    void registerBlobURL(const URL& url, const URL& source, const PolicyContainer& policy, const std::optional<SecurityOriginData>& topOrigin) final { m_registry.registerBlobURL(url, source, policy, topOrigin); }
+    void registerInternalBlobURLOptionallyFileBacked(const URL& url, const URL& source, RefPtr<BlobDataFileReference>&& reference, const String& contentType) final { m_registry.registerInternalBlobURLOptionallyFileBacked(url, source, WTF::move(reference), contentType, { }); }
+    void registerInternalBlobURLForSlice(const URL& url, const URL& source, long long start, long long end, const String& contentType) final { m_registry.registerInternalBlobURLForSlice(url, source, start, end, contentType); }
+    void unregisterBlobURL(const URL& url, const std::optional<SecurityOriginData>& topOrigin) final { m_registry.unregisterBlobURL(url, topOrigin); }
+    void registerBlobURLHandle(const URL& url, const std::optional<SecurityOriginData>& topOrigin) final { m_registry.registerBlobURLHandle(url, topOrigin); }
+    void unregisterBlobURLHandle(const URL& url, const std::optional<SecurityOriginData>& topOrigin) final { m_registry.unregisterBlobURLHandle(url, topOrigin); }
+    String blobType(const URL& url) final { return m_registry.blobType(url); }
+    unsigned long long blobSize(const URL& url) final { return m_registry.blobSize(url); }
+    void writeBlobsToTemporaryFilesForIndexedDB(const Vector<String>& urls, CompletionHandler<void(Vector<String>&&)>&& completion) final { m_registry.writeBlobsToTemporaryFilesForIndexedDB(urls, WTF::move(completion)); }
+    BlobRegistryImpl* blobRegistryImpl() final { return &m_registry; }
+
+private:
+    BlobRegistryImpl m_registry;
 };
+
+WTF_MAKE_TZONE_ALLOCATED_IMPL(RvBlobRegistry);
 
 class RvMediaStrategy final : public MediaStrategy {
 public:
@@ -1053,9 +1208,62 @@ struct RvWatch {
     WeakPtr<Node, WeakPtrImplWithEventTargetData> node;
 };
 
+// The NodeFilters rv_node_filter_create made that are still alive.
+static HashSet<const NodeFilter*>& hostNodeFilters()
+{
+    static NeverDestroyed<HashSet<const NodeFilter*>> filters;
+    return filters;
+}
+
+class RvHostNodeFilter final : public NodeFilter {
+public:
+    static Ref<RvHostNodeFilter> create(Document& document, RvNodeFilterCallback callback, void* context, RvNodeFilterRelease release)
+    {
+        return adoptRef(*new RvHostNodeFilter(document, callback, context, release));
+    }
+
+    ~RvHostNodeFilter()
+    {
+        hostNodeFilters().remove(this);
+        if (m_release)
+            m_release(m_context);
+    }
+
+    void* context() const { return m_context; }
+
+private:
+    RvHostNodeFilter(Document& document, RvNodeFilterCallback callback, void* context, RvNodeFilterRelease release)
+        : NodeFilter(&document)
+        , m_callback(callback)
+        , m_context(context)
+        , m_release(release)
+    {
+        hostNodeFilters().add(this);
+    }
+
+    CallbackResult<unsigned short> acceptNode(Node& node) final { return acceptNodeRethrowingException(node); }
+
+    CallbackResult<unsigned short> acceptNodeRethrowingException(Node& node) final
+    {
+        if (!canInvokeCallback())
+            return CallbackResultType::ExceptionThrown;
+        Ref protectedNode { node };
+        auto result = m_callback(m_context, reinterpret_cast<RvNode*>(&node));
+        if (result < FILTER_ACCEPT || result > FILTER_SKIP)
+            return CallbackResultType::ExceptionThrown;
+        return static_cast<unsigned short>(result);
+    }
+
+    bool hasCallback() const final { return true; }
+
+    RvNodeFilterCallback m_callback;
+    void* m_context;
+    RvNodeFilterRelease m_release;
+};
+
 struct RvListener {
     Ref<RvEventListener> listener;
-    Ref<Node> target;
+    Ref<EventTarget> target;
     AtomString type;
     bool capture;
 };
@@ -1103,7 +1311,18 @@ static int32_t fail(const Exception& exception) { return Ranvier::recordExceptio
 
 template<typename T> static int32_t status(const ExceptionOr<T>& result) { return result.hasException() ? fail(result.exception()) : RV_OK; }
 
-int32_t rv_abi_version(void) { return 30; }
+// The layouts tests/abi/abi_layouts.py checks from ctypes and the F# interop declares.
+static_assert(sizeof(void*) != 8 || (sizeof(RvFormSubmission) == 72 && offsetof(RvFormSubmission, method) == 8 && offsetof(RvFormSubmission, content_type) == 32
+    && offsetof(RvFormSubmission, body_length) == 48 && offsetof(RvFormSubmission, form) == 56 && offsetof(RvFormSubmission, submitter) == 64));
+static_assert(sizeof(void*) != 8 || (sizeof(RvTextSegments) == 32 && offsetof(RvTextSegments, starts) == 8 && offsetof(RvTextSegments, locale) == 24));
+static_assert(sizeof(void*) != 8 || (sizeof(RvEventInit) == 112 && offsetof(RvEventInit, screenX) == 24 && offsetof(RvEventInit, key) == 64
+    && offsetof(RvEventInit, relatedTarget) == 96 && offsetof(RvEventInit, customDetailJson) == 104));
+static_assert(sizeof(RvScreenMetrics) == 36 && offsetof(RvScreenMetrics, avail_left) == 12 && offsetof(RvScreenMetrics, orientation) == 32);
+
+
+static_assert(sizeof(RvWindowMetrics) == 32 && offsetof(RvWindowMetrics, outerHeight) == 16 && offsetof(RvWindowMetrics, devicePixelRatio) == 24);
+
+int32_t rv_abi_version(void) { return 54; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -1117,6 +1336,8 @@ int32_t rv_abi_has(const char* feature)
 {
     if (!feature)
         return 0;
+    if (!std::strcmp(feature, "screen"))
+        return 1;
     if (!std::strcmp(feature, "capabilities"))
         return 1;
     if (!std::strcmp(feature, "svg-view-selection"))
@@ -1124,6 +1345,30 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "image-decode"))
         return 1;
     if (!std::strcmp(feature, "font-load"))
+        return 1;
+    if (!std::strcmp(feature, "event-construction"))
+        return 1;
+    if (!std::strcmp(feature, "input-state"))
+        return 1;
+    if (!std::strcmp(feature, "viewport"))
+        return 1;
+    if (!std::strcmp(feature, "dom-binary-values"))
+        return 1;
+    if (!std::strcmp(feature, "accessibility-relations"))
+        return 1;
+    if (!std::strcmp(feature, "coordinate-spaces"))
+        return 1;
+    if (!std::strcmp(feature, "page-scale"))
+        return 1;
+    if (!std::strcmp(feature, "obscured-insets"))
+        return 1;
+    if (!std::strcmp(feature, "form-submission"))
+        return 1;
+    if (!std::strcmp(feature, "text-segmentation"))
+        return 1;
+    if (!std::strcmp(feature, "diagnostics"))
+        return 1;
+    if (!std::strcmp(feature, "cascade-diagnostics"))
         return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "accessibility-uia"))
@@ -1167,6 +1412,253 @@ static void applyCompositingMode(RvHost& host, int32_t mode)
 }
 #endif
 
+// The screen of a host without one from rv_host_set_screen: the host's size in CSS pixels, all of it available,
+// 24 bits deep, landscape-primary unless taller than wide.
+static ScreenData defaultScreen(const RvHost& host)
+{
+    ScreenData data;
+    data.screenRect = FloatRect { { }, host.size };
+    data.screenAvailableRect = data.screenRect;
+    data.screenDepth = 24;
+    data.screenDepthPerComponent = 8;
+    return data;
+}
+
+// Sets the screen data of every live host's display, which WebCore's PlatformScreen reports.
+static void publishScreens()
+{
+    ScreenProperties properties;
+    for (auto* live : liveHosts) {
+        auto data = live->screen.value_or(defaultScreen(*live));
+        if (!live->screen)
+            live->orientation->setOrientation(data.screenRect.height() > data.screenRect.width()
+                ? ScreenOrientationType::PortraitPrimary : ScreenOrientationType::LandscapePrimary);
+        properties.screenDataMap.set(live->displayID, WTF::move(data));
+        if (!properties.primaryDisplayID)
+            properties.primaryDisplayID = live->displayID;
+    }
+    PlatformScreen::updateSingletonProperties(WTF::move(properties));
+}
+
+int32_t rv_host_set_screen(RvHost* host, const RvScreenMetrics* metrics)
+{
+    if (!host || !metrics)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (metrics->size < sizeof(RvScreenMetrics) || metrics->width <= 0 || metrics->height <= 0 || metrics->avail_width < 0
+        || metrics->avail_height < 0 || metrics->color_depth <= 0 || metrics->color_depth > 64
+        || metrics->orientation < RV_SCREEN_PORTRAIT_PRIMARY || metrics->orientation > RV_SCREEN_LANDSCAPE_SECONDARY)
+        return RV_ERR_UNSUPPORTED;
+    ScreenData data;
+    data.screenRect = FloatRect { 0, 0, static_cast<float>(metrics->width), static_cast<float>(metrics->height) };
+    data.screenAvailableRect = FloatRect { static_cast<float>(metrics->avail_left), static_cast<float>(metrics->avail_top),
+        static_cast<float>(metrics->avail_width), static_cast<float>(metrics->avail_height) };
+    data.screenDepth = metrics->color_depth;
+    data.screenDepthPerComponent = metrics->color_depth / 3;
+    host->screen = WTF::move(data);
+    publishScreens();
+    host->page->screenPropertiesDidChange();
+    host->orientation->setOrientation(static_cast<ScreenOrientationType>(metrics->orientation));
+    return RV_OK;
+}
+
+struct RvDiagnosticEntry {
+    double numbers[RV_CASCADE_NUMBER_FIELDS] { };
+    std::string strings[RV_CASCADE_STRING_FIELDS];
+};
+
+struct RvDiagnostic {
+    int32_t kind;
+    std::string text;
+    std::vector<RvDiagnosticEntry> entries;
+};
+
+static std::atomic<int32_t> liveDiagnostics;
+
+static int32_t copyBytes(const std::string& value, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!length)
+        return RV_ERR_NULL_ARGUMENT;
+    *length = static_cast<int32_t>(value.size());
+    if (!buffer || capacity < *length)
+        return RV_ERR_BUFFER_TOO_SMALL;
+    std::memcpy(buffer, value.data(), value.size());
+    return RV_OK;
+}
+
+// RV_OK when the host is live, on its thread and has diagnostics enabled.
+static int32_t diagnosticsAllowed(RvHost* host)
+{
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host) || !host->diagnostics)
+        return RV_ERR_UNSUPPORTED;
+    return RV_OK;
+}
+
+static RvDiagnostic* newDiagnostic(int32_t kind)
+{
+    auto* diagnostic = new RvDiagnostic { kind, { }, { } };
+    ++liveDiagnostics;
+    return diagnostic;
+}
+
+int32_t rv_host_set_diagnostics(RvHost* host, int32_t enabled)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host) || (enabled != 0 && enabled != 1))
+        return RV_ERR_UNSUPPORTED;
+    host->diagnostics = enabled;
+    return RV_OK;
+}
+
+int32_t rv_host_inspect_render_tree(RvHost* host, RvNode* target, int32_t flags, RvDiagnostic** diagnostic)
+{
+    if (!host || !diagnostic)
+        return RV_ERR_NULL_ARGUMENT;
+    if (auto allowed = diagnosticsAllowed(host))
+        return allowed;
+    constexpr int32_t known = RV_RENDER_TREE_ALL_LAYERS | RV_RENDER_TREE_LAYER_NESTING | RV_RENDER_TREE_OVERFLOW
+        | RV_RENDER_TREE_SVG_GEOMETRY | RV_RENDER_TREE_ID_AND_CLASS | RV_RENDER_TREE_LAYOUT_STATE;
+    constexpr int32_t layers = RV_RENDER_TREE_ALL_LAYERS | RV_RENDER_TREE_LAYER_NESTING;
+    auto* document = reinterpret_cast<RvNode*>(&host->document());
+    bool element = target && target != document;
+    if (flags & ~known || (element && (flags & layers)))
+        return RV_ERR_UNSUPPORTED;
+    std::string text;
+    auto status = ranvier_inspect_render_tree(document, target, flags, [](void* context, const char* bytes, int32_t length) {
+        static_cast<std::string*>(context)->assign(bytes, length);
+    }, &text);
+    if (status)
+        return status;
+    auto* result = newDiagnostic(RV_DIAGNOSTIC_RENDER_TREE);
+    result->text = WTF::move(text);
+    *diagnostic = result;
+    return RV_OK;
+}
+
+int32_t rv_host_inspect_matched_rules(RvHost* host, RvNode* element, RvDiagnostic** diagnostic)
+{
+    if (!host || !element || !diagnostic)
+        return RV_ERR_NULL_ARGUMENT;
+    if (auto allowed = diagnosticsAllowed(host))
+        return allowed;
+    std::vector<RvDiagnosticEntry> entries;
+    auto status = ranvier_inspect_matched_rules(reinterpret_cast<RvNode*>(&host->document()), element, [](void* context, const RanvierInspectRule* rule) {
+        RvDiagnosticEntry entry;
+        entry.numbers[RV_RULE_ORIGIN] = rule->origin;
+        entry.numbers[RV_RULE_SPECIFICITY_A] = rule->specificity[0];
+        entry.numbers[RV_RULE_SPECIFICITY_B] = rule->specificity[1];
+        entry.numbers[RV_RULE_SPECIFICITY_C] = rule->specificity[2];
+        entry.numbers[RV_RULE_SELECTOR_COUNT] = rule->selectorCount;
+        entry.numbers[RV_RULE_MATCHED_SELECTOR_COUNT] = rule->matchedSelectorCount;
+        entry.strings[RV_RULE_SELECTOR_TEXT].assign(rule->selectorText ? rule->selectorText : "", rule->selectorTextLength);
+        entry.strings[RV_RULE_MATCHED_SELECTOR].assign(rule->matchedSelector ? rule->matchedSelector : "", rule->matchedSelectorLength);
+        entry.strings[RV_RULE_DECLARATIONS].assign(rule->declarations ? rule->declarations : "", rule->declarationsLength);
+        static_cast<std::vector<RvDiagnosticEntry>*>(context)->push_back(WTF::move(entry));
+    }, &entries);
+    if (status)
+        return status;
+    auto* result = newDiagnostic(RV_DIAGNOSTIC_MATCHED_RULES);
+    result->entries = WTF::move(entries);
+    *diagnostic = result;
+    return RV_OK;
+}
+
+int32_t rv_host_inspect_cascade(RvHost* host, RvNode* element, const uint8_t* property, int32_t property_length, RvDiagnostic** diagnostic)
+{
+    if (!host || !element || !property || !diagnostic)
+        return RV_ERR_NULL_ARGUMENT;
+    if (auto allowed = diagnosticsAllowed(host))
+        return allowed;
+    struct Collected {
+        std::string text;
+        std::vector<RvDiagnosticEntry> entries;
+    } collected;
+    auto status = ranvier_inspect_cascade(reinterpret_cast<RvNode*>(&host->document()), element, property, property_length,
+        [](void* context, const char* bytes, int32_t length) {
+            static_cast<Collected*>(context)->text.assign(bytes, length);
+        },
+        [](void* context, const RanvierCascadeEntry* source) {
+            RvDiagnosticEntry entry;
+            std::copy(std::begin(source->numbers), std::end(source->numbers), entry.numbers);
+            for (int field = 0; field < RV_CASCADE_STRING_FIELDS; ++field)
+                entry.strings[field].assign(source->strings[field] ? source->strings[field] : "", source->lengths[field]);
+            static_cast<Collected*>(context)->entries.push_back(WTF::move(entry));
+        }, &collected);
+    if (status)
+        return status;
+    auto* result = newDiagnostic(RV_DIAGNOSTIC_CASCADE);
+    result->text = WTF::move(collected.text);
+    result->entries = WTF::move(collected.entries);
+    *diagnostic = result;
+    return RV_OK;
+}
+
+int32_t rv_host_inspect_box_model(RvHost* host, RvNode* element, double* values)
+{
+    if (!host || !element || !values)
+        return RV_ERR_NULL_ARGUMENT;
+    if (auto allowed = diagnosticsAllowed(host))
+        return allowed;
+    return ranvier_inspect_box_model(reinterpret_cast<RvNode*>(&host->document()), element, values);
+}
+
+int32_t rv_diagnostic_kind(RvDiagnostic* diagnostic)
+{
+    return diagnostic ? diagnostic->kind : RV_ERR_NULL_ARGUMENT;
+}
+
+int32_t rv_diagnostic_text(RvDiagnostic* diagnostic, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!diagnostic)
+        return RV_ERR_NULL_ARGUMENT;
+    return copyBytes(diagnostic->text, buffer, capacity, length);
+}
+
+int32_t rv_diagnostic_count(RvDiagnostic* diagnostic)
+{
+    return diagnostic ? static_cast<int32_t>(diagnostic->entries.size()) : RV_ERR_NULL_ARGUMENT;
+}
+
+int32_t rv_diagnostic_entry_string(RvDiagnostic* diagnostic, int32_t index, int32_t field, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!diagnostic || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    int32_t fields = diagnostic->kind == RV_DIAGNOSTIC_CASCADE ? RV_CASCADE_STRING_FIELDS : RV_RULE_DECLARATIONS + 1;
+    if (index < 0 || static_cast<size_t>(index) >= diagnostic->entries.size() || field < 0 || field >= fields)
+        return RV_ERR_UNSUPPORTED;
+    return copyBytes(diagnostic->entries[index].strings[field], buffer, capacity, length);
+}
+
+int32_t rv_diagnostic_entry_number(RvDiagnostic* diagnostic, int32_t index, int32_t field, double* value)
+{
+    if (!diagnostic || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    int32_t fields = diagnostic->kind == RV_DIAGNOSTIC_CASCADE ? RV_CASCADE_NUMBER_FIELDS : RV_RULE_MATCHED_SELECTOR_COUNT + 1;
+    if (index < 0 || static_cast<size_t>(index) >= diagnostic->entries.size() || field < 0 || field >= fields)
+        return RV_ERR_UNSUPPORTED;
+    *value = diagnostic->entries[index].numbers[field];
+    return RV_OK;
+}
+
+void rv_diagnostic_release(RvDiagnostic* diagnostic)
+{
+    if (!diagnostic)
+        return;
+    delete diagnostic;
+    --liveDiagnostics;
+}
+
+int32_t rv_diagnostic_live_count(void)
+{
+    return liveDiagnostics.load();
+}
+
 RvHost* rv_host_create(int32_t width, int32_t height)
 {
     static bool initialized;
@@ -1174,21 +1666,32 @@ RvHost* rv_host_create(int32_t width, int32_t height)
         JSC::initialize();
         WTF::initializeMainThread();
         setPlatformStrategies(new RvPlatformStrategies);
+#if PLATFORM(MAC)
+        // Overlay scrollbars take no layout width, as on the Adwaita ports and in Chromium.
+        DeprecatedGlobalSettings::setUsesOverlayScrollbars(true);
+#endif
 #if PLATFORM(GTK) || PLATFORM(WPE)
         if (!PlatformDisplay::sharedDisplayIfExists())
             PlatformDisplay::setSharedDisplay(PlatformDisplaySurfaceless::create());
 #endif
         initialized = true;
+        segmentationInitialized = true;
     }
     if (!onOwningThread() || width <= 0 || height <= 0)
         return nullptr;
-    auto* host = new RvHost { createPage({ width, height }), { width, height }, std::nullopt };
+    Ref orientation = RvScreenOrientationManager::create();
+    auto* host = new RvHost { createPage({ width, height }, orientation), { width, height }, std::nullopt };
+    host->orientation = WTF::move(orientation);
     static_cast<RvChromeClient&>(host->page->chrome().client()).host = host;
+    static PlatformDisplayID nextDisplayID = 0x52560000;
+    host->displayID = ++nextDisplayID;
+    ranvier_page_set_display(reinterpret_cast<RvNode*>(&host->document()), host->displayID);
     host->noScript.emplace(host->document().vm());
 #if RANVIER_COMPOSITING
     applyCompositingMode(*host, RV_COMPOSITING_WHEN_NEEDED);
 #endif
     liveHosts.append(host);
+    publishScreens();
     return host;
 }
 
@@ -1239,6 +1742,7 @@ void rv_host_destroy(RvHost* host)
     if (!host || !onOwningThread())
         return;
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
+    ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     rv_host_detach_uia(host);
     rv_host_set_accelerated_compositing(host, RV_COMPOSITING_OFF);
     host->noScript.reset();
@@ -1246,6 +1750,7 @@ void rv_host_destroy(RvHost* host)
     static_cast<RvChromeClient&>(host->page->chrome().client()).host = nullptr;
     liveHosts.removeFirst(host);
     delete host;
+    publishScreens();
 }
 
 int32_t rv_host_load_html(RvHost* host, const char* html)
@@ -1255,6 +1760,7 @@ int32_t rv_host_load_html(RvHost* host, const char* html)
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
+    ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     loadHTML(host->frame(), utf8(html));
     // The new document posts accessibility notifications once its cache exists.
     if (host->accessibility)
@@ -1269,6 +1775,7 @@ int32_t rv_host_load_svg(RvHost* host, const char* svg)
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
+    ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     loadDocument(host->frame(), utf8(svg), "image/svg+xml"_s);
     if (host->accessibility)
         host->document().axObjectCache();
@@ -1696,6 +2203,25 @@ RvListener* rv_node_add_event_listener(RvNode* target, const char* type, int32_t
     return listener;
 }
 
+RvNodeFilter* rv_node_filter_create(RvNode* target, RvNodeFilterCallback callback, void* context, RvNodeFilterRelease release)
+{
+    if (!target || !callback || !onOwningThread())
+        return nullptr;
+    NodeFilter* filter = &RvHostNodeFilter::create(node(target)->document(), callback, context, release).leakRef();
+    return reinterpret_cast<RvNodeFilter*>(filter);
+}
+
+int32_t rv_node_filter_context(RvNodeFilter* filter, void** context)
+{
+    if (!filter || !context)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* engine = reinterpret_cast<NodeFilter*>(filter);
+    *context = hostNodeFilters().contains(engine) ? static_cast<RvHostNodeFilter*>(engine)->context() : nullptr;
+    return RV_OK;
+}
+
 int32_t rv_listener_remove(RvListener* listener)
 {
     if (!listener)
@@ -2055,6 +2581,178 @@ void rv_event_release(RvEvent* handle)
         event(handle)->deref();
 }
 
+static EventTarget* eventTarget(RvEventTarget* handle) { return reinterpret_cast<EventTarget*>(handle); }
+
+static RvEventTarget* targetHandleOrNull(EventTarget* target)
+{
+    if (!target)
+        return nullptr;
+    target->ref();
+    return reinterpret_cast<RvEventTarget*>(target);
+}
+
+RvEvent* rv_host_construct_event(RvHost* host, int32_t kind, const char* type, const RvEventInit* init)
+{
+    if (!host || !type || !init || !onOwningThread())
+        return nullptr;
+    return ranvier_event_construct(reinterpret_cast<RvNode*>(&host->document()), kind, type, init);
+}
+
+int32_t rv_custom_event_detail_json(RvEvent* handle, char* buffer, int32_t capacity, int32_t* length)
+{
+    return ranvier_custom_event_detail_json(handle, buffer, capacity, length);
+}
+
+RvEventTarget* rv_host_create_event_target(RvHost* host)
+{
+    if (!host || !onOwningThread())
+        return nullptr;
+    return ranvier_event_target_create(reinterpret_cast<RvNode*>(&host->document()));
+}
+
+RvEventTarget* rv_host_window_event_target(RvHost* host)
+{
+    if (!host || !onOwningThread())
+        return nullptr;
+    return ranvier_window_event_target(reinterpret_cast<RvNode*>(&host->document()));
+}
+
+int32_t rv_host_max_touch_points(RvHost* host, int32_t* value)
+{
+    if (!host || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_window_max_touch_points(reinterpret_cast<RvNode*>(&host->document()), value);
+}
+
+RvEventTarget* rv_event_target_retain(RvEventTarget* handle)
+{
+    if (!handle || !onOwningThread())
+        return nullptr;
+    eventTarget(handle)->ref();
+    return handle;
+}
+
+void rv_event_target_release(RvEventTarget* handle)
+{
+    if (handle && onOwningThread())
+        eventTarget(handle)->deref();
+}
+
+RvEventTarget* rv_node_as_event_target(RvNode* handle)
+{
+    if (!handle || !onOwningThread())
+        return nullptr;
+    return targetHandleOrNull(static_cast<EventTarget*>(node(handle)));
+}
+
+RvNode* rv_event_target_as_node(RvEventTarget* handle)
+{
+    if (!handle || !onOwningThread())
+        return nullptr;
+    return handleOrNull(dynamicDowncast<Node>(eventTarget(handle)));
+}
+
+int32_t rv_event_target_equals(RvEventTarget* left, RvEventTarget* right)
+{
+    return left && right && eventTarget(left) == eventTarget(right) ? 1 : 0;
+}
+
+RvListener* rv_event_target_add_listener(RvEventTarget* target, const char* type, int32_t flags, RvEventCallback callback, void* context)
+{
+    if (!target || !type || !callback || !onOwningThread())
+        return nullptr;
+    auto* listener = new RvListener { RvEventListener::create(callback, context), *eventTarget(target),
+        AtomString::fromUTF8(type), !!(flags & RV_LISTENER_CAPTURE) };
+    AddEventListenerOptions options;
+    options.capture = listener->capture;
+    if (flags & RV_LISTENER_PASSIVE_SPECIFIED)
+        options.passive = !!(flags & RV_LISTENER_PASSIVE);
+    listener->target->addEventListener(listener->type, listener->listener.copyRef(), options);
+    return listener;
+}
+
+int32_t rv_event_target_dispatch(RvEventTarget* target, RvEvent* dispatched, int32_t* defaultPrevented)
+{
+    if (!target || !dispatched)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    Ref protectedTarget = *eventTarget(target);
+    Ref protectedEvent = *event(dispatched);
+    auto result = dispatchCountingFailures([&] { protectedTarget->dispatchEvent(protectedEvent); });
+    if (defaultPrevented)
+        *defaultPrevented = protectedEvent->defaultPrevented() ? 1 : 0;
+    return result;
+}
+
+RvEventTarget* rv_event_get_target(RvEvent* subject, int32_t current)
+{
+    if (!subject || !onOwningThread())
+        return nullptr;
+    return targetHandleOrNull(current ? event(subject)->currentTarget() : event(subject)->target());
+}
+
+RvEventTarget* rv_event_get_related_target(RvEvent* subject)
+{
+    if (!subject || !onOwningThread())
+        return nullptr;
+    return targetHandleOrNull(event(subject)->relatedTarget());
+}
+
+int32_t rv_host_window_metrics(RvHost* host, RvWindowMetrics* metrics)
+{
+    if (!host || !metrics)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (metrics->size < static_cast<int32_t>(sizeof(RvWindowMetrics)))
+        return RV_ERR_UNSUPPORTED;
+    auto status = ranvier_window_metrics(reinterpret_cast<RvNode*>(&host->document()), metrics);
+    if (status != RV_OK)
+        return status;
+    // The window of a host is its viewport: the chrome client has no window rectangle of its own.
+    metrics->outerWidth = host->size.width();
+    metrics->outerHeight = host->size.height();
+    return RV_OK;
+}
+
+int32_t rv_host_set_visible(RvHost* host, int32_t visible)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    host->page->setIsVisible(!!visible);
+    return RV_OK;
+}
+
+RvEventTarget* rv_host_match_media(RvHost* host, const char* query)
+{
+    if (!host || !query || !onOwningThread())
+        return nullptr;
+    return ranvier_match_media(reinterpret_cast<RvNode*>(&host->document()), query);
+}
+
+int32_t rv_media_query_matches(RvEventTarget* target, int32_t* matches)
+{
+    if (!target || !matches)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_media_query_matches(target, matches);
+}
+
+int32_t rv_media_query_media(RvEventTarget* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_media_query_media(target, buffer, capacity, length);
+}
+
 RvEvent* rv_host_create_event(RvHost* host, int32_t eventInterface, const char* type, int32_t bubbles, int32_t cancelable)
 {
     if (!host || !type || !onOwningThread())
@@ -2124,6 +2822,8 @@ int32_t rv_event_interface(RvEvent* handle)
         return RV_EVENT_INPUT;
     case EventInterfaceType::FocusEvent:
         return RV_EVENT_FOCUS;
+    case EventInterfaceType::CustomEvent:
+        return RV_EVENT_CUSTOM;
     default:
         return RV_EVENT_OTHER;
     }
@@ -2188,6 +2888,9 @@ int32_t rv_last_exception(int32_t part, char* buffer, int32_t capacity, int32_t*
             return copyString("TypeError"_s, buffer, capacity, length);
         case ExceptionCode::JSSyntaxError:
             return copyString("SyntaxError"_s, buffer, capacity, length);
+        case ExceptionCode::ExistingExceptionError:
+            // A host callback, such as an RvNodeFilterCallback, reported a failure.
+            return copyString("ExistingExceptionError"_s, buffer, capacity, length);
         default:
             break;
         }
@@ -2406,6 +3109,17 @@ int32_t rv_element_focus(RvNode* target)
     return dispatchCountingFailures([&] { element->focus({ }); });
 }
 
+int32_t rv_host_set_form_submission_handler(RvHost* host, RvFormSubmissionHandler handler, void* context)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    host->formSubmissionHandler = handler;
+    host->formSubmissionContext = handler ? context : nullptr;
+    return RV_OK;
+}
+
 int32_t rv_host_set_resource_handler(RvHost* host, RvResourceHandler handler, void* context)
 {
     if (!host)
@@ -2444,6 +3158,10 @@ int32_t rv_host_resize(RvHost* host, int32_t width, int32_t height)
         return RV_ERR_PAINT_FAILED;
     host->size = { width, height };
     view->resize(host->size);
+    if (!host->screen) {
+        publishScreens();
+        host->page->screenPropertiesDidChange();
+    }
     host->dirty = { { }, host->size };
     host->requestFrame();
     return RV_OK;
@@ -2459,6 +3177,46 @@ int32_t rv_host_set_device_scale(RvHost* host, float scale)
         return RV_ERR_UNSUPPORTED;
     host->deviceScale = scale;
     host->page->setDeviceScaleFactor(scale);
+    host->dirty = { { }, host->size };
+    host->requestFrame();
+    return RV_OK;
+}
+
+int32_t rv_host_set_page_scale(RvHost* host, double scale, int32_t originX, int32_t originY)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!std::isfinite(scale) || scale <= 0)
+        return RV_ERR_UNSUPPORTED;
+    host->page->setPageScaleFactor(static_cast<float>(scale), { originX, originY });
+    host->dirty = { { }, host->size };
+    host->requestFrame();
+    return RV_OK;
+}
+
+int32_t rv_host_page_scale(RvHost* host, double* scale)
+{
+    if (!host || !scale)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    *scale = host->page->pageScaleFactor();
+    return RV_OK;
+}
+
+int32_t rv_host_set_obscured_insets(RvHost* host, double top, double right, double bottom, double left)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    for (double inset : { top, right, bottom, left }) {
+        if (!std::isfinite(inset) || inset < 0)
+            return RV_ERR_UNSUPPORTED;
+    }
+    host->page->setObscuredContentInsets(FloatBoxExtent { static_cast<float>(top), static_cast<float>(right), static_cast<float>(bottom), static_cast<float>(left) });
     host->dirty = { { }, host->size };
     host->requestFrame();
     return RV_OK;
@@ -2603,6 +3361,9 @@ int32_t rv_host_set_focused(RvHost* host, int32_t focused)
         return RV_ERR_WRONG_THREAD;
     auto& focus = host->page->focusController();
     return dispatchCountingFailures([&] {
+        // The first activation fires one window focus event when the main frame is focused while the page is unfocused.
+        if (!focus.focusedFrame())
+            focus.setFocusedFrame(&host->frame());
         focus.setActive(!!focused);
         focus.setFocused(!!focused);
     });
@@ -2749,6 +3510,133 @@ int32_t rv_host_cursor(RvHost* host)
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     return host->cursor;
+}
+
+int32_t rv_blob_read_bytes(RvBlob* handle, uint8_t* buffer, int64_t capacity, int64_t* length)
+{
+    if (!handle || !length || capacity < 0 || (capacity && !buffer))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    auto& blob = *reinterpret_cast<Blob*>(handle);
+    auto* registry = blobRegistry()->blobRegistryImpl();
+    RefPtr data = registry ? registry->blobDataFromURL(blob.url()) : nullptr;
+    if (!data)
+        return RV_ERR_UNSUPPORTED;
+    Vector<std::pair<const uint8_t*, size_t>> spans;
+    uint64_t total = 0;
+    for (auto& item : data->items()) {
+        auto span = item.switchOn([&](const DataSegment& segment) -> std::optional<std::span<const uint8_t>> {
+            auto bytes = segment.span();
+            auto offset = item.offset();
+            auto count = item.length();
+            if (offset < 0 || count < 0 || static_cast<uint64_t>(offset) > bytes.size() || static_cast<uint64_t>(count) > bytes.size() - offset)
+                return std::nullopt;
+            return bytes.subspan(offset, count);
+        }, [](const BlobDataFileReference&) -> std::optional<std::span<const uint8_t>> {
+            return std::nullopt;
+        });
+        if (!span)
+            return RV_ERR_UNSUPPORTED;
+        total += span->size();
+        spans.append({ span->data(), span->size() });
+    }
+    if (total > static_cast<uint64_t>(std::numeric_limits<int64_t>::max()))
+        return RV_ERR_UNSUPPORTED;
+    *length = static_cast<int64_t>(total);
+    if (static_cast<uint64_t>(capacity) < total)
+        return RV_ERR_BUFFER_TOO_SMALL;
+    for (auto& [bytes, count] : spans) {
+        if (count)
+            std::memcpy(buffer, bytes, count);
+        buffer += count;
+    }
+    return RV_OK;
+}
+
+int32_t rv_file_list_create(RvBlob* const* files, int32_t count, RvFileList** result)
+{
+    if (!result || count < 0 || (count && !files))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    Vector<Ref<File>> list;
+    list.reserveInitialCapacity(count);
+    for (int32_t i = 0; i < count; ++i) {
+        if (!files[i])
+            return RV_ERR_NULL_ARGUMENT;
+        RefPtr file = dynamicDowncast<File>(*reinterpret_cast<Blob*>(files[i]));
+        if (!file)
+            return RV_ERR_WRONG_INTERFACE;
+        list.append(file.releaseNonNull());
+    }
+    *result = reinterpret_cast<RvFileList*>(&FileList::create(WTF::move(list)).leakRef());
+    return RV_OK;
+}
+
+int32_t rv_blob_read(RvHost* host, RvBlob* blob, int32_t mode, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !blob || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_blob_read(reinterpret_cast<RvNode*>(&host->document()), blob, mode, completion, context, operation);
+}
+
+int32_t rv_blob_url_read(RvHost* host, const uint8_t* url, int32_t url_length, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || url_length < 0 || (url_length && !url) || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_blob_url_read(reinterpret_cast<RvNode*>(&host->document()), url, url_length, completion, context, operation);
+}
+
+int32_t rv_blob_read_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length)
+{
+    return ranvier_blob_read_result(operation, buffer, capacity, length);
+}
+
+int32_t rv_blob_read_type(uint64_t operation, char* buffer, int32_t capacity, int32_t* length)
+{
+    return ranvier_blob_read_type(operation, buffer, capacity, length);
+}
+
+int32_t rv_blob_read_error(uint64_t operation, char* buffer, int32_t capacity, int32_t* length)
+{
+    return ranvier_blob_read_error(operation, buffer, capacity, length);
+}
+
+int32_t rv_file_create_from_path(RvHost* host, const uint8_t* path, int32_t path_length, RvBlob** result)
+{
+    if (!host || path_length < 0 || (path_length && !path) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    auto text = String::fromUTF8(std::span<const char8_t> { reinterpret_cast<const char8_t*>(path), static_cast<size_t>(path_length) });
+    if (text.isNull())
+        return RV_ERR_NULL_ARGUMENT;
+    auto native = std::filesystem::path(std::u8string_view { reinterpret_cast<const char8_t*>(path), static_cast<size_t>(path_length) });
+    if (text.isEmpty() || !native.is_absolute() || text.contains('\0'))
+        return RV_ERR_UNSUPPORTED;
+    *result = reinterpret_cast<RvBlob*>(&File::create(&host->document(), text).leakRef());
+    return RV_OK;
+}
+
+int32_t rv_file_reader_result(RvEventTarget* reader, int32_t* kind, uint8_t* buffer, int64_t capacity, int64_t* length)
+{
+    return ranvier_file_reader_result(reader, kind, buffer, capacity, length);
+}
+
+int32_t rv_file_reader_error(RvEventTarget* reader, char* buffer, int32_t capacity, int32_t* length)
+{
+    return ranvier_file_reader_error(reader, buffer, capacity, length);
 }
 
 int32_t rv_host_scroll_position(RvHost* host, int32_t* x, int32_t* y)
@@ -2944,6 +3832,24 @@ int32_t rv_element_rect(RvNode* target, double* x, double* y, double* width, dou
     *width = rect.width();
     *height = rect.height();
     return RV_OK;
+}
+
+int32_t rv_node_convert_points(RvNode* from, int32_t fromSpace, RvNode* to, int32_t toSpace, double* xy, int32_t count)
+{
+    if (!from)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_convert_points(from, fromSpace, to, toSpace, xy, count);
+}
+
+int32_t rv_node_box_quad(RvNode* node, int32_t box, RvNode* to, int32_t toSpace, double* quad)
+{
+    if (!node || !quad)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_box_quad(node, box, to, toSpace, quad);
 }
 
 RvNode* rv_host_element_at(RvHost* host, int32_t x, int32_t y)
@@ -4618,6 +5524,29 @@ int32_t rv_ax_children(RvAxNode* handle, RvAxNode** nodes, int32_t capacity, int
     return RV_OK;
 }
 
+int32_t rv_ax_relations(RvAxNode* handle, int32_t kind, RvAxNode** nodes, int32_t capacity, int32_t* count)
+{
+    if (!count)
+        return RV_ERR_NULL_ARGUMENT;
+    if (auto status = axStatus(handle))
+        return status;
+    static constexpr AXRelation relations[] = { AXRelation::ActiveDescendant, AXRelation::ControllerFor, AXRelation::DescribedBy,
+        AXRelation::Details, AXRelation::ErrorMessage, AXRelation::FlowsTo, AXRelation::LabeledBy, AXRelation::OwnerFor };
+    if (kind < 0 || kind >= static_cast<int32_t>(std::size(relations)))
+        return RV_ERR_UNSUPPORTED;
+    Ref object = *axObject(handle);
+    updatedCache(object->document());
+    if (isGone(object))
+        return RV_ERR_DETACHED;
+    auto targets = object->relatedObjects(relations[kind]);
+    *count = static_cast<int32_t>(targets.size());
+    if (!nodes || capacity < *count)
+        return RV_ERR_BUFFER_TOO_SMALL;
+    for (size_t i = 0; i < targets.size(); ++i)
+        nodes[i] = axHandle(targets[i].ptr());
+    return RV_OK;
+}
+
 int32_t rv_ax_action(RvAxNode* handle, int32_t action)
 {
     if (auto status = axStatus(handle))
@@ -4955,4 +5884,137 @@ int32_t rv_ax_text_offset_at(RvAxNode* handle, int32_t x, int32_t y)
         return -1;
     auto point = makeBoundaryPoint(frame->visiblePositionForPoint(view->rootViewToContents(IntPoint { x, y })));
     return inScope(*scope, point) ? textOffset(*scope, point) : -1;
+}
+
+// Text segmentation.
+
+static int32_t textSegmentFailure(RvTextSegments* result, int32_t status)
+{
+    rv_text_segments_release(result);
+    return status;
+}
+
+static char* copyLocale(const char* value)
+{
+    auto length = std::strlen(value ? value : "");
+    auto* copy = static_cast<char*>(std::malloc(length + 1));
+    RELEASE_ASSERT(copy);
+    std::memcpy(copy, value ? value : "", length);
+    copy[length] = 0;
+    return copy;
+}
+
+int32_t rv_text_segment(int32_t granularity, const char* locale, const uint16_t* text, int32_t length, RvTextSegments* result)
+{
+    if (!result || length < 0 || (length && !text))
+        return RV_ERR_NULL_ARGUMENT;
+    *result = { };
+    if (!segmentationInitialized || !onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (granularity < RV_SEGMENT_GRAPHEME || granularity > RV_SEGMENT_LINE)
+        return RV_ERR_UNSUPPORTED;
+    char icuLocale[ULOC_FULLNAME_CAPACITY] = { };
+    if (locale && *locale) {
+        UErrorCode status = U_ZERO_ERROR;
+        int32_t parsed = 0;
+        auto tagLength = static_cast<int32_t>(std::strlen(locale));
+        uloc_forLanguageTag(locale, icuLocale, sizeof(icuLocale), &parsed, &status);
+        if (U_FAILURE(status) || status == U_STRING_NOT_TERMINATED_WARNING || parsed != tagLength)
+            return fail(Exception { ExceptionCode::RangeError, "Incorrect locale information provided"_s });
+    }
+    static constexpr UBreakIteratorType types[] = { UBRK_CHARACTER, UBRK_WORD, UBRK_SENTENCE, UBRK_LINE };
+    auto type = types[granularity];
+    auto* units = reinterpret_cast<const UChar*>(text);
+    UErrorCode status = U_ZERO_ERROR;
+    // An ICU iterator of the same type reports the locale, and serves words and sentences, whose WTF iterators
+    // ignore the locale.
+    UBreakIterator* icu = ubrk_open(type, icuLocale, length ? units : u"", length, &status);
+    if (U_FAILURE(status) || !icu)
+        return textSegmentFailure(result, RV_ERR_UNSUPPORTED);
+    status = U_ZERO_ERROR;
+    result->locale = copyLocale(ubrk_getLocaleByType(icu, ULOC_VALID_LOCALE, &status));
+    Vector<int32_t> starts;
+    Vector<int32_t> wordLike;
+    if (length) {
+        if (granularity == RV_SEGMENT_GRAPHEME || granularity == RV_SEGMENT_LINE) {
+            StringView view { std::span<const char16_t> { reinterpret_cast<const char16_t*>(text), static_cast<size_t>(length) } };
+            TextBreakIterator::Mode mode = TextBreakIterator::CaretMode { };
+            if (granularity == RV_SEGMENT_LINE)
+                mode = TextBreakIterator::LineMode { TextBreakIterator::LineMode::Behavior::Default };
+            CachedTextBreakIterator iterator(view, { }, mode, AtomString { String::fromLatin1(icuLocale) });
+            unsigned position = 0;
+            while (position < static_cast<unsigned>(length)) {
+                starts.append(static_cast<int32_t>(position));
+                auto next = iterator.following(position);
+                if (!next || *next <= position || *next > static_cast<unsigned>(length))
+                    break;
+                position = *next;
+            }
+        } else {
+            for (int32_t start = ubrk_first(icu), end = ubrk_next(icu); end != UBRK_DONE; start = end, end = ubrk_next(icu)) {
+                starts.append(start);
+                if (granularity == RV_SEGMENT_WORD)
+                    wordLike.append(ubrk_getRuleStatus(icu) >= UBRK_WORD_NONE_LIMIT ? 1 : 0);
+            }
+        }
+    }
+    ubrk_close(icu);
+    if (length && granularity != RV_SEGMENT_GRAPHEME) {
+        // A boundary inside a grapheme cluster joins its two segments, so no segment splits a grapheme; a joined
+        // word is word-like when either part is.
+        StringView view { std::span<const char16_t> { reinterpret_cast<const char16_t*>(text), static_cast<size_t>(length) } };
+        CachedTextBreakIterator graphemes(view, { }, TextBreakIterator::CaretMode { }, AtomString { String::fromLatin1(icuLocale) });
+        Vector<int32_t> keptStarts;
+        Vector<int32_t> keptWordLike;
+        for (size_t index = 0; index < starts.size(); ++index) {
+            if (index && !graphemes.isBoundary(static_cast<unsigned>(starts[index]))) {
+                if (granularity == RV_SEGMENT_WORD)
+                    keptWordLike.last() |= wordLike[index];
+                continue;
+            }
+            keptStarts.append(starts[index]);
+            if (granularity == RV_SEGMENT_WORD)
+                keptWordLike.append(wordLike[index]);
+        }
+        starts = WTF::move(keptStarts);
+        wordLike = WTF::move(keptWordLike);
+    }
+    result->count = static_cast<int32_t>(starts.size());
+    if (!starts.isEmpty()) {
+        result->starts = static_cast<int32_t*>(std::malloc(starts.size() * sizeof(int32_t)));
+        RELEASE_ASSERT(result->starts);
+        std::memcpy(result->starts, starts.span().data(), starts.size() * sizeof(int32_t));
+        if (granularity == RV_SEGMENT_WORD) {
+            result->word_like = static_cast<int32_t*>(std::malloc(wordLike.size() * sizeof(int32_t)));
+            RELEASE_ASSERT(result->word_like);
+            std::memcpy(result->word_like, wordLike.span().data(), wordLike.size() * sizeof(int32_t));
+        }
+    }
+    return RV_OK;
+}
+
+int32_t rv_text_segmentation_version(char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!length || capacity < 0 || (capacity && !buffer))
+        return RV_ERR_NULL_ARGUMENT;
+    UVersionInfo icu { };
+    UVersionInfo unicode { };
+    u_getVersion(icu);
+    u_getUnicodeVersion(unicode);
+    auto text = makeString("icu="_s, icu[0], '.', icu[1], " unicode="_s, unicode[0], '.', unicode[1]).utf8();
+    *length = static_cast<int32_t>(text.length());
+    if (capacity < *length)
+        return RV_ERR_BUFFER_TOO_SMALL;
+    std::memcpy(buffer, text.data(), text.length());
+    return RV_OK;
+}
+
+void rv_text_segments_release(RvTextSegments* segments)
+{
+    if (!segments)
+        return;
+    std::free(segments->starts);
+    std::free(segments->word_like);
+    std::free(segments->locale);
+    *segments = { };
 }

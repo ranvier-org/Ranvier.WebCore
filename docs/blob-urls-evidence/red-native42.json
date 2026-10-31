@@ -1,0 +1,1 @@
+{"abi": 50, "has": {"blob-urls": 0, "dom:FileReader": 0, "dom-constructor:FileReader": 0}, "exports": {"rv_dom_domurl_create_object_url": false, "rv_dom_file_reader_create": false, "rv_blob_read": false, "rv_blob_url_read": false, "rv_file_create_from_path": false, "rv_file_reader_result": false}}

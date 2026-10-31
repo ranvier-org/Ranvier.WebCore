@@ -1,0 +1,9 @@
+{
+  "file": "Source/WebCore/dom/Document.cpp",
+  "patch": "C:\\wk\\native-caret\\patches\\0035-caret-position-text-control-shadow-roots.patch",
+  "patchSha256": "756fdb4ef5c6511670ddd8d9144bcb6f5bc0b222d4dc1c74143536736377e5e4",
+  "sourceDiffSha256": "1ecdce5d3519e573bf540bc98a064bccca5c625a13733a8c4a651ef91f625e6c",
+  "assertion": "git diff of the file equals the patch hunk byte for byte",
+  "mtimeNs": 1793430662087056900,
+  "borrowedDocumentUnit": "C:/wk/h05-private/native22-final/023-UnifiedSource-dom-7.cpp.obj"
+}

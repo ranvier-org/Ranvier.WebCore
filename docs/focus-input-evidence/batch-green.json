@@ -1,0 +1,245 @@
+{
+  "candidate": "artifacts/native26-candidate-3 (private win-x64 slim, build_native26.py, parent native25-candidate-3 read-only)",
+  "sourceHead": "d96f53bf3a84c9d1551a4453b156587859701d2a",
+  "probes": [
+    {
+      "name": "css_supports",
+      "exitCode": 0,
+      "assertions": 72,
+      "logSha256": "05fd7ee5d224db2bdda49560178074bf6224c29dfed768643c846465a3ab3934"
+    },
+    {
+      "name": "computed_style",
+      "exitCode": 0,
+      "assertions": 93,
+      "logSha256": "70ebb4d87e4cd0001182e37a9082c86ea0337184fdf093a1af5135b7f903c4a7"
+    },
+    {
+      "name": "fragment_rectangles",
+      "exitCode": 0,
+      "assertions": 140,
+      "logSha256": "57a9638643ef3082abeb95f7b9f252efe211cab6677aca91510c564b52b97d40"
+    },
+    {
+      "name": "table_surface",
+      "exitCode": 0,
+      "assertions": 44,
+      "logSha256": "8bae3582a7fb2f662138794d8f64ab15bda8da5b98a4d71e7afab8e74c70b312"
+    },
+    {
+      "name": "element_reflection",
+      "exitCode": 0,
+      "assertions": 269,
+      "logSha256": "58175ae7a9e94642aaa3480e343152e27b64eac99c977e48f6c6ec7963e93bd4"
+    },
+    {
+      "name": "area_surface",
+      "exitCode": 0,
+      "assertions": 117,
+      "logSha256": "968d2113dff8c257fdbe03256fa57d16913f6043213f4b0af43d768c0b17d49a"
+    },
+    {
+      "name": "cssom_surface",
+      "exitCode": 0,
+      "assertions": 407,
+      "logSha256": "6fedf047a7e46989b2d1590a07e9b8e42c6399a07c0bb7fb1ddf72f7c7bda910"
+    },
+    {
+      "name": "keyframe_rules",
+      "exitCode": 0,
+      "assertions": 93,
+      "logSha256": "f6bee323788d263ad2cbf2f40d7e14126ae0953bf2756be2b5bb445abb427733"
+    },
+    {
+      "name": "counter_style_rules",
+      "exitCode": 0,
+      "assertions": 86,
+      "logSha256": "b2bc8e2d39c7a86523d540ceb732205aadfb4f3fef3d88f51f0c57ec6ab26584"
+    },
+    {
+      "name": "detached_cssom_context",
+      "exitCode": 0,
+      "assertions": 389,
+      "logSha256": "848ae3d09d5a9e63440a50d7af89f95236d133df48399209146c792944017c0d"
+    },
+    {
+      "name": "svg_mathml_surface",
+      "exitCode": 0,
+      "assertions": 95,
+      "logSha256": "6221d6c18fff05c9aa0010b9b3c6edc3a4752fa82b16782d2182769e16c7e036"
+    },
+    {
+      "name": "style_property_maps",
+      "exitCode": 0,
+      "assertions": 189,
+      "logSha256": "93d43c1f4e7a811536d7dae8186ad03f818049107c5a612eeb1767a257f8faa6"
+    },
+    {
+      "name": "declared_style_maps",
+      "exitCode": 0,
+      "assertions": 2069,
+      "logSha256": "17c73785458969864abeae85d5f935572174e29b1eecff1a771fa90978c23b7b"
+    },
+    {
+      "name": "style_map_entries",
+      "exitCode": 0,
+      "assertions": 144,
+      "logSha256": "a301369b66f47a650587c8bb2ac3011aa9be133a4675428c8d8d96dc271c343d"
+    },
+    {
+      "name": "typed_style_values",
+      "exitCode": 0,
+      "assertions": 190,
+      "logSha256": "4e691d16e784408ffec8a6f48c76916dab3c05c1053eeb73ae1e70c51e3718d1"
+    },
+    {
+      "name": "custom_properties",
+      "exitCode": 0,
+      "assertions": 231,
+      "logSha256": "96880645c1fc2da5221bba93ca4b419fc04154cdc2e74a40837edfa45cebbe72"
+    },
+    {
+      "name": "geometry_values",
+      "exitCode": 0,
+      "assertions": 260,
+      "logSha256": "29be327c4ca69a4a3daa3125018c3fd6bf49b541073fb1200180fb70117e8ad5"
+    },
+    {
+      "name": "matrix_values",
+      "exitCode": 0,
+      "assertions": 1091,
+      "logSha256": "072aefb0eecf088e70d410235077a7bc5efeeffa1d27a5af9dc62145229d150e"
+    },
+    {
+      "name": "css_transforms",
+      "exitCode": 0,
+      "assertions": 405,
+      "logSha256": "5890f78ca29b51c5d29d09139f3d93d92de5346d724bdd72119c2d52b6a278ba"
+    },
+    {
+      "name": "svg_geometry",
+      "exitCode": 0,
+      "assertions": 639,
+      "logSha256": "2fe8049b46ffce2bd4b349dfdd7066caeda689ee3ec0dcdb9f86861c58ed76cb"
+    },
+    {
+      "name": "svg_surfaces",
+      "exitCode": 0,
+      "assertions": 1594,
+      "logSha256": "836c19207512a19d33faf26d61626eddb6f8dcca8d5f1c2b3b9551d69cc68a74"
+    },
+    {
+      "name": "svg_documents",
+      "exitCode": 0,
+      "assertions": 78,
+      "logSha256": "70715fb4da194d2073a68d432087ae0b316e1b35fcd23c300fe24b150ecfa702"
+    },
+    {
+      "name": "svg_view_controls",
+      "exitCode": 0,
+      "assertions": 318,
+      "logSha256": "2dbdea20c9425e470f860ad8f303fbc8053ce0674e59f96ac24b28853324f6ca"
+    },
+    {
+      "name": "svg_animation_variants",
+      "exitCode": 0,
+      "assertions": 70,
+      "logSha256": "f1bfd6a2fac87ec95676243aaa313b97d3d9ecdbfbbeb172885a8d6eeb76daaf"
+    },
+    {
+      "name": "capabilities",
+      "exitCode": 0,
+      "assertions": null,
+      "logSha256": "b0ac8a8668e7703b7cbe8342c99a9fd75372aef974aead90f62662593a8e9517"
+    },
+    {
+      "name": "svg_view_selection",
+      "exitCode": 0,
+      "assertions": null,
+      "logSha256": "d20a490dafd4ee5fa1d5a064c7ad95f338aa9f3d6765740bbf6ac79b53bdbe3a"
+    },
+    {
+      "name": "svg_paint_servers",
+      "exitCode": 0,
+      "assertions": 565,
+      "logSha256": "4fee53f7e062bb018ebea3b6218dfca73e4fe5cf6a563e36e925c18650dc3731"
+    },
+    {
+      "name": "svg_filters",
+      "exitCode": 0,
+      "assertions": 9086,
+      "logSha256": "866b9c9713548497e6e0a475a65b51c9097d8344f2a8f99073ee8c3a65d1ac32"
+    },
+    {
+      "name": "svg_clip_mask_marker",
+      "exitCode": 0,
+      "assertions": 565,
+      "logSha256": "e16f521e717f252b4f1ea93688bded2b355b95918481a3fe4c93e1c1770a0b55"
+    },
+    {
+      "name": "svg_resources",
+      "exitCode": 0,
+      "assertions": 454,
+      "logSha256": "a205f7e30a24e5a88f3d18a06349efafde93d4c2217bf46e5655bf2df54683ce"
+    },
+    {
+      "name": "mathml_surface",
+      "exitCode": 0,
+      "assertions": 371,
+      "logSha256": "56d48519e6426f8dd3b9ce30e425e4bcdb8706a31bad44a061392e1d903d4ac5"
+    },
+    {
+      "name": "svg_tests_lists",
+      "exitCode": 0,
+      "assertions": 191,
+      "logSha256": "acf281005da2802259647ade5f0a0d4ee2599f3d9012e65ccadad5643e3f7d4e"
+    },
+    {
+      "name": "image_decode",
+      "exitCode": 0,
+      "assertions": 73,
+      "logSha256": "0cb02cdccf39530fe8ef1ad533a3c4b0d3b2e202230554dad05ddaf6122d38b4"
+    },
+    {
+      "name": "font_load",
+      "exitCode": 0,
+      "assertions": 42,
+      "logSha256": "d6029d08dee119055173a34aa1ac184857e9eb48b2211008721ccd8dfc03d155"
+    },
+    {
+      "name": "event_construction",
+      "exitCode": 0,
+      "assertions": 82,
+      "logSha256": "7a0a95498b578b237f423c6fcaffc384f75b0485ce7de4cc4d3f44611724a98a"
+    },
+    {
+      "name": "tree_traversal",
+      "exitCode": 0,
+      "assertions": 22285,
+      "logSha256": "f28092037b213721bb8660488972b271d69faf844d1ecea669fd907e6794b157"
+    },
+    {
+      "name": "focus_input",
+      "exitCode": 0,
+      "assertions": 80,
+      "logSha256": "6500eb7b15f69d453ac2f3ddd062a96f97752ecef04427b1b924f3e73d1fd94e"
+    },
+    {
+      "name": "frames",
+      "exitCode": 0,
+      "assertions": null,
+      "logSha256": "478594c4ee6c55ad3b8a9cf01b4a10088fe955daff9f8c4e8b2c8aaf6364ce47"
+    },
+    {
+      "name": "teardown",
+      "exitCode": 0,
+      "assertions": null,
+      "logSha256": "ba5a36853efec05c973933666bad4b78cf5e529fbb8e6bea69188b8d5173372d"
+    }
+  ],
+  "totalAssertions": 42877,
+  "driverTeardownCases": 58,
+  "red": "red-native25.log: Native25 candidate-3 reports ABI 33 and no input-state feature",
+  "measuredFirstActivation": "Before the host fix, the first rv_host_set_focused(1) fired two window focus events (FocusController::setFocusedFrame and setActivityState); one after.",
+  "measuredWindowLifetime": "rv_host_load_html and rv_host_load_svg keep the host window and its listeners (DocumentWriter::begin on the initial-empty-document state)."
+}

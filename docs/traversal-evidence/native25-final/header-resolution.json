@@ -1,0 +1,18 @@
+{
+  "C:/wk/src/Source/WebCore/html/HTMLImageElement.h": [
+    "000-RanvierDomGlue.cpp.obj.log",
+    "RanvierResourceGlue.log"
+  ],
+  "C:/wk/src/Source/WebCore/loader/ImageLoader.h": [
+    "000-RanvierDomGlue.cpp.obj.log",
+    "RanvierResourceGlue.log"
+  ],
+  "C:/wk/src/Source/WebCore/svg/SVGImageElement.h": [
+    "000-RanvierDomGlue.cpp.obj.log",
+    "RanvierResourceGlue.log"
+  ],
+  "C:/wk/src/Source/WebCore/svg/SVGImageLoader.h": [
+    "000-RanvierDomGlue.cpp.obj.log",
+    "RanvierResourceGlue.log"
+  ]
+}

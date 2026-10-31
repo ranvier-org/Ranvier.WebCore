@@ -1,0 +1,435 @@
+[
+  {
+    "name": "css_supports",
+    "assertions": 72,
+    "exitCode": 0,
+    "baselineAssertions": 72,
+    "sameCount": true
+  },
+  {
+    "name": "computed_style",
+    "assertions": 93,
+    "exitCode": 0,
+    "baselineAssertions": 93,
+    "sameCount": true
+  },
+  {
+    "name": "fragment_rectangles",
+    "assertions": 140,
+    "exitCode": 0,
+    "baselineAssertions": 140,
+    "sameCount": true
+  },
+  {
+    "name": "table_surface",
+    "assertions": 44,
+    "exitCode": 0,
+    "baselineAssertions": 44,
+    "sameCount": true
+  },
+  {
+    "name": "element_reflection",
+    "assertions": 269,
+    "exitCode": 0,
+    "baselineAssertions": 269,
+    "sameCount": true
+  },
+  {
+    "name": "area_surface",
+    "assertions": 117,
+    "exitCode": 0,
+    "baselineAssertions": 117,
+    "sameCount": true
+  },
+  {
+    "name": "cssom_surface",
+    "assertions": 407,
+    "exitCode": 0,
+    "baselineAssertions": 407,
+    "sameCount": true
+  },
+  {
+    "name": "keyframe_rules",
+    "assertions": 93,
+    "exitCode": 0,
+    "baselineAssertions": 93,
+    "sameCount": true
+  },
+  {
+    "name": "counter_style_rules",
+    "assertions": 86,
+    "exitCode": 0,
+    "baselineAssertions": 86,
+    "sameCount": true
+  },
+  {
+    "name": "detached_cssom_context",
+    "assertions": 389,
+    "exitCode": 0,
+    "baselineAssertions": 389,
+    "sameCount": true
+  },
+  {
+    "name": "svg_mathml_surface",
+    "assertions": 95,
+    "exitCode": 0,
+    "baselineAssertions": 95,
+    "sameCount": true
+  },
+  {
+    "name": "style_property_maps",
+    "assertions": 189,
+    "exitCode": 0,
+    "baselineAssertions": 189,
+    "sameCount": true
+  },
+  {
+    "name": "declared_style_maps",
+    "assertions": 2069,
+    "exitCode": 0,
+    "baselineAssertions": 2069,
+    "sameCount": true
+  },
+  {
+    "name": "style_map_entries",
+    "assertions": 144,
+    "exitCode": 0,
+    "baselineAssertions": 144,
+    "sameCount": true
+  },
+  {
+    "name": "typed_style_values",
+    "assertions": 190,
+    "exitCode": 0,
+    "baselineAssertions": 190,
+    "sameCount": true
+  },
+  {
+    "name": "custom_properties",
+    "assertions": 231,
+    "exitCode": 0,
+    "baselineAssertions": 231,
+    "sameCount": true
+  },
+  {
+    "name": "geometry_values",
+    "assertions": 260,
+    "exitCode": 0,
+    "baselineAssertions": 260,
+    "sameCount": true
+  },
+  {
+    "name": "matrix_values",
+    "assertions": 1091,
+    "exitCode": 0,
+    "baselineAssertions": 1091,
+    "sameCount": true
+  },
+  {
+    "name": "css_transforms",
+    "assertions": 405,
+    "exitCode": 0,
+    "baselineAssertions": 405,
+    "sameCount": true
+  },
+  {
+    "name": "svg_geometry",
+    "assertions": 639,
+    "exitCode": 0,
+    "baselineAssertions": 639,
+    "sameCount": true
+  },
+  {
+    "name": "svg_surfaces",
+    "assertions": 1594,
+    "exitCode": 0,
+    "baselineAssertions": 1594,
+    "sameCount": true
+  },
+  {
+    "name": "svg_documents",
+    "assertions": 78,
+    "exitCode": 0,
+    "baselineAssertions": 78,
+    "sameCount": true
+  },
+  {
+    "name": "svg_view_controls",
+    "assertions": 318,
+    "exitCode": 0,
+    "baselineAssertions": 318,
+    "sameCount": true
+  },
+  {
+    "name": "svg_animation_variants",
+    "assertions": 70,
+    "exitCode": 0,
+    "baselineAssertions": 70,
+    "sameCount": true
+  },
+  {
+    "name": "capabilities",
+    "assertions": null,
+    "exitCode": 0,
+    "baselineAssertions": null,
+    "sameCount": true
+  },
+  {
+    "name": "svg_view_selection",
+    "assertions": null,
+    "exitCode": 0,
+    "baselineAssertions": null,
+    "sameCount": true
+  },
+  {
+    "name": "svg_paint_servers",
+    "assertions": 565,
+    "exitCode": 0,
+    "baselineAssertions": 565,
+    "sameCount": true
+  },
+  {
+    "name": "svg_filters",
+    "assertions": 9086,
+    "exitCode": 0,
+    "baselineAssertions": 9086,
+    "sameCount": true
+  },
+  {
+    "name": "svg_clip_mask_marker",
+    "assertions": 565,
+    "exitCode": 0,
+    "baselineAssertions": 565,
+    "sameCount": true
+  },
+  {
+    "name": "svg_resources",
+    "assertions": 454,
+    "exitCode": 0,
+    "baselineAssertions": 454,
+    "sameCount": true
+  },
+  {
+    "name": "mathml_surface",
+    "assertions": 371,
+    "exitCode": 0,
+    "baselineAssertions": 371,
+    "sameCount": true
+  },
+  {
+    "name": "svg_tests_lists",
+    "assertions": 191,
+    "exitCode": 0,
+    "baselineAssertions": 191,
+    "sameCount": true
+  },
+  {
+    "name": "image_decode",
+    "assertions": 73,
+    "exitCode": 0,
+    "baselineAssertions": 73,
+    "sameCount": true
+  },
+  {
+    "name": "font_load",
+    "assertions": 42,
+    "exitCode": 0,
+    "baselineAssertions": 42,
+    "sameCount": true
+  },
+  {
+    "name": "event_construction",
+    "assertions": 82,
+    "exitCode": 0,
+    "baselineAssertions": 82,
+    "sameCount": true
+  },
+  {
+    "name": "tree_traversal",
+    "assertions": 22285,
+    "exitCode": 0,
+    "baselineAssertions": 22285,
+    "sameCount": true
+  },
+  {
+    "name": "focus_input",
+    "assertions": 80,
+    "exitCode": 0,
+    "baselineAssertions": 80,
+    "sameCount": true
+  },
+  {
+    "name": "viewport_events",
+    "assertions": 364,
+    "exitCode": 0,
+    "baselineAssertions": 364,
+    "sameCount": true
+  },
+  {
+    "name": "form_collections",
+    "assertions": 1168,
+    "exitCode": 0,
+    "baselineAssertions": 1168,
+    "sameCount": true
+  },
+  {
+    "name": "form_navigation",
+    "assertions": null,
+    "exitCode": 0,
+    "baselineAssertions": null,
+    "sameCount": true
+  },
+  {
+    "name": "viewport_scroll",
+    "assertions": 3232,
+    "exitCode": 0,
+    "baselineAssertions": 3232,
+    "sameCount": true
+  },
+  {
+    "name": "dialog_popover",
+    "assertions": 845,
+    "exitCode": 0,
+    "baselineAssertions": 845,
+    "sameCount": true
+  },
+  {
+    "name": "binary_values",
+    "assertions": 446,
+    "exitCode": 0,
+    "baselineAssertions": 446,
+    "sameCount": true
+  },
+  {
+    "name": "caret_hit",
+    "assertions": 18251,
+    "exitCode": 0,
+    "baselineAssertions": 18251,
+    "sameCount": true
+  },
+  {
+    "name": "url_values",
+    "assertions": 3538,
+    "exitCode": 0,
+    "baselineAssertions": 3538,
+    "sameCount": true
+  },
+  {
+    "name": "url_wpt",
+    "assertions": null,
+    "exitCode": 0,
+    "baselineAssertions": null,
+    "sameCount": true
+  },
+  {
+    "name": "form_submission",
+    "assertions": 418,
+    "exitCode": 0,
+    "baselineAssertions": 418,
+    "sameCount": true
+  },
+  {
+    "name": "text_segmentation",
+    "assertions": 812,
+    "exitCode": 0,
+    "baselineAssertions": 812,
+    "sameCount": true
+  },
+  {
+    "name": "crypto_random",
+    "assertions": 275,
+    "exitCode": 0,
+    "baselineAssertions": 275,
+    "sameCount": true
+  },
+  {
+    "name": "visual_viewport",
+    "assertions": 987,
+    "exitCode": 0,
+    "baselineAssertions": 987,
+    "sameCount": true
+  },
+  {
+    "name": "screen_metrics",
+    "assertions": 222,
+    "exitCode": 0,
+    "baselineAssertions": 222,
+    "sameCount": true
+  },
+  {
+    "name": "custom_highlights",
+    "assertions": 378,
+    "exitCode": 0,
+    "baselineAssertions": 378,
+    "sameCount": true
+  },
+  {
+    "name": "abi_layouts",
+    "assertions": 15,
+    "exitCode": 0,
+    "baselineAssertions": 15,
+    "sameCount": true
+  },
+  {
+    "name": "event_details",
+    "assertions": 391,
+    "exitCode": 0,
+    "baselineAssertions": 391,
+    "sameCount": true
+  },
+  {
+    "name": "aria_relations",
+    "assertions": 1210,
+    "exitCode": 0,
+    "baselineAssertions": 1210,
+    "sameCount": true
+  },
+  {
+    "name": "inspector_diagnostics",
+    "assertions": 929,
+    "exitCode": 0,
+    "baselineAssertions": 929,
+    "sameCount": true
+  },
+  {
+    "name": "string_nul",
+    "assertions": 192,
+    "exitCode": 0,
+    "baselineAssertions": 192,
+    "sameCount": true
+  },
+  {
+    "name": "native_types",
+    "assertions": null,
+    "exitCode": 0,
+    "baselineAssertions": null,
+    "sameCount": true
+  },
+  {
+    "name": "blob_urls",
+    "assertions": 697,
+    "exitCode": 0,
+    "baselineAssertions": 697,
+    "sameCount": true
+  },
+  {
+    "name": "coordinate_spaces",
+    "assertions": 6803,
+    "exitCode": 0,
+    "new": true
+  },
+  {
+    "name": "frames",
+    "assertions": null,
+    "exitCode": 0,
+    "baselineAssertions": null,
+    "sameCount": true
+  },
+  {
+    "name": "teardown",
+    "assertions": null,
+    "exitCode": 0,
+    "baselineAssertions": null,
+    "sameCount": true
+  }
+]

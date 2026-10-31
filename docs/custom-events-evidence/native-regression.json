@@ -1,0 +1,290 @@
+{
+  "runtime": {
+    "brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
+    "brotlidec.dll": "d42e2160f76f29a91f8be01b009b585c45496219794e16eab90b3599b6f70a7f",
+    "harfbuzz-icu.dll": "27662b477f7cb0c20cee64543a06296a48a00a17b6c7b57629bb166a30d5b164",
+    "harfbuzz.dll": "b519b2abc7f446ca45bff77aae1708f45afc9f557698bcd7295837cce0f12bfa",
+    "icudt77.dll": "b00d2fb856f548608c137e771257a70d0722654535c6c00b371c0fab3e2b802c",
+    "icuin77.dll": "e3785739e1fcf2e38053bbb85ef5f0f5dab63f865cbda762da5258566085a240",
+    "icuuc77.dll": "189c623f996c41488c262867bae04a5bb33dd485bd423e0a8bec05c455a90902",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+    "jpeg62.dll": "394811c1b1bf1fd914248a145ba3fcad1f5f27c7009754ce08e48ccb0266b785",
+    "libpng16.dll": "8b46592c5ea338dd6b23ca380d6db64a7849c2a534fc465a006ec668645d8185",
+    "libsharpyuv.dll": "df165de83480692f494c23061ef9c40c10abe19a89b1fa9fae2f1cd5152c07a7",
+    "libwebp.dll": "550c5a4860f61d32a274fdd7b5c8cbe266eee28b3a3ca888195248ea1d5e0f71",
+    "libwebpdemux.dll": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163",
+    "libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
+    "libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
+    "RanvierWebCoreHost.dll": "b02be2f42d28d7721ab4406c3be7c3741dc1a9f04f663f635e8bb595ab5a6edf",
+    "RanvierWebCoreHost.lib": "7d0c4b7f5e64932f23c30529517535d238f09145c11f113496e75734b2d441cb",
+    "RanvierWebCoreHost.pdb": "4d1bcc4415dd95cfd812c71dc8aa0a8f4925c77ffd32a5941c93d4a857678e9d",
+    "WebCore.dll": "16181e6fd8c2c877a682c02b4f5e82497fdc3b1f144a9f2b64896f515aaff972",
+    "WebCore.lib": "604d9f45802d3a9cfffdd7d7dda37cd66e74d81e478ee168aa545743b5689271",
+    "WebCore.pdb": "86af0749e1a3eac3d62c6dc807dd0af7c0926ff8aa4878ac8810b69e3c75c7c3",
+    "zlib1.dll": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93"
+  },
+  "records": [
+    {
+      "probe": "area_surface",
+      "exitCode": 0,
+      "logSha256": "32426b7bbab8afdc8f9f477885328c016e02cb3d07ad4792027e615bedb6973b",
+      "pass": [
+        "PASS HTML area surface: 117 assertions; retained handles released"
+      ]
+    },
+    {
+      "probe": "capabilities",
+      "exitCode": 0,
+      "logSha256": "fbdb2f0cfe68e58120f9e43c9c3550394b19f03a7fb7ac0ddbd666e6d922a468",
+      "pass": []
+    },
+    {
+      "probe": "computed_style",
+      "exitCode": 0,
+      "logSha256": "b6b28f4d0ab0e6f7432409d4f95d1414892b2f1dbba95bb6b1c48d48b98e4ea9",
+      "pass": [
+        "PASS computed style: 93 assertions; retained handles released"
+      ]
+    },
+    {
+      "probe": "counter_style_rules",
+      "exitCode": 0,
+      "logSha256": "ad5d922f8f396ba0d59ecdab181dd955d7a00e0ced0759dcda27e2c0fe6e831b",
+      "pass": [
+        "PASS counter style name/render effects: 86 assertions; retained handles released"
+      ]
+    },
+    {
+      "probe": "css_supports",
+      "exitCode": 0,
+      "logSha256": "c3de2f4c58618bdaccf143d004b6930304181128d1c91a152aaeeb619e897877",
+      "pass": [
+        "PASS CSS supports: 72 assertions; retained handles released"
+      ]
+    },
+    {
+      "probe": "css_transforms",
+      "exitCode": 0,
+      "logSha256": "f7c18122272231860af27df770dcc994a0898793c79240978afe3a954752a702",
+      "pass": [
+        "PASS typed CSS transforms: 405 assertions"
+      ]
+    },
+    {
+      "probe": "cssom_surface",
+      "exitCode": 0,
+      "logSha256": "2844115aaf13b6a0c3706b8a0429508885b787ae1a0bdce8ed6848f00e102e0b",
+      "pass": [
+        "PASS CSSOM surface: 407 assertions; retained handles released"
+      ]
+    },
+    {
+      "probe": "custom_properties",
+      "exitCode": 0,
+      "logSha256": "4977d1ac5d3c9388fcdacfec143b2a6b95c9f375d2e21d826d4de55351b8f8f3",
+      "pass": [
+        "PASS custom property registration: 231 assertions; retained handles released"
+      ]
+    },
+    {
+      "probe": "declared_style_maps",
+      "exitCode": 0,
+      "logSha256": "5190ee867cbd14249b27591f7766676118d199dc8df395a5806f78289964a0b7",
+      "pass": [
+        "PASS declared COW case: inline-custom-important",
+        "PASS declared COW case: expired-weak-owner",
+        "PASS declared typed style maps: 2069 assertions; six fresh-pair mutators; retained handles released"
+      ]
+    },
+    {
+      "probe": "detached_cssom_context",
+      "exitCode": 0,
+      "logSha256": "495e15a6bf39ff5a6baee26169f3095c1817e69a63513d5d86f29308b6cecc79",
+      "pass": [
+        "PASS detached CSSOM settings context: 389 assertions; handles released; settings toggle not exercised"
+      ]
+    },
+    {
+      "probe": "element_reflection",
+      "exitCode": 0,
+      "logSha256": "c94276cd43fb2254a55013d6217cb5e6d93edd7190c15f08a4265b61e6301d8c",
+      "pass": [
+        "PASS HTML reflection surface: 269 assertions; retained nodes released"
+      ]
+    },
+    {
+      "probe": "event_construction",
+      "exitCode": 0,
+      "logSha256": "a979e34ba100cec1dfa46ec989f8ac3e198555288a209e0480d5ae03b0ea4069",
+      "pass": [
+        "PASS event construction: 82 assertions; teardown 2 cases"
+      ]
+    },
+    {
+      "probe": "font_load",
+      "exitCode": 0,
+      "logSha256": "c3a9f4ea6430d8aa95f02f6b3ed6f3468eb1e39882d6b8c4d4f64746a87a9c49",
+      "pass": [
+        "PASS font load: 42 assertions"
+      ]
+    },
+    {
+      "probe": "fragment_rectangles",
+      "exitCode": 0,
+      "logSha256": "c9dd4e4f813c81dbe622bd46ff47a3be86bc3740652b6bf178668e1aaa96d5e8",
+      "pass": [
+        "PASS fragment rectangles: 140 assertions; retained handles released"
+      ]
+    },
+    {
+      "probe": "geometry_values",
+      "exitCode": 0,
+      "logSha256": "35cde51246af1ab84e71935fb75086002b81ce8251f5cccf6400c226aa8a4e10",
+      "pass": [
+        "PASS geometry values: 260 assertions"
+      ]
+    },
+    {
+      "probe": "image_decode",
+      "exitCode": 0,
+      "logSha256": "39058800143a4456e243873417cbd683e8a9c5e682a2784af86e44b6484f2da6",
+      "pass": [
+        "PASS image decode: 73 assertions"
+      ]
+    },
+    {
+      "probe": "keyframe_rules",
+      "exitCode": 0,
+      "logSha256": "b313a5540e8914402c824f0b74c11c731ea937b28c8b20b7ed3340923f05a280",
+      "pass": [
+        "PASS keyframe rule effects: 93 assertions; retained handles released"
+      ]
+    },
+    {
+      "probe": "matrix_values",
+      "exitCode": 0,
+      "logSha256": "f2667e24039a0dfa370ac5655b2829146c70ff14ab327727f7702f9ea8f43c6e",
+      "pass": [
+        "PASS matrix values: 1091 assertions"
+      ]
+    },
+    {
+      "probe": "style_map_entries",
+      "exitCode": 0,
+      "logSha256": "7ae684943c7ebb55b54186ac52b7714dd6add6896a25c393f6a8457979f65e66",
+      "pass": [
+        "PASS typed style map entries: 144 assertions; owned snapshots released"
+      ]
+    },
+    {
+      "probe": "style_property_maps",
+      "exitCode": 0,
+      "logSha256": "e8d44bd25a87438864c9b3aba773f56c578b5b63d3ec0bb90830743b40fe1b88",
+      "pass": [
+        "PASS typed style maps: 189 assertions; retained handles released"
+      ]
+    },
+    {
+      "probe": "svg_animation_variants",
+      "exitCode": 0,
+      "logSha256": "720dff7e0cde52e313d37a638b0ace3e8221cc8af2a8e0742d487879ce0b8d14",
+      "pass": [
+        "PASS SVG animation variants: 70 assertions"
+      ]
+    },
+    {
+      "probe": "svg_clip_mask_marker",
+      "exitCode": 0,
+      "logSha256": "f9a197e5fb0496fdc3d2e2364a805e837ab32423acc41b98647da35001e505f7",
+      "pass": [
+        "PASS SVG clip/mask/marker: 565 assertions"
+      ]
+    },
+    {
+      "probe": "svg_documents",
+      "exitCode": 0,
+      "logSha256": "14079d33287751c2a823e61217a4922c0c55a2e5a8f87ae532270898d1cdb03c",
+      "pass": [
+        "PASS SVG documents: 78 assertions"
+      ]
+    },
+    {
+      "probe": "svg_filters",
+      "exitCode": 0,
+      "logSha256": "0d355b4687ad2dfb932faaa422ae437e27b7c3e2546a2729e39ee3d8db195b75",
+      "pass": [
+        "PASS SVG filters: 9086 assertions"
+      ]
+    },
+    {
+      "probe": "svg_geometry",
+      "exitCode": 0,
+      "logSha256": "88cd92ea07ff0b99f9e2cb34cfb555db53d14239866128e460cca2d29aba31f2",
+      "pass": [
+        "PASS SVG geometry: 639 assertions"
+      ]
+    },
+    {
+      "probe": "svg_mathml_surface",
+      "exitCode": 0,
+      "logSha256": "14e8d3fbd412af68bf09c90f51fd8aae1678c10f4b27b52aea16813b69635976",
+      "pass": [
+        "PASS SVG/MathML shared members: 95 assertions; retained handles released"
+      ]
+    },
+    {
+      "probe": "svg_paint_servers",
+      "exitCode": 0,
+      "logSha256": "3d5fc31a62574ef7e5d7c1c30892ee1fb26b262982f9ea66984d4d3239491c0c",
+      "pass": [
+        "PASS SVG paint servers: 565 assertions"
+      ]
+    },
+    {
+      "probe": "svg_resources",
+      "exitCode": 0,
+      "logSha256": "4c5c95e31fa052decb7fce153152a783608f8d4f86358fd9085cc958e8467321",
+      "pass": [
+        "PASS SVG resources: 454 assertions"
+      ]
+    },
+    {
+      "probe": "svg_surfaces",
+      "exitCode": 0,
+      "logSha256": "94f3f87502f0a1d34d9b2ca868f6d0e35f749fac66be97460f4855e03468d686",
+      "pass": [
+        "PASS SVG surfaces: 1594 assertions"
+      ]
+    },
+    {
+      "probe": "svg_view_controls",
+      "exitCode": 0,
+      "logSha256": "182946be76004d596f5dafe3887f79bd69e03ab511b65f3518190119535f4457",
+      "pass": [
+        "PASS SVG view controls: 318 assertions"
+      ]
+    },
+    {
+      "probe": "svg_view_selection",
+      "exitCode": 0,
+      "logSha256": "7547979732a7a5f043a3973728133a7367d62f96b0ca22d1ac497b2d94f912ac",
+      "pass": []
+    },
+    {
+      "probe": "table_surface",
+      "exitCode": 0,
+      "logSha256": "f92c727bbf4eb5e09eb9bac35efbadfeac541110acfbb650c4a57b5ce90337f3",
+      "pass": [
+        "PASS native table editor surface: 44 assertions; retained handles released"
+      ]
+    },
+    {
+      "probe": "typed_style_values",
+      "exitCode": 0,
+      "logSha256": "d35562b96b33ac4ab1b9150e2cdae8e22a9aa2500a5a0add2fb07a9b5961d0d7",
+      "pass": [
+        "PASS typed CSS values: 190 assertions; retained handles released"
+      ]
+    }
+  ]
+}

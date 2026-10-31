@@ -1,0 +1,2 @@
+    raise AssertionError(label)
+AssertionError: ABI version 36

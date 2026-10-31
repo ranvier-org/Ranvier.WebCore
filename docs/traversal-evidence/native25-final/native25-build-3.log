@@ -1,0 +1,3 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+MSVC 14.50.35717 - tested: 14.50.35717
+D01 TRAVERSAL CANDIDATE READY: C:\wk\native-traversal\artifacts\native25-candidate-3\runtime {'WebCore.dll': '5301af3c', 'RanvierWebCoreHost.dll': 'f4866506', 'JavaScriptCore.dll': '95149cdc'}

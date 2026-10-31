@@ -77,9 +77,8 @@ queries borrow a Document and call `DOMCSSNamespace::supports` with its parser s
 namespace and member feature gates all apply. Unselected namespace members stay excluded.
 
 `rv_dom_css_supports_2` tests a property/value pair and `rv_dom_css_supports_1` tests a condition.
-Each string is a `const uint8_t*` plus signed byte length. Empty spans may use NULL; negative lengths,
-NULL with a nonzero length and invalid UTF-8 return `RV_ERR_NULL_ARGUMENT`. Embedded NUL is preserved.
-Existing null-terminated string signatures retain their transport. Failed calls preserve the result.
+Each string is a `const uint8_t*` plus signed byte length, as every generated string input is. Failed calls
+preserve the result.
 
 Run `python -I tests/abi/css_supports.py --native-directory <staged-native-directory>` for real parser,
 complete-input and receiver/thread validation. Every packaged slim CI target runs this probe.
@@ -89,6 +88,17 @@ complete-input and receiver/thread validation. Every packaged slim CI target run
 element or pseudo-element. A windowless context returns unsupported. Nullable input spans use
 length -1 for null, zero for empty and positive lengths for complete UTF-8; invalid spans preserve
 the result. Namespace and Window operations remain facade metadata rather than invented interface members.
+
+`windowObjectBindings` selects the operations of the object a readonly Window attribute holds (`accessor`), called
+through the Window of a checked Document: `rv_dom_crypto_random_uuid` calls `window()->crypto().randomUUID()`. A
+windowless document returns unsupported. The functions are facades whose contract owner is the object's interface.
+
+`typedArrayViewTypes` maps a top-level `[ReturnValue]` argument of a listed type (`ArrayBufferView`) to three
+parameters: an `RV_DOM_ARRAY_BUFFER_VIEW_*` element kind, a writable `uint8_t*` buffer and its `int32_t` byte length.
+The glue builds a view of that kind over a copy of the bytes, calls the member, and copies the bytes back on `RV_OK`,
+which stands for the returned view. A byte length that is not a multiple of the element size raises RangeError, and an
+unknown kind returns `RV_ERR_UNSUPPORTED`. A listed type nested in a union or sequence, as a result, or without
+`[ReturnValue]` is not mapped.
 
 Non-nullable IDL string results convert null internal engine strings to empty strings, matching
 browser DOM conversion. Nullable string results preserve null. This includes empty computed
@@ -127,13 +137,14 @@ the member belongs to; the IDL arguments follow in order; the result comes last,
 
 | IDL type | In | Out |
 |---|---|---|
-| `DOMString`, `USVString`, `ByteString` | `const char*`, UTF-8 | `char* buffer, int32_t capacity, int32_t* length`, as `rv_node_get_string`: `*length` -1 for null |
-| a union of strings and Trusted Types, such as `(TrustedHTML or DOMString)` | `const char*`, passed as the union's string | as a string |
+| `DOMString`, `USVString`, `ByteString` | `const uint8_t*` UTF-8 and `int32_t` byte length | `char* buffer, int32_t capacity, int32_t* length`, as `rv_node_get_string`: `*length` -1 for null |
+| a union of strings and Trusted Types, such as `(TrustedHTML or DOMString)` | as a string | as a string |
 | `boolean` | `int32_t` 0 or 1 | `int32_t*` |
 | `byte` ... `unsigned long long` | `int8_t` ... `uint64_t` | the same, by pointer |
 | `float`, `double` (also `unrestricted`) | `float`, `double` | by pointer |
 | IDL enumeration | `int32_t` index (attribute setters and dictionary fields) | `int32_t*` index |
-| IDL dictionary | `const RvDom<Dictionary>*` | (not mapped) |
+| IDL dictionary | `const RvDom<Dictionary>*` | `RvDom<Dictionary>**`, owned, for a dictionary `resultDictionaries` lists |
+| `record<K, V>` | the entry sequence transport of `sequence<pair<K, V>>` | the same, owned |
 | interface derived from `Node` | `RvNode*` | `RvNode**`, a new reference |
 | interface derived from `Event` | `RvEvent*` | `RvEvent**`, a new reference |
 | `EventTarget` | (not mapped) | `RvNode**` when the target is a node, else NULL |
@@ -144,9 +155,19 @@ The object handles are `RvCSSStyleDeclaration`, `RvDOMTokenList`, `RvDOMStringMa
 and `RvValidityState`.
 
 - **Nullable and optional.** A nullable argument, or an optional one without a default, is a pointer, and
-  NULL means null or absent: `const int32_t* force` for `optional boolean force`, `const char*` that may be
-  NULL for `DOMString?`. An optional argument with a default is a plain value; the header comment gives the
-  IDL default. A nullable number or boolean result adds `int32_t* present`, 0 for null.
+  NULL means null or absent: `const int32_t* force` for `optional boolean force`. A string takes length -1
+  instead. An optional argument with a default is a plain value; the header comment gives the IDL default. A
+  nullable number or boolean result adds `int32_t* present`, 0 for null.
+- **UTF-8 byte lengths (ABI 51).** Every string input is `const uint8_t*` plus an `int32_t` byte count, so it
+  may hold U+0000. Length -1 is null, or absent for an optional string without a default, which the member
+  receives as a null `String`. These return `RV_ERR_NULL_ARGUMENT`: -1 for a nonnullable string, a length
+  below -1, NULL with a positive length, and invalid UTF-8. NULL with length 0 is the empty string. A string
+  inside a union or sequence is an `RvDomUtf8StringSpan` (`data`, `length`), and a dictionary string field is
+  an `RvDomUtf8StringInput` (`present`, `data`, `length`). The generator rejects a NUL-terminated string
+  input, and the retired keys `stringInputs`, `complexStringSpans`, `interfaceStringInputs` and
+  `dictionaryStringInputs`. `sequenceStringSpans` only names its interfaces' string sequences `Utf8`; those
+  share the layout of the unsuffixed sequences. `browserWellFormedUnions` and `browserWellFormedSetters`
+  select the USVString inputs that the Fable browser provider converts to well-formed strings.
 - **Handles.** Node and event handles are the existing `RvNode` and `RvEvent`: the generated and hand-written
   functions share them, and `rv_node_release` releases both. Each other interface has its own opaque handle,
   named after the root of its inheritance, with `rv_dom_<root>_release` and `rv_dom_<root>_retain`. A
@@ -168,13 +189,27 @@ every default.
 
 - Fields follow the base dictionary's, then the dictionary's own, in IDL order. The committed header fixes the
   order: a regenerated struct keeps the existing fields in place and appends new ones.
-- A field maps as an argument does: `const char*` for a string (NULL for absent), a pointer for a scalar that
+- A field maps as an argument does: `RvDomUtf8StringInput` for a string (`present` 0 for absent), a pointer for a scalar that
   is optional without a default (NULL for absent), a plain value otherwise, `int32_t` for an enumeration and
   `RvNode*` for a node. The header comment of each field gives its IDL default. A `required` field outside
   `size` returns `RV_ERR_NULL_ARGUMENT`.
 - A dictionary declared in an interface's IDL file is that interface's C++ member (`Node::GetRootNodeOptions`).
 - Dictionaries can contain supported union and sequence transports. Unsupported field types still exclude
   the dictionary and its consumers; explicit exclusions are recorded in the report.
+
+### Dictionary results
+
+`resultDictionaries` in `gen/dom.json` lists the dictionaries a function may return. A listed dictionary keeps its
+argument layout. As a result, the glue allocates the struct, sets `size` to its own `sizeof`, and owns every field:
+strings, nested dictionaries (pointers), and union and sequence transports (pointers). A string or scalar field
+that the engine leaves absent reads as absent (`present` 0 for an `RvDomUtf8StringInput`, NULL for a pointer).
+`rv_dom_<dictionary>_release` frees the struct with everything it owns, on the main thread.
+
+- A function result is `RvDom<Dictionary>** result`. A nullable result writes NULL for null.
+- A listed dictionary may nest another listed dictionary; the nesting needs no `nestedDictionaries` entry.
+- A union or sequence result arm of a listed dictionary is an owned pointer; the container's release frees it.
+- A result dictionary with a node, event, object or enumeration member is left out, with its functions.
+- `dom-api.json`'s `resultDictionaries` gives each listed dictionary's struct and release function.
 
 ## Statuses, exceptions and threads
 
@@ -197,7 +232,13 @@ check it when they expose the member: `A&B` needs both settings, `A|B` either. W
 function returns `RV_ERR_UNSUPPORTED` and leaves the DOM unchanged. The glue reads the settings of the target's
 document; for an event, of its target node's document, so an event that has no node target returns
 `RV_ERR_UNSUPPORTED`; for a range, of its start container's document; for a `DOMStringMap`, of its element's.
-A gated member of another interface without a document is left out.
+A gated member of another interface without a document is left out, unless `creationGatedInterfaces` maps the
+interface to the factory member that creates its objects (`CaretPosition` to `Document.caretPositionFromPoint`): the
+factory checks the setting, so the interface's members check only settings beyond the interface's own. The generator
+stops when the named factory does not carry the setting.
+
+`finiteNumberInputs` names interfaces, or single `Interface.member` operations, whose restricted `double` and `float`
+arguments reject NaN and infinities with a `TypeError`, as WebIDL conversion does.
 
 ## How the glue calls a member
 
@@ -269,13 +310,32 @@ invented members to the shared DOM interfaces. CSS rule, stylesheet and declarat
 queries because CSSOM's historical `CSSRule.type` returns zero for modern rule types. An unscoped subtype
 reports its nearest scoped ancestor. Query names are reported separately from the IDL member count.
 
+An `Event` root reads an `RvEvent` handle (`rv_dom_event_get_interface_name`). A root listed in
+`runtimeTypePublicNames` reports the exposed interface name, `AnimationEvent` for `CSSAnimationEvent`, and
+`runtimeTypeExtras` names unscoped interfaces the query still reports, such as `CustomEvent`. An event outside
+both reports its nearest generated base: a `DragEvent` reads `MouseEvent`, a `TextEvent` `UIEvent`, a
+`ClipboardEvent` `Event`.
+
+A constructor with `"globalObject": true` serves `[CallWith=CurrentGlobalObject]`: the factory receives the
+receiver Document's global object first, and a document without a browsing context, such as one of a destroyed
+host, fails with `InvalidStateError`. `getterExpressions` maps `Interface.member` to the C++ expression a getter
+reads, for a member whose C++ type differs from its IDL type (`AnimationPlaybackEvent.currentTime` converts a
+`WebAnimationTime` to `CSSNumberish`).
+
+`callbackObjectRoots` makes a callback interface, such as `NodeFilter`, an object handle root. Its arguments and
+attributes pass `Rv<Name>*` handles with the generated `rv_dom_<name>_retain`/`_release`, and its members are
+excluded by name. The host creates the handles (`rv_node_filter_create`), so `RanvierWebCoreAbi.h` declares the
+handle type. `contract` gives the type the shared F# contract declares, and `resultEnum` the integer enumeration it
+returns. A nullable attribute of the type is an F# option there; an optional argument takes the function itself.
+Constants above `INT32_MAX` (`NodeFilter.SHOW_ALL`) are emitted as unsigned `#define`s and F# `u` literals.
+
 `gen/dom-report.txt` records the generated interface/function counts, handle types, constants, enumerations,
 dictionary structs and every member left out, by reason:
 
 - **By rule:** event handler attributes (`onclick`; listeners go through `rv_node_add_event_listener`),
   constructors and static members, WebKit-prefixed members (`webkit*`), members not exposed to `Window`,
   `[Custom]` bindings and `[EnabledForWorld]` extensions.
-- **Not mapped yet:** dictionary results and dictionaries with unmapped members, `any`, `object`,
+- **Not mapped yet:** dictionary results outside `resultDictionaries`, dictionaries with unmapped members, `any`, `object`,
   `Date`, callbacks, enumeration arguments of operations, and interfaces outside the scope (
   `DOMRectList`, ...).
 - **By `gen/dom.json`'s `exclude`:** browser features the patches cut or a UI does not use: cookies,
@@ -321,6 +381,6 @@ for an interface it needs.
 
 - `[CEReactions]`: the glue does not open a custom element reaction scope. The host runs no page script, so no
   custom element has script reactions; a page that defines them would see them run late.
-- Enumeration arguments of operations and dictionary results are not mapped.
+- Enumeration arguments of operations, and dictionary results outside `resultDictionaries`, are not mapped.
 - A dictionary that loses a locked field upstream is left unmapped, and the members that take it become stubs;
   `gen/dom-report.txt` names the lost fields. Keeping such a struct needs a decision on the retired field.

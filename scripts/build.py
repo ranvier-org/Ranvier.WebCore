@@ -194,7 +194,7 @@ def prepare():
     (api / 'RanvierAbi' / 'dom').mkdir(exist_ok=True)
     for name in ['RanvierWebCoreAbi.h', 'RanvierWebCoreAbi.cpp', 'RanvierWebCoreDom.h', 'RanvierWebCoreDom.cpp',
                  'RanvierWebCoreUia.cpp', 'RanvierWebCoreD3D11.h', 'RanvierWebCoreD3D11.cpp', 'dom/RanvierDomGlue.h',
-                 'RanvierCapabilities.inc', 'RanvierCapabilityCatalogue.inc', 'RanvierSvgViewGlue.h', 'RanvierResourceGlue.h']:
+                 'RanvierCapabilities.inc', 'RanvierCapabilityCatalogue.inc', 'RanvierSvgViewGlue.h', 'RanvierResourceGlue.h', 'RanvierEventGlue.h', 'RanvierViewportGlue.h', 'RanvierInspectGlue.h']:
         shutil.copy2(root / 'host' / name, api / 'RanvierAbi' / name)
     git('checkout', commit, '--', 'Tools/TestWebKitAPI/CMakeLists.txt', cwd=source)
     cmake = api / 'CMakeLists.txt'

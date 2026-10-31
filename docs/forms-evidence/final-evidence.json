@@ -1,0 +1,51 @@
+{
+ "group": [
+  "D13 #22"
+ ],
+ "native": "0.1.0-preview.28",
+ "abi": 36,
+ "feature": "dom:HTMLFormControlsCollection, dom:HTMLOptionsCollection, dom:DOMFormData, dom:SubmitEvent, dom:FormDataEvent, dom-form-data-entries",
+ "sourceHeadOfBatch": "1c403cb7c7b41e3f58de66e37229a2ba0c944062",
+ "candidate": "artifacts/forms-candidate-4 (native22-final replacement-objects-v2.json; RanvierDomGlue, UnifiedSource-svg-14, Svg/Resource/Event/Viewport glue and host units compiled from this tree)",
+ "red": {
+  "runtime": "native25-candidate-3",
+  "abiVersion": 33,
+  "result": "AssertionError ABI version 36; 32 D13 exports absent",
+  "logs": [
+   "red-native25.log",
+   "red-native25-exports.txt"
+  ]
+ },
+ "green": {
+  "formCollectionsAssertions": 1168,
+  "mismatches": 0,
+  "probes": 42,
+  "allExitZero": true,
+  "rawAssertions": 44409,
+  "teardownCases": 70,
+  "teardownAllCollected": true
+ },
+ "chromiumOracle": {
+  "browser": "chromium 156.0.8078.4",
+  "fixture": "tests/fixtures/form-collections-oracle.json",
+  "cases": "tests/fixtures/form-collections-cases.json"
+ },
+ "qualifications": [
+  "Host documents never navigate on form submission; the policy client is not consulted (form-navigation-report.json). The EmptyFrameLoaderClient Ignore change was not made: it is unobservable.",
+  "A File entry of FormData carries only its kind tag (RV_DOM_UNION_FILE_OR_USV_STRING_FILE, payload NULL); its name and contents are out of scope until H11. The Blob overloads of append and set are not generated.",
+  "EventInit.trusted (WebKit trustedForBindingsOnly) is excluded from generated event dictionaries."
+ ],
+ "files": {
+  "allocation-absence.json": "266150d415e941126f24e6de0740afe063159d750e0478cdef1d8483f76be7e3",
+  "batch-green.json": "f1461ad6fee5794770b1595023b636bfd7ba0e711448dc8821b8dfb32a7dd523",
+  "build_d13_candidate.py": "82bfa67bd7d243ec6c460acb03e864540411dab8dcff12b89e1bd20c5cd0ec5b",
+  "form-collections-report.json": "3e9753f1b87c32485ddb55cefed0e83c135ad87eac51e93e43a7a6c79edab304",
+  "form-navigation-red-native28-unpatched.json": "3162057b457b32941ca295b00290f43d941f85ca12b4d4be693f8e1c4a24ec42",
+  "form-navigation-report.json": "6274b895c98afba4404228a1dc8b74f274d7c425c3f29b8ae59bbed688e784e7",
+  "red-native25-exports.txt": "e438374c07819a0fb7aa04e016ddf361651be2f2d2d05f75eb89e54048a8b8d0",
+  "red-native25.log": "a0e02e12aa1fe1131f62f7564d50100122d49d17e43a7796449d8ecd50e3c03d",
+  "run_native28_batch.py": "96ddc0532caa93bd38f688c1b37f1fbc5daadd53755169349c994e1b20963966",
+  "runtime-receipt.json": "ad5b3dc49083292dc102e82d02dae520d7a9e71d4ccd47c7e53a077f443400c5",
+  "teardown-probes.json": "ef584b510f452836968809ca62662692b63e91d0482894f63e3172f7f3e7629d"
+ }
+}

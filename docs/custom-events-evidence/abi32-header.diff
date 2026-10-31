@@ -1,0 +1,89 @@
+diff --git a/host/RanvierWebCoreAbi.h b/host/RanvierWebCoreAbi.h
+index 22f1ee5..e9323a9 100644
+--- a/host/RanvierWebCoreAbi.h
++++ b/host/RanvierWebCoreAbi.h
+@@ -106,6 +106,7 @@ enum {
+     RV_EVENT_INPUT = 5,
+     RV_EVENT_FOCUS = 6,
+     RV_EVENT_OTHER = 7,
++    RV_EVENT_CUSTOM = 8,
+ };
+ 
+ /* Bits of rv_event_flags. */
+@@ -1225,6 +1226,76 @@ RV_EXPORT int32_t rv_resource_cancel(uint64_t operation);
+  * registered until released and holds no document. */
+ RV_EXPORT int32_t rv_resource_release(uint64_t operation);
+ 
++/* Event construction and standalone targets ("event-construction", v32). */
++typedef struct RvEventTarget RvEventTarget;
++
++/* Kinds of rv_host_construct_event; each uses the engine's constructor for that interface and its init dictionary. */
++enum {
++    RV_CONSTRUCT_EVENT = 0,
++    RV_CONSTRUCT_CUSTOM = 1,
++    RV_CONSTRUCT_UI = 2,
++    RV_CONSTRUCT_MOUSE = 3,
++    RV_CONSTRUCT_KEYBOARD = 4,
++    RV_CONSTRUCT_FOCUS = 5,
++};
++
++/* The init dictionary fields of rv_host_construct_event. size is sizeof(RvEventInit). Fields that the kind's init
++ * dictionary lacks are ignored: detail for UI, mouse and focus kinds; the coordinates, button, buttons and
++ * relatedTarget for mouse; key, code, location, repeat and isComposing for keyboard; relatedTarget for focus;
++ * modifiers (RV_MODIFIER_* bits) for mouse and keyboard. customDetailJson is CustomEvent.detail as UTF-8 JSON text,
++ * parsed in the host document's realm; NULL is a null detail. key and code may be NULL for empty strings.
++ * relatedTarget is borrowed for the call. UIEvent.view stays null, as for an init dictionary without view. */
++typedef struct RvEventInit {
++    int32_t size;
++    int32_t bubbles;
++    int32_t cancelable;
++    int32_t composed;
++    int32_t detail;
++    int32_t modifiers;
++    double screenX;
++    double screenY;
++    double clientX;
++    double clientY;
++    int32_t button;
++    int32_t buttons;
++    const char* key;
++    const char* code;
++    int32_t location;
++    int32_t repeat;
++    int32_t isComposing;
++    RvEventTarget* relatedTarget;
++    const char* customDetailJson;
++} RvEventInit;
++
++/* A new untrusted event from the engine constructor of kind, released with rv_event_release. Returns NULL for an
++ * unknown kind, a size other than sizeof(RvEventInit), a non-UTF-8 string, detail JSON the engine's parser rejects, or
++ * a call off the owning thread. */
++RV_EXPORT RvEvent* rv_host_construct_event(RvHost*, int32_t kind, const char* type, const RvEventInit* init);
++/* CustomEvent.detail serialized as JSON in the event's realm, with the exact-byte UTF-8 protocol of rv_event_type:
++ * length and capacity exclude the terminator. A null or undefined detail writes "null". Returns RV_ERR_UNSUPPORTED,
++ * leaving *length unchanged, for an event that is not a CustomEvent or a detail JSON.stringify cannot serialize. */
++RV_EXPORT int32_t rv_custom_event_detail_json(RvEvent*, char* buffer, int32_t capacity, int32_t* length);
++
++/* A new standalone EventTarget (the engine's EventTarget constructor) owned by the host's document, released with
++ * rv_event_target_release. It survives document replacement as a target with no context; listeners then still run. */
++RV_EXPORT RvEventTarget* rv_host_create_event_target(RvHost*);
++RV_EXPORT RvEventTarget* rv_event_target_retain(RvEventTarget*);
++RV_EXPORT void rv_event_target_release(RvEventTarget*);
++/* A new reference to the node as an EventTarget, for the rv_event_target_* functions. */
++RV_EXPORT RvEventTarget* rv_node_as_event_target(RvNode*);
++/* A new node reference when the target is a node, else NULL. */
++RV_EXPORT RvNode* rv_event_target_as_node(RvEventTarget*);
++/* 1 when both handles refer to the same target, else 0. */
++RV_EXPORT int32_t rv_event_target_equals(RvEventTarget*, RvEventTarget*);
++/* rv_node_add_event_listener for any EventTarget; remove the listener with rv_listener_remove. */
++RV_EXPORT RvListener* rv_event_target_add_listener(RvEventTarget*, const char* type, int32_t flags, RvEventCallback callback, void* context);
++/* rv_node_dispatch for any EventTarget. */
++RV_EXPORT int32_t rv_event_target_dispatch(RvEventTarget*, RvEvent*, int32_t* defaultPrevented);
++/* The event's target, or with current set its currentTarget, as a new EventTarget reference; NULL when it has none. */
++RV_EXPORT RvEventTarget* rv_event_get_target(RvEvent*, int32_t current);
++/* The relatedTarget of a mouse or focus event as a new EventTarget reference, or NULL. */
++RV_EXPORT RvEventTarget* rv_event_get_related_target(RvEvent*);
++
+ /* "dom-generated" and "dom:<Interface>" for rv_abi_has: the generated functions of RanvierWebCoreDom.h, one per
+  * IDL member of the interfaces gen/dom.json lists, from the same library. */
+ 

@@ -1,0 +1,84 @@
+{
+ "runtime": "C:\\wk\\native-vv\\artifacts\\vv-candidate-4-frozen\\runtimes\\win-x64\\native",
+ "elementReflectionExports": [
+  "rv_dom_element_get_aria_active_descendant_element",
+  "rv_dom_element_set_aria_active_descendant_element"
+ ],
+ "internalsExports": [
+  "rv_dom_html_template_element_get_shadow_root_custom_element_registry",
+  "rv_dom_html_template_element_set_shadow_root_custom_element_registry"
+ ],
+ "steps": [
+  {
+   "name": "custom element with role/aria attributes (no definition)",
+   "result": null,
+   "ax": {
+    "t": {
+     "role": "button",
+     "name": "Toggle",
+     "description": ""
+    }
+   }
+  },
+  {
+   "name": "aria-labelledby=\"l2 l1\"",
+   "result": 0,
+   "ax": {
+    "b": {
+     "role": "button",
+     "name": "Second First",
+     "description": ""
+    }
+   }
+  },
+  {
+   "name": "aria-describedby=\"d1\"",
+   "result": 0,
+   "ax": {
+    "b": {
+     "role": "button",
+     "name": "Second First",
+     "description": "Describe"
+    }
+   }
+  },
+  {
+   "name": "ariaActiveDescendantElement = o2",
+   "result": {
+    "set": 0,
+    "get": 0,
+    "sameNode": true,
+    "attribute": ""
+   },
+   "ax": {
+    "list": {
+     "role": "listbox",
+     "name": "Choices",
+     "description": ""
+    }
+   }
+  },
+  {
+   "name": "ariaActiveDescendantElement = null",
+   "result": {
+    "set": 0,
+    "get": 0,
+    "sameNode": null,
+    "attribute": null
+   },
+   "ax": {
+    "list": {
+     "role": "listbox",
+     "name": "Choices",
+     "description": ""
+    }
+   }
+  }
+ ],
+ "abi": 45,
+ "features": {
+  "accessibility": 1,
+  "dom:ElementInternals": 0,
+  "dom:CustomElementRegistry": 0
+ }
+}

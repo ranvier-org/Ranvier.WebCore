@@ -1,0 +1,4 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+MSVC 14.50.35717 - tested: 14.50.35717
+host-link FAILED: lld-link: error: undefined symbol: __declspec(dllimport) public: static void __cdecl WebCore::PlatformScreen::updateSingletonProperties(struct WebCore::ScreenProperties &&)
+lld-link: error: undefined symbol: public: void __cdecl WebCore::Page::windowScreenDidChange(unsigned int, class std::optional<unsigned int>)

@@ -1,0 +1,38 @@
+{
+  "runtime": "C:/wk/native-screen-red/artifacts/native38-candidate-1/runtime",
+  "abiVersion": 44,
+  "setScreenExport": false,
+  "hostSize": [
+    320,
+    200
+  ],
+  "engine": {
+    "width": 1920,
+    "height": 1080,
+    "avail_left": 0,
+    "avail_top": 24,
+    "avail_width": 1920,
+    "avail_height": 1008,
+    "color_depth": 24,
+    "orientationTypeStatus": -9
+  },
+  "primaryMonitor": {
+    "width": 1920,
+    "height": 1080,
+    "avail_left": 0,
+    "avail_top": 24,
+    "avail_width": 1920,
+    "avail_height": 1008,
+    "color_depth": 24
+  },
+  "engineEqualsMonitor": {
+    "width": true,
+    "height": true,
+    "avail_left": true,
+    "avail_top": true,
+    "avail_width": true,
+    "avail_height": true,
+    "color_depth": true
+  },
+  "engineEqualsHostSize": false
+}

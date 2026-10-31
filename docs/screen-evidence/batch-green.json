@@ -1,0 +1,770 @@
+[
+  {
+    "name": "css_supports",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\css_supports.log",
+    "logSha256": "05fd7ee5d224db2bdda49560178074bf6224c29dfed768643c846465a3ab3934",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\css_supports.py": "dcbb43a68a90f831a23e26d42930f522d4bf99b9e36438b92273a0b69c434896",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 72
+  },
+  {
+    "name": "computed_style",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\computed_style.log",
+    "logSha256": "70ebb4d87e4cd0001182e37a9082c86ea0337184fdf093a1af5135b7f903c4a7",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\computed_style.py": "628d349da44f0c580de60d92bb93768006bbdc40691e6084331db9c30cf8ee01",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 93
+  },
+  {
+    "name": "fragment_rectangles",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\fragment_rectangles.log",
+    "logSha256": "57a9638643ef3082abeb95f7b9f252efe211cab6677aca91510c564b52b97d40",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\fragment_rectangles.py": "178a03f93e6e11366e787791510c757075dca59b39120afd76cc91e4579b414d",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 140
+  },
+  {
+    "name": "table_surface",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\table_surface.log",
+    "logSha256": "8bae3582a7fb2f662138794d8f64ab15bda8da5b98a4d71e7afab8e74c70b312",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\table_surface.py": "9af4551cbf8de4b54d406812bb18783e8b36c68fb8d03ed35c8fb8b95e48cd95",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 44
+  },
+  {
+    "name": "element_reflection",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\element_reflection.log",
+    "logSha256": "58175ae7a9e94642aaa3480e343152e27b64eac99c977e48f6c6ec7963e93bd4",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\element_reflection.py": "bdb00a71e5569440caddc1b91747b1cd96b5f1c270e879d7f2b08f268768308c",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 269
+  },
+  {
+    "name": "area_surface",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\area_surface.log",
+    "logSha256": "968d2113dff8c257fdbe03256fa57d16913f6043213f4b0af43d768c0b17d49a",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\area_surface.py": "8e4fe511dc047e9173565fc1911737ac7719455082c181922f4beb117dbb8fe8",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 117
+  },
+  {
+    "name": "cssom_surface",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\cssom_surface.log",
+    "logSha256": "6fedf047a7e46989b2d1590a07e9b8e42c6399a07c0bb7fb1ddf72f7c7bda910",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\cssom_surface.py": "4873ee4a1229d3ba4b385807964c9c3500a69fdb67146483b959ea8fb9a00e7f",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 407
+  },
+  {
+    "name": "keyframe_rules",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\keyframe_rules.log",
+    "logSha256": "f6bee323788d263ad2cbf2f40d7e14126ae0953bf2756be2b5bb445abb427733",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\keyframe_rules.py": "dd77ff9ac1683fbfecb01d288809f87010ba02b7de8138726ddd4e6e78ea1085",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 93
+  },
+  {
+    "name": "counter_style_rules",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\counter_style_rules.log",
+    "logSha256": "b2bc8e2d39c7a86523d540ceb732205aadfb4f3fef3d88f51f0c57ec6ab26584",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\counter_style_rules.py": "405c43df03ad3e4945b9b25eb800017403df460bcf46a5adb1d636d9a0d9e3a2",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 86
+  },
+  {
+    "name": "detached_cssom_context",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\detached_cssom_context.log",
+    "logSha256": "848ae3d09d5a9e63440a50d7af89f95236d133df48399209146c792944017c0d",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\detached_cssom_context.py": "56b7549ef1fedd38b3b431cc1c055b1af07af31575dfcaea845aed5a79c9ec6f",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 389
+  },
+  {
+    "name": "svg_mathml_surface",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\svg_mathml_surface.log",
+    "logSha256": "6221d6c18fff05c9aa0010b9b3c6edc3a4752fa82b16782d2182769e16c7e036",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\svg_mathml_surface.py": "5d992a8a0c923080685915368ff537ceaec2c0927558cd04717df06fdf24e9a9",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 95
+  },
+  {
+    "name": "style_property_maps",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\style_property_maps.log",
+    "logSha256": "93d43c1f4e7a811536d7dae8186ad03f818049107c5a612eeb1767a257f8faa6",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\style_property_maps.py": "03955f4fc441d1241f72dd7978aaab14787f5400db16efabb0b31bf854e8dbe3",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 189
+  },
+  {
+    "name": "declared_style_maps",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\declared_style_maps.log",
+    "logSha256": "17c73785458969864abeae85d5f935572174e29b1eecff1a771fa90978c23b7b",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\declared_style_maps.py": "874abf21ad55c20f0f5f47a1198ec1668fb028619aa81a14de8e5d8e0eca8f93",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 2069
+  },
+  {
+    "name": "style_map_entries",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\style_map_entries.log",
+    "logSha256": "a301369b66f47a650587c8bb2ac3011aa9be133a4675428c8d8d96dc271c343d",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\style_map_entries.py": "4a61b612a9573c786cd5d7db9767ce5417f2ffd5e39f7c89f27534332db310c6",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 144
+  },
+  {
+    "name": "typed_style_values",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\typed_style_values.log",
+    "logSha256": "4e691d16e784408ffec8a6f48c76916dab3c05c1053eeb73ae1e70c51e3718d1",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\typed_style_values.py": "e7a710c53c9d5307be95a7cfdbdbe376e49e1458b34c2c9bf2f7cdfca477a4ba",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 190
+  },
+  {
+    "name": "custom_properties",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\custom_properties.log",
+    "logSha256": "96880645c1fc2da5221bba93ca4b419fc04154cdc2e74a40837edfa45cebbe72",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\custom_properties.py": "ff852a5fc4f2b4a371a00ca14a7958e447e7dc9e74234ed907ccff3a7f6b5d4f",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 231
+  },
+  {
+    "name": "geometry_values",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\geometry_values.log",
+    "logSha256": "29be327c4ca69a4a3daa3125018c3fd6bf49b541073fb1200180fb70117e8ad5",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\geometry_values.py": "df24fa7a320af87b83633332343e022970e08a204096243b85164de015962fbc",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 260
+  },
+  {
+    "name": "matrix_values",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\matrix_values.log",
+    "logSha256": "072aefb0eecf088e70d410235077a7bc5efeeffa1d27a5af9dc62145229d150e",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\matrix_values.py": "f2572da2574bcb708790e88125cf7a338d4bfb54dd784c39c15475133c692988",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 1091
+  },
+  {
+    "name": "css_transforms",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\css_transforms.log",
+    "logSha256": "5890f78ca29b51c5d29d09139f3d93d92de5346d724bdd72119c2d52b6a278ba",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\css_transforms.py": "54a7f9684fdd0dbe7fc0fe361abb337b156fa5933f2645bbcf65cd5cc1dc55ba",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 405
+  },
+  {
+    "name": "svg_geometry",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\svg_geometry.log",
+    "logSha256": "2fe8049b46ffce2bd4b349dfdd7066caeda689ee3ec0dcdb9f86861c58ed76cb",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\svg_geometry.py": "b357e1a83e97756d0a6d00038081320f0224927b61fa4cf5bc83b17586eb5be0",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 639
+  },
+  {
+    "name": "svg_surfaces",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\svg_surfaces.log",
+    "logSha256": "836c19207512a19d33faf26d61626eddb6f8dcca8d5f1c2b3b9551d69cc68a74",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\svg_surfaces.py": "55b205b6aed085a4578b9eb7bf5460a57824071b803bd8a627e1f1a95acaf4d4",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 1594
+  },
+  {
+    "name": "svg_documents",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\svg_documents.log",
+    "logSha256": "70715fb4da194d2073a68d432087ae0b316e1b35fcd23c300fe24b150ecfa702",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\svg_documents.py": "0e7ea4215e293457d8c20ec805acada6a4060e419694617e1a6350dae0afd8df",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 78
+  },
+  {
+    "name": "svg_view_controls",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\svg_view_controls.log",
+    "logSha256": "2dbdea20c9425e470f860ad8f303fbc8053ce0674e59f96ac24b28853324f6ca",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\svg_view_controls.py": "546c573f0543e440cc19cb383885ab89d9a13e347aaa11d31524cf3382f83922",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 318
+  },
+  {
+    "name": "svg_animation_variants",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\svg_animation_variants.log",
+    "logSha256": "f1bfd6a2fac87ec95676243aaa313b97d3d9ecdbfbbeb172885a8d6eeb76daaf",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\svg_animation_variants.py": "225b0aee8eeee99e8e955af74b388b84ed8df91352bdd7501aa95cdddbcf1f33",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 70
+  },
+  {
+    "name": "capabilities",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\capabilities.log",
+    "logSha256": "742e7e29f19c96bd8976f8a521c5afc5ef6ed11a8b55647a516a056905498e7e",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\capabilities.py": "af1faf6f7db4cee0714ae046629c73ca1b6859e9cff9c7e93cc8f84b9f36a793",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json"
+  },
+  {
+    "name": "svg_view_selection",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\svg_view_selection.log",
+    "logSha256": "520029c891cce1ba9f0d137cbbf0647d57bb63480cc285727aa7eebf70e33dac",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\svg_view_selection.py": "afba67967d4e549d5bf05a84821c9a760b79d65489ad4b652d373ab7658b2aba",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json"
+  },
+  {
+    "name": "svg_paint_servers",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\svg_paint_servers.log",
+    "logSha256": "4fee53f7e062bb018ebea3b6218dfca73e4fe5cf6a563e36e925c18650dc3731",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_servers.py": "8a31036ef0907f0fa47424c49b925d4d7686f0501c22390329b6dad95c342296",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 565
+  },
+  {
+    "name": "svg_filters",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\svg_filters.log",
+    "logSha256": "866b9c9713548497e6e0a475a65b51c9097d8344f2a8f99073ee8c3a65d1ac32",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\svg_filters.py": "f295b35ecd9afdc815107baf3ed68e22674ce2ab6b6dc52265135bb8724e641b",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 9086
+  },
+  {
+    "name": "svg_clip_mask_marker",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\svg_clip_mask_marker.log",
+    "logSha256": "e16f521e717f252b4f1ea93688bded2b355b95918481a3fe4c93e1c1770a0b55",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\svg_clip_mask_marker.py": "cdc9c9e75b8d96f26a18f5b6741c1fc3fc1509e74ecc84f9cecc47e363af176c",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 565
+  },
+  {
+    "name": "svg_resources",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\svg_resources.log",
+    "logSha256": "a205f7e30a24e5a88f3d18a06349efafde93d4c2217bf46e5655bf2df54683ce",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\svg_resources.py": "203a082c9b92a0d4dcc48440e964553583d0214609c1a00702c12b04257fc96c",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 454
+  },
+  {
+    "name": "mathml_surface",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\mathml_surface.log",
+    "logSha256": "56d48519e6426f8dd3b9ce30e425e4bcdb8706a31bad44a061392e1d903d4ac5",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\mathml_surface.py": "e69e7c5fdbabae76ea5c0836883dcccfbde1dd19efb3161dd21bbfba8d0d22f2",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 371
+  },
+  {
+    "name": "svg_tests_lists",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\svg_tests_lists.log",
+    "logSha256": "acf281005da2802259647ade5f0a0d4ee2599f3d9012e65ccadad5643e3f7d4e",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\svg_tests_lists.py": "2ce6eb3ac5f10ca2f9a3e9ba8a5285912b05172acc0b51823008e294dd308b6f",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 191
+  },
+  {
+    "name": "image_decode",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\image_decode.log",
+    "logSha256": "8979ef3a1dbf6162dd531776fbaec5545b72352d4219cfe7e157d9e52c24b488",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\image_decode.py": "753972b2937ca2a77a3dc133db00cdd745f84ba5a9cbbbe7b1a5910bcfcf5ecd",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 73
+  },
+  {
+    "name": "font_load",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\font_load.log",
+    "logSha256": "5166305d32d2636003fc833a9bff3276afd544828ebc1423240cddf1a5741435",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\font_load.py": "98d927cfeae9c3cad5eeeb47d49bfcbeb4ce715e709996e9a718ecd561b60552",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 42
+  },
+  {
+    "name": "event_construction",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\event_construction.log",
+    "logSha256": "7a0a95498b578b237f423c6fcaffc384f75b0485ce7de4cc4d3f44611724a98a",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\event_construction.py": "17d0ebd69f3ef481727cede291d8f9dc271d1d5d9ad2cfbd5a8f7f138ad53e42",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 82
+  },
+  {
+    "name": "tree_traversal",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\tree_traversal.log",
+    "logSha256": "f28092037b213721bb8660488972b271d69faf844d1ecea669fd907e6794b157",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\tree_traversal.py": "5451403906e464e4008941f236166765233a380c8f503b83729a15150a837f29",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 22285
+  },
+  {
+    "name": "focus_input",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\focus_input.log",
+    "logSha256": "6500eb7b15f69d453ac2f3ddd062a96f97752ecef04427b1b924f3e73d1fd94e",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\focus_input.py": "225fd47f1a809015c86e376fcda6050921fd6322601cf1296aefc97df6fb9c3e",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 80
+  },
+  {
+    "name": "viewport_events",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\viewport_events.log",
+    "logSha256": "d988f47bcc0624b3275f457859bd91782b48a1c5a551b73944404084642fdb8e",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\viewport_events.py": "d3e00337c76fa383b92a249fb1f54de6f38989bed9cdd85f8f49dcad3a95d459",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 364
+  },
+  {
+    "name": "form_collections",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\form_collections.log",
+    "logSha256": "68664e70da8b405dbe08db8f2bbbb7608e65038e52b281f4cc9210bef8ce8f20",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\form_collections.py": "1bc34ac4f4ab053aa3cde62ae9ed378e3a5263981b07d162e5c2efc6ca96080b",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 1168
+  },
+  {
+    "name": "form_navigation",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\form_navigation.log",
+    "logSha256": "f86a9620c464525aa9c37835ea0a8bec69676007af73551d78178b8fb4ae8bf7",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\form_navigation.py": "ef84f95bc88a7f187dba16d05a3a4fe6d9fb1ae2c9a038594e179b4cd8a478f9",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json"
+  },
+  {
+    "name": "viewport_scroll",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\viewport_scroll.log",
+    "logSha256": "c5cbcada356ec1fe5182d3fa20f9487f34eb44e2dc0eec75db77e03fcd8f2d6e",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\viewport_scroll.py": "efd45f780a70f58b4ed7e550aa8deb590b971c8f1d94ae456e6ffa1ca37b712a",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 3232
+  },
+  {
+    "name": "dialog_popover",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\dialog_popover.log",
+    "logSha256": "01a52aa2686cbbdb7e821a1fc24486d8eea81e52e491bf224ca6bda41ad805b1",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\dialog_popover.py": "edfc3123176cb68c0bd1ed58da4c30ff24ce3b92266694d0605d9a39ec5b7b2b",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 845
+  },
+  {
+    "name": "binary_values",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\binary_values.log",
+    "logSha256": "48b00e70b98ab68307ff3c93af15c81baf0c47d39d5b56d410a76ec5edb5ebb4",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\binary_values.py": "33b1c1c91ccafcb2bcef35ec4bbbc7e3cf21805d152f9b5a918a87fa15f1ec6d",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 446
+  },
+  {
+    "name": "caret_hit",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\caret_hit.log",
+    "logSha256": "e6dd6e6acd1ba3b50d8d40bb854b9c4a05d372077b567a6dcd85c74315c88a36",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\caret_hit.py": "622ab2ce1e7193e0ffc01fabfb0b04fd00fa5b57e6a53ad4daa838ddb9bb343e",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 18251
+  },
+  {
+    "name": "url_values",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\url_values.log",
+    "logSha256": "86f5cd1d16ea3b6cf9a9d7bbcdf3ecc54fdde300d18014509a55e6ae1f690c1e",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\url_values.py": "8203b24bd289462b6a1a7a8177bc1bbad9a67d18751b29faa62fd45b82614f99",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 3538
+  },
+  {
+    "name": "url_wpt",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\url_wpt.log",
+    "logSha256": "ab3c0f0b88e7c7e391c372db4ca57f6fc03352972cfc69afad9671ad259b476d",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\url_wpt.py": "4c336fd9ab5f123ed3e0c64409ec746f800204cc537393ba35bde52d4b90ad49",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json"
+  },
+  {
+    "name": "form_submission",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\form_submission.log",
+    "logSha256": "851a92b510a8e41694b29dc0c344704c9e4a4b96d82dd13800d065f1013cdc35",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\form_submission.py": "b129d12439e6ae41f6ab4aaeffa32f40ee0ceb619003e66dc2eb39db74107fdb",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 418
+  },
+  {
+    "name": "text_segmentation",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\text_segmentation.log",
+    "logSha256": "c3c1ba992710ab1e0b4923a932a4c32d821bf422d8a1acb19dbb142ce82f1083",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\text_segmentation.py": "bfab587a24a316d56d9c0e208de400ccce627588669078d368fa7246b4eccfc4",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 812
+  },
+  {
+    "name": "crypto_random",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\crypto_random.log",
+    "logSha256": "9eaad71433340c8b8899193f0b4d629ab4d5d7f2fa9e129c8dcb09508d124203",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\crypto_random.py": "12ae1d4956f6018c257ea0a45f29763b24b18f9b853b19a0303d3403d36a3dae",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 275
+  },
+  {
+    "name": "visual_viewport",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\visual_viewport.log",
+    "logSha256": "1af9f2335c9c9e657ca8f18b82f7bb9b45a382af9d57d345c2d8628bfa034a3b",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\visual_viewport.py": "d2368b5d3c0df4c6251acb70e2a008034764c468ff253aec43d96f56fc270688",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 987
+  },
+  {
+    "name": "screen_metrics",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\screen_metrics.log",
+    "logSha256": "b1725f6462a5fc1c3e2c14e2fa6ede92b25cab08c84a6e127a5e72a1534db4d5",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\screen_metrics.py": "b22ec8d26e9f7654c3175933eb12f952852b7e190da13a2a8796d6ed18dfd682",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 222
+  },
+  {
+    "name": "abi_layouts",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\abi_layouts.log",
+    "logSha256": "00ae44ef54f9acd22892c39f1511bd1f910c5b99b348bd1e480c2be9216e200d",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\abi_layouts.py": "ec6a41b9c8d798f3f2ce2e0fb4e182082be82a1dd1e006b21b37dbaf9b0ac9ef",
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json",
+    "assertions": 12
+  },
+  {
+    "name": "frames",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\frames.log",
+    "logSha256": "af9a2423ad5b25fdf506d8006c1d8464ce56a328f131b0735c6ac0752f26196d",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\brotlidec.dll": "d42e2160f76f29a91f8be01b009b585c45496219794e16eab90b3599b6f70a7f",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\FSharp.Core.dll": "1af305b7625c30a54d141caf805c5b0b5a8f6166fb5cef22e3570f55d33152bd",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\harfbuzz-icu.dll": "27662b477f7cb0c20cee64543a06296a48a00a17b6c7b57629bb166a30d5b164",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\harfbuzz.dll": "b519b2abc7f446ca45bff77aae1708f45afc9f557698bcd7295837cce0f12bfa",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\icudt77.dll": "b00d2fb856f548608c137e771257a70d0722654535c6c00b371c0fab3e2b802c",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\icuin77.dll": "e3785739e1fcf2e38053bbb85ef5f0f5dab63f865cbda762da5258566085a240",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\icuuc77.dll": "189c623f996c41488c262867bae04a5bb33dd485bd423e0a8bec05c455a90902",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\jpeg62.dll": "394811c1b1bf1fd914248a145ba3fcad1f5f27c7009754ce08e48ccb0266b785",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\libpng16.dll": "8b46592c5ea338dd6b23ca380d6db64a7849c2a534fc465a006ec668645d8185",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\libsharpyuv.dll": "df165de83480692f494c23061ef9c40c10abe19a89b1fa9fae2f1cd5152c07a7",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\libwebp.dll": "550c5a4860f61d32a274fdd7b5c8cbe266eee28b3a3ca888195248ea1d5e0f71",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\libwebpdemux.dll": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\RanvierWebCoreAbi.Driver.deps.json": "2826e597f87f7fb5628983d27e7fe294021913b60b1b6213bfeb6959cc0bc21a",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\RanvierWebCoreAbi.Driver.dll": "4566ff05071ccc9c1bce72fd4123bb706f9b4c9dccc35d69258db30a1747e4c8",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\RanvierWebCoreAbi.Driver.exe": "652bd10f9fd1ae954742c469000c98a60c3957843923d31db52f598caf6f0ff0",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\RanvierWebCoreAbi.Driver.runtimeconfig.json": "2ca90a18bac3b48286c20acd3c1ae4f83fa38de5acf4b2f8cdd277bf90dc9bd7",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\RanvierWebCoreHost.dll": "9e031c15dd4730028d3485e4d5027d332fbe7824db2d6280bf27c98381e67c53",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\WebCore.dll": "a7fc0f78d011666a06b7dfbcad548b22919e0cfe4d3926275c0482c2ef3e8b0d",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\zlib1.dll": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\cs\\FSharp.Core.resources.dll": "6521e3ed8998a2121fdf0951a7320741de7776d100236e3d54f395b781378cf5",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\de\\FSharp.Core.resources.dll": "7b4d4497c939f00e9f77f4ea1544f47a719c9a656fc35f5a23fc05cd08b82766",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\es\\FSharp.Core.resources.dll": "fe48943a4daf55a4a914bd0e4ab280c6debf6e9f02da51721ac7e13c809e452f",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\fr\\FSharp.Core.resources.dll": "a9d4712165ffbb3c076e3aaf51458f6d5aed384ffd3316d7013f54a02e5355cb",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\it\\FSharp.Core.resources.dll": "96f9668d451cf6226ed24400c8ccafe09a175afc15c00d5e2850a6def454afa6",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\ja\\FSharp.Core.resources.dll": "df268f8e7e061a265e9733b6dea143d634d32bd5dc6e98d2ff657a3a5449bf46",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\ko\\FSharp.Core.resources.dll": "2fd195fb6b16dbb24021f721585326c466b1cd1b1305aee5dd5867326d3ee7fe",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\pl\\FSharp.Core.resources.dll": "a1cf152aa5faede420a9f240b4029c6387602153bedde7d98b04ef124420e052",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\pt-BR\\FSharp.Core.resources.dll": "627a76d378b62e3536f7f8ef1513523b37129a780e17328ee447a7ee3bdf43bb",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\ru\\FSharp.Core.resources.dll": "ffc8ca0e104be87dbc963ecdbb8029d614b7d22b1911e7188340076c2a4eb616",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\tr\\FSharp.Core.resources.dll": "184a8ed7b221fa260c5522dee0fc3575993e5a04989d29b7e37a0c64a7f468ed",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\zh-Hans\\FSharp.Core.resources.dll": "9e4a6d6d399ed610d47091498cb3c2bd1b98e6e4bcd6cb803975e3fcb86c1e1e",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\zh-Hant\\FSharp.Core.resources.dll": "bb2e84215725b906da250a2473dc56d1a6fc0f5aecfdf4e30beb81d07a3f7b56"
+    },
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json"
+  },
+  {
+    "name": "teardown",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-screen\\artifacts\\native38-batch-7\\teardown.log",
+    "logSha256": "84d957d6597e7d16e6271523ab387b889d598002031c59aeea0286d695cc3408",
+    "executedSources": {
+      "C:\\wk\\native-screen\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\brotlidec.dll": "d42e2160f76f29a91f8be01b009b585c45496219794e16eab90b3599b6f70a7f",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\FSharp.Core.dll": "1af305b7625c30a54d141caf805c5b0b5a8f6166fb5cef22e3570f55d33152bd",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\harfbuzz-icu.dll": "27662b477f7cb0c20cee64543a06296a48a00a17b6c7b57629bb166a30d5b164",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\harfbuzz.dll": "b519b2abc7f446ca45bff77aae1708f45afc9f557698bcd7295837cce0f12bfa",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\icudt77.dll": "b00d2fb856f548608c137e771257a70d0722654535c6c00b371c0fab3e2b802c",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\icuin77.dll": "e3785739e1fcf2e38053bbb85ef5f0f5dab63f865cbda762da5258566085a240",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\icuuc77.dll": "189c623f996c41488c262867bae04a5bb33dd485bd423e0a8bec05c455a90902",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\jpeg62.dll": "394811c1b1bf1fd914248a145ba3fcad1f5f27c7009754ce08e48ccb0266b785",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\libpng16.dll": "8b46592c5ea338dd6b23ca380d6db64a7849c2a534fc465a006ec668645d8185",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\libsharpyuv.dll": "df165de83480692f494c23061ef9c40c10abe19a89b1fa9fae2f1cd5152c07a7",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\libwebp.dll": "550c5a4860f61d32a274fdd7b5c8cbe266eee28b3a3ca888195248ea1d5e0f71",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\libwebpdemux.dll": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\RanvierWebCoreAbi.Driver.deps.json": "2826e597f87f7fb5628983d27e7fe294021913b60b1b6213bfeb6959cc0bc21a",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\RanvierWebCoreAbi.Driver.dll": "4566ff05071ccc9c1bce72fd4123bb706f9b4c9dccc35d69258db30a1747e4c8",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\RanvierWebCoreAbi.Driver.exe": "652bd10f9fd1ae954742c469000c98a60c3957843923d31db52f598caf6f0ff0",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\RanvierWebCoreAbi.Driver.runtimeconfig.json": "2ca90a18bac3b48286c20acd3c1ae4f83fa38de5acf4b2f8cdd277bf90dc9bd7",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\RanvierWebCoreHost.dll": "9e031c15dd4730028d3485e4d5027d332fbe7824db2d6280bf27c98381e67c53",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\WebCore.dll": "a7fc0f78d011666a06b7dfbcad548b22919e0cfe4d3926275c0482c2ef3e8b0d",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\zlib1.dll": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\cs\\FSharp.Core.resources.dll": "6521e3ed8998a2121fdf0951a7320741de7776d100236e3d54f395b781378cf5",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\de\\FSharp.Core.resources.dll": "7b4d4497c939f00e9f77f4ea1544f47a719c9a656fc35f5a23fc05cd08b82766",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\es\\FSharp.Core.resources.dll": "fe48943a4daf55a4a914bd0e4ab280c6debf6e9f02da51721ac7e13c809e452f",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\fr\\FSharp.Core.resources.dll": "a9d4712165ffbb3c076e3aaf51458f6d5aed384ffd3316d7013f54a02e5355cb",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\it\\FSharp.Core.resources.dll": "96f9668d451cf6226ed24400c8ccafe09a175afc15c00d5e2850a6def454afa6",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\ja\\FSharp.Core.resources.dll": "df268f8e7e061a265e9733b6dea143d634d32bd5dc6e98d2ff657a3a5449bf46",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\ko\\FSharp.Core.resources.dll": "2fd195fb6b16dbb24021f721585326c466b1cd1b1305aee5dd5867326d3ee7fe",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\pl\\FSharp.Core.resources.dll": "a1cf152aa5faede420a9f240b4029c6387602153bedde7d98b04ef124420e052",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\pt-BR\\FSharp.Core.resources.dll": "627a76d378b62e3536f7f8ef1513523b37129a780e17328ee447a7ee3bdf43bb",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\ru\\FSharp.Core.resources.dll": "ffc8ca0e104be87dbc963ecdbb8029d614b7d22b1911e7188340076c2a4eb616",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\tr\\FSharp.Core.resources.dll": "184a8ed7b221fa260c5522dee0fc3575993e5a04989d29b7e37a0c64a7f468ed",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\zh-Hans\\FSharp.Core.resources.dll": "9e4a6d6d399ed610d47091498cb3c2bd1b98e6e4bcd6cb803975e3fcb86c1e1e",
+      "C:\\wk\\native-screen\\artifacts\\native38-driver-7\\zh-Hant\\FSharp.Core.resources.dll": "bb2e84215725b906da250a2473dc56d1a6fc0f5aecfdf4e30beb81d07a3f7b56"
+    },
+    "runtimeReceipt": "C:\\wk\\native-screen\\artifacts\\native38-frozen-7\\runtime-receipt.json"
+  }
+]

@@ -35,7 +35,7 @@ class HostPrepare(unittest.TestCase):
             exec(compile(ast.Module(body=[prepare],type_ignores=[]),'<actual-prepare>','exec'),scope)
             scope['prepare']()
             installed=api/'RanvierAbi'
-            for filename in ['RanvierWebCoreAbi.cpp','RanvierCapabilities.inc','RanvierCapabilityCatalogue.inc','RanvierSvgViewGlue.h']:
+            for filename in ['RanvierWebCoreAbi.cpp','RanvierCapabilities.inc','RanvierCapabilityCatalogue.inc','RanvierSvgViewGlue.h','RanvierEventGlue.h','RanvierViewportGlue.h','RanvierInspectGlue.h']:
                 self.assertEqual((installed/filename).read_bytes(),(root/'host'/filename).read_bytes())
             self.assertIn('#include "RanvierCapabilities.inc"',(installed/'RanvierWebCoreAbi.cpp').read_text())
             self.assertIn('#include "RanvierCapabilityCatalogue.inc"',(installed/'RanvierCapabilities.inc').read_text())

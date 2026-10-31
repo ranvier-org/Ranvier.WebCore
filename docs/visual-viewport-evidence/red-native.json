@@ -1,0 +1,69 @@
+{
+ "runtime": "C:\\wk\\native-caret\\artifacts\\native32-frozen\\runtimes\\win-x64\\native",
+ "hostExports": [
+  "rv_host_observe_resize",
+  "rv_host_resize",
+  "rv_host_scroll_to",
+  "rv_host_set_device_scale",
+  "rv_host_wheel",
+  "rv_host_window_metrics"
+ ],
+ "hostVisualViewportExports": [],
+ "webcoreEngineEntryPoints": [
+  "?setObscuredContentInsets@Page@WebCore@@QEAAXAEBV?$RectEdges@M@2@@Z",
+  "?setPageScaleFactor@Page@WebCore@@QEAAXMAEBVIntPoint@2@_N@Z"
+ ],
+ "abi": 40,
+ "features": {
+  "viewport": 1,
+  "scroll": 1,
+  "dom-window-scrolling": 1,
+  "visual-viewport": 0,
+  "page-scale": 0,
+  "obscured-insets": 0,
+  "resize": 1,
+  "input": 1
+ },
+ "windowMetrics": [
+  {
+   "resize": [
+    320,
+    240
+   ],
+   "deviceScale": 1.0,
+   "innerWidth": 320,
+   "innerHeight": 240,
+   "devicePixelRatio": 1.0
+  },
+  {
+   "resize": [
+    300,
+    200
+   ],
+   "deviceScale": 1.0,
+   "innerWidth": 300,
+   "innerHeight": 200,
+   "devicePixelRatio": 1.0
+  },
+  {
+   "resize": [
+    300,
+    200
+   ],
+   "deviceScale": 2.0,
+   "innerWidth": 300,
+   "innerHeight": 200,
+   "devicePixelRatio": 2.0
+  },
+  {
+   "resize": [
+    300,
+    200
+   ],
+   "deviceScale": 1.5,
+   "innerWidth": 300,
+   "innerHeight": 200,
+   "devicePixelRatio": 1.5
+  }
+ ]
+}

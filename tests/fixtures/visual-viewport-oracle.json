@@ -1,0 +1,356 @@
+{
+ "browser": "156.0.8078.4",
+ "page": "<!doctype html><style>html,body{margin:0}body{width:2000px;height:3000px}</style><body>",
+ "viewport": [
+  320,
+  240
+ ],
+ "steps": [
+  {
+   "name": "initial",
+   "operation": "none",
+   "args": [],
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 0,
+    "pageTop": 0,
+    "width": 320,
+    "height": 240,
+    "scale": 1,
+    "scrollX": 0,
+    "scrollY": 0,
+    "innerWidth": 320,
+    "innerHeight": 240
+   },
+   "events": []
+  },
+  {
+   "name": "scrollTo(10, 20)",
+   "operation": "scrollTo",
+   "args": [
+    10,
+    20
+   ],
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 10,
+    "pageTop": 20,
+    "width": 320,
+    "height": 240,
+    "scale": 1,
+    "scrollX": 10,
+    "scrollY": 20,
+    "innerWidth": 320,
+    "innerHeight": 240
+   },
+   "events": [
+    "window:scroll"
+   ]
+  },
+  {
+   "name": "scrollTo(0, 0)",
+   "operation": "scrollTo",
+   "args": [
+    0,
+    0
+   ],
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 0,
+    "pageTop": 0,
+    "width": 320,
+    "height": 240,
+    "scale": 1,
+    "scrollX": 0,
+    "scrollY": 0,
+    "innerWidth": 320,
+    "innerHeight": 240
+   },
+   "events": [
+    "window:scroll"
+   ]
+  },
+  {
+   "name": "resize 300x200",
+   "operation": "resize",
+   "args": [
+    300,
+    200
+   ],
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 0,
+    "pageTop": 0,
+    "width": 300,
+    "height": 200,
+    "scale": 1,
+    "scrollX": 0,
+    "scrollY": 0,
+    "innerWidth": 300,
+    "innerHeight": 200
+   },
+   "events": [
+    "window:resize",
+    "visualViewport:resize"
+   ]
+  },
+  {
+   "name": "device scale 2",
+   "operation": "deviceScale",
+   "args": [
+    2
+   ],
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 0,
+    "pageTop": 0,
+    "width": 300,
+    "height": 200,
+    "scale": 1,
+    "scrollX": 0,
+    "scrollY": 0,
+    "innerWidth": 300,
+    "innerHeight": 200
+   },
+   "events": []
+  },
+  {
+   "name": "device scale 1",
+   "operation": "deviceScale",
+   "args": [
+    1
+   ],
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 0,
+    "pageTop": 0,
+    "width": 300,
+    "height": 200,
+    "scale": 1,
+    "scrollX": 0,
+    "scrollY": 0,
+    "innerWidth": 300,
+    "innerHeight": 200
+   },
+   "events": []
+  },
+  {
+   "name": "page scale 2 at 0,0",
+   "operation": "pageScale",
+   "args": [
+    2,
+    0,
+    0
+   ],
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 0,
+    "pageTop": 0,
+    "width": 150,
+    "height": 100,
+    "scale": 2,
+    "scrollX": 0,
+    "scrollY": 0,
+    "innerWidth": 300,
+    "innerHeight": 200
+   },
+   "events": [
+    "visualViewport:resize"
+   ]
+  },
+  {
+   "name": "page scale 1 at 0,0",
+   "operation": "pageScale",
+   "args": [
+    1,
+    0,
+    0
+   ],
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 0,
+    "pageTop": 0,
+    "width": 300,
+    "height": 200,
+    "scale": 1,
+    "scrollX": 0,
+    "scrollY": 0,
+    "innerWidth": 300,
+    "innerHeight": 200
+   },
+   "events": [
+    "visualViewport:resize"
+   ]
+  },
+  {
+   "name": "page scale 2 at 0,0 again",
+   "operation": "pageScale",
+   "args": [
+    2,
+    0,
+    0
+   ],
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 0,
+    "pageTop": 0,
+    "width": 150,
+    "height": 100,
+    "scale": 2,
+    "scrollX": 0,
+    "scrollY": 0,
+    "innerWidth": 300,
+    "innerHeight": 200
+   },
+   "events": [
+    "visualViewport:resize"
+   ]
+  },
+  {
+   "name": "scrollTo(100, 50) at page scale 2",
+   "operation": "scrollTo",
+   "args": [
+    100,
+    50
+   ],
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 100,
+    "pageTop": 50,
+    "width": 150,
+    "height": 100,
+    "scale": 2,
+    "scrollX": 100,
+    "scrollY": 50,
+    "innerWidth": 300,
+    "innerHeight": 200
+   },
+   "events": [
+    "window:scroll"
+   ]
+  },
+  {
+   "name": "wheel 30, 40 at 150, 100 at page scale 2",
+   "operation": "wheel",
+   "args": [
+    150,
+    100,
+    30,
+    40
+   ],
+   "state": {
+    "offsetLeft": 15,
+    "offsetTop": 20,
+    "pageLeft": 115,
+    "pageTop": 70,
+    "width": 150,
+    "height": 100,
+    "scale": 2,
+    "scrollX": 100,
+    "scrollY": 50,
+    "innerWidth": 300,
+    "innerHeight": 200
+   },
+   "events": [
+    "visualViewport:scroll"
+   ]
+  },
+  {
+   "name": "page scale 1 at 100,50",
+   "operation": "pageScale",
+   "args": [
+    1,
+    100,
+    50
+   ],
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 100,
+    "pageTop": 50,
+    "width": 300,
+    "height": 200,
+    "scale": 1,
+    "scrollX": 100,
+    "scrollY": 50,
+    "innerWidth": 300,
+    "innerHeight": 200
+   },
+   "events": [
+    "visualViewport:resize",
+    "visualViewport:scroll"
+   ]
+  },
+  {
+   "name": "scrollTo(0, 0) at page scale 1",
+   "operation": "scrollTo",
+   "args": [
+    0,
+    0
+   ],
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 0,
+    "pageTop": 0,
+    "width": 300,
+    "height": 200,
+    "scale": 1,
+    "scrollX": 0,
+    "scrollY": 0,
+    "innerWidth": 300,
+    "innerHeight": 200
+   },
+   "events": [
+    "window:scroll"
+   ]
+  },
+  {
+   "name": "resize 320x240",
+   "operation": "resize",
+   "args": [
+    320,
+    240
+   ],
+   "state": {
+    "offsetLeft": 0,
+    "offsetTop": 0,
+    "pageLeft": 0,
+    "pageTop": 0,
+    "width": 320,
+    "height": 240,
+    "scale": 1,
+    "scrollX": 0,
+    "scrollY": 0,
+    "innerWidth": 320,
+    "innerHeight": 240
+   },
+   "events": [
+    "window:resize",
+    "visualViewport:resize"
+   ]
+  }
+ ],
+ "qualifiedBrowserOnly": {
+  "onscrollend": true,
+  "detachedFrame": {
+   "offsetLeft": 0,
+   "offsetTop": 0,
+   "pageLeft": 0,
+   "pageTop": 0,
+   "width": 0,
+   "height": 0,
+   "scale": 0
+  }
+ }
+}

@@ -257,6 +257,17 @@ reads it. At run time a host with accessibility on keeps an accessibility object
 updates the tree as the page changes, which costs memory and time in proportion to the page (E); a host
 with it off costs nothing.
 
+## Relations
+
+`rv_ax_relations` (`accessibility-relations`, ABI49) writes a node's ARIA relationship targets for one of eight kinds:
+active descendant, controls, described by, details, error message, flow to, labelled by and owns. The targets come from
+the attribute's ID references or from the elements set through `Element.aria*Element(s)` (`RanvierWebCoreDom.h`).
+Setting the elements sets the attribute to the empty string, and setting the attribute replaces the elements. The order
+is the reference order, and a target appears once. A target with no accessible object is left out: a removed element,
+or one in a shadow root that the referring element cannot see. The handles are new references, and a node whose object
+is gone returns `RV_ERR_DETACHED`. `ariaActionsElements` reports `RV_ERR_UNSUPPORTED`, because WebKit keeps
+`ARIAActionsSupportEnabled` off.
+
 ## Not covered
 
 - **Text attributes.** Font, size, weight, colour, language and misspelling over a text range (UI
@@ -266,8 +277,7 @@ with it off costs nothing.
   button inside a paragraph) are not marked in the text with U+FFFC as AT-SPI's hypertext expects.
 - **Tables.** Row and column counts, indexes, spans and headers (`AXTableHelpers`) are not exposed; the
   app sees rows and cells as children.
-- **Relations.** `aria-controls`, `aria-owns`, `aria-flowto`, `aria-details` and `aria-errormessage`
-  targets, and position in set (`aria-posinset`, `aria-setsize`) are not exposed.
+- **Position in set.** `aria-posinset` and `aria-setsize` are not exposed.
 - **Frames.** The host loads one document. An `<iframe>`'s content appears through WebCore's frame objects
   as on any port, but no test covers it.
 - **Off the main thread.** UI Automation calls a provider on its own threads; the app marshals each call

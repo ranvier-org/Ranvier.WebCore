@@ -1,0 +1,123 @@
+{
+  "directory": "C:\\wk\\native-forms\\artifacts\\forms-candidate-2\\runtime",
+  "cases": [
+    {
+      "name": "requestSubmit-no-action",
+      "status": 0,
+      "events": [
+        "submit",
+        "formdata"
+      ],
+      "before": {
+        "sameDocument": true,
+        "bodyChildElements": 2,
+        "readyState": 2,
+        "markerConnected": true,
+        "baseURI": "about:blank"
+      },
+      "immediately": {
+        "sameDocument": true,
+        "bodyChildElements": 2,
+        "readyState": 2,
+        "markerConnected": true,
+        "baseURI": "about:blank"
+      },
+      "afterRunLoop": {
+        "sameDocument": true,
+        "bodyChildElements": 2,
+        "readyState": 2,
+        "markerConnected": true,
+        "baseURI": "about:blank"
+      },
+      "cycles": 500
+    },
+    {
+      "name": "requestSubmit-https-action",
+      "status": 0,
+      "events": [
+        "submit",
+        "formdata"
+      ],
+      "before": {
+        "sameDocument": true,
+        "bodyChildElements": 2,
+        "readyState": 2,
+        "markerConnected": true,
+        "baseURI": "about:blank"
+      },
+      "immediately": {
+        "sameDocument": true,
+        "bodyChildElements": 2,
+        "readyState": 2,
+        "markerConnected": true,
+        "baseURI": "about:blank"
+      },
+      "afterRunLoop": {
+        "sameDocument": true,
+        "bodyChildElements": 2,
+        "readyState": 2,
+        "markerConnected": true,
+        "baseURI": "about:blank"
+      },
+      "cycles": 500
+    },
+    {
+      "name": "submit-default-action",
+      "status": 0,
+      "events": [
+        "formdata"
+      ],
+      "before": {
+        "sameDocument": true,
+        "bodyChildElements": 2,
+        "readyState": 2,
+        "markerConnected": true,
+        "baseURI": "about:blank"
+      },
+      "immediately": {
+        "sameDocument": true,
+        "bodyChildElements": 2,
+        "readyState": 2,
+        "markerConnected": true,
+        "baseURI": "about:blank"
+      },
+      "afterRunLoop": {
+        "sameDocument": true,
+        "bodyChildElements": 2,
+        "readyState": 2,
+        "markerConnected": true,
+        "baseURI": "about:blank"
+      },
+      "cycles": 460
+    },
+    {
+      "name": "submit-https-action",
+      "status": 0,
+      "events": [
+        "formdata"
+      ],
+      "before": {
+        "sameDocument": true,
+        "bodyChildElements": 2,
+        "readyState": 2,
+        "markerConnected": true,
+        "baseURI": "about:blank"
+      },
+      "immediately": {
+        "sameDocument": true,
+        "bodyChildElements": 2,
+        "readyState": 2,
+        "markerConnected": true,
+        "baseURI": "about:blank"
+      },
+      "afterRunLoop": {
+        "sameDocument": true,
+        "bodyChildElements": 2,
+        "readyState": 2,
+        "markerConnected": true,
+        "baseURI": "about:blank"
+      },
+      "cycles": 436
+    }
+  ]
+}

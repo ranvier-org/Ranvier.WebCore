@@ -1,0 +1,450 @@
+{
+  "group": [
+    "H13 #115"
+  ],
+  "native": "0.1.0-preview.33",
+  "abi": 41,
+  "features": [
+    "dom:DOMURL",
+    "dom:URLSearchParams",
+    "dom:URLPattern",
+    "dom-url-static",
+    "dom-url-search-params-entries"
+  ],
+  "members": [
+    "URL constructor, parse, canParse, href/origin/protocol/username/password/host/hostname/port/pathname/search/hash, searchParams, toJSON",
+    "URLSearchParams constructor (sequence, record, string), size, append, delete, get, getAll, has, set, sort, entries, toString",
+    "URLPattern constructors, test, exec (URLPatternResult), component getters, hasRegExpGroups"
+  ],
+  "excluded": [
+    "URL.createObjectURL",
+    "URL.revokeObjectURL (later blob-URL group)"
+  ],
+  "sourceHeadOfBatch": "c0fd2f49b42599efa41e9aece86c05c286cc35f5",
+  "route": {
+    "decision": "native: WebKit WTF URLParser and WebCore URLPattern through generated exports",
+    "systemUriHrefAgreement": "30/40",
+    "files": [
+      "route-red-cases.json",
+      "route-red-chromium.json",
+      "route-red-system-uri.json"
+    ]
+  },
+  "red": {
+    "runtime": "native-caret/artifacts/native32-frozen (Native32/ABI40)",
+    "files": [
+      "red-url-values-native32.log",
+      "red-url-wpt-native32.log"
+    ],
+    "nul": {
+      "runtime": "native-url/artifacts/native33-frozen (previous H13 head)",
+      "files": [
+        "red-nul-old-head.log",
+        "red-nul-old-head-differences.json"
+      ],
+      "case": "getAll of a=x%00y&a=%00 returned [x, \"\"]; a sequence init lost the text after U+0000"
+    },
+    "earlier": "native-dialog native30-candidate-1: url_values.py fails at the missing rv_dom_domurl_release"
+  },
+  "green": {
+    "urlValuesAssertions": 3538,
+    "ownCases": {
+      "parse": 83,
+      "setters": 27,
+      "params": 12,
+      "linked": 2,
+      "patterns": 22
+    },
+    "qualifiedDifferences": 6,
+    "wpt": {
+      "urltestdata": {
+        "cases": 896,
+        "native": 896,
+        "chromium": 787
+      },
+      "setters_tests": {
+        "cases": 278,
+        "native": 278,
+        "chromium": 238
+      },
+      "urlpatterntestdata": {
+        "cases": 369,
+        "native": 369,
+        "chromium": 369
+      }
+    },
+    "wptDisagreements": 150,
+    "wptBothFail": 0,
+    "probes": 46,
+    "allExitZero": true,
+    "batchParsedAssertions": 70721,
+    "batchParsedNote": "the batch runner parses \"PASS ... N assertions\" and \"<probe>: N assertions\" lines; url_wpt reports engine calls",
+    "rawAssertions": 70721,
+    "urlWptCalls": 15930,
+    "newProbes": [
+      "url_values",
+      "url_wpt"
+    ],
+    "probesRun": [
+      {
+        "name": "css_supports",
+        "exitCode": 0,
+        "assertions": 72,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "computed_style",
+        "exitCode": 0,
+        "assertions": 93,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "fragment_rectangles",
+        "exitCode": 0,
+        "assertions": 140,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "table_surface",
+        "exitCode": 0,
+        "assertions": 44,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "element_reflection",
+        "exitCode": 0,
+        "assertions": 269,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "area_surface",
+        "exitCode": 0,
+        "assertions": 117,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "cssom_surface",
+        "exitCode": 0,
+        "assertions": 407,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "keyframe_rules",
+        "exitCode": 0,
+        "assertions": 93,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "counter_style_rules",
+        "exitCode": 0,
+        "assertions": 86,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "detached_cssom_context",
+        "exitCode": 0,
+        "assertions": 389,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "svg_mathml_surface",
+        "exitCode": 0,
+        "assertions": 95,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "style_property_maps",
+        "exitCode": 0,
+        "assertions": 189,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "declared_style_maps",
+        "exitCode": 0,
+        "assertions": 2069,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "style_map_entries",
+        "exitCode": 0,
+        "assertions": 144,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "typed_style_values",
+        "exitCode": 0,
+        "assertions": 190,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "custom_properties",
+        "exitCode": 0,
+        "assertions": 231,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "geometry_values",
+        "exitCode": 0,
+        "assertions": 260,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "matrix_values",
+        "exitCode": 0,
+        "assertions": 1091,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "css_transforms",
+        "exitCode": 0,
+        "assertions": 405,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "svg_geometry",
+        "exitCode": 0,
+        "assertions": 639,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "svg_surfaces",
+        "exitCode": 0,
+        "assertions": 1594,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "svg_documents",
+        "exitCode": 0,
+        "assertions": 78,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "svg_view_controls",
+        "exitCode": 0,
+        "assertions": 318,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "svg_animation_variants",
+        "exitCode": 0,
+        "assertions": 70,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "capabilities",
+        "exitCode": 0,
+        "assertions": null,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "svg_view_selection",
+        "exitCode": 0,
+        "assertions": null,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "svg_paint_servers",
+        "exitCode": 0,
+        "assertions": 565,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "svg_filters",
+        "exitCode": 0,
+        "assertions": 9086,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "svg_clip_mask_marker",
+        "exitCode": 0,
+        "assertions": 565,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "svg_resources",
+        "exitCode": 0,
+        "assertions": 454,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "mathml_surface",
+        "exitCode": 0,
+        "assertions": 371,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "svg_tests_lists",
+        "exitCode": 0,
+        "assertions": 191,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "image_decode",
+        "exitCode": 0,
+        "assertions": 73,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "font_load",
+        "exitCode": 0,
+        "assertions": 42,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "event_construction",
+        "exitCode": 0,
+        "assertions": 82,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "tree_traversal",
+        "exitCode": 0,
+        "assertions": 22285,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "focus_input",
+        "exitCode": 0,
+        "assertions": 80,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "viewport_events",
+        "exitCode": 0,
+        "assertions": 364,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "form_collections",
+        "exitCode": 0,
+        "assertions": 1168,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "form_navigation",
+        "exitCode": 0,
+        "assertions": null,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "viewport_scroll",
+        "exitCode": 0,
+        "assertions": 3232,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "dialog_popover",
+        "exitCode": 0,
+        "assertions": 845,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "binary_values",
+        "exitCode": 0,
+        "assertions": 446,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "caret_hit",
+        "exitCode": 0,
+        "assertions": 18251,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "url_values",
+        "exitCode": 0,
+        "assertions": 3538,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "url_wpt",
+        "exitCode": 0,
+        "assertions": null,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "frames",
+        "exitCode": 0,
+        "assertions": null,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      },
+      {
+        "name": "teardown",
+        "exitCode": 0,
+        "assertions": null,
+        "runtimeReceipt": "C:\\wk\\native-url\\artifacts\\native33-frozen-2\\runtime-receipt.json"
+      }
+    ],
+    "teardownCases": 84,
+    "teardownCasesAdded": 4,
+    "teardownAllCollected": true
+  },
+  "chromiumOracle": {
+    "browser": "156.0.8078.4",
+    "wptRecordBrowser": "156.0.8078.4",
+    "wptCommit": "15b31607c5102637a3401608427e6a05aaaf3849"
+  },
+  "qualifications": [
+    {
+      "case": "parse[39]",
+      "note": "A space is a forbidden host code point (WHATWG URL host parser): the engine fails, as the spec and WPT require; Chromium percent-encodes it."
+    },
+    {
+      "case": "parse[44]",
+      "note": "\"|\" is outside the path percent-encode set: the engine keeps it, as the spec does; Chromium encodes it as %7C."
+    },
+    {
+      "case": "parse[53]",
+      "note": "The engine keeps the drive letter case of file:c:\foo; Chromium uppercases it."
+    },
+    {
+      "case": "parse[55]",
+      "note": "The spec file-host state replaces the host \"localhost\" with the empty host: the engine does; Chromium keeps localhost."
+    },
+    {
+      "case": "setters[3]",
+      "note": "The protocol setter cannot turn a non-special scheme into a special one: the engine keeps mailto:, as the spec does; Chromium switches to https."
+    },
+    {
+      "case": "setters[22]",
+      "note": "Setting search to \"?\" sets an empty query, so href keeps the \"?\" (spec); Chromium drops it."
+    },
+    {
+      "name": "WPT disagreements",
+      "count": 150,
+      "reason": "149 cases the engine passes and Chromium fails; urlpattern[347] is a JavaScript overload-conversion TypeError with no C ABI call"
+    }
+  ],
+  "packaging": {
+    "wptUnderSrc": [],
+    "packedManagedPackage": {
+      "Ranvier.WebCore.1.0.0.nupkg": {
+        "entries": 10,
+        "wptEntries": []
+      }
+    },
+    "note": "Ranvier.WebCore packed from this head carries no tests/fixtures or WPT entry; the native flavor packages carry only runtimes"
+  },
+  "files": {
+    "absence_h13.py": "27ff524b6597b66801ab8433d5077bbe2102bf5061d2c132c817739290bbb4ab",
+    "allocation-absence.json": "d26e345d9930edeb062f9a59b75d7be58f9dce1bee64803a48099468cf3538de",
+    "batch-green.json": "31f483a84b9467dc2738b605c140ad3d32a36346851703d469032d088445aa67",
+    "build_native33_candidate.py": "51ec2f90e13c75094f3ba142827d7bf685e7e33f4d63620aa04d71aaaf8fbfab",
+    "make_native33_evidence.py": "61f613dc030594e3853420565f881b1f98246702330a00966348aa751918ff73",
+    "package-wpt-check.json": "bfaea2b32596cae12a00598ec6bb164a6eb7a0cb34aa2e01c44d6f51c76edd81",
+    "red-nul-old-head-differences.json": "3167a7beba8400630c03c8c1248efd0df5747f2b6c2cf553946980c1736a8b4d",
+    "red-nul-old-head.log": "651e197c08e5158bd07e69dc0e95fa619ef5dff9a6bf621b467c323aefbaf2b3",
+    "red-url-values-native32.log": "3b2fe11e97c8058e4b0697bd451bdf5dc2cadfd9ac3e7b7c302894aead870219",
+    "red-url-wpt-native32.log": "8d9a47a34fc7d6c32e39e0822b748ffb93cb613173737bfd3959ae8edf920c35",
+    "route-red-cases.json": "d69de8a03599b2afa764fe61291ca8ee944f708cbcdc583b015d2247926e3bac",
+    "route-red-chromium.json": "62d715956954e8bbe9af57608938c60b871d5b53317a253a4c15c0ac23093a7a",
+    "route-red-system-uri.json": "994e34cfd28f3e79c35a079daa7ff8ab3669d44c4b027924598798807bd5faf4",
+    "run_native33_full_batch.py": "0a3bc956ddc0c0319e5e8e149b71d203b770fcd59f98b2c2760634e4674ad899",
+    "runtime-receipt.json": "5b2dd69de97cd83f10563aa0a6058a170dcc12ae97bd6a2afb9ffb5a2de722e1",
+    "source-patches.json": "8aad99b88161c67cecc14bbcbb1c75a843bbf3e6767b09dafc1b32d320ba7b5c",
+    "teardown-probes.json": "e728d223f8325af450b2d762989a624a1027c3bd775fca1bc3408ca148f3f2eb",
+    "url-values-probe.log": "d31a49b20f89451b20b352765846d403c03c3f0f74172f969c3bf718517ec89f",
+    "url-values-repeat30.txt": "52a027fe71b5575f4760236039312b30c4c621d09fd3e87132cf84c5ecf09834",
+    "url-wpt-probe.log": "d91bc3ccf91c9faa8d0b0362caa164274a0b3439e595fb53cf03ee09c61f24fb"
+  }
+}

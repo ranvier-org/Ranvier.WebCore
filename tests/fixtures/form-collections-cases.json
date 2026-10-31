@@ -1,0 +1,194 @@
+{
+  "comment": [
+    "D13 form collections and events. tests/abi/form_collections_browser.mjs replays each case in Chromium and writes",
+    "form-collections-oracle.json; tests/abi/form_collections.py replays it through the native ABI and must match.",
+    "Every case starts from markup. Nodes are named by id; created elements get the id given. A file entry is",
+    "recorded as {\"file\": true}: its name and contents are outside D13."
+  ],
+  "markup": "<!doctype html><body><form id=\"f\" name=\"main\"><input id=\"a1\" name=\"a\" value=\"1\"><input id=\"a2\" name=\"a\" value=\"2\"><input id=\"idonly\" value=\"i\"><input id=\"x\" name=\"y\" value=\"xy\"><input id=\"y\" name=\"z\" value=\"yz\"><fieldset id=\"fs\"><input id=\"inner\" name=\"inner\" value=\"in\"><output id=\"out\" name=\"out\">o</output></fieldset><input id=\"dis\" name=\"dis\" value=\"d\" disabled><input id=\"cb\" type=\"checkbox\" name=\"cb\" value=\"on\" checked><input id=\"cb2\" type=\"checkbox\" name=\"cb2\" value=\"off\"><input id=\"file\" type=\"file\" name=\"upload\"><input id=\"img\" type=\"image\" name=\"img\"><select id=\"s\" name=\"s\"><option id=\"o1\" value=\"v1\">One</option><optgroup id=\"g\" label=\"G\"><option id=\"o2\" name=\"two\">Two</option></optgroup><option id=\"o3\" value=\"v3\" selected>Three</option></select><textarea id=\"ta\" name=\"ta\">text</textarea><button id=\"b1\" name=\"go\" value=\"one\">Go</button><button id=\"b2\" type=\"button\" name=\"nb\">No</button><button id=\"b3\" type=\"reset\" name=\"rb\">Reset</button><input id=\"sub\" type=\"submit\" name=\"s2\" value=\"Send\"></form><input id=\"outside\" name=\"a\" value=\"3\" form=\"f\"><form id=\"f2\"><button id=\"other\" name=\"other\">Other</button></form><p id=\"p\"></p></body>",
+  "cases": [
+    {"name": "elements-initial", "steps": [
+      {"op": "elementsList", "form": "f"},
+      {"op": "elementsLength", "form": "f"},
+      {"op": "elementsItem", "form": "f", "index": 0},
+      {"op": "elementsItem", "form": "f", "index": 99},
+      {"op": "elementsList", "form": "f2"}
+    ]},
+    {"name": "elements-named", "steps": [
+      {"op": "elementsNamed", "form": "f", "name": "a"},
+      {"op": "elementsNamed", "form": "f", "name": "idonly"},
+      {"op": "elementsNamed", "form": "f", "name": "x"},
+      {"op": "elementsNamed", "form": "f", "name": "y"},
+      {"op": "elementsNamed", "form": "f", "name": "z"},
+      {"op": "elementsNamed", "form": "f", "name": "inner"},
+      {"op": "elementsNamed", "form": "f", "name": "img"},
+      {"op": "elementsNamed", "form": "f", "name": "missing"},
+      {"op": "elementsNamed", "form": "f", "name": ""}
+    ]},
+    {"name": "elements-removed-and-moved", "steps": [
+      {"op": "remove", "id": "a2"},
+      {"op": "elementsNamed", "form": "f", "name": "a"},
+      {"op": "remove", "id": "outside"},
+      {"op": "elementsNamed", "form": "f", "name": "a"},
+      {"op": "append", "parent": "f2", "id": "a1"},
+      {"op": "elementsNamed", "form": "f", "name": "a"},
+      {"op": "elementsList", "form": "f2"},
+      {"op": "append", "parent": "p", "id": "inner"},
+      {"op": "elementsList", "form": "f"}
+    ]},
+    {"name": "elements-form-attribute", "steps": [
+      {"op": "setAttribute", "id": "idonly", "name": "form", "value": "f2"},
+      {"op": "setAttribute", "id": "outside", "name": "form", "value": "f2"},
+      {"op": "elementsList", "form": "f"},
+      {"op": "elementsList", "form": "f2"},
+      {"op": "elementsNamed", "form": "f2", "name": "a"},
+      {"op": "removeAttribute", "id": "outside", "name": "form"},
+      {"op": "elementsList", "form": "f2"}
+    ]},
+    {"name": "options-initial", "steps": [
+      {"op": "optionsList", "select": "s"},
+      {"op": "optionsLength", "select": "s"},
+      {"op": "selectedIndex", "select": "s"},
+      {"op": "optionsItem", "select": "s", "index": 1},
+      {"op": "optionsItem", "select": "s", "index": 9},
+      {"op": "optionsNamed", "select": "s", "name": "two"},
+      {"op": "optionsNamed", "select": "s", "name": "o1"},
+      {"op": "optionsNamed", "select": "s", "name": "v1"},
+      {"op": "optionsNamed", "select": "s", "name": "missing"}
+    ]},
+    {"name": "options-add", "steps": [
+      {"op": "create", "tag": "option", "id": "n1", "text": "N1"},
+      {"op": "optionsAdd", "select": "s", "element": "n1", "before": {"element": "o2"}},
+      {"op": "create", "tag": "option", "id": "n2", "text": "N2"},
+      {"op": "optionsAdd", "select": "s", "element": "n2", "before": {"index": 0}},
+      {"op": "create", "tag": "option", "id": "n3", "text": "N3"},
+      {"op": "optionsAdd", "select": "s", "element": "n3", "before": null},
+      {"op": "create", "tag": "option", "id": "n4", "text": "N4"},
+      {"op": "optionsAdd", "select": "s", "element": "n4", "before": {"index": 99}},
+      {"op": "create", "tag": "optgroup", "id": "ng", "text": ""},
+      {"op": "optionsAdd", "select": "s", "element": "ng", "before": {"index": 1}},
+      {"op": "create", "tag": "option", "id": "n5", "text": "N5"},
+      {"op": "optionsAdd", "select": "s", "element": "n5", "before": {"element": "p"}},
+      {"op": "optionsList", "select": "s"},
+      {"op": "selectedIndex", "select": "s"}
+    ]},
+    {"name": "options-remove-and-length", "steps": [
+      {"op": "optionsRemove", "select": "s", "index": 0},
+      {"op": "optionsRemove", "select": "s", "index": 99},
+      {"op": "optionsRemove", "select": "s", "index": -1},
+      {"op": "optionsList", "select": "s"},
+      {"op": "optionsSetLength", "select": "s", "length": 1},
+      {"op": "optionsList", "select": "s"},
+      {"op": "optionsSetLength", "select": "s", "length": 3},
+      {"op": "optionsList", "select": "s"},
+      {"op": "optionsLength", "select": "s"},
+      {"op": "selectedIndex", "select": "s"}
+    ]},
+    {"name": "options-indexed-setter", "steps": [
+      {"op": "create", "tag": "option", "id": "n1", "text": "N1"},
+      {"op": "optionsSetItem", "select": "s", "index": 0, "option": "n1"},
+      {"op": "create", "tag": "option", "id": "n2", "text": "N2"},
+      {"op": "optionsSetItem", "select": "s", "index": 5, "option": "n2"},
+      {"op": "optionsList", "select": "s"},
+      {"op": "optionsSetItem", "select": "s", "index": 1, "option": null},
+      {"op": "optionsList", "select": "s"},
+      {"op": "optionsLength", "select": "s"}
+    ]},
+    {"name": "options-selected-index", "steps": [
+      {"op": "setSelectedIndex", "select": "s", "value": 0},
+      {"op": "selectedIndex", "select": "s"},
+      {"op": "setSelectedIndex", "select": "s", "value": -1},
+      {"op": "selectedIndex", "select": "s"},
+      {"op": "setSelectedIndex", "select": "s", "value": 99},
+      {"op": "selectedIndex", "select": "s"},
+      {"op": "setSelectedIndex", "select": "s", "value": 1},
+      {"op": "optionsNamed", "select": "s", "name": "two"},
+      {"op": "selectedIndex", "select": "s"}
+    ]},
+    {"name": "request-submit-submitters", "steps": [
+      {"op": "listen", "form": "f", "type": "submit", "action": "record"},
+      {"op": "listen", "form": "f", "type": "formdata", "action": "record"},
+      {"op": "requestSubmit", "form": "f", "submitter": null},
+      {"op": "requestSubmit", "form": "f", "submitter": "b1"},
+      {"op": "requestSubmit", "form": "f", "submitter": "sub"},
+      {"op": "requestSubmit", "form": "f", "submitter": "b1"}
+    ]},
+    {"name": "request-submit-prevented", "steps": [
+      {"op": "listen", "form": "f", "type": "submit", "action": "preventDefault"},
+      {"op": "listen", "form": "f", "type": "formdata", "action": "record"},
+      {"op": "requestSubmit", "form": "f", "submitter": "b1"},
+      {"op": "requestSubmit", "form": "f", "submitter": null}
+    ]},
+    {"name": "request-submit-errors", "steps": [
+      {"op": "listen", "form": "f", "type": "submit", "action": "record"},
+      {"op": "requestSubmit", "form": "f", "submitter": "b2"},
+      {"op": "requestSubmit", "form": "f", "submitter": "b3"},
+      {"op": "requestSubmit", "form": "f", "submitter": "other"},
+      {"op": "requestSubmit", "form": "f", "submitter": "a1"}
+    ]},
+    {"name": "submit-fires-formdata-only", "steps": [
+      {"op": "listen", "form": "f", "type": "submit", "action": "record"},
+      {"op": "listen", "form": "f", "type": "formdata", "action": "record"},
+      {"op": "submit", "form": "f"},
+      {"op": "submit", "form": "f"}
+    ]},
+    {"name": "formdata-listener-edits", "steps": [
+      {"op": "listen", "form": "f", "type": "formdata", "action": "edit", "edits": [
+        {"op": "append", "name": "extra", "value": "e"},
+        {"op": "delete", "name": "a"},
+        {"op": "set", "name": "ta", "value": "T"}
+      ]},
+      {"op": "requestSubmit", "form": "f", "submitter": "b1"},
+      {"op": "formDataNew", "var": "d", "form": "f", "submitter": "sub"},
+      {"op": "formDataEntries", "var": "d"}
+    ]},
+    {"name": "formdata-constructor", "steps": [
+      {"op": "listen", "form": "f", "type": "formdata", "action": "record"},
+      {"op": "formDataNew", "var": "d", "form": "f", "submitter": null},
+      {"op": "formDataEntries", "var": "d"},
+      {"op": "formDataNew", "var": "e", "form": "f", "submitter": "b1"},
+      {"op": "formDataEntries", "var": "e"},
+      {"op": "formDataNew", "var": "bad", "form": "f", "submitter": "b2"},
+      {"op": "formDataNew", "var": "bad", "form": "f", "submitter": "other"},
+      {"op": "formDataNew", "var": "empty", "form": null, "submitter": null},
+      {"op": "formDataEntries", "var": "empty"}
+    ]},
+    {"name": "formdata-disabled-and-removed", "steps": [
+      {"op": "remove", "id": "inner"},
+      {"op": "setAttribute", "id": "a1", "name": "disabled", "value": ""},
+      {"op": "setAttribute", "id": "fs", "name": "disabled", "value": ""},
+      {"op": "formDataNew", "var": "d", "form": "f", "submitter": null},
+      {"op": "formDataEntries", "var": "d"}
+    ]},
+    {"name": "formdata-operations", "steps": [
+      {"op": "formDataNew", "var": "d", "form": null, "submitter": null},
+      {"op": "formDataAppend", "var": "d", "name": "k", "value": "1"},
+      {"op": "formDataAppend", "var": "d", "name": "k", "value": "2"},
+      {"op": "formDataAppend", "var": "d", "name": "café", "value": "ü\u0000x"},
+      {"op": "formDataGet", "var": "d", "name": "k"},
+      {"op": "formDataGetAll", "var": "d", "name": "k"},
+      {"op": "formDataHas", "var": "d", "name": "k"},
+      {"op": "formDataGet", "var": "d", "name": "café"},
+      {"op": "formDataSet", "var": "d", "name": "k", "value": "3"},
+      {"op": "formDataEntries", "var": "d"},
+      {"op": "formDataDelete", "var": "d", "name": "k"},
+      {"op": "formDataHas", "var": "d", "name": "k"},
+      {"op": "formDataGet", "var": "d", "name": "k"},
+      {"op": "formDataGetAll", "var": "d", "name": "k"},
+      {"op": "formDataNew", "var": "f", "form": "f", "submitter": null},
+      {"op": "formDataGet", "var": "f", "name": "upload"},
+      {"op": "formDataGetAll", "var": "f", "name": "upload"},
+      {"op": "formDataAppend", "var": "f", "name": "upload", "value": "text"},
+      {"op": "formDataGetAll", "var": "f", "name": "upload"}
+    ]},
+    {"name": "constructed-events", "steps": [
+      {"op": "constructSubmitEvent", "type": "submit", "submitter": "b1", "bubbles": false, "cancelable": true},
+      {"op": "constructSubmitEvent", "type": "custom", "submitter": null, "bubbles": true, "cancelable": false},
+      {"op": "constructSubmitEvent", "type": "submit", "submitter": "p", "bubbles": false, "cancelable": false},
+      {"op": "formDataNew", "var": "d", "form": null, "submitter": null},
+      {"op": "formDataAppend", "var": "d", "name": "k", "value": "v"},
+      {"op": "constructFormDataEvent", "type": "formdata", "var": "d", "bubbles": true, "cancelable": false},
+      {"op": "dispatchFormDataEvent", "form": "f", "type": "formdata", "var": "d"}
+    ]}
+  ]
+}

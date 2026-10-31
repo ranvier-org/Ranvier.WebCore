@@ -1,0 +1,61 @@
+{
+  "runtime": "native34-candidate-4/runtime",
+  "sha256": {
+    "WebCore.dll": "96d3171f50026fb08a8f62720e96e92c8a53fa329057b4ff079099ae568f57e5",
+    "RanvierWebCoreHost.dll": "150d66fd19976603a9f014956c6ba03dcda72dcabb32ad82021c151230e361c2"
+  },
+  "handler": true,
+  "steps": [
+    {
+      "op": "requestSubmit",
+      "id": "g",
+      "status": "ok",
+      "lifecycle": [
+        "pagehide",
+        "unload"
+      ],
+      "events": [
+        "submit",
+        "formdata"
+      ],
+      "submissions": []
+    },
+    {
+      "op": "flush",
+      "id": null,
+      "status": "ok",
+      "lifecycle": [
+        "pagehide",
+        "unload"
+      ],
+      "events": [],
+      "submissions": [
+        "GET https://app.test/search?q=a+b%26c%3Dd&cb=on&go=one&outside=o"
+      ]
+    },
+    {
+      "op": "requestSubmit",
+      "id": "p",
+      "status": "ok",
+      "lifecycle": [
+        "pagehide",
+        "unload"
+      ],
+      "events": [],
+      "submissions": []
+    },
+    {
+      "op": "flush",
+      "id": null,
+      "status": "ok",
+      "lifecycle": [
+        "pagehide",
+        "unload"
+      ],
+      "events": [],
+      "submissions": [
+        "POST https://app.test/post"
+      ]
+    }
+  ]
+}

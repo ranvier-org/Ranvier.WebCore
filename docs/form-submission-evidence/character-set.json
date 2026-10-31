@@ -1,0 +1,20 @@
+[
+  {
+    "runtime": "C:/wk/native-url/artifacts/native33-frozen-2/runtimes/win-x64/native",
+    "hostSha256": "de84b58c538ed8b26e09f6d052739318015a77cf13012469f5ec23d934beca27",
+    "characterSet": {
+      "none": "windows-1252",
+      "meta-utf-8": "windows-1252",
+      "meta-windows-1252": "windows-1252"
+    }
+  },
+  {
+    "runtime": "artifacts/native34-frozen-2/runtimes/win-x64/native",
+    "hostSha256": "1b15eff6f291c1ad50eb786ae17a0e67a6333bfef1d3485a4728cd7956570a82",
+    "characterSet": {
+      "none": "UTF-8",
+      "meta-utf-8": "UTF-8",
+      "meta-windows-1252": "UTF-8"
+    }
+  }
+]

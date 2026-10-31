@@ -1,0 +1,18 @@
+{
+ "base": "77da397",
+ "generatorChange": "gen/idl.py, gen/domgen.py (setlike/maplike, variadic constructor, namespace readonly attribute)",
+ "checkExit": 0,
+ "checkOutput": [
+  "interfaces 266, functions 2584 (getters 1392, setters 636, operations 496, constructors 33, namespace operations 3, static operations 12, iterator snapshots 3, context operations 9), handle types 60, constants 190, enumerations 9, dictionaries 33, stubs 0, left out 758"
+ ],
+ "committedOutputSha256": {
+  "host/RanvierWebCoreDom.h": "f86eb2b4b01640ef3d41c26fc502d05cde5298ff44476f1d1397b641cb6fc45f",
+  "host/RanvierWebCoreDom.cpp": "13c87fe76580fed91716c479fef90687fc66fdf4568f325be55bcb95c4bf0362",
+  "host/dom/RanvierDomGlue.h": "a6c29822ce4234bf81ad9d55c934660406f29b039b7e97d1cac2484766b67164",
+  "host/dom/RanvierDomGlue.cpp": "1a930153dd137d076036442d09b9d27a0d4f4654f680c77154c1997c67b7e0f8",
+  "tests/abi/NativeDom.fs": "5eef0c5fd47449f4debfdbd4fefae5685c9a8e56350ea24e1f9779dd88c86e9f",
+  "gen/dom-report.txt": "af1e67ea32aad4df7c593a43dc88470990e329f60ef095a767ac290365d4d8e3",
+  "gen/Ranvier.Dom.fs": "9ee000b5d6b7e310dd12bbb11bb185663b2b2901db7d05021f53dc42156f5ee8",
+  "gen/dom-api.json": "881674f9a064c35cf6028f46015ec2901b494b0f09e870cd400d238b1ca31fcf"
+ }
+}
