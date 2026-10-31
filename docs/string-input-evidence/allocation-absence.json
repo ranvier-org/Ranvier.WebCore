@@ -1,10 +1,10 @@
 {
-  "checkedAtUtc": "2026-10-31T11:21:14.136194+00:00",
+  "checkedAtUtc": "2026-10-31T12:19:18.412213+00:00",
   "purpose": "WebCore #142 length-delimited generated string inputs: Native43/ABI51 (ABI-breaking for every generated string input), DOM alpha.46, Views 0.1.36, WebCore backend alpha.36 reservation",
   "abi": 51,
   "abiBreaking": "generated string inputs become UTF-8 pointer plus byte length; dictionary string fields RvDomUtf8StringInput; container strings RvDomUtf8StringSpan",
-  "stackedOn": "2a9cf7d (I08 Native39/ABI47); T03, I11, H08 merged before the final run",
-  "abiNumberInUse": "host/RanvierWebCoreAbi.cpp:1311:int32_t rv_abi_version(void) { return 47; }",
+  "stackedOn": "b631aae: H08 acf26e3 (Native42/ABI50), I11 5eee88a (Native41/ABI49), T03 828fb2b (Native40/ABI48), I08 2a9cf7d (Native39/ABI47)",
+  "abiNumberInUse": "host/RanvierWebCoreAbi.cpp:1320:int32_t rv_abi_version(void) { return 51; }",
   "packages": [
     {
       "package": "Ranvier.WebCore",
@@ -329,12 +329,6 @@
           "number": 21,
           "title": "feat(webcore): add shared SVG geometry and live values (Views 0.1.9)",
           "url": "https://github.com/ranvier-org/Ranvier.View/pull/21"
-        },
-        {
-          "headRefName": "codex/native-api-timing",
-          "number": 19,
-          "title": "feat(webcore): share profiling marks with the host frame clock",
-          "url": "https://github.com/ranvier-org/Ranvier.View/pull/19"
         }
       ]
     }

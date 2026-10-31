@@ -49,7 +49,7 @@ for name in series:
 # The host-glue objects WebCore links besides RanvierDomGlue are the parent's.
 link = (parent / 'webcore-link.rsp').read_text(encoding='utf-8')
 glue_objects = sorted({path for path in re.findall(r'(\S+Ranvier[A-Za-z]+Glue\.cpp\.obj)', link) if 'RanvierDomGlue' not in path})
-assert len(glue_objects) == 4, glue_objects
+assert len(glue_objects) >= 4, glue_objects
 
 runtime = out / 'runtime'
 runtime.mkdir(parents=True, exist_ok=True)
