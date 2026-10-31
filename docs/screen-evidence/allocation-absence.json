@@ -1,10 +1,10 @@
 {
-  "checkedAtUtc": "2026-10-31T10:06:50.726771+00:00",
+  "checkedAtUtc": "2026-10-31T10:20:56.869863+00:00",
   "purpose": "G04 screen Native38/ABI46 (preview.38), DOM alpha.41, Views 0.1.31, WebCore backend alpha.31 reservation",
   "abi": 46,
-  "nativeHead": "d8a2d53f32bda0943536b9cb1336a2fadd8bcd4f",
-  "stackedOn": "d8a2d53 (B22 c78a71a Native36/ABI44 + G04 screen + patch 0038)",
-  "abiNumberInUse": "host/RanvierWebCoreAbi.cpp:1301:int32_t rv_abi_version(void) { return 44; }",
+  "nativeHead": "0d172fc9206255a2dd5296a04d481bf98ee98a82",
+  "stackedOn": "0d172fc (B22 Native36/ABI44 + G03 cdf1a4e Native37/ABI45 + G04 screen + 0038)",
+  "abiNumberInUse": "host/RanvierWebCoreAbi.cpp:1303:int32_t rv_abi_version(void) { return 46; }",
   "packages": [
     {
       "package": "Ranvier.WebCore",
