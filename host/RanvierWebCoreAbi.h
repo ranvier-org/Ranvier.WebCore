@@ -1533,6 +1533,17 @@ RV_EXPORT int32_t rv_media_encoding_info(RvHost*, int32_t type, const RvMediaVid
  * for another operation or outcome, with the outputs untouched. */
 RV_EXPORT int32_t rv_media_capabilities_info(uint64_t operation, int32_t* supported, int32_t* smooth, int32_t* power_efficient);
 
+/* Image encodings, shared by snapshots and canvas export. RGBA8 is unpremultiplied RGBA8 rows, width * 4 bytes each,
+ * in the image's color space. PNG ignores quality. JPEG and WEBP take quality from 0 to 1; NaN or a value outside
+ * [0, 1] selects the engine encoder's default, as HTMLCanvasElement.toBlob does, and WEBP at exactly 1 is lossless.
+ * The facilities "image-encoding-png", "image-encoding-jpeg" and "image-encoding-webp" report the engine's encoders. */
+enum {
+    RV_IMAGE_ENCODING_RGBA8 = 0,
+    RV_IMAGE_ENCODING_PNG = 1,
+    RV_IMAGE_ENCODING_JPEG = 2,
+    RV_IMAGE_ENCODING_WEBP = 3,
+};
+
 enum {
     RV_FILE_READER_RESULT_NULL = 0,
     RV_FILE_READER_RESULT_STRING = 1,

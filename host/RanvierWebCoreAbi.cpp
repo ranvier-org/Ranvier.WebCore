@@ -61,6 +61,7 @@
 #include <WebCore/Range.h>
 #include <WebCore/Settings.h>
 #include <WebCore/MIMETypeRegistry.h>
+#include <WebCore/ImageUtilities.h>
 #include <WebCore/Text.h>
 #include <WebCore/TrustedHTML.h>
 #include <WebCore/DocumentLoader.h>
@@ -4360,6 +4361,45 @@ int32_t rv_element_snapshot(RvNode* target, uint8_t* rgba, int32_t length, int32
         return RV_ERR_BUFFER_TOO_SMALL;
     std::memcpy(rgba, pixels->bytes().data(), required);
     return RV_OK;
+}
+
+// The image encoder shared by snapshots and canvas export: RV_IMAGE_ENCODING_PNG, JPEG and WEBP through the engine's
+// encodeData. quality applies to JPEG and WEBP; NaN or a value outside [0, 1] selects the encoder's default, as
+// HTMLCanvasElement.toBlob does.
+static std::optional<double> imageEncodingQuality(int32_t encoding, double quality)
+{
+    if ((encoding != RV_IMAGE_ENCODING_JPEG && encoding != RV_IMAGE_ENCODING_WEBP) || !(quality >= 0 && quality <= 1))
+        return std::nullopt;
+    return quality;
+}
+
+static String imageEncodingMIMEType(int32_t encoding)
+{
+    switch (encoding) {
+    case RV_IMAGE_ENCODING_PNG:
+        return "image/png"_s;
+    case RV_IMAGE_ENCODING_JPEG:
+        return "image/jpeg"_s;
+    case RV_IMAGE_ENCODING_WEBP:
+        return "image/webp"_s;
+    default:
+        return { };
+    }
+}
+
+// Whether the engine encodes the encoding on this flavor; RV_IMAGE_ENCODING_RGBA8 always is.
+static bool imageEncodingSupported(int32_t encoding)
+{
+    if (encoding == RV_IMAGE_ENCODING_RGBA8)
+        return true;
+    auto type = imageEncodingMIMEType(encoding);
+    return !type.isNull() && MIMETypeRegistry::isSupportedImageMIMETypeForEncoding(type);
+}
+
+// Encodes the buffer's pixels; empty when the encoder fails.
+static Vector<uint8_t> encodeImage(RefPtr<ImageBuffer>&& buffer, int32_t encoding, double quality)
+{
+    return encodeData(WTF::move(buffer), imageEncodingMIMEType(encoding), imageEncodingQuality(encoding, quality));
 }
 
 int32_t rv_host_set_popup_handler(RvHost* host, RvPopupCallback callback, void* context)
