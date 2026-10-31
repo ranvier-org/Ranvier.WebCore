@@ -27,7 +27,7 @@ for repo in ['ranvier-org/Ranvier.WebCore', 'ranvier-org/Ranvier', 'ranvier-org/
     prs = json.loads(subprocess.run(['gh','pr','list','--repo',repo,'--state','open','--json','number,title,headRefName,url'], capture_output=True, text=True).stdout)
     gh.append({'repository': repo, 'matchingTags': [t for t in tags if any(m in t for m in marks)], 'openPullRequests': prs})
 abi = subprocess.run(['git','grep','-n','return 42;','--','host/RanvierWebCoreAbi.cpp'], cwd='C:/wk/native-formsubmit', capture_output=True, text=True).stdout
-receipt = {'checkedAtUtc': datetime.datetime.now(datetime.UTC).isoformat(), 'purpose': 'D14 form submission Native34/ABI42, DOM alpha.37, Views 0.1.27, WebCore backend alpha.27 reservation', 'abi': 42, 'stackedOn': '9164912 (Native33/ABI41 H13 4db4ad8 + d7e395c, H11 6610b57, G09 fb87eb0, source patch 0037 a005332)', 'abiNumberInUse': abi.strip(), 'packages': rows, 'github': gh}
+receipt = {'checkedAtUtc': datetime.datetime.now(datetime.UTC).isoformat(), 'purpose': 'D14 form submission Native34/ABI42, DOM alpha.37, Views 0.1.27, WebCore backend alpha.27 reservation', 'abi': 42, 'stackedOn': '7c92f3c (Native33/ABI41 H13 final 3c7e8d4, H11 6610b57, G09 fb87eb0 and a215ef9, source patch 0037 a005332)', 'abiNumberInUse': abi.strip(), 'packages': rows, 'github': gh}
 Path('C:/wk/native-formsubmit/docs/form-submission-evidence/allocation-absence.json').write_text(json.dumps(receipt, indent=2))
 print('not-absent:', [(r['package'], r['version'], r['published']) for r in rows if r['published'] is not False])
 for g in gh: print(g['repository'], 'tags', g['matchingTags'], 'prs', [(p['number'], p['headRefName']) for p in g['openPullRequests']])

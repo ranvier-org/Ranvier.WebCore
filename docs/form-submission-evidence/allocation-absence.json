@@ -1,8 +1,8 @@
 {
-  "checkedAtUtc": "2026-10-31T08:31:47.084288+00:00",
+  "checkedAtUtc": "2026-10-31T09:00:15.396972+00:00",
   "purpose": "D14 form submission Native34/ABI42, DOM alpha.37, Views 0.1.27, WebCore backend alpha.27 reservation",
   "abi": 42,
-  "stackedOn": "9164912 (Native33/ABI41 H13 4db4ad8 + d7e395c, H11 6610b57, G09 fb87eb0, source patch 0037 a005332)",
+  "stackedOn": "7c92f3c (Native33/ABI41 H13 final 3c7e8d4, H11 6610b57, G09 fb87eb0 and a215ef9, source patch 0037 a005332)",
   "abiNumberInUse": "host/RanvierWebCoreAbi.cpp:1248:int32_t rv_abi_version(void) { return 42; }",
   "packages": [
     {
@@ -299,12 +299,6 @@
       "repository": "ranvier-org/Ranvier.View",
       "matchingTags": [],
       "openPullRequests": [
-        {
-          "headRefName": "codex/release-views017",
-          "number": 35,
-          "title": "chore: release 0.1.7",
-          "url": "https://github.com/ranvier-org/Ranvier.View/pull/35"
-        },
         {
           "headRefName": "codex/native-api-custom-events",
           "number": 33,
