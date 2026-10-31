@@ -62,7 +62,8 @@ def run(name, command, expected=None, environment=None, executed=None, timeout=3
     assert before == {str(p): digest(p) for p in (executed or [])}, 'Executed managed assets changed'
     record = {'name': name, 'exitCode': result.returncode, 'log': str(log), 'logSha256': digest(log), 'executedSources': sources,
               'executedAssets': before, 'runtimeReceipt': str(freeze / 'runtime-receipt.json')}
-    match = re.search(rb'PASS[^\n]*?(\d+) assertions', result.stdout)
+    # Probes report either "... PASS ... N assertions" or "<probe>: N assertions".
+    match = re.search(rb'PASS[^\n]*?(\d+) assertions', result.stdout) or re.search(rb'(?m)^[a-z_]+: (\d+) assertions', result.stdout)
     if match:
         record['assertions'] = int(match.group(1))
     records[:] = [item for item in records if item['name'] != name]
