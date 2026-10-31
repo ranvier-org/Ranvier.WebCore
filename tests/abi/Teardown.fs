@@ -1206,6 +1206,121 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
 
             rv_dom_animation_effect_release effect
             fun () -> rv_event_target_release held.Value
+        | "canvas text metrics" ->
+            let canvas = rv_document_create_element (host, "canvas")
+            rv_node_append_child (div, canvas) |> check "append canvas"
+            rv_canvas_get_context (canvas, 1, 0n, &held.contents) |> check "getContext 2d"
+            rv_node_release canvas
+
+            rv_dom_canvas_rendering_context2_d_set_font (held.Value, utf8 "20px monospace", utf8Length "20px monospace")
+            |> check "font"
+
+            let mutable metrics = 0n
+
+            rv_dom_canvas_rendering_context2_d_measure_text (held.Value, utf8 "XX", utf8Length "XX", &metrics)
+            |> check "measureText"
+
+            fun () ->
+                let mutable width = 0.0
+
+                rv_dom_text_metrics_get_width (metrics, &width)
+                |> check "TextMetrics.width after destroy"
+
+                if width <= 0.0 then
+                    failwithf "TextMetrics.width after destroy: %f" width
+
+                let mutable later = 0n
+
+                let measured =
+                    rv_dom_canvas_rendering_context2_d_measure_text (held.Value, utf8 "X", utf8Length "X", &later)
+
+                if measured = 0 then
+                    rv_dom_text_metrics_release later
+                elif measured <> -10 && measured <> -11 then
+                    failwithf "measureText after destroy: %d" measured
+
+                rv_dom_text_metrics_release metrics
+                rv_dom_canvas_rendering_context2_d_release held.Value
+        | "canvas gradient" ->
+            let canvas = rv_document_create_element (host, "canvas")
+            rv_node_append_child (div, canvas) |> check "append canvas"
+            rv_canvas_get_context (canvas, 1, 0n, &held.contents) |> check "getContext 2d"
+            rv_node_release canvas
+            let mutable gradient = 0n
+
+            rv_dom_canvas_rendering_context2_d_create_linear_gradient (held.Value, 0.0, 0.0, 10.0, 0.0, &gradient)
+            |> check "createLinearGradient"
+
+            rv_dom_canvas_gradient_add_color_stop (gradient, document, 0.0, utf8 "red", utf8Length "red")
+            |> check "addColorStop"
+
+            let mutable style = RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern()
+            style.present <- 1
+            style.tag <- 2
+            style.arm1 <- gradient
+
+            rv_dom_canvas_rendering_context2_d_set_stroke_style (held.Value, [| style |])
+            |> check "strokeStyle gradient"
+
+            let context = rv_node_retain document
+
+            fun () ->
+                let added =
+                    rv_dom_canvas_gradient_add_color_stop (gradient, context, 1.0, utf8 "blue", utf8Length "blue")
+
+                if added <> 0 && added <> -10 && added <> -11 then
+                    failwithf "addColorStop after destroy: %d" added
+
+                let mutable read = RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern()
+                let status = rv_dom_canvas_rendering_context2_d_get_stroke_style (held.Value, &read)
+
+                if status = 0 then
+                    rv_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release &read
+                elif status <> -10 then
+                    failwithf "strokeStyle after destroy: %d" status
+
+                rv_dom_canvas_gradient_release gradient
+                rv_dom_canvas_rendering_context2_d_release held.Value
+                rv_node_release context
+        | "canvas path" ->
+            let canvas = rv_document_create_element (host, "canvas")
+            rv_node_append_child (div, canvas) |> check "append canvas"
+            rv_canvas_get_context (canvas, 1, 0n, &held.contents) |> check "getContext 2d"
+            rv_node_release canvas
+            let mutable path = 0n
+            rv_dom_path2_d_create_0 (document, &path) |> check "Path2D"
+            rv_dom_path2_d_rect (path, 0.0, 0.0, 10.0, 10.0) |> check "Path2D.rect"
+
+            rv_dom_canvas_rendering_context2_d_fill_2 (held.Value, path, RV_DOM_CANVAS_FILL_RULE_NONZERO)
+            |> check "fill(path)"
+
+            rv_dom_canvas_rendering_context2_d_clip_2 (held.Value, path, RV_DOM_CANVAS_FILL_RULE_EVENODD)
+            |> check "clip(path)"
+
+            fun () ->
+                let filled =
+                    rv_dom_canvas_rendering_context2_d_fill_2 (held.Value, path, RV_DOM_CANVAS_FILL_RULE_NONZERO)
+
+                if filled <> 0 && filled <> -10 then
+                    failwithf "fill(path) after destroy: %d" filled
+
+                let mutable hit = -1
+
+                let tested =
+                    rv_dom_canvas_rendering_context2_d_is_point_in_path_4 (
+                        held.Value,
+                        path,
+                        5.0,
+                        5.0,
+                        RV_DOM_CANVAS_FILL_RULE_NONZERO,
+                        &hit
+                    )
+
+                if tested <> 0 && tested <> -10 then
+                    failwithf "isPointInPath(path) after destroy: %d" tested
+
+                rv_dom_path2_d_release path
+                rv_dom_canvas_rendering_context2_d_release held.Value
         | "crypto" ->
             let filled = Array.zeroCreate<byte> 16
 
@@ -1507,6 +1622,9 @@ let run (outDir: string) =
                     "wake lock sentinel"
                     "notification"
                     "web animation"
+                    "canvas path"
+                    "canvas gradient"
+                    "canvas text metrics"
                 ] do
                 for remove in [ false; true ] do
                     releaseAfterDestroy kind remove

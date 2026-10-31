@@ -1,0 +1,6 @@
+native codex/batch-5 7cbabeb, Windows
+[0] tests/test_package_contract.py ::  OK 
+[0] tests/generator/test_domgen.py ::  OK 
+[0] scripts/capability_catalogue.py --check :: CAPABILITY_CATALOGUE_CHECK=PASS 
+[0] tests/abi/generate_native.py check :: header functions 311, Native.fs externs 311, differences 0 
+[0] gen/domgen.py check --source C:/wk/src :: interfaces 305, functions 2957 (getters 1535, setters 694, operations 615, constructors 64, namespace operations 4, static operations 19, iterator snapshots 4, context operations 22), handle types 78, constants 206, enumerations 29, dictionaries 56, stubs 0, left out 794 

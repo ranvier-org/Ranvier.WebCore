@@ -5,6 +5,7 @@
 #include "Blob.h"
 #include "CSSFontFace.h"
 #include "CSSFontFaceSet.h"
+#include "CSSStyleImageValue.h"
 #include "CachedImage.h"
 #include "ContextDestructionObserverInlines.h"
 #include "DOMException.h"
@@ -20,7 +21,11 @@
 #include "FontFace.h"
 #include "FontFaceSet.h"
 #include "FrameDestructionObserverInlines.h"
+#include "HTMLCanvasElement.h"
 #include "HTMLImageElement.h"
+#include "ImageBitmap.h"
+#include "ImageBitmapOptions.h"
+#include "ImageData.h"
 #include "HTMLElementTypeHelpers.h"
 #include "Image.h"
 #include "ImageLoader.h"
@@ -78,6 +83,7 @@ int32_t outcomeFor(ImageDecodeResult result)
 class BlobReadOperation;
 class MediaQueryOperation;
 class BytesOperation;
+class ImageBitmapOperation;
 
 // One terminal outcome per operation, delivered on the owning thread; see RanvierResourceGlue.h.
 class Operation : public RefCounted<Operation>, public CanMakeSingleThreadWeakPtr<Operation> {
@@ -144,6 +150,7 @@ public:
     virtual BlobReadOperation* asBlobRead() { return nullptr; }
     virtual MediaQueryOperation* asMediaQuery() { return nullptr; }
     virtual BytesOperation* asBytes() { return nullptr; }
+    virtual ImageBitmapOperation* asImageBitmap() { return nullptr; }
 
 protected:
     Operation(Document& document, RvResourceCompletion callback, void* context)
@@ -859,6 +866,74 @@ HashMap<RvFontsWatch*, Ref<RvFontsWatch>>& fontsWatches()
     static NeverDestroyed<HashMap<RvFontsWatch*, Ref<RvFontsWatch>>> values;
     return values;
 }
+// The name rv_last_exception reports for code: the WebIDL error names, else the DOMException name.
+CString errorNameFor(ExceptionCode code)
+{
+    switch (code) {
+    case ExceptionCode::RangeError:
+        return CString { "RangeError" };
+    case ExceptionCode::TypeError:
+        return CString { "TypeError" };
+    case ExceptionCode::JSSyntaxError:
+        return CString { "SyntaxError" };
+    default:
+        return String { DOMException::name(code) }.utf8();
+    }
+}
+
+// createImageBitmap through ImageBitmap::createCompletionHandler (patch 0049 for a crop). A source that completes
+// inside the starting call is delivered on a later run-loop turn by finish().
+class ImageBitmapOperation final : public Operation {
+    WTF_MAKE_TZONE_ALLOCATED(ImageBitmapOperation);
+
+public:
+    static Ref<ImageBitmapOperation> create(Document& document, RvResourceCompletion callback, void* context)
+    {
+        return adoptRef(*new ImageBitmapOperation(document, callback, context));
+    }
+
+    RefPtr<ImageBitmap> bitmap;
+    CString errorName;
+
+    ImageBitmapOperation* asImageBitmap() final { return this; }
+
+    void measure(int32_t& width, int32_t& height) final
+    {
+        width = bitmap ? static_cast<int32_t>(bitmap->width()) : 0;
+        height = bitmap ? static_cast<int32_t>(bitmap->height()) : 0;
+    }
+
+    void dispose() final
+    {
+        bitmap = nullptr;
+        detach();
+    }
+
+    ImageBitmap::ImageBitmapCompletionHandler completion()
+    {
+        return [weak = SingleThreadWeakPtr<Operation> { *this }](ExceptionOr<Ref<ImageBitmap>>&& result) {
+            RefPtr operation = weak.get();
+            if (!operation || operation->terminal)
+                return;
+            auto& creation = *operation->asImageBitmap();
+            if (result.hasException()) {
+                creation.errorName = errorNameFor(result.exception().code());
+                creation.finish(RV_RESOURCE_DECODE_FAILED);
+                return;
+            }
+            creation.bitmap = result.releaseReturnValue();
+            creation.finish(RV_RESOURCE_SUCCEEDED);
+        };
+    }
+
+private:
+    ImageBitmapOperation(Document& document, RvResourceCompletion callback, void* context)
+        : Operation(document, callback, context)
+    {
+    }
+};
+
+WTF_MAKE_TZONE_ALLOCATED_IMPL(ImageBitmapOperation);
 
 std::unordered_map<uint64_t, Ref<Operation>>& operations()
 {
@@ -1438,4 +1513,114 @@ int32_t ranvier_resource_bytes(uint64_t operation, uint8_t* buffer, int64_t capa
     if (!value || value->pending)
         return RV_ERR_UNSUPPORTED;
     return copyBytes(value->bytes.span(), buffer, capacity, length);
+}
+
+namespace {
+
+// The engine options for an app request, or nullopt for a value outside its enumeration.
+std::optional<ImageBitmapOptions> bitmapOptions(const RvImageBitmapOptions* requested)
+{
+    ImageBitmapOptions options;
+    if (!requested)
+        return options;
+    if (requested->size < static_cast<int32_t>(sizeof(RvImageBitmapOptions)) || (requested->crop != 0 && requested->crop != 1))
+        return std::nullopt;
+    if (requested->imageOrientation < 0 || requested->imageOrientation > RV_IMAGE_BITMAP_ORIENTATION_NONE
+        || requested->premultiplyAlpha < 0 || requested->premultiplyAlpha > RV_IMAGE_BITMAP_PREMULTIPLY_DEFAULT
+        || requested->colorSpaceConversion < 0 || requested->colorSpaceConversion > RV_IMAGE_BITMAP_COLOR_SPACE_CONVERSION_DEFAULT
+        || requested->resizeQuality < 0 || requested->resizeQuality > RV_IMAGE_BITMAP_RESIZE_HIGH)
+        return std::nullopt;
+    options.orientation = static_cast<ImageBitmapOptions::Orientation>(requested->imageOrientation);
+    options.premultiplyAlpha = static_cast<ImageBitmapOptions::PremultiplyAlpha>(requested->premultiplyAlpha);
+    options.colorSpaceConversion = static_cast<ImageBitmapOptions::ColorSpaceConversion>(requested->colorSpaceConversion);
+    options.resizeQuality = static_cast<ImageBitmapOptions::ResizeQuality>(requested->resizeQuality);
+    if (requested->resizeWidth)
+        options.resizeWidth = requested->resizeWidth;
+    if (requested->resizeHeight)
+        options.resizeHeight = requested->resizeHeight;
+    return options;
+}
+
+// The engine source for a handle of kind, or nullopt for a handle of another kind.
+std::optional<ImageBitmap::Source> bitmapSource(int32_t kind, void* source)
+{
+    switch (kind) {
+    case RV_IMAGE_BITMAP_SOURCE_NODE: {
+        auto& node = *reinterpret_cast<Node*>(source);
+        if (RefPtr image = dynamicDowncast<HTMLImageElement>(node))
+            return ImageBitmap::Source { image.releaseNonNull() };
+        if (RefPtr image = dynamicDowncast<SVGImageElement>(node))
+            return ImageBitmap::Source { image.releaseNonNull() };
+        if (RefPtr canvas = dynamicDowncast<HTMLCanvasElement>(node))
+            return ImageBitmap::Source { canvas.releaseNonNull() };
+        return std::nullopt;
+    }
+    case RV_IMAGE_BITMAP_SOURCE_BITMAP:
+        return ImageBitmap::Source { Ref { *reinterpret_cast<ImageBitmap*>(source) } };
+    case RV_IMAGE_BITMAP_SOURCE_IMAGE_DATA:
+        return ImageBitmap::Source { Ref { *reinterpret_cast<ImageData*>(source) } };
+    case RV_IMAGE_BITMAP_SOURCE_BLOB:
+        return ImageBitmap::Source { Ref { *reinterpret_cast<Blob*>(source) } };
+    default:
+        return std::nullopt;
+    }
+}
+
+ImageBitmapOperation* imageBitmapCreation(uint64_t operation)
+{
+    auto found = operations().find(operation);
+    return found == operations().end() ? nullptr : found->second->asImageBitmap();
+}
+
+} // namespace
+
+int32_t ranvier_image_bitmap_create(RvNode* documentHandle, int32_t kind, void* source, const RvImageBitmapOptions* requested,
+    RvResourceCompletion callback, void* context, uint64_t* operation)
+{
+    if (!documentHandle || !source || !callback || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* document = documentFromHandle(documentHandle);
+    if (!document || !document->window() || !nextOperation)
+        return RV_ERR_UNSUPPORTED;
+    auto options = bitmapOptions(requested);
+    auto engineSource = bitmapSource(kind, source);
+    if (!options || !engineSource)
+        return RV_ERR_UNSUPPORTED;
+    Ref value = ImageBitmapOperation::create(*document, callback, context);
+    *operation = nextOperation++;
+    operations().emplace(*operation, value.copyRef());
+    value->starting = true;
+    if (requested && requested->crop)
+        ImageBitmap::createCompletionHandler(*document, WTF::move(*engineSource), WTF::move(*options), requested->sx, requested->sy, requested->sw, requested->sh, value->completion());
+    else
+        ImageBitmap::createCompletionHandler(*document, WTF::move(*engineSource), WTF::move(*options), value->completion());
+    value->starting = false;
+    return RV_OK;
+}
+
+int32_t ranvier_image_bitmap_result(uint64_t operation, RvImageBitmap** bitmap)
+{
+    if (!bitmap)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* creation = imageBitmapCreation(operation);
+    if (!creation || !creation->bitmap)
+        return RV_ERR_UNSUPPORTED;
+    *bitmap = reinterpret_cast<RvImageBitmap*>(&Ref { *creation->bitmap }.leakRef());
+    return RV_OK;
+}
+
+int32_t ranvier_image_bitmap_error(uint64_t operation, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!length || capacity < 0 || (capacity && !buffer))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* creation = imageBitmapCreation(operation);
+    if (!creation || creation->errorName.isNull())
+        return RV_ERR_UNSUPPORTED;
+    return copyText(creation->errorName.span(), buffer, capacity, length);
 }

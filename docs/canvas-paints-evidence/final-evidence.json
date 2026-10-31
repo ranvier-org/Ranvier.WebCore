@@ -1,0 +1,42 @@
+{
+ "group": "R04 canvas paints (ranvier-org/Ranvier.WebCore#93)",
+ "nativeHead": "dceab26c9b640ffaead07429a961de0d452f5ca0",
+ "runtimeSourceHead": "dceab26c9b640ffaead07429a961de0d452f5ca0",
+ "abi": 55,
+ "runtime": {
+  "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+  "RanvierWebCoreHost.dll": "08e3e40fdb962b1bdeff66423c8ca14e922d56157acd4ab7e69267b5f90374c1",
+  "WebCore.dll": "1bf3847892ee9b8ff74d25890c922b37667ce5f4c7c8c5882730391fb89c3e1f"
+ },
+ "canvasPaintsAssertions": 210,
+ "repeat30": {
+  "runs": 30,
+  "distinct": [
+   "PASS: canvas_paints 210 assertions"
+  ]
+ },
+ "fullBatchRaw": 91958,
+ "probes": 67,
+ "teardownProbes": 108,
+ "qualifications": [
+  "ImageBitmap and CSSStyleImageValue arms of createPattern have no producer before R06/R07 and are not drawn; canvas and decoded <img> sources are",
+  "gradient and blurred-shadow pixels are compared within 6 levels of Chromium per channel; stroke, dash, pattern and solid shadow pixels exactly"
+ ],
+ "files": {
+  "batch-results.json": "7ded8eb446372190050bba1dbd87be48ff87eaacd3e8a5f9cc5457e2819ebcca",
+  "build_paints_candidate.py": "781a7c02cf3e14a906ce9d3eb148a9c6ad2fe052cf9c86f9d106815c4419531f",
+  "canvas-paints-repeat30.txt": "05d8e77d2af3f2ec465e4e252a6b75e427fcbc539a3ee70d43036997dcb351df",
+  "canvas-paints-report.json": "76d050ae01096428e9fba0a2196118d68df86d01e8de2a2c6efaa0b0b4921328",
+  "make_paints_evidence.py": "35dfe118473dd0118bac72fa9d6e918d5862a8f1781174755be238977fda13a1",
+  "r04-names.txt": "d99a5dcb912b875bf0747efeef65c9b51f47400478c4a91e8fbc7e2bb2ae2794",
+  "red-chromium.json": "b7020a33998feab4ba10b20176521873861100fa53683bcc46d58ade1545e937",
+  "red-native.json": "8c9de4887da5c8383d79e37c2fb463d44d58b5068c6471c3bcdd3d86d398f5bd",
+  "red_chromium.mjs": "bad8becddc5f037b55e4dcd14b717635277971a66cecd67b2d96786621d2530b",
+  "red_native.py": "9db4489b222857f9fb9421fa03c73cb9fd6b8cf8312ce1bbde8a37e3302056c5",
+  "repeat30.sh": "255ca0cdeef95341498db1480aac470e225017483b1cc6b6cf107bb89e94d57a",
+  "run_paints_full_batch.py": "22911361a7c3f8193b38b3543be94e0519e20b91f2fa6ab239b79221e131198a",
+  "runtime-receipt.json": "c397ecc26706566a406fda9325c4327097397577930fb109804006840a079df5",
+  "source-patches.json": "a692bf06ef7853408be9ac1366d81e1d3f42a3931b98f75098bd722d0aa5cd13",
+  "teardown-probes.json": "05a69054bc57ac6457a3703a4f0c802d3d77bcb5ec6388106852b0b70d9d8142"
+ }
+}

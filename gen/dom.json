@@ -327,6 +327,11 @@
     "FontFace": {
       "receiver": "Document",
       "factory": "FontFace::create"
+    },
+    "Path2D": {
+      "receiver": "Document",
+      "factory": "Path2D::create",
+      "passReceiver": false
     }
   },
   "dictionaryCppTypes": {
@@ -471,9 +476,14 @@
     "DataTransferItemList": "Document",
     "DataTransferItem": "Document",
     "KeyframeEffect": "Document",
-    "AnimationEffect": "Document"
+    "AnimationEffect": "Document",
+    "CanvasGradient": "Document"
   },
   "finiteNumberInputs": [
+    "CanvasGradient.addColorStop",
+    "CanvasRenderingContext2D.createLinearGradient",
+    "CanvasRenderingContext2D.createRadialGradient",
+    "CanvasRenderingContext2D.createConicGradient",
     "CSSUnitValue",
     "SVGSVGElement",
     "SVGGeometryElement",
@@ -790,7 +800,12 @@
     "HTMLCanvasElement",
     "CanvasRenderingContext2D",
     "CanvasGradient",
-    "CanvasPattern"
+    "CanvasPattern",
+    "ImageData",
+    "Path2D",
+    "ImageBitmap",
+    "ImageBitmapRenderingContext",
+    "TextMetrics"
   ],
   "skipDirectories": [
     "Modules/",
@@ -1291,13 +1306,96 @@
       "canvas",
       "fillStyle",
       "fillRect",
-      "clearRect"
+      "clearRect",
+      "createImageData",
+      "getImageData",
+      "putImageData",
+      "drawImage",
+      "strokeRect",
+      "beginPath",
+      "closePath",
+      "moveTo",
+      "lineTo",
+      "quadraticCurveTo",
+      "bezierCurveTo",
+      "arcTo",
+      "rect",
+      "roundRect",
+      "arc",
+      "ellipse",
+      "fill",
+      "stroke",
+      "clip",
+      "isPointInPath",
+      "isPointInStroke",
+      "save",
+      "restore",
+      "reset",
+      "scale",
+      "rotate",
+      "translate",
+      "transform",
+      "getTransform",
+      "setTransform",
+      "resetTransform",
+      "globalAlpha",
+      "globalCompositeOperation",
+      "filter",
+      "beginLayer",
+      "endLayer",
+      "strokeStyle",
+      "createLinearGradient",
+      "createRadialGradient",
+      "createConicGradient",
+      "createPattern",
+      "lineWidth",
+      "lineCap",
+      "lineJoin",
+      "miterLimit",
+      "setLineDash",
+      "getLineDash",
+      "lineDashOffset",
+      "shadowOffsetX",
+      "shadowOffsetY",
+      "shadowBlur",
+      "shadowColor",
+      "imageSmoothingEnabled",
+      "imageSmoothingQuality",
+      "font",
+      "textAlign",
+      "textBaseline",
+      "direction",
+      "letterSpacing",
+      "wordSpacing",
+      "fillText",
+      "strokeText",
+      "measureText"
     ],
-    "CanvasGradient": [],
-    "CanvasPattern": []
+    "CanvasGradient": [
+      "addColorStop"
+    ],
+    "CanvasPattern": [
+      "setTransform"
+    ],
+    "ImageBitmap": [
+      "width",
+      "height",
+      "close"
+    ],
+    "ImageBitmapRenderingContext": [
+      "canvas",
+      "transferFromImageBitmap"
+    ],
+    "ImageData": [
+      "width",
+      "height",
+      "colorSpace",
+      "pixelFormat"
+    ]
   },
   "unionSetterOverloads": [
-    "CanvasRenderingContext2D.fillStyle"
+    "CanvasRenderingContext2D.fillStyle",
+    "CanvasRenderingContext2D.strokeStyle"
   ],
   "dictionaryEventTargetMembers": [
     "MouseEventInit.relatedTarget"
@@ -1367,5 +1465,8 @@
     "Element.animate.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})",
     "KeyframeEffect.setKeyframes.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})",
     "Element.animate.options": "(o)=>{if(o==null||typeof o!=='object')return o;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing', 'iterationComposite', 'composite', 'pseudoElement', 'id', 'timeline'])if(o[k]!==undefined)r[k]=o[k];const d=o.duration;r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;return r;}"
-  }
+  },
+  "unionArgumentConversions": [
+    "CanvasImageSource"
+  ]
 }

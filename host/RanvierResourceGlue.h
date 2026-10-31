@@ -45,6 +45,11 @@ WEBCORE_EXPORT int32_t ranvier_media_capabilities_info(uint64_t operation, int32
 WEBCORE_EXPORT int32_t ranvier_media_capabilities_provider(int32_t encoding);
 WEBCORE_EXPORT int32_t ranvier_resource_settled_bytes(RvNode* document, const uint8_t* bytes, int64_t length, int32_t width, int32_t height, RvResourceCompletion, void* context, uint64_t* operation);
 WEBCORE_EXPORT int32_t ranvier_resource_bytes(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length);
+// createImageBitmap: an operation with the contract above that holds its ImageBitmap or DOMException name from its
+// terminal outcome until release.
+WEBCORE_EXPORT int32_t ranvier_image_bitmap_create(RvNode* document, int32_t kind, void* source, const RvImageBitmapOptions*, RvResourceCompletion, void* context, uint64_t* operation);
+WEBCORE_EXPORT int32_t ranvier_image_bitmap_result(uint64_t operation, RvImageBitmap** bitmap);
+WEBCORE_EXPORT int32_t ranvier_image_bitmap_error(uint64_t operation, char* buffer, int32_t capacity, int32_t* length);
 WEBCORE_EXPORT int32_t ranvier_file_reader_result(RvEventTarget* reader, int32_t* kind, uint8_t* buffer, int64_t capacity, int64_t* length);
 WEBCORE_EXPORT int32_t ranvier_file_reader_error(RvEventTarget* reader, char* buffer, int32_t capacity, int32_t* length);
 }

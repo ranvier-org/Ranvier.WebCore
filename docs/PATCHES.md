@@ -369,6 +369,27 @@ The new header is included only by `MediaCapabilities.cpp` and the host, so the 
 `tests/abi/media_capabilities.py` checks each case of `tests/fixtures/media-capabilities-cases.json` through
 `rv_media_decoding_info` and `rv_media_encoding_info`.
 
+## 0049-image-bitmap-crop-completion-handler
+
+`ImageBitmap::createCompletionHandler(context, source, options, sx, sy, sw, sh, handler)` is
+`createImageBitmap(image, sx, sy, sw, sh, options)` for an embedder, without JavaScript or a promise. It completes
+with RangeError for a zero `sw` or `sh`, normalises a negative rectangle as the promise path does, and runs the
+existing per-source crop overloads, which stay private. The promise path is unchanged. The header gains one static
+member function, so the eight unified sources that include `ImageBitmap.h` recompile with unchanged layouts.
+
+`tests/abi/canvas_export.py` creates cropped bitmaps through `rv_image_bitmap_create`. Without the patch the host glue
+has no public crop entry point: `docs/canvas-export-evidence/red-patch-0049-compile.log`.
+
+## 0050-image-bitmap-unaccelerated-buffers
+
+An ImageBitmap's buffer is accelerated only where a canvas's is: under `USE(CA)` or `USE(SKIA)`, `bufferRenderingMode`
+returns Unaccelerated when `canvasUsesAcceleratedDrawing` is off, the setting `CanvasBase::shouldAccelerate()` reads.
+The GTK and WPE `hardwareAccelerationEnabled` check stays. Cocoa enables the setting by default and keeps accelerated
+bitmaps. The change is inside `ImageBitmap.cpp` and recompiles one unified source.
+
+Without the patch every `createImageBitmap` on the slim Windows build creates an accelerated Skia buffer, whose
+Ganesh stub aborts the process: `docs/canvas-export-evidence/red-patch-0050.log` (`red_bitmap_buffer.py`).
+
 ## Working on the series
 
 ```

@@ -5419,6 +5419,51 @@ and [<AllowNullLiteral>] HTMLCanvasElement =
 and [<AllowNullLiteral>] CanvasRenderingContext2D =
     /// <summary>CanvasRenderingContext2D.canvas.</summary>
     abstract member canvas: HTMLCanvasElement with get
+    /// <summary>CanvasRenderingContext2D.save.</summary>
+    abstract member save: unit -> unit
+    /// <summary>CanvasRenderingContext2D.restore.</summary>
+    abstract member restore: unit -> unit
+    /// <summary>CanvasRenderingContext2D.reset.</summary>
+    abstract member reset: unit -> unit
+    /// <summary>CanvasRenderingContext2D.beginLayer.</summary>
+    abstract member beginLayer: unit -> unit
+    /// <summary>CanvasRenderingContext2D.endLayer.</summary>
+    abstract member endLayer: unit -> unit
+    /// <summary>CanvasRenderingContext2D.scale.</summary>
+    abstract member scale: x: float * y: float -> unit
+    /// <summary>CanvasRenderingContext2D.rotate.</summary>
+    abstract member rotate: angle: float -> unit
+    /// <summary>CanvasRenderingContext2D.translate.</summary>
+    abstract member translate: x: float * y: float -> unit
+    /// <summary>CanvasRenderingContext2D.transform.</summary>
+    abstract member transform: a: float * b: float * c: float * d: float * e: float * f: float -> unit
+    /// <summary>CanvasRenderingContext2D.getTransform.</summary>
+    abstract member getTransform: unit -> DOMMatrix
+    /// <summary>CanvasRenderingContext2D.setTransform.</summary>
+    abstract member setTransform: a: float * b: float * c: float * d: float * e: float * f: float -> unit
+    /// <summary>CanvasRenderingContext2D.setTransform.</summary>
+    abstract member setTransform: ?transform: DOMMatrix2DInit -> unit
+    /// <summary>CanvasRenderingContext2D.resetTransform.</summary>
+    abstract member resetTransform: unit -> unit
+    /// <summary>CanvasRenderingContext2D.globalAlpha.</summary>
+    abstract member globalAlpha: float with get, set
+    /// <summary>CanvasRenderingContext2D.globalCompositeOperation.</summary>
+    abstract member globalCompositeOperation: string with get, set
+    /// <summary>CanvasRenderingContext2D.imageSmoothingEnabled.</summary>
+    abstract member imageSmoothingEnabled: bool with get, set
+    /// <summary>CanvasRenderingContext2D.imageSmoothingQuality.</summary>
+    abstract member imageSmoothingQuality: ImageSmoothingQuality with get, set
+
+    /// <summary>CanvasRenderingContext2D.strokeStyle.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.strokeStyle")>]
+    abstract member __ranvier_get_strokeStyle: unit -> obj
+
+    [<Fable.Core.Emit("$0.strokeStyle = $1")>]
+    abstract member __ranvier_set_strokeStyle: value: obj -> unit
+#else
+    abstract member strokeStyle: DOMStringOrCanvasGradientOrCanvasPattern with get, set
+#endif
 
     /// <summary>CanvasRenderingContext2D.fillStyle.</summary>
 #if FABLE_COMPILER
@@ -5430,16 +5475,291 @@ and [<AllowNullLiteral>] CanvasRenderingContext2D =
 #else
     abstract member fillStyle: DOMStringOrCanvasGradientOrCanvasPattern with get, set
 #endif
+    /// <summary>CanvasRenderingContext2D.createLinearGradient.</summary>
+    abstract member createLinearGradient: x0: float * y0: float * x1: float * y1: float -> CanvasGradient
+    /// <summary>CanvasRenderingContext2D.createRadialGradient.</summary>
+    abstract member createRadialGradient: x0: float * y0: float * r0: float * x1: float * y1: float * r1: float -> CanvasGradient
+    /// <summary>CanvasRenderingContext2D.createConicGradient.</summary>
+    abstract member createConicGradient: angle: float * x: float * y: float -> CanvasGradient
+
+    /// <summary>CanvasRenderingContext2D.createPattern.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.createPattern($1, $2)")>]
+    abstract member __ranvier_createPattern: image: obj * repetition: string -> CanvasPattern
+#else
+    abstract member createPattern: image: HTMLImageElement * repetition: string -> CanvasPattern
+    abstract member createPattern: image: SVGImageElement * repetition: string -> CanvasPattern
+    abstract member createPattern: image: HTMLCanvasElement * repetition: string -> CanvasPattern
+    abstract member createPattern: image: ImageBitmap * repetition: string -> CanvasPattern
+    abstract member createPattern: image: CSSImageValue * repetition: string -> CanvasPattern
+#endif
+    /// <summary>CanvasRenderingContext2D.shadowOffsetX.</summary>
+    abstract member shadowOffsetX: float with get, set
+    /// <summary>CanvasRenderingContext2D.shadowOffsetY.</summary>
+    abstract member shadowOffsetY: float with get, set
+    /// <summary>CanvasRenderingContext2D.shadowBlur.</summary>
+    abstract member shadowBlur: float with get, set
+    /// <summary>CanvasRenderingContext2D.shadowColor.</summary>
+    abstract member shadowColor: string with get, set
+    /// <summary>CanvasRenderingContext2D.filter.</summary>
+    abstract member filter: string with get, set
     /// <summary>CanvasRenderingContext2D.clearRect.</summary>
     abstract member clearRect: x: float * y: float * w: float * h: float -> unit
     /// <summary>CanvasRenderingContext2D.fillRect.</summary>
     abstract member fillRect: x: float * y: float * w: float * h: float -> unit
+    /// <summary>CanvasRenderingContext2D.strokeRect.</summary>
+    abstract member strokeRect: x: float * y: float * w: float * h: float -> unit
+    /// <summary>CanvasRenderingContext2D.beginPath.</summary>
+    abstract member beginPath: unit -> unit
+    /// <summary>CanvasRenderingContext2D.fill.</summary>
+    abstract member fill: ?fillRule: CanvasFillRule -> unit
+    /// <summary>CanvasRenderingContext2D.fill.</summary>
+    abstract member fill: path: Path2D * ?fillRule: CanvasFillRule -> unit
+    /// <summary>CanvasRenderingContext2D.stroke.</summary>
+    abstract member stroke: unit -> unit
+    /// <summary>CanvasRenderingContext2D.stroke.</summary>
+    abstract member stroke: path: Path2D -> unit
+    /// <summary>CanvasRenderingContext2D.clip.</summary>
+    abstract member clip: ?fillRule: CanvasFillRule -> unit
+    /// <summary>CanvasRenderingContext2D.clip.</summary>
+    abstract member clip: path: Path2D * ?fillRule: CanvasFillRule -> unit
+    /// <summary>CanvasRenderingContext2D.isPointInPath.</summary>
+    abstract member isPointInPath: x: float * y: float * ?fillRule: CanvasFillRule -> bool
+    /// <summary>CanvasRenderingContext2D.isPointInPath.</summary>
+    abstract member isPointInPath: path: Path2D * x: float * y: float * ?fillRule: CanvasFillRule -> bool
+    /// <summary>CanvasRenderingContext2D.isPointInStroke.</summary>
+    abstract member isPointInStroke: x: float * y: float -> bool
+    /// <summary>CanvasRenderingContext2D.isPointInStroke.</summary>
+    abstract member isPointInStroke: path: Path2D * x: float * y: float -> bool
+    /// <summary>CanvasRenderingContext2D.fillText.</summary>
+    abstract member fillText: text: string * x: float * y: float * ?maxWidth: float -> unit
+    /// <summary>CanvasRenderingContext2D.strokeText.</summary>
+    abstract member strokeText: text: string * x: float * y: float * ?maxWidth: float -> unit
+    /// <summary>CanvasRenderingContext2D.measureText.</summary>
+    abstract member measureText: text: string -> TextMetrics
+
+    /// <summary>CanvasRenderingContext2D.drawImage.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.drawImage($1, $2, $3)")>]
+    abstract member __ranvier_drawImage: image: obj * dx: float * dy: float -> unit
+#else
+    abstract member drawImage: image: HTMLImageElement * dx: float * dy: float -> unit
+    abstract member drawImage: image: SVGImageElement * dx: float * dy: float -> unit
+    abstract member drawImage: image: HTMLCanvasElement * dx: float * dy: float -> unit
+    abstract member drawImage: image: ImageBitmap * dx: float * dy: float -> unit
+    abstract member drawImage: image: CSSImageValue * dx: float * dy: float -> unit
+#endif
+
+    /// <summary>CanvasRenderingContext2D.drawImage.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.drawImage($1, $2, $3, $4, $5)")>]
+    abstract member __ranvier_drawImage: image: obj * dx: float * dy: float * dw: float * dh: float -> unit
+#else
+    abstract member drawImage: image: HTMLImageElement * dx: float * dy: float * dw: float * dh: float -> unit
+    abstract member drawImage: image: SVGImageElement * dx: float * dy: float * dw: float * dh: float -> unit
+    abstract member drawImage: image: HTMLCanvasElement * dx: float * dy: float * dw: float * dh: float -> unit
+    abstract member drawImage: image: ImageBitmap * dx: float * dy: float * dw: float * dh: float -> unit
+    abstract member drawImage: image: CSSImageValue * dx: float * dy: float * dw: float * dh: float -> unit
+#endif
+
+    /// <summary>CanvasRenderingContext2D.drawImage.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.drawImage($1, $2, $3, $4, $5, $6, $7, $8, $9)")>]
+    abstract member __ranvier_drawImage:
+        image: obj * sx: float * sy: float * sw: float * sh: float * dx: float * dy: float * dw: float * dh: float -> unit
+#else
+    abstract member drawImage:
+        image: HTMLImageElement * sx: float * sy: float * sw: float * sh: float * dx: float * dy: float * dw: float * dh: float -> unit
+
+    abstract member drawImage:
+        image: SVGImageElement * sx: float * sy: float * sw: float * sh: float * dx: float * dy: float * dw: float * dh: float -> unit
+
+    abstract member drawImage:
+        image: HTMLCanvasElement * sx: float * sy: float * sw: float * sh: float * dx: float * dy: float * dw: float * dh: float -> unit
+
+    abstract member drawImage:
+        image: ImageBitmap * sx: float * sy: float * sw: float * sh: float * dx: float * dy: float * dw: float * dh: float -> unit
+
+    abstract member drawImage:
+        image: CSSImageValue * sx: float * sy: float * sw: float * sh: float * dx: float * dy: float * dw: float * dh: float -> unit
+#endif
+    /// <summary>CanvasRenderingContext2D.createImageData.</summary>
+    abstract member createImageData: sw: int * sh: int * ?settings: ImageDataSettings -> ImageData
+    /// <summary>CanvasRenderingContext2D.createImageData.</summary>
+    abstract member createImageData: imagedata: ImageData -> ImageData
+    /// <summary>CanvasRenderingContext2D.getImageData.</summary>
+    abstract member getImageData: sx: int * sy: int * sw: int * sh: int * ?settings: ImageDataSettings -> ImageData
+    /// <summary>CanvasRenderingContext2D.putImageData.</summary>
+    abstract member putImageData: imagedata: ImageData * dx: int * dy: int -> unit
+    /// <summary>CanvasRenderingContext2D.putImageData.</summary>
+    abstract member putImageData: imagedata: ImageData * dx: int * dy: int * dirtyX: int * dirtyY: int * dirtyWidth: int * dirtyHeight: int -> unit
+    /// <summary>CanvasRenderingContext2D.lineWidth.</summary>
+    abstract member lineWidth: float with get, set
+    /// <summary>CanvasRenderingContext2D.lineCap.</summary>
+    abstract member lineCap: CanvasLineCap with get, set
+    /// <summary>CanvasRenderingContext2D.lineJoin.</summary>
+    abstract member lineJoin: CanvasLineJoin with get, set
+    /// <summary>CanvasRenderingContext2D.miterLimit.</summary>
+    abstract member miterLimit: float with get, set
+    /// <summary>CanvasRenderingContext2D.setLineDash.</summary>
+    abstract member setLineDash: segments: (float) array -> unit
+    /// <summary>CanvasRenderingContext2D.getLineDash.</summary>
+    abstract member getLineDash: unit -> (float) array
+    /// <summary>CanvasRenderingContext2D.lineDashOffset.</summary>
+    abstract member lineDashOffset: float with get, set
+    /// <summary>CanvasRenderingContext2D.font.</summary>
+    abstract member font: string with get, set
+    /// <summary>CanvasRenderingContext2D.textAlign.</summary>
+    abstract member textAlign: CanvasTextAlign with get, set
+    /// <summary>CanvasRenderingContext2D.textBaseline.</summary>
+    abstract member textBaseline: CanvasTextBaseline with get, set
+    /// <summary>CanvasRenderingContext2D.direction.</summary>
+    abstract member direction: CanvasDirection with get, set
+    /// <summary>CanvasRenderingContext2D.letterSpacing.</summary>
+    abstract member letterSpacing: string with get, set
+    /// <summary>CanvasRenderingContext2D.wordSpacing.</summary>
+    abstract member wordSpacing: string with get, set
+    /// <summary>CanvasRenderingContext2D.closePath.</summary>
+    abstract member closePath: unit -> unit
+    /// <summary>CanvasRenderingContext2D.moveTo.</summary>
+    abstract member moveTo: x: float * y: float -> unit
+    /// <summary>CanvasRenderingContext2D.lineTo.</summary>
+    abstract member lineTo: x: float * y: float -> unit
+    /// <summary>CanvasRenderingContext2D.quadraticCurveTo.</summary>
+    abstract member quadraticCurveTo: cpx: float * cpy: float * x: float * y: float -> unit
+    /// <summary>CanvasRenderingContext2D.bezierCurveTo.</summary>
+    abstract member bezierCurveTo: cp1x: float * cp1y: float * cp2x: float * cp2y: float * x: float * y: float -> unit
+    /// <summary>CanvasRenderingContext2D.arcTo.</summary>
+    abstract member arcTo: x1: float * y1: float * x2: float * y2: float * radius: float -> unit
+    /// <summary>CanvasRenderingContext2D.rect.</summary>
+    abstract member rect: x: float * y: float * w: float * h: float -> unit
+
+    /// <summary>CanvasRenderingContext2D.roundRect.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.roundRect($1, $2, $3, $4, $5)")>]
+    abstract member __ranvier_roundRectList: x: float * y: float * w: float * h: float * radii: obj -> unit
+#else
+    abstract member roundRect: x: float * y: float * w: float * h: float * radii: (UnrestrictedDoubleOrDOMPointInit) array -> unit
+#endif
+
+    /// <summary>CanvasRenderingContext2D.roundRect.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.roundRect($1, $2, $3, $4, $5)")>]
+    abstract member __ranvier_roundRect: x: float * y: float * w: float * h: float * ?radii: obj -> unit
+#else
+    abstract member roundRect: x: float * y: float * w: float * h: float -> unit
+    abstract member roundRect: x: float * y: float * w: float * h: float * radii: float -> unit
+    abstract member roundRect: x: float * y: float * w: float * h: float * radii: DOMPointInit -> unit
+#endif
+    /// <summary>CanvasRenderingContext2D.arc.</summary>
+    abstract member arc: x: float * y: float * radius: float * startAngle: float * endAngle: float * ?anticlockwise: bool -> unit
+
+    /// <summary>CanvasRenderingContext2D.ellipse.</summary>
+    abstract member ellipse:
+        x: float * y: float * radiusX: float * radiusY: float * rotation: float * startAngle: float * endAngle: float * ?anticlockwise: bool -> unit
 
 /// <summary>CanvasGradient in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] CanvasGradient = interface end
+and [<AllowNullLiteral>] CanvasGradient =
+    /// <summary>CanvasGradient.addColorStop.</summary>
+    abstract member addColorStop: offset: float * color: string -> unit
 
 /// <summary>CanvasPattern in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] CanvasPattern = interface end
+and [<AllowNullLiteral>] CanvasPattern =
+    /// <summary>CanvasPattern.setTransform.</summary>
+    abstract member setTransform: ?transform: DOMMatrix2DInit -> unit
+
+/// <summary>ImageData in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ImageData =
+    /// <summary>ImageData.width.</summary>
+    abstract member width: uint32 with get
+    /// <summary>ImageData.height.</summary>
+    abstract member height: uint32 with get
+
+/// <summary>Path2D in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] Path2D =
+    /// <summary>Path2D.addPath.</summary>
+    abstract member addPath: path: Path2D * ?transform: DOMMatrix2DInit -> unit
+    /// <summary>Path2D.closePath.</summary>
+    abstract member closePath: unit -> unit
+    /// <summary>Path2D.moveTo.</summary>
+    abstract member moveTo: x: float * y: float -> unit
+    /// <summary>Path2D.lineTo.</summary>
+    abstract member lineTo: x: float * y: float -> unit
+    /// <summary>Path2D.quadraticCurveTo.</summary>
+    abstract member quadraticCurveTo: cpx: float * cpy: float * x: float * y: float -> unit
+    /// <summary>Path2D.bezierCurveTo.</summary>
+    abstract member bezierCurveTo: cp1x: float * cp1y: float * cp2x: float * cp2y: float * x: float * y: float -> unit
+    /// <summary>Path2D.arcTo.</summary>
+    abstract member arcTo: x1: float * y1: float * x2: float * y2: float * radius: float -> unit
+    /// <summary>Path2D.rect.</summary>
+    abstract member rect: x: float * y: float * w: float * h: float -> unit
+
+    /// <summary>Path2D.roundRect.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.roundRect($1, $2, $3, $4, $5)")>]
+    abstract member __ranvier_roundRectList: x: float * y: float * w: float * h: float * radii: obj -> unit
+#else
+    abstract member roundRect: x: float * y: float * w: float * h: float * radii: (UnrestrictedDoubleOrDOMPointInit) array -> unit
+#endif
+
+    /// <summary>Path2D.roundRect.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.roundRect($1, $2, $3, $4, $5)")>]
+    abstract member __ranvier_roundRect: x: float * y: float * w: float * h: float * ?radii: obj -> unit
+#else
+    abstract member roundRect: x: float * y: float * w: float * h: float -> unit
+    abstract member roundRect: x: float * y: float * w: float * h: float * radii: float -> unit
+    abstract member roundRect: x: float * y: float * w: float * h: float * radii: DOMPointInit -> unit
+#endif
+    /// <summary>Path2D.arc.</summary>
+    abstract member arc: x: float * y: float * radius: float * startAngle: float * endAngle: float * ?anticlockwise: bool -> unit
+
+    /// <summary>Path2D.ellipse.</summary>
+    abstract member ellipse:
+        x: float * y: float * radiusX: float * radiusY: float * rotation: float * startAngle: float * endAngle: float * ?anticlockwise: bool -> unit
+
+/// <summary>ImageBitmap in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ImageBitmap =
+    /// <summary>ImageBitmap.width.</summary>
+    abstract member width: uint32 with get
+    /// <summary>ImageBitmap.height.</summary>
+    abstract member height: uint32 with get
+    /// <summary>ImageBitmap.close.</summary>
+    abstract member close: unit -> unit
+
+/// <summary>ImageBitmapRenderingContext in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ImageBitmapRenderingContext =
+    /// <summary>ImageBitmapRenderingContext.canvas.</summary>
+    abstract member canvas: HTMLCanvasElement with get
+    /// <summary>ImageBitmapRenderingContext.transferFromImageBitmap.</summary>
+    abstract member transferFromImageBitmap: bitmap: ImageBitmap -> unit
+
+/// <summary>TextMetrics in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] TextMetrics =
+    /// <summary>TextMetrics.width.</summary>
+    abstract member width: float with get
+    /// <summary>TextMetrics.actualBoundingBoxLeft.</summary>
+    abstract member actualBoundingBoxLeft: float with get
+    /// <summary>TextMetrics.actualBoundingBoxRight.</summary>
+    abstract member actualBoundingBoxRight: float with get
+    /// <summary>TextMetrics.fontBoundingBoxAscent.</summary>
+    abstract member fontBoundingBoxAscent: float with get
+    /// <summary>TextMetrics.fontBoundingBoxDescent.</summary>
+    abstract member fontBoundingBoxDescent: float with get
+    /// <summary>TextMetrics.actualBoundingBoxAscent.</summary>
+    abstract member actualBoundingBoxAscent: float with get
+    /// <summary>TextMetrics.actualBoundingBoxDescent.</summary>
+    abstract member actualBoundingBoxDescent: float with get
+    /// <summary>TextMetrics.emHeightAscent.</summary>
+    abstract member emHeightAscent: float with get
+    /// <summary>TextMetrics.emHeightDescent.</summary>
+    abstract member emHeightDescent: float with get
+    /// <summary>TextMetrics.hangingBaseline.</summary>
+    abstract member hangingBaseline: float with get
+    /// <summary>TextMetrics.alphabeticBaseline.</summary>
+    abstract member alphabeticBaseline: float with get
+    /// <summary>TextMetrics.ideographicBaseline.</summary>
+    abstract member ideographicBaseline: float with get
 
 /// <summary>HTMLUnknownElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLUnknownElement =
@@ -5891,6 +6211,19 @@ and [<RequireQualifiedAccess>] DOMStringOrCanvasGradientOrCanvasPattern =
     | CanvasGradient of CanvasGradient
     | CanvasPattern of CanvasPattern
 
+/// <summary>HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue =
+    | HTMLImageElement of HTMLImageElement
+    | SVGImageElement of SVGImageElement
+    | HTMLCanvasElement of HTMLCanvasElement
+    | ImageBitmap of ImageBitmap
+    | CSSStyleImageValue of CSSImageValue
+
+/// <summary>UnrestrictedDoubleOrDOMPointInit in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] UnrestrictedDoubleOrDOMPointInit =
+    | UnrestrictedDouble of float
+    | DOMPointInit of DOMPointInit
+
 /// <summary>NodeOrDOMString in the scoped DOM interface model.</summary>
 and [<RequireQualifiedAccess>] NodeOrDOMString =
     | Node of Node
@@ -6093,6 +6426,9 @@ and [<AllowNullLiteral; DomDictionary>] URLPatternInit() =
     member val hash: (string) option = None with get, set
     member val baseURL: (string) option = None with get, set
 
+/// <summary>ImageDataSettings in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] ImageDataSettings() = class end
+
 /// <summary>FocusOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] FocusOptions() =
     member val preventScroll: bool = false with get, set
@@ -6197,6 +6533,52 @@ and [<DomStringEnum; RequireQualifiedAccess>] SlotAssignmentMode =
 and [<DomStringEnum; RequireQualifiedAccess>] VisibilityState =
     | [<CompiledName("hidden")>] Hidden
     | [<CompiledName("visible")>] Visible
+
+/// <summary>CanvasDirection in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] CanvasDirection =
+    | [<CompiledName("ltr")>] Ltr
+    | [<CompiledName("rtl")>] Rtl
+    | [<CompiledName("inherit")>] Inherit
+
+/// <summary>CanvasFillRule in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] CanvasFillRule =
+    | [<CompiledName("nonzero")>] Nonzero
+    | [<CompiledName("evenodd")>] Evenodd
+
+/// <summary>CanvasLineCap in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] CanvasLineCap =
+    | [<CompiledName("butt")>] Butt
+    | [<CompiledName("round")>] Round
+    | [<CompiledName("square")>] Square
+
+/// <summary>CanvasLineJoin in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] CanvasLineJoin =
+    | [<CompiledName("round")>] Round
+    | [<CompiledName("bevel")>] Bevel
+    | [<CompiledName("miter")>] Miter
+
+/// <summary>CanvasTextAlign in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] CanvasTextAlign =
+    | [<CompiledName("start")>] Start
+    | [<CompiledName("end")>] End
+    | [<CompiledName("left")>] Left
+    | [<CompiledName("right")>] Right
+    | [<CompiledName("center")>] Center
+
+/// <summary>CanvasTextBaseline in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] CanvasTextBaseline =
+    | [<CompiledName("top")>] Top
+    | [<CompiledName("hanging")>] Hanging
+    | [<CompiledName("middle")>] Middle
+    | [<CompiledName("alphabetic")>] Alphabetic
+    | [<CompiledName("ideographic")>] Ideographic
+    | [<CompiledName("bottom")>] Bottom
+
+/// <summary>ImageSmoothingQuality in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] ImageSmoothingQuality =
+    | [<CompiledName("low")>] Low
+    | [<CompiledName("medium")>] Medium
+    | [<CompiledName("high")>] High
 
 /// <summary>HighlightType in the scoped DOM interface model.</summary>
 and [<DomStringEnum; RequireQualifiedAccess>] HighlightType =
@@ -6481,6 +6863,21 @@ module BrowserUnionAdapters =
         | arm when isCanvasGradient arm -> DOMStringOrCanvasGradientOrCanvasPattern.CanvasGradient (unbox<CanvasGradient> arm)
         | arm when isCanvasPattern arm -> DOMStringOrCanvasGradientOrCanvasPattern.CanvasPattern (unbox<CanvasPattern> arm)
         | _ -> failwith "Unexpected DOM union result"
+
+    let private boxHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue
+        (value: HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue)
+        : obj =
+        match value with
+        | HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue.HTMLImageElement value -> box value
+        | HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue.SVGImageElement value -> box value
+        | HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue.HTMLCanvasElement value -> box value
+        | HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue.ImageBitmap value -> box value
+        | HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue.CSSStyleImageValue value -> box value
+
+    let private boxUnrestrictedDoubleOrDOMPointInit (value: UnrestrictedDoubleOrDOMPointInit) : obj =
+        match value with
+        | UnrestrictedDoubleOrDOMPointInit.UnrestrictedDouble value -> box value
+        | UnrestrictedDoubleOrDOMPointInit.DOMPointInit value -> box value
 
     let private boxNodeOrDOMString (value: NodeOrDOMString) : obj =
         match value with
@@ -6819,12 +7216,109 @@ module BrowserUnionAdapters =
 
 
     type CanvasRenderingContext2D with
+        member this.strokeStyle
+            with get (): DOMStringOrCanvasGradientOrCanvasPattern =
+                let value = this.__ranvier_get_strokeStyle ()
+                unboxDOMStringOrCanvasGradientOrCanvasPattern value
+            and set (value: DOMStringOrCanvasGradientOrCanvasPattern) =
+                this.__ranvier_set_strokeStyle (boxDOMStringOrCanvasGradientOrCanvasPattern value)
+
         member this.fillStyle
             with get (): DOMStringOrCanvasGradientOrCanvasPattern =
                 let value = this.__ranvier_get_fillStyle ()
                 unboxDOMStringOrCanvasGradientOrCanvasPattern value
             and set (value: DOMStringOrCanvasGradientOrCanvasPattern) =
                 this.__ranvier_set_fillStyle (boxDOMStringOrCanvasGradientOrCanvasPattern value)
+
+        member this.createPattern(image: HTMLImageElement, repetition: string) : CanvasPattern =
+            this.__ranvier_createPattern (box image, repetition)
+
+        member this.createPattern(image: SVGImageElement, repetition: string) : CanvasPattern =
+            this.__ranvier_createPattern (box image, repetition)
+
+        member this.createPattern(image: HTMLCanvasElement, repetition: string) : CanvasPattern =
+            this.__ranvier_createPattern (box image, repetition)
+
+        member this.createPattern(image: ImageBitmap, repetition: string) : CanvasPattern =
+            this.__ranvier_createPattern (box image, repetition)
+
+        member this.createPattern(image: CSSImageValue, repetition: string) : CanvasPattern =
+            this.__ranvier_createPattern (box image, repetition)
+
+        member this.drawImage(image: HTMLImageElement, dx: float, dy: float) : unit =
+            this.__ranvier_drawImage (box image, dx, dy)
+
+        member this.drawImage(image: SVGImageElement, dx: float, dy: float) : unit =
+            this.__ranvier_drawImage (box image, dx, dy)
+
+        member this.drawImage(image: HTMLCanvasElement, dx: float, dy: float) : unit =
+            this.__ranvier_drawImage (box image, dx, dy)
+
+        member this.drawImage(image: ImageBitmap, dx: float, dy: float) : unit =
+            this.__ranvier_drawImage (box image, dx, dy)
+
+        member this.drawImage(image: CSSImageValue, dx: float, dy: float) : unit =
+            this.__ranvier_drawImage (box image, dx, dy)
+
+        member this.drawImage(image: HTMLImageElement, dx: float, dy: float, dw: float, dh: float) : unit =
+            this.__ranvier_drawImage (box image, dx, dy, dw, dh)
+
+        member this.drawImage(image: SVGImageElement, dx: float, dy: float, dw: float, dh: float) : unit =
+            this.__ranvier_drawImage (box image, dx, dy, dw, dh)
+
+        member this.drawImage(image: HTMLCanvasElement, dx: float, dy: float, dw: float, dh: float) : unit =
+            this.__ranvier_drawImage (box image, dx, dy, dw, dh)
+
+        member this.drawImage(image: ImageBitmap, dx: float, dy: float, dw: float, dh: float) : unit =
+            this.__ranvier_drawImage (box image, dx, dy, dw, dh)
+
+        member this.drawImage(image: CSSImageValue, dx: float, dy: float, dw: float, dh: float) : unit =
+            this.__ranvier_drawImage (box image, dx, dy, dw, dh)
+
+        member this.drawImage
+            (image: HTMLImageElement, sx: float, sy: float, sw: float, sh: float, dx: float, dy: float, dw: float, dh: float)
+            : unit =
+            this.__ranvier_drawImage (box image, sx, sy, sw, sh, dx, dy, dw, dh)
+
+        member this.drawImage(image: SVGImageElement, sx: float, sy: float, sw: float, sh: float, dx: float, dy: float, dw: float, dh: float) : unit =
+            this.__ranvier_drawImage (box image, sx, sy, sw, sh, dx, dy, dw, dh)
+
+        member this.drawImage
+            (image: HTMLCanvasElement, sx: float, sy: float, sw: float, sh: float, dx: float, dy: float, dw: float, dh: float)
+            : unit =
+            this.__ranvier_drawImage (box image, sx, sy, sw, sh, dx, dy, dw, dh)
+
+        member this.drawImage(image: ImageBitmap, sx: float, sy: float, sw: float, sh: float, dx: float, dy: float, dw: float, dh: float) : unit =
+            this.__ranvier_drawImage (box image, sx, sy, sw, sh, dx, dy, dw, dh)
+
+        member this.drawImage(image: CSSImageValue, sx: float, sy: float, sw: float, sh: float, dx: float, dy: float, dw: float, dh: float) : unit =
+            this.__ranvier_drawImage (box image, sx, sy, sw, sh, dx, dy, dw, dh)
+
+        member this.roundRect(x: float, y: float, w: float, h: float, radii: (UnrestrictedDoubleOrDOMPointInit) array) : unit =
+            this.__ranvier_roundRectList (x, y, w, h, box (Array.map boxUnrestrictedDoubleOrDOMPointInit radii))
+
+        member this.roundRect(x: float, y: float, w: float, h: float) : unit =
+            this.__ranvier_roundRect (x, y, w, h, ?radii = None)
+
+        member this.roundRect(x: float, y: float, w: float, h: float, radii: float) : unit =
+            this.__ranvier_roundRect (x, y, w, h, ?radii = Some (box radii))
+
+        member this.roundRect(x: float, y: float, w: float, h: float, radii: DOMPointInit) : unit =
+            this.__ranvier_roundRect (x, y, w, h, ?radii = Some (box radii))
+
+
+    type Path2D with
+        member this.roundRect(x: float, y: float, w: float, h: float, radii: (UnrestrictedDoubleOrDOMPointInit) array) : unit =
+            this.__ranvier_roundRectList (x, y, w, h, box (Array.map boxUnrestrictedDoubleOrDOMPointInit radii))
+
+        member this.roundRect(x: float, y: float, w: float, h: float) : unit =
+            this.__ranvier_roundRect (x, y, w, h, ?radii = None)
+
+        member this.roundRect(x: float, y: float, w: float, h: float, radii: float) : unit =
+            this.__ranvier_roundRect (x, y, w, h, ?radii = Some (box radii))
+
+        member this.roundRect(x: float, y: float, w: float, h: float, radii: DOMPointInit) : unit =
+            this.__ranvier_roundRect (x, y, w, h, ?radii = Some (box radii))
 
 
     type ChildNode with

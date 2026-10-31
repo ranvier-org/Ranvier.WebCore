@@ -1,0 +1,402 @@
+{
+ "defaults": {
+  "transform": [
+   1.0,
+   0.0,
+   0.0,
+   1.0,
+   0.0,
+   0.0,
+   true,
+   true
+  ],
+  "alpha": 1.0,
+  "composite": "source-over",
+  "filter": "none"
+ },
+ "translate": [
+  1.0,
+  0.0,
+  0.0,
+  1.0,
+  10.0,
+  5.0,
+  true,
+  false
+ ],
+ "scale": [
+  2.0,
+  0.0,
+  0.0,
+  3.0,
+  10.0,
+  5.0,
+  true,
+  false
+ ],
+ "rotate": [
+  0.0,
+  1.0,
+  -1.0,
+  0.0,
+  0.0,
+  0.0,
+  true,
+  false
+ ],
+ "transform": [
+  2.0,
+  0.0,
+  0.0,
+  2.0,
+  5.0,
+  5.0,
+  true,
+  false
+ ],
+ "setTransformInit": [
+  1.0,
+  0.0,
+  0.0,
+  1.0,
+  7.0,
+  8.0,
+  true,
+  false
+ ],
+ "setTransformM": [
+  1.0,
+  0.0,
+  0.0,
+  1.0,
+  3.0,
+  4.0,
+  true,
+  false
+ ],
+ "setTransformDefault": [
+  1.0,
+  0.0,
+  0.0,
+  1.0,
+  0.0,
+  0.0,
+  true,
+  true
+ ],
+ "nonFinite": [
+  1.0,
+  0.0,
+  0.0,
+  1.0,
+  0.0,
+  0.0,
+  true,
+  true
+ ],
+ "getTransformIsCopy": true,
+ "drawTransformed": [
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ]
+ ],
+ "restored": {
+  "fillStyle": "#0000ff",
+  "alpha": 0.5,
+  "composite": "source-over",
+  "transform": [
+   1.0,
+   0.0,
+   0.0,
+   1.0,
+   5.0,
+   5.0,
+   true,
+   false
+  ]
+ },
+ "reset": {
+  "pixel": [
+   255,
+   255,
+   255,
+   255
+  ],
+  "fillStyle": "#000000",
+  "alpha": 1.0,
+  "composite": "source-over",
+  "transform": [
+   1.0,
+   0.0,
+   0.0,
+   1.0,
+   0.0,
+   0.0,
+   true,
+   true
+  ],
+  "path": false,
+  "restoreAfterReset": "#000000"
+ },
+ "alphaPixel": [
+  255,
+  127,
+  127,
+  255
+ ],
+ "webkitOnlyComposites": {
+  "darker": "darker",
+  "plus-darker": "plus-darker",
+  "plus-lighter": "plus-lighter",
+  "clear": "clear"
+ },
+ "composite": {
+  "source-over": {
+   "overlap": [
+    255,
+    0,
+    0,
+    255
+   ],
+   "dst": [
+    0,
+    0,
+    255,
+    255
+   ],
+   "src": [
+    255,
+    0,
+    0,
+    255
+   ]
+  },
+  "destination-over": {
+   "overlap": [
+    0,
+    0,
+    255,
+    255
+   ],
+   "dst": [
+    0,
+    0,
+    255,
+    255
+   ],
+   "src": [
+    255,
+    0,
+    0,
+    255
+   ]
+  },
+  "xor": {
+   "overlap": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "dst": [
+    0,
+    0,
+    255,
+    255
+   ],
+   "src": [
+    255,
+    0,
+    0,
+    255
+   ]
+  },
+  "lighter": {
+   "overlap": [
+    255,
+    0,
+    255,
+    255
+   ],
+   "dst": [
+    0,
+    0,
+    255,
+    255
+   ],
+   "src": [
+    255,
+    0,
+    0,
+    255
+   ]
+  },
+  "source-in": {
+   "overlap": [
+    255,
+    0,
+    0,
+    255
+   ],
+   "dst": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "src": [
+    255,
+    255,
+    255,
+    255
+   ]
+  },
+  "destination-out": {
+   "overlap": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "dst": [
+    0,
+    0,
+    255,
+    255
+   ],
+   "src": [
+    255,
+    255,
+    255,
+    255
+   ]
+  },
+  "multiply": {
+   "overlap": [
+    0,
+    0,
+    0,
+    255
+   ],
+   "dst": [
+    0,
+    0,
+    255,
+    255
+   ],
+   "src": [
+    255,
+    0,
+    0,
+    255
+   ]
+  },
+  "screen": {
+   "overlap": [
+    255,
+    0,
+    255,
+    255
+   ],
+   "dst": [
+    0,
+    0,
+    255,
+    255
+   ],
+   "src": [
+    255,
+    0,
+    0,
+    255
+   ]
+  },
+  "copy": {
+   "overlap": [
+    255,
+    0,
+    0,
+    255
+   ],
+   "dst": [
+    255,
+    255,
+    255,
+    255
+   ],
+   "src": [
+    255,
+    0,
+    0,
+    255
+   ]
+  }
+ },
+ "filter": {
+  "initial": "none",
+  "blurString": "blur(2px)",
+  "invalidKept": "blur(2px)",
+  "pixels": [
+   [
+    0,
+    255,
+    255,
+    255
+   ],
+   [
+    255,
+    0,
+    0,
+    255
+   ],
+   [
+    255,
+    127,
+    127,
+    255
+   ]
+  ],
+  "blur": [
+   [
+    255,
+    6,
+    6,
+    255
+   ],
+   [
+    255,
+    107,
+    107,
+    255
+   ],
+   [
+    255,
+    151,
+    151,
+    255
+   ],
+   [
+    255,
+    252,
+    252,
+    255
+   ]
+  ]
+ },
+ "assertions": 475
+}

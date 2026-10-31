@@ -1,0 +1,313 @@
+{
+ "construct": {
+  "size": [
+   2,
+   3
+  ],
+  "layout": {
+   "width": 2,
+   "height": 3,
+   "colorSpace": 0,
+   "pixelFormat": 0,
+   "bytesPerPixel": 4,
+   "rowBytes": 8,
+   "byteLength": 24
+  }
+ },
+ "constructErrors": {
+  "zeroWidth": "IndexSizeError",
+  "zeroHeight": "IndexSizeError",
+  "notMultipleOf4": "InvalidStateError",
+  "notMultipleOfRow": "IndexSizeError",
+  "heightMismatch": "IndexSizeError",
+  "emptyData": "InvalidStateError",
+  "huge": "RangeError",
+  "displayP3": "unsupported",
+  "float16": "unsupported",
+  "unknownColorSpace": "unsupported",
+  "unknownPixelFormat": "unsupported"
+ },
+ "constructFromData": {
+  "size": [
+   1,
+   2
+  ],
+  "data": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ]
+ },
+ "createImageData": {
+  "negative": [
+   3,
+   2
+  ],
+  "colorSpace": 0,
+  "zero": "IndexSizeError",
+  "copyOf": [
+   1,
+   2,
+   true
+  ]
+ },
+ "roundTrip": [
+  255,
+  0,
+  0,
+  255,
+  0,
+  255,
+  0,
+  255,
+  0,
+  0,
+  255,
+  255,
+  0,
+  0,
+  0,
+  0,
+  255,
+  255,
+  255,
+  128,
+  0,
+  0,
+  0,
+  255,
+  200,
+  100,
+  50,
+  255,
+  1,
+  2,
+  3,
+  255
+ ],
+ "outside": [
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0
+ ],
+ "negativeRect": [
+  255,
+  0,
+  0,
+  255,
+  0,
+  255,
+  0,
+  255
+ ],
+ "getErrors": {
+  "zeroWidth": "IndexSizeError",
+  "zeroHeight": "IndexSizeError"
+ },
+ "getColorSpace": 0,
+ "painted": [
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   0,
+   255,
+   0,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ]
+ ],
+ "dirty": {
+  "inside": [
+   0,
+   0,
+   255,
+   255
+  ],
+  "corner": [
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ "dirtyNegative": {
+  "at5": [
+   0,
+   0,
+   255,
+   255
+  ],
+  "at6": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "at4": [
+   0,
+   0,
+   255,
+   255
+  ]
+ },
+ "partlyOutsidePixel": [
+  0,
+  0,
+  255,
+  255
+ ],
+ "willReadFrequently": [
+  255,
+  0,
+  0,
+  255,
+  0,
+  0,
+  255,
+  255
+ ],
+ "drawCanvas": {
+  "left": [
+   255,
+   0,
+   0,
+   255
+  ],
+  "right": [
+   0,
+   0,
+   255,
+   255
+  ],
+  "beyond": [
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ "drawCanvasScaled": {
+  "left": [
+   255,
+   0,
+   0,
+   255
+  ],
+  "right": [
+   0,
+   0,
+   255,
+   255
+  ]
+ },
+ "drawCanvasSubRect": {
+  "left": [
+   0,
+   0,
+   255,
+   255
+  ],
+  "right": [
+   0,
+   0,
+   255,
+   255
+  ],
+  "beyond": [
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ "drawErrors": {
+  "zeroSizeCanvas": "InvalidStateError",
+  "zeroSourceRect": "ok",
+  "nonFinite": "ok",
+  "emptyImage": "ok"
+ },
+ "drawImage": [
+  255,
+  0,
+  0,
+  255,
+  0,
+  255,
+  0,
+  255,
+  0,
+  0,
+  255,
+  255,
+  0,
+  0,
+  0,
+  0
+ ],
+ "drawBroken": "InvalidStateError",
+ "drawSvgImage": [
+  255,
+  0,
+  0,
+  255,
+  0,
+  255,
+  0,
+  255,
+  0,
+  0,
+  255,
+  255,
+  0,
+  0,
+  0,
+  0
+ ],
+ "taint": {
+  "crossOrigin": "SecurityError",
+  "cors": [
+   255,
+   0,
+   0,
+   255
+  ],
+  "requests": [
+   "https://pixels.test/tile.png",
+   "https://pixels.test/tile.png?cors"
+  ]
+ },
+ "assertions": 297
+}

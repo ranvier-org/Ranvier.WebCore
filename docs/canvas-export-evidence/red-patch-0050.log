@@ -1,0 +1,20 @@
+== export-candidate-2 (0049, no 0050) kind 2
+create
+Fatal Python error: Aborted
+Current thread 0x00001f48 (most recent call first):
+  File "C:\wk\native-canvas-pixels\docs\canvas-export-evidence\red_bitmap_buffer.py", line 23 in <module>
+exit=0
+== export-candidate-3 (private 0050) kind 2
+create
+0
+[(0, 2, 2)]
+== export-candidate-2 (0049, no 0050) kind 0
+create
+Fatal Python error: Aborted
+Current thread 0x00002ab4 (most recent call first):
+  File "C:\wk\native-canvas-pixels\docs\canvas-export-evidence\red_bitmap_buffer.py", line 23 in <module>
+exit=0
+== export-candidate-3 (private 0050) kind 0
+create
+0
+[(0, 4, 2)]

@@ -29,6 +29,8 @@ class Type:
     nullable: bool = False
     subtypes: list = field(default_factory=list)
     attrs: dict = field(default_factory=dict)  # type-level extended attributes, such as [AtomString]
+    # The IDL file the type is written in: a typedef it references resolves to that file's definition first.
+    file: str = field(default="", compare=False, repr=False)
 
     def __str__(self):
         if self.name == "union":
@@ -253,6 +255,7 @@ class Parser:
         if self.accept("?"):
             result.nullable = True
         result.attrs = attrs
+        result.file = self.file
         return result
 
     def arguments(self):

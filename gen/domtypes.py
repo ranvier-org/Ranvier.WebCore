@@ -356,7 +356,9 @@ class ComplexGeneratorMixin:
                  '            if constexpr (std::is_constructible_v<U, T&&>) converted.append(U { std::move(value) });',
                  '            else converted.append(U { value.get() });', '        }',
                  '        return FixedVector<U> { std::move(converted) };', '    }',
-                 '    operator std::optional<Vector<T>>() && { return std::move(values); }', '};']
+                 '    operator std::optional<Vector<T>>() && { return std::move(values); }',
+                 '    // A span parameter borrows the values for the call, which the argument temporary outlives.',
+                 '    operator std::span<const T>() && { return values.span(); }', '};']
         lines += dictionary_declarations
         if self.uses_complex_string_spans():
             lines += ['RvDomUtf8StringSpan copyOwnedDomStringSpan(const String& value)', '{',

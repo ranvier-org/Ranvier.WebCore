@@ -1,0 +1,506 @@
+{
+ "browser": "156.0.8078.4",
+ "defaults": {
+  "font": "10px sans-serif",
+  "textAlign": "start",
+  "textBaseline": "alphabetic",
+  "direction": "inherit",
+  "letterSpacing": "0px",
+  "wordSpacing": "0px"
+ },
+ "loaded": 1,
+ "font": "20px RvAhem",
+ "fontKept": "20px RvAhem",
+ "fontShorthand": "italic bold 20px RvAhem",
+ "fontEm": "16px RvAhem",
+ "textAlignCenter": "center",
+ "textAlignKept": "center",
+ "textBaselineTop": "top",
+ "directionRtl": "rtl",
+ "letterSpacing": "2px",
+ "letterSpacingKept": "2px",
+ "letterSpacingEm": "0.5em",
+ "wordSpacing": "3px",
+ "wordSpacingKept": "3px",
+ "afterReset": {
+  "font": "10px sans-serif",
+  "textAlign": "start",
+  "textBaseline": "alphabetic",
+  "direction": "inherit",
+  "letterSpacing": "0px",
+  "wordSpacing": "0px"
+ },
+ "afterRestore": {
+  "font": "10px sans-serif",
+  "textAlign": "start"
+ },
+ "measureX": {
+  "width": 60,
+  "actualBoundingBoxLeft": 1,
+  "actualBoundingBoxRight": 61,
+  "fontBoundingBoxAscent": 16,
+  "fontBoundingBoxDescent": 4,
+  "actualBoundingBoxAscent": 16,
+  "actualBoundingBoxDescent": 4,
+  "hangingBaseline": 12.800000190734863,
+  "alphabeticBaseline": 0,
+  "ideographicBaseline": -4
+ },
+ "measureP": {
+  "width": 20,
+  "actualBoundingBoxLeft": 1,
+  "actualBoundingBoxRight": 21,
+  "fontBoundingBoxAscent": 16,
+  "fontBoundingBoxDescent": 4,
+  "actualBoundingBoxAscent": 0,
+  "actualBoundingBoxDescent": 4,
+  "hangingBaseline": 12.800000190734863,
+  "alphabeticBaseline": 0,
+  "ideographicBaseline": -4
+ },
+ "measureE": {
+  "width": 20,
+  "actualBoundingBoxLeft": 1,
+  "actualBoundingBoxRight": 21,
+  "fontBoundingBoxAscent": 16,
+  "fontBoundingBoxDescent": 4,
+  "actualBoundingBoxAscent": 16,
+  "actualBoundingBoxDescent": 0,
+  "hangingBaseline": 12.800000190734863,
+  "alphabeticBaseline": 0,
+  "ideographicBaseline": -4
+ },
+ "measureEmpty": {
+  "width": 0,
+  "actualBoundingBoxLeft": 0,
+  "actualBoundingBoxRight": 0,
+  "fontBoundingBoxAscent": 16,
+  "fontBoundingBoxDescent": 4,
+  "actualBoundingBoxAscent": 0,
+  "actualBoundingBoxDescent": 0,
+  "hangingBaseline": 12.800000190734863,
+  "alphabeticBaseline": 0,
+  "ideographicBaseline": -4
+ },
+ "measureSpace": {
+  "width": 60,
+  "actualBoundingBoxLeft": 1,
+  "actualBoundingBoxRight": 61,
+  "fontBoundingBoxAscent": 16,
+  "fontBoundingBoxDescent": 4,
+  "actualBoundingBoxAscent": 16,
+  "actualBoundingBoxDescent": 4,
+  "hangingBaseline": 12.800000190734863,
+  "alphabeticBaseline": 0,
+  "ideographicBaseline": -4
+ },
+ "align_start": {
+  "width": 40,
+  "actualBoundingBoxLeft": 1,
+  "actualBoundingBoxRight": 41,
+  "fontBoundingBoxAscent": 16,
+  "fontBoundingBoxDescent": 4,
+  "actualBoundingBoxAscent": 16,
+  "actualBoundingBoxDescent": 4,
+  "hangingBaseline": 12.800000190734863,
+  "alphabeticBaseline": 0,
+  "ideographicBaseline": -4
+ },
+ "align_end": {
+  "width": 40,
+  "actualBoundingBoxLeft": 41,
+  "actualBoundingBoxRight": 1,
+  "fontBoundingBoxAscent": 16,
+  "fontBoundingBoxDescent": 4,
+  "actualBoundingBoxAscent": 16,
+  "actualBoundingBoxDescent": 4,
+  "hangingBaseline": 12.800000190734863,
+  "alphabeticBaseline": 0,
+  "ideographicBaseline": -4
+ },
+ "align_left": {
+  "width": 40,
+  "actualBoundingBoxLeft": 1,
+  "actualBoundingBoxRight": 41,
+  "fontBoundingBoxAscent": 16,
+  "fontBoundingBoxDescent": 4,
+  "actualBoundingBoxAscent": 16,
+  "actualBoundingBoxDescent": 4,
+  "hangingBaseline": 12.800000190734863,
+  "alphabeticBaseline": 0,
+  "ideographicBaseline": -4
+ },
+ "align_right": {
+  "width": 40,
+  "actualBoundingBoxLeft": 41,
+  "actualBoundingBoxRight": 1,
+  "fontBoundingBoxAscent": 16,
+  "fontBoundingBoxDescent": 4,
+  "actualBoundingBoxAscent": 16,
+  "actualBoundingBoxDescent": 4,
+  "hangingBaseline": 12.800000190734863,
+  "alphabeticBaseline": 0,
+  "ideographicBaseline": -4
+ },
+ "align_center": {
+  "width": 40,
+  "actualBoundingBoxLeft": 21,
+  "actualBoundingBoxRight": 21,
+  "fontBoundingBoxAscent": 16,
+  "fontBoundingBoxDescent": 4,
+  "actualBoundingBoxAscent": 16,
+  "actualBoundingBoxDescent": 4,
+  "hangingBaseline": 12.800000190734863,
+  "alphabeticBaseline": 0,
+  "ideographicBaseline": -4
+ },
+ "baseline_top": {
+  "width": 20,
+  "actualBoundingBoxLeft": 1,
+  "actualBoundingBoxRight": 21,
+  "fontBoundingBoxAscent": 0,
+  "fontBoundingBoxDescent": 20,
+  "actualBoundingBoxAscent": 0,
+  "actualBoundingBoxDescent": 20,
+  "hangingBaseline": -3.1999998092651367,
+  "alphabeticBaseline": -16,
+  "ideographicBaseline": -20
+ },
+ "baseline_hanging": {
+  "width": 20,
+  "actualBoundingBoxLeft": 1,
+  "actualBoundingBoxRight": 21,
+  "fontBoundingBoxAscent": 3.1999998092651367,
+  "fontBoundingBoxDescent": 16.799999237060547,
+  "actualBoundingBoxAscent": 3.1999998092651367,
+  "actualBoundingBoxDescent": 16.799999237060547,
+  "hangingBaseline": 0,
+  "alphabeticBaseline": -12.800000190734863,
+  "ideographicBaseline": -16.799999237060547
+ },
+ "baseline_middle": {
+  "width": 20,
+  "actualBoundingBoxLeft": 1,
+  "actualBoundingBoxRight": 21,
+  "fontBoundingBoxAscent": 10,
+  "fontBoundingBoxDescent": 10,
+  "actualBoundingBoxAscent": 10,
+  "actualBoundingBoxDescent": 10,
+  "hangingBaseline": 6.800000190734863,
+  "alphabeticBaseline": -6,
+  "ideographicBaseline": -10
+ },
+ "baseline_alphabetic": {
+  "width": 20,
+  "actualBoundingBoxLeft": 1,
+  "actualBoundingBoxRight": 21,
+  "fontBoundingBoxAscent": 16,
+  "fontBoundingBoxDescent": 4,
+  "actualBoundingBoxAscent": 16,
+  "actualBoundingBoxDescent": 4,
+  "hangingBaseline": 12.800000190734863,
+  "alphabeticBaseline": 0,
+  "ideographicBaseline": -4
+ },
+ "baseline_ideographic": {
+  "width": 20,
+  "actualBoundingBoxLeft": 1,
+  "actualBoundingBoxRight": 21,
+  "fontBoundingBoxAscent": 20,
+  "fontBoundingBoxDescent": 0,
+  "actualBoundingBoxAscent": 20,
+  "actualBoundingBoxDescent": 0,
+  "hangingBaseline": 16.799999237060547,
+  "alphabeticBaseline": 4,
+  "ideographicBaseline": 0
+ },
+ "baseline_bottom": {
+  "width": 20,
+  "actualBoundingBoxLeft": 1,
+  "actualBoundingBoxRight": 21,
+  "fontBoundingBoxAscent": 20,
+  "fontBoundingBoxDescent": 0,
+  "actualBoundingBoxAscent": 20,
+  "actualBoundingBoxDescent": 0,
+  "hangingBaseline": 16.799999237060547,
+  "alphabeticBaseline": 4,
+  "ideographicBaseline": 0
+ },
+ "letterSpaced": {
+  "width": 75,
+  "actualBoundingBoxLeft": 1,
+  "actualBoundingBoxRight": 71,
+  "fontBoundingBoxAscent": 16,
+  "fontBoundingBoxDescent": 4,
+  "actualBoundingBoxAscent": 16,
+  "actualBoundingBoxDescent": 4,
+  "hangingBaseline": 12.800000190734863,
+  "alphabeticBaseline": 0,
+  "ideographicBaseline": -4
+ },
+ "wordSpaced": {
+  "width": 67,
+  "actualBoundingBoxLeft": 1,
+  "actualBoundingBoxRight": 68,
+  "fontBoundingBoxAscent": 16,
+  "fontBoundingBoxDescent": 4,
+  "actualBoundingBoxAscent": 16,
+  "actualBoundingBoxDescent": 4,
+  "hangingBaseline": 12.800000190734863,
+  "alphabeticBaseline": 0,
+  "ideographicBaseline": -4
+ },
+ "rtlStart": {
+  "width": 40,
+  "actualBoundingBoxLeft": 41,
+  "actualBoundingBoxRight": 1,
+  "fontBoundingBoxAscent": 16,
+  "fontBoundingBoxDescent": 4,
+  "actualBoundingBoxAscent": 16,
+  "actualBoundingBoxDescent": 4,
+  "hangingBaseline": 12.800000190734863,
+  "alphabeticBaseline": 0,
+  "ideographicBaseline": -4
+ },
+ "inheritRtl": {
+  "direction": "inherit",
+  "metrics": {
+   "width": 40,
+   "actualBoundingBoxLeft": 41,
+   "actualBoundingBoxRight": 1,
+   "fontBoundingBoxAscent": 16,
+   "fontBoundingBoxDescent": 4,
+   "actualBoundingBoxAscent": 16,
+   "actualBoundingBoxDescent": 4,
+   "hangingBaseline": 12.800000190734863,
+   "alphabeticBaseline": 0,
+   "ideographicBaseline": -4
+  }
+ },
+ "fill": [
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0
+  ]
+ ],
+ "maxWidth": [
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0
+  ]
+ ],
+ "nothingDrawn": [
+  [
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0
+  ]
+ ],
+ "centered": [
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   0,
+   0,
+   0,
+   0
+  ]
+ ],
+ "rtlFill": [
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0
+  ]
+ ],
+ "stroke": [
+  [
+   0,
+   0,
+   255,
+   223
+  ],
+  [
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   255,
+   223
+  ]
+ ],
+ "letterSpacedFill": [
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   0,
+   0,
+   0,
+   0
+  ]
+ ],
+ "inheritRtlFill": [
+  [
+   0,
+   255,
+   0,
+   255
+  ],
+  [
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0
+  ]
+ ]
+}

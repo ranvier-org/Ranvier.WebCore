@@ -1,0 +1,553 @@
+{
+ "defaults": {
+  "font": "10px sans-serif",
+  "textAlign": 0,
+  "textBaseline": 3,
+  "direction": 0,
+  "letterSpacing": "0px",
+  "wordSpacing": "0px"
+ },
+ "font": "20px RvAhem",
+ "fontKept": "20px RvAhem",
+ "fontShorthand": "italic bold 20px RvAhem",
+ "fontEm": "16px RvAhem",
+ "letterSpacingKept": "2px",
+ "letterSpacingEm": "0.5em",
+ "set": {
+  "font": "16px RvAhem",
+  "textAlign": 4,
+  "textBaseline": 0,
+  "direction": 1,
+  "letterSpacing": "0.5em",
+  "wordSpacing": "3px"
+ },
+ "afterReset": {
+  "font": "10px sans-serif",
+  "textAlign": 0,
+  "textBaseline": 3,
+  "direction": 0,
+  "letterSpacing": "0px",
+  "wordSpacing": "0px"
+ },
+ "measureX": {
+  "width": 60.0,
+  "actual_bounding_box_left": 0.0,
+  "actual_bounding_box_right": 60.0,
+  "font_bounding_box_ascent": 16.0,
+  "font_bounding_box_descent": 4.0,
+  "actual_bounding_box_ascent": 16.0,
+  "actual_bounding_box_descent": 4.0,
+  "em_height_ascent": 16.0,
+  "em_height_descent": 4.0,
+  "hanging_baseline": 16.0,
+  "alphabetic_baseline": -0.0,
+  "ideographic_baseline": -4.0
+ },
+ "measureP": {
+  "width": 20.0,
+  "actual_bounding_box_left": 0.0,
+  "actual_bounding_box_right": 20.0,
+  "font_bounding_box_ascent": 16.0,
+  "font_bounding_box_descent": 4.0,
+  "actual_bounding_box_ascent": 0.0,
+  "actual_bounding_box_descent": 4.0,
+  "em_height_ascent": 16.0,
+  "em_height_descent": 4.0,
+  "hanging_baseline": 16.0,
+  "alphabetic_baseline": -0.0,
+  "ideographic_baseline": -4.0
+ },
+ "measureE": {
+  "width": 20.0,
+  "actual_bounding_box_left": 0.0,
+  "actual_bounding_box_right": 20.0,
+  "font_bounding_box_ascent": 16.0,
+  "font_bounding_box_descent": 4.0,
+  "actual_bounding_box_ascent": 16.0,
+  "actual_bounding_box_descent": 0.0,
+  "em_height_ascent": 16.0,
+  "em_height_descent": 4.0,
+  "hanging_baseline": 16.0,
+  "alphabetic_baseline": -0.0,
+  "ideographic_baseline": -4.0
+ },
+ "measureEmpty": {
+  "width": 0.0,
+  "actual_bounding_box_left": 0.0,
+  "actual_bounding_box_right": 0.0,
+  "font_bounding_box_ascent": 16.0,
+  "font_bounding_box_descent": 4.0,
+  "actual_bounding_box_ascent": 0.0,
+  "actual_bounding_box_descent": 0.0,
+  "em_height_ascent": 16.0,
+  "em_height_descent": 4.0,
+  "hanging_baseline": 16.0,
+  "alphabetic_baseline": -0.0,
+  "ideographic_baseline": -4.0
+ },
+ "measureSpace": {
+  "width": 60.0,
+  "actual_bounding_box_left": 0.0,
+  "actual_bounding_box_right": 60.0,
+  "font_bounding_box_ascent": 16.0,
+  "font_bounding_box_descent": 4.0,
+  "actual_bounding_box_ascent": 16.0,
+  "actual_bounding_box_descent": 4.0,
+  "em_height_ascent": 16.0,
+  "em_height_descent": 4.0,
+  "hanging_baseline": 16.0,
+  "alphabetic_baseline": -0.0,
+  "ideographic_baseline": -4.0
+ },
+ "align_START": {
+  "width": 40.0,
+  "actual_bounding_box_left": 0.0,
+  "actual_bounding_box_right": 40.0,
+  "font_bounding_box_ascent": 16.0,
+  "font_bounding_box_descent": 4.0,
+  "actual_bounding_box_ascent": 16.0,
+  "actual_bounding_box_descent": 4.0,
+  "em_height_ascent": 16.0,
+  "em_height_descent": 4.0,
+  "hanging_baseline": 16.0,
+  "alphabetic_baseline": -0.0,
+  "ideographic_baseline": -4.0
+ },
+ "align_END": {
+  "width": 40.0,
+  "actual_bounding_box_left": 40.0,
+  "actual_bounding_box_right": 0.0,
+  "font_bounding_box_ascent": 16.0,
+  "font_bounding_box_descent": 4.0,
+  "actual_bounding_box_ascent": 16.0,
+  "actual_bounding_box_descent": 4.0,
+  "em_height_ascent": 16.0,
+  "em_height_descent": 4.0,
+  "hanging_baseline": 16.0,
+  "alphabetic_baseline": -0.0,
+  "ideographic_baseline": -4.0
+ },
+ "align_LEFT": {
+  "width": 40.0,
+  "actual_bounding_box_left": 0.0,
+  "actual_bounding_box_right": 40.0,
+  "font_bounding_box_ascent": 16.0,
+  "font_bounding_box_descent": 4.0,
+  "actual_bounding_box_ascent": 16.0,
+  "actual_bounding_box_descent": 4.0,
+  "em_height_ascent": 16.0,
+  "em_height_descent": 4.0,
+  "hanging_baseline": 16.0,
+  "alphabetic_baseline": -0.0,
+  "ideographic_baseline": -4.0
+ },
+ "align_RIGHT": {
+  "width": 40.0,
+  "actual_bounding_box_left": 40.0,
+  "actual_bounding_box_right": 0.0,
+  "font_bounding_box_ascent": 16.0,
+  "font_bounding_box_descent": 4.0,
+  "actual_bounding_box_ascent": 16.0,
+  "actual_bounding_box_descent": 4.0,
+  "em_height_ascent": 16.0,
+  "em_height_descent": 4.0,
+  "hanging_baseline": 16.0,
+  "alphabetic_baseline": -0.0,
+  "ideographic_baseline": -4.0
+ },
+ "align_CENTER": {
+  "width": 40.0,
+  "actual_bounding_box_left": 20.0,
+  "actual_bounding_box_right": 20.0,
+  "font_bounding_box_ascent": 16.0,
+  "font_bounding_box_descent": 4.0,
+  "actual_bounding_box_ascent": 16.0,
+  "actual_bounding_box_descent": 4.0,
+  "em_height_ascent": 16.0,
+  "em_height_descent": 4.0,
+  "hanging_baseline": 16.0,
+  "alphabetic_baseline": -0.0,
+  "ideographic_baseline": -4.0
+ },
+ "baseline_TOP": {
+  "width": 20.0,
+  "actual_bounding_box_left": 0.0,
+  "actual_bounding_box_right": 20.0,
+  "font_bounding_box_ascent": 0.0,
+  "font_bounding_box_descent": 20.0,
+  "actual_bounding_box_ascent": 0.0,
+  "actual_bounding_box_descent": 20.0,
+  "em_height_ascent": 0.0,
+  "em_height_descent": 20.0,
+  "hanging_baseline": 0.0,
+  "alphabetic_baseline": -16.0,
+  "ideographic_baseline": -20.0
+ },
+ "baseline_HANGING": {
+  "width": 20.0,
+  "actual_bounding_box_left": 0.0,
+  "actual_bounding_box_right": 20.0,
+  "font_bounding_box_ascent": 0.0,
+  "font_bounding_box_descent": 20.0,
+  "actual_bounding_box_ascent": 0.0,
+  "actual_bounding_box_descent": 20.0,
+  "em_height_ascent": 0.0,
+  "em_height_descent": 20.0,
+  "hanging_baseline": 0.0,
+  "alphabetic_baseline": -16.0,
+  "ideographic_baseline": -20.0
+ },
+ "baseline_MIDDLE": {
+  "width": 20.0,
+  "actual_bounding_box_left": 0.0,
+  "actual_bounding_box_right": 20.0,
+  "font_bounding_box_ascent": 10.0,
+  "font_bounding_box_descent": 10.0,
+  "actual_bounding_box_ascent": 10.0,
+  "actual_bounding_box_descent": 10.0,
+  "em_height_ascent": 10.0,
+  "em_height_descent": 10.0,
+  "hanging_baseline": 10.0,
+  "alphabetic_baseline": -6.0,
+  "ideographic_baseline": -10.0
+ },
+ "baseline_ALPHABETIC": {
+  "width": 20.0,
+  "actual_bounding_box_left": 0.0,
+  "actual_bounding_box_right": 20.0,
+  "font_bounding_box_ascent": 16.0,
+  "font_bounding_box_descent": 4.0,
+  "actual_bounding_box_ascent": 16.0,
+  "actual_bounding_box_descent": 4.0,
+  "em_height_ascent": 16.0,
+  "em_height_descent": 4.0,
+  "hanging_baseline": 16.0,
+  "alphabetic_baseline": -0.0,
+  "ideographic_baseline": -4.0
+ },
+ "baseline_IDEOGRAPHIC": {
+  "width": 20.0,
+  "actual_bounding_box_left": 0.0,
+  "actual_bounding_box_right": 20.0,
+  "font_bounding_box_ascent": 20.0,
+  "font_bounding_box_descent": 0.0,
+  "actual_bounding_box_ascent": 20.0,
+  "actual_bounding_box_descent": 0.0,
+  "em_height_ascent": 20.0,
+  "em_height_descent": 0.0,
+  "hanging_baseline": 20.0,
+  "alphabetic_baseline": 4.0,
+  "ideographic_baseline": 0.0
+ },
+ "baseline_BOTTOM": {
+  "width": 20.0,
+  "actual_bounding_box_left": 0.0,
+  "actual_bounding_box_right": 20.0,
+  "font_bounding_box_ascent": 20.0,
+  "font_bounding_box_descent": 0.0,
+  "actual_bounding_box_ascent": 20.0,
+  "actual_bounding_box_descent": 0.0,
+  "em_height_ascent": 20.0,
+  "em_height_descent": 0.0,
+  "hanging_baseline": 20.0,
+  "alphabetic_baseline": 4.0,
+  "ideographic_baseline": 0.0
+ },
+ "letterSpaced": {
+  "width": 75.0,
+  "actual_bounding_box_left": 0.0,
+  "actual_bounding_box_right": 75.0,
+  "font_bounding_box_ascent": 16.0,
+  "font_bounding_box_descent": 4.0,
+  "actual_bounding_box_ascent": 16.0,
+  "actual_bounding_box_descent": 4.0,
+  "em_height_ascent": 16.0,
+  "em_height_descent": 4.0,
+  "hanging_baseline": 16.0,
+  "alphabetic_baseline": -0.0,
+  "ideographic_baseline": -4.0
+ },
+ "wordSpaced": {
+  "width": 67.0,
+  "actual_bounding_box_left": 0.0,
+  "actual_bounding_box_right": 67.0,
+  "font_bounding_box_ascent": 16.0,
+  "font_bounding_box_descent": 4.0,
+  "actual_bounding_box_ascent": 16.0,
+  "actual_bounding_box_descent": 4.0,
+  "em_height_ascent": 16.0,
+  "em_height_descent": 4.0,
+  "hanging_baseline": 16.0,
+  "alphabetic_baseline": -0.0,
+  "ideographic_baseline": -4.0
+ },
+ "rtlStart": {
+  "width": 40.0,
+  "actual_bounding_box_left": 40.0,
+  "actual_bounding_box_right": 0.0,
+  "font_bounding_box_ascent": 16.0,
+  "font_bounding_box_descent": 4.0,
+  "actual_bounding_box_ascent": 16.0,
+  "actual_bounding_box_descent": 4.0,
+  "em_height_ascent": 16.0,
+  "em_height_descent": 4.0,
+  "hanging_baseline": 16.0,
+  "alphabetic_baseline": -0.0,
+  "ideographic_baseline": -4.0
+ },
+ "inheritRtl": {
+  "width": 40.0,
+  "actual_bounding_box_left": 40.0,
+  "actual_bounding_box_right": 0.0,
+  "font_bounding_box_ascent": 16.0,
+  "font_bounding_box_descent": 4.0,
+  "actual_bounding_box_ascent": 16.0,
+  "actual_bounding_box_descent": 4.0,
+  "em_height_ascent": 16.0,
+  "em_height_descent": 4.0,
+  "hanging_baseline": 16.0,
+  "alphabetic_baseline": -0.0,
+  "ideographic_baseline": -4.0
+ },
+ "fill": [
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ]
+ ],
+ "maxWidth": [
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ]
+ ],
+ "nothingDrawn": [
+  [
+   255,
+   255,
+   255,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ]
+ ],
+ "centered": [
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ],
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ],
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ],
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ]
+ ],
+ "rtlFill": [
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ]
+ ],
+ "stroke": [
+  [
+   0,
+   0,
+   255,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ],
+  [
+   0,
+   0,
+   255,
+   255
+  ]
+ ],
+ "letterSpacedFill": [
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ],
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ]
+ ],
+ "inheritRtlFill": [
+  [
+   0,
+   255,
+   0,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ]
+ ],
+ "keptAfterHost": {
+  "width": 40.0,
+  "actual_bounding_box_left": 0.0,
+  "actual_bounding_box_right": 40.0,
+  "font_bounding_box_ascent": 16.0,
+  "font_bounding_box_descent": 4.0,
+  "actual_bounding_box_ascent": 16.0,
+  "actual_bounding_box_descent": 4.0,
+  "em_height_ascent": 16.0,
+  "em_height_descent": 4.0,
+  "hanging_baseline": 16.0,
+  "alphabetic_baseline": -0.0,
+  "ideographic_baseline": -4.0
+ },
+ "assertions": 473
+}

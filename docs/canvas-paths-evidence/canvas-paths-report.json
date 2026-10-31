@@ -1,0 +1,197 @@
+{
+ "triangle": {
+  "inside": [
+   255,
+   0,
+   0,
+   255
+  ],
+  "outside": [
+   255,
+   255,
+   255,
+   255
+  ],
+  "hitInside": true,
+  "hitOutside": false,
+  "strokeOnEdge": true,
+  "strokeInside": false
+ },
+ "reuse": {
+  "pixels": [
+   [
+    0,
+    0,
+    255,
+    255
+   ],
+   [
+    0,
+    255,
+    0,
+    255
+   ],
+   [
+    255,
+    255,
+    255,
+    255
+   ]
+  ],
+  "hitSquare": true,
+  "hitMovedAtOrigin": false,
+  "hitMoved": true,
+  "squareUnchanged": false
+ },
+ "pathData": [
+  true,
+  false,
+  true,
+  false,
+  true
+ ],
+ "fillRule": [
+  true,
+  false,
+  true
+ ],
+ "shapes": {
+  "arc": [
+   true,
+   false,
+   true
+  ],
+  "halfArc": [
+   true,
+   false
+  ],
+  "anticlockwiseArc": [
+   false,
+   true
+  ],
+  "ellipse": [
+   true,
+   true,
+   false
+  ],
+  "rotatedEllipse": [
+   false,
+   true
+  ],
+  "quadratic": [
+   true,
+   false
+  ],
+  "bezier": [
+   true,
+   false
+  ],
+  "arcTo": [
+   true,
+   false,
+   true
+  ],
+  "rect": [
+   true,
+   false
+  ],
+  "roundRectList": [
+   false,
+   true,
+   true
+  ],
+  "roundRectValue": [
+   false,
+   true
+  ],
+  "roundRectPoint": [
+   true,
+   false,
+   true
+  ],
+  "roundRectFour": [
+   true,
+   true,
+   false
+  ]
+ },
+ "pathShapes": [
+  true,
+  true,
+  true,
+  true,
+  false,
+  true,
+  false
+ ],
+ "nonFinite": [
+  true,
+  false,
+  false
+ ],
+ "clip": [
+  [
+   255,
+   0,
+   0,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ]
+ ],
+ "clipCurrent": [
+  [
+   0,
+   0,
+   255,
+   255
+  ],
+  [
+   255,
+   255,
+   255,
+   255
+  ]
+ ],
+ "stroke": {
+  "pixels": [
+   [
+    0,
+    0,
+    0,
+    255
+   ],
+   [
+    255,
+    255,
+    255,
+    255
+   ],
+   [
+    0,
+    0,
+    0,
+    255
+   ],
+   [
+    255,
+    255,
+    255,
+    255
+   ],
+   [
+    0,
+    0,
+    0,
+    255
+   ]
+  ],
+  "hitLine": true,
+  "missLine": false
+ },
+ "assertions": 325
+}

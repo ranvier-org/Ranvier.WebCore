@@ -16,7 +16,7 @@ from form_collections import Native, Case, P, I, U
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT = 0, -1
-ABI = 57
+ABI = 58
 NODE_ARM, STRING_ARM = 1, 2
 HIDDEN_STRING_ARM = 3
 
