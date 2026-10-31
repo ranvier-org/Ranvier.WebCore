@@ -1,9 +1,9 @@
 {
-  "checkedAtUtc": "2026-10-31T09:46:51.507029+00:00",
+  "checkedAtUtc": "2026-10-31T11:10:35.311346+00:00",
   "purpose": "T03 custom highlights Native40/ABI48, DOM alpha.43, Views 0.1.33, WebCore backend alpha.33 reservation",
   "abi": 48,
-  "stackedOn": "901ced5 (T06 final Native35/ABI43); B22, G03, G04, I08 finals merge before release",
-  "abiNumberInUse": "host/RanvierWebCoreAbi.cpp:1255:int32_t rv_abi_version(void) { return 43; }",
+  "stackedOn": "6d636fb: T06 901ced5, B22 c78a71a, G03 cdf1a4e, G04 15e1bc9, I08 2a9cf7d final heads merged",
+  "abiNumberInUse": "host/RanvierWebCoreAbi.cpp:1311:int32_t rv_abi_version(void) { return 48; }",
   "packages": [
     {
       "package": "Ranvier.WebCore",
@@ -220,12 +220,6 @@
           "number": 135,
           "title": "feat(mathml): expose typed MathML elements (Native23/ABI31)",
           "url": "https://github.com/ranvier-org/Ranvier.WebCore/pull/135"
-        },
-        {
-          "headRefName": "codex/native-api-resource-completion",
-          "number": 133,
-          "title": "feat(resources): add image decode and font readiness without JavaScript (Native22/ABI30)",
-          "url": "https://github.com/ranvier-org/Ranvier.WebCore/pull/133"
         }
       ]
     },
@@ -274,18 +268,6 @@
           "number": 270,
           "title": "feat(dom): add qualified locale preference services",
           "url": "https://github.com/ranvier-org/Ranvier/pull/270"
-        },
-        {
-          "headRefName": "codex/native-api-svg-values",
-          "number": 269,
-          "title": "feat(dom): add SVG geometry and live value contracts (cohort 19)",
-          "url": "https://github.com/ranvier-org/Ranvier/pull/269"
-        },
-        {
-          "headRefName": "codex/native-api-timing",
-          "number": 268,
-          "title": "feat(dom): add shared monotonic user timing",
-          "url": "https://github.com/ranvier-org/Ranvier/pull/268"
         }
       ]
     },

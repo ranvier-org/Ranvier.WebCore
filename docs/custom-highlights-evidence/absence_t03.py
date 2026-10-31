@@ -18,8 +18,8 @@ for repo in ['ranvier-org/Ranvier.WebCore', 'ranvier-org/Ranvier', 'ranvier-org/
     tags = subprocess.run(['gh','api',f'repos/{repo}/tags','--paginate','--jq','.[].name'], capture_output=True, text=True).stdout.split()
     prs = json.loads(subprocess.run(['gh','pr','list','--repo',repo,'--state','open','--json','number,title,headRefName,url'], capture_output=True, text=True).stdout)
     gh.append({'repository': repo, 'matchingTags': [t for t in tags if any(m in t for m in marks)], 'openPullRequests': prs})
-abi = subprocess.run(['git','grep','-n','return 43;','--','host/RanvierWebCoreAbi.cpp'], cwd='C:/wk/native-highlight', capture_output=True, text=True).stdout
-receipt = {'checkedAtUtc': datetime.datetime.now(datetime.UTC).isoformat(), 'purpose': 'T03 custom highlights Native40/ABI48, DOM alpha.43, Views 0.1.33, WebCore backend alpha.33 reservation', 'abi': 48, 'stackedOn': '901ced5 (T06 final Native35/ABI43); B22, G03, G04, I08 finals merge before release', 'abiNumberInUse': abi.strip(), 'packages': rows, 'github': gh}
+abi = subprocess.run(['git','grep','-n','return 48;','--','host/RanvierWebCoreAbi.cpp'], cwd='C:/wk/native-highlight', capture_output=True, text=True).stdout
+receipt = {'checkedAtUtc': datetime.datetime.now(datetime.UTC).isoformat(), 'purpose': 'T03 custom highlights Native40/ABI48, DOM alpha.43, Views 0.1.33, WebCore backend alpha.33 reservation', 'abi': 48, 'stackedOn': '6d636fb: T06 901ced5, B22 c78a71a, G03 cdf1a4e, G04 15e1bc9, I08 2a9cf7d final heads merged', 'abiNumberInUse': abi.strip(), 'packages': rows, 'github': gh}
 Path('C:/wk/native-highlight/docs/custom-highlights-evidence/allocation-absence.json').write_text(json.dumps(receipt, indent=2))
 print('not-absent:', [(r['package'], r['version'], r['published']) for r in rows if r['published'] is not False])
 for g in gh: print(g['repository'], 'tags', g['matchingTags'], 'prs', [(p['number'], p['headRefName']) for p in g['openPullRequests']])
