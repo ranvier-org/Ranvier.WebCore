@@ -1,0 +1,1 @@
+     30 text_segmentation: 812 assertions, 15 qualified
