@@ -1,0 +1,278 @@
+Subject: [PATCH] Settle native image decode waiters where ImageLoader settles decode promises
+
+An already complete image settles a native waiter in a queued task, not a microtask: a host
+that disallows VM entry never performs a microtask checkpoint.
+
+diff --git a/Source/WebCore/html/HTMLImageElement.cpp b/Source/WebCore/html/HTMLImageElement.cpp
+--- a/Source/WebCore/html/HTMLImageElement.cpp
++++ b/Source/WebCore/html/HTMLImageElement.cpp
+@@ -835,6 +835,11 @@
+     return m_imageLoader->decode(WTF::move(promise));
+ }
+ 
++void HTMLImageElement::decode(Function<void(ImageDecodeResult)>&& waiter)
++{
++    m_imageLoader->decode(WTF::move(waiter));
++}
++
+ void HTMLImageElement::addSubresourceAttributeURLs(OrderedHashSet<URL>& urls) const
+ {
+     HTMLElement::addSubresourceAttributeURLs(urls);
+diff --git a/Source/WebCore/html/HTMLImageElement.h b/Source/WebCore/html/HTMLImageElement.h
+--- a/Source/WebCore/html/HTMLImageElement.h
++++ b/Source/WebCore/html/HTMLImageElement.h
+@@ -40,6 +40,7 @@
+ class HTMLAttachmentElement;
+ class HTMLFormElement;
+ class HTMLImageLoader;
++enum class ImageDecodeResult : uint8_t;
+ class HTMLMapElement;
+ class Image;
+ class SecurityOrigin;
+@@ -101,6 +102,7 @@
+     DecodingMode decodingMode() const;
+     
+     WEBCORE_EXPORT void decode(Ref<DeferredPromise>&&);
++    void decode(Function<void(ImageDecodeResult)>&&);
+ 
+ #if ENABLE(CONTENT_CHANGE_OBSERVER)
+     bool willRespondToMouseClickEventsWithEditability(Editability) const override;
+diff --git a/Source/WebCore/loader/ImageLoader.cpp b/Source/WebCore/loader/ImageLoader.cpp
+--- a/Source/WebCore/loader/ImageLoader.cpp
++++ b/Source/WebCore/loader/ImageLoader.cpp
+@@ -355,7 +355,7 @@
+         LOG_WITH_STREAM(LazyLoading, stream << " switching from old image " << oldImage.get() << " to image " << newImage.get() << " " << (newImage ? newImage->url() : URL()));
+ 
+         if (newImage != oldImage && hasPendingDecodePromises())
+-            rejectDecodePromises("Aborted by source change."_s);
++            rejectDecodePromises("Aborted by source change."_s, ImageDecodeResult::SourceChanged);
+ 
+         m_hasPendingBeforeLoadEvent = false;
+         if (m_hasPendingLoadEvent) {
+@@ -427,7 +427,6 @@
+ 
+ static inline void resolvePromises(Vector<Ref<DeferredPromise>>& promises)
+ {
+-    ASSERT(!promises.isEmpty());
+     auto promisesToBeResolved = std::exchange(promises, { });
+     for (auto& promise : promisesToBeResolved)
+         promise->resolve();
+@@ -435,20 +434,30 @@
+ 
+ static inline void rejectPromises(Vector<Ref<DeferredPromise>>& promises, ASCIILiteral message)
+ {
+-    ASSERT(!promises.isEmpty());
+     auto promisesToBeRejected = std::exchange(promises, { });
+     for (auto& promise : promisesToBeRejected)
+         promise->reject(Exception { ExceptionCode::EncodingError, message });
+ }
+ 
++static inline void settleWaiters(Vector<Function<void(ImageDecodeResult)>>& waiters, ImageDecodeResult result)
++{
++    auto waitersToBeSettled = std::exchange(waiters, { });
++    for (auto& waiter : waitersToBeSettled)
++        waiter(result);
++}
++
+ inline void ImageLoader::resolveDecodePromises()
+ {
++    ASSERT(hasPendingDecodePromises());
+     resolvePromises(m_decodingPromises);
++    settleWaiters(m_decodeWaiters, ImageDecodeResult::Decoded);
+ }
+ 
+-inline void ImageLoader::rejectDecodePromises(ASCIILiteral message)
++inline void ImageLoader::rejectDecodePromises(ASCIILiteral message, ImageDecodeResult result)
+ {
++    ASSERT(hasPendingDecodePromises());
+     rejectPromises(m_decodingPromises, message);
++    settleWaiters(m_decodeWaiters, result);
+ }
+ 
+ void ImageLoader::notifyFinished(CachedResource& resource, const NetworkLoadMetrics&, LoadWillContinueInAnotherProcess)
+@@ -485,7 +494,7 @@
+         protect(document())->addConsoleMessage(MessageSource::Security, MessageLevel::Error, message);
+ 
+         if (hasPendingDecodePromises())
+-            rejectDecodePromises("Access control error."_s);
++            rejectDecodePromises("Access control error."_s, ImageDecodeResult::AccessControlError);
+         
+         ASSERT(!m_hasPendingLoadEvent);
+ 
+@@ -499,7 +508,7 @@
+         setImageCompleteAndMaybeUpdateRenderer();
+ 
+         if (hasPendingDecodePromises())
+-            rejectDecodePromises("Loading was canceled."_s);
++            rejectDecodePromises("Loading was canceled."_s, ImageDecodeResult::Canceled);
+         m_hasPendingLoadEvent = false;
+         // Only consider updating the protection ref-count of the Element immediately before returning
+         // from this function as doing so might result in the destruction of this ImageLoader.
+@@ -598,20 +607,40 @@
+     }   
+ }
+ 
+-void ImageLoader::decode(Ref<DeferredPromise>&& promise)
++bool ImageLoader::registerDecodeRequest()
+ {
+-    m_decodingPromises.append(WTF::move(promise));
+-
+     if (!element().document().window()) {
+-        rejectDecodePromises("Inactive document."_s);
+-        return;
++        rejectDecodePromises("Inactive document."_s, ImageDecodeResult::InactiveDocument);
++        return false;
+     }
+ 
+     auto attr = protect(element())->imageSourceURL();
+     if (StringView(attr).containsOnly<isASCIIWhitespace<char16_t>>()) {
+-        rejectDecodePromises("Missing source URL."_s);
+-        return;
++        rejectDecodePromises("Missing source URL."_s, ImageDecodeResult::MissingSource);
++        return false;
+     }
++    return true;
++}
++
++void ImageLoader::decode(Function<void(ImageDecodeResult)>&& waiter)
++{
++    m_decodeWaiters.append(WTF::move(waiter));
++    if (!registerDecodeRequest() || !m_imageComplete)
++        return;
++    Ref document = element().document();
++    document->eventLoop().queueTask(TaskSource::InternalAsyncTask, [weakThis = WeakPtr { *this }] {
++        RefPtr protectedThis = weakThis;
++        if (!protectedThis || !protectedThis->m_imageComplete)
++            return;
++        protectedThis->decode();
++    });
++}
++
++void ImageLoader::decode(Ref<DeferredPromise>&& promise)
++{
++    m_decodingPromises.append(WTF::move(promise));
++    if (!registerDecodeRequest())
++        return;
+ 
+     if (m_imageComplete) {
+         Ref document = element().document();
+@@ -630,13 +659,13 @@
+         return;
+     
+     if (!element().document().window()) {
+-        rejectDecodePromises("Inactive document."_s);
++        rejectDecodePromises("Inactive document."_s, ImageDecodeResult::InactiveDocument);
+         return;
+     }
+ 
+     RefPtr image = m_image;
+     if (!image || !image->image() || image->errorOccurred()) {
+-        rejectDecodePromises("Loading error."_s);
++        rejectDecodePromises("Loading error."_s, ImageDecodeResult::LoadError);
+         return;
+     }
+ 
+@@ -646,12 +675,15 @@
+         return;
+     }
+ 
+-    bitmapImage->decode([promises = WTF::move(m_decodingPromises)](DecodingStatus decodingStatus) mutable {
++    bitmapImage->decode([promises = WTF::move(m_decodingPromises), waiters = WTF::move(m_decodeWaiters)](DecodingStatus decodingStatus) mutable {
+         ASSERT(decodingStatus != DecodingStatus::Decoding);
+-        if (decodingStatus == DecodingStatus::Invalid)
++        if (decodingStatus == DecodingStatus::Invalid) {
+             rejectPromises(promises, "Decoding error."_s);
+-        else
++            settleWaiters(waiters, ImageDecodeResult::DecodeError);
++        } else {
+             resolvePromises(promises);
++            settleWaiters(waiters, ImageDecodeResult::Decoded);
++        }
+     });
+ }
+ 
+@@ -732,7 +764,7 @@
+ void ImageLoader::elementDidMoveToNewDocument(Document& oldDocument)
+ {
+     if (hasPendingDecodePromises())
+-        rejectDecodePromises("Inactive document."_s);
++        rejectDecodePromises("Inactive document."_s, ImageDecodeResult::InactiveDocument);
+     clearFailedLoadURL();
+     clearImage();
+     resetLazyImageLoading(oldDocument);
+diff --git a/Source/WebCore/loader/ImageLoader.h b/Source/WebCore/loader/ImageLoader.h
+--- a/Source/WebCore/loader/ImageLoader.h
++++ b/Source/WebCore/loader/ImageLoader.h
+@@ -29,6 +29,7 @@
+ #include <WebCore/LoaderMalloc.h>
+ #include <WebCore/NodeDocument.h>
+ #include <WebCore/Timer.h>
++#include <wtf/Function.h>
+ #include <wtf/Vector.h>
+ #include <wtf/text/AtomString.h>
+ 
+@@ -36,6 +37,9 @@
+ 
+ class DeferredPromise;
+ class Document;
++
++// The settlement of a decode request: one value per point at which the promise path resolves or rejects.
++enum class ImageDecodeResult : uint8_t { Decoded, SourceChanged, AccessControlError, Canceled, InactiveDocument, MissingSource, LoadError, DecodeError };
+ class ImageLoader;
+ class Page;
+ class RenderImageResource;
+@@ -80,6 +84,9 @@
+     
+     size_t pendingDecodePromisesCountForTesting() const { return m_decodingPromises.size(); }
+     void decode(Ref<DeferredPromise>&&);
++    // Settles at the same points as decode(Ref<DeferredPromise>&&), without a promise or script. An already
++    // complete image settles in a later task instead of a microtask.
++    void decode(Function<void(ImageDecodeResult)>&&);
+ 
+     void setLoadManually(bool loadManually) { m_loadManually = loadManually; }
+     void setElementIsUserAgentShadowRootResource(bool value) { m_elementIsUserAgentShadowRootResource = value; }
+@@ -120,9 +127,10 @@
+     void clearImageWithoutConsideringPendingLoadEvent();
+     void clearFailedLoadURL();
+ 
+-    bool hasPendingDecodePromises() const { return !m_decodingPromises.isEmpty(); }
++    bool hasPendingDecodePromises() const { return !m_decodingPromises.isEmpty() || !m_decodeWaiters.isEmpty(); }
+     void resolveDecodePromises();
+-    void rejectDecodePromises(ASCIILiteral message);
++    void rejectDecodePromises(ASCIILiteral message, ImageDecodeResult);
++    bool registerDecodeRequest();
+     void decode();
+     
+     void timerFired();
+@@ -138,6 +146,7 @@
+     String m_failedLoadURL;
+     String m_pendingURL;
+     Vector<Ref<DeferredPromise>> m_decodingPromises;
++    Vector<Function<void(ImageDecodeResult)>> m_decodeWaiters;
+     bool m_hasPendingBeforeLoadEvent : 1;
+     bool m_hasPendingLoadEvent : 1;
+     bool m_hasPendingErrorEvent : 1;
+diff --git a/Source/WebCore/svg/SVGImageElement.cpp b/Source/WebCore/svg/SVGImageElement.cpp
+--- a/Source/WebCore/svg/SVGImageElement.cpp
++++ b/Source/WebCore/svg/SVGImageElement.cpp
+@@ -229,4 +229,9 @@
+     return m_imageLoader->decode(WTF::move(promise));
+ }
+ 
++void SVGImageElement::decode(Function<void(ImageDecodeResult)>&& waiter)
++{
++    m_imageLoader->decode(WTF::move(waiter));
++}
++
+ }
+diff --git a/Source/WebCore/svg/SVGImageElement.h b/Source/WebCore/svg/SVGImageElement.h
+--- a/Source/WebCore/svg/SVGImageElement.h
++++ b/Source/WebCore/svg/SVGImageElement.h
+@@ -56,6 +56,7 @@
+     using PropertyRegistry = SVGPropertyOwnerRegistry<SVGImageElement, SVGGraphicsElement, SVGURIReference>;
+ 
+     void decode(Ref<DeferredPromise>&&);
++    void decode(Function<void(ImageDecodeResult)>&&);
+ 
+ private:
+     SVGImageElement(const QualifiedName&, Document&);
