@@ -373,7 +373,9 @@ class World:
             except Unsupported as error:
                 raise Unsupported(f"dictionary {name}: member {member.name}: {error}")
             empty_default = member.default == '{}' or member.attrs.get('ImplementationDefaultValue') == '{}'
-            if mapped.kind == "dict" and (name not in self.config.get("nestedDictionaries", [])
+            result_nested = (name in self.config.get("resultDictionaries", [])
+                             and mapped.interface in self.config.get("resultDictionaries", []) and not mapped.nullable)
+            if mapped.kind == "dict" and not result_nested and (name not in self.config.get("nestedDictionaries", [])
                                           or member.required or not empty_default or mapped.nullable):
                 raise Unsupported(f"dictionary {name}: nested member {member.name} requires an opted-in nonnullable empty default")
             configured_object = f"{name}.{member.name}" in self.config.get("dictionaryObjectMembers", [])
@@ -456,6 +458,9 @@ class World:
                     child.string_spans = True
             label = 'And'.join(labels)
             return Mapped('pair', False, 'RvDomPair' + label, subtypes=children, label=label + ' entry')
+        if t.name == "record" and len(t.subtypes) == 2:
+            # WebCore holds a record as Vector<KeyValuePair<K, V>>: the transport of a sequence of entries.
+            return self.map(idl.Type("sequence", t.nullable, [idl.Type("pair", subtypes=list(t.subtypes))]))
         if t.name in ("record", "Promise", "ObservableArray"):
             raise Unsupported(f"{t.name} type {t}")
         if t.name in self.dictionaries:
@@ -488,6 +493,7 @@ def c_name(name):
 
 class Generator(ComplexGeneratorMixin):
     unsupported_type = Unsupported
+    result_field_name = staticmethod(lambda name: c_name(name))
     def __init__(self, world: World):
         self.world = world
         self.functions = []
@@ -516,6 +522,7 @@ class Generator(ComplexGeneratorMixin):
         self.changed = []  # names whose C signature differs from the lock
         self.complex_used = {}
         self.complex_inputs = set()
+        self.result_dicts = {}  # name -> struct, for dictionaries the glue encodes as owned results
         self.namespace_features = []
         self.const_getters_used = set()
         self.setter_checks_used = set()
@@ -563,6 +570,9 @@ class Generator(ComplexGeneratorMixin):
         if missing_svg_matrix_bindings:
             raise SystemExit(f'configured SVG matrix dictionary bindings did not match selected operations: {sorted(missing_svg_matrix_bindings)}')
         self.add_stubs()
+        releases = [snake(name) for name in self.handles] + [snake(name) for name in self.result_dicts]
+        if len(set(releases)) != len(releases):
+            raise SystemExit(f"dictionary result releases collide with handle releases: {sorted(releases)}")
         names = [f.name for f in self.functions]
         duplicates = {n for n in names if names.count(n) > 1}
         if duplicates:
@@ -1375,7 +1385,11 @@ class Generator(ComplexGeneratorMixin):
                 if getattr(function, "string_spans", False):
                     nullable_span = (getattr(function, 'nullable_spans', False) and mapped.nullable
                                      and not optional_no_default and argument.default in (None, 'null'))
-                    if (argument.optional or mapped.nullable) and not nullable_span:
+                    if optional_no_default and not mapped.nullable:
+                        nullable_span = True
+                        notes.append(f"{name}_length -1 means absent")
+                    defaulted = argument.optional and argument.default not in (None, 'null') and not mapped.nullable
+                    if (argument.optional or mapped.nullable) and not nullable_span and not defaulted:
                         raise Unsupported("optional or nullable namespace strings need an explicit presence representation")
                     params += [("const uint8_t*", name), ("int32_t", name + "_length")]
                     minimum = -1 if nullable_span else 0
@@ -1553,6 +1567,16 @@ class Generator(ComplexGeneratorMixin):
                     sink = (f"storeTrackedHandle<{root}, {returns.cls}>(value, result)" if root in self.tracked_roots
                             else f"storeHandle<{root}>(value, result)")
             notes.append("*result is a new reference" + (", or NULL" if returns.nullable or returns.interface == "EventTarget" else ""))
+        elif returns.kind == "dict":
+            struct = self.use_result_dictionary(returns.interface)
+            params.append((f"{struct}**", "result"))
+            checks.append("result")
+            if returns.nullable:
+                sink = f"storeOptionalDictionary(value, result, [](const auto& item) {{ return encodeDict{struct}(item); }})"
+                notes.append("*result is NULL for null")
+            else:
+                sink = f"(*result = encodeDict{struct}(value), RV_OK)"
+            notes.append(f"*result is owned; release it with rv_dom_{snake(returns.interface)}_release")
         elif returns.kind in ("union", "sequence"):
             if not self.transport_can_return(returns):
                 raise Unsupported("dictionary result in a union or sequence")
@@ -1749,6 +1773,8 @@ class Generator(ComplexGeneratorMixin):
             "containers": [{"mapping": self.describe_mapping(mapped),
                             "releaseFunction": "rv_dom_" + transport_token(name) + "_release"}
                            for name, mapped in self.complex_used.items()],
+            "resultDictionaries": {name: {"struct": struct, "releaseFunction": f"rv_dom_{snake(name)}_release"}
+                                   for name, struct in self.result_dicts.items()},
             "dictionaries": {name: [{"name": member.name, "field": c_name(member.name),
                                      "ctype": self.field_ctype(member, mapped, name), "required": member.required,
                                      "default": member.default, "mapping": self.describe_mapping(mapped)}
@@ -1822,7 +1848,11 @@ class Generator(ComplexGeneratorMixin):
         for name, fields in self.dicts_used.items():
             struct = f"RvDom{name}"
             lines.append(f"/* The IDL dictionary {name}. size is sizeof({struct}) as the caller compiles it; a field past")
-            lines.append(" * size takes its IDL default, so fields can be added at the end. */")
+            if name in self.result_dicts:
+                lines.append(" * size takes its IDL default, so fields can be added at the end. As a result, the glue allocates it,")
+                lines.append(f" * sets size, owns every field and nested value, and rv_dom_{snake(name)}_release frees it. */")
+            else:
+                lines.append(" * size takes its IDL default, so fields can be added at the end. */")
             lines.append(f"typedef struct {struct} {{")
             lines.append("    uint32_t size;")
             for member, mapped in fields:
@@ -1841,6 +1871,9 @@ class Generator(ComplexGeneratorMixin):
             lines.append("")
         lines += self.transport_structs()
         lines += self.complex_release_declarations("rv_dom_", "RV_EXPORT")
+        for name, struct in self.result_dicts.items():
+            lines.append(f"/* Releases an owned {name} result, its strings and nested values, and the struct. */")
+            lines.append(f"RV_EXPORT void rv_dom_{snake(name)}_release({struct}* value);")
         for name in self.handles:
             lines.append(f"/* Releases a handle to a {name}. */")
             lines.append(f"RV_EXPORT void rv_dom_{snake(name)}_release(Rv{name}*);")
@@ -1894,6 +1927,8 @@ class Generator(ComplexGeneratorMixin):
             lines.append(f"WEBCORE_EXPORT void ranvier_dom_{snake(name)}_release(Rv{name}*);")
             lines.append(f"WEBCORE_EXPORT Rv{name}* ranvier_dom_{snake(name)}_retain(Rv{name}*);")
         lines += self.complex_release_declarations("ranvier_dom_", "WEBCORE_EXPORT")
+        for name, struct in self.result_dicts.items():
+            lines.append(f"WEBCORE_EXPORT void ranvier_dom_{snake(name)}_release({struct}* value);")
         for query in self.runtime_queries:
             parameters = [(row['ctype'], row['name']) for row in query['parameters']]
             name = query['function'].replace('rv_dom_', 'ranvier_dom_', 1)
@@ -1917,6 +1952,8 @@ class Generator(ComplexGeneratorMixin):
             lines.append(f"Rv{name}* rv_dom_{snake(name)}_retain(Rv{name}* handle) {{ return ranvier_dom_{snake(name)}_retain(handle); }}")
         for name in self.complex_used:
             lines.append(f"void rv_dom_{transport_token(name)}_release({name}* value) {{ ranvier_dom_{transport_token(name)}_release(value); }}")
+        for name, struct in self.result_dicts.items():
+            lines.append(f"void rv_dom_{snake(name)}_release({struct}* value) {{ ranvier_dom_{snake(name)}_release(value); }}")
         for query in self.runtime_queries:
             parameters = [(row['ctype'], row['name']) for row in query['parameters']]
             name = query['function']
@@ -1974,6 +2011,9 @@ class Generator(ComplexGeneratorMixin):
         for name in self.complex_used:
             lines += [f"void ranvier_dom_{transport_token(name)}_release({name}* value)", "{",
                       f"    if (isMainThread()) clear{name}(value);", "}", ""]
+        for name, struct in self.result_dicts.items():
+            lines += [f"void ranvier_dom_{snake(name)}_release({struct}* value)", "{",
+                      f"    if (isMainThread()) releaseDict{struct}(value);", "}", ""]
         for name in self.handles:
             cls = self.world.cpp_class(name)
             release = (f'releaseTrackedHandle(reinterpret_cast<{cls}*>(handle));' if cls in self.tracked_roots
@@ -2162,6 +2202,8 @@ template<typename Concrete, typename Root> Concrete* castTrackedHandle(Root& val
                 else:
                     lines.append(f"    val mutable {field}: {FSHARP_NUMBERS[ctype]}")
         lines += self.complex_fsharp()
+        for name in self.result_dicts:
+            lines += ["", "[<DllImport(Lib)>]", f"extern void rv_dom_{snake(name)}_release(nativeint value)"]
         for name in self.handles:
             lines += ["", "[<DllImport(Lib)>]", f"extern void rv_dom_{snake(name)}_release(nativeint handle)"]
             lines += ["", "[<DllImport(Lib)>]", f"extern nativeint rv_dom_{snake(name)}_retain(nativeint handle)"]

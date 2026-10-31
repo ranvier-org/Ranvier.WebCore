@@ -138072,6 +138072,7 @@
       "releaseFunction": "rv_dom_sequence_pair_usv_string_and_union_file_or_usv_string_release"
     }
   ],
+  "resultDictionaries": {},
   "dictionaries": {
     "GetRootNodeOptions": [
       {

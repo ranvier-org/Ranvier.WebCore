@@ -133,7 +133,8 @@ the member belongs to; the IDL arguments follow in order; the result comes last,
 | `byte` ... `unsigned long long` | `int8_t` ... `uint64_t` | the same, by pointer |
 | `float`, `double` (also `unrestricted`) | `float`, `double` | by pointer |
 | IDL enumeration | `int32_t` index (attribute setters and dictionary fields) | `int32_t*` index |
-| IDL dictionary | `const RvDom<Dictionary>*` | (not mapped) |
+| IDL dictionary | `const RvDom<Dictionary>*` | `RvDom<Dictionary>**`, owned, for a dictionary `resultDictionaries` lists |
+| `record<K, V>` | the entry sequence transport of `sequence<pair<K, V>>` | the same, owned |
 | interface derived from `Node` | `RvNode*` | `RvNode**`, a new reference |
 | interface derived from `Event` | `RvEvent*` | `RvEvent**`, a new reference |
 | `EventTarget` | (not mapped) | `RvNode**` when the target is a node, else NULL |
@@ -147,6 +148,10 @@ and `RvValidityState`.
   NULL means null or absent: `const int32_t* force` for `optional boolean force`, `const char*` that may be
   NULL for `DOMString?`. An optional argument with a default is a plain value; the header comment gives the
   IDL default. A nullable number or boolean result adds `int32_t* present`, 0 for null.
+- **UTF-8 byte lengths.** A function with `stringInputs` or `interfaceStringInputs` set to `utf8-lengths` takes each
+  string as `const uint8_t*` plus an `int32_t` byte length. An optional string without a default takes length -1
+  for absent, which the member receives as a null `String`. An optional string with a default is passed as a
+  value; the header comment gives the default.
 - **Handles.** Node and event handles are the existing `RvNode` and `RvEvent`: the generated and hand-written
   functions share them, and `rv_node_release` releases both. Each other interface has its own opaque handle,
   named after the root of its inheritance, with `rv_dom_<root>_release` and `rv_dom_<root>_retain`. A
@@ -175,6 +180,20 @@ every default.
 - A dictionary declared in an interface's IDL file is that interface's C++ member (`Node::GetRootNodeOptions`).
 - Dictionaries can contain supported union and sequence transports. Unsupported field types still exclude
   the dictionary and its consumers; explicit exclusions are recorded in the report.
+
+### Dictionary results
+
+`resultDictionaries` in `gen/dom.json` lists the dictionaries a function may return. A listed dictionary keeps its
+argument layout. As a result, the glue allocates the struct, sets `size` to its own `sizeof`, and owns every field:
+strings, nested dictionaries (pointers), and union and sequence transports (pointers). A string or scalar field
+that the engine leaves absent reads as absent (`present` 0 for an `RvDomUtf8StringInput`, NULL for a pointer).
+`rv_dom_<dictionary>_release` frees the struct with everything it owns, on the main thread.
+
+- A function result is `RvDom<Dictionary>** result`. A nullable result writes NULL for null.
+- A listed dictionary may nest another listed dictionary; the nesting needs no `nestedDictionaries` entry.
+- A union or sequence result arm of a listed dictionary is an owned pointer; the container's release frees it.
+- A result dictionary with a node, event, object or enumeration member is left out, with its functions.
+- `dom-api.json`'s `resultDictionaries` gives each listed dictionary's struct and release function.
 
 ## Statuses, exceptions and threads
 
@@ -282,7 +301,7 @@ dictionary structs and every member left out, by reason:
 - **By rule:** event handler attributes (`onclick`; listeners go through `rv_node_add_event_listener`),
   constructors and static members, WebKit-prefixed members (`webkit*`), members not exposed to `Window`,
   `[Custom]` bindings and `[EnabledForWorld]` extensions.
-- **Not mapped yet:** dictionary results and dictionaries with unmapped members, `any`, `object`,
+- **Not mapped yet:** dictionary results outside `resultDictionaries`, dictionaries with unmapped members, `any`, `object`,
   `Date`, callbacks, enumeration arguments of operations, and interfaces outside the scope (
   `DOMRectList`, ...).
 - **By `gen/dom.json`'s `exclude`:** browser features the patches cut or a UI does not use: cookies,
@@ -328,6 +347,6 @@ for an interface it needs.
 
 - `[CEReactions]`: the glue does not open a custom element reaction scope. The host runs no page script, so no
   custom element has script reactions; a page that defines them would see them run late.
-- Enumeration arguments of operations and dictionary results are not mapped.
+- Enumeration arguments of operations, and dictionary results outside `resultDictionaries`, are not mapped.
 - A dictionary that loses a locked field upstream is left unmapped, and the members that take it become stubs;
   `gen/dom-report.txt` names the lost fields. Keeping such a struct needs a decision on the retired field.
