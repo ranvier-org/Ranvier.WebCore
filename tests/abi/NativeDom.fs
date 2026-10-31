@@ -9823,6 +9823,27 @@ extern int rv_dom_url_pattern_test(nativeint target, [<In>] RvDomUnionUSVStringO
 extern int rv_dom_url_pattern_exec(nativeint target, [<In>] RvDomUnionUSVStringOrURLPatternInit[] input, byte[] base_url, int base_url_length, nativeint& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_visual_viewport_get_offset_left(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_visual_viewport_get_offset_top(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_visual_viewport_get_page_left(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_visual_viewport_get_page_top(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_visual_viewport_get_width(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_visual_viewport_get_height(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_visual_viewport_get_scale(nativeint target, float& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_css_supports_2(nativeint target, byte[] property, int property_length, byte[] value, int value_length, int& result)
 
 [<DllImport(Lib)>]
@@ -9857,6 +9878,9 @@ extern int rv_dom_window_scroll_by_1(nativeint target, [<In>] RvDomScrollToOptio
 
 [<DllImport(Lib)>]
 extern int rv_dom_window_scroll_by_2(nativeint target, float x, float y)
+
+[<DllImport(Lib)>]
+extern int rv_dom_window_get_visual_viewport(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_crypto_get_random_values(nativeint target, int array_kind, byte[] array, int array_length)

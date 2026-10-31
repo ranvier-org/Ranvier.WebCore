@@ -11,7 +11,8 @@
     "contract's function type, and resultEnum the integer enumeration it returns.",
     "typedArrayViewTypes lists the IDL types passed as an in/out typed array: an element kind, a writable buffer and its",
     "byte length; only a [ReturnValue] argument maps. windowObjectBindings binds the operations of the object a readonly",
-    "Window attribute (accessor) holds, called through the Window of a checked Document."
+    "Window attribute (accessor) holds, called through the Window of a checked Document.",
+    "eventTargetObjects lists interfaces derived directly from EventTarget whose handles are RvEventTarget references; attached is the C++ condition under which their members answer, else RV_ERR_DETACHED."
   ],
   "attributeBridges": {
     "Document.adoptedStyleSheets": {
@@ -600,7 +601,8 @@
     "CaretPosition",
     "DOMURL",
     "URLSearchParams",
-    "URLPattern"
+    "URLPattern",
+    "VisualViewport"
   ],
   "skipDirectories": [
     "Modules/",
@@ -930,6 +932,14 @@
         ],
         "feature": "dom-window-scrolling",
         "stringInputs": "utf8-lengths"
+      },
+      {
+        "receiver": "Document",
+        "members": [
+          "visualViewport"
+        ],
+        "feature": "visual-viewport",
+        "stringInputs": "utf8-lengths"
       }
     ]
   },
@@ -991,7 +1001,13 @@
     }
   },
   "creationGatedInterfaces": {
-    "CaretPosition": "Document.caretPositionFromPoint"
+    "CaretPosition": "Document.caretPositionFromPoint",
+    "VisualViewport": "DOMWindow.visualViewport"
+  },
+  "eventTargetObjects": {
+    "VisualViewport": {
+      "attached": "impl->frame()"
+    }
   },
   "resultDictionaries": [
     "URLPatternResult",
