@@ -4,8 +4,8 @@ RV_SPACE_PAGE within 1/64 CSS pixel, under nested 2D and 3D transforms, perspect
 and a fixed box. Then, in each of six viewport states (scroll, device scale 2, page scale 2 and 1.5 at non-zero
 origins), checks every space against the engine's own metrics: CLIENT against rv_element_rect and the visual
 viewport's page offset, HOST against rv_host_mouse's MouseEvent.clientX and target, DEVICE against the paint size;
-every ordered space pair round-trips within 1/64; box quads; hit testing a transformed overlay through
-rv_host_element_at and rv_host_mouse; the errors; and the teardown cases: a removed node, a replaced document, a second
+every ordered space pair round-trips within 1/64 for points projected from each node's box; box quads; hit testing a
+transformed overlay through rv_host_element_at and rv_host_mouse; the errors; and the teardown cases: a removed node, a replaced document, a second
 host's node and a node held past rv_host_destroy, as from and as to."""
 
 import argparse
@@ -50,6 +50,8 @@ def verify(native_directory):
         P, I, D = p.pointer, p.integer, ctypes.c_double
         p.expect(p.bind('rv_abi_version', I, [])() == ABI, 'ABI version ' + str(ABI))
         p.expect(p.bind('rv_abi_has', I, [ctypes.c_char_p])(b'coordinate-spaces') == 1, 'coordinate-spaces advertised')
+        compositing = p.bind('rv_abi_has', I, [ctypes.c_char_p])(b'compositing') == 1
+        report['compositing'] = compositing
         convert_raw = p.bind('rv_node_convert_points', I, [P, I, P, I, ctypes.POINTER(D), I])
         quad_raw = p.bind('rv_node_box_quad', I, [P, I, P, I, ctypes.POINTER(D)])
         element_rect = p.bind('rv_element_rect', I, [P] + [ctypes.POINTER(D)] * 4)
@@ -104,9 +106,8 @@ def verify(native_directory):
         native_page = {}
 
         def expected_page(name):
-            # Projective chains are compared with Chromium by distance only (QUALIFIED_3D); within the engine their page
-            # points are fixed under scroll and scale.
-            if oracle['elements'][name]['projective']:
+            # Scroll and scale preserve the selected projective composition.
+            if oracle['elements'][name]['projective'] and not compositing:
                 return native_page[name]
             return [tuple(q) for q in oracle['elements'][name]['page']]
 
@@ -149,7 +150,7 @@ def verify(native_directory):
         for name, element in oracle['elements'].items():
             page_points = converted(nodes[name], NODE, None, PAGE, element['points'], name + ' node to page')
             native_page[name] = page_points
-            if element['projective']:
+            if element['projective'] and not compositing:
                 report['qualified'][name] = {'reason': QUALIFIED_3D, 'distanceFromChromium': error(
                     page_points, [tuple(q) for q in element['page']], 'projectiveDistanceFromChromium')}
             else:
@@ -212,7 +213,8 @@ def verify(native_directory):
                     for b in SPACES:
                         if a == b:
                             continue
-                        source = element['points'] if a == NODE else expected.get(a, all_points)
+                        source = element['points'] if a == NODE else converted(
+                            anchor, NODE, anchor, a, element['points'], name + ' ' + element_name + ' source points')
                         there = converted(anchor, a, anchor, b, source, '%s %s %s to %s' % (name, element_name, SPACES[a], SPACES[b]))
                         back = converted(anchor, b, anchor, a, there, '%s %s %s back to %s' % (name, element_name, SPACES[b], SPACES[a]))
                         close(back, [tuple(q) for q in source], '%s: %s %s -> %s -> %s' % (name, element_name, SPACES[a], SPACES[b], SPACES[a]), 'roundTrip')
@@ -273,6 +275,20 @@ def verify(native_directory):
             status, _ = quad(document, BORDER, nodes[name], NODE)
             p.expect(status == UNSUPPORTED, transform + ': box quad into it is UNSUPPORTED')
         report['singular'] = {name: 'node to page OK; page to node UNSUPPORTED' for name in SINGULAR}
+
+        if compositing:
+            clipped = {}
+            for element_name in ['e', 'g']:
+                for space in [PAGE, CLIENT, HOST, DEVICE]:
+                    source = converted(document, PAGE, None, space, [(0., 0.)], element_name + ' clipped source')
+                    status, unchanged = convert(document, space, nodes[element_name], NODE, source)
+                    p.expect(status == UNSUPPORTED, element_name + ': inverse behind the projection plane is rejected')
+                    p.expect(unchanged == source, element_name + ': rejected projective inverse leaves xy unchanged')
+                    clipped[element_name + ':' + SPACES[space]] = status
+            outside = converted(document, PAGE, nodes['e'], NODE, [(-12., 140.75)], 'visible projection outside e')
+            close(converted(nodes['e'], NODE, None, PAGE, outside, 'outside e back to page'), [(-12., 140.75)],
+                  'a visible projective inverse outside the box still round-trips', 'roundTrip')
+            report['clippedInverse'] = clipped
 
         # Arguments and boxes.
         points = (D * 2)(3.0, 4.0)
@@ -340,21 +356,22 @@ def verify(native_directory):
         release(fresh)
         release(document)
 
-        # The perspective property in paint: the conversion of a rotateY(40deg) child of perspective: 400px agrees with
-        # the software paint, whose left edge stays at the flat composition's 61.7 px, not Chromium's 54.0 px.
+        # The perspective property's projected edge agrees with painting and hit testing.
         painter = host_create(320, 240)
         p.expect(load_html(painter, b'<!doctype html><style>body{margin:0;background:#fff}#p{position:absolute;left:50px;top:50px;width:200px;'
                            b'height:200px;perspective:400px}#q{width:100px;height:100px;background:#f00;transform:rotateY(40deg)}</style>'
                            b'<div id=p><div id=q></div></div>') == OK, 'perspective paint page')
         q = by_id(painter, b'q')
         (left_edge, _), = converted(q, NODE, None, HOST, [(0.0, 50.0)], 'perspective child left edge')
-        p.expect(math.isclose(left_edge, 50 + 50 - 50 * math.cos(math.radians(40)), abs_tol=TOLERANCE), 'left edge without perspective: ' + str(left_edge))
+        chromium_left = oracle['elements']['q']['page'][0][0] - oracle['elements']['p']['page'][0][0] + 50
+        expected_left = chromium_left if compositing else 50 + 50 - 50 * math.cos(math.radians(40))
+        p.expect(math.isclose(left_edge, expected_left, abs_tol=TOLERANCE), 'left edge follows the composition: ' + str(left_edge))
         rgba = (ctypes.c_uint8 * (320 * 240 * 4))()
         p.expect(p.bind('rv_host_update', I, [P])(painter) >= 0, 'perspective paint update')
         p.expect(p.bind('rv_host_paint_rgba', I, [P, P, I])(painter, rgba, len(rgba)) == OK, 'perspective paint')
         red = [rgba[(100 * 320 + x) * 4 + 1] < 128 for x in range(50, 70)]
         p.expect(red.index(True) + 50 == math.ceil(left_edge - 0.5), 'paint left edge follows the conversion: ' + str(red))
-        report['perspectivePaint'] = {'convertedLeftEdge': left_edge, 'firstRedColumn': red.index(True) + 50, 'chromiumLeftEdge': 54.0}
+        report['perspectivePaint'] = {'convertedLeftEdge': left_edge, 'firstRedColumn': red.index(True) + 50, 'chromiumLeftEdge': chromium_left}
 
         def hit_in(host, x, y):
             node = element_at(host, int(math.floor(x)), int(math.floor(y)))
@@ -365,14 +382,14 @@ def verify(native_directory):
             finally:
                 release(node)
 
-        # Hit testing agrees: points converted from inside the box hit it, and Chromium's left edge region does not.
+        # Hit testing includes the browser's perspective edge when compositing is active.
         hits = {}
         for local in [(3.0, 50.0), (97.0, 50.0), (50.0, 3.0), (50.0, 97.0)]:
             (x, y), = converted(q, NODE, None, CLIENT, [local], 'perspective child point')
             hits[str(local)] = hit_in(painter, x, y)
             p.expect(hits[str(local)] == 'q', 'rv_host_element_at at converted ' + str(local) + ' hits q: ' + str(hits[str(local)]))
         hits['chromium-only 56,100'] = hit_in(painter, 56, 100)
-        p.expect(hits['chromium-only 56,100'] == 'p', 'Chromium-only edge region hits the perspective parent: ' + str(hits['chromium-only 56,100']))
+        p.expect(hits['chromium-only 56,100'] == ('q' if compositing else 'p'), 'perspective edge hit: ' + str(hits['chromium-only 56,100']))
         report['perspectivePaint']['hits'] = hits
         release(q)
         # A perspective() function: the painted edges of the trapezoid follow its converted corners.
@@ -385,6 +402,7 @@ def verify(native_directory):
         red_at = lambda x, y: rgba[(y * 320 + x) * 4 + 1] < 128
         row = [x for x in range(320) if red_at(x, 90)]
         column = [y for y in range(240) if red_at(140, y)]
+        p.expect(bool(row) and bool(column), 'perspective() row and column contain painted red pixels')
 
         def along(a, b, coordinate, value):
             k = (value - a[coordinate]) / (b[coordinate] - a[coordinate])
