@@ -1,3 +1,4 @@
+diff --git a/Source/WebCore/dom/ViewTransition.cpp b/Source/WebCore/dom/ViewTransition.cpp
 --- a/Source/WebCore/dom/ViewTransition.cpp
 +++ b/Source/WebCore/dom/ViewTransition.cpp
 @@ -77,6 +77,30 @@
@@ -89,6 +90,7 @@
      callbackPromise->whenSettledWithResult([weakThis = WeakPtr { *this }](auto*, bool isFulfilled, auto result) mutable {
          RefPtr protectedThis = weakThis.get();
          if (!protectedThis)
+diff --git a/Source/WebCore/dom/ViewTransitionTypeSet.h b/Source/WebCore/dom/ViewTransitionTypeSet.h
 --- a/Source/WebCore/dom/ViewTransitionTypeSet.h
 +++ b/Source/WebCore/dom/ViewTransitionTypeSet.h
 @@ -50,6 +50,7 @@
