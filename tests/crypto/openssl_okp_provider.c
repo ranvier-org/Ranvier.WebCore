@@ -114,6 +114,7 @@ static int ed25519_operations(void)
 static int der_roundtrip(int type)
 {
     unsigned char encoded[128], original[32], recovered[32];
+    unsigned char malformed[128], canonical[128];
     size_t original_size = sizeof(original), recovered_size = sizeof(recovered);
     unsigned char* output = encoded;
     const unsigned char* input;
@@ -142,6 +143,50 @@ static int der_roundtrip(int type)
         goto done;
     EVP_PKEY_free(decoded);
     decoded = NULL;
+    memcpy(malformed, encoded, 9);
+    malformed[1] += 2;
+    malformed[3] += 2;
+    malformed[9] = 5;
+    malformed[10] = 0;
+    memcpy(malformed + 11, encoded + 9, 35);
+    input = malformed;
+    decoded = d2i_PUBKEY(NULL, &input, 46);
+    output = canonical;
+    ok = expect(!decoded || i2d_PUBKEY(decoded, &output) != 46 || memcmp(malformed, canonical, 46),
+        "present SPKI parameters cannot survive the canonical import check");
+    EVP_PKEY_free(decoded);
+    decoded = NULL;
+    if (!ok)
+        goto done;
+    memcpy(malformed, encoded, 44);
+    malformed[11] = 1;
+    input = malformed;
+    decoded = d2i_PUBKEY(NULL, &input, 44);
+    output = canonical;
+    ok = expect(!decoded || i2d_PUBKEY(decoded, &output) != 44 || memcmp(malformed, canonical, 44),
+        "nonzero unused SPKI bits cannot survive the canonical import check");
+    EVP_PKEY_free(decoded);
+    decoded = NULL;
+    if (!ok)
+        goto done;
+    memcpy(malformed, encoded, 44);
+    malformed[44] = 0;
+    input = malformed;
+    decoded = d2i_PUBKEY(NULL, &input, 45);
+    ok = expect(!decoded || input != malformed + 45, "SPKI decoder exposes trailing input for rejection");
+    EVP_PKEY_free(decoded);
+    decoded = NULL;
+    if (!ok)
+        goto done;
+    memcpy(malformed, encoded, 44);
+    malformed[8] = (unsigned char)(type == EVP_PKEY_ED25519 ? 110 : 112);
+    input = malformed;
+    decoded = d2i_PUBKEY(NULL, &input, 44);
+    ok = expect(!decoded || EVP_PKEY_id(decoded) != type, "cross-curve SPKI exposes a different algorithm identity");
+    EVP_PKEY_free(decoded);
+    decoded = NULL;
+    if (!ok)
+        goto done;
     info = EVP_PKEY2PKCS8(key);
     output = encoded;
     length = info ? i2d_PKCS8_PRIV_KEY_INFO(info, &output) : 0;
