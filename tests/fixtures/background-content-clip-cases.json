@@ -1,0 +1,24 @@
+{
+  "scales": [1, 1.5, 2],
+  "style": "html,body{margin:0;background:white}#f{box-sizing:content-box;width:100.5px;height:33.25px;padding:10px 4px 6px 2px;border:5px solid black;margin:3px;background:red;background-clip:content-box}",
+  "cases": [
+    {"name":"bordered-half-phase"},
+    {"name":"zero-origin","css":"#f{margin:0}"},
+    {"name":"borderless-half-phase","css":"#f{border:0;padding:0}"},
+    {"name":"negative-origin","css":"#f{position:absolute;left:-6px;top:-6px}"},
+    {"name":"fractional-border-padding","css":"#f{border-width:2.5px;padding:3.25px 1.75px 5.5px 2.25px}"},
+    {"name":"nested-offset","before":"<div style='position:relative;left:7px;top:11px;padding:2.5px'>","after":"</div>"},
+    {"name":"translate-fractional","css":"#f{transform:translate(7.25px,11.5px)}"},
+    {"name":"scale-fractional","css":"#f{transform-origin:0 0;transform:translate(12px,12px) scale(1.25)}"},
+    {"name":"rotate-quarter","css":"#f{transform-origin:0 0;transform:translate(100px,12px) rotate(90deg)}"},
+    {"name":"rotate-oblique","css":"#f{transform-origin:0 0;transform:translate(30px,12px) rotate(13deg)}"},
+    {"name":"composited-translate","css":"#f{transform:translate3d(7.25px,11.5px,0);will-change:transform}"},
+    {"name":"always-composited","compositing":1},
+    {"name":"ancestor-scroll","before":"<div id='s' style='width:180px;height:100px;overflow:scroll'><div style='width:400px;height:300px;padding:20px'>","after":"</div></div>","scroll":["s",7,11]},
+    {"name":"local-background-scroll","css":"#f{height:60px;overflow:scroll;background-attachment:local}","inside":"<div style='width:300px;height:200px'></div>","scroll":["f",7,11]},
+    {"name":"padding-box","css":"#f{background-clip:padding-box}"},
+    {"name":"fragment-slice","css":"#f{display:inline;margin:0;font:20px/30px Arial;box-decoration-break:slice}i{display:inline-block;width:40px;height:18px}","element":"span","inside":"<i></i><br><i></i>"},
+    {"name":"fragment-clone","css":"#f{display:inline;margin:0;font:20px/30px Arial;box-decoration-break:clone}i{display:inline-block;width:40px;height:18px}","element":"span","inside":"<i></i><br><i></i>"},
+    {"name":"rounded-border-control","css":"#f{border-radius:11px}"}
+  ]
+}
