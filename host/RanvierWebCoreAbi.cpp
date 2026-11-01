@@ -1628,7 +1628,7 @@ int32_t rv_abi_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "animation-custom-effects"))
         return 1;
-#if !USE(GPU_STUB)
+#if RANVIER_COMPOSITING
     if (!std::strcmp(feature, "view-transitions"))
         return 1;
 #endif

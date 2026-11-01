@@ -19,13 +19,16 @@ EXPRESSIONS = {'work': '${{ env.RANVIER_WORK }}', 'flavor': '${{ env.FLAVOR }}',
 NATIVE = '{work}/out/{flavor}/runtimes/{rid}/native'
 
 
-def probe(name, *commands, rid=None, flavor='slim', timeout=TIMEOUT, env=None):
-    """A probe: its commands, run when the runtime has the RID and the flavor (None matches every one)."""
+def probe(name, *commands, rid=None, flavor=('slim', 'gpu'), timeout=TIMEOUT, env=None):
+    """A probe: common contracts run on slim and GPU; explicit flavors restrict a probe, and None matches all."""
     return {'name': name, 'commands': [command.replace('{native}', NATIVE) for command in commands],
             'rid': rid, 'flavor': flavor, 'timeout': timeout, 'env': dict(env or {})}
 
 
 PROBES = [
+    probe('Verify Windows same-document transition snapshot pixels',
+          'python -I tests/gpu/windows_view_transition_pixels.py --native-directory {native} --output {work}/gpu-transition-readback',
+          rid='win-x64', flavor='gpu'),
     *[probe('Verify Linux same-document transition snapshot pixels',
             'python -I tests/gpu/linux_view_transition_pixels.py --native-directory {native}',
             rid=rid, flavor='gpu',
@@ -261,7 +264,9 @@ def condition(entry):
 
 
 def applies(entry, rid, flavor):
-    return entry['rid'] in (None, rid) and entry['flavor'] in (None, flavor)
+    flavors = entry['flavor']
+    return entry['rid'] in (None, rid) and (flavors is None or flavor in (
+        flavors if isinstance(flavors, (tuple, list)) else (flavors,)))
 
 
 def workflow_text(command):
