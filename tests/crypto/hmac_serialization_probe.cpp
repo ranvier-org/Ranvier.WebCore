@@ -69,7 +69,9 @@ public:
                 result[result.size() - 10] |= 1;
                 break;
             case 6:
-                result[0] = 3;
+                if (result.size() < 8)
+                    return std::nullopt;
+                result[4] = 3;
                 break;
             default:
                 return std::nullopt;
@@ -109,12 +111,12 @@ extern "C" WEBCORE_EXPORT int32_t ranvier_test_hmac_serialization(uint32_t bits,
     if (!key)
         return 1;
     auto expectedBits = bits ? bits : 160;
-    auto dataCopy = CryptoKey::create(key->data());
+    auto dataCopy = CryptoKey::create(static_cast<CryptoKey&>(*key).data());
     if (!dataCopy || logicalLength(*key) != expectedBits || logicalLength(*dataCopy) != expectedBits
         || !equalSpans(key->key().span(), downcast<CryptoKeyHMAC>(*dataCopy).key().span()))
         return 2;
     auto direct = SerializedScriptValue::serializeCryptoKey(*key);
-    if (direct.size() < 4 || direct[0] != (expectedBits % 8 ? 2 : 1) || direct[1] || direct[2] || direct[3])
+    if (direct.size() < 8 || direct[4] != (expectedBits % 8 ? 2 : 1) || direct[5] || direct[6] || direct[7])
         return 3;
 
     auto client = makeUniqueRef<RoundTripClient>(corruption);
@@ -146,10 +148,10 @@ extern "C" WEBCORE_EXPORT int32_t ranvier_test_hmac_serialization(uint32_t bits,
     auto restored = serialized->deserialize(*global, global, SerializationErrorMode::NonThrowing, &failed);
     if (corruption)
         return failed ? 0 : 7;
-    auto* wrapper = JSC::jsDynamicCast<JSCryptoKey*>(restored);
-    if (failed || !wrapper || logicalLength(wrapper->wrapped()) != expectedBits)
+    RefPtr restoredKey = JSCryptoKey::toWrapped(global->vm(), restored);
+    if (failed || !restoredKey || logicalLength(*restoredKey) != expectedBits)
         return 8;
-    if (!equalSpans(downcast<CryptoKeyHMAC>(wrapper->wrapped()).key().span(), downcast<CryptoKeyHMAC>(*dataCopy).key().span()))
+    if (!equalSpans(downcast<CryptoKeyHMAC>(*restoredKey).key().span(), downcast<CryptoKeyHMAC>(*dataCopy).key().span()))
         return 9;
     return 0;
 }
