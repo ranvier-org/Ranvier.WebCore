@@ -2,6 +2,7 @@
 #
 #   build_cache.py keys       --rid RID --flavor FLAVOR    print the cache keys as name=value lines (GITHUB_OUTPUT)
 #   build_cache.py normalise  --build DIR --source DIR     give unchanged sources the times of the cached build
+#   build_cache.py explain    --build DIR                  print the edges ninja would run and its first reasons
 #   build_cache.py record     --build DIR --source DIR     write the manifest of the sources as they are, for a tree
 #                                                          built from them without the cache (a workstation's)
 #
@@ -197,26 +198,42 @@ def vcpkg_patches():
             for path in sorted((root / 'patches').glob('*.patch')) if inputs.search(path.read_text(encoding='utf-8'))}
 
 
+def tree_digest(*directories):
+    """Hash of the relative path and size of every file under the directories."""
+    entries = []
+    for directory in directories:
+        for folder, _, names in os.walk(directory):
+            for name in names:
+                path = os.path.join(folder, name)
+                entries.append(f'{os.path.relpath(path, directory)}:{os.path.getsize(path)}')
+    return hashlib.sha256('|'.join(sorted(entries)).encode()).hexdigest()[:16]
+
+
 def msvc(arch):
-    """(VC tools version, Windows SDK version) that build.py's vcvars call selects: the default toolset of the newest
-    Visual Studio with the architecture's C++ tools, and the newest Windows 10/11 SDK."""
+    """The identity of the toolset that build.py's vcvars call selects (the default toolset of the newest Visual
+    Studio with the architecture's C++ tools, and the newest Windows 10/11 SDK): their versions, the hash of
+    cl.exe, which vcpkg's compiler hash also covers, and the paths and sizes of their headers. Runner images can
+    ship the same versions with other binaries and headers; ninja tracks neither."""
     component = {'x64': 'x86.x64', 'arm64': 'ARM64'}[arch]
     vswhere = pathlib.Path(os.environ.get('ProgramFiles(x86)', 'C:/Program Files (x86)')) / 'Microsoft Visual Studio/Installer/vswhere.exe'
     installs = output([str(vswhere), '-latest', '-products', '*', '-requires',
                        f'Microsoft.VisualStudio.Component.VC.Tools.{component}', '-property', 'installationPath']).splitlines()
     if not installs:
         sys.exit(f'vswhere found no Visual Studio with the {arch} C++ build tools')
-    tools = (pathlib.Path(installs[-1]) / 'VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt').read_text().strip()
+    version = (pathlib.Path(installs[-1]) / 'VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt').read_text().strip()
+    tools = pathlib.Path(installs[-1]) / 'VC/Tools/MSVC' / version
+    cl = hashlib.sha256((tools / f'bin/Host{arch}/{arch}/cl.exe').read_bytes()).hexdigest()[:16]
     kits = pathlib.Path(os.environ.get('ProgramFiles(x86)', 'C:/Program Files (x86)')) / 'Windows Kits/10/Include'
     sdks = sorted((p.name for p in kits.glob('10.*') if (p / 'um').exists()), key=lambda v: [int(x) for x in v.split('.')])
-    return tools, sdks[-1] if sdks else 'none'
+    sdk = sdks[-1] if sdks else 'none'
+    return [version, sdk, cl, tree_digest(tools / 'include', *([kits / sdk] if sdks else []))]
 
 
 def toolchain(rid):
     """The compilers' identity, which ninja does not track: a build tree is reused only under the same one."""
     system, arch = rid.split('-')
     if system == 'win':
-        return list(msvc(arch))
+        return msvc(arch)
     if system == 'linux':
         return [output(['clang', '--version']).splitlines()[0], os.environ.get('ImageOS', '')]
     return [output(['xcodebuild', '-version']).replace('\n', ' '), output(['xcrun', '--show-sdk-version'])]
@@ -258,6 +275,18 @@ def keys(args):
             out.write(text)
 
 
+def explain(args):
+    """Prints how many edges ninja would run for the target and the first reasons it gives, without building."""
+    result = subprocess.run(['cmake', '--build', args.build, '--target', args.target, '--', '-n', '-d', 'explain'],
+                            capture_output=True, text=True, errors='replace')
+    lines = (result.stdout + result.stderr).splitlines()
+    reasons = [line for line in lines if line.startswith('ninja explain:')]
+    edges = [line for line in lines if re.match(r'\[\d+/\d+\] ', line)]
+    print(f'build_cache: ninja would run {len(edges)} edges for {args.target}', flush=True)
+    for line in reasons[:args.lines]:
+        print(line)
+
+
 parser = argparse.ArgumentParser()
 sub = parser.add_subparsers(dest='command', required=True)
 for command in ['normalise', 'record']:
@@ -266,8 +295,12 @@ for command in ['normalise', 'record']:
     n.add_argument('--source', required=True, help='the WebKit checkout')
     n.add_argument('--repository', default=str(root), help="this repository's checkout (default: the one holding this script)")
     n.add_argument('--clear-unknown', action='store_true', help='empty a build directory that has no manifest instead of failing')
+e = sub.add_parser('explain')
+e.add_argument('--build', required=True)
+e.add_argument('--target', default='RanvierWebCoreHost')
+e.add_argument('--lines', type=int, default=20)
 k = sub.add_parser('keys')
 k.add_argument('--rid', required=True)
 k.add_argument('--flavor', required=True)
 args = parser.parse_args()
-{'normalise': normalise, 'record': normalise, 'keys': keys}[args.command](args)
+{'normalise': normalise, 'record': normalise, 'keys': keys, 'explain': explain}[args.command](args)
