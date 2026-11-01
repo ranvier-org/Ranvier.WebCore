@@ -94,6 +94,17 @@ static int ed25519_operations(void)
         ok = expect(EVP_DigestVerify(verify, signature, signature_size, message, sizeof(message)) != 1, "wrong Ed25519 signature is false")
             && expect(EVP_DigestVerify(verify, signature, 63, message, sizeof(message)) != 1, "short Ed25519 signature is false");
     }
+    if (ok) {
+        EVP_MD_CTX_free(sign);
+        EVP_MD_CTX_free(verify);
+        sign = EVP_MD_CTX_new();
+        verify = EVP_MD_CTX_new();
+        signature_size = sizeof(signature);
+        ok = expect(sign && verify && EVP_DigestSignInit(sign, NULL, NULL, NULL, key) == 1
+            && EVP_DigestSign(sign, signature, &signature_size, NULL, 0) == 1 && signature_size == 64, "empty null-span message signs")
+            && expect(EVP_DigestVerifyInit(verify, NULL, NULL, NULL, key) == 1
+                && EVP_DigestVerify(verify, signature, signature_size, NULL, 0) == 1, "empty null-span signature verifies");
+    }
     EVP_MD_CTX_free(sign);
     EVP_MD_CTX_free(verify);
     EVP_PKEY_free(key);
