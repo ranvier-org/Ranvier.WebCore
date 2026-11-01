@@ -721,7 +721,7 @@ def verify(directory, arm=True):
             control = subprocess.run([sys.executable, '-I', '-X', 'utf8', str(Path(__file__).with_name('web_animations.py')),
                                       '--native-directory', str(directory), '--vm-entry-control'], capture_output=True, text=True, timeout=120)
             native.expect(control.returncode not in (0, 3) and 'VM_ENTRY_CONTROL_SURVIVED' not in control.stdout,
-                          'the armed VM-entry crash aborts a page load (control exit ' + str(control.returncode) + ')')
+                          'the armed VM-entry crash aborts a page load (control exit ' + str(control.returncode) + ') ' + control.stderr[-2000:])
         native.expect(native.text('rv_dom_document_get_title', [P], page.document) == title, 'no script ran')
     finally:
         if armed:

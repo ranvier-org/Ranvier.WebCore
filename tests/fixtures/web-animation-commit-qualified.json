@@ -5,6 +5,8 @@
    "field": "committed/afterCancel",
    "reason": "WebKit serializes the style attribute with the important declaration after the normal one; the declarations, values and priorities are the same.",
    "webkit": "margin-top: 0px; color: rgb(1, 2, 3) !important; transform: translateX(50px); opacity: 0.5;",
+   "webkitDarwinReason": "WebAnimation::commitStyles (WebAnimation.cpp) sets the targeted properties in the iteration order of a HashSet<AnimatableCSSProperty>, hashed by CSSPropertyID. The Mac port enables ENABLE_TEXT_AUTOSIZING (OptionsMac.cmake), which adds the high-priority -webkit-text-size-adjust (CSSProperties.json) ahead of them: opacity and transform become 208 and 313 (207 and 312 on Linux), which land in buckets 6 and 7 of the 8-slot table (6 and 5 on Linux), so opacity is set first.",
+   "webkitDarwin": "margin-top: 0px; color: rgb(1, 2, 3) !important; opacity: 0.5; transform: translateX(50px);",
    "chromium": "color: rgb(1, 2, 3) !important; margin-top: 0px; transform: translateX(50px); opacity: 0.5;"
   },
   "over an important inline value": {
