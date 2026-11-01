@@ -201,7 +201,10 @@ RV_EXPORT int32_t rv_host_acquire_egl_frame(RvHost*, RvGpuFrame** frame);
  * SDL may retain its COM reference, but must destroy its wrapper before
  * presenting a different resource. All arguments are required and calls use the host owner thread. */
 RV_EXPORT int32_t rv_gpu_frame_info(RvGpuFrame*, void** texture, int32_t* width, int32_t* height, int32_t* format);
-/* Before release, flush the SDL draw batch (SDL_FlushRenderer) or SDL_RenderPresent. Release flushes
+/* Before release, flush the SDL draw batch (SDL_FlushRenderer) or SDL_RenderPresent. On Linux, destroy imported
+ * textures and keep the acquisition's exact consumer context current and alive through release; another context
+ * returns RV_ERR_PAINT_FAILED and retains the frame for retry. linux_egl.py verifies the context mismatch case.
+ * Release flushes
  * the consumer immediate context, returns the keyed mutex to the producer and frees this frame handle.
  * The SDL wrapper and all frame handles must be disposed before unloading their native DLLs. */
 RV_EXPORT int32_t rv_gpu_frame_release(RvGpuFrame*);
