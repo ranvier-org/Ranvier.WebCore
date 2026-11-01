@@ -119,6 +119,7 @@
 #include <WebCore/HTMLNames.h>
 #include <wtf/SetForScope.h>
 #include <wtf/HashMap.h>
+#include <wtf/text/StringHash.h>
 #include <WebCore/DragEvent.h>
 #include <WebCore/VisiblePosition.h>
 #include <WebCore/DataTransfer.h>
@@ -1189,7 +1190,7 @@ private:
 
 // The pasteboard, blob registry and media strategies follow TestWebKitAPI's
 // Tests/WebCore/TestPlatformStrategies.cpp (Copyright (C) 2026 Apple Inc., BSD-2-Clause): stubs that
-// a document without scripts, media and editing commands leaves uncalled.
+// a document without scripts, media and editing commands leaves uncalled, except the Cocoa named pasteboards.
 class RvPasteboardStrategy final : public PasteboardStrategy {
 public:
 #if PLATFORM(IOS_FAMILY)
@@ -1200,21 +1201,77 @@ public:
     void updateSupportedTypeIdentifiers(const Vector<String>&, const String&, const PasteboardContext*) final { }
 #endif
 #if PLATFORM(COCOA)
-    void getTypes(Vector<String>&, const String&, const PasteboardContext*) final { }
-    RefPtr<SharedBuffer> bufferForType(const String&, const String&, const PasteboardContext*) final { return nullptr; }
+    // Cocoa's Pasteboard (platform/mac/PasteboardMac.mm, platform/cocoa/PasteboardCocoa.mm) stores every named
+    // pasteboard through this strategy; Windows and GLib hold a drag's data in the Pasteboard itself. Each named
+    // pasteboard is held in memory: its types in declaration order, a string or buffer per type, and a change count
+    // that setTypes increments, as NSPasteboard's clearContents does. getTypes lists the types holding a value.
+    void getTypes(Vector<String>& types, const String& name, const PasteboardContext*) final
+    {
+        auto& store = pasteboard(name);
+        types.clear();
+        for (auto& type : store.types) {
+            if (store.strings.contains(type) || store.buffers.contains(type))
+                types.append(type);
+        }
+    }
+    RefPtr<SharedBuffer> bufferForType(const String& type, const String& name, const PasteboardContext*) final
+    {
+        return pasteboard(name).buffers.get(type);
+    }
     void getPathnamesForType(Vector<String>&, const String&, const String&, const PasteboardContext*) final { }
-    String stringForType(const String&, const String&, const PasteboardContext*) final { return { }; }
-    Vector<String> allStringsForType(const String&, const String&, const PasteboardContext*) final { return { }; }
-    int64_t changeCount(const String&, const PasteboardContext*) final { return 0; }
+    String stringForType(const String& type, const String& name, const PasteboardContext*) final
+    {
+        return pasteboard(name).strings.get(type);
+    }
+    Vector<String> allStringsForType(const String& type, const String& name, const PasteboardContext*) final
+    {
+        auto& strings = pasteboard(name).strings;
+        auto found = strings.find(type);
+        if (found == strings.end())
+            return { };
+        return { found->value };
+    }
+    int64_t changeCount(const String& name, const PasteboardContext*) final { return pasteboard(name).changeCount; }
     Color color(const String&, const PasteboardContext*) final { return { }; }
     URL url(const String&, const PasteboardContext*) final { return { }; }
     int getNumberOfFiles(const String&, const PasteboardContext*) final { return 0; }
-    int64_t addTypes(const Vector<String>&, const String&, const PasteboardContext*) final { return 0; }
-    int64_t setTypes(const Vector<String>&, const String&, const PasteboardContext*) final { return 0; }
-    int64_t setBufferForType(SharedBuffer*, const String&, const String&, const PasteboardContext*) final { return 0; }
-    int64_t setURL(const PasteboardURL&, const String&, const PasteboardContext*) final { return 0; }
-    int64_t setColor(const Color&, const String&, const PasteboardContext*) final { return 0; }
-    int64_t setStringForType(const String&, const String&, const String&, const PasteboardContext*) final { return 0; }
+    int64_t addTypes(const Vector<String>& types, const String& name, const PasteboardContext*) final
+    {
+        auto& store = pasteboard(name);
+        for (auto& type : types)
+            declare(store, type);
+        return store.changeCount;
+    }
+    int64_t setTypes(const Vector<String>& types, const String& name, const PasteboardContext*) final
+    {
+        auto& store = pasteboard(name);
+        ++store.changeCount;
+        store.types.clear();
+        store.strings.clear();
+        store.buffers.clear();
+        for (auto& type : types)
+            declare(store, type);
+        return store.changeCount;
+    }
+    int64_t setBufferForType(SharedBuffer* buffer, const String& type, const String& name, const PasteboardContext*) final
+    {
+        auto& store = pasteboard(name);
+        declare(store, type);
+        if (buffer)
+            store.buffers.set(type, Ref { *buffer });
+        else
+            store.buffers.remove(type);
+        return store.changeCount;
+    }
+    int64_t setURL(const PasteboardURL&, const String& name, const PasteboardContext*) final { return pasteboard(name).changeCount; }
+    int64_t setColor(const Color&, const String& name, const PasteboardContext*) final { return pasteboard(name).changeCount; }
+    int64_t setStringForType(const String& value, const String& type, const String& name, const PasteboardContext*) final
+    {
+        auto& store = pasteboard(name);
+        declare(store, type);
+        store.strings.set(type, value);
+        return store.changeCount;
+    }
     int64_t writeWebArchive(LegacyWebArchive&, const String&) final { return 0; }
     bool containsURLStringSuitableForLoading(const String&, const PasteboardContext*) final { return false; }
     String urlStringSuitableForLoading(const String&, String&, const PasteboardContext*) final { return { }; }
@@ -1240,6 +1297,29 @@ public:
     void getTypes(Vector<String>&) final { }
     void writeToPasteboard(const PasteboardWebContent&) final { }
     void writeToPasteboard(const String&, const String&) final { }
+#endif
+
+#if PLATFORM(COCOA)
+private:
+    struct NamedPasteboard {
+        Vector<String> types;
+        HashMap<String, String> strings;
+        HashMap<String, Ref<SharedBuffer>> buffers;
+        int64_t changeCount { 0 };
+    };
+
+    NamedPasteboard& pasteboard(const String& name)
+    {
+        return m_pasteboards.ensure(name, [] { return NamedPasteboard { }; }).iterator->value;
+    }
+
+    static void declare(NamedPasteboard& store, const String& type)
+    {
+        if (!store.types.contains(type))
+            store.types.append(type);
+    }
+
+    HashMap<String, NamedPasteboard> m_pasteboards;
 #endif
 };
 
