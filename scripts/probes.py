@@ -26,6 +26,16 @@ def probe(name, *commands, rid=None, flavor='slim', timeout=TIMEOUT, env=None):
 
 
 PROBES = [
+    *[probe('Verify embedded WPE built-in images and icon lifetimes',
+            'python -I tests/abi/wpe_builtin_images.py --native-directory {native}',
+            rid=rid, flavor=None,
+            env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
+      for rid in ['linux-x64', 'linux-arm64']],
+    *[probe('Verify embedded WPE icons through retained EGLImage frames',
+            'python -I tests/abi/wpe_builtin_images.py --native-directory {native} --gpu',
+            rid=rid, flavor='gpu',
+            env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
+      for rid in ['linux-x64', 'linux-arm64']],
     *[probe('Verify Linux same-document transition snapshot pixels',
             'python -I tests/gpu/linux_view_transition_pixels.py --native-directory {native}',
             rid=rid, flavor='gpu',
