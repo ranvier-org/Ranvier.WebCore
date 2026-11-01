@@ -42,6 +42,19 @@ def run(directory, slim):
             n.expect(start(page.document, None, ctypes.byref(result)) == UNSUPPORTED, 'slim start is safely unsupported')
             n.expect(not result.value, 'unsupported start creates no transition')
             return n.assertions
+        absent_events = []
+        absent_sink = SETTLED(lambda _, kind, error: absent_events.append((kind, error.decode() if error else None)))
+        absent_observer = P()
+        n.expect(start(page.document, None, ctypes.byref(result)) == OK and result.value, 'transition starts without an update callback')
+        n.ok('rv_view_transition_observe', [P, P, SETTLED, P, ctypes.POINTER(P)], page.host, result, absent_sink, None, ctypes.byref(absent_observer))
+        deadline = time.monotonic() + 5
+        while len(absent_events) < 3 and time.monotonic() < deadline:
+            n.call('rv_host_update', [P], page.host)
+            n.call('rv_run_loop_cycle', [I], 5)
+        n.expect(absent_events == [(0, None), (1, None), (2, None)], f'absent callback promise settlement: {absent_events}')
+        n.bind('rv_view_transition_observer_release', None, [P])(absent_observer)
+        n.bind('rv_dom_view_transition_release', None, [P])(result)
+        result = P()
         log, releases = [], []
         update = UPDATE(lambda _: log.append(('update', None)) or 0)
         release = RELEASE(lambda _: releases.append('callback'))
