@@ -1,7 +1,28 @@
+diff --git a/Source/WebCore/platform/graphics/Damage.h b/Source/WebCore/platform/graphics/Damage.h
+index ee4bc92..d6d4fab 100644
+--- a/Source/WebCore/platform/graphics/Damage.h
++++ b/Source/WebCore/platform/graphics/Damage.h
+@@ -25,7 +25,7 @@
+ 
+ #pragma once
+ 
+-#if USE(COORDINATED_GRAPHICS)
++#if USE(COORDINATED_GRAPHICS) || (PLATFORM(WPE) && USE(GRAPHICS_LAYER_TEXTURE_MAPPER))
+ #include "FloatRect.h"
+ #include "LayoutSize.h"
+ #include "Region.h"
+@@ -640,4 +640,4 @@ static inline WTF::TextStream& operator<<(WTF::TextStream& ts, const Damage& dam
+ 
+ } // namespace WebCore
+ 
+-#endif // USE(COORDINATED_GRAPHICS)
++#endif // USE(COORDINATED_GRAPHICS) || (PLATFORM(WPE) && USE(GRAPHICS_LAYER_TEXTURE_MAPPER))
 diff --git a/Source/cmake/OptionsWPE.cmake b/Source/cmake/OptionsWPE.cmake
+index ecf52b4..5777736 100644
 --- a/Source/cmake/OptionsWPE.cmake
 +++ b/Source/cmake/OptionsWPE.cmake
-@@ -442,6 +442,11 @@
+@@ -441,7 +441,12 @@ endif ()
+ 
  SET_AND_EXPOSE_TO_BUILD(USE_CAIRO FALSE)
  SET_AND_EXPOSE_TO_BUILD(USE_TEXTURE_MAPPER TRUE)
 -SET_AND_EXPOSE_TO_BUILD(USE_COORDINATED_GRAPHICS TRUE)
