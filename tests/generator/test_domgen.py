@@ -874,6 +874,31 @@ interface Surface {
         # Pattern.h is already included for the selected interface.
         self.assertNotIn('#if (defined(ENABLE_PATTERNS) && ENABLE_PATTERNS)', glue)
 
+    def test_conditional_interfaces_guard_their_transport_helpers_and_handle_bodies(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + """
+[Conditional=TOUCHES] interface Touch { readonly attribute long identifier; };
+[Conditional=TOUCHES] interface TouchList { readonly attribute unsigned long length; };
+partial interface Node {
+    [Conditional=TOUCHES] undefined touch(sequence<Touch> touches);
+};
+""")
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['Touch', 'TouchList']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        glue = generator.glue()
+        decode = glue.index('decodeRvDomSequenceTouch(const RvDomSequenceTouch* source')
+        self.assertEqual('#if (ENABLE(TOUCHES))', glue[:decode].rsplit('\n#', 1)[1].join(['#', '']).splitlines()[0])
+        self.assertIn('void ranvier_dom_touch_release(RvTouch* handle)\n{\n#if ENABLE(TOUCHES)\n', glue)
+        self.assertIn('#else\n    UNUSED_PARAM(handle);\n    return nullptr;\n#endif\n}', glue)
+        self.assertIn('void ranvier_dom_sequence_touch_release(RvDomSequenceTouch* value)\n{\n#if (ENABLE(TOUCHES))\n', glue)
+        # Only the conditional types are guarded.
+        guards = [line for line in glue.splitlines() if line.startswith('#if ') and 'ENABLE(' in line]
+        self.assertTrue(guards and all('ENABLE(TOUCHES)' in line for line in guards), guards)
+
     def test_opaque_union_arm_returns_a_tag_with_a_null_payload_and_no_decoder(self):
         generator = self.form_data_generator()
         names = {function.name for function in generator.functions}

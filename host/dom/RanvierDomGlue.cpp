@@ -1163,6 +1163,7 @@ void clearRvDomUnionBooleanOrImportNodeOptions(RvDomUnionBooleanOrImportNodeOpti
     }
     *value = { };
 }
+#if (ENABLE(TOUCH_EVENTS))
 
 std::optional<Vector<Ref<Touch>>> decodeRvDomSequenceTouch(const RvDomSequenceTouch* source, int32_t& status)
 {
@@ -1201,6 +1202,7 @@ template<typename V> int32_t encodeRvDomSequenceTouch(V&& input, RvDomSequenceTo
     }
     return RV_OK;
 }
+#endif
 
 std::optional<std::optional<Vector<Ref<Element>>>> decodeRvDomSequenceElementNullable(const RvDomSequenceElementNullable* source, int32_t& status)
 {
@@ -4949,7 +4951,11 @@ void ranvier_dom_union_boolean_or_import_node_options_release(RvDomUnionBooleanO
 
 void ranvier_dom_sequence_touch_release(RvDomSequenceTouch* value)
 {
+#if (ENABLE(TOUCH_EVENTS))
     if (isMainThread()) clearRvDomSequenceTouch(value);
+#else
+    UNUSED_PARAM(value);
+#endif
 }
 
 void ranvier_dom_sequence_element_nullable_release(RvDomSequenceElementNullable* value)
@@ -5704,30 +5710,48 @@ RvValidityState* ranvier_dom_validity_state_retain(RvValidityState* handle)
 
 void ranvier_dom_touch_release(RvTouch* handle)
 {
+#if ENABLE(TOUCH_EVENTS)
     if (handle && isMainThread())
         reinterpret_cast<Touch*>(handle)->deref();
+#else
+    UNUSED_PARAM(handle);
+#endif
 }
 
 RvTouch* ranvier_dom_touch_retain(RvTouch* handle)
 {
+#if ENABLE(TOUCH_EVENTS)
     if (!handle || !isMainThread())
         return nullptr;
     reinterpret_cast<Touch*>(handle)->ref();
     return handle;
+#else
+    UNUSED_PARAM(handle);
+    return nullptr;
+#endif
 }
 
 void ranvier_dom_touch_list_release(RvTouchList* handle)
 {
+#if ENABLE(TOUCH_EVENTS)
     if (handle && isMainThread())
         reinterpret_cast<TouchList*>(handle)->deref();
+#else
+    UNUSED_PARAM(handle);
+#endif
 }
 
 RvTouchList* ranvier_dom_touch_list_retain(RvTouchList* handle)
 {
+#if ENABLE(TOUCH_EVENTS)
     if (!handle || !isMainThread())
         return nullptr;
     reinterpret_cast<TouchList*>(handle)->ref();
     return handle;
+#else
+    UNUSED_PARAM(handle);
+    return nullptr;
+#endif
 }
 
 void ranvier_dom_svg_rect_release(RvSVGRect* handle)

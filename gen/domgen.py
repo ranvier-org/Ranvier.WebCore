@@ -705,6 +705,13 @@ class Function:
         self.unused = False  # a stub, whose parameters the glue does not read
 
 
+def guarded_body(condition, body, otherwise):
+    """A function body that runs only where the build declares its types, and runs otherwise elsewhere."""
+    if not condition:
+        return body
+    return [f"#if {condition}"] + body + ["#else"] + otherwise + ["#endif"]
+
+
 def c_name(name):
     name = snake(name) if not name.isupper() else name.lower()
     return name + "_" if name in RESERVED or name in C_KEYWORDS else name
@@ -2723,9 +2730,11 @@ class Generator(ComplexGeneratorMixin):
         lines.append("    return 0;")
         lines.append("}")
         lines.append("")
-        for name in self.complex_used:
-            lines += [f"void ranvier_dom_{transport_token(name)}_release({name}* value)", "{",
-                      f"    if (isMainThread()) clear{name}(value);", "}", ""]
+        for name, mapped in self.complex_used.items():
+            condition = self.type_condition(mapped)
+            lines += [f"void ranvier_dom_{transport_token(name)}_release({name}* value)", "{"]
+            lines += guarded_body(condition, [f"    if (isMainThread()) clear{name}(value);"], ["    UNUSED_PARAM(value);"])
+            lines += ["}", ""]
         for name, struct in self.result_dicts.items():
             lines += [f"void ranvier_dom_{snake(name)}_release({struct}* value)", "{",
                       f"    if (isMainThread()) releaseDict{struct}(value);", "}", ""]
@@ -2735,22 +2744,14 @@ class Generator(ComplexGeneratorMixin):
                        else f'reinterpret_cast<{cls}*>(handle)->deref();')
             retain = (f'retainTrackedHandle(reinterpret_cast<{cls}*>(handle));' if cls in self.tracked_roots
                       else f'reinterpret_cast<{cls}*>(handle)->ref();')
-            lines += [
-                f"void ranvier_dom_{snake(name)}_release(Rv{name}* handle)",
-                "{",
-                "    if (handle && isMainThread())",
-                f"        {release}",
-                "}",
-                "",
-                f"Rv{name}* ranvier_dom_{snake(name)}_retain(Rv{name}* handle)",
-                "{",
-                "    if (!handle || !isMainThread())",
-                "        return nullptr;",
-                f"    {retain}",
-                "    return handle;",
-                "}",
-                "",
-            ]
+            interface = self.world.interfaces.get(name)
+            condition = self.conditional(interface) if interface is not None else None
+            lines += [f"void ranvier_dom_{snake(name)}_release(Rv{name}* handle)", "{"]
+            lines += guarded_body(condition, ["    if (handle && isMainThread())", f"        {release}"], ["    UNUSED_PARAM(handle);"])
+            lines += ["}", "", f"Rv{name}* ranvier_dom_{snake(name)}_retain(Rv{name}* handle)", "{"]
+            lines += guarded_body(condition, ["    if (!handle || !isMainThread())", "        return nullptr;", f"    {retain}", "    return handle;"],
+                                  ["    UNUSED_PARAM(handle);", "    return nullptr;"])
+            lines += ["}", ""]
         for function in self.functions:
             lines.append(f"// {function.comment}")
             lines.append(f"int32_t ranvier_dom_{function.name}({params_text(function.params)})")

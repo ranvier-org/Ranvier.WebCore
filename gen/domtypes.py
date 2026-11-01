@@ -394,7 +394,9 @@ class ComplexGeneratorMixin:
                       '    RELEASE_ASSERT(result);', '    std::memcpy(result, utf8.data(), utf8.length());',
                       '    result[utf8.length()] = 0;',
                       '    return { result, static_cast<int32_t>(utf8.length()) };', '}']
+        guarded = []  # (first line, condition) of each transport's helpers
         for name, mapped in self.complex_used.items():
+            guarded.append((len(lines), self.type_condition(mapped)))
             cpp = self.transport_cpp(mapped)
             if name in self.complex_inputs:
                 lines += ['', f'std::optional<{cpp}> decode{name}(const {name}* source, int32_t& status)', '{']
@@ -473,7 +475,24 @@ class ComplexGeneratorMixin:
             else:
                 lines += ['    result->tag = static_cast<int32_t>(value.index()) + 1;', f'    encodeArms{name}(value, result);']
             lines += ['    return RV_OK;', '}']
+        for (start, condition), (end, _) in reversed(list(zip(guarded, guarded[1:] + [(len(lines), None)]))):
+            if condition:
+                lines[start:end] = [f'#if {condition}'] + lines[start:end] + ['#endif']
         return lines + dictionary_definitions + ['}']
+
+    def type_condition(self, mapped):
+        """The build condition under which WebKit declares every interface and dictionary the mapping holds, as a
+        preprocessor expression; None when the mapping holds no [Conditional] type."""
+        conditions = set()
+        def walk(m):
+            for name in {m.interface, m.root, m.cls} - {None}:
+                definition = self.world.interfaces.get(name) or self.world.dictionaries.get(name)
+                if definition is not None and self.conditional(definition):
+                    conditions.add(self.conditional(definition))
+            for child in m.subtypes:
+                walk(child)
+        walk(mapped)
+        return ' && '.join(f'({c})' for c in sorted(conditions)) if conditions else None
 
     def transport_can_return(self, mapped):
         if mapped.kind == 'bytes':
