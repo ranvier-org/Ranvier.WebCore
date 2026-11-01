@@ -1,0 +1,34 @@
+diff --git a/Source/WebCore/rendering/BackgroundPainter.cpp b/Source/WebCore/rendering/BackgroundPainter.cpp
+--- a/Source/WebCore/rendering/BackgroundPainter.cpp
++++ b/Source/WebCore/rendering/BackgroundPainter.cpp
+@@ -49,6 +49,7 @@
+ #include "StyleBoxShadow.h"
+ #include "StylePrimitiveNumericTypes+Evaluation.h"
+ #include "TextBoxPainter.h"
++#include <cmath>
+ 
+ namespace WebCore {
+ 
+@@ -435,8 +436,21 @@
+                 scrolledPaintRect.y() + m_renderer.borderTop() + (includePadding ? m_renderer.paddingTop() : 0_lu),
+                 scrolledPaintRect.width() - bLeft - bRight - (includePadding ? pLeft + pRight : 0_lu),
+                 scrolledPaintRect.height() - m_renderer.borderTop() - m_renderer.borderBottom() - (includePadding ? m_renderer.paddingTop() + m_renderer.paddingBottom() : 0_lu));
++            auto borderPixels = [deviceScaleFactor](LayoutUnit border) {
++                return std::round(border.toDouble() * deviceScaleFactor);
++            };
++            double pixelX = scrolledPaintRect.x().toDouble() * deviceScaleFactor + borderPixels(bLeft)
++                + (includePadding ? pLeft.toDouble() * deviceScaleFactor : 0);
++            double pixelY = scrolledPaintRect.y().toDouble() * deviceScaleFactor + borderPixels(m_renderer.borderTop())
++                + (includePadding ? m_renderer.paddingTop().toDouble() * deviceScaleFactor : 0);
++            double left = std::floor(pixelX + 0.5);
++            double top = std::floor(pixelY + 0.5);
++            double right = std::floor(pixelX + clipRect.width().toDouble() * deviceScaleFactor + 0.5);
++            double bottom = std::floor(pixelY + clipRect.height().toDouble() * deviceScaleFactor + 0.5);
++            FloatRect deviceAlignedClip(left / deviceScaleFactor, top / deviceScaleFactor,
++                (right - left) / deviceScaleFactor, (bottom - top) / deviceScaleFactor);
+             backgroundClipStateSaver.save();
+-            context.clip(clipRect);
++            context.clip(deviceAlignedClip);
+         }
+         break;
+     }
