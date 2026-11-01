@@ -3,6 +3,7 @@
 import argparse
 import base64
 import ctypes
+from contextlib import contextmanager
 import json
 from pathlib import Path
 import sys
@@ -157,6 +158,18 @@ def snapshot(value):
 
 
 class AesProbe(Probe):
+    def __init__(self, *arguments):
+        super().__init__(*arguments)
+        self.failures = []
+
+    @contextmanager
+    def check(self, name):
+        try:
+            yield
+        except AssertionError as error:
+            self.failures.append({'case': name, 'error': str(error)})
+            print('AES_CASE_FAIL ' + json.dumps(self.failures[-1]), flush=True)
+
     def generate(self, page, name, bits=MISSING, usages=('encrypt', 'decrypt'), extractable=True):
         parameters = KeyGen(ctypes.sizeof(KeyGen), span(name.encode()), bits is not MISSING, bits if bits is not MISSING else 0)
         return self.start('aes_generate', [P, ctypes.POINTER(KeyGen), I, Strings], page.document,
@@ -203,26 +216,30 @@ class AesProbe(Probe):
                           ctypes.byref(options), 1, strings(usages))
 
 
-def run(directory, bridge_library=None):
-    n = Native(directory)
-    probe = AesProbe(n, ctypes.CDLL(bridge_library) if bridge_library else n.library)
-    page = Case(n, '<p>AES owner</p>')
-    try:
-        for name in ['AES-CBC', 'AES-CTR', 'AES-GCM', 'AES-KW']:
+def check_generation(probe, page):
+    n = probe.n
+    for name in ['AES-CBC', 'AES-CTR', 'AES-GCM', 'AES-KW']:
+        with probe.check(f'generation line224: {name!r}'):
             supported = I()
             probe.ok('aes_supported', [P, Bytes, ctypes.POINTER(I)], page.document, span(name.encode()), ctypes.byref(supported))
             n.expect(supported.value == 1, name + ' registered')
             usages = ('wrapKey', 'unwrapKey') if name == 'AES-KW' else ('encrypt', 'decrypt')
             for bits in [128, 192, 256]:
-                generated = probe.take(probe.generate(page, name.lower(), bits, usages), page)
-                n.expect(len(probe.bytes(probe.export(page, generated), page)) * 8 == bits, 'generated AES key length')
+                with probe.check(f'generation line229: {bits!r}'):
+                    generated = probe.take(probe.generate(page, name.lower(), bits, usages), page)
+                    n.expect(len(probe.bytes(probe.export(page, generated), page)) * 8 == bits, 'generated AES key length')
             for bits, error in [(MISSING, 'TypeError'), (65536, 'TypeError'), (0, 'OperationError'), (127, 'OperationError')]:
-                probe.error_is(page, probe.generate(page, name, bits, usages), error)
+                with probe.check(f'generation line232: {(bits, error)!r}'):
+                    probe.error_is(page, probe.generate(page, name, bits, usages), error)
             probe.error_is(page, probe.generate(page, name, 128, ()), 'SyntaxError')
             probe.error_is(page, probe.generate(page, name, 128, ('sign',)), 'SyntaxError')
-        cases = json.loads((FIXTURES / 'crypto-aes-cbc-ctr-sp800-38a.json').read_text())
-        plain = bytes.fromhex(''.join(cases['message_blocks_hex']))
-        for case in cases['vectors']:
+
+def check_vectors(probe, page):
+    n = probe.n
+    cases = json.loads((FIXTURES / 'crypto-aes-cbc-ctr-sp800-38a.json').read_text())
+    plain = bytes.fromhex(''.join(cases['message_blocks_hex']))
+    for case in cases['vectors']:
+        with probe.check(f'vectors line238: {case!r}'):
             name = 'AES-' + case['mode']
             key = probe.import_key(page, name.lower(), bytes.fromhex(case['key_hex']))
             initial = case.get('iv_hex', case.get('initial_counter_hex'))
@@ -234,21 +251,24 @@ def run(directory, bridge_library=None):
             n.expect(probe.bytes(probe.transform(page, 'decrypt', key, parameters, encrypted), page) == plain, 'mode decrypt round trip')
             if case['mode'] == 'CBC':
                 probe.error_is(page, probe.transform(page, 'decrypt', key, parameters, expected), 'OperationError')
-        first_cbc = next(case for case in cases['vectors'] if case['mode'] == 'CBC')
-        cbc_key = probe.import_key(page, 'AES-CBC', bytes.fromhex(first_cbc['key_hex']))
-        first_block, original_iv = bytes.fromhex(first_cbc['ciphertext_blocks_hex'][0]), bytes.fromhex(first_cbc['iv_hex'])
-        first_plain = plain[:16]
-        for padding in [0, 1, 2, 17]:
+    first_cbc = next((case for case in cases['vectors'] if case['mode'] == 'CBC'))
+    cbc_key = probe.import_key(page, 'AES-CBC', bytes.fromhex(first_cbc['key_hex']))
+    first_block, original_iv = (bytes.fromhex(first_cbc['ciphertext_blocks_hex'][0]), bytes.fromhex(first_cbc['iv_hex']))
+    first_plain = plain[:16]
+    for padding in [0, 1, 2, 17]:
+        with probe.check(f'vectors line254: {padding!r}'):
             changed_iv = bytearray(original_iv)
             for index in range(1, (padding if 0 < padding <= 16 else 1) + 1):
-                changed_iv[-index] ^= first_plain[-index] ^ padding
+                with probe.check(f'vectors line256: {index!r}'):
+                    changed_iv[-index] ^= first_plain[-index] ^ padding
             operation = probe.transform(page, 'decrypt', cbc_key, cipher('AES-CBC', bytes(changed_iv)), first_block)
             if padding in [0, 17]:
                 probe.error_is(page, operation, 'OperationError')
             else:
                 n.expect(probe.bytes(operation, page) == first_plain[:-padding], 'CBC validates and removes PKCS7 padding')
-        for case in json.loads((FIXTURES / 'crypto-aes-gcm-cavp.json').read_text())['vectors']:
-            data, expected, group = case['input'], case['expected'], case['source']['group']
+    for case in json.loads((FIXTURES / 'crypto-aes-gcm-cavp.json').read_text())['vectors']:
+        with probe.check(f'vectors line263: {case!r}'):
+            data, expected, group = (case['input'], case['expected'], case['source']['group'])
             key = probe.import_key(page, 'AES-GCM', bytes.fromhex(data['Key']))
             parameters = cipher('AES-GCM', bytes.fromhex(data['IV']), aad=bytes.fromhex(data['AAD']), tag=group['Taglen'])
             if case['operation'] == 'encrypt':
@@ -262,7 +282,8 @@ def run(directory, bridge_library=None):
                     probe.error_is(page, operation, 'OperationError')
                 else:
                     n.expect(probe.bytes(operation, page).hex() == expected['PT'], 'NIST GCM decrypt vector')
-        for case in json.loads((FIXTURES / 'crypto-aes-kw-rfc3394.json').read_text())['vectors']:
+    for case in json.loads((FIXTURES / 'crypto-aes-kw-rfc3394.json').read_text())['vectors']:
+        with probe.check(f'vectors line278: {case!r}'):
             wrapping = probe.import_key(page, 'AES-KW', bytes.fromhex(case['kek_hex']), usages=('wrapKey', 'unwrapKey'))
             key = probe.import_key(page, 'AES-GCM', bytes.fromhex(case['key_data_hex']))
             wrapped = probe.bytes(probe.wrap(page, key, wrapping, cipher('AES-KW')), page)
@@ -271,117 +292,116 @@ def run(directory, bridge_library=None):
             n.expect(probe.bytes(probe.export(page, restored), page).hex() == case['key_data_hex'], 'KW unwrap raw key')
             probe.error_is(page, probe.transform(page, 'encrypt', wrapping, cipher('AES-KW'), bytes(16)), 'NotSupportedError')
 
-        raw = bytes(range(16))
-        key = probe.import_key(page, 'AES-GCM', raw)
-        info = AesInfo(ctypes.sizeof(AesInfo))
-        probe.ok('aes_key_info', [Key, ctypes.POINTER(AesInfo)], key, ctypes.byref(info))
-        n.expect((info.length_bits, info.extractable, info.can_encrypt, info.can_decrypt, info.can_wrap, info.can_unwrap)
-                 == (128, 1, 1, 1, 1, 1), 'AES immutable metadata')
-        for function, expected in [('key_algorithm_name', b'AES-GCM'), ('key_type', b'secret')]:
-            buffer, length = ctypes.create_string_buffer(64), I()
+def check_jwk(probe, page):
+    n = probe.n
+    raw = bytes(range(16))
+    key = probe.import_key(page, 'AES-GCM', raw)
+    info = AesInfo(ctypes.sizeof(AesInfo))
+    probe.ok('aes_key_info', [Key, ctypes.POINTER(AesInfo)], key, ctypes.byref(info))
+    n.expect((info.length_bits, info.extractable, info.can_encrypt, info.can_decrypt, info.can_wrap, info.can_unwrap) == (128, 1, 1, 1, 1, 1), 'AES immutable metadata')
+    for function, expected in [('key_algorithm_name', b'AES-GCM'), ('key_type', b'secret')]:
+        with probe.check(f'jwk line293: {(function, expected)!r}'):
+            buffer, length = (ctypes.create_string_buffer(64), I())
             probe.ok(function, [Key, P, I, ctypes.POINTER(I)], key, buffer, len(buffer), ctypes.byref(length))
             n.expect(buffer.raw[:length.value] == expected, 'canonical ' + function)
-        exported = probe.export(page, key, 'jwk')
-        probe.wait(exported, page)
-        view = Jwk(ctypes.sizeof(Jwk))
-        probe.ok('operation_octet_jwk', [Operation, ctypes.POINTER(Jwk)], exported, ctypes.byref(view))
-        fields = snapshot(view)
-        n.expect(fields['kty'] == 'oct' and fields['alg'] == 'A128GCM' and fields['ext'], 'typed JWK export')
-        imported = probe.imported(page, 'AES-GCM', view, format='jwk')
-        probe.ok('operation_release', [Operation], exported)
-        del probe.operations[exported.value]
-        restored = probe.take(imported, page)
-        n.expect(probe.bytes(probe.export(page, restored), page) == raw, 'JWK snapshot copied before source operation release')
-        basic = {'kty': 'oct', 'k': base64.urlsafe_b64encode(raw).decode().rstrip('=')}
-        for changes, expected in [
-            ({'kty': ''}, 'DataError'), ({'kty': 'OCT'}, 'DataError'), ({'k': ''}, 'DataError'),
-            ({'alg': 'a128gcm'}, 'DataError'), ({'alg': 'A256GCM'}, 'DataError'),
-            ({'use': ''}, 'DataError'), ({'use': 'sig'}, 'DataError'),
-            ({'ext': False}, 'DataError'), ({'key_ops': []}, 'DataError'),
-            ({'key_ops': ['encrypt', 'encrypt']}, 'DataError'), ({'key_ops': ['bogus']}, 'DataError'),
-            ({'key_ops': ['bogus', 'bogus', 'encrypt']}, 'DataError'),
-        ]:
+    exported = probe.export(page, key, 'jwk')
+    probe.wait(exported, page)
+    view = Jwk(ctypes.sizeof(Jwk))
+    probe.ok('operation_octet_jwk', [Operation, ctypes.POINTER(Jwk)], exported, ctypes.byref(view))
+    fields = snapshot(view)
+    n.expect(fields['kty'] == 'oct' and fields['alg'] == 'A128GCM' and fields['ext'], 'typed JWK export')
+    imported = probe.imported(page, 'AES-GCM', view, format='jwk')
+    probe.ok('operation_release', [Operation], exported)
+    del probe.operations[exported.value]
+    restored = probe.take(imported, page)
+    n.expect(probe.bytes(probe.export(page, restored), page) == raw, 'JWK snapshot copied before source operation release')
+    basic = {'kty': 'oct', 'k': base64.urlsafe_b64encode(raw).decode().rstrip('=')}
+    for changes, expected in [({'kty': ''}, 'DataError'), ({'kty': 'OCT'}, 'DataError'), ({'k': ''}, 'DataError'), ({'alg': 'a128gcm'}, 'DataError'), ({'alg': 'A256GCM'}, 'DataError'), ({'use': ''}, 'DataError'), ({'use': 'sig'}, 'DataError'), ({'ext': False}, 'DataError'), ({'key_ops': []}, 'DataError'), ({'key_ops': ['encrypt', 'encrypt']}, 'DataError'), ({'key_ops': ['bogus']}, 'DataError'), ({'key_ops': ['bogus', 'bogus', 'encrypt']}, 'DataError')]:
+        with probe.check(f'jwk line309: {(changes, expected)!r}'):
             probe.error_is(page, probe.imported(page, 'AES-GCM', {**basic, **changes}, format='jwk', usages=('encrypt',)), expected)
-        private = probe.import_key(page, 'AES-GCM', {**basic, 'ext': False}, format='jwk', extractable=False, usages=('encrypt',))
-        probe.error_is(page, probe.export(page, private), 'InvalidAccessError')
-        probe.error_is(page, probe.export(page, private, 'spki'), 'InvalidAccessError')
-        probe.error_is(page, probe.imported(page, 'AES-GCM', b'', usages=('encrypt',)), 'DataError')
-        probe.error_is(page, probe.imported(page, 'unknown', raw, usages=('encrypt',)), 'NotSupportedError')
-        probe.error_is(page, probe.imported(page, 'AES-GCM', raw, usages=('sign',)), 'SyntaxError')
-        probe.error_is(page, probe.imported(page, 'AES-GCM', raw, usages=()), 'SyntaxError')
-        probe.error_is(page, probe.imported(page, 'AES-GCM', raw, format='RAW'), 'TypeError')
-        probe.error_is(page, probe.imported(page, 'AES-GCM', raw, format='spki'), 'NotSupportedError')
-        probe.error_is(page, probe.imported(page, 'AES-KWP', raw, usages=('wrapKey',)), 'NotSupportedError')
-        probe.error_is(page, probe.imported(page, 'unknown', raw, usages=('bogus',)), 'TypeError')
-        probe.error_is(page, probe.imported(page, 'unknown', {**basic, 'key_ops': ['bogus']}, format='jwk'), 'NotSupportedError')
-        extended = probe.import_key(page, 'AES-GCM', {**basic, 'key_ops': ['encrypt', 'bogus', 'sign']}, format='jwk', usages=('encrypt',))
-        n.expect(probe.bytes(probe.export(page, extended), page) == raw, 'unrecognized JWK usages do not change recognized requested usage intersection')
-        probe.error_is(page, probe.imported(page, 'AES-GCM', {**basic, 'key_ops': ['encrypt', 'encrypt']}, format='jwk', usages=('sign',)), 'SyntaxError')
+    private = probe.import_key(page, 'AES-GCM', {**basic, 'ext': False}, format='jwk', extractable=False, usages=('encrypt',))
+    probe.error_is(page, probe.export(page, private), 'InvalidAccessError')
+    probe.error_is(page, probe.export(page, private, 'spki'), 'InvalidAccessError')
+    probe.error_is(page, probe.imported(page, 'AES-GCM', b'', usages=('encrypt',)), 'DataError')
+    probe.error_is(page, probe.imported(page, 'unknown', raw, usages=('encrypt',)), 'NotSupportedError')
+    probe.error_is(page, probe.imported(page, 'AES-GCM', raw, usages=('sign',)), 'SyntaxError')
+    probe.error_is(page, probe.imported(page, 'AES-GCM', raw, usages=()), 'SyntaxError')
+    probe.error_is(page, probe.imported(page, 'AES-GCM', raw, format='RAW'), 'TypeError')
+    probe.error_is(page, probe.imported(page, 'AES-GCM', raw, format='spki'), 'NotSupportedError')
+    probe.error_is(page, probe.imported(page, 'AES-KWP', raw, usages=('wrapKey',)), 'NotSupportedError')
+    probe.error_is(page, probe.imported(page, 'unknown', raw, usages=('bogus',)), 'TypeError')
+    probe.error_is(page, probe.imported(page, 'unknown', {**basic, 'key_ops': ['bogus']}, format='jwk'), 'NotSupportedError')
+    extended = probe.import_key(page, 'AES-GCM', {**basic, 'key_ops': ['encrypt', 'bogus', 'sign']}, format='jwk', usages=('encrypt',))
+    n.expect(probe.bytes(probe.export(page, extended), page) == raw, 'unrecognized JWK usages do not change recognized requested usage intersection')
+    probe.error_is(page, probe.imported(page, 'AES-GCM', {**basic, 'key_ops': ['encrypt', 'encrypt']}, format='jwk', usages=('sign',)), 'SyntaxError')
 
-        ctr_key = probe.import_key(page, 'AES-CTR', raw)
-        for parameters, expected in [
-            (cipher('AES-GCM'), 'TypeError'), (cipher('AES-GCM', b''), 'OperationError'),
-            (cipher('AES-GCM', bytes(12), tag=0), 'OperationError'),
-            (cipher('AES-GCM', bytes(12), tag=40), 'OperationError'),
-            (cipher('AES-GCM', bytes(12), tag=256), 'TypeError'),
-        ]:
+def check_cipher_validation(probe, page):
+    n = probe.n
+    raw = bytes(range(16))
+    key = probe.import_key(page, 'AES-GCM', raw)
+    ctr_key = probe.import_key(page, 'AES-CTR', raw)
+    for parameters, expected in [(cipher('AES-GCM'), 'TypeError'), (cipher('AES-GCM', b''), 'OperationError'), (cipher('AES-GCM', bytes(12), tag=0), 'OperationError'), (cipher('AES-GCM', bytes(12), tag=40), 'OperationError'), (cipher('AES-GCM', bytes(12), tag=256), 'TypeError')]:
+        with probe.check(f'cipher_validation line335: {(parameters, expected)!r}'):
             probe.error_is(page, probe.transform(page, 'encrypt', key, parameters, b'message'), expected)
-        probe.error_is(page, probe.transform(page, 'encrypt', ctr_key, cipher('AES-GCM'), b''), 'TypeError')
-        probe.error_is(page, probe.transform(page, 'encrypt', ctr_key, cipher('AES-GCM', b''), b''), 'InvalidAccessError')
-        for parameters, expected in [
-            (cipher('AES-CTR', bytes(16)), 'TypeError'), (cipher('AES-CTR', bytes(16), ctr_bits=0), 'OperationError'),
-            (cipher('AES-CTR', bytes(16), ctr_bits=129), 'OperationError'),
-            (cipher('AES-CTR', bytes(16), ctr_bits=256), 'TypeError'),
-            (cipher('AES-CTR', bytes(15), ctr_bits=128), 'OperationError'),
-        ]:
+    probe.error_is(page, probe.transform(page, 'encrypt', ctr_key, cipher('AES-GCM'), b''), 'TypeError')
+    probe.error_is(page, probe.transform(page, 'encrypt', ctr_key, cipher('AES-GCM', b''), b''), 'InvalidAccessError')
+    for parameters, expected in [(cipher('AES-CTR', bytes(16)), 'TypeError'), (cipher('AES-CTR', bytes(16), ctr_bits=0), 'OperationError'), (cipher('AES-CTR', bytes(16), ctr_bits=129), 'OperationError'), (cipher('AES-CTR', bytes(16), ctr_bits=256), 'TypeError'), (cipher('AES-CTR', bytes(15), ctr_bits=128), 'OperationError')]:
+        with probe.check(f'cipher_validation line344: {(parameters, expected)!r}'):
             probe.error_is(page, probe.transform(page, 'encrypt', ctr_key, parameters, b'message'), expected)
-        probe.error_is(page, probe.transform(page, 'encrypt', ctr_key, cipher('AES-CTR', bytes(16), ctr_bits=1), bytes(33)), 'OperationError')
+    probe.error_is(page, probe.transform(page, 'encrypt', ctr_key, cipher('AES-CTR', bytes(16), ctr_bits=1), bytes(33)), 'OperationError')
 
-        for name in ['AES-CBC', 'AES-CTR', 'AES-GCM']:
+def check_wrapping(probe, page):
+    n = probe.n
+    raw = bytes(range(16))
+    key = probe.import_key(page, 'AES-GCM', raw)
+    basic = {'kty': 'oct', 'k': base64.urlsafe_b64encode(raw).decode().rstrip('=')}
+    private = probe.import_key(page, 'AES-GCM', raw, extractable=False, usages=('encrypt',))
+    for name in ['AES-CBC', 'AES-CTR', 'AES-GCM']:
+        with probe.check(f'wrapping line353: {name!r}'):
             parameters = cipher(name, bytes(16 if name != 'AES-GCM' else 12), ctr_bits=128)
             wrapping = probe.import_key(page, name, raw, usages=('wrapKey', 'unwrapKey'))
             for format in ['raw', 'jwk']:
-                wrapped = probe.bytes(probe.wrap(page, key, wrapping, parameters, format), page)
-                restored = probe.take(probe.unwrap(page, wrapped, wrapping, parameters, format=format), page)
-                n.expect(probe.bytes(probe.export(page, restored), page) == raw, name + ' wrap-only key and unwrap-only key permissions')
+                with probe.check(f'wrapping line356: {format!r}'):
+                    wrapped = probe.bytes(probe.wrap(page, key, wrapping, parameters, format), page)
+                    restored = probe.take(probe.unwrap(page, wrapped, wrapping, parameters, format=format), page)
+                    n.expect(probe.bytes(probe.export(page, restored), page) == raw, name + ' wrap-only key and unwrap-only key permissions')
             probe.error_is(page, probe.wrap(page, private, wrapping, parameters), 'InvalidAccessError')
             probe.error_is(page, probe.transform(page, 'encrypt', wrapping, parameters, b''), 'InvalidAccessError')
             encrypting = probe.import_key(page, name, raw, usages=('encrypt', 'decrypt'))
             probe.error_is(page, probe.wrap(page, key, encrypting, parameters), 'InvalidAccessError')
             valid_wrapped = probe.bytes(probe.wrap(page, key, wrapping, parameters), page)
             probe.error_is(page, probe.unwrap(page, valid_wrapped, encrypting, parameters), 'InvalidAccessError')
-            invalid_json = [
-                (b'{', 'DataError'), (b'1', 'DataError'), (b'null', 'DataError'), (b'[]', 'DataError'),
-                (json.dumps({**basic, 'key_ops': ['encrypt', 'encrypt']}).encode(), 'DataError'),
-                (json.dumps({**basic, 'key_ops': ['bogus']}).encode(), 'DataError'),
-                (json.dumps({**basic, 'key_ops': None}).encode(), 'DataError'),
-                (json.dumps({**basic, 'alg': ''}).encode(), 'DataError'),
-            ]
+            invalid_json = [(b'{', 'DataError'), (b'1', 'DataError'), (b'null', 'DataError'), (b'[]', 'DataError'), (json.dumps({**basic, 'key_ops': ['encrypt', 'encrypt']}).encode(), 'DataError'), (json.dumps({**basic, 'key_ops': ['bogus']}).encode(), 'DataError'), (json.dumps({**basic, 'key_ops': None}).encode(), 'DataError'), (json.dumps({**basic, 'alg': ''}).encode(), 'DataError')]
             for data, error in invalid_json:
-                wrapped = probe.bytes(probe.transform(page, 'encrypt', encrypting, parameters, data), page)
-                probe.error_is(page, probe.unwrap(page, wrapped, wrapping, parameters, format='jwk'), error)
+                with probe.check(f'wrapping line373: {(data, error)!r}'):
+                    wrapped = probe.bytes(probe.transform(page, 'encrypt', encrypting, parameters, data), page)
+                    probe.error_is(page, probe.unwrap(page, wrapped, wrapping, parameters, format='jwk'), error)
             hmac = probe.import_key(page, 'HMAC', b'hmac wrapping target', usages=('sign',), options=algorithm('HMAC', 'SHA-256'))
             for format in ['raw', 'jwk']:
-                wrapped = probe.bytes(probe.wrap(page, hmac, wrapping, parameters, format), page)
-                restored = probe.take(probe.unwrap(page, wrapped, wrapping, parameters, name='HMAC', format=format,
-                                                   usages=('sign',), options=algorithm('HMAC', 'SHA-256')), page)
-                n.expect(probe.bytes(probe.export(page, restored), page) == b'hmac wrapping target', 'HMAC target normalization and round trip')
+                with probe.check(f'wrapping line377: {format!r}'):
+                    wrapped = probe.bytes(probe.wrap(page, hmac, wrapping, parameters, format), page)
+                    restored = probe.take(probe.unwrap(page, wrapped, wrapping, parameters, name='HMAC', format=format, usages=('sign',), options=algorithm('HMAC', 'SHA-256')), page)
+                    n.expect(probe.bytes(probe.export(page, restored), page) == b'hmac wrapping target', 'HMAC target normalization and round trip')
 
+def check_lifetime(probe):
+    n = probe.n
+    raw = bytes(range(16))
+    page = Case(n, '<p>AES lifetime owner</p>')
+    try:
+        key = probe.import_key(page, 'AES-GCM', raw)
         parameters = cipher('AES-GCM', bytes(12))
         source = span(raw)
-        options, usage = algorithm('AES-GCM'), strings(('encrypt',))
+        options, usage = (algorithm('AES-GCM'), strings(('encrypt',)))
         data = KeyData(ctypes.sizeof(KeyData), 1, source, None)
-        pending = probe.start('secret_import', [P, Bytes, ctypes.POINTER(KeyData), ctypes.POINTER(ImportParams), I, Strings],
-                              page.document, span(b'raw'), ctypes.byref(data), ctypes.byref(options), 1, usage)
+        pending = probe.start('secret_import', [P, Bytes, ctypes.POINTER(KeyData), ctypes.POINTER(ImportParams), I, Strings], page.document, span(b'raw'), ctypes.byref(data), ctypes.byref(options), 1, usage)
         source.backing[0] = b'X'
         copied = probe.take(pending, page)
         n.expect(probe.bytes(probe.export(page, copied), page) == raw, 'raw import copies caller data at admission')
-        plain, iv, aad = span(b'copied plaintext'), span(bytes(12)), span(b'associated')
+        plain, iv, aad = (span(b'copied plaintext'), span(bytes(12)), span(b'associated'))
         body = Gcm(ctypes.sizeof(Gcm), 1, iv, 1, aad, 0, 0)
         copied_parameters = Cipher(ctypes.sizeof(Cipher), span(b'AES-GCM'), None, None, ctypes.pointer(body))
-        pending = probe.start('aes_encrypt', [P, ctypes.POINTER(Cipher), Key, Bytes], page.document,
-                              ctypes.byref(copied_parameters), copied, plain)
-        plain.backing[0], iv.backing[0], aad.backing[0] = b'X', b'X', b'X'
+        pending = probe.start('aes_encrypt', [P, ctypes.POINTER(Cipher), Key, Bytes], page.document, ctypes.byref(copied_parameters), copied, plain)
+        plain.backing[0], iv.backing[0], aad.backing[0] = (b'X', b'X', b'X')
         expected = probe.bytes(probe.transform(page, 'encrypt', key, cipher('AES-GCM', bytes(12), aad=b'associated'), b'copied plaintext'), page)
         n.expect(probe.bytes(pending, page) == expected, 'cipher copies plaintext, IV and AAD before return')
         pending = probe.transform(page, 'encrypt', copied, parameters, b'retained')
@@ -397,8 +417,7 @@ def run(directory, bridge_library=None):
         probe.ok('operation_release', [Operation], abandoned)
         del probe.operations[abandoned.value]
         n.call('rv_run_loop_cycle', [I], 10)
-        n.expect(probe.call('operation_ready', [Operation, ctypes.POINTER(I)], abandoned, ctypes.byref(I())) == -10,
-                 'AES cancellation revokes queued completion')
+        n.expect(probe.call('operation_ready', [Operation, ctypes.POINTER(I)], abandoned, ctypes.byref(I())) == -10, 'AES cancellation revokes queued completion')
         pending = probe.transform(page, 'encrypt', key, parameters, b'owner teardown')
         page.close()
         page = None
@@ -406,16 +425,31 @@ def run(directory, bridge_library=None):
         n.expect(probe.error(pending) == 'AbortError', 'AES owner teardown aborts pending operation')
         page = Case(n, '<p>AES replacement owner</p>')
         encrypted = probe.bytes(probe.transform(page, 'encrypt', key, parameters, b'new context'), page)
-        n.expect(probe.bytes(probe.transform(page, 'decrypt', key, parameters, encrypted), page) == b'new context',
-                 'AES key survives document teardown and crosses service contexts')
+        n.expect(probe.bytes(probe.transform(page, 'decrypt', key, parameters, encrypted), page) == b'new context', 'AES key survives document teardown and crosses service contexts')
+    finally:
+        if page:
+            page.close()
+
+
+def run(directory, bridge_library=None):
+    n = Native(directory)
+    probe = AesProbe(n, ctypes.CDLL(bridge_library) if bridge_library else n.library)
+    page = Case(n, '<p>AES owner</p>')
+    try:
+        for group in [check_generation, check_vectors, check_jwk, check_cipher_validation, check_wrapping]:
+            with probe.check(group.__name__):
+                group(probe, page)
+        with probe.check('check_lifetime'):
+            check_lifetime(probe)
+        if probe.failures:
+            raise AssertionError(f'{len(probe.failures)} independent AES cases failed')
         return n.assertions
     except BaseException:
-        print(f'SUBTLE_CRYPTO_AES FAIL assertions={n.assertions}', flush=True)
+        print(f'SUBTLE_CRYPTO_AES FAIL assertions={n.assertions} cases={len(probe.failures)}', flush=True)
         raise
     finally:
         probe.close()
-        if page:
-            page.close()
+        page.close()
 
 
 if __name__ == '__main__':
