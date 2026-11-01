@@ -79,6 +79,30 @@ class ProbeRunnerTests(unittest.TestCase):
 
 
 class WorkflowTests(unittest.TestCase):
+    def test_common_contracts_run_on_slim_and_gpu_without_broadening_explicit_flavors(self):
+        common = probes.probe('common', 'python common.py')
+        slim = probes.probe('slim only', 'python slim.py', flavor='slim')
+        gpu = probes.probe('gpu only', 'python gpu.py', flavor='gpu')
+        every = probes.probe('every', 'python every.py', flavor=None)
+        for flavor in ['slim', 'gpu']:
+            self.assertTrue(probes.applies(common, 'linux-x64', flavor), flavor)
+            self.assertTrue(probes.applies(every, 'linux-x64', flavor), flavor)
+        self.assertFalse(probes.applies(common, 'linux-x64', 'lean'))
+        self.assertFalse(probes.applies(slim, 'linux-x64', 'gpu'))
+        self.assertFalse(probes.applies(gpu, 'linux-x64', 'slim'))
+        self.assertTrue(probes.applies(every, 'linux-x64', 'lean'))
+
+    def test_linux_gpu_runs_the_complete_reviewed_common_and_gpu_catalogue(self):
+        for rid in ['linux-x64', 'linux-arm64']:
+            selected = [entry for entry in probes.PROBES if probes.applies(entry, rid, 'gpu')]
+            commands = '\n'.join(command for entry in selected for command in entry['commands'])
+            for script in ['coordinate_spaces.py', 'web_animations.py', 'data_transfer.py',
+                           'linux_view_transition_pixels.py', 'compositor_reattach.py']:
+                self.assertIn(script, commands, rid)
+            for entry in selected:
+                if entry['rid'] is not None:
+                    self.assertEqual(entry['rid'], rid)
+
     def test_linux_gpu_selects_real_transition_snapshot_pixels_for_both_linux_rids(self):
         for rid in ['linux-x64', 'linux-arm64']:
             selected = [entry for entry in probes.PROBES if probes.applies(entry, rid, 'gpu')]
