@@ -23,6 +23,12 @@ hashes. The shared Chromium capture and each native capture contain lossless
 compressed RGBA bytes with per-image hashes. The verification command only reads
 these files.
 
+Raw artifact hashes preserve their original byte provenance, including line
+endings. Fixture verification uses the separate `canonical-json-v1` identity:
+UTF-8 JSON with sorted keys, no ASCII escaping, and comma/colon separators without
+extra whitespace. This identity is portable across LF and CRLF checkouts while
+still rejecting changed JSON content. Per-image RGBA hashes remain byte-exact.
+
 To propose a replacement baseline, use the profile's `regenerationCommand` with
 the exact candidate stage and source commit, writing a **new** capture file. Run
 the full paint capture and native catalogue, retain the old/new pointwise report

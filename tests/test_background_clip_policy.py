@@ -1,9 +1,12 @@
 from pathlib import Path
+import json
+import subprocess
 import sys
+import tempfile
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / 'abi'))
-from background_content_clip_regression import pixel_policy, solid_red, unique_entries
+from background_content_clip_regression import BASELINES, load_inputs, pixel_policy, solid_red, unique_entries
 
 
 class PaintPolicyTests(unittest.TestCase):
@@ -38,6 +41,32 @@ class PaintPolicyTests(unittest.TestCase):
         self.assertEqual(set(unique_entries(valid,expected)), expected)
         with self.assertRaises(AssertionError):
             unique_entries(valid[:-1] + [valid[0]],expected)
+
+    def test_actual_git_blob_fixtures_load_with_lf_or_crlf_but_reject_changed_content(self):
+        repo = Path(__file__).resolve().parents[1]
+        names = ['background-content-clip-cases.json','background-content-clip-oracle.json',
+                 'background-content-clip-baselines/chromium-rgba.json']
+        blobs = {name:subprocess.check_output(['git','-C',str(repo),'show','HEAD:tests/fixtures/'+name])
+                 for name in names}
+        self.assertTrue(all(b'\r\n' not in blob for blob in blobs.values()))
+        with tempfile.TemporaryDirectory() as directory:
+            fixtures = Path(directory)
+            baselines = fixtures/'background-content-clip-baselines'
+            baselines.mkdir()
+            profile = BASELINES/'linux-x64-gpu.json'
+            (baselines/profile.name).write_bytes(profile.read_bytes())
+            for ending in [b'\n',b'\r\n']:
+                for name,blob in blobs.items():
+                    (fixtures/name).write_bytes(blob.replace(b'\n',ending))
+                _,_,expected,before,targets = load_inputs('linux-x64',fixtures,baselines)
+                self.assertEqual(len(expected),54)
+                self.assertEqual(set(before),set(targets))
+            chrome = baselines/'chromium-rgba.json'
+            value = json.loads(chrome.read_text())
+            value['results'][0]['rgbaSha256'] = '0'*64
+            chrome.write_text(json.dumps(value))
+            with self.assertRaisesRegex(AssertionError,'Fixture JSON identity mismatch: chrome'):
+                load_inputs('linux-x64',fixtures,baselines)
 
 
 if __name__ == '__main__':

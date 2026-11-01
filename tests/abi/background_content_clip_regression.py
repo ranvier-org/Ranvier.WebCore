@@ -56,6 +56,32 @@ def pixel_policy(before, after, chrome):
                 improvedPixels=improved, totalL1ErrorDelta=delta)
 
 
+def json_identity(value):
+    canonical = json.dumps(value,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode('utf-8')
+    return hashlib.sha256(canonical).hexdigest()
+
+
+def load_inputs(rid, fixtures=None, baselines=None):
+    fixtures = fixtures if fixtures is not None else FIXTURES
+    baselines = baselines if baselines is not None else BASELINES
+    profile = json.loads((baselines / (rid + '-gpu.json')).read_text(encoding='utf-8'))
+    assert profile['rid'] == rid and profile['flavor'] == 'gpu'
+    identity = profile['fixtureIdentity']
+    assert identity['format'] == 'canonical-json-v1'
+    inputs = {}
+    for name,path in [('cases',fixtures / 'background-content-clip-cases.json'),
+                      ('oracle',fixtures / 'background-content-clip-oracle.json'),
+                      ('chrome',baselines / 'chromium-rgba.json')]:
+        value = json.loads(path.read_text(encoding='utf-8'))
+        assert json_identity(value) == identity['sha256'][name], 'Fixture JSON identity mismatch: ' + name
+        inputs[name] = value
+    cases = inputs['cases']
+    expected = {(test['name'],scale) for scale in cases['scales'] for test in cases['cases']}
+    before = unique_entries(profile['results'],expected)
+    targets = unique_entries(inputs['chrome']['results'],expected)
+    return profile,cases,expected,before,targets
+
+
 def verify(directory, rid):
     assert rid in PROFILES and sys.platform == PROFILES[rid], 'Unproven native platform/RID'
     assert platform.machine().lower() in ['amd64', 'x86_64'], 'No ARM baseline has been qualified'
@@ -64,18 +90,7 @@ def verify(directory, rid):
     native = Native(directory)
     assert native.bind('rv_abi_version', I, [])() == 60
     assert native.call('rv_abi_has', [ctypes.c_char_p], b'compositing') == 1, 'Only the GPU profile is qualified'
-    profile = json.loads((BASELINES / (rid + '-gpu.json')).read_text())
-    assert profile['rid'] == rid and profile['flavor'] == 'gpu'
-    cases_path = FIXTURES / 'background-content-clip-cases.json'
-    oracle_path = FIXTURES / 'background-content-clip-oracle.json'
-    assert hashlib.sha256(cases_path.read_bytes()).hexdigest() == profile['casesSha256']
-    assert hashlib.sha256(oracle_path.read_bytes()).hexdigest() == profile['oracleSha256']
-    chrome_path = BASELINES / 'chromium-rgba.json'
-    assert hashlib.sha256(chrome_path.read_bytes()).hexdigest() == profile['chromeCaptureSha256']
-    cases = json.loads(cases_path.read_text())
-    expected = {(test['name'],scale) for scale in cases['scales'] for test in cases['cases']}
-    before = unique_entries(profile['results'], expected)
-    targets = unique_entries(json.loads(chrome_path.read_text())['results'], expected)
+    profile,cases,expected,before,targets = load_inputs(rid)
     results, seen = [], set()
     with contextlib.closing(capture_samples(directory,cases)) as samples:
         for name,scale,width,height,raw in samples:
