@@ -370,6 +370,15 @@
 #include "WheelEvent.h"
 #include "svg/properties/SVGAnimatedPropertyImpl.h"
 #include "wtf/KeyValuePair.h"
+#if (defined(ENABLE_OFFSCREEN_CANVAS) && ENABLE_OFFSCREEN_CANVAS)
+#include "OffscreenCanvas.h"
+#endif
+#if (defined(ENABLE_VIDEO) && ENABLE_VIDEO)
+#include "HTMLVideoElement.h"
+#endif
+#if (defined(ENABLE_WEB_CODECS) && ENABLE_WEB_CODECS)
+#include "WebCodecsVideoFrame.h"
+#endif
 #include "JSAnimationFrameRatePreset.h"
 #include "JSWebAnimation.h"
 #include "JSWebAnimation.h"

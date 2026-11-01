@@ -836,6 +836,44 @@ interface Surface {
         plain = self.draw_generator().glue()
         self.assertIn('impl->draw(std::move(*a0), x)', plain)
 
+    def test_union_arms_of_a_build_condition_get_guarded_includes(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface Gradient {};
+interface Pattern {};
+typedef (Gradient
+#if defined(ENABLE_PATTERNS) && ENABLE_PATTERNS
+    or Pattern
+#endif
+#if defined(ENABLE_VIDEO) && ENABLE_VIDEO
+    or HTMLVideoElement
+#else
+    or Gradient
+#endif
+) PaintSource;
+#if defined(ENABLE_OTHER)
+typedef (Gradient or Pattern) OtherSource;
+#endif
+interface Surface {
+    undefined draw(PaintSource source, unrestricted double x);
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['Surface', 'Gradient', 'Pattern']
+        config['unionArgumentConversions'] = ['PaintSource']
+        world = domgen.World(self.source, config)
+        self.assertEqual({('(defined(ENABLE_PATTERNS) && ENABLE_PATTERNS)', 'Pattern'), ('(defined(ENABLE_VIDEO) && ENABLE_VIDEO)', 'HTMLVideoElement')},
+                         world.conditional_arms['PaintSource'])
+        self.assertNotIn('OtherSource', world.conditional_arms)
+        generator = domgen.Generator(world)
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        glue = generator.glue()
+        self.assertIn('#if (defined(ENABLE_VIDEO) && ENABLE_VIDEO)\n#include "HTMLVideoElement.h"\n#endif', glue)
+        # Pattern.h is already included for the selected interface.
+        self.assertNotIn('#if (defined(ENABLE_PATTERNS) && ENABLE_PATTERNS)', glue)
+
     def test_opaque_union_arm_returns_a_tag_with_a_null_payload_and_no_decoder(self):
         generator = self.form_data_generator()
         names = {function.name for function in generator.functions}

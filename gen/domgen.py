@@ -233,6 +233,9 @@ class World:
         self.typedefs = {}  # name -> the last definition read; typedef() selects the definition a reference resolves to
         self.file_typedefs = {}  # (file, name) -> the definition in that file
         self.typedef_files = {}  # name -> [file], each file that defines the typedef
+        # Union typedef name -> {(condition, arm)}: the arms inside #if branches, which the parser drops and an engine
+        # build that enables the condition holds in its Variant.
+        self.conditional_arms = {}
         self.enums = {}  # name -> (values, attrs, file)
         self.dictionaries = {}  # name -> idl.Dictionary, with its partials' members
         self.callbacks = set()
@@ -247,7 +250,10 @@ class World:
             relative = path.relative_to(self.webcore).as_posix()
             if relative.startswith("bindings/scripts/test/"):
                 continue
-            document = idl.parse(path.read_text(encoding="utf-8"), relative)
+            text = path.read_text(encoding="utf-8")
+            document = idl.parse(text, relative)
+            for name, arms in idl.conditional_union_arms(text).items():
+                self.conditional_arms.setdefault(name, set()).update(arms)
             for namespace in document.namespaces:
                 if namespace.partial:
                     if not self.skipped(relative):
@@ -2643,6 +2649,33 @@ class Generator(ComplexGeneratorMixin):
             lines.append(f"int32_t rv_dom_{function.name}({params_text(function.params)}) {{ return ranvier_dom_{function.name}({args}); }}")
         return "\n".join(lines) + "\n"
 
+    def conditional_arm_includes(self, headers):
+        """Guarded includes of the arm types that a union typedef of a generated function's arguments or result holds
+        only in a build that enables a condition: the engine's Variant of the typedef needs those types complete."""
+        def names(t):
+            if t is not None:
+                yield t.name
+                for subtype in t.subtypes:
+                    yield from names(subtype)
+        used = set()
+        for function in self.functions:
+            member = function.member
+            if member is not None:
+                used.update(names(member.type))
+                for argument in member.arguments:
+                    used.update(names(argument.type))
+        guarded = {}
+        for name in sorted(used & set(self.world.conditional_arms)):
+            for condition, arm in self.world.conditional_arms[name]:
+                cls = self.world.cpp_class(arm) if arm in self.world.interfaces else arm
+                header = self.interface_headers.get(f'{cls}.h', f'{cls}.h')
+                if header not in headers:
+                    guarded.setdefault(condition, set()).add(header)
+        lines = []
+        for condition, group in sorted(guarded.items()):
+            lines += [f'#if {condition}'] + [f'#include "{header}"' for header in sorted(group)] + ['#endif']
+        return lines
+
     def glue(self):
         lines = [
             "// The glue of the generated DOM functions, compiled into WebCore by patch 0012 (config/common.cmake names this",
@@ -2652,7 +2685,9 @@ class Generator(ComplexGeneratorMixin):
             '#include "RanvierDomGlue.h"',
             "",
         ]
-        lines += [f'#include "{h}"' for h in sorted({self.interface_headers.get(header, header) for header in self.headers})]
+        headers = {self.interface_headers.get(header, header) for header in self.headers}
+        lines += [f'#include "{h}"' for h in sorted(headers)]
+        lines += self.conditional_arm_includes(headers)
         for enum, (_, _, file) in sorted(self.enums_used.items()):
             lines.append(f'#include "JS{pathlib.PurePosixPath(file).stem}.h"')
         lines += ["", RUNTIME, ""]

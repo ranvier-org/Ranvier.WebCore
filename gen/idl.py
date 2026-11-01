@@ -140,6 +140,47 @@ def preprocess(text: str) -> str:
     return "\n".join(out)
 
 
+def conditional_union_arms(text: str) -> dict:
+    """The union typedef arms inside the #if branches preprocess drops: typedef name -> [(condition, arm)], where
+    condition joins the enclosing #if conditions with &&. The engine's Variant of such a typedef holds these arms in
+    a build that enables the condition."""
+    arms, stack, typedef, depth, outer = {}, [], None, 0, 0
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("#if"):
+            stack.append([stripped[3:].strip(), False])
+            continue
+        if stripped.startswith("#else"):
+            stack[-1][1] = True
+            continue
+        if stripped.startswith("#endif"):
+            stack.pop()
+            continue
+        code = re.sub(r"//.*", "", line)
+        if typedef is None:
+            found = re.search(r"\btypedef\s*\(", code)
+            if not found:
+                continue
+            if not all(alternate for _, alternate in stack):
+                continue  # the parser drops this typedef
+            typedef, depth, outer, code = [], 0, len(stack), code[found.end() - 1:]
+        dropped = [condition for condition, alternate in stack[outer:] if not alternate]
+        for character in code:
+            depth += {"(": 1, ")": -1}.get(character, 0)
+        typedef.append((code, " && ".join(f"({c})" for c in dropped) if dropped else None))
+        if depth == 0 and ";" in code:
+            body = " ".join(part for part, _ in typedef)
+            name = re.search(r"\)\s*([_A-Za-z]\w*)\s*;", body)
+            if name:
+                for part, condition in typedef:
+                    if condition:
+                        for arm in re.findall(r"[_A-Za-z]\w*", part):
+                            if arm != "or":
+                                arms.setdefault(name.group(1), []).append((condition, arm))
+            typedef = None
+    return arms
+
+
 class Parser:
     def __init__(self, text: str, file: str):
         self.file = file
