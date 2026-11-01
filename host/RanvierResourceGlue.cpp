@@ -43,6 +43,16 @@
 #include "ThreadableBlobRegistry.h"
 #include "WebAnimation.h"
 #include "WebAnimationPromiseObserver.h"
+
+#if ENABLE(VIDEO)
+#include "HTMLVideoElement.h"
+#endif
+#if ENABLE(OFFSCREEN_CANVAS)
+#include "OffscreenCanvas.h"
+#endif
+#if ENABLE(WEB_CODECS)
+#include "WebCodecsVideoFrame.h"
+#endif
 #include "SVGElementTypeHelpers.h"
 #include "dom/RanvierDomGlue.h"
 #include <JavaScriptCore/ArrayBuffer.h>
