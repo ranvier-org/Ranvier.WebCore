@@ -115,7 +115,7 @@ def normalise(args):
             raw_hash = raw_sha256(full)
             previous = old.get(path)
             if (args.command == 'normalise' and previous is not None
-                    and isinstance(previous, list) and previous and previous[0] == oid
+                    and isinstance(previous, list) and len(previous) >= 2
                     and (len(previous) < 3 or previous[2] != raw_hash)):
                 try:
                     previous_seconds = int(previous[1])

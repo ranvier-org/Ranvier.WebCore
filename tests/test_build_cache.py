@@ -135,6 +135,38 @@ class BuildCacheTests(unittest.TestCase):
         self.assertEqual(int(self.prefix.stat().st_mtime), OLD_TIME)
         self.assertEqual(self.manifest()['format'], 2)
 
+    def test_changed_git_blob_with_equal_raw_length_and_cached_timestamp_fails_closed(self):
+        self.assertEqual(self.run_cache('record').returncode, 0)
+        old_blob = git(self.source, 'rev-parse', 'HEAD:JavaScriptCorePrefix.h')
+        manifest_before = (self.build / 'ranvier-sources.json').read_bytes()
+        sentinel = self.build / 'stale-object.obj'
+        sentinel.write_bytes(b'stale object')
+        self.set_mtime(self.early, FRESH_TIME)
+        changed = self.canonical.replace(b'CACHE_TEST 1', b'CACHE_TEST 2')
+        self.assertEqual(len(changed), len(self.canonical))
+        self.prefix.write_bytes(changed)
+        changed_blob = subprocess.run(
+            ['git', '-C', str(self.source), 'hash-object', '--path=JavaScriptCorePrefix.h', '--stdin'],
+            input=changed,
+            capture_output=True,
+            check=True,
+        ).stdout.decode().strip()
+        self.assertNotEqual(changed_blob, old_blob)
+        self.set_mtime(self.prefix, OLD_TIME)
+
+        refused = self.run_cache('normalise')
+        self.assertNotEqual(refused.returncode, 0)
+        self.assertIn('refusing cached PCH reuse', refused.stderr)
+        self.assertEqual((self.build / 'ranvier-sources.json').read_bytes(), manifest_before)
+        self.assertTrue(sentinel.exists())
+        self.assertEqual(int(self.early.stat().st_mtime), FRESH_TIME)
+
+        cleared = self.run_cache('normalise', clear_unknown=True)
+        self.assertEqual(cleared.returncode, 0, cleared.stderr)
+        self.assertFalse(sentinel.exists())
+        self.assertFalse((self.build / 'build.ninja').exists())
+        self.assertEqual(self.manifest()['format'], 2)
+
     def test_ci_normalise_caller_explicitly_allows_legacy_cache_migration(self):
         workflow = (ROOT / '.github' / 'workflows' / 'build.yml').read_text(encoding='utf-8')
         command = next(line for line in workflow.splitlines() if 'scripts/build_cache.py normalise' in line)
