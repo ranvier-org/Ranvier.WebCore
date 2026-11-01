@@ -41,6 +41,9 @@ jobs:
       - run: python -I tests/test_probes.py
       - run: python -I tests/test_sdl_runtime.py
       - run: python -I tests/test_package_gpu.py
+      - run: python -I tests/test_sccache_cache_policy.py
+      - run: python -I tests/test_build_sccache_launcher.py
+      - run: python -I tests/test_sccache_workflow.py
       - run: python -I tests/test_host_prepare.py
       - run: python -I tests/generator/test_domgen.py
       - run: python -I scripts/capability_catalogue.py --check
@@ -208,6 +211,9 @@ jobs:
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 360
+    concurrency:
+      group: ${{ github.ref == 'refs/heads/main' && matrix.rid == 'win-x64' && 'build-sccache-main-writer' || format('native-{0}-{1}', github.run_id, matrix.rid) }}
+      cancel-in-progress: false
     permissions:
       contents: read
       # Deleting the build tree a run has superseded (docs/CI.md, "Build tree").
@@ -230,6 +236,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.14'
+
+      - name: Verify optional sccache fallback
+        if: runner.os == 'Windows' && matrix.rid == 'win-x64'
+        run: python -I tests/test_sccache_powershell.py
+
+      - name: Verify sccache launcher cache fallback
+        if: runner.os == 'Windows' && matrix.rid == 'win-x64'
+        run: python -I tests/test_build_sccache_launcher.py
 
       # The F# ABI tests of the smoke step target .NET 10.
       - uses: actions/setup-dotnet@v4
@@ -345,6 +359,50 @@ jobs:
           path: C:\rw\tools\llvm
           key: ${{ steps.keys.outputs.llvm }}
 
+      - name: Install and configure sccache
+        id: sccache-install
+        if: runner.os == 'Windows' && matrix.rid == 'win-x64'
+        shell: pwsh
+        run: |
+          $installed = $false
+          try {
+            python -I scripts/sccache_cache_policy.py install --out C:\rw\tools\sccache
+            if ($LASTEXITCODE -eq 0) {
+              & C:\rw\tools\sccache\sccache.exe --version
+              $installed = $LASTEXITCODE -eq 0
+            }
+          } catch {
+            Write-Warning 'Pinned sccache installation failed; continuing with the direct compiler.'
+          }
+          if ($installed) {
+            New-Item -ItemType Directory -Force C:\rw\sccache-cache | Out-Null
+            Add-Content $env:GITHUB_PATH 'C:\rw\tools\sccache'
+            Add-Content $env:GITHUB_ENV 'RANVIER_SCCACHE=C:\rw\tools\sccache\sccache.exe'
+            Add-Content $env:GITHUB_ENV 'SCCACHE_DIR=C:\rw\sccache-cache'
+            Add-Content $env:GITHUB_ENV 'SCCACHE_CACHE_SIZE=192M'
+            Add-Content $env:GITHUB_OUTPUT 'available=true'
+          } else {
+            Write-Warning 'Pinned sccache could not be installed; continuing with the direct compiler.'
+            Add-Content $env:GITHUB_OUTPUT 'available=false'
+            $global:LASTEXITCODE = 0
+          }
+
+      - name: Set sccache weekly key
+        id: sccache-key
+        if: steps.sccache-install.outputs.available == 'true'
+        shell: pwsh
+        run: python -I scripts/sccache_cache_policy.py key
+
+      - name: Restore sccache cache
+        id: sccache-cache
+        if: steps.sccache-install.outputs.available == 'true'
+        continue-on-error: true
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\rw\sccache-cache
+          key: ${{ steps.sccache-key.outputs.key }}
+          restore-keys: sccache-win-x64-release-clang23-v1-
+
       - name: Apply patches and install the host
         run: python scripts/build.py prepare --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
 
@@ -408,8 +466,86 @@ jobs:
         continue-on-error: true
         run: python -I scripts/build_cache.py explain --build "${{ env.BUILD_DIR }}"
 
+      - name: Read sccache budget before build
+        id: sccache-preflight
+        if: steps.sccache-install.outputs.available == 'true'
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SCCACHE_USAGE_URL: ${{ github.api_url }}/repos/${{ github.repository }}/actions/cache/usage
+        run: python -I scripts/sccache_cache_policy.py preflight
+
+      - name: sccache stats before build
+        if: steps.sccache-install.outputs.available == 'true'
+        continue-on-error: true
+        shell: pwsh
+        run: sccache --show-stats
+
       - name: Build
         run: python scripts/build.py build --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
+
+      - name: sccache stats after build
+        if: steps.sccache-install.outputs.available == 'true'
+        continue-on-error: true
+        shell: pwsh
+        run: sccache --show-stats
+
+      # Prune only the old main-ref entries under this cache family, after a successful compile and a passing
+      # preflight. Never delete this week's immutable key. If deletion fails the save gate remains closed.
+      - name: Prune old sccache entries
+        id: sccache-cleanup
+        if: >-
+          steps.sccache-install.outputs.available == 'true' &&
+          github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+          steps.sccache-preflight.outputs.usage_available == 'true' &&
+          steps.sccache-cache.outputs.cache-hit != 'true'
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          python -I scripts/sccache_cache_policy.py cleanup
+          --current-key "${{ steps.sccache-key.outputs.key }}"
+
+      - name: Check sccache save budget
+        id: sccache-gate
+        if: steps.sccache-install.outputs.available == 'true'
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SCCACHE_USAGE_URL: ${{ github.api_url }}/repos/${{ github.repository }}/actions/cache/usage
+          SCCACHE_CACHE_HIT: ${{ steps.sccache-cache.outputs.cache-hit }}
+          SCCACHE_PREFLIGHT_USAGE: ${{ steps.sccache-preflight.outputs.usage_bytes }}
+          SCCACHE_CLEANUP_OK: ${{ steps.sccache-cleanup.outputs.previous_prefix_pruned }}
+        run: |
+          $policyArgs = @(
+            'gate', '--cache-dir', 'C:\rw\sccache-cache', '--usage-url', $env:SCCACHE_USAGE_URL,
+            '--token', $env:GITHUB_TOKEN, '--cohort', 'windows-x64-release',
+            '--preflight-usage', $env:SCCACHE_PREFLIGHT_USAGE,
+            '--event-name', $env:GITHUB_EVENT_NAME, '--ref', $env:GITHUB_REF,
+            '--compile-succeeded'
+          )
+          if ($env:SCCACHE_CACHE_HIT -eq 'true') { $policyArgs += '--weekly-key-exists' }
+          if ($env:SCCACHE_CLEANUP_OK -eq 'true') { $policyArgs += '--previous-prefix-pruned' }
+          python -I scripts/sccache_cache_policy.py @policyArgs
+
+      - name: Save sccache cache
+        id: sccache-save
+        if: steps.sccache-gate.outputs.save == 'true'
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: C:\rw\sccache-cache
+          key: ${{ steps.sccache-key.outputs.key }}
+
+      - name: Verify saved sccache archive size
+        id: sccache-verify
+        if: steps.sccache-save.outcome == 'success'
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          python -I scripts/sccache_cache_policy.py verify
+          --current-key "${{ steps.sccache-key.outputs.key }}"
 
       # Right after the build, so that a later failure keeps it. An exact hit has nothing new to save.
       - name: Save the build tree
@@ -558,7 +694,7 @@ jobs:
   windows-gpu-cohort:
     needs: publish
     if: >-
-      ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') &&
+      ${{ !cancelled() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') &&
           needs.publish.result == 'success' }}
     runs-on: ubuntu-latest
     permissions:

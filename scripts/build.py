@@ -85,6 +85,14 @@ def retried(action, what, attempts=4):
             time.sleep(pause)
 
 
+def compiler_launcher_arguments(rid, executable):
+    """Set or clear the Windows x64 compiler launcher, including a restored CMake cache."""
+    if rid != 'win-x64':
+        return []
+    launcher = pathlib.Path(executable).as_posix() if executable else ''
+    return [f'-DCMAKE_C_COMPILER_LAUNCHER={launcher}', f'-DCMAKE_CXX_COMPILER_LAUNCHER={launcher}']
+
+
 def sha256(path):
     digest = hashlib.sha256()
     with open(path, 'rb') as stream:
@@ -132,6 +140,12 @@ def clone(repository, commit, target, exclude=()):
     git('checkout', '-q', '--detach', commit, cwd=target)
 
 
+def sccache_environment(environment):
+    """Carry only the explicit sccache settings into Windows' fresh vcvars environment."""
+    names = ('RANVIER_SCCACHE', 'SCCACHE_DIR', 'SCCACHE_CACHE_SIZE')
+    return {name: environment[name] for name in names if name in environment}
+
+
 def toolchain_env():
     """On Windows, the vcvars environment of the target architecture with LLVM and --tool-path first on PATH;
     elsewhere this process's environment with --tool-path first, and clang unless CC and CXX say otherwise."""
@@ -156,6 +170,7 @@ def toolchain_env():
     env['VCPKG_ROOT'] = str(vcpkg)
     env['VCPKG_DISABLE_METRICS'] = '1'
     env['DOTNET_CLI_TELEMETRY_OPTOUT'] = '1'
+    env.update(sccache_environment(os.environ))
     print('MSVC', env.get('VCToolsVersion', '?'), '- tested:', pins['msvc']['tested'], flush=True)
     return env
 
@@ -249,6 +264,7 @@ def configure(env):
         command += [f'-DCMAKE_C_COMPILER={clang}', f'-DCMAKE_CXX_COMPILER={clang}',
                     f'-DCMAKE_TOOLCHAIN_FILE={(vcpkg / "scripts/buildsystems/vcpkg.cmake").as_posix()}',
                     f'-DVCPKG_INSTALLED_DIR={installed.as_posix()}']
+        command += compiler_launcher_arguments(args.rid, env.get('RANVIER_SCCACHE'))
     if windows and arch == 'arm64':
         # The ICU port of WebKit's registry bases its DLLs below 4 GB (-base:0x4a800000 and up), which link.exe
         # rejects for ARM64 (LNK1355). link.exe appends _LINK_ after the command line, so this base wins, and

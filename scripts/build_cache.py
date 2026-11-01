@@ -8,10 +8,11 @@
 #
 # A restored build tree holds the objects of an earlier build, but checkout and the WebKit fetch give every
 # source file a fresh modification time, which ninja reads as a change to all of them. The tree carries a
-# manifest of the sources it was built from: for each file, its git blob id and its modification time.
-# normalise sets every file whose blob id matches the manifest back to the recorded time, leaves changed and
+# manifest of the sources it was built from: for each file, its git blob id, raw-byte SHA-256 and modification time.
+# normalise sets every file whose blob id and raw-byte hash match the manifest back to the recorded time, leaves changed and
 # new files at their checkout time, then writes the manifest of the current sources for the next save. Blob ids
-# come from git's index, which the checkout has just written, so only the files git reports as changed are read.
+# come from git's index, which the checkout has just written, so only files Git reports as changed need a Git hash;
+# raw-byte hashes are still computed for each regular tracked source before a timestamp is reused.
 # Restoring the recorded time rather than an arbitrary old one also keeps clang's precompiled headers valid:
 # a PCH records each input's modification time and is rejected when one differs.
 #
@@ -21,7 +22,116 @@ import argparse, hashlib, json, os, pathlib, re, stat, subprocess, sys, time
 
 root = pathlib.Path(__file__).resolve().parents[1]
 MANIFEST = 'ranvier-sources.json'
-FORMAT = 1
+FORMAT = 2
+
+
+def raw_sha256(path):
+    """Hash the bytes the compiler reads, without loading large source files into memory."""
+    digest = hashlib.sha256()
+    with open(path, 'rb') as source:
+        while block := source.read(1024 * 1024):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+class UnsafeBuildTreeReparsePath(RuntimeError):
+    pass
+
+
+def resolved_path_key(path):
+    return os.path.normcase(os.path.normpath(os.path.realpath(os.path.abspath(str(path)))))
+
+
+def path_is_within(path, root):
+    try:
+        return os.path.commonpath((path, root)) == root
+    except ValueError:
+        return False
+
+
+def source_directory_keys(source_files, source_roots):
+    directories = set(source_roots)
+    for source in source_files:
+        for root in source_roots:
+            if not path_is_within(source, root):
+                continue
+            parent = os.path.dirname(source)
+            while path_is_within(parent, root):
+                directories.add(parent)
+                if parent == root:
+                    break
+                parent = os.path.dirname(parent)
+            break
+    return directories
+
+
+def is_reparse_path(info, reparse_flag):
+    return stat.S_ISLNK(info.st_mode) or bool(getattr(info, 'st_file_attributes', 0) & reparse_flag)
+
+
+def newest_cached_output_mtime_ns(build, source_files, source_roots):
+    """Newest reusable file timestamp, excluding metadata and known source aliases."""
+    metadata = {MANIFEST, 'build.ninja', '.ninja_log', '.ninja_deps', 'CMakeCache.txt', 'compile_commands.json'}
+    newest = None
+    if not build.exists():
+        return newest
+    reparse_flag = getattr(stat, 'FILE_ATTRIBUTE_REPARSE_POINT', 0x400)
+    source_directories = source_directory_keys(source_files, source_roots)
+    build_key = resolved_path_key(build)
+    internal_directory_links = set()
+    scanned_directories = set()
+    for directory, directories, names in os.walk(build):
+        scanned_directories.add(resolved_path_key(directory))
+        for name in tuple(directories):
+            path = pathlib.Path(directory) / name
+            try:
+                info = os.lstat(long_path(path))
+            except OSError as error:
+                raise UnsafeBuildTreeReparsePath(f'cannot inspect directory path {path}: {error}') from error
+            if not is_reparse_path(info, reparse_flag):
+                continue
+            directories.remove(name)
+            try:
+                target_key = resolved_path_key(path)
+                target_info = os.stat(long_path(path))
+            except (OSError, RuntimeError) as error:
+                raise UnsafeBuildTreeReparsePath(f'cannot resolve directory reparse path {path}: {error}') from error
+            if target_key in source_directories:
+                continue
+            if not stat.S_ISDIR(target_info.st_mode):
+                raise UnsafeBuildTreeReparsePath(f'directory reparse path does not resolve to a directory: {path}')
+            if path_is_within(target_key, build_key):
+                internal_directory_links.add(target_key)
+                continue
+            raise UnsafeBuildTreeReparsePath(f'unclassified external directory reparse path {path}')
+        for name in names:
+            if name in metadata or name == 'CMakeConfigureLog.yaml':
+                continue
+            path = pathlib.Path(directory) / name
+            try:
+                info = os.lstat(long_path(path))
+            except OSError as error:
+                raise UnsafeBuildTreeReparsePath(f'cannot inspect build output path {path}: {error}') from error
+            if is_reparse_path(info, reparse_flag):
+                try:
+                    target_key = resolved_path_key(path)
+                    target_info = os.stat(long_path(path))
+                except (OSError, RuntimeError) as error:
+                    raise UnsafeBuildTreeReparsePath(f'cannot resolve file reparse path {path}: {error}') from error
+                if target_key in source_files:
+                    continue
+                if not stat.S_ISREG(target_info.st_mode):
+                    raise UnsafeBuildTreeReparsePath(f'file reparse path does not resolve to a regular file: {path}')
+                newest = max(newest or 0, info.st_mtime_ns, target_info.st_mtime_ns)
+                continue
+            if stat.S_ISREG(info.st_mode) and (newest is None or info.st_mtime_ns > newest):
+                newest = info.st_mtime_ns
+    unscanned_internal_links = internal_directory_links - scanned_directories
+    if unscanned_internal_links:
+        raise UnsafeBuildTreeReparsePath(
+            f'internal artifact directory reparse path was not covered by regular build traversal: '
+            f'{sorted(unscanned_internal_links)[0]}')
+    return newest
 
 
 def long_path(path):
@@ -85,12 +195,14 @@ def normalise(args):
             sys.exit(f'build_cache: {build} has no {MANIFEST}; build_cache.py record writes one for a tree built from these sources')
         print('build_cache: the build tree has no source manifest, so it is cleared', flush=True)
         clear(build)
-    written = {'format': FORMAT, 'trees': {}}
+    # Hash and inspect the full input set before mutating any source times. A same-timestamp raw-byte change must
+    # refuse atomically; otherwise earlier unchanged files could already have been normalized before the refusal.
+    scanned = {}
+    unsafe_raw_changes = []
     for name, tree in trees.items():
         ids, hashed = blob_ids(tree)
         old = (cached or {}).get('trees', {}).get(name, {})
-        entries = {}
-        kept = changed = added = 0
+        files = {}
         for path, oid in ids.items():
             full = long_path(tree / path)
             try:
@@ -100,17 +212,68 @@ def normalise(args):
             if not stat.S_ISREG(info.st_mode):
                 continue
             seconds = int(info.st_mtime)
+            raw_hash = raw_sha256(full)
+            previous = old.get(path)
+            if (args.command == 'normalise' and previous is not None
+                    and isinstance(previous, list) and len(previous) >= 2
+                    and (len(previous) < 3 or previous[2] != raw_hash)):
+                try:
+                    previous_seconds = int(previous[1])
+                except (IndexError, TypeError, ValueError):
+                    previous_seconds = 'unknown'
+                unsafe_raw_changes.append((name, path, previous_seconds, seconds, info.st_mtime_ns))
+            files[path] = (oid, info, seconds, raw_hash)
+        scanned[name] = (tree, ids, hashed, old, files)
+    if unsafe_raw_changes:
+        source_files = set()
+        source_roots = set()
+        for tree, _, _, _, files in scanned.values():
+            root_key = resolved_path_key(tree)
+            source_roots.add(root_key)
+            source_files.update(os.path.normcase(os.path.normpath(os.path.join(root_key, *path.split('/'))))
+                                for path in files)
+        try:
+            newest_output_ns = newest_cached_output_mtime_ns(build, source_files, source_roots)
+            unsafe_path_reason = None
+        except UnsafeBuildTreeReparsePath as error:
+            newest_output_ns = None
+            unsafe_path_reason = f'build_cache: unsafe build-tree link: {error}; refusing cached PCH reuse'
+        unsafe_change = next((change for change in unsafe_raw_changes
+                              if newest_output_ns is not None and change[4] <= newest_output_ns), None)
+        if unsafe_path_reason:
+            reason = unsafe_path_reason
+        elif unsafe_change is not None:
+            name, path, cached_seconds, current_seconds, _ = unsafe_change
+            reason = (f'build_cache: raw bytes changed but the source timestamp is not newer than cached output '
+                      f'{name}/{path} (cached-source={cached_seconds}, current={current_seconds}, '
+                      f'newest-output-ns={newest_output_ns}); refusing cached PCH reuse')
+        else:
+            reason = None
+        if reason is not None:
+            if not args.clear_unknown:
+                sys.exit(reason + '; rerun with --clear-unknown to discard the build tree explicitly')
+            print(reason + '; --clear-unknown was given, so the build tree is cleared', flush=True)
+            if build.exists():
+                clear(build)
+            cached = None
+    written = {'format': FORMAT, 'trees': {}}
+    for name, (tree, ids, hashed, old, files) in scanned.items():
+        old = (cached or {}).get('trees', {}).get(name, {})
+        entries = {}
+        kept = changed = added = 0
+        for path, (oid, info, seconds, raw_hash) in files.items():
+            full = long_path(tree / path)
             previous = old.get(path)
             if previous is None:
                 added += 1
-            elif previous[0] != oid:
+            elif previous[0] != oid or len(previous) < 3 or previous[2] != raw_hash:
                 changed += 1
             else:
                 kept += 1
                 if previous[1] != seconds:
                     os.utime(full, ns=(previous[1] * 10**9, previous[1] * 10**9))
                     seconds = previous[1]
-            entries[path] = [oid, seconds]
+            entries[path] = [oid, seconds, raw_hash]
         # A directory is an input of some edges (WebKit's header links name source directories), and checkout gives
         # it a fresh time too. One whose listing of tracked entries is unchanged gets its recorded time back.
         listings = {}
@@ -265,7 +428,9 @@ def keys(args):
     core = files_digest('patches', 'config', 'scripts/build.py', 'scripts/patches.py')
     host = files_digest('host')
     base = f'tree-{rid}-{flavor}-{webkit[:12]}-{tool}-'
-    lines['tree'] = f'{base}{core}-{host}'
+    # A restored cache with an older source-manifest format is cleared by normalise. Give the
+    # migrated tree a new primary key so Actions can save it after the legacy prefix restore.
+    lines['tree'] = f'{base}{core}-{host}-manifest-v{FORMAT}'
     lines['tree-restore'] = f'{base}{core}-\n{base}'
     lines['toolchain'] = json.dumps(tools)
     text = ''.join(f'{name}<<EOF\n{value}\nEOF\n' if '\n' in value else f'{name}={value}\n' for name, value in lines.items())
@@ -294,7 +459,7 @@ for command in ['normalise', 'record']:
     n.add_argument('--build', required=True, help='the build directory, which holds the manifest')
     n.add_argument('--source', required=True, help='the WebKit checkout')
     n.add_argument('--repository', default=str(root), help="this repository's checkout (default: the one holding this script)")
-    n.add_argument('--clear-unknown', action='store_true', help='empty a build directory that has no manifest instead of failing')
+    n.add_argument('--clear-unknown', action='store_true', help='empty a build tree when its cached source identity is unknown instead of failing')
 e = sub.add_parser('explain')
 e.add_argument('--build', required=True)
 e.add_argument('--target', default='RanvierWebCoreHost')
