@@ -26,6 +26,9 @@ def probe(name, *commands, rid=None, flavor=('slim', 'gpu'), timeout=TIMEOUT, en
 
 
 PROBES = [
+    probe('Verify Windows same-document transition snapshot pixels',
+          'python -I tests/gpu/windows_view_transition_pixels.py --native-directory {native} --output {work}/gpu-transition-readback',
+          rid='win-x64', flavor='gpu'),
     *[probe('Verify Linux same-document transition snapshot pixels',
             'python -I tests/gpu/linux_view_transition_pixels.py --native-directory {native}',
             rid=rid, flavor='gpu',

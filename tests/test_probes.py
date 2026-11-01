@@ -79,6 +79,15 @@ class ProbeRunnerTests(unittest.TestCase):
 
 
 class WorkflowTests(unittest.TestCase):
+    def test_windows_gpu_selects_real_transition_snapshot_pixels(self):
+        selected = [entry for entry in probes.PROBES if probes.applies(entry, 'win-x64', 'gpu')]
+        pixels = [entry for entry in selected if any('windows_view_transition_pixels.py' in command for command in entry['commands'])]
+        self.assertEqual(len(pixels), 1)
+        self.assertIn('--native-directory ' + probes.NATIVE, pixels[0]['commands'][0])
+        self.assertIn('--output {work}/gpu-transition-readback', pixels[0]['commands'][0])
+        self.assertFalse(probes.applies(pixels[0], 'win-x64', 'slim'))
+        self.assertFalse(probes.applies(pixels[0], 'linux-x64', 'gpu'))
+
     def test_common_contracts_run_on_slim_and_gpu_without_broadening_explicit_flavors(self):
         common = probes.probe('common', 'python common.py')
         slim = probes.probe('slim only', 'python slim.py', flavor='slim')

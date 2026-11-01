@@ -14,6 +14,7 @@ from web_animations import Animations, Time
 
 
 class Consumer:
+    transport = 'EGLImage'
     def __init__(self, native):
         self.n = native
         self.egl = C.CDLL('libEGL.so.1')
@@ -98,11 +99,11 @@ def animations(n, document):
     return handles
 
 
-def run(directory):
+def run(directory, consumer_type=Consumer):
     n = Native(directory)
     assert n.bind('rv_abi_version', I, [])() == 60
     assert n.call('rv_abi_has', [C.c_char_p], b'view-transitions')
-    consumer = Consumer(n)
+    consumer = consumer_type(n)
     page = Case(n, PAGE)
     transition, observer, callback = P(), P(), None
     controlled = []
@@ -237,7 +238,7 @@ def run(directory):
             assert not animations(n, new_document), 'replacement kept pseudo animations'
         finally:
             n.bind('rv_node_release', None, [P])(new_document)
-        print(json.dumps({'result': 'PASS', 'transport': 'EGLImage', 'gpu_frames': consumer.frames,
+        print(json.dumps({'result': 'PASS', 'transport': consumer.transport, 'gpu_frames': consumer.frames,
                           'cpu_paint_api_calls': 0, 'events': events, 'pseudo_animations_after': len(leftover),
                           'controlled_times_ms': [0, 50000, 100000], 'skip_cleanup': True, 'replacement_cleanup': True}))
     finally:

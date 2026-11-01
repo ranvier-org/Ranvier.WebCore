@@ -14,6 +14,22 @@ spec.loader.exec_module(probe)
 
 
 class PackagedGpuTests(unittest.TestCase):
+    def test_windows_gpu_package_checks_real_transition_pixels_on_the_extracted_payload(self):
+        with tempfile.TemporaryDirectory() as directory:
+            calls = []
+
+            def execute(command, **kwargs):
+                if Path(command[2]).name == 'windows_view_transition_pixels.py':
+                    calls.append((command, kwargs))
+                    self.assertEqual(command[3], '--native-directory')
+                    self.assertEqual((Path(command[4]) / 'RanvierWebCoreHost.dll').read_bytes(), b'packaged host')
+                    self.assertIn('--output', command)
+
+            with patch('subprocess.run', side_effect=execute):
+                probe.verify(self.package(Path(directory)), gpu=True)
+            self.assertEqual(len(calls), 1)
+            self.assertTrue(calls[0][1]['check'])
+
     def setUp(self):
         self.assertIn('gpu', inspect.signature(probe.verify).parameters,
                       'Packaged GPU payloads need a shared-frame acceptance mode')
@@ -38,7 +54,7 @@ class PackagedGpuTests(unittest.TestCase):
 
             with patch('subprocess.run', side_effect=execute):
                 probe.verify(self.package(Path(directory)), gpu=True)
-        self.assertEqual(len(calls), 2)
+        self.assertEqual(len(calls), 3)
         self.assertTrue(calls[0][2].endswith('sdl_runtime.py'))
         self.assertTrue(Path(calls[1][2]).as_posix().endswith('tests/gpu/run.py'))
         self.assertEqual(calls[1][-2:], ['--teardown', 'all'])
