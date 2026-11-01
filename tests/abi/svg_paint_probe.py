@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 import ctypes
 import math
 import os
@@ -24,6 +25,7 @@ class SvgProbe:
         self.width, self.height = width, height
         self.retained, self.watches = [], []
         self.assertions = 0
+        self._assertion_count_suppression = 0
         self.host = self.bind('rv_host_create', self.pointer, [self.integer, self.integer])(width, height)
         self.expect(bool(self.host), 'SVG paint host creation')
 
@@ -45,9 +47,18 @@ class SvgProbe:
             raise AssertionError('required native binding is absent: ' + name) from error
 
     def expect(self, condition, label):
-        self.assertions += 1
+        if self._assertion_count_suppression == 0:
+            self.assertions += 1
         if not condition:
             raise AssertionError(label)
+
+    @contextmanager
+    def suppress_assertion_count(self):
+        self._assertion_count_suppression += 1
+        try:
+            yield
+        finally:
+            self._assertion_count_suppression -= 1
 
     def close(self, actual, expected, label, tolerance=0.001):
         self.expect(len(actual) == len(expected) and all(math.isclose(a, b, rel_tol=0, abs_tol=tolerance) for a, b in zip(actual, expected)), label + ': ' + str(actual))
