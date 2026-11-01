@@ -74,9 +74,21 @@ class ReleaseTests(unittest.TestCase):
         self.assertGreater(probe_index, smoke_index)
         smoke, probe = calls[smoke_index], calls[probe_index]
         self.assertEqual(probe[probe.index('--package') + 1], smoke[smoke.index('--package') + 1])
-        for flavor in ['gpu', 'lean']:
-            _, calls = self.invoke(flavor)
-            self.assertFalse(any(any(value.endswith('check_package_api.py') for value in command) for command in calls))
+        _, calls = self.invoke('lean')
+        self.assertFalse(any(any(value.endswith('check_package_api.py') for value in command) for command in calls))
+
+    def test_windows_gpu_release_checks_shared_frames_from_the_packed_payload(self):
+        code, calls = self.invoke('gpu')
+        self.assertIsNone(code)
+        smoke_index = next(index for index, command in enumerate(calls) if any(value.endswith('smoke.py') for value in command))
+        frame_checks = [(index, command) for index, command in enumerate(calls)
+                        if any(value.endswith('check_package_api.py') for value in command)]
+        self.assertEqual(len(frame_checks), 1)
+        index, probe = frame_checks[0]
+        self.assertGreater(index, smoke_index)
+        self.assertIn('--gpu', probe)
+        smoke = calls[smoke_index]
+        self.assertEqual(probe[probe.index('--package') + 1], smoke[smoke.index('--package') + 1])
 
     def test_gpu_release_still_rejects_dirty_source(self):
         code, calls = self.invoke('gpu', dirty=True)
