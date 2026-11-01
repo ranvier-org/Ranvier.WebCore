@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/mnt/c/wk/project2/dnd156/repro.py", line 29, in <module>
+    probe.run(args.native_directory, None)
+  File "/mnt/c/wk/project2-linux-gpu/tests/abi/data_transfer.py", line 607, in run
+    compare(n, results, spec, oracle, qualified)
+  File "/mnt/c/wk/project2/dnd156/repro.py", line 24, in compare
+    n.expect(actual == expected, f'issue156 dropped files: expected {expected!r}, got {actual!r}')
+  File "/mnt/c/wk/project2-linux-gpu/tests/abi/data_transfer.py", line 86, in expect
+    raise AssertionError(label)
+AssertionError: issue156 dropped files: expected [['note.txt', 'text/plain', 10], ['table.csv', 'text/csv', 3]], got []
