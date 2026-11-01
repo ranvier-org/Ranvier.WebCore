@@ -1,0 +1,896 @@
+{
+  "source": {
+    "organization": "NIST Cryptographic Algorithm Validation Program (CAVP)",
+    "page_url": "https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/CAVP-TESTING-BLOCK-CIPHER-MODES",
+    "archive_url": "https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Algorithm-Validation-Program/documents/mac/gcmtestvectors.zip",
+    "archive_filename": "gcmtestvectors.zip",
+    "archive_sha256": "f9fc479e134cde2980b3bb7cddbcb567b2cd96fd753835243ed067699f26a023",
+    "response_file_sha256": {
+      "gcmEncryptExtIV128.rsp": "30156236f768b0d81e58a3e5bd3bd79ce294cf9ef0ba0a84cf7b869c89ebd9fd",
+      "gcmDecrypt128.rsp": "0d1f98d0c9e176ede1f3e85484dd13de92c3436ca97df378ec3481e04c19a732",
+      "gcmEncryptExtIV192.rsp": "86827942bf67d1c67f34532bd057adf0a41cd911396a36023d9033f89fc6f571",
+      "gcmDecrypt192.rsp": "ca65640844441d58828e29bff87b7ec4571ef6778f4c331fc06697264edb2ffd",
+      "gcmEncryptExtIV256.rsp": "4448b4998c3f58cd9f5542ddf7c573189a721ff3d3ac24cd5177bb4910a787f8",
+      "gcmDecrypt256.rsp": "ed318735a517d5a85c82d2846c23dcf56e57a352fb0f0a163d9e7617a7bd12ad"
+    }
+  },
+  "algorithm": "AES-GCM",
+  "selection": {
+    "profile_tag_lengths_bits": [
+      32,
+      64,
+      96,
+      104,
+      112,
+      120,
+      128
+    ],
+    "aes_key_lengths_bits": [
+      128,
+      192,
+      256
+    ],
+    "coverage": "One NIST encryption response for each AES key length and tag length, plus empty plaintext/AAD, empty plaintext with AAD, non-96-bit IV, and explicit decrypt FAIL examples for each key length.",
+    "limitation": "Representative selected CAVP responses only; this is not a complete CAVP suite or validation claim."
+  },
+  "vectors": [
+    {
+      "operation": "encrypt",
+      "selection": "tag_length_32_bits_nonempty_plaintext_and_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV128.rsp",
+        "response_file_sha256": "30156236f768b0d81e58a3e5bd3bd79ce294cf9ef0ba0a84cf7b869c89ebd9fd",
+        "group": {
+          "Keylen": 128,
+          "IVlen": 96,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 32
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "cc0282d06b3c6a805dc676dbcd077506",
+        "IV": "5596781b0c103ca601e5bd05",
+        "PT": "9ba8c0e5284fc002a4ca830031",
+        "AAD": "fb6aee4838f634cbaff8e0d53336a3f3"
+      },
+      "expected": {
+        "CT": "bdb075cd7919a9600348d5a38b",
+        "Tag": "b89861a0"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "tag_length_64_bits_nonempty_plaintext_and_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV128.rsp",
+        "response_file_sha256": "30156236f768b0d81e58a3e5bd3bd79ce294cf9ef0ba0a84cf7b869c89ebd9fd",
+        "group": {
+          "Keylen": 128,
+          "IVlen": 96,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 64
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "f9844de997835781b9ff71752a96a539",
+        "IV": "0614849226f61da4111f63ce",
+        "PT": "8e8678d6f5ec116360f67980c0",
+        "AAD": "46af9fdc3266745be4629e866945ce69"
+      },
+      "expected": {
+        "CT": "256e4169994a9d9d6f67a05f80",
+        "Tag": "aad3a268c2470495"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "tag_length_96_bits_nonempty_plaintext_and_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV128.rsp",
+        "response_file_sha256": "30156236f768b0d81e58a3e5bd3bd79ce294cf9ef0ba0a84cf7b869c89ebd9fd",
+        "group": {
+          "Keylen": 128,
+          "IVlen": 96,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 96
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "1efb999a6e6321c473bddc598838a93b",
+        "IV": "1571c934050479cb19743c6c",
+        "PT": "9da0445b68a66bd98b80ab178b",
+        "AAD": "78ebc32a9e8ecbf0805c55a63b791b2f"
+      },
+      "expected": {
+        "CT": "c10c4eba4857af5856e531f1a0",
+        "Tag": "e2e20d097a3e6fe7a2a7fe89"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "tag_length_104_bits_nonempty_plaintext_and_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV128.rsp",
+        "response_file_sha256": "30156236f768b0d81e58a3e5bd3bd79ce294cf9ef0ba0a84cf7b869c89ebd9fd",
+        "group": {
+          "Keylen": 128,
+          "IVlen": 96,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 104
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "27e3626a8347f252519f3a391712f65a",
+        "IV": "e50b6bbe4ac7307f75421a71",
+        "PT": "bf386209503082f15ed8461ddd",
+        "AAD": "96fe6e72597f596ae93907a820ba79a8"
+      },
+      "expected": {
+        "CT": "34d347fa1b56d2cf691f1ce062",
+        "Tag": "cb083ec9d63075bea3bba1c0d4"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "tag_length_112_bits_nonempty_plaintext_and_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV128.rsp",
+        "response_file_sha256": "30156236f768b0d81e58a3e5bd3bd79ce294cf9ef0ba0a84cf7b869c89ebd9fd",
+        "group": {
+          "Keylen": 128,
+          "IVlen": 96,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 112
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "aa0e62fd07409c542f540909d06f1e01",
+        "IV": "da1b9f26fff5fc32a12b5069",
+        "PT": "af937f3c93a7197f20a59524ea",
+        "AAD": "f4c009f26bfb3692fc05dc21cce7ff82"
+      },
+      "expected": {
+        "CT": "2eceb8036386dffac21f108814",
+        "Tag": "9aa5f8c7154030c73fca616d1c16"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "tag_length_120_bits_nonempty_plaintext_and_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV128.rsp",
+        "response_file_sha256": "30156236f768b0d81e58a3e5bd3bd79ce294cf9ef0ba0a84cf7b869c89ebd9fd",
+        "group": {
+          "Keylen": 128,
+          "IVlen": 96,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 120
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "6792da189a2240ab853c8b6c05b94658",
+        "IV": "a6159f26e5d09d9c8472ce01",
+        "PT": "ec4ef2dda99b33b109dbb042bf",
+        "AAD": "1d76fc16940bc77c772b8fb871327de1"
+      },
+      "expected": {
+        "CT": "1137ad31d6ce148486042be48d",
+        "Tag": "d3d391799be08fd499e448377b40ce"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "tag_length_128_bits_nonempty_plaintext_and_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV128.rsp",
+        "response_file_sha256": "30156236f768b0d81e58a3e5bd3bd79ce294cf9ef0ba0a84cf7b869c89ebd9fd",
+        "group": {
+          "Keylen": 128,
+          "IVlen": 96,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 128
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "dfefde23c6122bf0370ab5890e804b73",
+        "IV": "92d6a8029990670f16de79e2",
+        "PT": "64260a8c287de978e96c7521d0",
+        "AAD": "a2b16d78251de6c191ce350e5c5ef242"
+      },
+      "expected": {
+        "CT": "bf78de948a847c173649d4b4d0",
+        "Tag": "9da3829968cdc50794d1c30d41cd4515"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "empty_plaintext_and_empty_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV128.rsp",
+        "response_file_sha256": "30156236f768b0d81e58a3e5bd3bd79ce294cf9ef0ba0a84cf7b869c89ebd9fd",
+        "group": {
+          "Keylen": 128,
+          "IVlen": 96,
+          "PTlen": 0,
+          "AADlen": 0,
+          "Taglen": 128
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "11754cd72aec309bf52f7687212e8957",
+        "IV": "3c819d9a9bed087615030b65",
+        "PT": "",
+        "AAD": ""
+      },
+      "expected": {
+        "CT": "",
+        "Tag": "250327c674aaf477aef2675748cf6971"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "empty_plaintext_with_nonempty_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV128.rsp",
+        "response_file_sha256": "30156236f768b0d81e58a3e5bd3bd79ce294cf9ef0ba0a84cf7b869c89ebd9fd",
+        "group": {
+          "Keylen": 128,
+          "IVlen": 96,
+          "PTlen": 0,
+          "AADlen": 128,
+          "Taglen": 128
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "77be63708971c4e240d1cb79e8d77feb",
+        "IV": "e0e00f19fed7ba0136a797f3",
+        "PT": "",
+        "AAD": "7a43ec1d9c0a5a78a0b16533a6213cab"
+      },
+      "expected": {
+        "CT": "",
+        "Tag": "209fcc8d3675ed938e9c7166709dd946"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "non_96_bit_IV_with_plaintext_and_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV128.rsp",
+        "response_file_sha256": "30156236f768b0d81e58a3e5bd3bd79ce294cf9ef0ba0a84cf7b869c89ebd9fd",
+        "group": {
+          "Keylen": 128,
+          "IVlen": 8,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 128
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "b0bf1fbff0006793781e08f4edbbbf18",
+        "IV": "d7",
+        "PT": "afb4dab4310dd94e9c69725dfb",
+        "AAD": "2510573bcdcdd8da5c573a5580c26d0a"
+      },
+      "expected": {
+        "CT": "329ed915f9ccad9fddf7b54f9d",
+        "Tag": "f0987d96afc8f0924109325cefa59866"
+      }
+    },
+    {
+      "operation": "decrypt",
+      "selection": "explicit NIST FAIL response with nonempty ciphertext and AAD",
+      "source": {
+        "response_file": "gcmDecrypt128.rsp",
+        "response_file_sha256": "0d1f98d0c9e176ede1f3e85484dd13de92c3436ca97df378ec3481e04c19a732",
+        "group": {
+          "Keylen": 128,
+          "IVlen": 8,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 128
+        },
+        "count": 1
+      },
+      "input": {
+        "Key": "844218d8aa8227a6876f190cc3a07fa4",
+        "IV": "da",
+        "CT": "bf9d1b61fd44cdd200118bd2e9",
+        "AAD": "f615290b72d79bf03fd607ae02177d38",
+        "Tag": "8ffbfe1b0bf821c9dab92311bd3407c7"
+      },
+      "expected": {
+        "result": "FAIL"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "tag_length_32_bits_nonempty_plaintext_and_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV192.rsp",
+        "response_file_sha256": "86827942bf67d1c67f34532bd057adf0a41cd911396a36023d9033f89fc6f571",
+        "group": {
+          "Keylen": 192,
+          "IVlen": 96,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 32
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "bd5ba143f0da31b52071ed822a2b40604b9c087782ff20b2",
+        "IV": "d489b696c2263c8bfc3e9ce0",
+        "PT": "d1c3e85a8866dd770c046eb719",
+        "AAD": "11e245632b8d659760217057a2fd20d4"
+      },
+      "expected": {
+        "CT": "b384c81ff4c006d27acbd5582d",
+        "Tag": "39dd6479"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "tag_length_64_bits_nonempty_plaintext_and_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV192.rsp",
+        "response_file_sha256": "86827942bf67d1c67f34532bd057adf0a41cd911396a36023d9033f89fc6f571",
+        "group": {
+          "Keylen": 192,
+          "IVlen": 96,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 64
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "a574f8b7dc792f69fb315bd975cb30f54f7645d395f7b411",
+        "IV": "f03c618122d40c7e88ac5e6c",
+        "PT": "2aa98b30f66ce60b6c42b7c86d",
+        "AAD": "da0e910b058ce4fa6e625d14b113a9cc"
+      },
+      "expected": {
+        "CT": "0aef1a1104c0d5ddb0171c816f",
+        "Tag": "02c6cc89e79b81b3"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "tag_length_96_bits_nonempty_plaintext_and_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV192.rsp",
+        "response_file_sha256": "86827942bf67d1c67f34532bd057adf0a41cd911396a36023d9033f89fc6f571",
+        "group": {
+          "Keylen": 192,
+          "IVlen": 96,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 96
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "5b689f5d0c3c395bc3ff44752782689a3dc7a0b9bbc555fd",
+        "IV": "d88bb363fe10c571e19e753f",
+        "PT": "0da7f6d3d82049a00be90de59c",
+        "AAD": "b9820269e041ebff56b8cd2fb26e070d"
+      },
+      "expected": {
+        "CT": "94e766cb81370e323ae6cec064",
+        "Tag": "2a54b279b2dab1bb9a821fd4"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "tag_length_104_bits_nonempty_plaintext_and_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV192.rsp",
+        "response_file_sha256": "86827942bf67d1c67f34532bd057adf0a41cd911396a36023d9033f89fc6f571",
+        "group": {
+          "Keylen": 192,
+          "IVlen": 96,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 104
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "ee621ea35edfd47fcf3af9590a3d2c691c90328d384668be",
+        "IV": "dd3e47584ab2a594ce1d459a",
+        "PT": "da503f8b03dd2f806af553d3b4",
+        "AAD": "86716f0137e8bacf1f53ef6d2289ba58"
+      },
+      "expected": {
+        "CT": "f4b943a7a7f6856db8d67c32bf",
+        "Tag": "30b1e36237082134ca1eaafb69"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "tag_length_112_bits_nonempty_plaintext_and_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV192.rsp",
+        "response_file_sha256": "86827942bf67d1c67f34532bd057adf0a41cd911396a36023d9033f89fc6f571",
+        "group": {
+          "Keylen": 192,
+          "IVlen": 96,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 112
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "c68f6987ace7b82894e01df4b86a7113b18ea1f178e356f7",
+        "IV": "3d68d891a3ba56daea3923c0",
+        "PT": "c8135d5189f422e9f06f5f1ebf",
+        "AAD": "a02fcf42aa90391c1d3592fb00ec3e63"
+      },
+      "expected": {
+        "CT": "435262294a1ee35de21d4f6b4f",
+        "Tag": "0292c188a04b920730dc6fba7dd2"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "tag_length_120_bits_nonempty_plaintext_and_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV192.rsp",
+        "response_file_sha256": "86827942bf67d1c67f34532bd057adf0a41cd911396a36023d9033f89fc6f571",
+        "group": {
+          "Keylen": 192,
+          "IVlen": 96,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 120
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "e10211f3e77158bf7735406ac88fcc1c8f172af8bc9d032d",
+        "IV": "dd4d978e4e81ad636cef1062",
+        "PT": "130c62d475b6477098642b9753",
+        "AAD": "fc14b3107f7c41f3fd682788584af5dd"
+      },
+      "expected": {
+        "CT": "21492b31d9bdff74cdf2863798",
+        "Tag": "0fa492b49bf4d1f651a64e32e465cc"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "tag_length_128_bits_nonempty_plaintext_and_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV192.rsp",
+        "response_file_sha256": "86827942bf67d1c67f34532bd057adf0a41cd911396a36023d9033f89fc6f571",
+        "group": {
+          "Keylen": 192,
+          "IVlen": 96,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 128
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "5daa8910d9dc5068f2f55c163986d071452344a5eac5a805",
+        "IV": "8f88d70e250dbf1282413fd7",
+        "PT": "4235e42f32cff44a507dd8a366",
+        "AAD": "3b3bbb2ccd76236f074eecc19f341057"
+      },
+      "expected": {
+        "CT": "e92df9d2fd436ed254fa92789c",
+        "Tag": "4cdddb4a9546a8d73afc9f5e46a926f3"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "empty_plaintext_and_empty_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV192.rsp",
+        "response_file_sha256": "86827942bf67d1c67f34532bd057adf0a41cd911396a36023d9033f89fc6f571",
+        "group": {
+          "Keylen": 192,
+          "IVlen": 96,
+          "PTlen": 0,
+          "AADlen": 0,
+          "Taglen": 128
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "aa740abfadcda779220d3b406c5d7ec09a77fe9d94104539",
+        "IV": "ab2265b4c168955561f04315",
+        "PT": "",
+        "AAD": ""
+      },
+      "expected": {
+        "CT": "",
+        "Tag": "f149e2b5f0adaa9842ca5f45b768a8fc"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "empty_plaintext_with_nonempty_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV192.rsp",
+        "response_file_sha256": "86827942bf67d1c67f34532bd057adf0a41cd911396a36023d9033f89fc6f571",
+        "group": {
+          "Keylen": 192,
+          "IVlen": 96,
+          "PTlen": 0,
+          "AADlen": 128,
+          "Taglen": 128
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "41c5da8667ef725220ffe39ae0ac590ac9fca729ab60ada0",
+        "IV": "05ad13a5e2c2ab667e1a6fbc",
+        "PT": "",
+        "AAD": "8b5c124bef6e2f0fe4d8c95cd5fa4cf1"
+      },
+      "expected": {
+        "CT": "",
+        "Tag": "204bdb1bd62154bf08922aaa54eed705"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "non_96_bit_IV_with_plaintext_and_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV192.rsp",
+        "response_file_sha256": "86827942bf67d1c67f34532bd057adf0a41cd911396a36023d9033f89fc6f571",
+        "group": {
+          "Keylen": 192,
+          "IVlen": 8,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 128
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "524c395eac979b468d20d9dd5db664fc73840b30db9f1368",
+        "IV": "3d",
+        "PT": "30b5177b9dcd15cc52a03123c8",
+        "AAD": "156b387330a12a88a6b9b46e50869cd2"
+      },
+      "expected": {
+        "CT": "58741e01aadc4e876f35b27c50",
+        "Tag": "ee64e6790d65e61f711c67429d3897bf"
+      }
+    },
+    {
+      "operation": "decrypt",
+      "selection": "explicit NIST FAIL response with nonempty ciphertext and AAD",
+      "source": {
+        "response_file": "gcmDecrypt192.rsp",
+        "response_file_sha256": "ca65640844441d58828e29bff87b7ec4571ef6778f4c331fc06697264edb2ffd",
+        "group": {
+          "Keylen": 192,
+          "IVlen": 8,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 128
+        },
+        "count": 2
+      },
+      "input": {
+        "Key": "d7b7b40ae849f43252b805a947036feb1125390c1347273b",
+        "IV": "6d",
+        "CT": "ad4f39e7d294a1c20796bdb010",
+        "AAD": "68a4ebd3a06fa4b60c2b0967de8425ad",
+        "Tag": "6ebff9c2072bd9a05c2d74c5a0a494be"
+      },
+      "expected": {
+        "result": "FAIL"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "tag_length_32_bits_nonempty_plaintext_and_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV256.rsp",
+        "response_file_sha256": "4448b4998c3f58cd9f5542ddf7c573189a721ff3d3ac24cd5177bb4910a787f8",
+        "group": {
+          "Keylen": 256,
+          "IVlen": 96,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 32
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "bca34009a2f62bd987390965d7b658a27d70a79cf7c2466dc3058d770b9ede24",
+        "IV": "05e40b4c45bdc8dba1907ec6",
+        "PT": "7a22406c477db0466a285839d1",
+        "AAD": "7d48a6dfdcb0c6b6ca1439df8359fe0a"
+      },
+      "expected": {
+        "CT": "71e7c3c0550e494649640e439b",
+        "Tag": "ba17876d"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "tag_length_64_bits_nonempty_plaintext_and_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV256.rsp",
+        "response_file_sha256": "4448b4998c3f58cd9f5542ddf7c573189a721ff3d3ac24cd5177bb4910a787f8",
+        "group": {
+          "Keylen": 256,
+          "IVlen": 96,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 64
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "eae0d0d2d4641dd6165a6da368a4993fd1c8e545ea703aa1474dd2595ecbc3d8",
+        "IV": "a3cdeacd28162a26e7fb249e",
+        "PT": "24ff47f83342fefc6d164c7bd6",
+        "AAD": "3ceb81d0fefc4e0aa378fac729bd41a1"
+      },
+      "expected": {
+        "CT": "ad4b9564c3450328775f5a2a0f",
+        "Tag": "d7b6a5f8efbeaa9b"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "tag_length_96_bits_nonempty_plaintext_and_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV256.rsp",
+        "response_file_sha256": "4448b4998c3f58cd9f5542ddf7c573189a721ff3d3ac24cd5177bb4910a787f8",
+        "group": {
+          "Keylen": 256,
+          "IVlen": 96,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 96
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "586a41514a5d86abe03c375b6771c4228b316ffdc4c717e18a8403d1d74ecc4d",
+        "IV": "bea1761d0bdfd0659c7e5ace",
+        "PT": "d6b0d28dc982c82f617f1a0330",
+        "AAD": "c5e3d5aff6c9ddbec333ac515f56f61b"
+      },
+      "expected": {
+        "CT": "0c651e00a1f5e9584ec7afe24b",
+        "Tag": "cdc05bd8e15fac64145c68b4"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "tag_length_104_bits_nonempty_plaintext_and_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV256.rsp",
+        "response_file_sha256": "4448b4998c3f58cd9f5542ddf7c573189a721ff3d3ac24cd5177bb4910a787f8",
+        "group": {
+          "Keylen": 256,
+          "IVlen": 96,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 104
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "9fa5c9363a81fbc7a253ad404b6cd757c542101ebf54b27cc69d124729a45286",
+        "IV": "24846a143dad87103e87223b",
+        "PT": "359571e58b91844757f1ff1fcd",
+        "AAD": "bf29e748c9e5ccab6e299c2265f73b50"
+      },
+      "expected": {
+        "CT": "5f9c155d51ab68b360ecf41711",
+        "Tag": "44e1bbc0e185f838dacb9d07d6"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "tag_length_112_bits_nonempty_plaintext_and_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV256.rsp",
+        "response_file_sha256": "4448b4998c3f58cd9f5542ddf7c573189a721ff3d3ac24cd5177bb4910a787f8",
+        "group": {
+          "Keylen": 256,
+          "IVlen": 96,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 112
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "7c4ed60e870d9d30566f28fa7a6660faecdfea19366a69685c0d296ac64d3d3d",
+        "IV": "73be829baf361302dfc038b6",
+        "PT": "b41f0e050a65e17eafa9ed0c82",
+        "AAD": "00ada23984784f60f922707c29dc0642"
+      },
+      "expected": {
+        "CT": "36caa6c3b081d2f7c4d00dffaa",
+        "Tag": "30ba4417bc410ea7327ac6a49fac"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "tag_length_120_bits_nonempty_plaintext_and_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV256.rsp",
+        "response_file_sha256": "4448b4998c3f58cd9f5542ddf7c573189a721ff3d3ac24cd5177bb4910a787f8",
+        "group": {
+          "Keylen": 256,
+          "IVlen": 96,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 120
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "74bbcff69157f019dd990e47493c2b3206e06bb0ee1b0459f6f9368205e28476",
+        "IV": "2400088dd67da333030996bd",
+        "PT": "958d25468d4896fc152f089531",
+        "AAD": "c069ce10f5e1e427c67f87572f59a4ad"
+      },
+      "expected": {
+        "CT": "4f7e83dba2949971331e888924",
+        "Tag": "6531c9d23a9b210981983978cb5d29"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "tag_length_128_bits_nonempty_plaintext_and_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV256.rsp",
+        "response_file_sha256": "4448b4998c3f58cd9f5542ddf7c573189a721ff3d3ac24cd5177bb4910a787f8",
+        "group": {
+          "Keylen": 256,
+          "IVlen": 96,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 128
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "dad89d9be9bba138cdcf8752c45b579d7e27c3dbb40f53e771dd8cfd500aa2d5",
+        "IV": "cfb2aec82cfa6c7d89ee72ff",
+        "PT": "b526ba1050177d05b0f72f8d67",
+        "AAD": "6e43784a91851a77667a02198e28dc32"
+      },
+      "expected": {
+        "CT": "8b29e66e924ecae84f6d8f7d68",
+        "Tag": "1e365805c8f28b2ed8a5cadfd9079158"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "empty_plaintext_and_empty_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV256.rsp",
+        "response_file_sha256": "4448b4998c3f58cd9f5542ddf7c573189a721ff3d3ac24cd5177bb4910a787f8",
+        "group": {
+          "Keylen": 256,
+          "IVlen": 96,
+          "PTlen": 0,
+          "AADlen": 0,
+          "Taglen": 128
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "b52c505a37d78eda5dd34f20c22540ea1b58963cf8e5bf8ffa85f9f2492505b4",
+        "IV": "516c33929df5a3284ff463d7",
+        "PT": "",
+        "AAD": ""
+      },
+      "expected": {
+        "CT": "",
+        "Tag": "bdc1ac884d332457a1d2664f168c76f0"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "empty_plaintext_with_nonempty_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV256.rsp",
+        "response_file_sha256": "4448b4998c3f58cd9f5542ddf7c573189a721ff3d3ac24cd5177bb4910a787f8",
+        "group": {
+          "Keylen": 256,
+          "IVlen": 96,
+          "PTlen": 0,
+          "AADlen": 128,
+          "Taglen": 128
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "78dc4e0aaf52d935c3c01eea57428f00ca1fd475f5da86a49c8dd73d68c8e223",
+        "IV": "d79cf22d504cc793c3fb6c8a",
+        "PT": "",
+        "AAD": "b96baa8c1c75a671bfb2d08d06be5f36"
+      },
+      "expected": {
+        "CT": "",
+        "Tag": "3e5d486aa2e30b22e040b85723a06e76"
+      }
+    },
+    {
+      "operation": "encrypt",
+      "selection": "non_96_bit_IV_with_plaintext_and_AAD",
+      "source": {
+        "response_file": "gcmEncryptExtIV256.rsp",
+        "response_file_sha256": "4448b4998c3f58cd9f5542ddf7c573189a721ff3d3ac24cd5177bb4910a787f8",
+        "group": {
+          "Keylen": 256,
+          "IVlen": 8,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 128
+        },
+        "count": 0
+      },
+      "input": {
+        "Key": "45de3f479656b126b6e185570032480eac062ef0312b1032000c809e14e565ec",
+        "IV": "69",
+        "PT": "a131993cae39f8976aefb15715",
+        "AAD": "b99de47dfdf4177000969fe4b2ca9547"
+      },
+      "expected": {
+        "CT": "33aafd041ff9c6160fd08466b1",
+        "Tag": "1f0f3a96337a00c36e23862039ffe666"
+      }
+    },
+    {
+      "operation": "decrypt",
+      "selection": "explicit NIST FAIL response with nonempty ciphertext and AAD",
+      "source": {
+        "response_file": "gcmDecrypt256.rsp",
+        "response_file_sha256": "ed318735a517d5a85c82d2846c23dcf56e57a352fb0f0a163d9e7617a7bd12ad",
+        "group": {
+          "Keylen": 256,
+          "IVlen": 8,
+          "PTlen": 104,
+          "AADlen": 128,
+          "Taglen": 128
+        },
+        "count": 3
+      },
+      "input": {
+        "Key": "404b6335fdad84c8f6a0a0cf35aba2246136f74183e91cad8a172771284088f3",
+        "IV": "8c",
+        "CT": "12a2f09fe656403b99801479b9",
+        "AAD": "ffecb9133eba5b6ebfc7ba85734df1a5",
+        "Tag": "93a1e7931dead5ceda49e87faac968b7"
+      },
+      "expected": {
+        "result": "FAIL"
+      }
+    }
+  ]
+}

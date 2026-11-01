@@ -1,0 +1,7 @@
+# NIST AES-GCM vector provenance
+
+`tests/fixtures/crypto-aes-gcm-cavp.json` is a selected subset of NIST CAVP AES-GCM response files. The official [CAVP Block Cipher Modes page](https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/CAVP-TESTING-BLOCK-CIPHER-MODES) links the GCM vectors; the downloaded archive is [gcmtestvectors.zip](https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Algorithm-Validation-Program/documents/mac/gcmtestvectors.zip). The archive SHA-256 and SHA-256 hashes of all six response files are recorded in the fixture. Expected CT, Tag, and FAIL values are copied directly from those response records.
+
+The selected set has 33 records: one nonempty-plaintext/nonempty-AAD encryption record for each of the three AES key lengths and each of the seven agreed tag lengths (32, 64, 96, 104, 112, 120, and 128 bits); per key length, an empty plaintext/empty AAD case, an empty plaintext/nonempty AAD case, a plaintext/AAD case with an 8-bit IV, and an explicit decrypt `FAIL` case with nonempty ciphertext and AAD. Each vector retains its response filename, group lengths, and `COUNT`.
+
+This is representative data for those sampled dimensions, not the complete CAVP suite and not a validation claim. It makes no assertion about the supported capabilities of any particular browser or backend. `tests/test_crypto_aes_gcm_cavp_fixture.py` checks only source-hash shape, case coverage, hex syntax, and bit/octet length consistency; it does not calculate AES-GCM outputs.
