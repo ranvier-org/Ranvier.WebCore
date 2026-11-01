@@ -34,11 +34,11 @@ def timed(cycle, milliseconds):
 def queued_tasks(native, cycle):
     """Each showPopover/hidePopover queues a toggle event task; one cycle(0) after it is due delivers it."""
     case = Case(native, '<div id=p popover>x</div>')
-    target = native.bind('rv_document_get_element_by_id', P, [P, ctypes.c_char_p])(case.host, b'p')
+    target = native.bind('rv_document_get_element_by_id', P, [P, ctypes.c_char_p, I])(case.host, b'p', 1)
     native.expect(bool(target), 'popover element')
     toggles = []
     callback = CALLBACK(lambda event, data: toggles.append(1) or 0)
-    listener = native.bind('rv_node_add_event_listener', P, [P, ctypes.c_char_p, I, CALLBACK, P])(target, b'toggle', 0, callback, None)
+    listener = native.bind('rv_node_add_event_listener', P, [P, ctypes.c_char_p, I, I, CALLBACK, P])(target, b'toggle', 6, 0, callback, None)
     native.expect(bool(listener), 'toggle listener')
     case.listeners.append(listener)
     show = native.bind('rv_dom_html_element_show_popover', I, [P, P])
