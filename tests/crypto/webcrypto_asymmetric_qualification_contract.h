@@ -10,7 +10,7 @@ struct AsymmetricRequest {
     int32_t format;
     int32_t hash;
     int32_t curve;
-    int32_t parameter;
+    int64_t parameter;
     int32_t extractable;
     uint32_t usages;
     void* key;
