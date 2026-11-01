@@ -5926,8 +5926,8 @@ int32_t rv_text_segment(int32_t granularity, const char* locale, const uint16_t*
     auto type = types[granularity];
     auto* units = reinterpret_cast<const UChar*>(text);
     UErrorCode status = U_ZERO_ERROR;
-    // An ICU iterator of the same type reports the locale, and serves words and sentences, whose WTF iterators
-    // ignore the locale.
+    // An ICU iterator of the same type reports the locale, and serves graphemes, words and sentences, so graphemes
+    // follow UAX #29 on every platform (WTF's caret iterator uses CFString clusters on Cocoa, which split CR LF).
     UBreakIterator* icu = ubrk_open(type, icuLocale, length ? units : u"", length, &status);
     if (U_FAILURE(status) || !icu)
         return textSegmentFailure(result, RV_ERR_UNSUPPORTED);
@@ -5936,12 +5936,9 @@ int32_t rv_text_segment(int32_t granularity, const char* locale, const uint16_t*
     Vector<int32_t> starts;
     Vector<int32_t> wordLike;
     if (length) {
-        if (granularity == RV_SEGMENT_GRAPHEME || granularity == RV_SEGMENT_LINE) {
+        if (granularity == RV_SEGMENT_LINE) {
             StringView view { std::span<const char16_t> { reinterpret_cast<const char16_t*>(text), static_cast<size_t>(length) } };
-            TextBreakIterator::Mode mode = TextBreakIterator::CaretMode { };
-            if (granularity == RV_SEGMENT_LINE)
-                mode = TextBreakIterator::LineMode { TextBreakIterator::LineMode::Behavior::Default };
-            CachedTextBreakIterator iterator(view, { }, mode, AtomString { String::fromLatin1(icuLocale) });
+            CachedTextBreakIterator iterator(view, { }, TextBreakIterator::LineMode { TextBreakIterator::LineMode::Behavior::Default }, AtomString { String::fromLatin1(icuLocale) });
             unsigned position = 0;
             while (position < static_cast<unsigned>(length)) {
                 starts.append(static_cast<int32_t>(position));
@@ -5962,12 +5959,14 @@ int32_t rv_text_segment(int32_t granularity, const char* locale, const uint16_t*
     if (length && granularity != RV_SEGMENT_GRAPHEME) {
         // A boundary inside a grapheme cluster joins its two segments, so no segment splits a grapheme; a joined
         // word is word-like when either part is.
-        StringView view { std::span<const char16_t> { reinterpret_cast<const char16_t*>(text), static_cast<size_t>(length) } };
-        CachedTextBreakIterator graphemes(view, { }, TextBreakIterator::CaretMode { }, AtomString { String::fromLatin1(icuLocale) });
+        status = U_ZERO_ERROR;
+        UBreakIterator* graphemes = ubrk_open(UBRK_CHARACTER, icuLocale, units, length, &status);
+        if (U_FAILURE(status) || !graphemes)
+            return textSegmentFailure(result, RV_ERR_UNSUPPORTED);
         Vector<int32_t> keptStarts;
         Vector<int32_t> keptWordLike;
         for (size_t index = 0; index < starts.size(); ++index) {
-            if (index && !graphemes.isBoundary(static_cast<unsigned>(starts[index]))) {
+            if (index && !ubrk_isBoundary(graphemes, starts[index])) {
                 if (granularity == RV_SEGMENT_WORD)
                     keptWordLike.last() |= wordLike[index];
                 continue;
@@ -5976,6 +5975,7 @@ int32_t rv_text_segment(int32_t granularity, const char* locale, const uint16_t*
             if (granularity == RV_SEGMENT_WORD)
                 keptWordLike.append(wordLike[index]);
         }
+        ubrk_close(graphemes);
         starts = WTF::move(keptStarts);
         wordLike = WTF::move(keptWordLike);
     }
