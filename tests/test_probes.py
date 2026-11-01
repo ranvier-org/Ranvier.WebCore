@@ -120,7 +120,6 @@ class WorkflowTests(unittest.TestCase):
             for entry in selected:
                 if entry['rid'] is not None:
                     self.assertEqual(entry['rid'], rid)
-
     def test_linux_gpu_selects_real_transition_snapshot_pixels_for_both_linux_rids(self):
         for rid in ['linux-x64', 'linux-arm64']:
             selected = [entry for entry in probes.PROBES if probes.applies(entry, rid, 'gpu')]

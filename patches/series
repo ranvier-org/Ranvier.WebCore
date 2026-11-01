@@ -57,3 +57,4 @@
 0058-wpe-skia-backing-context.patch
 0056-device-pixel-content-box.patch
 0059-fractional-device-content-clipping.patch
+0061-svg-failed-image-paint.patch
