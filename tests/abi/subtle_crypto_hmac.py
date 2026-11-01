@@ -180,7 +180,8 @@ def run(directory, bridge_library=None):
             operation = probe.start('hmac_import_raw', [P, ctypes.POINTER(Params), Bytes],
                                     page.document, ctypes.byref(options), span(b'secret'))
             probe.wait(operation, page)
-            n.expect(probe.error(operation) == expected_error, expected_error)
+            actual_error = probe.error(operation)
+            n.expect(actual_error == expected_error, f'expected {expected_error}, actual {actual_error!r}')
         private = probe.import_key(page, params(extractable=False, usages=(b'sign',)))
         for name, arguments, values in [
             ('hmac_export_raw', [P, Key], (page.document, private)),
@@ -229,6 +230,9 @@ def run(directory, bridge_library=None):
         probe.ok('hmac_key_info', [Key, ctypes.POINTER(Info)], partial, ctypes.byref(info))
         n.expect(info.length_bits == 159, 'WebCrypto generated bit length is preserved')
         return n.assertions
+    except BaseException:
+        print(f'SUBTLE_CRYPTO_HMAC FAIL assertions={n.assertions}', flush=True)
+        raise
     finally:
         probe.close()
         if page:

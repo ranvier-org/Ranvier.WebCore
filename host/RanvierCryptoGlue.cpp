@@ -431,7 +431,9 @@ int32_t ranvier_crypto_operation_error(RanvierCryptoOperationHandle handle, char
         return status;
     if (!value->result)
         return RV_ERR_UNSUPPORTED;
-    auto name = value->result->kind == ResultKind::Error ? String(DOMException::name(value->result->error)).utf8() : CString("");
+    auto name = value->result->kind == ResultKind::Error
+        ? String(value->result->error == ExceptionCode::TypeError ? "TypeError"_s : DOMException::name(value->result->error)).utf8()
+        : CString("");
     return copyBytes(std::span { reinterpret_cast<const uint8_t*>(name.data()), name.length() }, reinterpret_cast<uint8_t*>(buffer), capacity, length);
 }
 
