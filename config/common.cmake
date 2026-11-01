@@ -9,6 +9,8 @@ if (RANVIER_RID MATCHES "^win-(.+)$")
     set(PORT "Win" CACHE STRING "")
     # WebKit's overlay triplet (WebKitLibraries/triplets): dynamic libraries, release only.
     set(VCPKG_TARGET_TRIPLET "${CMAKE_MATCH_1}-windows-webkit" CACHE STRING "")
+    # Precompiled headers without input times (config/win-project.cmake).
+    set(CMAKE_PROJECT_WebKit_INCLUDE "${CMAKE_CURRENT_LIST_DIR}/win-project.cmake" CACHE FILEPATH "")
 elseif (RANVIER_RID MATCHES "^linux-")
     include("${CMAKE_CURRENT_LIST_DIR}/wpe.cmake")
 elseif (RANVIER_RID MATCHES "^osx-")

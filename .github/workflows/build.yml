@@ -396,6 +396,11 @@ jobs:
           path: C:\rw\vcpkg-downloads
           key: ${{ steps.keys.outputs.downloads }}
 
+      # What ninja will rebuild and why: a reused tree that rebuilds much names the input here.
+      - name: Explain the build
+        continue-on-error: true
+        run: python -I scripts/build_cache.py explain --build "${{ env.BUILD_DIR }}"
+
       - name: Build
         run: python scripts/build.py build --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
 
