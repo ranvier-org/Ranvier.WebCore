@@ -207,11 +207,43 @@ def prepare():
         sys.exit('the WebKit checkout has edits outside the series')
 
 
+def stable_interpreters(env):
+    """-D options that name Python and Ruby by links under <work>/tools/stable. The generator rules' command lines
+    name the interpreters, and ninja reruns a rule whose command line changes; the runners' paths name the patch
+    version (hostedtoolcache/Python/3.14.10), so a reused build tree would regenerate every derived source."""
+    stable = work / 'tools' / 'stable'
+    stable.mkdir(parents=True, exist_ok=True)
+    options = []
+    # Python is the interpreter running this script; Ruby is the one on the toolchain's PATH.
+    for name, found, variables in [('python', sys.executable, ['Python_EXECUTABLE', 'Python3_EXECUTABLE']),
+                                   ('ruby', shutil.which('ruby', path=env['PATH']), ['Ruby_EXECUTABLE', 'RUBY_EXECUTABLE'])]:
+        if not found:
+            continue
+        real = pathlib.Path(os.path.realpath(found))
+        link = stable / name
+        if os.path.lexists(link):
+            if windows:
+                os.rmdir(link)
+            else:
+                link.unlink()
+        if windows:
+            # A junction needs no privilege. Ruby finds its library from bin/.., so the junction is to the install root.
+            target = real.parent.parent if real.parent.name.lower() == 'bin' else real.parent
+            import _winapi
+            _winapi.CreateJunction(str(target), str(link))
+            executable = link / real.relative_to(target)
+        else:
+            link.symlink_to(real)
+            executable = link
+        options += [f'-D{variable}={executable.as_posix()}' for variable in variables]
+    return options
+
+
 def configure(env):
     build.mkdir(parents=True, exist_ok=True)
     # RANVIER_RID comes before -C: config/common.cmake picks the port from it.
     command = ['cmake', '-S', source, '-B', build, '-G', 'Ninja', f'-DRANVIER_RID={args.rid}',
-               '-C', root / 'config' / f'{args.flavor}.cmake']
+               '-C', root / 'config' / f'{args.flavor}.cmake', *stable_interpreters(env)]
     if windows:
         clang = (llvm / 'clang-cl.exe').as_posix()
         command += [f'-DCMAKE_C_COMPILER={clang}', f'-DCMAKE_CXX_COMPILER={clang}',

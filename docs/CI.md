@@ -38,7 +38,7 @@ tree's key names the toolchain.
 | gperf (Windows, from Chocolatey) | its version and the RID: a cache entry holds paths relative to the workspace, whose drive differs between the x64 and ARM64 images | always | its install |
 | LLVM (Windows) | the RID's archive hash in `pins.json` | always | fetch |
 | build tree | see [Build tree](#build-tree) | unless a manual run sets `clean` | the build |
-| vcpkg binary archives (Windows) | the RID, the flavor and vcpkg's ABI inputs: the vcpkg and WebKit pins, any patch that writes WebKit's `vcpkg.json`, `vcpkg-configuration.json` or `WebKitLibraries/triplets/`, the flavor's `VCPKG_MANIFEST_FEATURES`, and the MSVC toolset | when no build tree was restored | a successful configure |
+| vcpkg binary archives (Windows) | the RID, the flavor and vcpkg's ABI inputs: the vcpkg and WebKit pins, any patch that writes WebKit's `vcpkg.json`, `vcpkg-configuration.json` or `WebKitLibraries/triplets/`, the flavor's `VCPKG_MANIFEST_FEATURES`, and the MSVC toolset's identity (as in the build tree's key) | when no build tree was restored | a successful configure |
 | vcpkg downloads (Windows) | the RID and the vcpkg, WebKit and ICU pins | when the archives missed | a successful configure |
 
 - A miss restores the newest entry with the same prefix (`vcpkg-<rid>-<flavor>-`, `vcpkg-downloads-<rid>-`):
@@ -68,7 +68,7 @@ tree-<rid>-<flavor>-<WebKit pin>-<toolchain>-<core>-<host>
 
 | Part | Hash of |
 |---|---|
-| toolchain | Windows: the MSVC toolset, the Windows SDK, the LLVM pin and the vcpkg key (the tree holds `vcpkg_installed`). Linux: `clang --version` and the image. macOS: `xcodebuild -version` and the SDK version. |
+| toolchain | Windows: the MSVC toolset and Windows SDK versions, the hash of `cl.exe`, the paths and sizes of their headers, the LLVM pin and the vcpkg key (the tree holds `vcpkg_installed`). Runner images ship the same toolset version with other binaries and headers: on 2026-11-01 vcpkg's compiler hash differed between `windows-2025` images 20261021.278.1 and 20261030.294.1, both MSVC 14.51.36231. Linux: `clang --version` and the image. macOS: `xcodebuild -version` and the SDK version. |
 | core | the blob ids of `patches/`, `config/`, `scripts/build.py` and `scripts/patches.py` |
 | host | the blob ids of `host/` |
 
@@ -96,9 +96,23 @@ blob ids come from git's index, which checkout has just written, and only the fi
 about 10 s on a Windows workstation. normalise then writes the manifest of the current sources, which the save
 stores with the tree.
 
-clang-cl's precompiled headers need the recorded time rather than an arbitrary old one: on Windows CMake
-builds them without `-fno-pch-timestamp`, and clang rejects a PCH whose inputs' times differ from the ones it
-recorded.
+Clang records each input's modification time in a precompiled header and rejects the header when a time differs.
+CMake builds Clang's PCHs with `-fno-pch-timestamp` on Linux and macOS, but not clang-cl's on Windows, so
+`config/win-project.cmake` adds `-Xclang -fno-pch-timestamp` to every C and C++ compile there. Without it a
+Visual Studio header whose time differs between runner images rejected WebCore's PCH (`xfacet has been modified
+since the precompiled header`), and ninja, which ignores system headers, rebuilt nothing. A PCH is still
+rejected when an input's size differs, which the toolchain part of the key covers.
+
+ninja also reruns a rule whose command line changed. WebKit's generator rules name Python and Ruby, and the
+runners' paths name their patch versions (`hostedtoolcache/Python/3.14.10`), which change between images: on
+macOS the move from 3.14.9 to 3.14.10 reran every generator and 342 edges (24 minutes) on an exact hit. So
+`build.py configure` names them by links that keep their path, `<work>/tools/stable/python` and `ruby`
+(symbolic links, or junctions on Windows). Configure-time files written only when they change keep their times
+too: patches 0005 and 0007 write the stub event factory inputs that way, which otherwise made every configure
+regenerate the event factories and recompile 240 WebCore sources on Windows.
+
+Before the build, `build_cache.py explain` prints how many edges ninja will run and its first 20 reasons
+(`ninja -n -d explain`), such as `command line changed for ...` or `... older than most recent input ...`.
 
 normalise also deletes the tree's `CMakeCache.txt` and `CMakeFiles/CMakeConfigureLog.yaml`, so every configure
 starts without a cache. The config files set options with `set(... CACHE)`, which leaves a value already in a

@@ -1,9 +1,9 @@
 diff --git a/Source/WebCore/Modules/stub/BrowserAPIStub.cmake b/Source/WebCore/Modules/stub/BrowserAPIStub.cmake
 new file mode 100644
-index 0000000..3d73fbb
+index 0000000..cf52012
 --- /dev/null
 +++ b/Source/WebCore/Modules/stub/BrowserAPIStub.cmake
-@@ -0,0 +1,65 @@
+@@ -0,0 +1,72 @@
 +# WebCore without WebTransport, the File System and entries APIs, WebXR and the WebGPU bindings
 +# (USE_BROWSER_API_STUB). Their sources and IDL files are left out. The IDL files in Modules/stub/idl
 +# replace the interfaces and mixins referenced by the remaining WebCore code; they declare no members
@@ -52,8 +52,15 @@ index 0000000..3d73fbb
 +    string(REPLACE "\n" ";" _lines "${_contents}")
 +    list(FILTER _lines EXCLUDE REGEX "^(${_excluded})( .*)?$")
 +    string(REPLACE ";" "\n" _contents "${_lines}")
-+    file(WRITE "${WebCore_DERIVED_SOURCES_DIR}/BrowserAPIStub${_name}.in" "${_contents}")
-+    set(${_variable} "${WebCore_DERIVED_SOURCES_DIR}/BrowserAPIStub${_name}.in" PARENT_SCOPE)
++    set(_output "${WebCore_DERIVED_SOURCES_DIR}/BrowserAPIStub${_name}.in")
++    # Written only when it changes: the file's time is an input of the event factory rules.
++    if (EXISTS "${_output}")
++        file(READ "${_output}" _written)
++    endif ()
++    if (NOT EXISTS "${_output}" OR NOT _written STREQUAL _contents)
++        file(WRITE "${_output}" "${_contents}")
++    endif ()
++    set(${_variable} "${_output}" PARENT_SCOPE)
 +endfunction()
 +if (NOT WebCore_EVENT_INTERFACES_FILE)
 +    set(WebCore_EVENT_INTERFACES_FILE "${WEBCORE_DIR}/dom/EventInterfaces.in")
