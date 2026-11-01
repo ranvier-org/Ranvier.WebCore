@@ -1,0 +1,135 @@
+{
+  "source": {
+    "rfc": "RFC 2202",
+    "url": "https://www.rfc-editor.org/rfc/rfc2202.html",
+    "section": "3, test cases 1-7",
+    "notes": [
+      "Expected MAC bytes are transcribed from the cited RFC; no MAC is computed by these fixture checks.",
+      "Truncated values are the RFC-published prefixes only, not full digests; no missing suffix is generated.",
+      "RFC 2202 section 1 says ASCII inputs exclude the terminating NUL byte."
+    ]
+  },
+  "algorithms": {
+    "HMAC-SHA-1": 20
+  },
+  "cases": [
+    {
+      "case": 1,
+      "key_hex": "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b",
+      "key_bytes": 20,
+      "data_hex": "4869205468657265",
+      "data_bytes": 8,
+      "macs": {
+        "HMAC-SHA-1": [
+          {
+            "hex": "b617318655057264e28bc0b6fb378c8ef146be00",
+            "byte_length": 20,
+            "kind": "full_digest"
+          }
+        ]
+      }
+    },
+    {
+      "case": 2,
+      "key_hex": "4a656665",
+      "key_bytes": 4,
+      "data_hex": "7768617420646f2079612077616e7420666f72206e6f7468696e673f",
+      "data_bytes": 28,
+      "macs": {
+        "HMAC-SHA-1": [
+          {
+            "hex": "effcdf6ae5eb2fa2d27416d5f184df9c259a7c79",
+            "byte_length": 20,
+            "kind": "full_digest"
+          }
+        ]
+      }
+    },
+    {
+      "case": 3,
+      "key_hex": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "key_bytes": 20,
+      "data_hex": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "data_bytes": 50,
+      "macs": {
+        "HMAC-SHA-1": [
+          {
+            "hex": "125d7342b9ac11cd91a39af48aa17b4f63f175d3",
+            "byte_length": 20,
+            "kind": "full_digest"
+          }
+        ]
+      }
+    },
+    {
+      "case": 4,
+      "key_hex": "0102030405060708090a0b0c0d0e0f10111213141516171819",
+      "key_bytes": 25,
+      "data_hex": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+      "data_bytes": 50,
+      "macs": {
+        "HMAC-SHA-1": [
+          {
+            "hex": "4c9007f4026250c6bc8414f9bf50c86c2d7235da",
+            "byte_length": 20,
+            "kind": "full_digest"
+          }
+        ]
+      }
+    },
+    {
+      "case": 5,
+      "key_hex": "0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c",
+      "key_bytes": 20,
+      "data_hex": "546573742057697468205472756e636174696f6e",
+      "data_bytes": 20,
+      "macs": {
+        "HMAC-SHA-1": [
+          {
+            "hex": "4c1a03424b55e07fe7f27be1d58bb9324a9a5a04",
+            "byte_length": 20,
+            "kind": "full_digest"
+          },
+          {
+            "hex": "4c1a03424b55e07fe7f27be1",
+            "byte_length": 12,
+            "kind": "truncated_prefix",
+            "truncation_bits": 96
+          }
+        ]
+      }
+    },
+    {
+      "case": 6,
+      "key_hex": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "key_bytes": 80,
+      "data_hex": "54657374205573696e67204c6172676572205468616e20426c6f636b2d53697a65204b6579202d2048617368204b6579204669727374",
+      "data_bytes": 54,
+      "macs": {
+        "HMAC-SHA-1": [
+          {
+            "hex": "aa4ae5e15272d00e95705637ce8a3b55ed402112",
+            "byte_length": 20,
+            "kind": "full_digest"
+          }
+        ]
+      }
+    },
+    {
+      "case": 7,
+      "key_hex": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "key_bytes": 80,
+      "data_hex": "54657374205573696e67204c6172676572205468616e20426c6f636b2d53697a65204b657920616e64204c6172676572205468616e204f6e6520426c6f636b2d53697a652044617461",
+      "data_bytes": 73,
+      "macs": {
+        "HMAC-SHA-1": [
+          {
+            "hex": "e8e99d0f45237d786d6bbaa7965c7808bbff1a91",
+            "byte_length": 20,
+            "kind": "full_digest"
+          }
+        ]
+      }
+    }
+  ]
+}
