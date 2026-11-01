@@ -58,17 +58,39 @@ class PackagedGpuTests(unittest.TestCase):
 
                 def execute(command, **kwargs):
                     calls.append((command, kwargs))
-                    self.assertEqual(Path(command[3]).read_bytes(), b'packaged host')
+                    if command[3] == '--native-directory':
+                        self.assertEqual((Path(command[4]) / 'libRanvierWebCoreHost.so').read_bytes(), b'packaged host')
+                    else:
+                        self.assertEqual(Path(command[3]).read_bytes(), b'packaged host')
 
                 with self.subTest(rid=rid), patch('subprocess.run', side_effect=execute):
                     probe.verify(self.package(Path(directory), rid=rid), gpu=True)
-                self.assertEqual(len(calls), 2)
-                self.assertEqual(calls[1][0], calls[0][0] + ['--context-lifecycle'])
-                for command, options in calls:
+                egl_calls = [call for call in calls if Path(call[0][2]).name == 'linux_egl.py']
+                self.assertEqual(len(egl_calls), 2)
+                self.assertEqual(egl_calls[1][0], egl_calls[0][0] + ['--context-lifecycle'])
+                for command, options in egl_calls:
                     self.assertTrue(Path(command[2]).as_posix().endswith('tests/gpu/linux_egl.py'))
                     self.assertEqual(options['env']['EGL_PLATFORM'], 'surfaceless')
                     self.assertEqual(options['env']['LIBGL_ALWAYS_SOFTWARE'], '1')
                     self.assertTrue(options['check'])
+
+    def test_linux_gpu_package_checks_transition_pixels_on_the_extracted_payload(self):
+        with tempfile.TemporaryDirectory() as directory:
+            for rid in ['linux-x64', 'linux-arm64']:
+                calls = []
+
+                def execute(command, **kwargs):
+                    if Path(command[2]).name == 'linux_view_transition_pixels.py':
+                        calls.append((command, kwargs))
+                        self.assertEqual(command[3], '--native-directory')
+                        self.assertEqual((Path(command[4]) / 'libRanvierWebCoreHost.so').read_bytes(), b'packaged host')
+
+                with self.subTest(rid=rid), patch('subprocess.run', side_effect=execute):
+                    probe.verify(self.package(Path(directory), rid=rid), gpu=True)
+                self.assertEqual(len(calls), 1)
+                self.assertTrue(calls[0][1]['check'])
+                self.assertEqual(calls[0][1]['env']['EGL_PLATFORM'], 'surfaceless')
+                self.assertEqual(calls[0][1]['env']['LIBGL_ALWAYS_SOFTWARE'], '1')
 
 
 if __name__ == '__main__':

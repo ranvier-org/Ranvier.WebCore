@@ -79,6 +79,16 @@ class ProbeRunnerTests(unittest.TestCase):
 
 
 class WorkflowTests(unittest.TestCase):
+    def test_linux_gpu_selects_real_transition_snapshot_pixels_for_both_linux_rids(self):
+        for rid in ['linux-x64', 'linux-arm64']:
+            selected = [entry for entry in probes.PROBES if probes.applies(entry, rid, 'gpu')]
+            pixels = [entry for entry in selected if any('tests/gpu/linux_view_transition_pixels.py' in command for command in entry['commands'])]
+            self.assertEqual(len(pixels), 1, rid)
+            self.assertEqual(pixels[0]['commands'], [
+                'python -I tests/gpu/linux_view_transition_pixels.py --native-directory ' + probes.NATIVE])
+            self.assertEqual(pixels[0]['env'], {'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
+            self.assertFalse(probes.applies(pixels[0], rid, 'slim'))
+
     def test_linux_gpu_selects_the_egl_image_probe_for_both_linux_rids(self):
         for rid in ['linux-x64', 'linux-arm64']:
             selected = [entry for entry in probes.PROBES if probes.applies(entry, rid, 'gpu')]

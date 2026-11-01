@@ -39,6 +39,8 @@ def verify(package, gpu=False):
             for arguments in [[], ['--context-lifecycle']]:
                 subprocess.run([sys.executable, '-I', str(root / 'tests/gpu/linux_egl.py'),
                                 str(destination / 'libRanvierWebCoreHost.so'), *arguments], check=True, env=environment)
+            subprocess.run([sys.executable, '-I', str(root / 'tests/gpu/linux_view_transition_pixels.py'),
+                            '--native-directory', str(destination)], check=True, env=environment)
         elif gpu:
             sdl = destination.parent / 'sdl'
             subprocess.run([sys.executable, '-I', str(root / 'scripts/sdl_runtime.py'), '--out', str(sdl)], check=True)
