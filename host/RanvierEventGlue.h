@@ -26,4 +26,12 @@ WEBCORE_EXPORT RvCustomEffectCallback* ranvier_custom_effect_callback_create(RvN
     RvCustomEffectRelease release);
 WEBCORE_EXPORT int32_t ranvier_custom_effect_callback_revoke(RvCustomEffectCallback*);
 WEBCORE_EXPORT void ranvier_custom_effect_callbacks_revoke_document(RvNode* document);
+WEBCORE_EXPORT RvViewTransitionUpdateCallback* ranvier_view_transition_update_callback_create(RvNode* document,
+    RvViewTransitionUpdate update, void* context, RvCustomEffectRelease release);
+WEBCORE_EXPORT int32_t ranvier_view_transition_update_callback_revoke(RvViewTransitionUpdateCallback*);
+WEBCORE_EXPORT int32_t ranvier_view_transition_observe(RvNode* document, RvViewTransition*, RvViewTransitionSettled,
+    void* context, RvViewTransitionObserver** observer);
+WEBCORE_EXPORT void ranvier_view_transition_observer_release(RvViewTransitionObserver*);
+WEBCORE_EXPORT void ranvier_view_transitions_deliver();
+WEBCORE_EXPORT void ranvier_view_transitions_invalidate_document(RvNode* document);
 }

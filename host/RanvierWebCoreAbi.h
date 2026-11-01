@@ -1628,6 +1628,27 @@ RV_EXPORT RvCustomEffectCallback* rv_custom_effect_callback_create(RvHost*, RvCu
 /* Stops the callback: no tick runs after this returns, including ticks already queued. A second call does nothing.
  * rv_host_load_html and rv_host_destroy revoke every callback of the host. */
 RV_EXPORT int32_t rv_custom_effect_callback_revoke(RvCustomEffectCallback*);
+
+typedef struct RvViewTransition RvViewTransition;
+typedef struct RvViewTransitionUpdateCallback RvViewTransitionUpdateCallback;
+typedef struct RvViewTransitionObserver RvViewTransitionObserver;
+/* Runs after old-state capture from rv_run_loop_cycle. Zero completes the update; nonzero rejects it with TypeError. */
+typedef int32_t (*RvViewTransitionUpdate)(void* context);
+/* promise is 0 (updateCallbackDone), 1 (ready), or 2 (finished); errorName is NULL on fulfillment, otherwise a
+ * borrowed UTF-8 exception name valid until the callback returns. Each promise is reported once. */
+typedef void (*RvViewTransitionSettled)(void* context, int32_t promise, const char* errorName);
+/* Returns a new callback reference of the current document, released with rv_dom_view_transition_update_callback_release.
+ * release runs once after the engine drops its last reference. Host replacement or destruction revokes update. */
+RV_EXPORT RvViewTransitionUpdateCallback* rv_view_transition_update_callback_create(RvHost*, RvViewTransitionUpdate update,
+    void* context, RvCustomEffectRelease release);
+/* Stops future application updates; a pending engine callback rejects with TypeError. */
+RV_EXPORT int32_t rv_view_transition_update_callback_revoke(RvViewTransitionUpdateCallback*);
+/* Observes all three promises. Delivery is deferred to rv_run_loop_cycle, including already-settled promises.
+ * Returns RV_ERR_WRONG_HOST for a transition from another document. Replacement/destruction stops delivery. */
+RV_EXPORT int32_t rv_view_transition_observe(RvHost*, RvViewTransition* transition, RvViewTransitionSettled callback, void* context,
+    RvViewTransitionObserver** observer);
+/* Stops delivery and releases the observer. May be called from its callback. */
+RV_EXPORT void rv_view_transition_observer_release(RvViewTransitionObserver*);
 /* rv_node_add_event_listener for any EventTarget; remove the listener with rv_listener_remove. */
 RV_EXPORT RvListener* rv_event_target_add_listener(RvEventTarget*, const uint8_t* type, int32_t type_length, int32_t flags, RvEventCallback callback, void* context);
 /* rv_node_dispatch for any EventTarget. */

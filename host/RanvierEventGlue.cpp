@@ -374,3 +374,5 @@ void ranvier_custom_effect_callbacks_revoke_document(RvNode* documentHandle)
             callback->revoke();
     }
 }
+
+#include "RanvierViewTransitions.inc"

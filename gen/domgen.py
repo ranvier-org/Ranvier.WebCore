@@ -569,6 +569,11 @@ class World:
             configured_object = f"{name}.{member.name}" in self.config.get("dictionaryObjectMembers", [])
             if configured_object and (mapped.kind != "object" or not member.required or mapped.nullable):
                 raise SystemExit(f"{name}.{member.name}: dictionary object members must be required nonnullable object handles")
+            if f"{name}.{member.name}" in self.config.get('nullableObjectMembers', []):
+                if mapped.kind != 'object' or member.required or member.default != 'null' or not mapped.nullable:
+                    raise SystemExit(f'{name}.{member.name}: nullable object members must be optional object handles with a null default')
+                mapped.absent_handle = True
+                configured_object = True
             event_target = (mapped.interface == "EventTarget"
                             and f"{name}.{member.name}" in self.config.get("dictionaryEventTargetMembers", []))
             optional_object = f"{name}.{member.name}" in self.config.get("optionalObjectMembers", [])
@@ -2323,6 +2328,13 @@ class Generator(ComplexGeneratorMixin):
             return text.replace("{call_with_lead}", "".join(f"{value}, " for value in supplied))
         # An enumeration setter names its getter's call in a decltype, which takes the same context.
         body += [with_context(line) for line in prepare]
+        call_check = self.world.config.get('callChecks', {}).get(f'{function.interface}.{member.name}')
+        if call_check:
+            if call_check.get('header'):
+                self.headers.add(call_check['header'])
+            body += [with_context(line) for line in call_check['lines']]
+            if call_check.get('note'):
+                notes.append(call_check['note'])
         expression = with_context(call)
         for index, value in enumerate(passed):
             expression = expression.replace(f"{{arg{index}}}", value)

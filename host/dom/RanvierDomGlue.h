@@ -180,8 +180,14 @@ WEBCORE_EXPORT void ranvier_dom_image_bitmap_rendering_context_release(RvImageBi
 WEBCORE_EXPORT RvImageBitmapRenderingContext* ranvier_dom_image_bitmap_rendering_context_retain(RvImageBitmapRenderingContext*);
 WEBCORE_EXPORT void ranvier_dom_text_metrics_release(RvTextMetrics*);
 WEBCORE_EXPORT RvTextMetrics* ranvier_dom_text_metrics_retain(RvTextMetrics*);
+WEBCORE_EXPORT void ranvier_dom_view_transition_release(RvViewTransition*);
+WEBCORE_EXPORT RvViewTransition* ranvier_dom_view_transition_retain(RvViewTransition*);
+WEBCORE_EXPORT void ranvier_dom_view_transition_type_set_release(RvViewTransitionTypeSet*);
+WEBCORE_EXPORT RvViewTransitionTypeSet* ranvier_dom_view_transition_type_set_retain(RvViewTransitionTypeSet*);
 WEBCORE_EXPORT void ranvier_dom_custom_effect_callback_release(RvCustomEffectCallback*);
 WEBCORE_EXPORT RvCustomEffectCallback* ranvier_dom_custom_effect_callback_retain(RvCustomEffectCallback*);
+WEBCORE_EXPORT void ranvier_dom_view_transition_update_callback_release(RvViewTransitionUpdateCallback*);
+WEBCORE_EXPORT RvViewTransitionUpdateCallback* ranvier_dom_view_transition_update_callback_retain(RvViewTransitionUpdateCallback*);
 WEBCORE_EXPORT void ranvier_dom_union_node_or_dom_string_release(RvDomUnionNodeOrDOMString* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_node_or_dom_string_release(RvDomSequenceNodeOrDOMString* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_css_style_sheet_release(RvDomSequenceCSSStyleSheet* value);
@@ -191,6 +197,7 @@ WEBCORE_EXPORT void ranvier_dom_sequence_shadow_root_release(RvDomSequenceShadow
 WEBCORE_EXPORT void ranvier_dom_union_dom_string_or_element_creation_options_release(RvDomUnionDOMStringOrElementCreationOptions* value);
 WEBCORE_EXPORT void ranvier_dom_union_boolean_or_import_node_options_release(RvDomUnionBooleanOrImportNodeOptions* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_touch_release(RvDomSequenceTouch* value);
+WEBCORE_EXPORT void ranvier_dom_sequence_dom_string_nullable_release(RvDomSequenceDOMStringNullable* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_element_nullable_release(RvDomSequenceElementNullable* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_dom_string_release(RvDomSequenceDOMString* value);
 WEBCORE_EXPORT void ranvier_dom_union_boolean_or_scroll_into_view_options_release(RvDomUnionBooleanOrScrollIntoViewOptions* value);
@@ -392,6 +399,7 @@ WEBCORE_EXPORT int32_t ranvier_dom_document_set_design_mode(RvNode* target, cons
 WEBCORE_EXPORT int32_t ranvier_dom_document_get_anchors(RvNode* target, RvHTMLCollection** result);
 WEBCORE_EXPORT int32_t ranvier_dom_document_get_hidden(RvNode* target, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_document_get_visibility_state(RvNode* target, int32_t* result);
+WEBCORE_EXPORT int32_t ranvier_dom_document_get_active_view_transition(RvNode* target, RvViewTransition** result);
 WEBCORE_EXPORT int32_t ranvier_dom_document_get_root_element(RvNode* target, RvNode** result);
 WEBCORE_EXPORT int32_t ranvier_dom_document_get_children(RvNode* target, RvHTMLCollection** result);
 WEBCORE_EXPORT int32_t ranvier_dom_document_get_first_element_child(RvNode* target, RvNode** result);
@@ -433,6 +441,7 @@ WEBCORE_EXPORT int32_t ranvier_dom_document_query_command_supported(RvNode* targ
 WEBCORE_EXPORT int32_t ranvier_dom_document_query_command_value(RvNode* target, const uint8_t* command_id, int32_t command_id_length, char* buffer, int32_t capacity, int32_t* length);
 WEBCORE_EXPORT int32_t ranvier_dom_document_get_selection(RvNode* target, RvDOMSelection** result);
 WEBCORE_EXPORT int32_t ranvier_dom_document_create_touch_list(RvNode* target, const RvDomSequenceTouch* touches, RvTouchList** result);
+WEBCORE_EXPORT int32_t ranvier_dom_document_start_view_transition(RvNode* target, const RvDomStartViewTransitionOptions* callback_options, RvViewTransition** result);
 WEBCORE_EXPORT int32_t ranvier_dom_document_prepend(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes);
 WEBCORE_EXPORT int32_t ranvier_dom_document_append(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes);
 WEBCORE_EXPORT int32_t ranvier_dom_document_replace_children(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes);
@@ -3198,6 +3207,9 @@ WEBCORE_EXPORT int32_t ranvier_dom_text_metrics_get_em_height_descent(RvTextMetr
 WEBCORE_EXPORT int32_t ranvier_dom_text_metrics_get_hanging_baseline(RvTextMetrics* target, double* result);
 WEBCORE_EXPORT int32_t ranvier_dom_text_metrics_get_alphabetic_baseline(RvTextMetrics* target, double* result);
 WEBCORE_EXPORT int32_t ranvier_dom_text_metrics_get_ideographic_baseline(RvTextMetrics* target, double* result);
+WEBCORE_EXPORT int32_t ranvier_dom_view_transition_get_types(RvViewTransition* target, RvViewTransitionTypeSet** result);
+WEBCORE_EXPORT int32_t ranvier_dom_view_transition_set_types(RvViewTransition* target, RvViewTransitionTypeSet* value);
+WEBCORE_EXPORT int32_t ranvier_dom_view_transition_skip_transition(RvViewTransition* target);
 WEBCORE_EXPORT int32_t ranvier_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_css_supports_1(RvNode* target, const uint8_t* condition_text, int32_t condition_text_length, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_css_get_highlights(RvNode* target, RvHighlightRegistry** result);
@@ -3253,6 +3265,12 @@ WEBCORE_EXPORT int32_t ranvier_dom_highlight_values(RvHighlight* target, RvDomSe
 WEBCORE_EXPORT int32_t ranvier_dom_highlight_add(RvHighlight* target, RvAbstractRange* value);
 WEBCORE_EXPORT int32_t ranvier_dom_highlight_delete(RvHighlight* target, RvAbstractRange* value, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_highlight_clear(RvHighlight* target);
+WEBCORE_EXPORT int32_t ranvier_dom_view_transition_type_set_size(RvViewTransitionTypeSet* target, uint32_t* result);
+WEBCORE_EXPORT int32_t ranvier_dom_view_transition_type_set_has(RvViewTransitionTypeSet* target, const uint8_t* value, int32_t value_length, int32_t* result);
+WEBCORE_EXPORT int32_t ranvier_dom_view_transition_type_set_values(RvViewTransitionTypeSet* target, RvDomSequenceDOMString* result);
+WEBCORE_EXPORT int32_t ranvier_dom_view_transition_type_set_add(RvViewTransitionTypeSet* target, const uint8_t* value, int32_t value_length);
+WEBCORE_EXPORT int32_t ranvier_dom_view_transition_type_set_delete(RvViewTransitionTypeSet* target, const uint8_t* value, int32_t value_length, int32_t* result);
+WEBCORE_EXPORT int32_t ranvier_dom_view_transition_type_set_clear(RvViewTransitionTypeSet* target);
 WEBCORE_EXPORT int32_t ranvier_dom_highlight_registry_size(RvHighlightRegistry* target, uint32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_highlight_registry_has(RvHighlightRegistry* target, const uint8_t* key, int32_t key_length, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_highlight_registry_get(RvHighlightRegistry* target, const uint8_t* key, int32_t key_length, RvHighlight** result);
