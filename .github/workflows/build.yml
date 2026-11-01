@@ -39,6 +39,7 @@ jobs:
       - run: python -I tests/test_release.py
       - run: python -I tests/test_publish_gate.py
       - run: python -I tests/test_probes.py
+      - run: python -I tests/test_background_clip_policy.py
       - run: python -I tests/test_sdl_runtime.py
       - run: python -I tests/test_package_gpu.py
       - run: python -I tests/test_sccache_cache_policy.py
