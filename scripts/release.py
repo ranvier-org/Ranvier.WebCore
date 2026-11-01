@@ -70,7 +70,7 @@ run('gh', 'release', 'create', tag, '--target', head, '--title', tag, '--notes',
     *(['--prerelease'] if '-' in version else []), *packages)
 if args.flavor == 'slim':
     print(f'{tag} created: its CI run checks these packages and publishes them with the rest', flush=True)
-elif args.flavor == 'gpu':
+elif args.flavor == 'gpu' and set(args.rid) == {'win-x64'}:
     print(f'{tag} created: its slim tag run automatically dispatches the matching Windows x64 GPU cohort after publication', flush=True)
 else:
     print(f'{tag} created: wait for its default slim CI run to succeed, then dispatch this flavor on the same tag:', flush=True)
