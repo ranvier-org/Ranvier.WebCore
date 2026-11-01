@@ -182,6 +182,9 @@
 #include <wtf/MainThread.h>
 #include <wtf/ProcessID.h>
 #include <wtf/RunLoop.h>
+#if PLATFORM(COCOA)
+#include <CoreFoundation/CoreFoundation.h>
+#endif
 #include <wtf/HexNumber.h>
 #include <wtf/text/MakeString.h>
 #include <wtf/text/TextBreakIterator.h>
@@ -3043,7 +3046,12 @@ int32_t rv_run_loop_cycle(int32_t milliseconds)
     auto deadline = MonotonicTime::now() + Seconds::fromMilliseconds(milliseconds);
     int32_t cycles = 0;
     do {
+#if PLATFORM(COCOA)
+        // RunLoop::cycle() waits up to 50 ms for a source on Cocoa; one CFRunLoop pass returns without waiting.
+        CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, true);
+#else
         RunLoop::cycle();
+#endif
         ++cycles;
         if (MonotonicTime::now() < deadline)
             WTF::sleep(1_ms);
