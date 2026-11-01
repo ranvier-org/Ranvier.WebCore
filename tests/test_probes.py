@@ -3,6 +3,7 @@
 from pathlib import Path
 import importlib.util
 import io
+import os
 import contextlib
 import tempfile
 import time
@@ -30,6 +31,15 @@ def run(entries, *options):
 
 
 class ProbeRunnerTests(unittest.TestCase):
+    def test_probe_environment_reaches_the_child_without_changing_the_parent(self):
+        entry = probes.probe('environment', 'python -c "import os; print(os.environ.get(\'RANVIER_PROBE_ENV_TEST\'))"')
+        entry['env'] = {'RANVIER_PROBE_ENV_TEST': 'isolated-child'}
+        before = os.environ.get('RANVIER_PROBE_ENV_TEST')
+        code, _, logs = run([entry])
+        self.assertEqual(code, 0)
+        self.assertIn('isolated-child', next(logs.glob('01-*.log')).read_text())
+        self.assertEqual(os.environ.get('RANVIER_PROBE_ENV_TEST'), before)
+
     def test_a_failure_runs_the_later_probes_and_fails_the_run(self):
         code, summary, _ = run([probes.probe('fails', 'python -c "raise SystemExit(3)"'),
                                 probes.probe('passes', 'python -c "print(1)"')])
@@ -69,6 +79,16 @@ class ProbeRunnerTests(unittest.TestCase):
 
 
 class WorkflowTests(unittest.TestCase):
+    def test_linux_gpu_selects_the_egl_image_probe_for_both_linux_rids(self):
+        for rid in ['linux-x64', 'linux-arm64']:
+            selected = [entry for entry in probes.PROBES if probes.applies(entry, rid, 'gpu')]
+            frames = [entry for entry in selected if any('tests/gpu/linux_egl.py' in command for command in entry['commands'])]
+            self.assertEqual(len(frames), 1, rid)
+            self.assertIn(probes.NATIVE + '/libRanvierWebCoreHost.so', frames[0]['commands'][0])
+            self.assertEqual(frames[0]['env'], {'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
+            self.assertFalse(probes.applies(frames[0], rid, 'slim'))
+            self.assertFalse(probes.applies(frames[0], 'win-x64', 'gpu'))
+
     def test_windows_gpu_runs_actual_shared_frame_and_lifetime_acceptance(self):
         selected = [entry for entry in probes.PROBES if probes.applies(entry, 'win-x64', 'gpu')]
         frames = [entry for entry in selected if any('tests/gpu/run.py' in command for command in entry['commands'])]

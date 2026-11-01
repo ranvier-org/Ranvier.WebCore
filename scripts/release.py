@@ -57,7 +57,7 @@ for rid in args.rid:
         '--expect-version', version, '--expect-flavor', args.flavor, *(['--no-load'] if rid.startswith('linux') else []))
     if args.flavor == 'slim':
         run(sys.executable, '-I', root / 'scripts/check_package_api.py', '--package', package)
-    elif args.flavor == 'gpu' and rid == 'win-x64':
+    elif args.flavor == 'gpu' and (rid == 'win-x64' or rid.startswith('linux-')):
         run(sys.executable, '-I', root / 'scripts/check_package_api.py', '--gpu', '--package', package)
     packages.append(package)
 

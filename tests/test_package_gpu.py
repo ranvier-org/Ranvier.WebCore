@@ -22,7 +22,8 @@ class PackagedGpuTests(unittest.TestCase):
         archive = directory / 'runtime.nupkg'
         with zipfile.ZipFile(archive, 'w') as package:
             package.writestr('manifest.json', json.dumps({'rid': rid, 'flavor': flavor}))
-            package.writestr(f'runtimes/{rid}/native/RanvierWebCoreHost.dll', b'packaged host')
+            library = 'libRanvierWebCoreHost.so' if rid.startswith('linux') else 'RanvierWebCoreHost.dll'
+            package.writestr(f'runtimes/{rid}/native/{library}', b'packaged host')
         return archive
 
     def test_gpu_package_runs_shared_frame_lifetime_checks_on_the_extracted_payload(self):
@@ -44,11 +45,28 @@ class PackagedGpuTests(unittest.TestCase):
 
     def test_gpu_package_gate_rejects_the_wrong_flavor_or_rid_without_running_it(self):
         with tempfile.TemporaryDirectory() as directory:
-            for flavor, rid in [('slim', 'win-x64'), ('gpu', 'linux-x64'), ('gpu', 'win-arm64')]:
+            for flavor, rid in [('slim', 'win-x64'), ('gpu', 'osx-arm64'), ('gpu', 'win-arm64')]:
                 with self.subTest(flavor=flavor, rid=rid), patch('subprocess.run') as run:
-                    with self.assertRaisesRegex(ValueError, 'Windows x64 GPU'):
+                    with self.assertRaisesRegex(ValueError, 'supported GPU'):
                         probe.verify(self.package(Path(directory), flavor, rid), gpu=True)
                     run.assert_not_called()
+
+    def test_linux_gpu_package_checks_the_extracted_egl_payload_headlessly(self):
+        with tempfile.TemporaryDirectory() as directory:
+            for rid in ['linux-x64', 'linux-arm64']:
+                calls = []
+
+                def execute(command, **kwargs):
+                    calls.append((command, kwargs))
+                    self.assertEqual(Path(command[-1]).read_bytes(), b'packaged host')
+
+                with self.subTest(rid=rid), patch('subprocess.run', side_effect=execute):
+                    probe.verify(self.package(Path(directory), rid=rid), gpu=True)
+                self.assertEqual(len(calls), 1)
+                command, options = calls[0]
+                self.assertTrue(Path(command[2]).as_posix().endswith('tests/gpu/linux_egl.py'))
+                self.assertEqual(options['env']['EGL_PLATFORM'], 'surfaceless')
+                self.assertEqual(options['env']['LIBGL_ALWAYS_SOFTWARE'], '1')
 
 
 if __name__ == '__main__':

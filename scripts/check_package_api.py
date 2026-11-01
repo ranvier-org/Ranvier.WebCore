@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -15,8 +16,8 @@ def verify(package, gpu=False):
         with zipfile.ZipFile(package) as archive:
             manifest = json.loads(archive.read('manifest.json'))
             rid = manifest['rid']
-            if gpu and (rid != 'win-x64' or manifest.get('flavor') != 'gpu'):
-                raise ValueError('Shared-frame acceptance requires a Windows x64 GPU package')
+            if gpu and (rid not in ['win-x64', 'linux-x64', 'linux-arm64'] or manifest.get('flavor') != 'gpu'):
+                raise ValueError('Shared-frame acceptance requires a supported GPU package (Windows x64 or Linux)')
             if rid not in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64', 'osx-arm64']:
                 raise ValueError('Unsupported package runtime: ' + str(rid))
             prefix = f'runtimes/{rid}/native/'
@@ -33,7 +34,11 @@ def verify(package, gpu=False):
                 files += 1
             if files == 0:
                 raise ValueError('Package has no native payload for ' + rid)
-        if gpu:
+        if gpu and rid.startswith('linux-'):
+            environment = dict(os.environ, EGL_PLATFORM='surfaceless', LIBGL_ALWAYS_SOFTWARE='1')
+            subprocess.run([sys.executable, '-I', str(root / 'tests/gpu/linux_egl.py'),
+                            str(destination / 'libRanvierWebCoreHost.so')], check=True, env=environment)
+        elif gpu:
             sdl = destination.parent / 'sdl'
             subprocess.run([sys.executable, '-I', str(root / 'scripts/sdl_runtime.py'), '--out', str(sdl)], check=True)
             subprocess.run([sys.executable, '-I', str(root / 'tests/gpu/run.py'), '--native', str(destination),
@@ -48,6 +53,6 @@ def verify(package, gpu=False):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--package', type=Path, required=True)
-    parser.add_argument('--gpu', action='store_true', help='Verify shared D3D11 frames and lifetimes (Windows x64 GPU only)')
+    parser.add_argument('--gpu', action='store_true', help='Verify shared frames and lifetimes (Windows x64 D3D11 or Linux EGLImage)')
     args = parser.parse_args()
     verify(args.package, gpu=args.gpu)

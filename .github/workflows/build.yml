@@ -190,8 +190,8 @@ jobs:
         shell: bash
         run: python -I scripts/check_package_api.py --package 'packages/${{ matrix.asset }}'
 
-      - name: Verify packaged Windows GPU shared frames and lifetimes
-        if: env.FLAVOR == 'gpu' && matrix.rid == 'win-x64'
+      - name: Verify packaged GPU shared frames and lifetimes
+        if: env.FLAVOR == 'gpu' && (matrix.rid == 'win-x64' || startsWith(matrix.rid, 'linux-'))
         shell: bash
         run: python -I scripts/check_package_api.py --gpu --package 'packages/${{ matrix.asset }}'
 

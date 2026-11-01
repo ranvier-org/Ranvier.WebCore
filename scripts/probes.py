@@ -19,13 +19,17 @@ EXPRESSIONS = {'work': '${{ env.RANVIER_WORK }}', 'flavor': '${{ env.FLAVOR }}',
 NATIVE = '{work}/out/{flavor}/runtimes/{rid}/native'
 
 
-def probe(name, *commands, rid=None, flavor='slim', timeout=TIMEOUT):
+def probe(name, *commands, rid=None, flavor='slim', timeout=TIMEOUT, env=None):
     """A probe: its commands, run when the runtime has the RID and the flavor (None matches every one)."""
     return {'name': name, 'commands': [command.replace('{native}', NATIVE) for command in commands],
-            'rid': rid, 'flavor': flavor, 'timeout': timeout}
+            'rid': rid, 'flavor': flavor, 'timeout': timeout, 'env': dict(env or {})}
 
 
 PROBES = [
+    *[probe('Verify Linux shared EGLImage frames and retained lifetimes',
+            'python -I tests/gpu/linux_egl.py {native}/libRanvierWebCoreHost.so', rid=rid, flavor='gpu',
+            env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
+      for rid in ['linux-x64', 'linux-arm64']],
     probe('Verify Windows shared D3D11 frames and bounded lifetimes',
           'python -I scripts/sdl_runtime.py --out {work}/tools/sdl3',
           'python -I tests/gpu/run.py --native {native} --sdl {work}/tools/sdl3/SDL3.dll --teardown all',
@@ -286,7 +290,7 @@ def kill(process):
             pass
 
 
-def execute(command, log, deadline):
+def execute(command, log, deadline, env=None):
     """Runs the command, copying its output to the job log and to the log file. Returns its exit code, or None when
     it outlived the deadline and was killed."""
     log.write(f'> {subprocess.list2cmdline(command)}\n'.encode())
@@ -294,7 +298,7 @@ def execute(command, log, deadline):
     sys.stdout.flush()
     options = {'creationflags': subprocess.CREATE_NEW_PROCESS_GROUP} if os.name == 'nt' else {'start_new_session': True}
     process = subprocess.Popen(command, cwd=root, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
-                               stderr=subprocess.STDOUT, **options)
+                               stderr=subprocess.STDOUT, env=dict(os.environ, **(env or {})), **options)
 
     def copy():
         for line in iter(process.stdout.readline, b''):
@@ -334,7 +338,7 @@ def run(args):
         outcome = 'PASS'
         with open(path, 'wb') as log:
             for command in entry['commands']:
-                code = execute(argv(command, values, args.no_dump), log, deadline)
+                code = execute(argv(command, values, args.no_dump), log, deadline, entry.get('env'))
                 if code is None:
                     outcome = f'FAIL (timed out after {timeout} s)'
                 elif code:
@@ -367,7 +371,8 @@ def list_probes(args):
         if args.rid and args.flavor and not applies(entry, args.rid, args.flavor):
             continue
         print(json.dumps({'name': entry['name'], 'if': condition(entry),
-                          'run': [workflow_text(command) for command in entry['commands']], 'timeout': entry['timeout']}))
+                          'run': [workflow_text(command) for command in entry['commands']], 'timeout': entry['timeout'],
+                          'env': entry.get('env', {})}))
     return 0
 
 

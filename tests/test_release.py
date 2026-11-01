@@ -100,6 +100,15 @@ class ReleaseTests(unittest.TestCase):
         smoke = calls[smoke_index]
         self.assertEqual(probe[probe.index('--package') + 1], smoke[smoke.index('--package') + 1])
 
+    def test_linux_gpu_release_checks_the_packed_egl_payload(self):
+        for rid in ['linux-x64', 'linux-arm64']:
+            with self.subTest(rid=rid):
+                code, calls = self.invoke('gpu', rids=(rid,))
+                self.assertIsNone(code)
+                frames = [command for command in calls if any(value.endswith('check_package_api.py') for value in command)]
+                self.assertEqual(len(frames), 1)
+                self.assertIn('--gpu', frames[0])
+
     def test_only_windows_x64_gpu_release_uses_automatic_only_guidance(self):
         self.invoke('gpu', dry_run=False)
         self.assertIn('automatically dispatches', self.transcript)

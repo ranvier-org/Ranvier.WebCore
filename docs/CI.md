@@ -242,6 +242,14 @@ The `webcore-gpu` lane verifies the exact package identity, version, flavor and 
 the counter with JIT and NativeAOT. Its GPU counts, visible SDL backbuffer and independent OS UIA checks
 must succeed without CPU fallback before the accelerated release is complete.
 
+Linux GPU packages use an explicit same-tag `flavor=gpu` dispatch with `rids=linux-x64,linux-arm64`.
+Their native job runs `tests/gpu/linux_egl.py` through the probe runner with
+`EGL_PLATFORM=surfaceless` and `LIBGL_ALWAYS_SOFTWARE=1`, scoped to that child process. This checks
+EGLImage content and retained-frame lifetimes even though Linux skips the F# ABI smoke driver.
+Locally attached Linux GPU packages run the same check on their extracted payload before publication;
+`release.py --flavor gpu` also runs it before attaching a Linux package. This Mesa software-driver proof
+is distinct from the View SDL presenter and visible-window acceptance.
+
 An incremental rebuild after vcpkg reinstalls packages can fail with clang rejecting a precompiled header:
 the reinstalled headers keep older modification times. Delete `cmake_pch.cxx.obj` under
 `<build>/Source` and build again. CI does not hit this: it reuses a build tree only under the same vcpkg key.
