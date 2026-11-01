@@ -96,6 +96,14 @@ def reference_hkdf(hash_name, key, salt, info, size):
 
 
 class KdfProbe(AesProbe):
+    def bytes(self, operation, page):
+        try:
+            return super().bytes(operation, page)
+        except AssertionError as error:
+            if str(error) == 'successful byte result':
+                raise AssertionError('byte result rejected with ' + self.error(operation)) from error
+            raise
+
     def wait(self, operation, page=None):
         deadline, ready = time.monotonic() + 120, I()
         while time.monotonic() < deadline:
@@ -157,16 +165,40 @@ def check_hashes_and_derived_keys(probe, page):
                             probe.n.expect(probe.bytes(probe.export(page, derived), page) == expected_key, 'deriveKey uses target length then raw import')
                             metadata = AesInfo(ctypes.sizeof(AesInfo))
                             probe.ok('aes_key_info', [Key, ctypes.POINTER(AesInfo)], derived, ctypes.byref(metadata))
-                            probe.n.expect(metadata.length_bits == bits, 'derived AES metadata')
+                            cipher_usage = aes != 'AES-KW'
+                            probe.n.expect((metadata.length_bits, metadata.extractable, metadata.can_encrypt, metadata.can_decrypt,
+                                            metadata.can_wrap, metadata.can_unwrap) == (bits, 1, cipher_usage, cipher_usage, not cipher_usage, not cipher_usage),
+                                           'derived AES length, extractability and exact usages')
+                            buffer, size = ctypes.create_string_buffer(64), I()
+                            probe.ok('key_algorithm_name', [Key, P, I, ctypes.POINTER(I)], derived, buffer, len(buffer), ctypes.byref(size))
+                            probe.n.expect(buffer.raw[:size.value].decode() == aes, 'derived AES algorithm identity')
                 for bits in [MISSING, 160]:
                     with probe.check(f'{name}/{hash_name} -> HMAC{bits is MISSING and "default" or bits}'):
                         derived = probe.take(probe.derived_key(page, key, options, target('HMAC', bits, hash_name), ('sign',)), page)
                         length = (512 if hash_name in ['SHA-1', 'SHA-256'] else 1024) if bits is MISSING else bits
                         probe.n.expect(probe.bytes(probe.export(page, derived), page) == probe.bytes(probe.bits(page, key, options, length), page), 'HMAC default block size or explicit byte length')
+                independent = probe.take(probe.derived_key(page, key, options, target('HMAC', 256, 'SHA-512'), ('sign',)), page)
+                material = probe.bytes(probe.export(page, independent), page)
+                signature = probe.start('hmac_sign', [P, Key, Bytes], page.document, independent, span(b'derived metadata'))
+                probe.n.expect(probe.bytes(signature, page) == hmac.digest(material, b'derived metadata', 'sha512'),
+                               'derived HMAC hash is independent of derivation hash')
                 private = probe.take(probe.derived_key(page, key, options, target('AES-GCM', 128), extractable=False), page)
                 probe.error_is(page, probe.export(page, private), 'InvalidAccessError')
                 for bits, error in [(159, 'OperationError'), (0, 'TypeError')]:
                     probe.error_is(page, probe.derived_key(page, key, options, target('HMAC', bits, hash_name), ('sign',)), error)
+
+
+def check_empty_inputs(probe, page):
+    for name in ['HKDF', 'PBKDF2']:
+        for password in [b'', b'password']:
+            for salt in [b'', b'salt']:
+                for bits in [0, 8]:
+                    with probe.check(f'{name} present input={password!r} salt={salt!r} bits={bits}'):
+                        key = probe.base(page, name, password)
+                        output = probe.bytes(probe.bits(page, key, parameters(name, 'SHA-256', salt, b'', 1), bits), page)
+                        expected = (b'' if not bits else reference_hkdf('SHA-256', password, salt, b'', 1) if name == 'HKDF'
+                                    else hashlib.pbkdf2_hmac('sha256', password, salt, 1, 1))
+                        probe.n.expect(output == expected, 'present empty password/salt is valid and distinct from missing')
 
 
 def check_validation(probe, page):
@@ -182,9 +214,7 @@ def check_validation(probe, page):
         probe.error_is(page, probe.imported(page, name, b'', usages=('encrypt',), extractable=False), 'SyntaxError')
         probe.error_is(page, probe.imported(page, name, {'kty': 'oct', 'k': 'AQ'}, format='jwk',
                                             usages=('encrypt',), extractable=True), 'NotSupportedError')
-        options = parameters(name, 'SHA-256', b'', b'', 1)
-        empty = probe.base(page, name, b'')
-        probe.n.expect(len(probe.bytes(probe.bits(page, empty, options, 8), page)) == 1, 'empty password/input is present valid key material')
+        options = parameters(name, 'SHA-256', b'salt', b'', 1)
         for length, error in [(MISSING, 'OperationError'), (1, 'OperationError'), (9, 'OperationError'), (2**32, 'TypeError')]:
             probe.error_is(page, probe.bits(page, key, options, length), error)
         probe.n.expect(probe.bytes(probe.bits(page, key, options, 0), page) == b'', 'zero length is an empty owning byte result')
@@ -209,8 +239,9 @@ def check_validation(probe, page):
     key = probe.base(page, 'HKDF')
     probe.error_is(page, probe.bits(page, key, parameters('HKDF', 'SHA-256', b''), 128), 'TypeError')
     probe.error_is(page, probe.bits(page, key, parameters('HKDF', 'SHA-256', b'', b''), 255 * 256 + 8), 'OperationError')
-    maximum = probe.bytes(probe.bits(page, key, parameters('HKDF', 'SHA-256', b'', b''), 255 * 256), page)
-    probe.n.expect(maximum == reference_hkdf('SHA-256', b'password', b'', b'', 255 * 32), 'HKDF exact maximum and final counter block')
+    with probe.check('HKDF exact maximum'):
+        maximum = probe.bytes(probe.bits(page, key, parameters('HKDF', 'SHA-256', b'', b''), 255 * 256), page)
+        probe.n.expect(maximum == reference_hkdf('SHA-256', b'password', b'', b'', 255 * 32), 'HKDF exact maximum and final counter block')
     key = probe.base(page, 'PBKDF2')
     for iterations, error in [(MISSING, 'TypeError'), (0, 'OperationError'), (2**32, 'TypeError'), (-1, 'TypeError')]:
         with probe.check('PBKDF2 iteration/range ' + str(iterations)):
@@ -244,6 +275,12 @@ def check_lifetime(probe):
         options.backing[2].backing[0], options.backing[3].backing[0] = b'X', b'X'
         expected = reference_hkdf('SHA-256', raw, b'salt', b'info', 32)
         probe.n.expect(probe.bytes(operation, page) == expected, 'password/salt/info copied before admission returns')
+        derived = target('HMAC', 256, 'SHA-512')
+        operation = probe.derived_key(page, key, parameters('HKDF', 'SHA-256', b'salt', b'info'), derived, ('sign',))
+        derived.backing[1].backing[0] = b'X'
+        derived_key = probe.take(operation, page)
+        signature = probe.start('hmac_sign', [P, Key, Bytes], page.document, derived_key, span(b'copied target'))
+        probe.n.expect(probe.bytes(signature, page) == hmac.digest(expected, b'copied target', 'sha512'), 'derived import parameters copied before return')
         retained = probe.base(page, 'HKDF', raw)
         operation = probe.bits(page, retained, parameters('HKDF', 'SHA-256', b'salt', b'info'), 256)
         probe.ok('key_release', [Key], retained)
@@ -276,7 +313,7 @@ def run(directory, bridge_library=None):
             supported = I()
             probe.ok('kdf_supported', [P, Bytes, ctypes.POINTER(I)], page.document, span(name.encode()), ctypes.byref(supported))
             n.expect(supported.value == 1, name + ' registered')
-        for group in [check_vectors, check_hashes_and_derived_keys, check_validation]:
+        for group in [check_vectors, check_hashes_and_derived_keys, check_empty_inputs, check_validation]:
             with probe.check(group.__name__):
                 group(probe, page)
         with probe.check('check_lifetime'):
