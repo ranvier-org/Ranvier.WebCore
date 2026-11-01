@@ -94,10 +94,14 @@ class BuildCacheTests(unittest.TestCase):
         ).stdout.decode().strip()
         self.assertEqual(canonical_hash, old_blob)
         self.set_mtime(self.prefix, FRESH_TIME)
+        cached_output = self.build / 'cached-object.obj'
+        cached_output.write_bytes(b'cached output')
+        self.set_mtime(cached_output, OLD_TIME)
 
         result = self.run_cache('normalise')
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(int(self.prefix.stat().st_mtime), FRESH_TIME, result.stdout)
+        self.assertTrue(cached_output.exists())
 
     def test_unchanged_raw_bytes_still_reuse_the_recorded_timestamp(self):
         self.assertEqual(self.run_cache('record').returncode, 0)
@@ -123,6 +127,7 @@ class BuildCacheTests(unittest.TestCase):
         refused = self.run_cache('normalise')
         self.assertNotEqual(refused.returncode, 0)
         self.assertIn('refusing cached PCH reuse', refused.stderr)
+        self.assertIn('cached output', refused.stderr)
         self.assertEqual((self.build / 'ranvier-sources.json').read_bytes(), manifest_before)
         self.assertTrue(sentinel.exists())
         self.assertEqual(int(self.early.stat().st_mtime), FRESH_TIME, 'preflight must not normalize healthy files before refusing')
@@ -135,7 +140,7 @@ class BuildCacheTests(unittest.TestCase):
         self.assertEqual(int(self.prefix.stat().st_mtime), OLD_TIME)
         self.assertEqual(self.manifest()['format'], 2)
 
-    def test_changed_git_blob_with_equal_raw_length_and_cached_timestamp_fails_closed(self):
+    def test_changed_git_blob_with_equal_raw_length_and_newer_source_than_cache_fails_closed_when_output_is_newer(self):
         self.assertEqual(self.run_cache('record').returncode, 0)
         old_blob = git(self.source, 'rev-parse', 'HEAD:JavaScriptCorePrefix.h')
         manifest_before = (self.build / 'ranvier-sources.json').read_bytes()
@@ -152,11 +157,12 @@ class BuildCacheTests(unittest.TestCase):
             check=True,
         ).stdout.decode().strip()
         self.assertNotEqual(changed_blob, old_blob)
-        self.set_mtime(self.prefix, OLD_TIME)
+        self.set_mtime(self.prefix, OLD_TIME + 100)
 
         refused = self.run_cache('normalise')
         self.assertNotEqual(refused.returncode, 0)
         self.assertIn('refusing cached PCH reuse', refused.stderr)
+        self.assertIn('cached output', refused.stderr)
         self.assertEqual((self.build / 'ranvier-sources.json').read_bytes(), manifest_before)
         self.assertTrue(sentinel.exists())
         self.assertEqual(int(self.early.stat().st_mtime), FRESH_TIME)
@@ -165,6 +171,7 @@ class BuildCacheTests(unittest.TestCase):
         self.assertEqual(cleared.returncode, 0, cleared.stderr)
         self.assertFalse(sentinel.exists())
         self.assertFalse((self.build / 'build.ninja').exists())
+        self.assertEqual(int(self.prefix.stat().st_mtime), OLD_TIME + 100)
         self.assertEqual(self.manifest()['format'], 2)
 
     def test_ci_normalise_caller_explicitly_allows_legacy_cache_migration(self):

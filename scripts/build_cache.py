@@ -34,6 +34,25 @@ def raw_sha256(path):
     return digest.hexdigest()
 
 
+def newest_cached_output_mtime_ns(build):
+    """Newest reusable file timestamp in a build tree, excluding cache/build metadata."""
+    metadata = {MANIFEST, 'build.ninja', '.ninja_log', '.ninja_deps', 'CMakeCache.txt', 'compile_commands.json'}
+    newest = None
+    if not build.exists():
+        return newest
+    for directory, _, names in os.walk(build):
+        for name in names:
+            if name in metadata or name == 'CMakeConfigureLog.yaml':
+                continue
+            try:
+                info = os.stat(long_path(pathlib.Path(directory) / name))
+            except FileNotFoundError:
+                continue
+            if stat.S_ISREG(info.st_mode) and (newest is None or info.st_mtime_ns > newest):
+                newest = info.st_mtime_ns
+    return newest
+
+
 def long_path(path):
     """path in the form Windows accepts beyond MAX_PATH; other systems take it as it is."""
     if os.name != 'nt':
@@ -99,6 +118,8 @@ def normalise(args):
     # refuse atomically; otherwise earlier unchanged files could already have been normalized before the refusal.
     scanned = {}
     unsafe_raw_changes = []
+    newest_output_ns = None
+    output_mtime_scanned = False
     for name, tree in trees.items():
         ids, hashed = blob_ids(tree)
         old = (cached or {}).get('trees', {}).get(name, {})
@@ -120,16 +141,19 @@ def normalise(args):
                 try:
                     previous_seconds = int(previous[1])
                 except (IndexError, TypeError, ValueError):
-                    unsafe_raw_changes.append((name, path, 'unknown cached timestamp', seconds))
-                else:
-                    if seconds <= previous_seconds:
-                        unsafe_raw_changes.append((name, path, previous_seconds, seconds))
+                    previous_seconds = 'unknown'
+                if not output_mtime_scanned:
+                    newest_output_ns = newest_cached_output_mtime_ns(build)
+                    output_mtime_scanned = True
+                if newest_output_ns is not None and info.st_mtime_ns <= newest_output_ns:
+                    unsafe_raw_changes.append((name, path, previous_seconds, seconds, newest_output_ns))
             files[path] = (oid, info, seconds, raw_hash)
         scanned[name] = (tree, ids, hashed, old, files)
     if unsafe_raw_changes:
-        name, path, cached_seconds, current_seconds = unsafe_raw_changes[0]
-        reason = (f'build_cache: raw bytes changed without a strictly newer source timestamp at '
-                  f'{name}/{path} (cached={cached_seconds}, current={current_seconds}); refusing cached PCH reuse')
+        name, path, cached_seconds, current_seconds, newest_output_ns = unsafe_raw_changes[0]
+        reason = (f'build_cache: raw bytes changed but the source timestamp is not newer than cached output '
+                  f'{name}/{path} (cached-source={cached_seconds}, current={current_seconds}, '
+                  f'newest-output-ns={newest_output_ns}); refusing cached PCH reuse')
         if not args.clear_unknown:
             sys.exit(reason + '; rerun with --clear-unknown to discard the build tree explicitly')
         print(reason + '; --clear-unknown was given, so the build tree is cleared', flush=True)
