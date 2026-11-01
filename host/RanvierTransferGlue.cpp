@@ -75,6 +75,9 @@ public:
     void writeCustomData(const Vector<PasteboardCustomData>&) final { }
 
     FileContentState fileContentState() final { return m_files.isEmpty() ? FileContentState::NoFileOrImageData : FileContentState::InMemoryImage; }
+#if PLATFORM(WPE)
+    bool allowsInMemoryFileAccessForDrag() const final { return true; }
+#endif
     bool canSmartReplace() final { return false; }
 
 #if ENABLE(DRAG_SUPPORT)

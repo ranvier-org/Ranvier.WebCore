@@ -1,0 +1,857 @@
+{
+ "results": {
+  "constructed": {
+   "initial": {
+    "dropEffect": "none",
+    "effectAllowed": "none",
+    "types": []
+   },
+   "bogus": [
+    "none",
+    "none"
+   ],
+   "link": [
+    "none",
+    "none"
+   ],
+   "types": [
+    "text/plain",
+    "text/html",
+    "application/x-custom"
+   ],
+   "text": "a",
+   "url": "",
+   "afterFile": {
+    "types": [
+     "text/plain",
+     "text/html",
+     "application/x-custom"
+    ],
+    "items": [
+     [
+      "string",
+      "text/plain"
+     ],
+     [
+      "string",
+      "text/html"
+     ],
+     [
+      "file",
+      "text/plain"
+     ]
+    ],
+    "files": [
+     "z.txt"
+    ]
+   },
+   "dup": "NotSupportedError",
+   "removed": [
+    "text/html",
+    "application/x-custom"
+   ],
+   "cleared": [
+    "application/x-custom"
+   ],
+   "clearAll": {
+    "types": [],
+    "files": 1
+   },
+   "itemsClear": {
+    "types": [],
+    "files": 0
+   }
+  },
+  "drop": {
+   "over": 1,
+   "dropped": 1,
+   "log": [
+    {
+     "interface": "DragEvent",
+     "dt": {
+      "types": [
+       "text/plain",
+       "text/html",
+       "Files"
+      ],
+      "text": "",
+      "html": "",
+      "uri": "",
+      "files": [],
+      "items": [
+       [
+        "string",
+        "text/plain"
+       ],
+       [
+        "string",
+        "text/html"
+       ]
+      ],
+      "dropEffect": "none",
+      "effectAllowed": "copy"
+     },
+     "type": "dragenter"
+    },
+    {
+     "interface": "DragEvent",
+     "dt": {
+      "types": [
+       "text/plain",
+       "text/html",
+       "Files"
+      ],
+      "text": "",
+      "html": "",
+      "uri": "",
+      "files": [],
+      "items": [
+       [
+        "string",
+        "text/plain"
+       ],
+       [
+        "string",
+        "text/html"
+       ]
+      ],
+      "dropEffect": "none",
+      "effectAllowed": "copy"
+     },
+     "type": "dragover",
+     "write": {
+      "setData": false,
+      "itemsAdd": false
+     }
+    },
+    {
+     "interface": "DragEvent",
+     "dt": {
+      "types": [
+       "text/plain",
+       "text/html",
+       "Files"
+      ],
+      "text": "",
+      "html": "",
+      "uri": "",
+      "files": [],
+      "items": [
+       [
+        "string",
+        "text/plain"
+       ],
+       [
+        "string",
+        "text/html"
+       ]
+      ],
+      "dropEffect": "none",
+      "effectAllowed": "copy"
+     },
+     "type": "dragover",
+     "write": {
+      "setData": false,
+      "itemsAdd": false
+     }
+    },
+    {
+     "interface": "DragEvent",
+     "dt": {
+      "types": [
+       "text/plain",
+       "text/html",
+       "Files"
+      ],
+      "text": "XY",
+      "html": "<i>X</i>Y",
+      "uri": "",
+      "files": [
+       [
+        "note.txt",
+        "text/plain",
+        10
+       ],
+       [
+        "table.csv",
+        "text/csv",
+        3
+       ]
+      ],
+      "items": [
+       [
+        "string",
+        "text/plain"
+       ],
+       [
+        "string",
+        "text/html"
+       ],
+       [
+        "file",
+        "text/plain"
+       ],
+       [
+        "file",
+        "text/csv"
+       ]
+      ],
+      "dropEffect": "none",
+      "effectAllowed": "copy"
+     },
+     "type": "drop",
+     "write": {
+      "setData": false,
+      "itemsAdd": false
+     }
+    }
+   ],
+   "after": {
+    "dragenter": {
+     "types": [],
+     "text": "",
+     "html": "",
+     "uri": "",
+     "files": [],
+     "items": [
+      [
+       "string",
+       "text/plain"
+      ],
+      [
+       "string",
+       "text/html"
+      ]
+     ],
+     "dropEffect": "none",
+     "effectAllowed": "copy"
+    },
+    "dragover": {
+     "types": [],
+     "text": "",
+     "html": "",
+     "uri": "",
+     "files": [],
+     "items": [
+      [
+       "string",
+       "text/plain"
+      ],
+      [
+       "string",
+       "text/html"
+      ]
+     ],
+     "dropEffect": "none",
+     "effectAllowed": "copy"
+    },
+    "drop": {
+     "types": [],
+     "text": "",
+     "html": "",
+     "uri": "",
+     "files": [],
+     "items": [
+      [
+       "string",
+       "text/plain"
+      ],
+      [
+       "string",
+       "text/html"
+      ],
+      [
+       "file",
+       "text/plain"
+      ],
+      [
+       "file",
+       "text/csv"
+      ]
+     ],
+     "dropEffect": "none",
+     "effectAllowed": "copy"
+    }
+   }
+  },
+  "filePrivacy": {
+   "diskPathStringsExposeFiles": false
+  },
+  "paste": {
+   "status": 1,
+   "offers": [
+    0,
+    0,
+    0,
+    -9,
+    -11
+   ],
+   "log": [
+    {
+     "interface": "ClipboardEvent",
+     "dt": {
+      "types": [
+       "text/plain",
+       "text/html",
+       "Files"
+      ],
+      "text": "PQ",
+      "html": "<u>P</u>Q",
+      "uri": "",
+      "files": [
+       [
+        "image.png",
+        "image/png",
+        70
+       ]
+      ],
+      "items": [
+       [
+        "string",
+        "text/plain"
+       ],
+       [
+        "string",
+        "text/html"
+       ],
+       [
+        "file",
+        "image/png"
+       ]
+      ],
+      "dropEffect": "none",
+      "effectAllowed": "uninitialized"
+     },
+     "type": "paste",
+     "write": {
+      "setData": false,
+      "itemsAdd": false
+     }
+    },
+    {
+     "interface": "InputEvent",
+     "dt": {
+      "types": [
+       "text/plain",
+       "text/html"
+      ],
+      "text": "PQ",
+      "html": "<u>P</u>Q",
+      "uri": "",
+      "files": [],
+      "items": [
+       [
+        "string",
+        "text/plain"
+       ],
+       [
+        "string",
+        "text/html"
+       ]
+      ],
+      "dropEffect": "none",
+      "effectAllowed": "uninitialized"
+     },
+     "inputType": "insertFromPaste",
+     "data": null,
+     "ranges": [
+      [
+       0,
+       2
+      ]
+     ],
+     "type": "beforeinput"
+    },
+    {
+     "interface": "InputEvent",
+     "dt": {
+      "types": [
+       "text/plain",
+       "text/html"
+      ],
+      "text": "PQ",
+      "html": "<u>P</u>Q",
+      "uri": "",
+      "files": [],
+      "items": [
+       [
+        "string",
+        "text/plain"
+       ],
+       [
+        "string",
+        "text/html"
+       ]
+      ],
+      "dropEffect": "none",
+      "effectAllowed": "uninitialized"
+     },
+     "inputType": "insertFromPaste",
+     "data": null,
+     "ranges": [],
+     "type": "input"
+    }
+   ],
+   "after": {
+    "paste": {
+     "types": [],
+     "text": "",
+     "html": "",
+     "uri": "",
+     "files": [],
+     "items": [
+      [
+       "string",
+       "text/plain"
+      ],
+      [
+       "string",
+       "text/html"
+      ],
+      [
+       "file",
+       "image/png"
+      ]
+     ],
+     "dropEffect": "none",
+     "effectAllowed": "uninitialized"
+    },
+    "beforeinput": {
+     "types": [
+      "text/plain",
+      "text/html"
+     ],
+     "text": "PQ",
+     "html": "<u>P</u>Q",
+     "uri": "",
+     "files": [],
+     "items": [
+      [
+       "string",
+       "text/plain"
+      ],
+      [
+       "string",
+       "text/html"
+      ]
+     ],
+     "dropEffect": "none",
+     "effectAllowed": "uninitialized"
+    },
+    "input": {
+     "types": [
+      "text/plain",
+      "text/html"
+     ],
+     "text": "PQ",
+     "html": "<u>P</u>Q",
+     "uri": "",
+     "files": [],
+     "items": [
+      [
+       "string",
+       "text/plain"
+      ],
+      [
+       "string",
+       "text/html"
+      ]
+     ],
+     "dropEffect": "none",
+     "effectAllowed": "uninitialized"
+    }
+   },
+   "html": "<u>P</u>Q<br>"
+  },
+  "deny": {
+   "status": -3,
+   "exception": "NotAllowedError",
+   "offers": [
+    0
+   ],
+   "events": [],
+   "html": "<u>P</u>Q<br>"
+  },
+  "copy": {
+   "status": 1,
+   "log": [
+    {
+     "type": "copy",
+     "interface": "ClipboardEvent",
+     "dt": {
+      "types": [
+       "text/plain"
+      ],
+      "text": "C\u00001",
+      "html": "",
+      "uri": "",
+      "files": [
+       [
+        "c.txt",
+        "text/plain",
+        6
+       ]
+      ],
+      "items": [
+       [
+        "string",
+        "text/plain"
+       ],
+       [
+        "file",
+        "text/plain"
+       ]
+      ],
+      "dropEffect": "none",
+      "effectAllowed": "uninitialized"
+     }
+    }
+   ],
+   "after": {
+    "copy": {
+     "types": [],
+     "text": "",
+     "html": "",
+     "uri": "",
+     "files": [],
+     "items": [
+      [
+       "string",
+       "text/plain"
+      ],
+      [
+       "file",
+       "text/plain"
+      ]
+     ],
+     "dropEffect": "none",
+     "effectAllowed": "uninitialized"
+    }
+   },
+   "written": [
+    [
+     "string",
+     "text/plain",
+     "C\u00001",
+     1
+    ],
+    [
+     "file",
+     "c.txt",
+     "text/plain",
+     6,
+     0
+    ]
+   ]
+  },
+  "dragOut": {
+   "allowed": 5,
+   "files": 1,
+   "file": [
+    "c.txt",
+    "text/plain",
+    6
+   ],
+   "items": [
+    [
+     "text/plain",
+     "drag"
+    ],
+    [
+     "Text",
+     null
+    ],
+    [
+     "text",
+     null
+    ]
+   ],
+   "image": [
+    -6,
+    40,
+    20,
+    5,
+    7
+   ],
+   "fed": [
+    {
+     "types": [
+      "text/plain",
+      "Text",
+      "text",
+      "Files"
+     ],
+     "text": "",
+     "html": "",
+     "uri": "",
+     "files": [],
+     "items": [
+      [
+       "string",
+       "text/plain"
+      ]
+     ],
+     "dropEffect": "none",
+     "effectAllowed": "copyLink"
+    },
+    {
+     "types": [
+      "text/plain",
+      "Text",
+      "text",
+      "Files"
+     ],
+     "text": "drag",
+     "html": "",
+     "uri": "",
+     "files": [
+      [
+       "c.txt",
+       "text/plain",
+       6
+      ]
+     ],
+     "items": [
+      [
+       "string",
+       "text/plain"
+      ],
+      [
+       "file",
+       "text/plain"
+      ]
+     ],
+     "dropEffect": "none",
+     "effectAllowed": "copyLink"
+    }
+   ],
+   "fedOperation": 1
+  },
+  "replace": {
+   "cancelled": {
+    "status": 0,
+    "log": [
+     {
+      "interface": "InputEvent",
+      "dt": {
+       "types": [
+        "text/plain",
+        "text/html"
+       ],
+       "text": "there",
+       "html": "there",
+       "uri": "",
+       "files": [],
+       "items": [
+        [
+         "string",
+         "text/plain"
+        ],
+        [
+         "string",
+         "text/html"
+        ]
+       ],
+       "dropEffect": "none",
+       "effectAllowed": "uninitialized"
+      },
+      "inputType": "insertReplacementText",
+      "data": null,
+      "ranges": [
+       [
+        6,
+        11
+       ]
+      ],
+      "type": "beforeinput"
+     }
+    ],
+    "after": {
+     "beforeinput": {
+      "types": [
+       "text/plain",
+       "text/html"
+      ],
+      "text": "there",
+      "html": "there",
+      "uri": "",
+      "files": [],
+      "items": [
+       [
+        "string",
+        "text/plain"
+       ],
+       [
+        "string",
+        "text/html"
+       ]
+      ],
+      "dropEffect": "none",
+      "effectAllowed": "uninitialized"
+     }
+    },
+    "html": "hello world"
+   },
+   "applied": {
+    "status": 1,
+    "log": [
+     {
+      "interface": "InputEvent",
+      "dt": {
+       "types": [
+        "text/plain",
+        "text/html"
+       ],
+       "text": "there",
+       "html": "there",
+       "uri": "",
+       "files": [],
+       "items": [
+        [
+         "string",
+         "text/plain"
+        ],
+        [
+         "string",
+         "text/html"
+        ]
+       ],
+       "dropEffect": "none",
+       "effectAllowed": "uninitialized"
+      },
+      "inputType": "insertReplacementText",
+      "data": null,
+      "ranges": [
+       [
+        6,
+        11
+       ]
+      ],
+      "type": "beforeinput"
+     },
+     {
+      "interface": "InputEvent",
+      "dt": {
+       "types": [
+        "text/plain",
+        "text/html"
+       ],
+       "text": "there",
+       "html": "there",
+       "uri": "",
+       "files": [],
+       "items": [
+        [
+         "string",
+         "text/plain"
+        ],
+        [
+         "string",
+         "text/html"
+        ]
+       ],
+       "dropEffect": "none",
+       "effectAllowed": "uninitialized"
+      },
+      "inputType": "insertReplacementText",
+      "data": null,
+      "ranges": [],
+      "type": "input"
+     }
+    ],
+    "after": {
+     "beforeinput": {
+      "types": [
+       "text/plain",
+       "text/html"
+      ],
+      "text": "there",
+      "html": "there",
+      "uri": "",
+      "files": [],
+      "items": [
+       [
+        "string",
+        "text/plain"
+       ],
+       [
+        "string",
+        "text/html"
+       ]
+      ],
+      "dropEffect": "none",
+      "effectAllowed": "uninitialized"
+     },
+     "input": {
+      "types": [
+       "text/plain",
+       "text/html"
+      ],
+      "text": "there",
+      "html": "there",
+      "uri": "",
+      "files": [],
+      "items": [
+       [
+        "string",
+        "text/plain"
+       ],
+       [
+        "string",
+        "text/html"
+       ]
+      ],
+      "dropEffect": "none",
+      "effectAllowed": "uninitialized"
+     }
+    },
+    "html": "hello there"
+   },
+   "second": {
+    "status": 1,
+    "html": "HELLO there"
+   },
+   "foreign": -12,
+   "constructedEvent": {
+    "inputType": "insertText",
+    "dataTransfer": null
+   }
+  },
+  "errors": {
+   "dragEventOnInputEvent": -11,
+   "nullTransfer": -1,
+   "nullContext": -1,
+   "replaceNull": -1,
+   "offerNull": -1,
+   "denyNull": -1,
+   "fileWriteNull": -1,
+   "dragFileNull": -1,
+   "dragFileCountNull": -1,
+   "thread": {
+    "replace": -2,
+    "create": -2,
+    "dragFile": -2
+   }
+  },
+  "reserved": {
+   "dragFiles": -9,
+   "dragBlob": -11,
+   "dragNull": -1
+  },
+  "pastHost": [
+   [
+    "note.txt",
+    "text/plain",
+    10,
+    "hello file"
+   ],
+   [
+    "table.csv",
+    "text/csv",
+    3,
+    "a,b"
+   ]
+  ]
+ },
+ "assertions": 960
+}

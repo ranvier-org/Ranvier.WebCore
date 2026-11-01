@@ -39,11 +39,16 @@ def verify(package, gpu=False):
             for arguments in [[], ['--context-lifecycle']]:
                 subprocess.run([sys.executable, '-I', str(root / 'tests/gpu/linux_egl.py'),
                                 str(destination / 'libRanvierWebCoreHost.so'), *arguments], check=True, env=environment)
+            subprocess.run([sys.executable, '-I', str(root / 'tests/gpu/linux_view_transition_pixels.py'),
+                            '--native-directory', str(destination)], check=True, env=environment)
         elif gpu:
             sdl = destination.parent / 'sdl'
             subprocess.run([sys.executable, '-I', str(root / 'scripts/sdl_runtime.py'), '--out', str(sdl)], check=True)
             subprocess.run([sys.executable, '-I', str(root / 'tests/gpu/run.py'), '--native', str(destination),
                             '--sdl', str(sdl / 'SDL3.dll'), '--teardown', 'all'], check=True)
+            subprocess.run([sys.executable, '-I', str(root / 'tests/gpu/windows_view_transition_pixels.py'),
+                            '--native-directory', str(destination), '--output', str(destination.parent / 'transition-readback')],
+                           check=True)
         else:
             for name in ['css_supports', 'computed_style', 'fragment_rectangles', 'keyframe_rules', 'counter_style_rules', 'custom_properties', 'typed_style_values', 'style_property_maps', 'declared_style_maps', 'style_map_entries', 'geometry_values', 'matrix_values', 'css_transforms', 'detached_cssom_context']:
                 subprocess.run([sys.executable, '-I', str(root / 'tests/abi' / (name + '.py')),

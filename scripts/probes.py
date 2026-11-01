@@ -19,13 +19,21 @@ EXPRESSIONS = {'work': '${{ env.RANVIER_WORK }}', 'flavor': '${{ env.FLAVOR }}',
 NATIVE = '{work}/out/{flavor}/runtimes/{rid}/native'
 
 
-def probe(name, *commands, rid=None, flavor='slim', timeout=TIMEOUT, env=None):
-    """A probe: its commands, run when the runtime has the RID and the flavor (None matches every one)."""
+def probe(name, *commands, rid=None, flavor=('slim', 'gpu'), timeout=TIMEOUT, env=None):
+    """A probe: common contracts run on slim and GPU; explicit flavors restrict a probe, and None matches all."""
     return {'name': name, 'commands': [command.replace('{native}', NATIVE) for command in commands],
             'rid': rid, 'flavor': flavor, 'timeout': timeout, 'env': dict(env or {})}
 
 
 PROBES = [
+    probe('Verify Windows same-document transition snapshot pixels',
+          'python -I tests/gpu/windows_view_transition_pixels.py --native-directory {native} --output {work}/gpu-transition-readback',
+          rid='win-x64', flavor='gpu'),
+    *[probe('Verify Linux same-document transition snapshot pixels',
+            'python -I tests/gpu/linux_view_transition_pixels.py --native-directory {native}',
+            rid=rid, flavor='gpu',
+            env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
+      for rid in ['linux-x64', 'linux-arm64']],
     *[probe('Verify Linux shared EGLImage frames and retained lifetimes',
             'python -I tests/gpu/linux_egl.py {native}/libRanvierWebCoreHost.so',
             'python -I tests/gpu/linux_egl.py {native}/libRanvierWebCoreHost.so --context-lifecycle',
@@ -144,6 +152,11 @@ PROBES = [
           'python -I -X utf8 tests/abi/web_animation_effects.py --native-directory {native}'),
     probe('Verify Web Animations creation against the Chromium oracle',
           'python -I -X utf8 tests/abi/web_animations.py --native-directory {native}'),
+    *[probe('Verify default compositor root reattachment',
+            'python -I -X utf8 tests/gpu/compositor_reattach.py --native-directory {native}',
+            rid=rid, flavor='gpu',
+            env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'} if rid.startswith('linux-') else {})
+      for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],
     probe('Verify the Web Animations lifecycle and promises against the Chromium oracle',
           'python -I -X utf8 tests/abi/animation_lifecycle.py --native-directory {native}'),
     probe('Verify typed animation and transition events against the Chromium oracle',
@@ -251,7 +264,9 @@ def condition(entry):
 
 
 def applies(entry, rid, flavor):
-    return entry['rid'] in (None, rid) and entry['flavor'] in (None, flavor)
+    flavors = entry['flavor']
+    return entry['rid'] in (None, rid) and (flavors is None or flavor in (
+        flavors if isinstance(flavors, (tuple, list)) else (flavors,)))
 
 
 def workflow_text(command):
