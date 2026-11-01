@@ -12,6 +12,7 @@ private memory flat."""
 
 import argparse
 import ctypes
+import faulthandler
 import json
 import os
 from pathlib import Path
@@ -21,6 +22,9 @@ import threading
 import subprocess
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from form_collections import Native, P, I, U, OK, NULL_ARGUMENT, WRONG_THREAD, DOM_EXCEPTION, WRONG_INTERFACE, ABI  # noqa: E402
+
+# A native fault (SIGBUS, SIGSEGV, SIGABRT) prints every thread's Python stack, which names the step reached.
+faulthandler.enable()
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 D = ctypes.c_double
@@ -201,10 +205,33 @@ class Page:
 
 # JSC's exported Options::setOption(const char*, bool), MSVC and Itanium manglings.
 SET_OPTION = ['?setOption@Options@JSC@@SA_NPEBD_N@Z', '_ZN3JSC7Options9setOptionEPKcb']
-# WTF::Config::disableFreezingForTesting(). On Linux and macOS, WTF write-protects JSC's options when the first VM is set
-# up, so a later Options::setOption faults; Windows leaves them writable.
+# WTF::Config::disableFreezingForTesting(). On Linux and macOS, WTF write-protects JSC's options (WebConfig::g_config) when
+# the first VM is set up (WTF::Config::finalize, WTFConfig.cpp), so a later Options::setOption faults; Windows leaves them
+# writable. On macOS, WTF::setPermissionsOfConfigPage remaps g_config and restores only its allocator slots (WTFConfig.cpp),
+# which resets the flag set by disableFreezingForTesting; so it runs first, as in JSC::Config::configureForTesting (JSCConfig.h).
 DISABLE_FREEZING = '_ZN3WTF6Config25disableFreezingForTestingEv'
+CONFIG_PAGE = '_ZN3WTF26setPermissionsOfConfigPageEv'
 options_writable = sys.platform == 'win32'
+# The steps keep_options_writable reached, with the image each symbol resolved to; a failure to arm reports them.
+arming = []
+
+
+class DlInfo(ctypes.Structure):
+    _fields_ = [('fname', ctypes.c_char_p), ('fbase', P), ('sname', ctypes.c_char_p), ('saddr', P)]
+
+
+def resolve(library, name):
+    """The exported function name from library or a library it loads, or None; records the defining image in arming."""
+    function = getattr(library, name, None)
+    image = 'missing'
+    if function is not None:
+        dladdr, info = getattr(ctypes.CDLL(None), 'dladdr', None), DlInfo()
+        if dladdr is not None:
+            dladdr.restype, dladdr.argtypes = ctypes.c_int, [P, ctypes.POINTER(DlInfo)]
+        found = dladdr is not None and dladdr(ctypes.cast(function, P), ctypes.byref(info)) and info.fname
+        image = Path(info.fname.decode('utf-8', 'replace')).name if found else 'unknown image'
+    arming.append(f'{name} in {image}')
+    return function
 
 
 def keep_options_writable(library):
@@ -213,18 +240,45 @@ def keep_options_writable(library):
     global options_writable
     if options_writable:
         return
-    function = getattr(library, DISABLE_FREEZING, None)
-    if function is not None:
+    steps = [CONFIG_PAGE, DISABLE_FREEZING] if sys.platform == 'darwin' else [DISABLE_FREEZING]
+    functions = [resolve(library, name) for name in steps]
+    if None in functions:
+        return
+    for name, function in zip(steps, functions):
         function.restype, function.argtypes = None, []
         function()
-        options_writable = True
+        arming.append('called ' + name)
+    options_writable = True
+
+
+def options_page_writable(library):
+    """Whether the page of WebConfig::g_config, which holds JSC's options, takes a store, or None where library does not
+    export g_config. A read() into a write-protected page fails with EFAULT where a store would fault; the read writes back
+    the byte already there."""
+    try:
+        config = ctypes.c_uint8.in_dll(library, 'g_config')
+    except ValueError:
+        arming.append('g_config missing')
+        return None
+    libc = ctypes.CDLL(None, use_errno=True)
+    libc.read.restype, libc.read.argtypes = ctypes.c_ssize_t, [ctypes.c_int, P, ctypes.c_size_t]
+    source, sink = os.pipe()
+    try:
+        os.write(sink, bytes([config.value]))
+        if libc.read(source, ctypes.addressof(config), 1) == 1:
+            return True
+        arming.append('g_config write-protected: ' + os.strerror(ctypes.get_errno()))
+        return False
+    finally:
+        os.close(source)
+        os.close(sink)
 
 
 def arm_vm_entry_crash(directory, crash=True):
-    """Makes a VM entry under DisallowVMEntry crash the process; returns False where JSC does not export the setter or
-    its options are write-protected."""
+    """Makes a VM entry under DisallowVMEntry crash the process; returns False where JSC does not export the setter. Raises
+    where the options stay write-protected, naming the steps keep_options_writable reached."""
     if not options_writable:
-        return False
+        raise AssertionError('JSC options stay write-protected: ' + ('; '.join(arming) or 'keep_options_writable did not run'))
     names = {'win32': ['JavaScriptCore.dll'], 'darwin': ['JavaScriptCore.framework/JavaScriptCore', 'libJavaScriptCore.dylib']}
     for name in names.get(sys.platform, ['libRanvierWebCoreHost.so', 'libJavaScriptCore.so']):
         path = Path(directory) / name
@@ -234,6 +288,8 @@ def arm_vm_entry_crash(directory, crash=True):
         for symbol in SET_OPTION:
             function = getattr(library, symbol, None)
             if function is not None:
+                if sys.platform != 'win32' and options_page_writable(library) is False:
+                    raise AssertionError(f'JSC options in {name} are write-protected: ' + '; '.join(arming))
                 function.restype, function.argtypes = ctypes.c_bool, [ctypes.c_char_p, ctypes.c_bool]
                 return bool(function(b'crashOnDisallowedVMEntry=' + (b'true' if crash else b'false'), False))
     return False
@@ -245,7 +301,12 @@ def vm_entry_control(directory):
     keep_options_writable(native.library)
     host = native.bind('rv_host_create', P, [I, I])(64, 64)
     native.call('rv_host_load_html', [P, ctypes.c_char_p, I], host, b'<p>first</p>', len(b'<p>first</p>'))  # utf8
-    if not arm_vm_entry_crash(directory):
+    try:
+        armed = arm_vm_entry_crash(directory)
+    except AssertionError as error:
+        print(error, file=sys.stderr, flush=True)
+        armed = False
+    if not armed:
         raise SystemExit(3)
     native.call('rv_host_load_html', [P, ctypes.c_char_p, I], host, b'<p>second</p>', len(b'<p>second</p>'))  # utf8
     print('VM_ENTRY_CONTROL_SURVIVED', flush=True)
@@ -620,7 +681,7 @@ def verify(directory, arm=True):
             control = subprocess.run([sys.executable, '-I', '-X', 'utf8', __file__, '--native-directory', str(directory), '--vm-entry-control'],
                                      capture_output=True, text=True, timeout=120)
             native.expect(control.returncode not in (0, 3) and 'VM_ENTRY_CONTROL_SURVIVED' not in control.stdout,
-                          'the armed VM-entry crash aborts a page load (control exit ' + str(control.returncode) + ')')
+                          'the armed VM-entry crash aborts a page load (control exit ' + str(control.returncode) + ') ' + control.stderr[-2000:])
         native.expect(native.text('rv_dom_document_get_title', [P], page.document) == title, 'no script ran after arming')
     finally:
         # Host teardown is outside the armed scope: it releases the lock-taking work above.

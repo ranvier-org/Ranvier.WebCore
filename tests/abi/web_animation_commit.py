@@ -131,7 +131,9 @@ def verify(directory):
         entry = qualified.get(actual['name'])
         if entry and entry['field'] == 'committed/afterCancel':
             # The declarations match exactly; only their order differs, as recorded.
-            expected_native = dict(wanted, committed=entry['webkit'], afterCancel=entry['webkit'])
+            # On macOS the committed properties come in another order: webkitDarwinReason in the fixture.
+            webkit = entry['webkitDarwin'] if sys.platform == 'darwin' and 'webkitDarwin' in entry else entry['webkit']
+            expected_native = dict(wanted, committed=webkit, afterCancel=webkit)
             same = actual == expected_native and wanted['committed'] == entry['chromium']
         elif entry:
             same = actual == dict(wanted, **entry['webkit']) and all(wanted[k] == v for k, v in entry['chromium'].items())
