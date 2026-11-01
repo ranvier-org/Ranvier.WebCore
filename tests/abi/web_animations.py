@@ -295,6 +295,9 @@ def arm_vm_entry_crash(directory, crash=True):
     return False
 
 
+NOT_ARMED_EXIT = 97
+
+
 def vm_entry_control(directory):
     """The positive control, in a child process: with the crash armed, a page load (which enters the VM) aborts."""
     native = Native(directory)
@@ -307,7 +310,8 @@ def vm_entry_control(directory):
         print(error, file=sys.stderr, flush=True)
         armed = False
     if not armed:
-        raise SystemExit(3)
+        # 97, not 3: abort() itself exits 3 on Windows, which is the outcome the control expects.
+        raise SystemExit(NOT_ARMED_EXIT)
     native.call('rv_host_load_html', [P, ctypes.c_char_p, I], host, b'<p>second</p>', len(b'<p>second</p>'))  # utf8
     print('VM_ENTRY_CONTROL_SURVIVED', flush=True)
 
@@ -680,7 +684,7 @@ def verify(directory, arm=True):
         if armed:
             control = subprocess.run([sys.executable, '-I', '-X', 'utf8', __file__, '--native-directory', str(directory), '--vm-entry-control'],
                                      capture_output=True, text=True, timeout=120)
-            native.expect(control.returncode not in (0, 3) and 'VM_ENTRY_CONTROL_SURVIVED' not in control.stdout,
+            native.expect(control.returncode not in (0, NOT_ARMED_EXIT) and 'VM_ENTRY_CONTROL_SURVIVED' not in control.stdout,
                           'the armed VM-entry crash aborts a page load (control exit ' + str(control.returncode) + ') ' + control.stderr[-2000:])
         native.expect(native.text('rv_dom_document_get_title', [P], page.document) == title, 'no script ran after arming')
     finally:

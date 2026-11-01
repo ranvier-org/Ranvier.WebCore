@@ -404,7 +404,10 @@ def verify(directory, evidence_json=None):
         ok(fill_rect(ctx, 40, 0, 10, 10), 'blurred shadow fill')
         report['shadow'] = pixels((10, 10), (30, 10), (45, 10), (45, 25), (45, 31), (45, 38))
         expect(report['shadow'][:3] == [RED, BLUE, WHITE], 'shadow: ' + str(report['shadow'][:3]))
-        missed = misses(['blurred centre', 'blurred edge', 'blurred far'], report['shadow'][3:], [over_white([0, 0, 255, alpha]) for alpha in [249, 63, 0]])
+        # CoreGraphics draws a blurred shadow with its private CGStyleCreateShadow2 (GraphicsContextCG.cpp), whose kernel
+        # gives the edge alpha 55 where Chromium gives 63; the value is the one measured on macOS (run 41289077910).
+        shadow_alphas = [249, 55 if sys.platform == 'darwin' else 63, 0]
+        missed = misses(['blurred centre', 'blurred edge', 'blurred far'], report['shadow'][3:], [over_white([0, 0, 255, alpha]) for alpha in shadow_alphas])
         expect(not missed, 'blurred shadow: ' + '; '.join(missed))
         ok(reset(ctx), 'reset')
         ok(numbers['shadow_offset_x'][1](ctx, 20), 'shadowOffsetX')
