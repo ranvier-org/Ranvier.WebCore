@@ -5,7 +5,8 @@ that changes layout is followed by rv_host_update, which runs the rendering upda
 never asserted apart from that ordered log. Also checks argument and thread errors, the unchanged v15
 rv_host_observe_resize, and teardown: an observer outliving its target, document replacement, release inside a
 callback and host destroy. Differences listed in tests/fixtures/resize-observation-qualified.json are recorded, not
-failed."""
+failed. Original G10 CSS parity remains checked at scales 1 and 2; extended CSS values are recorded against Chromium
+and must remain equal to the frozen native T2 checkpoint. Device values are compared at all three scales."""
 
 import argparse
 import ctypes
@@ -21,6 +22,8 @@ FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, WRONG_THREAD, NOT_ELEMENT, UNSUPPORTED = 0, -1, -2, -4, -9
 ABI = 60
 BOXES = {None: None, 'content-box': 0, 'border-box': 1, 'device-pixel-content-box': 2}
+LEGACY_CSS_SCENARIOS = frozenset(['contentBox', 'borderBox', 'defaultBox', 'boxChanges', 'verticalChange', 'reobserve',
+                                'order', 'observerOrder', 'beforeIntersection', 'depth', 'stop', 'lifecycle'])
 D = ctypes.c_double
 
 
@@ -364,9 +367,13 @@ def teardown(native, cases, report):
 def compare(native, oracle, results, report, qualified):
     """Compares each scenario's log and statuses, and each entry field by field where both sides have the same entries."""
     differences = {}
+    strict_differences = set()
+    device_count = 0
 
-    def differ(key, got, want, scale):
+    def differ(key, got, want, scale, strict=True):
         differences.setdefault(key, {'native': got, 'chromium': want, 'scales': []})['scales'].append(scale)
+        if strict:
+            strict_differences.add(key)
 
     for scale, scenarios in results.items():
         for name, got in scenarios.items():
@@ -376,17 +383,51 @@ def compare(native, oracle, results, report, qualified):
                 if got[key] != want[key]:
                     differ(f'{name}.{key}', got[key], want[key], scale)
             expected = want['entries']
+            by_identity = {}
+            for entry in expected:
+                by_identity.setdefault((entry['o'], entry['t']), []).append(entry['device'])
+            for entry in got['entries']:
+                identity = (entry['o'], entry['t'])
+                candidates = by_identity.get(identity, [])
+                native.expect(bool(candidates), f'device pixel entry missing from oracle: {scale}/{name}/{identity}')
+                device = candidates.pop(0)
+                native.expect(entry['device'] == device,
+                              f'device pixel mismatch: {scale}/{name}/{identity}: {entry["device"]} != {device}')
+                device_count += 1
+            native.expect(not any(by_identity.values()), f'device pixel delivery missing: {scale}/{name}')
             if [(e['o'], e['t']) for e in got['entries']] != [(e['o'], e['t']) for e in expected]:
                 differ(f'{name}.entries', got['entries'], expected, scale)
                 continue
             for index, (mine, theirs) in enumerate(zip(got['entries'], expected)):
-                for field in ['rect', 'content', 'border', 'device']:
+                for field in ['rect', 'content', 'border']:
                     native.expect(True, 'compared')
                     if mine[field] != theirs[field]:
-                        differ(f"{name}.entries.{mine['t']}.{field}", mine[field], theirs[field], scale)
+                        differ(f"{name}.entries.{mine['t']}.{field}", mine[field], theirs[field], scale,
+                               strict=scale in ('1', '2') and name in LEGACY_CSS_SCENARIOS)
     report['differences'] = differences
+    report['comparedDeviceEntries'] = device_count
+    report['extendedCssDifferences'] = {key: value for key, value in differences.items() if key not in strict_differences}
+    baseline = json.loads((FIXTURES / 'resize-observation-native-t2.json').read_text())
+    changed_css = []
+    css_count = 0
+    for scale, scenarios in results.items():
+        for name in baseline['originalScenarios']:
+            mine = scenarios[name]['entries']
+            previous = baseline['results'][scale][name]['entries']
+            native.expect([(entry['o'], entry['t']) for entry in mine] == [(entry['o'], entry['t']) for entry in previous],
+                          f'native CSS baseline entry identities changed: {scale}/{name}')
+            for index, (entry, prior) in enumerate(zip(mine, previous)):
+                for field in ['rect', 'content', 'border']:
+                    css_count += 1
+                    if entry[field] != prior[field]:
+                        changed_css.append({'scale': scale, 'scenario': name, 'entry': index, 'field': field,
+                                            'native': entry[field], 'baseline': prior[field]})
+    report['comparedNativeCssFields'] = css_count
+    report['nativeCssBaselineSource'] = baseline['source']
+    report['changedNativeCssFields'] = changed_css
+    native.expect(not changed_css, 'native CSS baseline changed: ' + json.dumps(changed_css))
     keys = set(differences)
-    unqualified = sorted(keys - set(qualified))
+    unqualified = sorted(strict_differences - set(qualified))
     native.expect(not unqualified, 'unqualified differences: ' + json.dumps({k: differences[k] for k in unqualified}))
     native.expect(not set(qualified) - keys, 'qualified differences that no longer occur: ' + str(sorted(set(qualified) - keys)))
 

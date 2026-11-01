@@ -3,7 +3,9 @@ import ctypes
 import hashlib
 import json
 from pathlib import Path
+import sys
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from resize_observation import Scene, Native, P, I
 from snapshot_options import png_pixels
 
