@@ -1,0 +1,101 @@
+--- a/Source/WebCore/dom/ViewTransition.cpp
++++ b/Source/WebCore/dom/ViewTransition.cpp
+@@ -77,6 +77,30 @@
+ WTF_MAKE_TZONE_ALLOCATED_IMPL(ViewTransitionParams);
+ WTF_MAKE_TZONE_ALLOCATED_IMPL(ViewTransition);
+ 
++// An embedder that disallows VM entry never runs a JavaScript promise reaction. A transition whose update callback is
++// absent or the embedder's settles its promises through C++ microtasks there, which run at microtask checkpoints.
++static bool settlesWithoutScript(Document& document, ViewTransitionUpdateCallback* callback)
++{
++    return (!callback || !callback->isJSViewTransitionUpdateCallback()) && document.vm().disallowVMEntryCount;
++}
++
++// Settles finished as updateCallbackDone settled: fulfilled, or rejected with its reason.
++static void settleFinished(DOMPromise& updateCallbackDone, DeferredPromise& finished)
++{
++    switch (updateCallbackDone.status()) {
++    case DOMPromise::Status::Fulfilled:
++        finished.resolve();
++        break;
++    case DOMPromise::Status::Rejected:
++        finished.rejectWithCallback([&] (auto&) {
++            return updateCallbackDone.result();
++        }, RejectAsHandled::Yes);
++        break;
++    case DOMPromise::Status::Pending:
++        break;
++    }
++}
++
+ ViewTransition::ViewTransition(Document& document, RefPtr<ViewTransitionUpdateCallback>&& updateCallback, Vector<AtomString>&& initialActiveTypes)
+     : ActiveDOMObject(document)
+     , m_updateCallback(WTF::move(updateCallback))
+@@ -215,6 +239,17 @@
+         protect(m_ready.second)->rejectWithCallback([&] (auto&) {
+             return reason.releaseReturnValue();
+         }, RejectAsHandled::Yes);
++    }
++
++    if (settlesWithoutScript(document, m_updateCallback.get())) {
++        // A pending update settles finished when it completes (callUpdateCallback).
++        if (m_updateCallbackDone.first->status() == DOMPromise::Status::Pending)
++            return;
++        protect(document->eventLoop())->queueMicrotask(document->vm(), [weakThis = WeakPtr { *this }] {
++            if (RefPtr protectedThis = weakThis.get(); protectedThis && !protectedThis->isContextStopped())
++                settleFinished(protect(protectedThis->m_updateCallbackDone.first), protect(protectedThis->m_finished.second));
++        });
++        return;
+     }
+ 
+     protect(m_updateCallbackDone.first)->whenSettled([this, protectedThis = Ref { *this }] {
+@@ -287,6 +322,39 @@
+         return result.releaseReturnValue();
+     }();
+ 
++    if (settlesWithoutScript(document, m_updateCallback.get()) && callbackPromise->status() != DOMPromise::Status::Pending) {
++        protect(document->eventLoop())->queueMicrotask(document->vm(), [weakThis = WeakPtr { *this }, callbackPromise] {
++            RefPtr protectedThis = weakThis.get();
++            if (!protectedThis || protectedThis->isContextStopped())
++                return;
++            protectedThis->m_updateCallbackTimeout = nullptr;
++            if (callbackPromise->status() == DOMPromise::Status::Fulfilled) {
++                protect(protectedThis->m_updateCallbackDone.second)->resolve();
++                if (protectedThis->m_phase == ViewTransitionPhase::Done)
++                    settleFinished(protect(protectedThis->m_updateCallbackDone.first), protect(protectedThis->m_finished.second));
++                else
++                    protectedThis->activateViewTransition();
++                return;
++            }
++            protect(protectedThis->m_updateCallbackDone.second)->rejectWithCallback([&] (auto&) {
++                return callbackPromise->result();
++            }, RejectAsHandled::No);
++            if (protectedThis->m_phase == ViewTransitionPhase::Done) {
++                settleFinished(protect(protectedThis->m_updateCallbackDone.first), protect(protectedThis->m_finished.second));
++                return;
++            }
++            protectedThis->m_ready.second->markAsHandled();
++            protectedThis->skipViewTransition(callbackPromise->result());
++        });
++        m_updateCallbackTimeout = protect(document->eventLoop())->scheduleTask(defaultTimeout, TaskSource::DOMManipulation, [weakThis = WeakPtr { *this }] {
++            RefPtr protectedThis = weakThis.get();
++            if (!protectedThis || protectedThis->m_phase == ViewTransitionPhase::Done)
++                return;
++            protectedThis->skipViewTransition(Exception { ExceptionCode::TimeoutError, "View transition update callback timed out."_s });
++        });
++        return;
++    }
++
+     callbackPromise->whenSettledWithResult([weakThis = WeakPtr { *this }](auto*, bool isFulfilled, auto result) mutable {
+         RefPtr protectedThis = weakThis.get();
+         if (!protectedThis)
+--- a/Source/WebCore/dom/ViewTransitionTypeSet.h
++++ b/Source/WebCore/dom/ViewTransitionTypeSet.h
+@@ -50,6 +50,7 @@
+     bool removeFromSetLike(const AtomString&);
+ 
+     bool NODELETE hasType(const AtomString&) const;
++    const ListHashSet<AtomString>& types() const { return m_typeSet; }
+ 
+ private:
+     ViewTransitionTypeSet(Document&, Vector<AtomString>&&);
