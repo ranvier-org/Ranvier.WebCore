@@ -2507,6 +2507,9 @@ static int32_t composite(RvCompositor& compositor, LocalFrameView& view, uint8_t
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     // FlipY::Yes puts the page's first row at the framebuffer's first row, which glReadPixels returns first.
     compositor.textureMapper->beginPainting(TextureMapper::FlipY::Yes);
+#if ENABLE(DAMAGE_TRACKING)
+    rootLayer.layer().prepareForPainting(*compositor.textureMapper);
+#endif
     rootLayer.layer().paint(*compositor.textureMapper);
     compositor.textureMapper->endPainting();
     if (!rgba) {

@@ -84,9 +84,18 @@ if args.context_lifecycle:
     assert all(is_texture(name) for name in sentinels), "host destruction deleted consumer textures"
     print(json.dumps({"result": "PASS", "consumer_textures_preserved": alive, "html_replacement": True, "host_destroy": True}))
     raise SystemExit(0)
-html = b"<style>html,body{margin:0;background:rgb(17,34,51)}div{width:30px;height:20px;background:rgb(221,17,34);transform:translate3d(7px,9px,0)}</style><div></div>"
+html = b"<style>html,body{margin:0;background:rgb(17,34,51)}div{width:30px;height:20px;background:rgb(221,17,34);transform:translate3d(7px,9px,0)}</style><div id=box></div>"
 assert load(host, html, len(html)) == 0
 assert update(host) == 0
+element = bind(runtime, "rv_document_get_element_by_id", ptr, ptr, C.c_char_p, integer)(host, b"box", 3)
+style_buffer, style_length = C.create_string_buffer(128), integer()
+assert bind(runtime, "rv_element_computed_style", integer, ptr, C.c_char_p, ptr, integer, C.POINTER(integer))(
+    element, b"transform", style_buffer, 128, C.byref(style_length)) == 0
+rect = [C.c_double() for _ in range(4)]
+assert bind(runtime, "rv_element_rect", integer, ptr, *([C.POINTER(C.c_double)] * 4))(
+    element, *[C.byref(value) for value in rect]) == 0
+print(json.dumps({"transform": style_buffer.value.decode(), "rect": [value.value for value in rect]}), flush=True)
+bind(runtime, "rv_node_release", None, ptr)(element)
 assert make_current(display, None, None, context)
 frame = ptr()
 assert acquire(None, C.byref(frame)) == -1 and not frame
@@ -136,6 +145,8 @@ red_points = [(index % width.value, index // width.value) for index in range(wid
 print(json.dumps({"red_bounds": [min(x for x, y in red_points), min(y for x, y in red_points),
                                  max(x for x, y in red_points), max(y for x, y in red_points)] if red_points else [],
                   "top_left": list(pixels[:4])}), flush=True)
+assert [min(x for x, y in red_points), min(y for x, y in red_points),
+        max(x for x, y in red_points), max(y for x, y in red_points)] == [7, 9, 36, 28]
 read(0, 0, 1, 1, 0x1908, 0x1401, pixel)
 assert list(pixel) == [17, 34, 51, 255], list(pixel)
 read(10, 12, 1, 1, 0x1908, 0x1401, pixel)
