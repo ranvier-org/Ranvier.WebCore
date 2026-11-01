@@ -79,6 +79,15 @@ class ProbeRunnerTests(unittest.TestCase):
 
 
 class WorkflowTests(unittest.TestCase):
+    def test_c_abi_layout_probe_runs_for_every_native_flavor(self):
+        layouts = [entry for entry in probes.PROBES if 'tests/abi/abi_layouts.py' in ' '.join(entry['commands'])]
+        self.assertEqual(len(layouts), 1)
+        self.assertEqual(layouts[0]['flavor'], None)
+        self.assertIsNone(layouts[0]['rid'])
+        for flavor in ['slim', 'gpu', 'lean']:
+            for rid in ['win-x64', 'linux-x64', 'osx-arm64']:
+                self.assertTrue(probes.applies(layouts[0], rid, flavor), (rid, flavor))
+
     def test_linux_gpu_selects_real_transition_snapshot_pixels_for_both_linux_rids(self):
         for rid in ['linux-x64', 'linux-arm64']:
             selected = [entry for entry in probes.PROBES if probes.applies(entry, rid, 'gpu')]
