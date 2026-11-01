@@ -123,6 +123,26 @@ about 0.6 GB on macOS: about 3.7 GB for the five RIDs. The repository's 10 GB al
 and the vcpkg entries (about 1 GB), so the default branch's trees and one pull request's fit only narrowly;
 GitHub evicts the least recently used entries beyond the limit.
 
+## Probes
+
+After `smoke.py`, one step runs `scripts/probes.py run`: the probes of `tests/abi`, `tests/generator` and
+`tests/uia` against the staged runtime, in the order of its `PROBES` list. The list is the only place a probe
+is stated. Each entry holds the probe's commands, its condition (a RID, a flavor, both, or neither) and its
+timeout, 600 s unless the entry sets one.
+
+- Every probe that applies runs, whatever the earlier ones did. The step fails at the end when any probe failed
+  or timed out, and one run reports every failing probe.
+- Each probe's output is a collapsed group of the job log, followed by a `PASS` or `FAIL` line with its
+  duration; a failure is also an error annotation. The step summary has the table of results.
+- The logs, one per probe and `summary.txt`, are in `<work>/probe-logs` and the artifact
+  `probe-logs-<rid>-<flavor>`, uploaded whether the job passed or not.
+- A probe of several commands, such as the UI Automation teardowns, runs them in order and stops at the first
+  that fails. A probe past its timeout is killed with its descendants.
+- `probes.py list --rid RID --flavor FLAVOR` prints the probes that apply, as workflow steps would state them.
+  `run --only TEXT` runs the probes whose name or commands contain the text.
+- In WSL, run with `--no-dump`: each probe's interpreter makes itself non-dumpable, because WSL writes the
+  core dump of every crash to the Windows temp folder whatever `ulimit -c` says.
+
 ## Local runs
 
 The same steps run on a workstation, ending with the same check CI runs:
