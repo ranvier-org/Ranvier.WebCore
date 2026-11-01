@@ -125,9 +125,12 @@ def verify(directory, webkit_source, evidence_json=None):
             release_metrics(handle.value)
             return values
 
+        # HarfBuzz returns 16.16 fixed-point advances, so a measured width can be short by 2^-16 px per glyph.
+        WIDTH_TOLERANCE = 2 ** -14
+
         def matches(actual, expected, label):
             def within(name):
-                tolerance = 1.0 if name in ACTUAL else 1e-6
+                tolerance = 1.0 if name in ACTUAL else WIDTH_TOLERANCE
                 return abs(actual[name] - expected[name]) <= tolerance
             expect(all(within(name) for name in METRICS), label + ': ' + json.dumps(actual) + ' expected ' + json.dumps(expected))
 
@@ -266,7 +269,7 @@ def verify(directory, webkit_source, evidence_json=None):
         expect(retain_metrics(kept) == kept, 'rv_dom_text_metrics_retain returns its argument')
         release_metrics(kept)
         ok(strings['font'](ctx, '40px RvAhem'), 'font 40px')
-        expect(read(kept)['width'] == 40, 'a TextMetrics is a snapshot: later font changes keep its width')
+        expect(abs(read(kept)['width'] - 40) <= WIDTH_TOLERANCE, 'a TextMetrics is a snapshot: later font changes keep its width')
         ok(strings['font'](ctx, '20px RvAhem'), 'font 20px again')
 
         # 4. Pixels, sampled at least 2px from a glyph edge.
