@@ -6,6 +6,7 @@ import threading
 
 parser = argparse.ArgumentParser()
 parser.add_argument("runtime")
+parser.add_argument("--context-lifecycle", action="store_true")
 args = parser.parse_args()
 runtime = C.CDLL(args.runtime)
 assert hasattr(runtime, "rv_configure_egl_display"), "Linux EGL display configuration is missing"
@@ -58,6 +59,31 @@ host = create(80, 60)
 assert host
 assert configure(display) == -9, "display selection is frozen once a host exists"
 assert mode(host, 1) == 0, "strict compositor must be supported"
+if args.context_lifecycle:
+    assert make_current(display, None, None, context)
+    sentinels = (uint * 64)()
+    gen_texture(64, sentinels)
+    for name in sentinels:
+        bind_texture(0x0DE1, name)
+    is_texture = bind(gl, "glIsTexture", C.c_ubyte, uint)
+    assert all(is_texture(name) for name in sentinels)
+    assert mode(host, 0) == 0
+    assert make_current(display, None, None, context)
+    alive = sum(bool(is_texture(name)) for name in sentinels)
+    assert alive == len(sentinels), f"native compositor disable deleted {len(sentinels)-alive} consumer texture(s)"
+    assert mode(host, 1) == 0
+    assert make_current(display, None, None, context)
+    replacement = b"<p>replacement document</p>"
+    assert load(host, replacement, len(replacement)) == 0
+    assert make_current(display, None, None, context)
+    assert all(is_texture(name) for name in sentinels), "HTML replacement deleted consumer textures"
+    assert mode(host, 1) == 0
+    assert make_current(display, None, None, context)
+    destroy(host)
+    assert make_current(display, None, None, context)
+    assert all(is_texture(name) for name in sentinels), "host destruction deleted consumer textures"
+    print(json.dumps({"result": "PASS", "consumer_textures_preserved": alive, "html_replacement": True, "host_destroy": True}))
+    raise SystemExit(0)
 html = b"<style>html,body{margin:0;background:rgb(17,34,51)}div{width:30px;height:20px;background:rgb(221,17,34);transform:translate3d(7px,9px,0)}</style><div></div>"
 assert load(host, html, len(html)) == 0
 assert update(host) == 0
@@ -103,6 +129,13 @@ bind_fbo(0x8D40, framebuffer)
 attach(0x8D40, 0x8CE0, 0x0DE1, texture, 0)
 assert bind(gl, "glCheckFramebufferStatus", uint, uint)(0x8D40) == 0x8CD5
 pixel = (C.c_ubyte * 4)()
+pixels = (C.c_ubyte * (width.value * height.value * 4))()
+read(0, 0, width.value, height.value, 0x1908, 0x1401, pixels)
+red_points = [(index % width.value, index // width.value) for index in range(width.value * height.value)
+              if list(pixels[index * 4:index * 4 + 4]) == [221, 17, 34, 255]]
+print(json.dumps({"red_bounds": [min(x for x, y in red_points), min(y for x, y in red_points),
+                                 max(x for x, y in red_points), max(y for x, y in red_points)] if red_points else [],
+                  "top_left": list(pixels[:4])}), flush=True)
 read(0, 0, 1, 1, 0x1908, 0x1401, pixel)
 assert list(pixel) == [17, 34, 51, 255], list(pixel)
 read(10, 12, 1, 1, 0x1908, 0x1401, pixel)
