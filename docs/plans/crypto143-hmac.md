@@ -1,0 +1,17 @@
+# SubtleCrypto first native slice
+
+Codex. Base 06044b2d234934ce7ffca4f561a865ebc002aaf9. This is an HMAC ownership slice, not completion of #143.
+
+1. Pin the private C DTO layout with C11/C++20 compiler tests before adding the header. Distinct uint64 key/operation tokens share one never-reused token domain. No public ABI version, generated kind or package allocation occurs here.
+2. Add raw HMAC generate/import/export/sign/verify probes with RFC 4231 case 1, deferred completion, metadata, WebCrypto error names, invalid signature=false, copied inputs, cross-context retained keys and abandoned operations. Missing bridge exports on the baseline are RED, not a qualification.
+3. Implement script-free normalization and WebCore CryptoAlgorithm callbacks in an embedder glue unit. All bridge calls require the main thread. Keys are context-independent; operations observe the admitting context weakly, and terminal delivery is posted to that context even for inline backend callbacks. Releasing an operation cancels delivery and destroys unconsumed results.
+4. Add only the owned embedder-source entry. Linux owns the warm source/build handoff after #210/0061; root owns shared Windows source. Do not configure/build either before that handoff.
+5. Compile the exact glue on Linux GCrypt, replay the unchanged raw probe, then request independent ownership/error review. Preserve the engine's non-byte-aligned HMAC gap as a failing parity case until a tested engine fix is coordinated into Windows-owned canonical 0060.
+
+Windows owns the OKP/OpenSSL-family engine files, registry and canonical 0060. This branch owns host/RanvierCryptoContract.h, RanvierCryptoGlue.h/.cpp, config/common.cmake and shared contract tests. No VM/JSGlobalObject is constructed. No key material is exposed through metadata. Native misuse statuses remain separate from named WebCrypto errors.
+
+The raw probe's final non-byte-length import/generation assertions deliberately retain the pinned engine parity gap in the full route. They must pass before HMAC qualification; there is no skip or success qualification. The normalization shim distinguishes explicit raw-import length zero from an absent length, since the lower engine treats both as zero. The required errors and bit lengths follow [WebCrypto HMAC operations](https://w3c.github.io/webcrypto/#hmac-operations).
+
+Private compile evidence is separate from runtime evidence. The T4 overlay compiled the glue before the explicit-zero import check was added (source hashes are in the artifact receipt); the current source still needs compile/link and the complete raw probe. The immutable baseline exits at the missing private bridge export. The private symbols are reached through the host's ELF dependency graph on Linux; on Windows the probe accepts `--bridge-library` for the actual WebCore DLL. No public host export is allocated by this slice.
+
+The first private Linux compile/link passed against the frozen baec Slim closure. Its full probe stopped at a TypeError-name transport defect: the operation rejected with TypeError, while DOMException::name returned an empty name for that JavaScript exception code. A control read through rv_last_exception returned TypeError; SyntaxError controls agreed through both paths. The explicit TypeError mapping fixes that bridge defect and awaits the next coordinated compile. The raw probe still includes all remaining ownership and bit-length assertions.
