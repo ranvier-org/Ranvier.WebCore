@@ -1,0 +1,49 @@
+diff --git a/Source/WebCore/rendering/svg/RenderSVGImage.cpp b/Source/WebCore/rendering/svg/RenderSVGImage.cpp
+--- a/Source/WebCore/rendering/svg/RenderSVGImage.cpp
++++ b/Source/WebCore/rendering/svg/RenderSVGImage.cpp
+@@ -28,8 +28,9 @@
+ #include "RenderSVGImage.h"
+ 
+ #include "AXObjectCache.h"
+ #include "BitmapImage.h"
++#include "CachedImage.h"
+ #include "GeometryUtilities.h"
+ #include "GraphicsContext.h"
+ #include "HitTestResult.h"
+ #include "ImageBuffer.h"
+@@ -206,9 +207,9 @@
+             protect(cachedImage())->removeAllClientsWaitingForAsyncDecoding();
+         return;
+     }
+ 
+-    if (!imageResource().cachedImage()) {
++    if (RefPtr cachedImage = imageResource().cachedImage(); !cachedImage || cachedImage->errorOccurred()) {
+         protect(page())->addRelevantUnpaintedObject(*this, visualOverflowRectEquivalent());
+         return;
+     }
+ 
+diff --git a/Source/WebCore/rendering/svg/legacy/LegacyRenderSVGImage.cpp b/Source/WebCore/rendering/svg/legacy/LegacyRenderSVGImage.cpp
+--- a/Source/WebCore/rendering/svg/legacy/LegacyRenderSVGImage.cpp
++++ b/Source/WebCore/rendering/svg/legacy/LegacyRenderSVGImage.cpp
+@@ -26,8 +26,9 @@
+ #include "config.h"
+ #include "LegacyRenderSVGImage.h"
+ #include "LegacyRenderSVGModelObjectInlines.h"
+ 
++#include "CachedImage.h"
+ #include "FloatQuad.h"
+ #include "GraphicsContext.h"
+ #include "HitTestResult.h"
+ #include "ImageQualityController.h"
+@@ -219,8 +220,11 @@
+ }
+ 
+ void LegacyRenderSVGImage::paintForeground(PaintInfo& paintInfo)
+ {
++    if (RefPtr cachedImage = imageResource().cachedImage(); !cachedImage || cachedImage->errorOccurred())
++        return;
++
+     RefPtr<Image> image = imageResource().image();
+     if (!image)
+         return;
+ 
