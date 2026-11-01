@@ -2555,8 +2555,8 @@ int32_t rv_host_acquire_egl_frame(RvHost* host, RvGpuFrame** frame)
         return RV_ERR_UNSUPPORTED;
     if (host->presentationSurface && !host->presentationSurface->available())
         return RV_ERR_UNSUPPORTED;
-    RvEGLContextScope contextScope;
     auto consumerContext = eglGetCurrentContext();
+    RvEGLContextScope contextScope;
     auto result = [&]() -> int32_t {
         SetForScope inFrame(host->inFrame, true);
         host->frameRequested = false;
