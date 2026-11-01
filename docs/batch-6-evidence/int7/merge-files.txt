@@ -1,0 +1,12 @@
+.github/workflows/build.yml
+docs/CI.md
+docs/caret-hit-evidence/make_qualified.py
+host/RanvierWebCoreAbi.cpp
+tests/abi/caret_hit.py
+tests/abi/caret_hit_support.py
+tests/abi/event_details.py
+tests/abi/form_collections.py
+tests/abi/form_navigation.py
+tests/fixtures/caret-hit-qualified.darwin.json
+tests/fixtures/caret-hit-qualified.linux.json
+tests/fixtures/event-details-qualified.json

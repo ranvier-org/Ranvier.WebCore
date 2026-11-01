@@ -1,0 +1,32 @@
+{
+ "tree": "6e2174504b15b24d262425a9ca77688458456c56 (batch 6 22f6aec + main e9af8278)",
+ "candidate": "vm2-fix2b (C:/wk/native-vm2/artifacts/vm2-fix2b-frozen, copied to artifacts/int7-fix2b-frozen): batch6-candidate-diag1 plus patch 0052 v2 (dom-10 overlay, EventLoop.cpp sha ac4fd71d = C:/wk/src). Root decision 2026-11-01: no fresh candidate, because the merge changes no Windows-compiled file (windows-compile-scope.json); the macOS host change is proven by the five-runtime PR CI.",
+ "runtimeSha256": {
+  "JavaScriptCore.dll": "1af0ee5fc6c4a907812cd16a92d72961786c3a631ffb81b14479f0123c9264dc",
+  "RanvierWebCoreHost.dll": "88eda842d630aa608022c880c66ae9e7f506285f3fb76ecaf6107cd8aca9df3b",
+  "WebCore.dll": "88608dd0fad8e4e9f90d2854e14a7fc62be31e57a551978f394574e09b7b299e"
+ },
+ "driver": "artifacts/int7-fix2b-driver = batch6-candidate-2-driver (tests/abi *.fs and *.fsproj unchanged 21a298d..6e217450)",
+ "runner": "docs/batch-6-evidence/int7/run_int7_full_batch.py int7-fix2b 59 135 artifacts/batch6-candidate-2-batch/results.json",
+ "total": "BATCH6_FULL_BATCH=103707 RAW +135 TEARDOWN = batch6-candidate-2 103693 + event_loop_latency 14",
+ "records": 96,
+ "allExitZero": true,
+ "countsDifferingFromCandidate2": {
+  "event_loop_latency": [
+   null,
+   14
+  ]
+ },
+ "caretHit": 18251,
+ "eventDetails": 391,
+ "teardown": {
+  "records": 135,
+  "allCollected": true
+ },
+ "resultsSha256": "22b8dfffeb35f8936ffc9b25f499d73774644247e75730bced596af343a80a23",
+ "generatorChecks": {
+  "windows": "gen-check-windows.txt",
+  "wslUbuntu": "gen-check-wsl-ubuntu.txt"
+ },
+ "strscan": "strscan.txt (127 = int6 126 + event_loop_latency.py:26, qualified in strscan-qualification.txt)"
+}

@@ -1,0 +1,127 @@
+tests/abi/Native.fs:215: "rv_host_load_html"
+tests/abi/Native.fs:220: "rv_document_get_element_by_id"
+tests/abi/Native.fs:222: "rv_document_create_text"
+tests/abi/Native.fs:224: "rv_node_set_text_content"
+tests/abi/Native.fs:225: "rv_element_set_attribute"
+tests/abi/Native.fs:232: "rv_node_add_event_listener"
+tests/abi/Native.fs:236: "rv_node_dispatch_event"
+tests/abi/Native.fs:244: "rv_document_create_comment"
+tests/abi/Native.fs:247: "rv_node_parse_fragment"
+tests/abi/Native.fs:251: "rv_node_set_string"
+tests/abi/Native.fs:264: "rv_host_create_event"
+tests/abi/Native.fs:299: "rv_host_key"
+tests/abi/Native.fs:310: "rv_host_ime_set_composition"
+tests/abi/Native.fs:311: "rv_host_ime_commit"
+tests/abi/Native.fs:314: "rv_element_class"
+tests/abi/Native.fs:315: "rv_element_set_style"
+tests/abi/Native.fs:357: "rv_clipboard_offer"
+tests/abi/Native.fs:364: "rv_drag_data_add"
+tests/abi/Native.fs:398: "rv_ax_set_value"
+tests/abi/Native.fs:409: "rv_host_load_svg"
+tests/abi/Native.fs:429: "rv_host_construct_event"
+tests/abi/Native.fs:442: "rv_event_target_add_listener"
+tests/abi/Native.fs:550: extern int rv_host_load_html(nativeint host, [<In>] byte[] html, int html_length)
+tests/abi/Native.fs:565: extern nativeint rv_document_get_element_by_id(nativeint host, [<In>] byte[] elementId, int elementId_length)
+tests/abi/Native.fs:571: extern nativeint rv_document_create_text(nativeint host, [<In>] byte[] data, int data_length)
+tests/abi/Native.fs:577: extern int rv_node_set_text_content(nativeint node, [<In>] byte[] text, int text_length)
+tests/abi/Native.fs:580: extern int rv_element_set_attribute(
+tests/abi/Native.fs:606: extern nativeint rv_node_add_event_listener(
+tests/abi/Native.fs:625: extern int rv_node_dispatch_event(
+tests/abi/Native.fs:656: extern nativeint rv_document_create_comment(nativeint host, [<In>] byte[] data, int data_length)
+tests/abi/Native.fs:665: extern nativeint rv_node_parse_fragment(nativeint context, [<In>] byte[] markup, int markup_length)
+tests/abi/Native.fs:677: extern int rv_node_set_string(nativeint node, int property, [<In>] byte[] value, int value_length)
+tests/abi/Native.fs:722: extern nativeint rv_host_create_event(
+tests/abi/Native.fs:855: extern int rv_host_key(
+tests/abi/Native.fs:897: extern int rv_host_ime_set_composition(
+tests/abi/Native.fs:906: extern int rv_host_ime_commit(nativeint host, [<In>] byte[] text, int text_length)
+tests/abi/Native.fs:915: extern int rv_element_class(nativeint node, [<In>] byte[] token, int token_length, int operation)
+tests/abi/Native.fs:918: extern int rv_element_set_style(
+tests/abi/Native.fs:1097: extern int rv_clipboard_offer(
+tests/abi/Native.fs:1123: extern int rv_drag_data_add(
+tests/abi/Native.fs:1238: extern int rv_ax_set_value(nativeint ax, [<In>] byte[] value, int value_length)
+tests/abi/Native.fs:1278: extern int rv_host_load_svg(nativeint host, [<In>] byte[] svg, int svg_length)
+tests/abi/Native.fs:1407: extern nativeint rv_host_construct_event(
+tests/abi/Native.fs:1469: extern nativeint rv_event_target_add_listener(
+tests/abi/Native.fs:1886: let rv_host_load_html (host: nativeint, html: byte[], html_length: int) : int =
+tests/abi/Native.fs:1889: let result = Raw.rv_host_load_html (host, html, html_length)
+tests/abi/Native.fs:1896: Raw.rv_host_load_html (host, html, html_length)
+tests/abi/Native.fs:1946: let rv_document_get_element_by_id (host: nativeint, elementId: byte[], elementId_length: int) : nativeint =
+tests/abi/Native.fs:1949: let result = Raw.rv_document_get_element_by_id (host, elementId, elementId_length)
+tests/abi/Native.fs:1956: Raw.rv_document_get_element_by_id (host, elementId, elementId_length)
+tests/abi/Native.fs:1970: let rv_document_create_text (host: nativeint, data: byte[], data_length: int) : nativeint =
+tests/abi/Native.fs:1973: let result = Raw.rv_document_create_text (host, data, data_length)
+tests/abi/Native.fs:1980: Raw.rv_document_create_text (host, data, data_length)
+tests/abi/Native.fs:1994: let rv_node_set_text_content (node: nativeint, text: byte[], text_length: int) : int =
+tests/abi/Native.fs:1997: let result = Raw.rv_node_set_text_content (node, text, text_length)
+tests/abi/Native.fs:2004: Raw.rv_node_set_text_content (node, text, text_length)
+tests/abi/Native.fs:2006: let rv_element_set_attribute (node: nativeint, name: string, value: byte[], value_length: int) : int =
+tests/abi/Native.fs:2009: let result = Raw.rv_element_set_attribute (node, name, value, value_length)
+tests/abi/Native.fs:2016: Raw.rv_element_set_attribute (node, name, value, value_length)
+tests/abi/Native.fs:2092: let rv_node_add_event_listener
+tests/abi/Native.fs:2099: Raw.rv_node_add_event_listener (target, ``type``, type_length, capture, callback, context)
+tests/abi/Native.fs:2107: Raw.rv_node_add_event_listener (target, ``type``, type_length, capture, callback, context)
+tests/abi/Native.fs:2145: let rv_node_dispatch_event
+tests/abi/Native.fs:2152: Raw.rv_node_dispatch_event (target, ``type``, type_length, bubbles, cancelable, &defaultPrevented)
+tests/abi/Native.fs:2160: Raw.rv_node_dispatch_event (target, ``type``, type_length, bubbles, cancelable, &defaultPrevented)
+tests/abi/Native.fs:2246: let rv_document_create_comment (host: nativeint, data: byte[], data_length: int) : nativeint =
+tests/abi/Native.fs:2249: let result = Raw.rv_document_create_comment (host, data, data_length)
+tests/abi/Native.fs:2256: Raw.rv_document_create_comment (host, data, data_length)
+tests/abi/Native.fs:2282: let rv_node_parse_fragment (context: nativeint, markup: byte[], markup_length: int) : nativeint =
+tests/abi/Native.fs:2285: let result = Raw.rv_node_parse_fragment (context, markup, markup_length)
+tests/abi/Native.fs:2292: Raw.rv_node_parse_fragment (context, markup, markup_length)
+tests/abi/Native.fs:2330: let rv_node_set_string (node: nativeint, property: int, value: byte[], value_length: int) : int =
+tests/abi/Native.fs:2333: let result = Raw.rv_node_set_string (node, property, value, value_length)
+tests/abi/Native.fs:2340: Raw.rv_node_set_string (node, property, value, value_length)
+tests/abi/Native.fs:2486: let rv_host_create_event
+tests/abi/Native.fs:2493: Raw.rv_host_create_event (host, eventInterface, ``type``, type_length, bubbles, cancelable)
+tests/abi/Native.fs:2501: Raw.rv_host_create_event (host, eventInterface, ``type``, type_length, bubbles, cancelable)
+tests/abi/Native.fs:2926: let rv_host_key
+tests/abi/Native.fs:2941: Raw.rv_host_key (host, action, key, code, text, text_length, modifiers, repeat)
+tests/abi/Native.fs:2949: Raw.rv_host_key (host, action, key, code, text, text_length, modifiers, repeat)
+tests/abi/Native.fs:3071: let rv_host_ime_set_composition
+tests/abi/Native.fs:3078: Raw.rv_host_ime_set_composition (host, text, text_length, selectionStart, selectionEnd)
+tests/abi/Native.fs:3086: Raw.rv_host_ime_set_composition (host, text, text_length, selectionStart, selectionEnd)
+tests/abi/Native.fs:3088: let rv_host_ime_commit (host: nativeint, text: byte[], text_length: int) : int =
+tests/abi/Native.fs:3091: let result = Raw.rv_host_ime_commit (host, text, text_length)
+tests/abi/Native.fs:3098: Raw.rv_host_ime_commit (host, text, text_length)
+tests/abi/Native.fs:3124: let rv_element_class (node: nativeint, token: byte[], token_length: int, operation: int) : int =
+tests/abi/Native.fs:3127: let result = Raw.rv_element_class (node, token, token_length, operation)
+tests/abi/Native.fs:3134: Raw.rv_element_class (node, token, token_length, operation)
+tests/abi/Native.fs:3136: let rv_element_set_style (node: nativeint, property: string, value: byte[], value_length: int, important: int) : int =
+tests/abi/Native.fs:3141: Raw.rv_element_set_style (node, property, value, value_length, important)
+tests/abi/Native.fs:3149: Raw.rv_element_set_style (node, property, value, value_length, important)
+tests/abi/Native.fs:3708: let rv_clipboard_offer (value: nativeint, ``type``: string, data: byte[], data_length: int) : int =
+tests/abi/Native.fs:3711: let result = Raw.rv_clipboard_offer (value, ``type``, data, data_length)
+tests/abi/Native.fs:3718: Raw.rv_clipboard_offer (value, ``type``, data, data_length)
+tests/abi/Native.fs:3792: let rv_drag_data_add (value: nativeint, ``type``: string, data: byte[], data_length: int) : int =
+tests/abi/Native.fs:3795: let result = Raw.rv_drag_data_add (value, ``type``, data, data_length)
+tests/abi/Native.fs:3802: Raw.rv_drag_data_add (value, ``type``, data, data_length)
+tests/abi/Native.fs:4212: let rv_ax_set_value (ax: nativeint, value: byte[], value_length: int) : int =
+tests/abi/Native.fs:4215: let result = Raw.rv_ax_set_value (ax, value, value_length)
+tests/abi/Native.fs:4222: Raw.rv_ax_set_value (ax, value, value_length)
+tests/abi/Native.fs:4344: let rv_host_load_svg (host: nativeint, svg: byte[], svg_length: int) : int =
+tests/abi/Native.fs:4347: let result = Raw.rv_host_load_svg (host, svg, svg_length)
+tests/abi/Native.fs:4354: Raw.rv_host_load_svg (host, svg, svg_length)
+tests/abi/Native.fs:4625: let rv_host_construct_event
+tests/abi/Native.fs:4630: let result = Raw.rv_host_construct_event (host, kind, ``type``, type_length, &init)
+tests/abi/Native.fs:4637: Raw.rv_host_construct_event (host, kind, ``type``, type_length, &init)
+tests/abi/Native.fs:4795: let rv_event_target_add_listener
+tests/abi/Native.fs:4802: Raw.rv_event_target_add_listener (target, ``type``, type_length, flags, callback, context)
+tests/abi/Native.fs:4810: Raw.rv_event_target_add_listener (target, ``type``, type_length, flags, callback, context)
+tests/abi/Native.fs:6053: rv_node_add_event_listener (
+tests/abi/Native.fs:6073: rv_node_dispatch_event (
+tests/abi/custom_effects.py:14: tick, around the application's own calls: no custom effect path runs script. rv_host_update, rv_host_load_html and the
+tests/abi/event_loop_latency.py:26: set_attribute = b('rv_element_set_attribute', i32, [p, ctypes.c_char_p, ctypes.c_char_p, i32])
+tests/abi/host_string_nul.py:225: function = 'rv_document_create_text' if op == 'createText' else 'rv_document_create_comment'
+tests/abi/host_string_nul.py:449: """The transport's argument errors on every changed export, and rv_host_key's null text."""
+tests/abi/host_string_nul.py:476: if name in ('rv_host_load_html', 'rv_host_load_svg') or (request is None) == (name == 'rv_clipboard_offer'):
+tests/abi/host_string_nul.py:494: for name in ('rv_host_load_html', 'rv_host_load_svg'):
+tests/abi/host_string_nul.py:509: n.expect(n.call('rv_node_set_text_content', [P, P, I], node, ctypes.cast(ctypes.create_string_buffer(b'abc', 3), P),
+tests/abi/host_string_nul.py:512: # rv_host_key's text is nullable: -1 is no text.
+tests/abi/host_string_nul.py:513: key = n.bind('rv_host_key', I, [P, I, C, C, P, I, I])
+tests/abi/host_string_nul.py:514: n.expect(key(host, KEY_CHAR, b'a', b'KeyA', None, -1, 0, 0) >= 0, 'rv_host_key: -1 is no text')
+tests/abi/host_string_nul.py:515: n.expect(key(host, KEY_CHAR, b'a', b'KeyA', None, -2, 0, 0) == NULL_ARGUMENT, 'rv_host_key: length below -1')
+tests/abi/host_string_nul.py:517: 'rv_host_key: NULL data with a positive length')
+tests/abi/host_string_nul.py:519: == NULL_ARGUMENT, 'rv_host_key: invalid UTF-8')
+tests/abi/host_string_nul.py:520: raw.append('rv_host_key')
+tests/abi/media_capabilities.py:276: expect(1004 not in deliveries, 'a reached answer is not delivered inside rv_host_load_html')

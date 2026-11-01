@@ -1,0 +1,6 @@
+Python 3.12.3
+[0] tests/test_package_contract.py ::  OK 
+[0] tests/generator/test_domgen.py ::  OK 
+[0] scripts/capability_catalogue.py --check :: CAPABILITY_CATALOGUE_CHECK=PASS 
+[0] tests/abi/generate_native.py check :: header functions 315, Native.fs externs 315, differences 0 
+[0] gen/domgen.py check --source /mnt/c/wk/src :: interfaces 310, functions 2976 (getters 1544, setters 696, operations 620, constructors 67, namespace operations 4, static operations 19, iterator snapshots 4, context operations 22), handle types 79,
