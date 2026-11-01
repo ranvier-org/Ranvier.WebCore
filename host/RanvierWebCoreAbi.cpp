@@ -184,6 +184,7 @@
 #include <wtf/RunLoop.h>
 #if PLATFORM(COCOA)
 #include <CoreFoundation/CoreFoundation.h>
+#include <WebCore/MainThreadSharedTimer.h>
 #endif
 #include <wtf/HexNumber.h>
 #include <wtf/text/MakeString.h>
@@ -3037,6 +3038,21 @@ void rv_collect_garbage_eden(void)
         commonVM().heap.collectNow(JSC::Sync, JSC::CollectionScope::Eden);
 }
 
+#if PLATFORM(COCOA)
+// RunLoop::cycle() waits up to 50 ms for a source on Cocoa. Zero-limit passes deliver the pending sources without
+// waiting; the kernel can deliver a due timer's port message after them, so a due WebCore shared timer fires directly.
+static void cycleCocoaRunLoop()
+{
+    constexpr int maximumSourcePasses = 64;
+    for (int pass = 0; pass < maximumSourcePasses; ++pass) {
+        if (CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, true) != kCFRunLoopRunHandledSource)
+            break;
+    }
+    if (CFRunLoopGetNextTimerFireDate(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode) <= CFAbsoluteTimeGetCurrent())
+        MainThreadSharedTimer::restartSharedTimer();
+}
+#endif
+
 int32_t rv_run_loop_cycle(int32_t milliseconds)
 {
     if (milliseconds < 0)
@@ -3047,8 +3063,7 @@ int32_t rv_run_loop_cycle(int32_t milliseconds)
     int32_t cycles = 0;
     do {
 #if PLATFORM(COCOA)
-        // RunLoop::cycle() waits up to 50 ms for a source on Cocoa; one CFRunLoop pass returns without waiting.
-        CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, true);
+        cycleCocoaRunLoop();
 #else
         RunLoop::cycle();
 #endif
