@@ -326,7 +326,7 @@ def teardown(native, cases, report):
         scene.release_node(node)
     scene.nodes.clear()
     n.bind('rv_host_destroy', None, [P])(scene.host)
-    n.call('rv_run_loop_cycle', [])
+    n.call('rv_run_loop_cycle', [I], 0)
     result['hostDestroyed'] = scene.log
     n.expect(scene.log == [], 'host destroy log')
     report['teardown'] = result
