@@ -1,0 +1,170 @@
+{
+  "batch": "batch 6: Web Animations A02 effects, A05 discovery, A04 commitStyles (anim1), A03 lifecycle, A10 events (anim2), A06-A08 timelines (anim3), A09 custom effects (anim4)",
+  "oneBatchNote": "Nine groups in one batch because all four lanes edit the same animation files (gen/dom.json, generator, Teardown.fs, glue, Views fixtures).",
+  "numbers": {
+    "abi": 59,
+    "native": "0.1.0-preview.51",
+    "dom": "0.1.0-alpha.54",
+    "views": "0.1.44",
+    "backend": "0.1.0-alpha.44",
+    "absence": "docs/batch-6-evidence/allocation-absence.json",
+    "absenceSha256": "eefcc7fae87df370941d93b0c3c1b0032cbd8a2f9a01eb8493859607fb6de09a",
+    "viewsKinds": "none added (lanes used WebAnimation 107 / AnimationEffect 108 / AnimationTimeline 109 and no placeholder kinds); batch 5 ends at 116"
+  },
+  "laneHeads": {
+    "anim1": "native b5b2f86, Core 97a0dadd, Views ad11464f",
+    "anim2": "native eb2700b (0051 v2 e68a584d), Core 2634078a, Views 7f29b26a",
+    "anim3": "native ea8f348, Core 811be0af, Views 46ee91ca",
+    "anim4": "native 869e523 (A09 018185a + base-dictionary-first), Core 63ef3db5, Views e14dc3ea"
+  },
+  "patches": {
+    "series": "0040-0051",
+    "0051": "web-animation-promise-observer v2 (e68a584d), UnifiedSource-animation-4 recompiled from C:/wk/src",
+    "0052": {
+      "status": "tried and DROPPED from batch 6 (root decision c)",
+      "trial": "batch6-candidate-1 compiled UnifiedSource-dom-10 with an overlay EventLoop.cpp carrying 0052 (builder BATCH6_OVERLAY_PATCH); native batch 103693 raw +135 teardown passed",
+      "regression": {
+        "mechanism": "with 0052 an event-loop task queued after a C++ microtask under DisallowVMEntry waits for WindowEventLoop startOneShot(0) instead of running on the next run-loop turn; delivery needs only rv_run_loop_cycle (no lost wakeup) but costs timer latency",
+        "I03 pointerlockerror after deny (Views JIT, same managed binary, natives swapped)": {
+          "with0052": "13.8k-20.8k Cycle 0 calls, 4.2-6.4 ms",
+          "without0052 (batch6-candidate-diag1)": "cycle 1, 0.1 ms"
+        },
+        "R07 createImageBitmap(Blob)": {
+          "with0052": "2k-34k turns, 1.5-14 ms (fixture bound 400 turns failed)",
+          "without0052": "turn 1, 0.4-0.6 ms"
+        },
+        "nativeReplica": "docs/batch-6-evidence/deny_trace.py: the bare native deny sequence delivers on cycle 1 with and without 0052, so the latency needs the managed run state; the arming call was not identified (hwtrace could not resolve EventLoop::scheduleToRunIfNeeded / EventLoop::run)",
+        "managedRun": "C:/wk/int6-tools/runs/run1, run2 (JIT/AOT stopped at I03 and R07; Chromium 117 passed)"
+      },
+      "vm1StepsWith0052": {
+        "step1Census": "docs/batch-6-evidence/vm1/census (pausecancel/cancel: no C++ microtask enqueued at cancel, census queues empty; unpatched vm1 runs C:/wk/vm1-artifacts/probe/l2-*)",
+        "steps2and4": {
+          "armedPauseCancelExit": 0,
+          "armedPauseCancelSurvived": true,
+          "animateCancelPrivateBytes": [
+            326094848,
+            326250496,
+            326393856
+          ],
+          "pauseCancelPrivateBytes": [
+            326467584,
+            326774784,
+            326787072
+          ],
+          "pauseCancelFlat": true
+        },
+        "step3": "full native batch on batch6-candidate-1: 103693 raw, every batch-5 count unchanged"
+      },
+      "evidenceForTheRevisedPatch": "kept above; a separate lane revises 0052"
+    }
+  },
+  "candidate": {
+    "dir": "artifacts/batch6-candidate-2",
+    "builder": "docs/batch-6-evidence/build_batch6_candidate.py (no overlay)",
+    "sameRecipeAs": "batch6-candidate-diag1 (built from a scratch copy of the builder without the overlay job; I03 and R07 pass on it)",
+    "parent": "batch5-candidate-1 objects on C:/wk/pointer-build (read-only)",
+    "runtime": {
+      "WebCore.dll": "8515cc6db9296949aba43a3bcd36a1a3550d37f61d01874ab5eded4186878e4c",
+      "RanvierWebCoreHost.dll": "cf7c9abf0bb7186061e31a1b4457501675856f61792fe8ae228d8cb426bbb3e2",
+      "JavaScriptCore.dll": "1af0ee5fc6c4a907812cd16a92d72961786c3a631ffb81b14479f0123c9264dc"
+    },
+    "recompiledUnits": {
+      "UnifiedSource-animation-4.cpp.obj": {
+        "disassemblyEqualToBuild": false,
+        "patchFilesReaching": [
+          "Source/WebCore/animation/WebAnimation.cpp"
+        ]
+      }
+    },
+    "glueUnits": [
+      "RanvierCanvasExportGlue.cpp.obj",
+      "RanvierCanvasGlue.cpp.obj",
+      "RanvierCanvasPixelsGlue.cpp.obj",
+      "RanvierDomGlue.cpp.obj",
+      "RanvierEventGlue.cpp.obj",
+      "RanvierInspectGlue.cpp.obj",
+      "RanvierNotificationGlue.cpp.obj",
+      "RanvierPointerGlue.cpp.obj",
+      "RanvierResourceGlue.cpp.obj",
+      "RanvierSvgViewGlue.cpp.obj",
+      "RanvierTransferGlue.cpp.obj",
+      "RanvierViewportGlue.cpp.obj",
+      "RanvierWakeLockGlue.cpp.obj"
+    ],
+    "hostUnits": 5,
+    "sourcePatchesSha256": "feaf86966de0d7a5977f09f91ff80687f80afe4bbafe349b296e1b6be1eda4d5",
+    "trialCandidate": {
+      "dir": "artifacts/batch6-candidate-1",
+      "runtime": {
+        "WebCore.dll": "46710c7249c5d46aa1308560b963a2f27c137bdd242a3a54854eb97df13c43ff",
+        "RanvierWebCoreHost.dll": "15864132b8c2eaafab1ae6f4f0f3ceabc0f41d4676e877b5591ed864b98067a6"
+      }
+    }
+  },
+  "nativeBatch": {
+    "runner": "docs/batch-6-evidence/run_batch6_full_batch.py",
+    "results": "artifacts/batch6-candidate-2-batch/results.json",
+    "resultsSha256": "a8f54e817985eaf276440788a48240991694b3c7d7211545f55a5aead4797092",
+    "raw": 103693,
+    "expectedRaw": "99920 (batch 5) + effects 106 + commit 70 + discovery 185 + lifecycle 600 + events 235 + timelines 1914 + custom effects 663 = 103693",
+    "teardownRecords": 135,
+    "teardownAllCollected": true,
+    "countsChangedFromBatch5": {},
+    "added": {
+      "web_animation_effects": 106,
+      "web_animation_commit": 70,
+      "web_animation_discovery": 185,
+      "animation_lifecycle": 600,
+      "animation_events": 235,
+      "animation_timelines": 1914,
+      "custom_effects": 663
+    }
+  },
+  "a03Qualification": {
+    "armedPauseCancel": "without 0052 Animation.cancel() with a pending pause aborts when crashOnDisallowedVMEntry is armed (exit 0xC0000409, steps-batch6-candidate-2.json, as on batch5-candidate-1); the anim2 probes animation_lifecycle.py and animation_events.py never arm the crash and pass unarmed (600, 235)",
+    "batch6-candidate-2": {
+      "armedPauseCancelExit": 3221226505,
+      "armedPauseCancelSurvived": false,
+      "animateCancelPrivateBytes": [
+        327208960,
+        327462912,
+        327782400
+      ],
+      "pauseCancelPrivateBytes": [
+        327905280,
+        327557120,
+        327602176
+      ],
+      "pauseCancelFlat": true
+    },
+    "batch5-candidate-1": {
+      "armedPauseCancelExit": 3221226505,
+      "armedPauseCancelSurvived": false,
+      "animateCancelPrivateBytes": [
+        326946816,
+        327221248,
+        327540736
+      ],
+      "pauseCancelPrivateBytes": [
+        327684096,
+        327262208,
+        327335936
+      ],
+      "pauseCancelFlat": true
+    }
+  },
+  "generatorChecks": {
+    "windows": "docs/batch-6-evidence/gen-check-windows.txt",
+    "wslUbuntu": "docs/batch-6-evidence/gen-check-wsl-ubuntu.txt",
+    "generatorTests": 130,
+    "gendelta": "every generated declaration equals batch 5 or its lane except RvDomKeyframeAnimationOptions (A08 range_start/range_end appended; size-prefixed; abi_layouts does not cover it)"
+  },
+  "strscan": "126 hits vs batch-5 125; the one new hit is a docstring line in tests/abi/custom_effects.py (no call). scan_loops: 1 pre-existing (tree_traversal).",
+  "managed": {
+    "run": "C:/wk/int6-tools/runs/run4 (feed C:/wk/int6-feed, stage = batch6-candidate-2)",
+    "jitPassLines": 170,
+    "aotPassLines": 170,
+    "chromiumPassLines": 117,
+    "superset": "every batch-5 run1 PASS line with an identical count; new A02 54, A03 29 (+4 lifetime), A04 9, A05 33, A06 24 (+5), A07 38, A08 54, A09 23 (+3), A10 9 on JIT and AOT; A02-A10 on Chromium"
+  }
+}

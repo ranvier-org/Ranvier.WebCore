@@ -45,8 +45,16 @@ class InterfaceEmitter:
         self.sources = {self.world.public_name(name): name for name in self.world.contract_types}
         self.names = list(self.sources)
 
-    def type(self, value):
+    def resolve(self, value):
+        """The resolved type, with a single-arm union resolved to its arm: the model names the arm's own type."""
         value = self.world.resolve(value)
+        while value.name == 'union' and len(value.subtypes) == 1:
+            arm = self.world.resolve(value.subtypes[0])
+            value = idl.Type(arm.name, value.nullable or arm.nullable, arm.subtypes, {**arm.attrs, **value.attrs}, arm.file)
+        return value
+
+    def type(self, value):
+        value = self.resolve(value)
         if value.name in STRINGS or self.world.string_union(value) is not None and value.name == 'union':
             result = 'string'
         elif value.name in NUMBERS:
@@ -93,16 +101,41 @@ class InterfaceEmitter:
         return result
 
     def union(self, value):
-        value = self.world.resolve(value)
+        value = self.resolve(value)
         return value.name == 'union' and self.world.string_union(value) is None
 
+    def union_sequence(self, value):
+        """A sequence of a union, which the browser receives as an array of the arms' raw values."""
+        value = self.resolve(value)
+        return value.name == 'sequence' and bool(value.subtypes) and self.union(value.subtypes[0])
+
     def complex(self, member):
-        return self.union(member.type) or any(self.union(arg.type) for arg in member.arguments)
+        return (self.union(member.type) or any(self.union(arg.type) for arg in member.arguments)
+                or any(self.union_sequence(arg.type) and not arg.variadic for arg in member.arguments)
+                or bool(self.result_union_fields(member.type)))
+
+    def raw_name(self, member):
+        """The browser member an adapter calls; an overload with a union sequence takes its own name."""
+        return f'__ranvier_{member.name}' + ('List' if any(self.union_sequence(a.type) for a in member.arguments) else '')
+
+    def result_union_fields(self, value):
+        """The (dictionary, field, union type) of a dictionary result, or a sequence of one, whose fields are unions: a
+        browser returns plain values there, which the Fable adapter wraps in the contract's unions."""
+        t = self.resolve(value)
+        if t.name in ('sequence', 'FrozenArray'):
+            t = self.resolve(t.subtypes[0])
+        if t.name not in self.world.dictionaries or t.name not in self.world.config.get('resultDictionaries', []):
+            return []
+        try:
+            fields = self.world.dictionary_fields(t.name)
+        except self.generator.unsupported_type:
+            return []
+        return [(t.name, member, self.resolve(member.type)) for member, _ in fields if self.union(member.type)]
 
     def choices(self, arguments):
         variants = []
         for argument in arguments:
-            t = self.world.resolve(argument.type)
+            t = self.resolve(argument.type)
             alternatives = list(t.subtypes) if self.union(t) and not argument.variadic else [argument.type]
             if argument.optional and self.union(t):
                 alternatives = [None] + alternatives
@@ -126,9 +159,9 @@ class InterfaceEmitter:
             if t is None:
                 continue
             ftype = self.type(t)
-            if argument.optional and self.world.resolve(t).name in self.world.config.get('callbackObjectRoots', {}):
-                ftype = self.world.resolve(t).name
-            if raw and self.union(argument.type):
+            if argument.optional and self.resolve(t).name in self.world.config.get('callbackObjectRoots', {}):
+                ftype = self.resolve(t).name
+            if raw and (self.union(argument.type) or self.union_sequence(argument.type)):
                 ftype = 'obj'
             if argument.variadic:
                 ftype += ' array'
@@ -173,7 +206,7 @@ class InterfaceEmitter:
                      f'    abstract member {member.name}: eventType: string * listener: EventListener * ?capture: bool -> unit',
                      f'    abstract member {member.name}: eventType: string * listener: EventListenerObject * ?capture: bool -> unit']
             if len(member.arguments) >= 3:
-                options = self.world.resolve(member.arguments[2].type)
+                options = self.resolve(member.arguments[2].type)
                 for choice in options.subtypes if options.name == 'union' else [options]:
                     if choice.name not in self.world.contract_dictionary_fields:
                         continue
@@ -203,10 +236,10 @@ class InterfaceEmitter:
             signature = f'    abstract member {identifier(member.name)}: {result} with {access}'
             if not needs_adapter:
                 source = self.sources.get(owner, owner)
-                if setter and self.world.resolve(member.type).name == 'USVString' and source in self.world.config.get('browserWellFormedSetters', []):
+                if setter and self.resolve(member.type).name == 'USVString' and source in self.world.config.get('browserWellFormedSetters', []):
                     expression = '$0.' + member.name + "{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}"
                     return [''] + lines + ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif', signature, '']
-                if getter and not setter and self.world.resolve(member.type).name in WIDE_INTEGERS:
+                if getter and not setter and self.resolve(member.type).name in WIDE_INTEGERS:
                     # A browser returns a JavaScript number; Fable represents int64 and uint64 as BigInt.
                     return [''] + lines + ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("BigInt($0.{member.name})")>]', '#endif', signature, '']
                 if owner in ('Document', 'ShadowRoot', 'DocumentOrShadowRoot') and member.name == 'styleSheets' and getter:
@@ -232,6 +265,12 @@ class InterfaceEmitter:
         if anonymous_property and not needs_adapter:
             expression = self.browser_property_expression(owner, member)
             lines += ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif']
+        # A getter WebKit's IDL names, which browsers expose only as an indexed property.
+        indexed = f'{owner}.{member.name}' in self.world.config.get('browserIndexedGetters', [])
+        if indexed:
+            if member.special != 'getter' or needs_adapter or len(member.arguments) != 1:
+                raise SystemExit(f'{owner}.{member.name}: browserIndexedGetters requires a one-argument named getter')
+            lines = ([''] if lines[0] != '' else []) + lines + ['#if FABLE_COMPILER', '    [<Fable.Core.Emit("($0[$1] ?? null)")>]', '#endif']
         matrix_adapter = f'{owner}.{member.name}'
         if matrix_adapter in self.generator.svg_matrix_bindings:
             expression = ("((v,d)=>{const n=globalThis.DOMMatrix.fromMatrix(d??{});"
@@ -241,15 +280,33 @@ class InterfaceEmitter:
             lines += ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif']
             self.svg_matrix_dictionary_adapters_used.add(matrix_adapter)
         if matrix_adapter in self.world.config.get('browserMatrixFlagAdapters', []):
-            if member.kind != 'operation' or member.name != 'toMatrix' or needs_adapter or anonymous_property or member.arguments or self.world.resolve(member.type).name != 'DOMMatrix':
+            if member.kind != 'operation' or member.name != 'toMatrix' or needs_adapter or anonymous_property or member.arguments or self.resolve(member.type).name != 'DOMMatrix':
                 raise SystemExit(f'{matrix_adapter}: matrix flag adapter requires a plain zero-argument DOMMatrix operation')
             fields = ','.join(f'm.m{column}{row}' for column in range(1, 5) for row in range(1, 5))
             expression = ('((v)=>{const m=v.toMatrix();return v.is2D===false&&m.is2D===true?'
                           f'new m.constructor([{fields}]):m;}})($0)')
             lines += ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif']
             self.matrix_flag_adapters_used.add(matrix_adapter)
-        wide = [i for i, a in enumerate(member.arguments) if self.world.resolve(a.type).name in WIDE_INTEGERS]
-        if wide and not needs_adapter and not anonymous_property and not member.arguments[-1].variadic:
+        # browserArgumentConversions maps Interface.member.argument to a JavaScript function of the F# value that gives
+        # the browser's argument: a keyframe sequence becomes the browser's keyframe objects.
+        conversions = {i: self.world.config.get('browserArgumentConversions', {}).get(f'{self.sources.get(owner, owner)}.{member.name}.{a.name}')
+                       for i, a in enumerate(member.arguments)}
+        conversions = {i: c for i, c in conversions.items() if c}
+        result_conversion = self.world.config.get('browserResultConversions', {}).get(f'{self.sources.get(owner, owner)}.{member.name}')
+        if result_conversion and not needs_adapter and not anonymous_property:
+            names = [f'a{i}' for i in range(len(member.arguments))]
+            passed = [f'({conversions[i]})({n})' if i in conversions else n for i, n in enumerate(names)]
+            expression = (f"((o{''.join(',' + n for n in names)})=>({result_conversion})(o.{member.name}({','.join(passed)})))"
+                          f"($0{''.join(f',${i + 1}' for i in range(len(member.arguments)))})")
+            lines = ([''] if lines[0] != '' else []) + lines + ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif']
+        elif conversions and not needs_adapter and not anonymous_property:
+            names = [f'a{i}' for i in range(len(member.arguments))]
+            passed = [f'({conversions[i]})({n})' if i in conversions else n for i, n in enumerate(names)]
+            expression = (f"((o,{','.join(names)})=>o.{member.name}({','.join(passed)}))"
+                          f"($0,{','.join(f'${i + 1}' for i in range(len(member.arguments)))})")
+            lines = ([''] if lines[0] != '' else []) + lines + ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif']
+        wide = [i for i, a in enumerate(member.arguments) if self.resolve(a.type).name in WIDE_INTEGERS]
+        if wide and not conversions and not needs_adapter and not anonymous_property and not member.arguments[-1].variadic:
             # Fable passes int64 arguments as BigInt, which a browser's number conversion rejects.
             names = [f'a{i}' for i in range(len(member.arguments))]
             passed = [f"{n}===void 0?void 0:Number({n})" if i in wide else n for i, n in enumerate(names)]
@@ -258,24 +315,42 @@ class InterfaceEmitter:
             lines = ([''] if lines[0] != '' else []) + lines + ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif']
         if needs_adapter:
             raw_params = self.parameters(member.arguments, [a.type for a in member.arguments], raw=True)
-            raw_result = 'obj' if self.union(member.type) else result
-            arg_expressions = [('...' if a.variadic else '') + f'${i + 1}' for i, a in enumerate(member.arguments)]
+            raw_result = 'obj' if self.union(member.type) or self.result_union_fields(member.type) else result
+            arg_expressions = [('...' if a.variadic else '') + (f'({conversions[i]})(${i + 1})' if i in conversions else f'${i + 1}')
+                               for i, a in enumerate(member.arguments)]
             expression = f'$0.{member.name}(' + ', '.join(arg_expressions) + ')'
+            if result_conversion:
+                expression = f'({result_conversion})({expression})'
             if anonymous_property:
                 expression = self.browser_property_expression(owner, member)
-            lines += ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]',
-                      f'    abstract member __ranvier_{member.name}: {raw_params} -> {raw_result}', '#else']
+            raw_signature = f'{raw_params} -> {raw_result}'
+            raw_member = f'    abstract member {self.raw_name(member)}: {raw_signature}'
+            # Fantomas breaks a signature past the line length after the colon.
+            raw_lines = [raw_member] if len(raw_member) <= 150 else [f'    abstract member {self.raw_name(member)}:', f'        {raw_signature}']
+            lines += ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]'] + raw_lines + ['#else']
+        previous_wrapped = None
         for selected in selected_arguments:
-            lines += [f'    abstract member {identifier(member.name)}: {self.parameters(member.arguments, selected)} -> {result}']
+            signature = f'{self.parameters(member.arguments, selected)} -> {result}'
+            wrapped = len(f'    abstract member {identifier(member.name)}: {signature}') > 150
+            # Fantomas separates a multi-line overload from its neighbouring overloads with a blank line.
+            if previous_wrapped is not None and (wrapped or previous_wrapped):
+                lines += ['']
+            if wrapped:
+                # Fantomas breaks a signature past the line length after the colon, with a blank line before the member.
+                lines = ([''] if lines and lines[0] != '' else []) + lines
+                lines += [f'    abstract member {identifier(member.name)}:', f'        {signature}']
+            else:
+                lines += [f'    abstract member {identifier(member.name)}: {signature}']
+            previous_wrapped = wrapped
         if needs_adapter:
             lines += ['#endif']
             self.adapters.append((owner, member))
-        if anonymous_property or matrix_adapter in self.generator.svg_matrix_bindings or (wide and not needs_adapter and lines[-1] != ''):
+        if anonymous_property or indexed or matrix_adapter in self.generator.svg_matrix_bindings or (wide and not needs_adapter and lines[-1] != ''):
             lines += ['']
         return lines
 
     def box_union(self, value, expression):
-        t = self.world.resolve(value)
+        t = self.resolve(value)
         if not self.union(t):
             return f'box ({expression})'
         name = label(t)
@@ -285,13 +360,13 @@ class InterfaceEmitter:
         return f'(match {expression} with ' + ' | '.join(f'{name}.{label(child)} value -> box value' for child in t.subtypes) + ')'
 
     def unbox_union(self, value, expression):
-        t = self.world.resolve(value)
+        t = self.resolve(value)
         if not self.union(t):
             return expression
         name = label(t)
         arms = []
         for child in t.subtypes:
-            child = self.world.resolve(child)
+            child = self.resolve(child)
             ftype = self.type(child)
             if child.name in STRINGS or child.name in NUMBERS or child.name == 'boolean':
                 test = f':? {ftype} as arm'
@@ -307,7 +382,7 @@ class InterfaceEmitter:
         lines = ['', '#if FABLE_COMPILER', '[<AutoOpen>]', 'module BrowserUnionAdapters =']
         span_unions = set(self.world.config.get('browserWellFormedUnions', []))
         reference_unions = span_unions | set(self.world.config.get('validatedReferenceUnions', []))
-        if any(self.world.resolve(child).name == 'undefined' for children in self.unions.values() for child in children):
+        if any(self.resolve(child).name == 'undefined' for children in self.unions.values() for child in children):
             lines += ['    [<Fable.Core.Emit("$0 === undefined")>]',
                       '    let private isUndefinedUnionValue (_: obj) : bool =', '        Fable.Core.Util.jsNative', '']
         if any(name in span_unions for name in self.unions):
@@ -315,12 +390,25 @@ class InterfaceEmitter:
                       '    let private normalizeUSVString (_: string) : string =', '        Fable.Core.Util.jsNative', '']
         result_interfaces = set()
         for _, member in self.adapters:
-            t = self.world.resolve(member.type)
+            t = self.resolve(member.type)
             if self.union(t):
                 result_interfaces.update(child.name for child in t.subtypes if self.world.public_name(child.name) in self.names)
         strict_interfaces = {child.name for name, children in self.unions.items() if name in reference_unions
                              for child in children if self.world.public_name(child.name) in self.names}
         result_interfaces.update(strict_interfaces)
+        # A dictionary arm of a result union is a plain object: neither a typed CSS value nor a node.
+        result_dictionaries = set()
+        for _, member in self.adapters:
+            t = self.resolve(member.type)
+            if self.union(t):
+                result_dictionaries.update(child.name for child in (self.resolve(c) for c in t.subtypes)
+                                           if child.name in self.world.dictionaries)
+        result_interfaces -= result_dictionaries
+        for name in sorted(result_dictionaries):
+            predicate = ("((v)=>{if(v==null||typeof v!=='object'||v.nodeType!==undefined)return false;"
+                         "try{globalThis.CSSStyleValue.prototype.toString.call(v);return false;}catch{return true;}})($0)")
+            lines += [f'    [<Fable.Core.Emit("{predicate}")>]',
+                      f'    let private is{name} (_: obj) : bool =', '        Fable.Core.Util.jsNative', '']
         for name in sorted(result_interfaces):
             browser_name = self.world.interfaces[name].attrs.get('InterfaceName', self.world.public_name(name))
             predicate = '$0 != null && $0.nodeType === 1' if name == 'Element' else f'Object.prototype.toString.call($0) === \'[object {browser_name}]\''
@@ -341,15 +429,17 @@ class InterfaceEmitter:
             lines += [f'    [<Fable.Core.Emit("{predicate}")>]',
                       f'    let private is{name} (_: obj) : bool =', '        Fable.Core.Util.jsNative', '']
         for name, children in self.unions.items():
-            lines += ['', f'    let private box{name} (value: {name}) : obj =']
+            head = f'    let private box{name} (value: {name}) : obj ='
+            # Fantomas puts the parameter and the return type on their own lines past the line length.
+            lines += ['', head] if len(head) <= 150 else ['', f'    let private box{name}', f'        (value: {name})', '        : obj =']
             if name in reference_unions:
                 lines += ['        if isNull (box value) then', '            nullArg "value"', '']
             lines += ['        match value with']
             for child in children:
-                boxed = 'box (normalizeUSVString value)' if name in span_unions and self.world.resolve(child).name == 'USVString' else 'box value'
-                if self.world.resolve(child).name == 'undefined':
+                boxed = 'box (normalizeUSVString value)' if name in span_unions and self.resolve(child).name == 'USVString' else 'box value'
+                if self.resolve(child).name == 'undefined':
                     boxed = 'Fable.Core.JsInterop.emitJsExpr () "undefined"'
-                resolved = self.world.resolve(child)
+                resolved = self.resolve(child)
                 if name in reference_unions and resolved.name in strict_interfaces:
                     lines += [f'        | {name}.{label(child)} value ->',
                               '            if isNull (box value) then', '                nullArg "value"', '',
@@ -358,10 +448,14 @@ class InterfaceEmitter:
                               f'            {boxed}']
                 else:
                     lines += [f'        | {name}.{label(child)} value -> {boxed}']
-            if any(self.union(member.type) and label(self.world.resolve(member.type)) == name for _, member in self.adapters):
-                lines += ['', f'    let private unbox{name} (value: obj) : {name} =', '        match value with']
+            if any((self.union(member.type) and label(self.resolve(member.type)) == name)
+                   or any(label(union) == name for _, _, union in self.result_union_fields(member.type)) for _, member in self.adapters):
+                head = f'    let private unbox{name} (value: obj) : {name} ='
+                # Fantomas puts the parameter and the return type on their own lines past the line length.
+                lines += (['', head] if len(head) <= 150
+                          else ['', f'    let private unbox{name}', '        (value: obj)', f'        : {name} =']) + ['        match value with']
                 for child in children:
-                    resolved = self.world.resolve(child)
+                    resolved = self.resolve(child)
                     ftype = self.type(child)
                     if resolved.name == 'undefined':
                         lines += [f'        | arm when isUndefinedUnionValue arm -> {name}.{label(child)} ()']
@@ -370,8 +464,30 @@ class InterfaceEmitter:
                     else:
                         head = f'        | arm when is{resolved.name} arm ->'
                         value = f'{name}.{label(child)} (unbox<{ftype}> arm)'
-                        lines += [head, f'            {value}'] if name not in self.world.config.get('validatedReferenceUnions', []) and len(head + ' ' + value) > 120 else [head + ' ' + value]
+                        lines += [head, f'            {value}'] if name not in self.world.config.get('validatedReferenceUnions', []) and len(head + ' ' + value) > 150 else [head + ' ' + value]
                 lines += ['        | _ -> failwith "Unexpected DOM union result"']
+        converted = {}
+        for _, member in self.adapters:
+            for name, field, union in self.result_union_fields(member.type):
+                converted.setdefault(name, []).append((field, union))
+        if converted:
+            lines += ['', '    [<Fable.Core.Emit("$0[$1]")>]', '    let private rawField (_: obj) (_: string) : obj =',
+                      '        Fable.Core.Util.jsNative']
+        for name, fields in converted.items():
+            lines += ['', f'    let private resultDict{name} (raw: obj) : {name} =', f'        let value = unbox<{name}> raw']
+            for field, union in fields:
+                union_name = label(union)
+                plain = f'unbox{union_name} (rawField raw "{field.name}")'
+                if union.nullable or (not field.required and field.default is None):
+                    # An optional field: absent or null is None. Fantomas's layout: a multi-line if between blank lines.
+                    raw_name = identifier(field.name) + 'Field'
+                    lines += [f'        let {raw_name} = rawField raw "{field.name}"', '',
+                              f'        value.{identifier(field.name)} <-',
+                              f'            (if isNull {raw_name} then', '                 None', '             else',
+                              f'                 Some (unbox{union_name} {raw_name}))', '']
+                else:
+                    lines += [f'        value.{identifier(field.name)} <- {plain}']
+            lines += ['        value']
         for owner in dict.fromkeys(owner for owner, _ in self.adapters):
             lines += ['', f'    type {owner} with']
             for current, member in self.adapters:
@@ -380,12 +496,12 @@ class InterfaceEmitter:
                 result = self.type(member.type)
                 if member.kind == 'attribute':
                     getter, setter = self.attribute_access[(owner, self.world.member_key(member))]
-                    union_name = label(self.world.resolve(member.type))
+                    union_name = label(self.resolve(member.type))
                     if getter and not setter:
                         # A get-only adapter is a property with a body, as Fantomas formats it.
                         lines += [f'        member this.{identifier(member.name)}: {result} =',
                                   f'            let value = this.__ranvier_get_{member.name} ()']
-                        if self.world.resolve(member.type).nullable:
+                        if self.resolve(member.type).nullable:
                             lines += ['', '            if isNull value then', '                None', '            else',
                                       f'                Some (unbox{union_name} value)']
                         else:
@@ -396,16 +512,16 @@ class InterfaceEmitter:
                     if getter:
                         lines += [f'            with get (): {result} =',
                                   f'                let value = this.__ranvier_get_{member.name} ()']
-                        if self.world.resolve(member.type).nullable:
+                        if self.resolve(member.type).nullable:
                             lines += ['', '                if isNull value then', '                    None', '                else',
                                       f'                    Some (unbox{union_name} value)']
                         else:
                             lines += [f'                unbox{union_name} value']
                     if setter:
-                        boxed = f'value |> Option.map box{union_name} |> Option.defaultValue null' if self.world.resolve(member.type).nullable else f'box{union_name} value'
+                        boxed = f'value |> Option.map box{union_name} |> Option.defaultValue null' if self.resolve(member.type).nullable else f'box{union_name} value'
                         setter_head = f'            {"and" if getter else "with"} set (value: {result}) ='
                         lines += [setter_head]
-                        if self.world.resolve(member.type).nullable:
+                        if self.resolve(member.type).nullable:
                             lines += [f'                this.__ranvier_set_{member.name} (', '                    value',
                                       f'                    |> Option.map box{union_name}', '                    |> Option.defaultValue null', '                )']
                         else:
@@ -427,14 +543,18 @@ class InterfaceEmitter:
                         optional = argument.optional and not self.union(argument.type)
                         if argument.variadic:
                             declarations.append(f'[<System.ParamArray>] {name}: {ftype} array')
-                            expr = f'{name} |> Array.map box{label(self.world.resolve(argument.type))}' if self.union(argument.type) else name
+                            expr = f'{name} |> Array.map box{label(self.resolve(argument.type))}' if self.union(argument.type) else name
+                        elif self.union_sequence(argument.type):
+                            declarations.append(f'{"?" if optional else ""}{name}: {ftype}')
+                            element = label(self.resolve(self.resolve(argument.type).subtypes[0]))
+                            expr = f'box (Array.map box{element} {name})'
                         else:
                             declarations.append(f'{"?" if optional else ""}{name}: {ftype}')
                             expr = f'box {name}' if self.union(argument.type) else name
-                            if self.union(argument.type) and label(self.world.resolve(argument.type)) in span_unions and self.world.resolve(chosen).name == 'USVString':
+                            if self.union(argument.type) and label(self.resolve(argument.type)) in span_unions and self.resolve(chosen).name == 'USVString':
                                 expr = f'box (normalizeUSVString {name})'
-                            if self.union(argument.type) and label(self.world.resolve(argument.type)) in reference_unions and self.world.resolve(chosen).name in strict_interfaces:
-                                selected_interface = self.world.resolve(chosen).name
+                            if self.union(argument.type) and label(self.resolve(argument.type)) in reference_unions and self.resolve(chosen).name in strict_interfaces:
+                                selected_interface = self.resolve(chosen).name
                                 guards += [f'            if isNull (box {name}) then',
                                            f'                nullArg "{argument.name}"', '',
                                            f'            if not (is{selected_interface} (box {name})) then',
@@ -447,17 +567,30 @@ class InterfaceEmitter:
                         elif any(previous.optional for previous in member.arguments[:argument_index]):
                             expr = f'{name} = {expr}'
                         passed.append(expr)
-                    raw_call = f'this.__ranvier_{member.name} (' + ', '.join(passed) + ')'
-                    lines += [f'        member this.{identifier(member.name)}(' + ', '.join(declarations) + f') : {result} =']
+                    raw_call = f'this.{self.raw_name(member)} (' + ', '.join(passed) + ')'
+                    head = f'        member this.{identifier(member.name)}(' + ', '.join(declarations) + f') : {result} ='
+                    if len(head) > 150:
+                        # Fantomas moves the parameters and the return type of a long member head onto lines of their own.
+                        lines += [f'        member this.{identifier(member.name)}', '            (' + ', '.join(declarations) + ')',
+                                  f'            : {result} =']
+                    else:
+                        lines += [head]
                     lines += guards
                     if self.union(member.type):
-                        union_name = label(self.world.resolve(member.type))
+                        union_name = label(self.resolve(member.type))
                         lines += [f'            let value = {raw_call}', '']
-                        if self.world.resolve(member.type).nullable:
+                        if self.resolve(member.type).nullable:
                             lines += ['            if isNull value then', '                None', '            else',
                                       f'                Some (unbox{union_name} value)']
                         else:
                             lines += [f'            unbox{union_name} value']
+                    elif self.result_union_fields(member.type):
+                        name = self.result_union_fields(member.type)[0][0]
+                        t = self.resolve(member.type)
+                        if t.name in ('sequence', 'FrozenArray'):
+                            lines += [f'            {raw_call} |> unbox<obj array> |> Array.map resultDict{name}']
+                        else:
+                            lines += [f'            resultDict{name} ({raw_call})']
                     else:
                         lines += [f'            {raw_call}']
                     lines += ['']
@@ -514,7 +647,18 @@ class InterfaceEmitter:
             declarations.append((name, '[<AllowNullLiteral>]', body or ['    interface end']))
         for name, children in self.unions.items():
             declarations.append((name, '[<RequireQualifiedAccess>]', [f'    | {label(child)} of {self.type(child)}' for child in children]))
-        for name, fields in self.dictionaries.items():
+        # A derived contract dictionary is a subclass, which JavaScript defines only after its base class.
+        ordered = []
+
+        def place(name):
+            base = self.world.dictionaries[name].base
+            if name in self.world.contract_dictionary_fields and base in self.dictionaries:
+                place(base)
+            if name not in ordered:
+                ordered.append(name)
+        for name in self.dictionaries:
+            place(name)
+        for name, fields in [(name, self.dictionaries[name]) for name in ordered]:
             body = []
             base = self.world.dictionaries[name].base
             inherited = set()
@@ -524,7 +668,7 @@ class InterfaceEmitter:
             for member, ftype in fields:
                 if member.name in inherited:
                     continue
-                t = self.world.resolve(member.type)
+                t = self.resolve(member.type)
                 default = member.default
                 if not member.required and default is None:
                     ftype = f'({ftype}) option' if not ftype.endswith(' option') else ftype
@@ -535,12 +679,26 @@ class InterfaceEmitter:
                     value = '[||]'
                 elif t.name in self.world.enums and default is not None:
                     value = f'{t.name}.{case_name(default.strip(chr(34)))}'
+                elif default is not None and self.union(member.type):
+                    # A union default names the arm of its literal: a string arm for "auto", else the number arm.
+                    quoted = default.startswith('"')
+                    arm = next(child for child in t.subtypes
+                               if (self.resolve(child).name in STRINGS) == quoted
+                               and (quoted or self.resolve(child).name in NUMBERS))
+                    literal = default if quoted or '.' in default else default + '.0'
+                    value = f'{ftype}.{label(arm)} {literal}'
                 elif default is not None:
                     suffix = {'sbyte': 'y', 'byte': 'uy', 'int16': 's', 'uint16': 'us', 'uint32': 'u', 'int64': 'L', 'uint64': 'UL', 'float32': 'f'}.get(ftype, '')
                     value = default + suffix
                 else:
                     value = 'Unchecked.defaultof<_>'
-                body += [f'    member val {identifier(member.name)}: {ftype} = {value} with get, set']
+                line = f'    member val {identifier(member.name)}: {ftype} = {value} with get, set'
+                if len(line) > 120:
+                    # Fantomas breaks a long field after the equals sign, with blank lines around it.
+                    body += ([] if not body or body[-1] == '' else ['']) + [
+                        f'    member val {identifier(member.name)}: {ftype} =', f'        {value} with get, set', '']
+                else:
+                    body.append(line)
             declarations.append((name + '()', '[<AllowNullLiteral; DomDictionary>]', body or ['    class end']))
         for name in sorted(self.callbacks):
             if name == 'EventListener':
@@ -548,10 +706,11 @@ class InterfaceEmitter:
                 declarations.append(('EventListenerObject', '[<AllowNullLiteral>]', ['    abstract member handleEvent: event: Event -> unit']))
             elif name in self.world.config.get('callbackObjectRoots', {}):
                 callback = self.world.config['callbackObjectRoots'][name]
-                result = callback['resultEnum']
                 declarations.append((name, '', ['    ' + callback['contract']]))
-                declarations.append((result['name'], '',
-                                     [f'    | {case} = {value}' for case, value in result['cases'].items()]))
+                if 'resultEnum' in callback:
+                    result = callback['resultEnum']
+                    declarations.append((result['name'], '',
+                                         [f'    | {case} = {value}' for case, value in result['cases'].items()]))
         for name, (values, _, _) in self.world.enums.items():
             if name in self.enums:
                 declarations.append((name, '[<RequireQualifiedAccess>]', [f'    | [<CompiledName("{value}")>] {case_name(value)}' for value in values]))

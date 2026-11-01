@@ -9,6 +9,9 @@
 #include <vector>
 #include "../../host/RanvierWebCoreAbi.h"
 
+// A string literal's UTF-8 bytes and byte count, for a length-delimited string input.
+#define RV_TEXT(literal) reinterpret_cast<const uint8_t*>(literal), static_cast<int32_t>(sizeof(literal) - 1)
+
 using Microsoft::WRL::ComPtr;
 constexpr UINT removeMessage = WM_APP + 21;
 constexpr UINT closeMessage = WM_APP + 22;
@@ -211,7 +214,7 @@ LRESULT CALLBACK windowProcedure(HWND hwnd, UINT message, WPARAM wparam, LPARAM 
 {
     if (message == removeMessage) { rv_node_remove(fixtureButton); return 0; }
     if (message == addChurnMessage) {
-        transientNode = rv_document_create_element(fixtureHost, "button"); rv_node_set_text_content(transientNode, "Transient item");
+        transientNode = rv_document_create_element(fixtureHost, "button"); rv_node_set_text_content(transientNode, RV_TEXT("Transient item"));
         auto* body = rv_document_body(fixtureHost); rv_node_append_child(body, transientNode); rv_node_release(body); rv_host_update(fixtureHost); return 0;
     }
     if (message == removeChurnMessage) {
@@ -244,16 +247,16 @@ int main(int argc, char** argv)
     HWND hwnd = CreateWindowExW(WS_EX_TOPMOST | WS_EX_NOACTIVATE, wc.lpszClassName, L"Ranvier UIA acceptance", WS_OVERLAPPEDWINDOW | WS_VISIBLE, 100, 120, teardown == "overflow" ? 1000 : 640, teardown == "overflow" ? 700 : 480, nullptr, nullptr, wc.hInstance, nullptr);
     require(hwnd != nullptr, "create visible fixture HWND");
     fixtureHost = rv_host_create(teardown == "overflow" ? 640 : 600, 400); require(fixtureHost != nullptr, "create actual WebCore host");
-    require(rv_host_load_html(fixtureHost, "<!doctype html><title>UIA fixture</title><body><button id='action'>Press me</button><label>Your name<input aria-label='Your name'></label><label><input type='checkbox' aria-label='Accept terms'>Accept terms</label><input type='password' aria-label='Password' value='secret'><button style='display:none'>Hidden secret</button><input type='range' aria-label='Volume' min='0' max='10' value='3'><button disabled>Disabled action</button><textarea aria-label='Clipped text' style='display:block;height:20px;line-height:20px'>first line\nsecond line\nthird line</textarea><p style='position:absolute;top:1800px'>Far below</p></body>") == RV_OK, "load fixture HTML");
-    fixtureButton = rv_document_get_element_by_id(fixtureHost, "action");
+    require(rv_host_load_html(fixtureHost, RV_TEXT("<!doctype html><title>UIA fixture</title><body><button id='action'>Press me</button><label>Your name<input aria-label='Your name'></label><label><input type='checkbox' aria-label='Accept terms'>Accept terms</label><input type='password' aria-label='Password' value='secret'><button style='display:none'>Hidden secret</button><input type='range' aria-label='Volume' min='0' max='10' value='3'><button disabled>Disabled action</button><textarea aria-label='Clipped text' style='display:block;height:20px;line-height:20px'>first line\nsecond line\nthird line</textarea><p style='position:absolute;top:1800px'>Far below</p></body>")) == RV_OK, "load fixture HTML");
+    fixtureButton = rv_document_get_element_by_id(fixtureHost, RV_TEXT("action"));
     if (teardown == "overflow") {
         require(rv_host_set_device_scale(fixtureHost, 1.5f) == RV_OK, "set nonunit device scale");
-        require(rv_element_set_attribute(fixtureButton, "style", "position:absolute;left:20px;top:30px;width:80px;height:32px;padding:0;border:0;z-index:10") == RV_OK, "set known CSS button geometry");
+        require(rv_element_set_attribute(fixtureButton, "style", RV_TEXT("position:absolute;left:20px;top:30px;width:80px;height:32px;padding:0;border:0;z-index:10")) == RV_OK, "set known CSS button geometry");
         auto* wide = rv_document_create_element(fixtureHost, "div"); auto* body = rv_document_body(fixtureHost);
-        rv_element_set_attribute(wide, "style", "width:2000px;height:2px"); rv_node_append_child(body, wide); rv_node_release(wide); rv_node_release(body);
+        rv_element_set_attribute(wide, "style", RV_TEXT("width:2000px;height:2px")); rv_node_append_child(body, wide); rv_node_release(wide); rv_node_release(body);
         SetWindowPos(hwnd, nullptr, 420, 260, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
     }
-    RvListener* listener = rv_node_add_event_listener(fixtureButton, "click", 0, [](void*, RvEvent*) -> int32_t { return rv_node_set_text_content(fixtureButton, "Pressed once"); }, nullptr);
+    RvListener* listener = rv_node_add_event_listener(fixtureButton, RV_TEXT("click"), 0, [](void*, RvEvent*) -> int32_t { return rv_node_set_text_content(fixtureButton, RV_TEXT("Pressed once")); }, nullptr);
     require(listener != nullptr, "attach actual DOM event listener");
     require(rv_host_attach_uia(fixtureHost, hwnd) == RV_OK, "attach native UIA bridge");
     rv_host_update(fixtureHost);

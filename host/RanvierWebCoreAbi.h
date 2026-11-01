@@ -1,5 +1,5 @@
 /*
- * Ranvier native WebCore C ABI, version 54.
+ * Ranvier native WebCore C ABI, version 55.
  *
  * The boundary consists of C scalars, UTF-8 strings, opaque handles and a caller-owned RGBA8 buffer,
  * and is identical on every WebCore port that compiles RanvierWebCoreAbi.cpp.
@@ -26,7 +26,14 @@
  * Strings in (ABI 51, breaking): every generated rv_dom_* string input carries UTF-8 bytes with an explicit byte
  * count, so a string may hold U+0000. A plain argument is a pointer and a length, -1 for null or absent; a string
  * inside a union or sequence is an RvDomUtf8StringSpan; a dictionary string field is an RvDomUtf8StringInput, present
- * 0 for its default. The hand-written functions of this header take NUL-terminated UTF-8.
+ * 0 for its default.
+ *
+ * Hand-written strings in (ABI 55, breaking): a free-text input of this header, such as markup, text, a value, an ID, a
+ * class token or an event type, is a const uint8_t* and an int32_t byte count in the same form, so it may hold U+0000.
+ * A length below -1, a NULL pointer with a positive length, invalid UTF-8, or -1 for a string that cannot be null
+ * returns RV_ERR_NULL_ARGUMENT, or NULL from a function that returns a handle. RvClipboardWrite delivers its data the
+ * same way. Identifiers and protocol strings stay const char* NUL-terminated UTF-8: element and attribute names,
+ * selectors, MIME and data types, style property names, the RvEventInit strings, URLs and capability names.
  */
 #pragma once
 
@@ -129,7 +136,7 @@ RV_EXPORT int64_t rv_process_id(void);
 
 RV_EXPORT RvHost* rv_host_create(int32_t width, int32_t height);
 RV_EXPORT void rv_host_destroy(RvHost*);
-RV_EXPORT int32_t rv_host_load_html(RvHost*, const char* html);
+RV_EXPORT int32_t rv_host_load_html(RvHost*, const uint8_t* html, int32_t html_length);
 RV_EXPORT int32_t rv_host_scripts_enabled(RvHost*);
 RV_EXPORT int32_t rv_host_vm_entry_disallowed(RvHost*);
 
@@ -137,13 +144,13 @@ RV_EXPORT RvNode* rv_document_body(RvHost*);
 /* The document's head element, or NULL when it has none. */
 RV_EXPORT RvNode* rv_document_head(RvHost*);
 /* The first element in tree order whose ID is elementId, or NULL. */
-RV_EXPORT RvNode* rv_document_get_element_by_id(RvHost*, const char* elementId);
+RV_EXPORT RvNode* rv_document_get_element_by_id(RvHost*, const uint8_t* elementId, int32_t elementId_length);
 RV_EXPORT RvNode* rv_document_create_element(RvHost*, const char* tagName);
-RV_EXPORT RvNode* rv_document_create_text(RvHost*, const char* data);
+RV_EXPORT RvNode* rv_document_create_text(RvHost*, const uint8_t* data, int32_t data_length);
 
 RV_EXPORT int32_t rv_node_append_child(RvNode* parent, RvNode* child);
-RV_EXPORT int32_t rv_node_set_text_content(RvNode*, const char* text);
-RV_EXPORT int32_t rv_element_set_attribute(RvNode*, const char* name, const char* value);
+RV_EXPORT int32_t rv_node_set_text_content(RvNode*, const uint8_t* text, int32_t text_length);
+RV_EXPORT int32_t rv_element_set_attribute(RvNode*, const char* name, const uint8_t* value, int32_t value_length);
 RV_EXPORT void rv_node_release(RvNode*);
 
 /* Lays out and paints the viewport into rgba (width*height*4 bytes, unpremultiplied RGBA8, sRGB). */
@@ -201,7 +208,7 @@ enum {
 /* Registers a WebCore EventListener on target that calls callback(context, event). capture contains
  * RV_LISTENER_* bits. Explicit passive true ignores preventDefault; explicit false permits it for
  * cancelable events. Returns NULL on a NULL argument or the wrong thread. */
-RV_EXPORT RvListener* rv_node_add_event_listener(RvNode* target, const char* type, int32_t capture,
+RV_EXPORT RvListener* rv_node_add_event_listener(RvNode* target, const uint8_t* type, int32_t type_length, int32_t capture,
     RvEventCallback callback, void* context);
 /* Unregisters the listener and frees the handle. The callback will not run after this returns, also
  * when the listener is removed by another listener of the dispatch in progress. */
@@ -224,7 +231,7 @@ RV_EXPORT RvNodeFilter* rv_node_filter_create(RvNode* target, RvNodeFilterCallba
 RV_EXPORT int32_t rv_node_filter_context(RvNodeFilter* filter, void** context);
 
 /* Dispatches a new untrusted Event. *defaultPrevented is set to 1 when a listener cancelled it. */
-RV_EXPORT int32_t rv_node_dispatch_event(RvNode* target, const char* type, int32_t bubbles, int32_t cancelable,
+RV_EXPORT int32_t rv_node_dispatch_event(RvNode* target, const uint8_t* type, int32_t type_length, int32_t bubbles, int32_t cancelable,
     int32_t* defaultPrevented);
 /* Runs HTMLElement::click(): a simulated click with the element's default action. */
 RV_EXPORT int32_t rv_element_click(RvNode*);
@@ -240,13 +247,13 @@ RV_EXPORT void rv_event_stop_propagation(RvEvent*);
 /* v3: the DOM subset of one Ranvier component. */
 
 RV_EXPORT RvNode* rv_host_document(RvHost*);
-RV_EXPORT RvNode* rv_document_create_comment(RvHost*, const char* data);
+RV_EXPORT RvNode* rv_document_create_comment(RvHost*, const uint8_t* data, int32_t data_length);
 RV_EXPORT RvNode* rv_document_create_fragment(RvHost*);
 /* Document.importNode in the host's document. */
 RV_EXPORT RvNode* rv_document_import_node(RvHost*, RvNode*, int32_t deep);
 /* The children of a fragment parsed from markup with context as the HTML fragment parsing context
  * element, through Range.createContextualFragment. */
-RV_EXPORT RvNode* rv_node_parse_fragment(RvNode* context, const char* markup);
+RV_EXPORT RvNode* rv_node_parse_fragment(RvNode* context, const uint8_t* markup, int32_t markup_length);
 
 /* 1 element, 3 text, 8 comment, 9 document, 11 fragment, as Node.nodeType. */
 RV_EXPORT int32_t rv_node_type(RvNode*);
@@ -255,7 +262,7 @@ RV_EXPORT RvNode* rv_node_relative(RvNode*, int32_t relation);
 RV_EXPORT int32_t rv_node_get_string(RvNode*, int32_t property, char* buffer, int32_t capacity, int32_t* length);
 /* Writes RV_STRING_TEXT_CONTENT, RV_STRING_INNER_HTML, RV_STRING_DATA, RV_STRING_VALUE or RV_STRING_TITLE.
  * RV_STRING_VALUE reads and writes the value of <input>, <textarea>, <select> and <option>. */
-RV_EXPORT int32_t rv_node_set_string(RvNode*, int32_t property, const char* value);
+RV_EXPORT int32_t rv_node_set_string(RvNode*, int32_t property, const uint8_t* value, int32_t value_length);
 /* Inserts child before reference, or appends it when reference is NULL. */
 RV_EXPORT int32_t rv_node_insert_before(RvNode* parent, RvNode* child, RvNode* reference);
 RV_EXPORT int32_t rv_node_remove_child(RvNode* parent, RvNode* child);
@@ -277,7 +284,7 @@ RV_EXPORT RvEvent* rv_event_retain(RvEvent*);
 RV_EXPORT void rv_event_release(RvEvent*);
 /* A new untrusted event from Document.createEvent and Event.initEvent. RV_EVENT_INPUT creates a
  * UIEvent, RV_EVENT_POINTER a MouseEvent: the document's createEvent has no other constructors. */
-RV_EXPORT RvEvent* rv_host_create_event(RvHost*, int32_t eventInterface, const char* type, int32_t bubbles, int32_t cancelable);
+RV_EXPORT RvEvent* rv_host_create_event(RvHost*, int32_t eventInterface, const uint8_t* type, int32_t type_length, int32_t bubbles, int32_t cancelable);
 /* Dispatches a created event. *defaultPrevented is set to 1 when a listener cancelled it. */
 RV_EXPORT int32_t rv_node_dispatch(RvNode* target, RvEvent*, int32_t* defaultPrevented);
 RV_EXPORT int32_t rv_event_interface(RvEvent*);
@@ -345,7 +352,8 @@ RV_EXPORT RvNode* rv_document_active_element(RvHost*);
 /* v10 */
 
 /* Cycles the calling thread's run loop, which fires due timers and dispatches pending messages, until the
- * given milliseconds have elapsed, at least once. Returns the cycles run, or a negative status. */
+ * given milliseconds have elapsed, at least once. A cycle returns without waiting for a source; 0 runs exactly one
+ * cycle. Returns the cycles run, or a negative status. */
 RV_EXPORT int32_t rv_run_loop_cycle(int32_t milliseconds);
 
 /* v11 */
@@ -454,10 +462,10 @@ RV_EXPORT int32_t rv_host_mouse(RvHost*, int32_t action, int32_t x, int32_t y, i
 RV_EXPORT int32_t rv_host_wheel(RvHost*, int32_t x, int32_t y, float deltaX, float deltaY, int32_t modifiers);
 /* key and code are KeyboardEvent.key and KeyboardEvent.code values, such as "a" and "KeyA", or "Enter" for
  * both. A platform sends RV_KEY_DOWN, then RV_KEY_CHAR with text for a key that produces characters, then
- * RV_KEY_UP; text is NULL or empty for the others. RV_KEY_DOWN runs the key's editing command (Backspace,
+ * RV_KEY_UP; text is length -1 or empty for the others. RV_KEY_DOWN runs the key's editing command (Backspace,
  * Delete, the arrows, Home, End, Enter, Control+A), and Tab moves focus; RV_KEY_CHAR inserts text into the
  * focused editable element. */
-RV_EXPORT int32_t rv_host_key(RvHost*, int32_t action, const char* key, const char* code, const char* text, int32_t modifiers, int32_t repeat);
+RV_EXPORT int32_t rv_host_key(RvHost*, int32_t action, const char* key, const char* code, const uint8_t* text, int32_t text_length, int32_t modifiers, int32_t repeat);
 /* Sets whether the host's window has keyboard focus and is active, as the platform window's focus changes.
  * A host starts unfocused: no caret blinks and :focus-visible does not match until it is focused. */
 RV_EXPORT int32_t rv_host_set_focused(RvHost*, int32_t focused);
@@ -569,9 +577,9 @@ RV_EXPORT int32_t rv_host_scroll_to(RvHost*, int32_t x, int32_t y);
  * composition is the underlined text being composed; selectionStart and selectionEnd are UTF-16 offsets of
  * the selection within it. Setting it replaces the selection or the previous composition, and empty text
  * removes it. */
-RV_EXPORT int32_t rv_host_ime_set_composition(RvHost*, const char* text, int32_t selectionStart, int32_t selectionEnd);
+RV_EXPORT int32_t rv_host_ime_set_composition(RvHost*, const uint8_t* text, int32_t text_length, int32_t selectionStart, int32_t selectionEnd);
 /* Replaces the composition, or the selection when there is none, with text, as typed text. */
-RV_EXPORT int32_t rv_host_ime_commit(RvHost*, const char* text);
+RV_EXPORT int32_t rv_host_ime_commit(RvHost*, const uint8_t* text, int32_t text_length);
 RV_EXPORT int32_t rv_host_ime_cancel(RvHost*);
 /* Writes the bounds of the composition's first line, or of the caret, in CSS pixels of the viewport, where an
  * input method places its candidate window, and returns 1; returns 0 and writes zeros when there is neither. */
@@ -588,10 +596,10 @@ enum {
 };
 
 /* Applies the operation to a class token and returns 1 when the element has the class afterwards, else 0. */
-RV_EXPORT int32_t rv_element_class(RvNode*, const char* token, int32_t operation);
+RV_EXPORT int32_t rv_element_class(RvNode*, const uint8_t* token, int32_t token_length, int32_t operation);
 /* Sets an inline style property, as CSSStyleDeclaration.setProperty with "important" priority when important
  * is 1. An empty value removes the property, and an invalid one leaves it unchanged, as in CSS. */
-RV_EXPORT int32_t rv_element_set_style(RvNode*, const char* property, const char* value, int32_t important);
+RV_EXPORT int32_t rv_element_set_style(RvNode*, const char* property, const uint8_t* value, int32_t value_length, int32_t important);
 /* Copies an inline style property's value, empty when the element does not set it. */
 RV_EXPORT int32_t rv_element_get_style(RvNode*, const char* property, char* buffer, int32_t capacity, int32_t* length);
 /* Copies a property of the element's computed style, as getComputedStyle, with style updated first. */
@@ -710,6 +718,125 @@ RV_EXPORT int32_t rv_observer_unobserve(RvObserver*, RvNode* element);
 /* Disconnects the observer and frees it, before rv_host_destroy. Its callback will not run after this returns. */
 RV_EXPORT void rv_observer_release(RvObserver*);
 
+/* v55: "resize-entries" for rv_abi_has. A ResizeObserver delivering ResizeObserverEntry data: the content rectangle and
+ * the logical content and border box sizes. */
+typedef struct RvResizeEntry {
+    /* sizeof(RvResizeEntry). */
+    int32_t size;
+    /* 1 when devicePixelInlineSize and devicePixelBlockSize hold the device-pixel content box. Always 0: the engine
+     * has no device-pixel-content-box (webkit.org/b/219005, Ranvier.WebCore#146). */
+    int32_t hasDevicePixel;
+    /* The observed element, valid for the callback; rv_node_retain keeps it. */
+    RvNode* target;
+    /* ResizeObserverEntry.contentRect in CSS pixels: the content box at its offset inside the padding box. */
+    double contentX;
+    double contentY;
+    double contentWidth;
+    double contentHeight;
+    /* contentBoxSize[0] and borderBoxSize[0] in CSS pixels, in the element's writing mode: inline is the width of a
+     * horizontal writing mode and the height of a vertical one. */
+    double contentInlineSize;
+    double contentBlockSize;
+    double borderInlineSize;
+    double borderBlockSize;
+    /* devicePixelContentBoxSize[0] in device pixels when hasDevicePixel is 1, else 0. */
+    double devicePixelInlineSize;
+    double devicePixelBlockSize;
+} RvResizeEntry;
+
+/* Box options of rv_observer_observe_box: ResizeObserverOptions.box. */
+enum {
+    RV_RESIZE_BOX_CONTENT = 0,
+    RV_RESIZE_BOX_BORDER = 1,
+    RV_RESIZE_BOX_DEVICE_PIXEL_CONTENT = 2,
+};
+
+/* Called on the host thread during rv_host_update, once per observer with pending notifications, before intersection
+ * observers. entries holds count entries in observation order; the array, its entries and their targets are valid only
+ * during the call, so the callback copies what it keeps. Each target is reported when first observed, also at 0 by 0,
+ * and again when its observed box changes size. Observers deliver in the order of their first observation. The
+ * callback may call any function of this ABI. A size change it makes to an element deeper than the shallowest
+ * delivered target is reported in the same rv_host_update; a shallower one is reported in the next, after the
+ * window's error event "ResizeObserver loop completed with undelivered notifications.". */
+typedef void (*RvResizeEntriesCallback)(void* context, RvObserver* observer, const RvResizeEntry* entries, int32_t count);
+/* A ResizeObserver delivering entries, observed with rv_observer_observe (content box) or rv_observer_observe_box,
+ * stopped with rv_observer_unobserve and freed with rv_observer_release. NULL for a NULL host or callback. */
+RV_EXPORT RvObserver* rv_host_observe_resize_entries(RvHost*, RvResizeEntriesCallback callback, void* context);
+/* ResizeObserver.observe(element, { box }). Observing an observed element with another box replaces its observation
+ * and reports it again; with the same box it changes nothing. RV_ERR_UNSUPPORTED for
+ * RV_RESIZE_BOX_DEVICE_PIXEL_CONTENT, which the engine lacks (Ranvier.WebCore#146), for another box value, and for an
+ * intersection observer. */
+RV_EXPORT int32_t rv_observer_observe_box(RvObserver*, RvNode* element, int32_t box);
+/* ResizeObserver.disconnect() or IntersectionObserver.disconnect(): unobserves every target and drops pending
+ * notifications. The observer stays valid, observes again, and is freed with rv_observer_release. */
+RV_EXPORT int32_t rv_observer_disconnect(RvObserver*);
+
+/* v55: "intersection-entries" for rv_abi_has. An IntersectionObserver with a viewport, document or element root,
+ * root and scroll margins, delivering IntersectionObserverEntry data, and its queued records. */
+typedef struct RvIntersectionEntry {
+    /* sizeof(RvIntersectionEntry). */
+    int32_t size;
+    /* IntersectionObserverEntry.isIntersecting, 1 or 0. */
+    int32_t isIntersecting;
+    /* The observed element, valid for the call; rv_node_retain keeps it. */
+    RvNode* target;
+    /* IntersectionObserverEntry.time: milliseconds on the clock of rv_host_now. */
+    double time;
+    /* 1 when rootX to rootHeight hold IntersectionObserverEntry.rootBounds. Always 1: a host's frames share one
+     * origin, and rootBounds is null only for a cross-origin target. */
+    int32_t hasRootBounds;
+    int32_t reserved;
+    /* rootBounds, boundingClientRect and intersectionRect in CSS pixels of the client space (RV_SPACE_CLIENT). The
+     * root bounds include the root margin and the scroll margin; Chromium's exclude the scroll margin. A target outside the root's containing block chain, a disconnected
+     * target and a target of a disconnected root report all three as 0, 0, 0, 0. */
+    double rootX;
+    double rootY;
+    double rootWidth;
+    double rootHeight;
+    double boundsX;
+    double boundsY;
+    double boundsWidth;
+    double boundsHeight;
+    double intersectionX;
+    double intersectionY;
+    double intersectionWidth;
+    double intersectionHeight;
+    /* IntersectionObserverEntry.intersectionRatio, from 0 to 1. */
+    double intersectionRatio;
+} RvIntersectionEntry;
+
+/* Called on the host thread during rv_host_update, after resize observers, once per observer with queued entries,
+ * and from rv_observer_take_records. entries holds count entries in the order of their targets' observation; the
+ * array, its entries and their targets are valid only during the call, so the callback copies what it keeps. A
+ * target is reported when first observed and again when its intersection crosses one of the observer's thresholds.
+ * Observers deliver in the order they gained their first target; an observer that lost all its targets moves to
+ * the end when it observes again. The callback may call any function of this ABI. */
+typedef void (*RvIntersectionEntriesCallback)(void* context, RvObserver* observer, const RvIntersectionEntry* entries, int32_t count);
+/* new IntersectionObserver(callback, { root, rootMargin, scrollMargin, threshold }), written to *observer and freed
+ * with rv_observer_release. root is NULL for the implicit root (the host's viewport), the host's document node, or
+ * an element of the host's document, connected or not. rootMargin and scrollMargin are UTF-8 CSS margins, such as
+ * "10px" or "10% 0px"; a NULL margin with length 0 is "0px". With the implicit root, scrollMargin grows the
+ * scrollports of the scroll containers between a target and the root; with an explicit root the engine clips by
+ * those scrollports unchanged (Chromium grows them too). thresholds holds count ratios from 0 to 1, in any order, or is NULL
+ * with count 0 for 0 alone. Returns RV_ERR_NULL_ARGUMENT for a NULL host, callback or observer, a negative length
+ * or count, or a NULL margin or thresholds with a length or count above 0; RV_ERR_DOM_EXCEPTION for an invalid
+ * margin (rv_last_exception names SyntaxError) or a threshold outside 0 to 1 (RangeError); RV_ERR_NOT_ELEMENT for a
+ * root that is neither an element nor a document; RV_ERR_WRONG_HOST for a root of another live host; and
+ * RV_ERR_DETACHED for a root of a document the host does not show, such as one rv_host_load_html replaced. *observer
+ * is NULL on every error. */
+RV_EXPORT int32_t rv_host_observe_intersection_entries(RvHost*, RvIntersectionEntriesCallback callback, void* context, RvNode* root,
+    const uint8_t* rootMargin, int32_t rootMargin_length, const uint8_t* scrollMargin, int32_t scrollMargin_length,
+    const double* thresholds, int32_t thresholdCount, RvObserver** observer);
+/* IntersectionObserver.takeRecords(): removes the observer's queued entries and passes them to sink, called once
+ * before this returns, with count 0 when none are queued. rv_host_update queues and delivers entries within one
+ * call, so an observer holds queued entries only while another observer's callback of the same update runs. An
+ * observer of rv_host_observe_intersection passes its entries to sink in the same form. Returns RV_ERR_UNSUPPORTED
+ * for a resize observer, without calling sink. */
+RV_EXPORT int32_t rv_observer_take_records(RvObserver*, RvIntersectionEntriesCallback sink, void* context);
+/* Writes the host's document's performance.now(): the clock of RvIntersectionEntry.time, in whole milliseconds from the
+ * time origin of the host's window. A document rv_host_load_html loads keeps that origin. */
+RV_EXPORT int32_t rv_host_now(RvHost*, double* milliseconds);
+
 /* Paints the element and its descendants alone, without what lies behind or over them, at the host's device
  * scale, into unpremultiplied RGBA8, such as for a drag image. Writes the image's size in device pixels to
  * *width and *height; when length is below width * height * 4 it returns RV_ERR_BUFFER_TOO_SMALL with the
@@ -792,17 +919,39 @@ enum {
 
 typedef struct RvClipboardRequest RvClipboardRequest;
 
-/* App style: called once per copied type, such as "text/plain" and "text/html", in order. first is 1 for the
- * first type of a copy or cut, when the app replaces what its clipboard held. */
-typedef void (*RvClipboardWrite)(void* context, const char* type, const char* data, int32_t first);
-/* App style: called at a paste; the app offers each type it holds with rv_clipboard_offer before it returns. */
+/* App style: called once per copied type, such as "text/plain" and "text/html", in order. type is NUL-terminated;
+ * data is data_length UTF-8 bytes without a terminator, valid for the call. first is 1 for the first type of a copy or
+ * cut, when the app replaces what its clipboard held. */
+typedef void (*RvClipboardWrite)(void* context, const char* type, const uint8_t* data, int32_t data_length, int32_t first);
+/* App style: called at a paste; the app offers each type it holds with rv_clipboard_offer and each file with
+ * rv_clipboard_offer_file before it returns, or refuses the read with rv_clipboard_deny. */
 typedef void (*RvClipboardRead)(void* context, RvClipboardRequest* request);
 
 /* Sets the host's clipboard style. The callbacks are for RV_CLIPBOARD_APP and NULL otherwise.
  * RV_CLIPBOARD_NATIVE returns RV_ERR_UNSUPPORTED where WebCore has no platform clipboard (Linux). */
 RV_EXPORT int32_t rv_host_set_clipboard(RvHost*, int32_t style, RvClipboardWrite write, RvClipboardRead read, void* context);
-/* Offers one type of the clipboard's content to a paste, during RvClipboardRead. */
-RV_EXPORT int32_t rv_clipboard_offer(RvClipboardRequest*, const char* type, const char* data);
+/* Offers one type of the clipboard's content to a paste, during RvClipboardRead. The type "Files", in any case, is
+ * reserved for files and returns RV_ERR_UNSUPPORTED. */
+RV_EXPORT int32_t rv_clipboard_offer(RvClipboardRequest*, const char* type, const uint8_t* data, int32_t data_length);
+
+/* "clipboard-files" for rv_abi_has: files and images in the App clipboard style. docs/CLIPBOARD-DND.md describes them. */
+
+typedef struct RvBlob RvBlob;
+
+/* Offers a File, such as an image/png file for an image, to a paste during RvClipboardRead: the paste's
+ * clipboardData lists it in files, as an item of kind "file" and as the type "Files". The page's File is a copy with
+ * the same name, type and bytes. RV_ERR_WRONG_INTERFACE for a Blob that is not a File, RV_ERR_UNSUPPORTED for one
+ * backed by a file on disk. A plain-text paste carries no files. */
+RV_EXPORT int32_t rv_clipboard_offer_file(RvClipboardRequest*, RvBlob* file);
+/* Refuses the paste during RvClipboardRead: no paste event fires and nothing is inserted, and rv_host_edit returns
+ * RV_ERR_DOM_EXCEPTION, with NotAllowedError in rv_last_exception. */
+RV_EXPORT int32_t rv_clipboard_deny(RvClipboardRequest*);
+/* App style: called after the copied types for each File a copy or cut listener added with clipboardData.items.add,
+ * in order. file is borrowed for the call; rv_dom_blob_retain keeps it. first is 1 for the first call of a copy or
+ * cut across RvClipboardWrite and this callback. */
+typedef void (*RvClipboardWriteFile)(void* context, RvBlob* file, int32_t first);
+/* Sets the host's file write callback, or with a NULL callback removes it; files a page copies then reach no app. */
+RV_EXPORT int32_t rv_host_set_clipboard_file_write(RvHost*, RvClipboardWriteFile write, void* context);
 /* Runs an editing command on the selection of the host's document, as a menu would; Control+C, X and V in
  * rv_host_key run the same commands. Copy, cut and paste fire their DOM events first, and a page that
  * cancels one supplies or takes the data itself. Returns 1 when the command ran, 0 when it does not apply,
@@ -842,16 +991,22 @@ enum {
 typedef struct RvDragData RvDragData;
 
 RV_EXPORT int32_t rv_host_set_drag(RvHost*, int32_t style);
-/* The data of a drag, of types such as "text/plain", "text/html" and "text/uri-list" (file URLs for files). */
+/* The data of a drag: strings of types such as "text/plain", "text/html" and "text/uri-list", and files. The type
+ * "Files", in any case, is reserved for files and returns RV_ERR_UNSUPPORTED. */
 RV_EXPORT RvDragData* rv_drag_data_create(void);
-RV_EXPORT int32_t rv_drag_data_add(RvDragData*, const char* type, const char* data);
+RV_EXPORT int32_t rv_drag_data_add(RvDragData*, const char* type, const uint8_t* data, int32_t data_length);
+/* "data-transfer-files" for rv_abi_has: adds a File to the drag's data, as rv_clipboard_offer_file does to a paste.
+ * The drop's dataTransfer lists it in files and items; dragenter, dragover and dragleave list only the type "Files". */
+RV_EXPORT int32_t rv_drag_data_add_file(RvDragData*, RvBlob* file);
 RV_EXPORT void rv_drag_data_release(RvDragData*);
 /* Forwards a drag from outside the page at x, y CSS pixels of the viewport, with the RV_DROP_* operations
  * the source allows. As the element under the point changes the host fires dragleave and dragenter, then
  * dragover, or drop for RV_DRAG_DROP, each with a dataTransfer holding data; drop's data is readable. Returns
  * the RV_DROP_* operation the page accepts, which the app shows as the cursor: the dataTransfer's dropEffect
  * when a listener cancelled dragover, else RV_DROP_COPY for text over editable content, else RV_DROP_NONE.
- * A drop that no listener cancels inserts the text, or the HTML, into editable content at the point. */
+ * A drop that no listener cancels inserts the text, or the HTML, into editable content at the point.
+ * The dataTransfer of dragenter, dragover and dragleave is protected: its types are readable, its data and files are
+ * not. Drop's is read-only. Each is unreadable once its event is over; the Files read from it stay valid. */
 RV_EXPORT int32_t rv_host_drag(RvHost*, int32_t action, int32_t x, int32_t y, int32_t allowed, RvDragData* data, int32_t modifiers);
 
 /* v20: "drag-out" for rv_abi_has: drags that start in the page. */
@@ -872,15 +1027,31 @@ RV_EXPORT int32_t rv_drag_item_count(RvDrag*);
 /* Copies the type or the value of the drag's item at index. */
 RV_EXPORT int32_t rv_drag_item_type(RvDrag*, int32_t index, char* buffer, int32_t capacity, int32_t* length);
 RV_EXPORT int32_t rv_drag_item_value(RvDrag*, int32_t index, char* buffer, int32_t capacity, int32_t* length);
-/* A copy of the drag's items as drag data, for rv_host_drag; released with rv_drag_data_release. */
+/* A copy of the drag's items and files as drag data, for rv_host_drag; released with rv_drag_data_release. */
 RV_EXPORT RvDragData* rv_drag_data(RvDrag*);
+/* The Files dragstart listeners added to the drag's items, and a new reference to the one at index. */
+RV_EXPORT int32_t rv_drag_file_count(RvDrag*);
+RV_EXPORT int32_t rv_drag_file(RvDrag*, int32_t index, RvBlob** result);
 /* Paints the dragged element as rv_element_snapshot does, and writes where the press was within the image,
- * in device pixels, to *offsetX and *offsetY. RV_ERR_UNSUPPORTED for a selection drag, which has no element. */
+ * in device pixels, to *offsetX and *offsetY. When a dragstart listener called setDragImage with an element in the
+ * document, paints that element instead, with the offset it gave. RV_ERR_UNSUPPORTED for a selection drag without
+ * one, which has no element. */
 RV_EXPORT int32_t rv_drag_image(RvDrag*, uint8_t* rgba, int32_t length, int32_t* width, int32_t* height, int32_t* offsetX, int32_t* offsetY);
 /* Ends the drag at x, y CSS pixels of the viewport with the RV_DROP_* operation the drop target accepted, or
  * RV_DROP_NONE when the drag was cancelled: the page's dragend fires with it. The drag is invalid after the
  * call. */
 RV_EXPORT int32_t rv_drag_end(RvDrag*, int32_t x, int32_t y, int32_t operation);
+
+/* "range-replacement" for rv_abi_has: an editor's replacement of a range, such as a spelling correction. */
+
+typedef struct RvAbstractRange RvAbstractRange;
+
+/* Replaces the range, a Range or StaticRange of the host's document, with text (text_length UTF-8 bytes) as an
+ * insertReplacementText edit: beforeinput fires, cancelable, with the range as getTargetRanges() and, in editable
+ * content, a dataTransfer of text/plain and text/html; then the edit and input. The dataTransfer stays readable while
+ * a handle holds it. Returns 1 when the edit applied, 0 when a listener cancelled beforeinput or the range is not
+ * editable, RV_ERR_WRONG_HOST for a range of another document. */
+RV_EXPORT int32_t rv_host_replace_range(RvHost*, RvAbstractRange* range, const uint8_t* text, int32_t text_length);
 
 /* "accessibility" for rv_abi_has: the page's accessibility tree, which the app exposes through the platform's
  * accessibility API (UI Automation, NSAccessibility, AT-SPI). docs/ACCESSIBILITY.md describes the model.
@@ -1178,7 +1349,7 @@ RV_EXPORT int32_t rv_ax_action(RvAxNode*, int32_t action);
 /* Sets the value of an editable text field. An <input> or <textarea> fires input and change, as after a user's
  * edit; other editable content takes the text as WebCore's platform accessibility sets it. Returns 1 when set,
  * 0 when the node's value is not editable, or a negative status. */
-RV_EXPORT int32_t rv_ax_set_value(RvAxNode*, const char* value);
+RV_EXPORT int32_t rv_ax_set_value(RvAxNode*, const uint8_t* value, int32_t value_length);
 /* Sets the value of a range, such as a slider, clamped to its minimum and maximum; a range <input> fires input
  * and change. Returns as rv_ax_set_value. */
 RV_EXPORT int32_t rv_ax_set_number(RvAxNode*, double value);
@@ -1232,7 +1403,7 @@ RV_EXPORT int32_t rv_ax_text_offset_at(RvAxNode*, int32_t x, int32_t y);
 RV_EXPORT int32_t rv_ax_text_child_range(RvAxNode* ancestor, RvAxNode* child, int32_t* start, int32_t* end);
 
 /* Replaces the main frame with UTF-8 image/svg+xml, with scripts disabled. Malformed XML loads the engine's parser-error document. */
-RV_EXPORT int32_t rv_host_load_svg(RvHost*, const char* svg);
+RV_EXPORT int32_t rv_host_load_svg(RvHost*, const uint8_t* svg, int32_t svg_length);
 
 /* Passive capability queries. Categories: ABI=0, renderer setting=1, image format=2,
  * font format=3, platform facility=4. Dimensions: exported=0, implemented=1, enabled=2,
@@ -1260,6 +1431,8 @@ enum {
     RV_RESOURCE_DECODE_FAILED = 2,
     RV_RESOURCE_CANCELLED = 3,
     RV_RESOURCE_INVALIDATED = 4,
+    /* The engine rejected the operation with AbortError. */
+    RV_RESOURCE_ABORTED = 5,
 };
 
 /* Receives exactly one terminal outcome per operation on the owning thread. width and height are the image's natural
@@ -1290,6 +1463,67 @@ RV_EXPORT int32_t rv_resource_cancel(uint64_t operation);
  * a new document deliver INVALIDATED to in-flight operations and release them; a terminal operation stays
  * registered until released and holds no document. */
 RV_EXPORT int32_t rv_resource_release(uint64_t operation);
+
+/* Font readiness ("font-readiness"): the CSS Font Loading API's FontFaceSet (document.fonts) of the host's current
+ * document, without JavaScript or a promise. font is font_length bytes of UTF-8 holding a CSS font shorthand; text is
+ * text_length bytes of UTF-8, and NULL with length 0 means " ". A font value that is not a valid shorthand returns
+ * RV_ERR_DOM_EXCEPTION with SyntaxError in rv_last_exception. Non-UTF-8 input, a destroyed host and a document without
+ * a window return RV_ERR_UNSUPPORTED. */
+enum {
+    RV_FONTS_LOADED = 0,
+    RV_FONTS_LOADING = 1,
+};
+/* FontFaceSet.status after a style update: RV_FONTS_LOADING while any face is loading. */
+RV_EXPORT int32_t rv_fonts_status(RvHost*, int32_t* status);
+/* FontFaceSet.check: writes 1 when no face matching font for text is pending or loading, including when none matches,
+ * else 0. Starts no load. */
+RV_EXPORT int32_t rv_fonts_check(RvHost*, const uint8_t* font, int32_t font_length, const uint8_t* text, int32_t text_length, int32_t* loaded);
+/* FontFaceSet.load: starts the loads of the faces matching font for text and writes an operation token. SUCCEEDED once
+ * every matching face has loaded, with width the number of matching faces (0 when none matches); LOAD_FAILED when a
+ * matching face fails, the engine's NetworkError. height is 0. A syntax error creates no operation. Delivery, cancel,
+ * release and invalidation follow rv_image_decode. */
+RV_EXPORT int32_t rv_fonts_load(RvHost*, const uint8_t* font, int32_t font_length, const uint8_t* text, int32_t text_length, RvResourceCompletion completion, void* context, uint64_t* operation);
+/* FontFaceSet.ready: updates layout, so the faces the layout uses start loading, and writes an operation token.
+ * SUCCEEDED once the document's load event has finished and no face is loading, including loads started after the
+ * call; width and height are 0. A ready set at the call is delivered on a later rv_run_loop_cycle. Delivery, cancel,
+ * release and invalidation follow rv_image_decode. */
+RV_EXPORT int32_t rv_fonts_ready(RvHost*, RvResourceCompletion completion, void* context, uint64_t* operation);
+enum {
+    RV_FONTS_EVENT_LOADING = 0,
+    RV_FONTS_EVENT_LOADINGDONE = 1,
+    RV_FONTS_EVENT_LOADINGERROR = 2,
+};
+/* One font set event. families holds count UTF-8 family names of family_lengths bytes, one per face, valid only during
+ * the call; LOADING has none. */
+typedef void (*RvFontsEventCallback)(void* context, int32_t kind, const uint8_t* const* families, const int32_t* family_lengths, int32_t count);
+typedef struct RvFontsWatch RvFontsWatch;
+/* Watches the CSS Font Loading events of the current document's font set: LOADING when a face starts loading while
+ * none is; when none is left loading, LOADINGDONE with the faces that loaded since, then LOADINGERROR with the faces
+ * that failed, when any did. A watch created while faces are loading first receives LOADING, and its LOADINGDONE and
+ * LOADINGERROR list the faces that finished after it was created. The engine dispatches only the loading event to DOM
+ * listeners; the watch reports all three. Events are delivered in order from rv_run_loop_cycle, never inside another rv_* call. A new document or
+ * rv_host_destroy ends the watch without an event. */
+RV_EXPORT int32_t rv_fonts_watch(RvHost*, RvFontsEventCallback callback, void* context, RvFontsWatch** watch);
+/* Ends the watch and frees it, also after its document ended; the callback and context are not used afterwards. NULL
+ * and a watch already removed are ignored. */
+RV_EXPORT void rv_fonts_unwatch(RvFontsWatch*);
+
+/* FontFace promises ("font-face-load"), without JavaScript. RvFontFace is the generated handle of FontFace
+ * (RanvierWebCoreDom.h): rv_dom_font_face_create builds one from a URL source or bytes, and FontFaceSet.values and
+ * Document.fonts reach the document's faces. */
+typedef struct RvFontFace RvFontFace;
+/* FontFace.load(): starts the face's load and writes an operation token. SUCCEEDED once the face is loaded;
+ * DECODE_FAILED when the engine rejects the face with SyntaxError: an invalid descriptor or source string, or bytes the
+ * engine cannot use as a font, empty bytes included; LOAD_FAILED when it rejects with NetworkError, a URL source that
+ * fails to fetch or decode. A settled face keeps its outcome and is not loaded again. width and height are 0. The
+ * completion is called only from rv_run_loop_cycle, also for a face settled at the call, except that
+ * rv_resource_cancel and rv_resource_release deliver CANCELLED before they return. Release and invalidation follow
+ * rv_image_decode. Returns RV_ERR_WRONG_HOST for a face of another host's document, and RV_ERR_DETACHED for one whose
+ * document a later rv_host_load_html or rv_host_load_svg replaced. */
+RV_EXPORT int32_t rv_font_face_load(RvHost*, RvFontFace* face, RvResourceCompletion completion, void* context, uint64_t* operation);
+/* FontFace.loaded: as rv_font_face_load, without starting a load. An unloaded face settles once a load starts
+ * elsewhere: rv_font_face_load, rv_fonts_load, or layout of text in a face of the document's font set. */
+RV_EXPORT int32_t rv_font_face_loaded(RvHost*, RvFontFace* face, RvResourceCompletion completion, void* context, uint64_t* operation);
 
 /* Event construction and standalone targets ("event-construction", v32). */
 typedef struct RvEventTarget RvEventTarget;
@@ -1338,7 +1572,7 @@ typedef struct RvEventInit {
  * current document. Returns NULL for an unknown kind, a size other than sizeof(RvEventInit), a non-UTF-8 string,
  * detail JSON the engine's parser rejects, or a call off the owning thread. The engine exposes MouseEvent clientX and
  * clientY as integers. */
-RV_EXPORT RvEvent* rv_host_construct_event(RvHost*, int32_t kind, const char* type, const RvEventInit* init);
+RV_EXPORT RvEvent* rv_host_construct_event(RvHost*, int32_t kind, const uint8_t* type, int32_t type_length, const RvEventInit* init);
 /* CustomEvent.detail serialized as JSON in the event's realm, with the exact-byte UTF-8 protocol of rv_event_type:
  * length and capacity exclude the terminator. A null detail writes "null". Returns RV_ERR_UNSUPPORTED, leaving
  * *length unchanged, for an event that is not a CustomEvent, a detail JSON.stringify cannot serialize, or a detail
@@ -1359,8 +1593,43 @@ RV_EXPORT RvEventTarget* rv_node_as_event_target(RvNode*);
 RV_EXPORT RvNode* rv_event_target_as_node(RvEventTarget*);
 /* 1 when both handles refer to the same target, else 0. */
 RV_EXPORT int32_t rv_event_target_equals(RvEventTarget* left, RvEventTarget* right);
+/* A new reference to the animation as the RvEventTarget the generated rv_dom_web_animation_* functions take, or NULL
+ * off the owning thread. It equals (rv_event_target_equals) the handle rv_dom_element_get_animations returns for the
+ * same animation; release it with rv_event_target_release. */
+RV_EXPORT RvEventTarget* rv_animation_as_event_target(RvAnimation*);
+/* Animation.ready and Animation.finished without JavaScript ("animation-promises"). animation is a Web Animations
+ * animation handle (rv_dom_element_animate, rv_dom_web_animation_create, rv_animation_as_event_target). Each writes an
+ * operation token that observes the animation's promise current at the call, as the ready or finished attribute
+ * returns it: SUCCEEDED once that promise resolves, also when it is already resolved at the call; ABORTED once the
+ * engine rejects it with AbortError (cancel(), or a reset of the pending tasks). width and height are 0. The
+ * completion is called only from rv_run_loop_cycle, except that rv_resource_cancel and rv_resource_release deliver
+ * CANCELLED before they return. rv_host_destroy and a new document deliver INVALIDATED. A terminal operation holds no
+ * animation. Returns RV_ERR_WRONG_INTERFACE for an event target that is not an animation, and RV_ERR_WRONG_HOST for an
+ * animation of another document than the host's current one. */
+RV_EXPORT int32_t rv_animation_ready(RvHost*, RvEventTarget* animation, RvResourceCompletion completion, void* context, uint64_t* operation);
+RV_EXPORT int32_t rv_animation_finished(RvHost*, RvEventTarget* animation, RvResourceCompletion completion, void* context, uint64_t* operation);
+
+/* Web Animations custom effects ("animation-custom-effects"): the CustomEffectCallback that rv_dom_custom_effect_create
+ * and rv_dom_document_timeline_animate take, implemented by the application. */
+typedef struct RvCustomEffectCallback RvCustomEffectCallback;
+/* Receives the progress a rendering update (rv_host_update) computed for a custom effect, on the host thread from
+ * rv_run_loop_cycle after that update has returned: updates in order, and within an update in the timeline's
+ * animation order. An update where the effect's progress is null calls nothing. The tick may call any function of
+ * this ABI; the ticks of an update it runs are delivered on a later run-loop turn. */
+typedef void (*RvCustomEffectTick)(void* context, double progress);
+/* Runs once with the context, on the owning thread, when the engine drops its last reference to the callback. */
+typedef void (*RvCustomEffectRelease)(void* context);
+/* Creates a CustomEffectCallback of the host's current document that calls tick(context, progress). The caller owns
+ * the returned reference and drops it with rv_dom_custom_effect_callback_release; each effect holds its own. release,
+ * when not NULL, runs after the last reference is dropped. Effects of another document return RV_ERR_WRONG_HOST.
+ * Returns NULL for a NULL host or tick, a destroyed host, or the wrong thread. */
+RV_EXPORT RvCustomEffectCallback* rv_custom_effect_callback_create(RvHost*, RvCustomEffectTick tick, void* context,
+    RvCustomEffectRelease release);
+/* Stops the callback: no tick runs after this returns, including ticks already queued. A second call does nothing.
+ * rv_host_load_html and rv_host_destroy revoke every callback of the host. */
+RV_EXPORT int32_t rv_custom_effect_callback_revoke(RvCustomEffectCallback*);
 /* rv_node_add_event_listener for any EventTarget; remove the listener with rv_listener_remove. */
-RV_EXPORT RvListener* rv_event_target_add_listener(RvEventTarget*, const char* type, int32_t flags, RvEventCallback callback, void* context);
+RV_EXPORT RvListener* rv_event_target_add_listener(RvEventTarget*, const uint8_t* type, int32_t type_length, int32_t flags, RvEventCallback callback, void* context);
 /* rv_node_dispatch for any EventTarget. */
 RV_EXPORT int32_t rv_event_target_dispatch(RvEventTarget*, RvEvent*, int32_t* defaultPrevented);
 /* The event's target, or with current set its currentTarget, as a new EventTarget reference; NULL when it has none. */
@@ -1410,6 +1679,51 @@ RV_EXPORT RvEventTarget* rv_host_match_media(RvHost*, const char* query);
 RV_EXPORT int32_t rv_media_query_matches(RvEventTarget*, int32_t* matches);
 RV_EXPORT int32_t rv_media_query_media(RvEventTarget*, char* buffer, int32_t capacity, int32_t* length);
 
+/* v55: "media-preferences" for rv_abi_has. The user preferences and input devices the host supplies to media query
+ * evaluation. Every field's RV_MEDIA_DEFAULT (0) keeps the engine's own value: light, no motion or contrast
+ * preference, no pointing device, no hover, and text at its page size. */
+enum {
+    RV_MEDIA_DEFAULT = 0,
+    /* color_scheme: prefers-color-scheme. */
+    RV_MEDIA_LIGHT = 1,
+    RV_MEDIA_DARK = 2,
+    /* reduced_motion and contrast: no-preference, or the preference itself (reduce, more). */
+    RV_MEDIA_NO_PREFERENCE = 1,
+    RV_MEDIA_PREFERENCE = 2,
+    /* pointer and any_pointer: none, coarse or fine; any_pointer also takes both. */
+    RV_MEDIA_POINTER_NONE = 1,
+    RV_MEDIA_POINTER_COARSE = 2,
+    RV_MEDIA_POINTER_FINE = 3,
+    RV_MEDIA_POINTER_COARSE_AND_FINE = 4,
+    /* hover and any_hover. */
+    RV_MEDIA_HOVER_NONE = 1,
+    RV_MEDIA_HOVER = 2,
+};
+typedef struct RvMediaPreferences {
+    uint32_t size;
+    int32_t color_scheme;
+    int32_t reduced_motion;
+    int32_t contrast;
+    /* The primary pointing device, for pointer and hover. */
+    int32_t pointer;
+    int32_t hover;
+    /* Every available pointing device, for any-pointer and any-hover. */
+    int32_t any_pointer;
+    int32_t any_hover;
+    /* The platform's text scale: laid-out text is this many times its font size, from 0.25 to 8; 0 for 1. The
+     * computed font-size and media queries do not read it. */
+    float text_scale;
+} RvMediaPreferences;
+/* Supplies the host's media preferences, all fields at once. Style, layout and every MediaQueryList of the host's
+ * document see them at the next rv_host_update, which fires each list's change event once when its matches changed,
+ * in the order the lists were created. forced-colors stays none, prefers-contrast less and custom never match, and
+ * scripting reports the build: the engine has no input for them. Returns RV_ERR_UNSUPPORTED, applying nothing, for a
+ * size smaller than RvMediaPreferences or a value out of range. */
+RV_EXPORT int32_t rv_host_set_media_preferences(RvHost*, const RvMediaPreferences* preferences);
+/* Writes the preferences last supplied, RV_MEDIA_DEFAULT for each field never supplied. Returns RV_ERR_UNSUPPORTED
+ * when preferences->size is smaller than RvMediaPreferences. */
+RV_EXPORT int32_t rv_host_media_preferences(RvHost*, RvMediaPreferences* preferences);
+
 /* v39: "dom-binary-values" for rv_abi_has. RvBlob is the generated handle of Blob and File, and RvFileList of
  * FileList (RanvierWebCoreDom.h). The host's blob registry holds the bytes of every Blob and File it creates in
  * memory, so reading them completes during the call. */
@@ -1458,6 +1772,127 @@ RV_EXPORT int32_t rv_blob_read_error(uint64_t operation, char* buffer, int32_t c
  * missing or deleted when read fails the read with "NotFoundError". rv_blob_read_bytes returns RV_ERR_UNSUPPORTED for
  * it; read it with rv_blob_read, FileReader or an object URL. */
 RV_EXPORT int32_t rv_file_create_from_path(RvHost*, const uint8_t* path, int32_t path_length, RvBlob** result);
+
+/* "media-capabilities" for rv_abi_has: MediaCapabilities.decodingInfo() and encodingInfo(), without JavaScript or a
+ * promise. The answers come from the engine's media engine configuration providers, which the capability facilities
+ * "media-decoding-provider" and "media-encoding-provider" report; with neither, every valid configuration is
+ * unsupported. A query enables no playback, codec, capture or setting. */
+enum {
+    RV_MEDIA_DECODING_FILE = 0,
+    RV_MEDIA_DECODING_MEDIA_SOURCE = 1,
+    RV_MEDIA_DECODING_WEBRTC = 2,
+};
+enum {
+    RV_MEDIA_ENCODING_RECORD = 0,
+    RV_MEDIA_ENCODING_WEBRTC = 1,
+};
+enum {
+    RV_MEDIA_HDR_SMPTE_ST2086 = 0,
+    RV_MEDIA_HDR_SMPTE_ST2094_10 = 1,
+    RV_MEDIA_HDR_SMPTE_ST2094_40 = 2,
+};
+enum {
+    RV_MEDIA_GAMUT_SRGB = 0,
+    RV_MEDIA_GAMUT_P3 = 1,
+    RV_MEDIA_GAMUT_REC2020 = 2,
+};
+enum {
+    RV_MEDIA_TRANSFER_SRGB = 0,
+    RV_MEDIA_TRANSFER_PQ = 1,
+    RV_MEDIA_TRANSFER_HLG = 2,
+};
+/* VideoConfiguration. size is sizeof(RvMediaVideoConfiguration). content_type is content_type_length bytes of UTF-8,
+ * and may be NULL when the length is 0. alpha_channel is 0 or 1, and it and the enum members are -1 when absent. */
+typedef struct RvMediaVideoConfiguration {
+    int32_t size;
+    const uint8_t* content_type;
+    int32_t content_type_length;
+    uint32_t width;
+    uint32_t height;
+    uint64_t bitrate;
+    double framerate;
+    int32_t alpha_channel;
+    int32_t hdr_metadata_type;
+    int32_t color_gamut;
+    int32_t transfer_function;
+} RvMediaVideoConfiguration;
+/* AudioConfiguration. size is sizeof(RvMediaAudioConfiguration). channels is channels_length bytes of UTF-8, or absent
+ * when NULL. bitrate and samplerate are absent when negative; samplerate is at most UINT32_MAX. spatial_rendering is
+ * 0 or 1, or -1 when absent. */
+typedef struct RvMediaAudioConfiguration {
+    int32_t size;
+    const uint8_t* content_type;
+    int32_t content_type_length;
+    const uint8_t* channels;
+    int32_t channels_length;
+    int64_t bitrate;
+    int64_t samplerate;
+    int32_t spatial_rendering;
+} RvMediaAudioConfiguration;
+/* Queries a MediaDecodingConfiguration of type RV_MEDIA_DECODING_* in the host's current document; video and audio
+ * are absent when NULL. A configuration the engine rejects, including one with neither, returns RV_ERR_DOM_EXCEPTION
+ * with "TypeError" in rv_last_exception and leaves *operation untouched. A type, size, length, optional member or
+ * UTF-8 input out of range returns RV_ERR_UNSUPPORTED. Otherwise writes an operation token: the operation follows
+ * rv_image_decode's delivery, rv_resource_cancel and rv_resource_release, and is SUCCEEDED, with width and height 0,
+ * once the engine answers, never before the call returns. An answer the providers give inside the call is reached then
+ * and delivered on a later rv_run_loop_cycle; rv_resource_cancel, rv_resource_release, a new document and rv_host_destroy
+ * keep it, as they keep any reached outcome. A new document or rv_host_destroy delivers INVALIDATED to a query whose
+ * provider has not answered. */
+RV_EXPORT int32_t rv_media_decoding_info(RvHost*, int32_t type, const RvMediaVideoConfiguration* video,
+    const RvMediaAudioConfiguration* audio, RvResourceCompletion completion, void* context, uint64_t* operation);
+/* rv_media_decoding_info for a MediaEncodingConfiguration of type RV_MEDIA_ENCODING_*. */
+RV_EXPORT int32_t rv_media_encoding_info(RvHost*, int32_t type, const RvMediaVideoConfiguration* video,
+    const RvMediaAudioConfiguration* audio, RvResourceCompletion completion, void* context, uint64_t* operation);
+/* The MediaCapabilitiesInfo of a SUCCEEDED query, each member 0 or 1, until rv_resource_release. RV_ERR_UNSUPPORTED
+ * for another operation or outcome, with the outputs untouched. */
+RV_EXPORT int32_t rv_media_capabilities_info(uint64_t operation, int32_t* supported, int32_t* smooth, int32_t* power_efficient);
+
+/* Image encodings, shared by snapshots and canvas export. RGBA8 is unpremultiplied RGBA8 rows, width * 4 bytes each,
+ * in the image's color space. PNG ignores quality. JPEG and WEBP take quality from 0 to 1; NaN or a value outside
+ * [0, 1] selects the engine encoder's default, as HTMLCanvasElement.toBlob does, and WEBP at exactly 1 is lossless.
+ * The facilities "image-encoding-png", "image-encoding-jpeg" and "image-encoding-webp" report the engine's encoders. */
+enum {
+    RV_IMAGE_ENCODING_RGBA8 = 0,
+    RV_IMAGE_ENCODING_PNG = 1,
+    RV_IMAGE_ENCODING_JPEG = 2,
+    RV_IMAGE_ENCODING_WEBP = 3,
+};
+/* "snapshot-options" for rv_abi_has: snapshots of the viewport or an element with scale, crop, color space and encoding,
+ * delivered as an operation. */
+enum {
+    RV_SNAPSHOT_SRGB = 0,
+    /* Only where the "snapshot-display-p3" facility is implemented; RV_ERR_UNSUPPORTED elsewhere. */
+    RV_SNAPSHOT_DISPLAY_P3 = 1,
+};
+/* size is sizeof(RvSnapshotOptions). scale is device pixels per CSS pixel, from 0.25 to 8, or 0 for the host's device
+ * scale. crop 1 paints only x, y, width, height, in CSS pixels from the subject's top left, expanded to whole CSS
+ * pixels and intersected with the subject; width and height are positive. encoding is RV_IMAGE_ENCODING_*. */
+typedef struct RvSnapshotOptions {
+    int32_t size;
+    int32_t color_space;
+    double scale;
+    int32_t crop;
+    int32_t encoding;
+    double x;
+    double y;
+    double width;
+    double height;
+    double quality;
+} RvSnapshotOptions;
+/* Paints element, which must be in the host's current document, as rv_element_snapshot does (its subtree alone over a
+ * transparent background), or the viewport as rv_host_paint_rgba's CPU path does when element is NULL, then reads or
+ * encodes the image, all during the call, and writes an operation token. The operation follows rv_image_decode's
+ * delivery, rv_resource_cancel and rv_resource_release: it is SUCCEEDED with the image's size in pixels as width and
+ * height, delivered on a later rv_run_loop_cycle and never inside the call, and a new document or rv_host_destroy keeps
+ * it. RV_ERR_UNSUPPORTED for an option out of range, an encoding or color space this flavor lacks (never a substitute)
+ * or a crop outside the subject; RV_ERR_WRONG_HOST for an element of another document; RV_ERR_PAINT_FAILED for an
+ * element without a box. */
+RV_EXPORT int32_t rv_host_snapshot(RvHost*, RvNode* element, const RvSnapshotOptions* options, RvResourceCompletion completion,
+    void* context, uint64_t* operation);
+/* Copies a delivered snapshot's bytes and writes their count to *length, until rv_resource_release. A capacity below
+ * the count returns RV_ERR_BUFFER_TOO_SMALL with *length written and buffer untouched; capacity 0 with a NULL buffer
+ * queries the count. RV_ERR_UNSUPPORTED before delivery and for another operation. */
+RV_EXPORT int32_t rv_snapshot_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length);
 
 enum {
     RV_FILE_READER_RESULT_NULL = 0,
@@ -1806,6 +2241,412 @@ enum {
     RV_CASCADE_CONDITIONS = 6,
     RV_CASCADE_STRING_FIELDS = 7,
 };
+
+/* v56: "canvas-context" for rv_abi_has: HTMLCanvasElement.getContext and CanvasRenderingContext2D.getContextAttributes
+ * without JavaScript. RanvierWebCoreDom.h holds the context's generated members and its release and retain. */
+typedef struct RvCanvasRenderingContext2D RvCanvasRenderingContext2D;
+
+/* "canvas-filters" for rv_abi_has: CanvasRenderingContext2D.filter applies CSS filter functions to drawing, as the
+ * host enables WebKit's CanvasFiltersEnabled setting. Canvas layers (beginLayer, endLayer) return RV_ERR_UNSUPPORTED. */
+
+/* Context types of rv_canvas_get_context. */
+enum {
+    RV_CANVAS_CONTEXT_NONE = 0,
+    RV_CANVAS_CONTEXT_2D = 1,
+    RV_CANVAS_CONTEXT_BITMAP_RENDERER = 2,
+    RV_CANVAS_CONTEXT_WEBGL = 3,
+    RV_CANVAS_CONTEXT_WEBGL2 = 4,
+    RV_CANVAS_CONTEXT_WEBGPU = 5,
+};
+
+/* PredefinedColorSpace and CanvasColorType of RvCanvas2DSettings. */
+enum {
+    RV_CANVAS_COLOR_SPACE_SRGB = 0,
+    RV_CANVAS_COLOR_SPACE_DISPLAY_P3 = 1,
+};
+enum {
+    RV_CANVAS_COLOR_TYPE_UNORM8 = 0,
+    RV_CANVAS_COLOR_TYPE_FLOAT16 = 1,
+};
+
+/* CanvasRenderingContext2DSettings. size is sizeof(RvCanvas2DSettings); the flags are 0 or 1. The defaults are alpha 1,
+ * desynchronized 0, willReadFrequently 0, sRGB and unorm8. */
+typedef struct RvCanvas2DSettings {
+    int32_t size;
+    int32_t alpha;
+    int32_t desynchronized;
+    int32_t willReadFrequently;
+    int32_t colorSpace;
+    int32_t colorType;
+} RvCanvas2DSettings;
+
+/* HTMLCanvasElement.getContext for a context type. For RV_CANVAS_CONTEXT_2D, *context is a new reference to the canvas's
+ * one 2D context: the first call creates it with settings (NULL for the defaults), and every later call returns the same
+ * object and ignores settings. The context keeps its canvas alive. RV_OK with *context NULL means the canvas already has
+ * a context of another type.
+ * Every other type returns RV_ERR_UNSUPPORTED: this ABI creates 2D contexts only. Settings the engine cannot honour
+ * also return RV_ERR_UNSUPPORTED, whether or not the canvas has a context: alpha 0, display-p3, float16, a flag other
+ * than 0 or 1, or size below sizeof(RvCanvas2DSettings). An unsupported call leaves *context NULL and the canvas as it
+ * was.
+ * Returns RV_ERR_WRONG_INTERFACE for a node that is not a <canvas>. */
+RV_EXPORT int32_t rv_canvas_get_context(RvNode* canvas, int32_t type, const RvCanvas2DSettings* settings, RvCanvasRenderingContext2D** context);
+/* CanvasRenderingContext2D.getContextAttributes: the settings the context applies. Returns RV_ERR_UNSUPPORTED, with
+ * settings unchanged, when settings->size is below sizeof(RvCanvas2DSettings). */
+RV_EXPORT int32_t rv_canvas_context_2d_attributes(RvCanvasRenderingContext2D* context, RvCanvas2DSettings* settings);
+
+/* Screen wake locks, where rv_abi_has("wake-locks") is 1. A sentinel is a WakeLockSentinel EventTarget: its
+ * "release" event (not bubbling, not cancelable, trusted) runs listeners added with rv_event_target_add_listener. */
+enum {
+    RV_WAKE_LOCK_SCREEN = 0,
+};
+
+/* Decides a host's wake lock request: 1 grants it, any other value denies it. Runs inside rv_wake_lock_request, after
+ * the document checks pass; it must not destroy the host. */
+typedef int32_t (*RvWakeLockPolicy)(void* context, RvHost* host, int32_t type);
+/* Sets the application policy for the host's requests. A host without a policy denies every request. */
+RV_EXPORT int32_t rv_host_set_wake_lock_policy(RvHost*, RvWakeLockPolicy policy, void* context);
+/* WakeLock.request(type) for the host's current document, synchronously. On success *sentinel is a new EventTarget
+ * reference to an unreleased sentinel, which the caller releases with rv_event_target_release. An unknown type returns
+ * RV_ERR_DOM_EXCEPTION with TypeError. A document that is not fully active or is hidden, the screen-wake-lock
+ * permissions policy feature disabled, or a denied policy return RV_ERR_DOM_EXCEPTION with NotAllowedError. */
+RV_EXPORT int32_t rv_wake_lock_request(RvHost*, int32_t type, RvEventTarget** sentinel);
+/* WakeLockSentinel.release(): releases the lock and dispatches "release" before returning. A released sentinel stays
+ * released and dispatches nothing. Valid after the document is replaced or destroyed. RV_ERR_WRONG_INTERFACE for
+ * another target. */
+RV_EXPORT int32_t rv_wake_lock_release(RvEventTarget* sentinel);
+/* The sentinel's released flag (1 or 0) and its RV_WAKE_LOCK_* type. */
+RV_EXPORT int32_t rv_wake_lock_state(RvEventTarget* sentinel, int32_t* released, int32_t* type);
+/* Releases every lock of the host's current document, in acquisition order, each with its "release" event. Hiding the
+ * page (rv_host_set_visible) does the same. Replacing or destroying the document releases its locks with no event. */
+RV_EXPORT int32_t rv_host_release_wake_locks(RvHost*);
+
+/* Reports WebCore's display and system sleep disablers: held is 1 when the disabler identified by id starts and 0
+ * when it ends. A screen wake lock holds one display disabler per document while any of its locks is held, with the
+ * reason "Screen Wake Lock"; media playback holds others. display is 1 for a display disabler, 0 for a system one. */
+typedef void (*RvSleepDisablerCallback)(void* context, uint64_t id, int32_t display, const char* reason, int32_t held);
+/* Sets the process's sleep disabler callback, or with NULL removes it; disablers that start without a callback are
+ * never reported. Without a callback no platform service keeps the display awake. Returns RV_ERR_WRONG_THREAD off
+ * the owning thread or before the first rv_host_create. */
+RV_EXPORT int32_t rv_set_sleep_disabler_callback(RvSleepDisablerCallback callback, void* context);
+
+/* Notifications, where rv_abi_has("notifications") is 1. A notification is a Notification EventTarget: its "show",
+ * "click", "close" and "error" events (not bubbling, not cancelable, trusted) run listeners added with
+ * rv_event_target_add_listener, on a later rv_run_loop_cycle. The application presents notifications: WebCore asks
+ * through the host's RvNotificationPresenter, and the presenter reports back with rv_notification_report. Actions,
+ * persistent (service worker) notifications, requireInteraction, image and badge are unsupported. */
+enum {
+    RV_NOTIFICATION_DEFAULT = 0,
+    RV_NOTIFICATION_DENIED = 1,
+    RV_NOTIFICATION_GRANTED = 2,
+};
+
+/* Requests of RvNotificationPresenter. */
+enum {
+    /* Present the notification. */
+    RV_NOTIFICATION_SHOW = 0,
+    /* Notification.close(): remove it; report RV_NOTIFICATION_EVENT_CLOSE once it is gone. */
+    RV_NOTIFICATION_CANCEL = 1,
+    /* Its document stopped: the presenter may keep showing it, and its reports dispatch nothing. */
+    RV_NOTIFICATION_DESTROYED = 2,
+};
+
+/* Events of rv_notification_report. */
+enum {
+    RV_NOTIFICATION_EVENT_SHOW = 0,
+    RV_NOTIFICATION_EVENT_CLICK = 1,
+    RV_NOTIFICATION_EVENT_CLOSE = 2,
+    RV_NOTIFICATION_EVENT_ERROR = 3,
+};
+
+/* NotificationDirection. */
+enum {
+    RV_NOTIFICATION_DIR_AUTO = 0,
+    RV_NOTIFICATION_DIR_LTR = 1,
+    RV_NOTIFICATION_DIR_RTL = 2,
+};
+
+/* String fields of rv_notification_string. */
+enum {
+    RV_NOTIFICATION_TITLE = 0,
+    RV_NOTIFICATION_BODY = 1,
+    RV_NOTIFICATION_TAG = 2,
+    RV_NOTIFICATION_LANG = 3,
+    /* The icon URL, resolved against the document; empty without one. */
+    RV_NOTIFICATION_ICON = 4,
+};
+
+/* NotificationOptions. Each string is UTF-8 with its byte count; a length of -1 or a NULL pointer is the empty
+ * default. silent is -1 for unset, else 0 or 1. size is sizeof(RvNotificationOptions). */
+typedef struct RvNotificationOptions {
+    int32_t size;
+    int32_t dir;
+    int32_t silent;
+    int32_t body_length;
+    int32_t tag_length;
+    int32_t lang_length;
+    int32_t icon_length;
+    int32_t reserved;
+    const uint8_t* body;
+    const uint8_t* tag;
+    const uint8_t* lang;
+    const uint8_t* icon;
+} RvNotificationOptions;
+
+/* Receives the host's presenter requests, only inside rv_run_loop_cycle, in the order WebCore made them.
+ * notification is valid for the call; rv_event_target_retain keeps it. The presenter may call any rv_* function. */
+typedef void (*RvNotificationPresenter)(void* context, RvHost* host, RvEventTarget* notification, int32_t request);
+/* Sets the host's presenter, or with NULL removes it. Without a presenter a granted show fires "error". */
+RV_EXPORT int32_t rv_host_set_notification_presenter(RvHost*, RvNotificationPresenter presenter, void* context);
+/* Sets the host's permission, RV_NOTIFICATION_DEFAULT at creation. A show under DEFAULT or DENIED fires "error". */
+RV_EXPORT int32_t rv_host_set_notification_permission(RvHost*, int32_t permission);
+/* The host's permission. Native documents are not secure contexts, where Notification.permission reads denied; the
+ * host's setting replaces that rule, as it decides each show. */
+RV_EXPORT int32_t rv_host_notification_permission(RvHost*, int32_t* permission);
+/* new Notification(title, options) for the host's current document; options may be NULL. *notification is a new
+ * EventTarget reference, released with rv_event_target_release. The show runs on a later rv_run_loop_cycle. An
+ * options size other than sizeof(RvNotificationOptions) or an unknown dir returns RV_ERR_UNSUPPORTED. */
+RV_EXPORT int32_t rv_notification_create(RvHost*, const uint8_t* title, int32_t title_length, const RvNotificationOptions* options,
+    RvEventTarget** notification);
+/* Notification.close(). The presenter receives RV_NOTIFICATION_CANCEL for a shown notification. */
+RV_EXPORT int32_t rv_notification_close(RvEventTarget* notification);
+/* Dispatches an RV_NOTIFICATION_EVENT_* on a later rv_run_loop_cycle; CLOSE also finishes the notification. A
+ * notification whose document stopped dispatches nothing. */
+RV_EXPORT int32_t rv_notification_report(RvEventTarget* notification, int32_t event);
+/* An RV_NOTIFICATION_* string field as UTF-8 bytes, with the protocol of rv_event_type: *length excludes no
+ * terminator, and a capacity below it returns RV_ERR_BUFFER_TOO_SMALL with the buffer untouched. */
+RV_EXPORT int32_t rv_notification_string(RvEventTarget* notification, int32_t field, uint8_t* buffer, int32_t capacity, int32_t* length);
+/* The notification's RV_NOTIFICATION_DIR_* and silent flag (-1 unset, 0 or 1). */
+RV_EXPORT int32_t rv_notification_flags(RvEventTarget* notification, int32_t* dir, int32_t* silent);
+/* Pointer input ("pointer-input"): mouse, pen and touch samples, and pointer lock ("pointer-lock"). */
+
+/* Types of RvPointerSample.pointerType, as PointerEvent.pointerType. */
+enum {
+    RV_POINTER_TYPE_MOUSE = 0,
+    RV_POINTER_TYPE_PEN = 1,
+    RV_POINTER_TYPE_TOUCH = 2,
+};
+
+/* Actions of RvPointerSample.action. The first three equal RV_MOUSE_*. RV_POINTER_CANCEL ends a pen or touch contact
+ * the platform withdrew; RV_POINTER_STATIONARY is a touch contact that did not change. */
+enum {
+    RV_POINTER_MOVE = 0,
+    RV_POINTER_DOWN = 1,
+    RV_POINTER_UP = 2,
+    RV_POINTER_CANCEL = 3,
+    RV_POINTER_STATIONARY = 4,
+};
+
+/* One sample of a pointing device. */
+typedef struct RvPointerSample {
+    /* sizeof(RvPointerSample), set by the caller. */
+    int32_t size;
+    int32_t pointerType;
+    /* The device's id for the contact or pen, 0 or more. PointerEvent.pointerId is 1 for the mouse, 2 + id for a
+     * touch contact and 2^30 + id for a pen. */
+    int32_t id;
+    int32_t action;
+    /* CSS pixels of the host surface, as rv_host_mouse's x and y. */
+    double x;
+    double y;
+    /* MouseEvent.button of a down or up (RV_BUTTON_*), RV_BUTTON_NONE otherwise; MouseEvent.buttons after the sample. */
+    int32_t button;
+    int32_t buttons;
+    int32_t modifiers;
+    /* 1 for a single press, 2 for a double; 0 for other actions. */
+    int32_t clickCount;
+    /* 0 to 1. A NaN pressure gives the engine's value for a device without pressure: 0.5 with a button down, else 0. */
+    float pressure;
+    /* -1 to 1, a pen's barrel pressure. */
+    float tangentialPressure;
+    /* Degrees: tilt -90 to 90, twist 0 to 359. */
+    int32_t tiltX;
+    int32_t tiltY;
+    int32_t twist;
+    /* The contact's size in CSS pixels, 1 for a point. */
+    float width;
+    float height;
+    /* The movement since the device's previous sample in CSS pixels, as MouseEvent.movementX and movementY: under
+     * pointer lock the only position change the page receives. */
+    double movementX;
+    double movementY;
+} RvPointerSample;
+
+/* Native input from a mouse, a pen or a touch screen, handled as the user's like rv_host_mouse. A mouse or pen
+ * delivers one sample. A touch frame delivers one sample per active contact, each with its action, and dispatches
+ * touchstart, touchmove, touchend or touchcancel with touches, targetTouches and changedTouches, and a pointer event
+ * per changed contact. Under pointer lock, mouse and pen samples go to the lock target with clientX and clientY held
+ * at the lock position. Returns 1 when the page or WebCore handled the input, 0 when not, or a negative status:
+ * RV_ERR_UNSUPPORTED for a bad size, type, action or count, a touch frame with a repeated id or without a changed
+ * contact, or touch input where WebKit builds without TOUCH_EVENTS (macOS). */
+RV_EXPORT int32_t rv_host_pointer(RvHost* host, const RvPointerSample* samples, int32_t count);
+/* Sets Navigator.maxTouchPoints of the host's documents: the contacts the app's touch screen reports, 0 (the initial
+ * value) for none. RV_ERR_UNSUPPORTED for a negative value. */
+RV_EXPORT int32_t rv_host_set_max_touch_points(RvHost* host, int32_t value);
+
+/* A touch contact's geometry ("touch-input"), which WebKit exposes only as the prefixed Touch.webkitRadiusX,
+ * webkitRadiusY, webkitRotationAngle and webkitForce: radii in CSS pixels, the angle in degrees, force 0 to 1. */
+typedef struct RvTouch RvTouch;
+typedef struct RvTouchGeometry {
+    /* sizeof(RvTouchGeometry), set by the caller. */
+    int32_t size;
+    float rotationAngle;
+    double radiusX;
+    double radiusY;
+    float force;
+} RvTouchGeometry;
+
+/* Writes the geometry of a Touch from rv_dom_touch_list_item. RV_ERR_UNSUPPORTED when geometry->size is smaller than
+ * RvTouchGeometry, or where WebKit builds without TOUCH_EVENTS. */
+RV_EXPORT int32_t rv_touch_geometry(RvTouch* touch, RvTouchGeometry* geometry);
+
+/* States of rv_host_pointer_lock_state. */
+enum {
+    RV_POINTER_LOCK_NONE = 0,
+    /* The page asked for the lock: the app answers with rv_host_pointer_lock_resolve. */
+    RV_POINTER_LOCK_PENDING = 1,
+    RV_POINTER_LOCK_LOCKED = 2,
+};
+
+/* Writes the host's pointer-lock state and, when element is not NULL, a new reference to the lock target or NULL. The
+ * app reads it after each input call, as it does rv_host_cursor: while LOCKED it hides the cursor and sends relative
+ * movement. */
+RV_EXPORT int32_t rv_host_pointer_lock_state(RvHost* host, int32_t* state, RvNode** element);
+/* Grants (1) or denies (0) the pending request: a grant fires pointerlockchange, a denial pointerlockerror, on the next
+ * rv_run_loop_cycle. RV_ERR_UNSUPPORTED when no request is pending. */
+RV_EXPORT int32_t rv_host_pointer_lock_resolve(RvHost* host, int32_t granted);
+/* Ends a held lock as the platform does on Escape or a lost window, with pointerlockchange; RV_OK without a lock.
+ * rv_host_set_focused(host, 0) does the same, and denies a pending request. */
+RV_EXPORT int32_t rv_host_pointer_lock_lose(RvHost* host);
+/* Element.requestPointerLock, with unadjustedMovement 1 or 0. The engine requires a user gesture: a call inside a
+ * listener of trusted input. A request the engine refuses returns RV_ERR_DOM_EXCEPTION with rv_last_exception naming
+ * NotAllowedError (no gesture), WrongDocumentError (a disconnected element, or a host whose window is unfocused, which
+ * also fires pointerlockerror), InvalidStateError or NotSupportedError (unadjusted movement, which no host provides);
+ * an accepted request makes the state PENDING. */
+RV_EXPORT int32_t rv_element_request_pointer_lock(RvNode* element, int32_t unadjustedMovement);
+/* Document.exitPointerLock: pointerlockchange on the next rv_run_loop_cycle when the document holds the lock. */
+RV_EXPORT int32_t rv_document_exit_pointer_lock(RvNode* document);
+
+/* v58: "canvas-pixels" for rv_abi_has: ImageData construction and pixel bytes without JavaScript. RvImageData is the
+ * generated ImageData handle, released with rv_dom_image_data_release; RanvierWebCoreDom.h holds its generated members
+ * and the generated createImageData, getImageData, putImageData and drawImage of CanvasRenderingContext2D. */
+typedef struct RvImageData RvImageData;
+
+/* The layout of an ImageData's pixels. Rows run top to bottom with no padding, so rowBytes is width * bytesPerPixel.
+ * Each pixel holds R, G, B and A in that order, and the colour channels are not premultiplied by alpha. colorSpace is
+ * an RV_CANVAS_COLOR_SPACE_* value, and pixelFormat an RV_DOM_IMAGE_DATA_PIXEL_FORMAT_* value with 4 bytes per pixel
+ * for rgba-unorm8. byteLength is 0 for detached data. size is sizeof(RvImageDataLayout). */
+typedef struct RvImageDataLayout {
+    int32_t size;
+    uint32_t width;
+    uint32_t height;
+    int32_t colorSpace;
+    int32_t pixelFormat;
+    int32_t bytesPerPixel;
+    int64_t rowBytes;
+    int64_t byteLength;
+} RvImageDataLayout;
+
+/* new ImageData(width, height) when bytes is NULL and length 0, else new ImageData(data, width, height) over a copy of
+ * length bytes in the layout of RvImageDataLayout. *result is a new reference. The DOM exceptions are those of the
+ * constructor: IndexSizeError for a zero dimension or a length that does not match width and height, InvalidStateError
+ * for a length that is not a non-zero multiple of 4, and RangeError for a size the engine cannot allocate. Returns
+ * RV_ERR_UNSUPPORTED for a colour space other than sRGB or a pixel format other than rgba-unorm8. */
+RV_EXPORT int32_t rv_image_data_create(uint32_t width, uint32_t height, const uint8_t* bytes, int64_t length, int32_t colorSpace, int32_t pixelFormat, RvImageData** result);
+/* Writes the layout of data. Returns RV_ERR_UNSUPPORTED, with layout unchanged, when layout->size is below
+ * sizeof(RvImageDataLayout). */
+RV_EXPORT int32_t rv_image_data_layout(RvImageData* data, RvImageDataLayout* layout);
+/* Copies length bytes of the pixels from offset into buffer. A range past the end copies nothing and returns
+ * RV_ERR_DOM_EXCEPTION with a RangeError; detached data returns an InvalidStateError. buffer may be NULL for length 0. */
+RV_EXPORT int32_t rv_image_data_read(RvImageData* data, int64_t offset, uint8_t* buffer, int64_t length);
+/* Copies length bytes into the pixels at offset, as data.set(bytes, offset) does. A range past the end writes nothing
+ * and returns RV_ERR_DOM_EXCEPTION with a RangeError; detached data returns an InvalidStateError. */
+RV_EXPORT int32_t rv_image_data_write(RvImageData* data, int64_t offset, const uint8_t* bytes, int64_t length);
+
+/* v58: "canvas-export" for rv_abi_has: HTMLCanvasElement.toBlob and toDataURL through the shared RV_IMAGE_ENCODING_*
+ * encoders, and the bitmaprenderer context. RanvierWebCoreDom.h holds the generated ImageBitmapRenderingContext and
+ * ImageBitmap members. encoding is PNG, JPEG or WEBP and quality follows the RV_IMAGE_ENCODING_* contract. An encoding
+ * the engine cannot encode on this flavor, RGBA8 and an unknown value return RV_ERR_UNSUPPORTED: a browser falls back
+ * to PNG instead. A canvas whose origin is not clean returns RV_ERR_DOM_EXCEPTION with a SecurityError, and an encoder
+ * failure an EncodingError. Each returns RV_ERR_WRONG_INTERFACE for a node that is not a <canvas>. */
+typedef struct RvImageBitmap RvImageBitmap;
+typedef struct RvImageBitmapRenderingContext RvImageBitmapRenderingContext;
+
+/* The encoded bytes of the canvas bitmap, the bytes toBlob's Blob holds. A zero-size canvas has none: RV_OK with
+ * *length 0. Capacity, a NULL buffer and RV_ERR_BUFFER_TOO_SMALL follow rv_blob_read_bytes. */
+RV_EXPORT int32_t rv_canvas_encode(RvNode* canvas, int32_t encoding, double quality, uint8_t* buffer, int64_t capacity, int64_t* length);
+/* HTMLCanvasElement.toDataURL: "data:<type>;base64,<bytes>", or "data:," for a zero-size canvas, as ASCII without a
+ * terminating NUL. A capacity below the length copies nothing and returns RV_ERR_BUFFER_TOO_SMALL with the length in
+ * *length; buffer may be NULL for capacity 0. */
+RV_EXPORT int32_t rv_canvas_to_data_url(RvNode* canvas, int32_t encoding, double quality, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLCanvasElement.toBlob, during the call: *blob is a new Blob of the encoded bytes with the encoding's type, or
+ * NULL for a zero-size canvas. */
+RV_EXPORT int32_t rv_canvas_to_blob(RvNode* canvas, int32_t encoding, double quality, RvBlob** blob);
+/* getContext("bitmaprenderer"): *context is a new reference to the canvas's one bitmaprenderer context, created on the
+ * first call. RV_OK with *context NULL means the canvas already has a context of another type. */
+RV_EXPORT int32_t rv_canvas_get_bitmap_context(RvNode* canvas, RvImageBitmapRenderingContext** context);
+
+/* v58: "image-bitmaps" for rv_abi_has: createImageBitmap without JavaScript. */
+enum {
+    RV_IMAGE_BITMAP_SOURCE_NODE = 0, /* RvNode*: an <img>, an SVG <image> or a <canvas> */
+    RV_IMAGE_BITMAP_SOURCE_BITMAP = 1, /* RvImageBitmap* */
+    RV_IMAGE_BITMAP_SOURCE_IMAGE_DATA = 2, /* RvImageData* */
+    RV_IMAGE_BITMAP_SOURCE_BLOB = 3, /* RvBlob* */
+};
+enum {
+    RV_IMAGE_BITMAP_ORIENTATION_FROM_IMAGE = 0,
+    RV_IMAGE_BITMAP_ORIENTATION_FLIP_Y = 1,
+    RV_IMAGE_BITMAP_ORIENTATION_NONE = 2,
+};
+enum {
+    RV_IMAGE_BITMAP_PREMULTIPLY_NONE = 0,
+    RV_IMAGE_BITMAP_PREMULTIPLY_PREMULTIPLY = 1,
+    RV_IMAGE_BITMAP_PREMULTIPLY_DEFAULT = 2,
+};
+enum {
+    RV_IMAGE_BITMAP_COLOR_SPACE_CONVERSION_NONE = 0,
+    RV_IMAGE_BITMAP_COLOR_SPACE_CONVERSION_DEFAULT = 1,
+};
+enum {
+    RV_IMAGE_BITMAP_RESIZE_PIXELATED = 0,
+    RV_IMAGE_BITMAP_RESIZE_LOW = 1,
+    RV_IMAGE_BITMAP_RESIZE_MEDIUM = 2,
+    RV_IMAGE_BITMAP_RESIZE_HIGH = 3,
+};
+
+/* ImageBitmapOptions, and the source rectangle of createImageBitmap(image, sx, sy, sw, sh) when crop is 1. size is
+ * sizeof(RvImageBitmapOptions). resizeWidth and resizeHeight are 0 when absent. The defaults are from-image, default,
+ * default, no resize and low. */
+typedef struct RvImageBitmapOptions {
+    int32_t size;
+    int32_t crop;
+    int32_t sx;
+    int32_t sy;
+    int32_t sw;
+    int32_t sh;
+    int32_t imageOrientation;
+    int32_t premultiplyAlpha;
+    int32_t colorSpaceConversion;
+    uint32_t resizeWidth;
+    uint32_t resizeHeight;
+    int32_t resizeQuality;
+} RvImageBitmapOptions;
+
+/* createImageBitmap(source, options) in the host's current document. kind is an RV_IMAGE_BITMAP_SOURCE_* value and
+ * source the handle of that kind; a handle of another kind, or a node that is no <img>, SVG <image> or <canvas>,
+ * returns RV_ERR_UNSUPPORTED. options may be NULL for the defaults, and an option value outside its enumeration or a
+ * size below sizeof(RvImageBitmapOptions) returns RV_ERR_UNSUPPORTED. The completion runs on a later
+ * rv_run_loop_cycle, or in rv_resource_cancel/rv_resource_release, as for rv_image_decode: SUCCEEDED with the bitmap's
+ * size, the bitmap available from rv_image_bitmap_result, or DECODE_FAILED with the DOMException name from
+ * rv_image_bitmap_error, such as "InvalidStateError" for an undecodable blob or a closed bitmap and "RangeError" for a
+ * crop with a zero sw or sh. */
+RV_EXPORT int32_t rv_image_bitmap_create(RvHost*, int32_t kind, void* source, const RvImageBitmapOptions* options,
+    RvResourceCompletion completion, void* context, uint64_t* operation);
+/* The bitmap of a SUCCEEDED rv_image_bitmap_create as a new reference, until rv_resource_release. RV_ERR_UNSUPPORTED
+ * for another operation or outcome. */
+RV_EXPORT int32_t rv_image_bitmap_result(uint64_t operation, RvImageBitmap** bitmap);
+/* The DOMException name of a DECODE_FAILED rv_image_bitmap_create, until rv_resource_release; capacity follows
+ * rv_last_exception. RV_ERR_UNSUPPORTED for another operation or outcome. */
+RV_EXPORT int32_t rv_image_bitmap_error(uint64_t operation, char* buffer, int32_t capacity, int32_t* length);
 
 #ifdef __cplusplus
 }

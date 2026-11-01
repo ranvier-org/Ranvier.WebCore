@@ -1,0 +1,65 @@
+diff --git a/Source/WebCore/page/Navigator.cpp b/Source/WebCore/page/Navigator.cpp
+index ae4bfda..4d3742d 100644
+--- a/Source/WebCore/page/Navigator.cpp
++++ b/Source/WebCore/page/Navigator.cpp
+@@ -62,6 +62,8 @@
+ #include <wtf/RunLoop.h>
+ #include <wtf/StdLibExtras.h>
+ #include <wtf/TZoneMallocInlines.h>
++#include <wtf/NeverDestroyed.h>
++#include <wtf/WeakHashMap.h>
+ #include <wtf/WeakPtr.h>
+ 
+ namespace WebCore {
+@@ -453,6 +455,26 @@ void Navigator::clearAppBadge(ScriptExecutionContext& callingContext, Ref<Deferr
+     setAppBadge(callingContext, 0, WTF::move(promise));
+ }
+ 
++static WeakHashMap<Page, int>& embedderTouchPoints()
++{
++    static NeverDestroyed<WeakHashMap<Page, int>> map;
++    return map;
++}
++
++void Navigator::setEmbedderMaxTouchPoints(Page& page, int value)
++{
++    if (value > 0)
++        embedderTouchPoints().set(page, value);
++    else
++        embedderTouchPoints().remove(page);
++}
++
++int Navigator::embedderMaxTouchPoints(const Page& page)
++{
++    auto iterator = embedderTouchPoints().find(page);
++    return iterator == embedderTouchPoints().end() ? 0 : iterator->value;
++}
++
+ int Navigator::maxTouchPoints() const
+ {
+ #if ENABLE(IOS_TOUCH_EVENTS) && !PLATFORM(MACCATALYST)
+@@ -461,7 +483,9 @@ int Navigator::maxTouchPoints() const
+         return 5;
+ #endif
+ 
+-    return 0;
++    RefPtr frame = this->frame();
++    RefPtr page = frame ? frame->page() : nullptr;
++    return page ? embedderMaxTouchPoints(*page) : 0;
+ }
+ 
+ NavigatorUAData& Navigator::userAgentData() const
+diff --git a/Source/WebCore/page/Navigator.h b/Source/WebCore/page/Navigator.h
+index c2759da..9b25b14 100644
+--- a/Source/WebCore/page/Navigator.h
++++ b/Source/WebCore/page/Navigator.h
+@@ -47,6 +47,9 @@ class Navigator final
+     WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(Navigator);
+ public:
+     static Ref<Navigator> create(ScriptExecutionContext* context, LocalDOMWindow& window) { return adoptRef(*new Navigator(context, window)); }
++    // The touch capacity an embedder reports for a page's navigators off iOS, 0 until set.
++    WEBCORE_EXPORT static void setEmbedderMaxTouchPoints(Page&, int);
++    WEBCORE_EXPORT static int embedderMaxTouchPoints(const Page&);
+     virtual ~Navigator();
+ 
+     String appVersion() const;

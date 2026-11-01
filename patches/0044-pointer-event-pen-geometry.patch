@@ -1,0 +1,92 @@
+diff --git a/Source/WebCore/dom/Element.cpp b/Source/WebCore/dom/Element.cpp
+index d29335e..0505e4b 100644
+--- a/Source/WebCore/dom/Element.cpp
++++ b/Source/WebCore/dom/Element.cpp
+@@ -519,6 +519,8 @@ static ShouldIgnoreMouseEvent dispatchPointerEventIfNeeded(Element& element, con
+             return ShouldIgnoreMouseEvent::No;
+ 
+         if (RefPtr pointerEvent = pointerCaptureController.pointerEventForMouseEvent(mouseEvent, platformEvent.pointerId(), platformEvent.pointerType())) {
++            if (auto* penGeometry = PointerEvent::pendingPenGeometry(); penGeometry && platformEvent.pointerType() == penPointerEventType())
++                pointerEvent->setPenGeometry(*penGeometry);
+             pointerCaptureController.dispatchEvent(*pointerEvent, &element);
+             if (isCompatibilityMouseEvent(mouseEvent) && pointerCaptureController.preventsCompatibilityMouseEventsForIdentifier(pointerEvent->pointerId()))
+                 return ShouldIgnoreMouseEvent::Yes;
+diff --git a/Source/WebCore/dom/PointerEvent.cpp b/Source/WebCore/dom/PointerEvent.cpp
+index dd8c59f..a712d7a 100644
+--- a/Source/WebCore/dom/PointerEvent.cpp
++++ b/Source/WebCore/dom/PointerEvent.cpp
+@@ -276,6 +276,39 @@ PointerEvent::PointerEvent(const AtomString& type, PointerID pointerId, const St
+ 
+ PointerEvent::~PointerEvent() = default;
+ 
++static thread_local const PointerEvent::PenGeometry* currentPenGeometry;
++
++auto PointerEvent::pendingPenGeometry() -> const PenGeometry*
++{
++    return currentPenGeometry;
++}
++
++PointerEvent::PendingPenGeometryScope::PendingPenGeometryScope(const PenGeometry& geometry)
++    : m_previous(currentPenGeometry)
++{
++    currentPenGeometry = &geometry;
++}
++
++PointerEvent::PendingPenGeometryScope::~PendingPenGeometryScope()
++{
++    currentPenGeometry = m_previous;
++}
++
++void PointerEvent::setPenGeometry(const PenGeometry& geometry)
++{
++    m_tiltX = geometry.tiltX;
++    m_tiltY = geometry.tiltY;
++    m_twist = geometry.twist;
++    m_tangentialPressure = geometry.tangentialPressure;
++    m_width = geometry.width;
++    m_height = geometry.height;
++    auto angle = angleFromTilt(m_tiltX, m_tiltY);
++    m_altitudeAngle = angle.altitudeAngle;
++    m_azimuthAngle = angle.azimuthAngle;
++    for (auto& coalesced : m_coalescedEvents)
++        coalesced->setPenGeometry(geometry);
++}
++
+ Vector<Ref<PointerEvent>> PointerEvent::getCoalescedEvents() const
+ {
+ #if ASSERT_ENABLED
+diff --git a/Source/WebCore/dom/PointerEvent.h b/Source/WebCore/dom/PointerEvent.h
+index a9ad0f7..f3cfb10 100644
+--- a/Source/WebCore/dom/PointerEvent.h
++++ b/Source/WebCore/dom/PointerEvent.h
+@@ -71,6 +71,30 @@ public:
+ 
+     enum class IsPrimary : bool { No, Yes };
+ 
++    // Pen tilt, twist, tangential pressure and contact geometry that a platform mouse event of pointer type pen
++    // carries outside PlatformMouseEvent, for the pointer events dispatched from it.
++    struct PenGeometry {
++        long tiltX { 0 };
++        long tiltY { 0 };
++        long twist { 0 };
++        float tangentialPressure { 0 };
++        double width { 1 };
++        double height { 1 };
++    };
++
++    // The pen geometry of the platform event being dispatched on this thread, or null. An embedder sets it around a
++    // dispatch through PendingPenGeometryScope.
++    WEBCORE_EXPORT static const PenGeometry* pendingPenGeometry();
++    class PendingPenGeometryScope {
++    public:
++        WEBCORE_EXPORT explicit PendingPenGeometryScope(const PenGeometry&);
++        WEBCORE_EXPORT ~PendingPenGeometryScope();
++    private:
++        const PenGeometry* m_previous;
++    };
++    // Sets the pen fields of this event and its coalesced events, with altitudeAngle and azimuthAngle from the tilt.
++    void setPenGeometry(const PenGeometry&);
++
+     static Ref<PointerEvent> create(const AtomString& type, Init&& initializer)
+     {
+         return adoptRef(*new PointerEvent(type, WTF::move(initializer), IsTrusted::No));

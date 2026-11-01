@@ -1,0 +1,27 @@
+{
+  "description": "Notification and app badge outcomes (B09, WebCore #117). Chromium values come from tests/abi/notifications_browser.mjs; native values from tests/abi/notifications.py. A qualified case records where the engines differ and why; a native value of null is browser-only evidence.",
+  "cases": {
+    "default-permission": {"chromium": "denied", "native": "default",
+      "qualification": "Automated Chromium reports denied before any grant; a native host starts at default and the application sets the permission."},
+    "show-without-permission": {"chromium": [["error", false, false, true]], "native": [["error", false, false, true]]},
+    "fields": {
+      "chromium": {"title": "Title é", "body": "Body", "tag": "t1", "lang": "en-GB", "dir": "rtl", "silent": true, "icon": "/icons/a.png"},
+      "native": {"title": "Title é", "body": "Body", "tag": "t1", "lang": "en-GB", "dir": "rtl", "silent": true, "icon": "https://example.test/icons/a.png"},
+      "qualification": "A native document's base URL is about:blank, so the native probe passes an absolute icon URL; a relative one resolves to no icon, which the probe also checks."},
+    "defaults": {
+      "chromium": {"title": "", "body": "", "tag": "", "lang": "", "dir": "auto", "silent": false, "icon": ""},
+      "native": {"title": "", "body": "", "tag": "", "lang": "", "dir": "auto", "silent": null, "icon": ""},
+      "qualification": "An unset silent reads false in Chromium and null in WebKit, as the nullable IDL attribute specifies."},
+    "missing-title": {"chromium": "TypeError", "native": null, "qualification": "The native title is a required argument; the managed contract rejects a null title."},
+    "actions": {"chromium": "TypeError", "native": null, "qualification": "Actions belong to persistent notifications, which no target provides; the managed contract has no actions."},
+    "bad-dir": {"chromium": "TypeError", "native": "unsupported", "qualification": "Native rejects a dir outside RV_NOTIFICATION_DIR_* with RV_ERR_UNSUPPORTED."},
+    "badge-set": {"chromium": "ok", "native": null, "qualification": "Badges are managed only: the application's handler receives them."},
+    "badge-clear": {"chromium": "ok", "native": null, "qualification": "As badge-set."},
+    "badge-negative": {"chromium": "TypeError", "native": null, "qualification": "As badge-set; the managed count is an unsigned 64-bit value."},
+    "request-granted": {"chromium": "granted", "native": null, "qualification": "Native permission is the application's setting, not a prompt."},
+    "show-granted": {
+      "chromium": [["error", false, false, true]],
+      "native": [["show", false, false, true], ["click", false, false, true], ["close", false, false, true]],
+      "qualification": "Headless Chromium has no notification presenter, so a granted show fires error. A native presenter shows it; the probe reports show, click and, after the cancel request, close."}
+  }
+}

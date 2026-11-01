@@ -1,0 +1,8 @@
+
+#endif /* CMAKECONFIG_H */
+/* int7 macOS stand-in: features on for Windows and off for osx-arm64 (feature-diff.json), forced off. */
+#define ENABLE_TOUCH_EVENTS 0
+#define ENABLE_PAN_SCROLLING 0
+#define ENABLE_MEDIA_STATISTICS 0
+#define ENABLE_ALL_LEGACY_REGISTERED_SPECIAL_URL_SCHEMES 0
+#define ENABLE_RELEASE_LOG 0

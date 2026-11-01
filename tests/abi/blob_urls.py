@@ -18,10 +18,11 @@ import time
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from form_collections import Native, P, I, U, utf8
 from binary_values import Binary
+from utf8_inputs import Utf8
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, WRONG_THREAD, DOM_EXCEPTION, BUFFER_TOO_SMALL, UNSUPPORTED, DETACHED, WRONG_INTERFACE = 0, -1, -2, -3, -6, -9, -10, -11
-ABI = 54
+ABI = 59
 SUCCEEDED, LOAD_FAILED, DECODE_FAILED, CANCELLED, INVALIDATED = 0, 1, 2, 3, 4
 OUTCOMES = {0: 'succeeded', 1: 'loadFailed', 2: 'decodeFailed', 3: 'cancelled', 4: 'invalidated'}
 READ_TEXT, READ_BYTES = 0, 1
@@ -65,7 +66,7 @@ class Host:
         self.n.call('rv_resource_load_fail', [P], load)
 
     def load(self, markup):
-        self.n.ok('rv_host_load_html', [P, ctypes.c_char_p], self.host, markup.encode('utf-8'))
+        self.n.ok('rv_host_load_html', [P, Utf8], self.host, markup.encode('utf-8'))
         self.document = self.n.bind('rv_host_document', P, [P])(self.host)
         self.binary = Binary(self.n, type('CaseLike', (), {'document': self.document})())
 
@@ -203,7 +204,7 @@ class Reader:
         for kind in TYPES:
             callback = EVENT_CALLBACK(lambda context, event, kind=kind: self.on_event(kind))
             host.callbacks.append(callback)
-            listener = self.n.bind('rv_event_target_add_listener', P, [P, ctypes.c_char_p, I, EVENT_CALLBACK, P])(self.target, kind.encode(), 0, callback, None)
+            listener = self.n.bind('rv_event_target_add_listener', P, [P, Utf8, I, EVENT_CALLBACK, P])(self.target, kind.encode(), 0, callback, None)
             self.n.expect(bool(listener), 'FileReader listener')
             host.listeners.append(listener)
 

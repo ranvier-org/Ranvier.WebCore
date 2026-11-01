@@ -50,13 +50,13 @@ let run (outDir: string) =
     let mutable offered: (string * string) list = []
 
     let write =
-        ClipboardWrite(fun _ kind data first ->
-            written.Add $"{first}:{Marshal.PtrToStringUTF8 kind}:{(Marshal.PtrToStringUTF8 data).Length}")
+        ClipboardWrite(fun _ kind data dataLength first ->
+            written.Add $"{first}:{Marshal.PtrToStringUTF8 kind}:{(Marshal.PtrToStringUTF8(data, dataLength)).Length}")
 
     let read =
         ClipboardRead(fun _ request ->
             for kind, data in offered do
-                rv_clipboard_offer (request, kind, data) |> check "clipboard_offer")
+                rv_clipboard_offer (request, kind, utf8 data, utf8Length data) |> check "clipboard_offer")
 
     rv_host_set_clipboard (
         host.Handle,

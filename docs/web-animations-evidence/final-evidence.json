@@ -1,0 +1,63 @@
+{
+  "group": "A01",
+  "nativeHead": "see git log (evidence commit on 52745a6)",
+  "candidate": "waapi-candidate-3",
+  "parent": "C:/wk/native-cascade-shadow/artifacts/native46-candidate-6",
+  "runtime": {
+    "brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
+    "brotlidec.dll": "d42e2160f76f29a91f8be01b009b585c45496219794e16eab90b3599b6f70a7f",
+    "harfbuzz-icu.dll": "27662b477f7cb0c20cee64543a06296a48a00a17b6c7b57629bb166a30d5b164",
+    "harfbuzz.dll": "b519b2abc7f446ca45bff77aae1708f45afc9f557698bcd7295837cce0f12bfa",
+    "icudt77.dll": "b00d2fb856f548608c137e771257a70d0722654535c6c00b371c0fab3e2b802c",
+    "icuin77.dll": "e3785739e1fcf2e38053bbb85ef5f0f5dab63f865cbda762da5258566085a240",
+    "icuuc77.dll": "189c623f996c41488c262867bae04a5bb33dd485bd423e0a8bec05c455a90902",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+    "jpeg62.dll": "394811c1b1bf1fd914248a145ba3fcad1f5f27c7009754ce08e48ccb0266b785",
+    "libpng16.dll": "8b46592c5ea338dd6b23ca380d6db64a7849c2a534fc465a006ec668645d8185",
+    "libsharpyuv.dll": "df165de83480692f494c23061ef9c40c10abe19a89b1fa9fae2f1cd5152c07a7",
+    "libwebp.dll": "550c5a4860f61d32a274fdd7b5c8cbe266eee28b3a3ca888195248ea1d5e0f71",
+    "libwebpdemux.dll": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163",
+    "libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
+    "libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
+    "RanvierWebCoreHost.dll": "cc9ca3a9cbaeb088c3a5e3e6d57af644087d1fa45de3a1331879f81c876b9970",
+    "RanvierWebCoreHost.lib": "e907067699ff12756c62ca9e779a905005c741d1d3f193f83f857c3e97e5f99f",
+    "RanvierWebCoreHost.pdb": "24cf0672f68212d6938119438f53e04324637f9ae7c3d25e78e11b78e8bd26e6",
+    "WebCore.dll": "411a1d3f0271d1ba09e7922d537838bc6224aa05619682e4791c2a9fdc2433c9",
+    "WebCore.lib": "e74e78e79a1c9949b184926e3b15566b53d5314ae7987e114d496250c79a0e91",
+    "WebCore.pdb": "c381649382fc632ad0f7da0f6d1991ca8539baa25ab8c8a43fe113f07228b2f0",
+    "zlib1.dll": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93"
+  },
+  "batch": {
+    "raw": 92029,
+    "baselineRaw": 90743,
+    "webAnimations": 1286,
+    "teardownRecords": 106,
+    "teardownAllCollected": true
+  },
+  "repeat30": 30,
+  "oracleRepeat30": "ORACLE_REPEAT identical=30/30",
+  "qualifications": [
+    "Element.animate, KeyframeEffect create and setKeyframes take the JS lock; its release attempts a microtask drain refused by DisallowVMEntry (root decision B); no script runs (canary); 3x1000 calls keep private memory flat",
+    "crashOnDisallowedVMEntry armed (JSC Options::setOption, child-process control) for lock-free calls; painting outside the armed scope (rendering update attempts its own entry, pre-existing)",
+    "keyframes: keyframe-sequence form only",
+    "pre-existing VM-entry attempts recorded in preexisting-vm-entry.md"
+  ],
+  "files": {
+    "batch-green.json": "d748817afc046b0324245810295eba472211ec27c8c7ef69e05d77f90d10ed67",
+    "build_waapi_candidate.py": "dcdaeabfa1362aec9d174b4ffef3cf5e13d5f40059aabe4d6bcae46a22d8d39f",
+    "native_red.py": "adb8453c812d4ae3afd1b65308d08d2a2f24c3f45cdfc049d23849467856d602",
+    "oracle-repeat30.txt": "4d6b7dbb0f03bb7579d5e04ae2dec5879075076fb000cf4e45a1861ed6086ea4",
+    "oracle_repeat.py": "41c78fe446b997398a8f08171d07534400860a5c8d24951b2b64caae20dbbc10",
+    "preexisting-vm-entry.md": "e8259435df08b0b4f7a79e1d2e566cab1c77dd182f71dce45ed633fcc056f9df",
+    "red-chromium.json": "9b9a1cbd6628a92ef36e10a41cf836c9c64d1ccc4efecf352631fd8ecd8814fc",
+    "red-native.json": "19afac3a0e7f81084ddec2dac05f2f6388ebcd6441b0350fbcb5f088d5069d2b",
+    "red_chromium.mjs": "4b2b3881bd9c0854810c407281e81d1ba474e5572e03514ac9c60dfc85014709",
+    "repeat30.sh": "b8413ee19b81af8783f17fe10a31a8ab76f5989f4a865d9e2b778133475e2874",
+    "run_waapi_full_batch.py": "0d95d94432b209cce4cffacff5669cc197e876e06e09670233f22497a1a8aa59",
+    "runtime-receipt.json": "fdcabd3836598b7b0d5f47f3c64ecb5ebf82efb57c17c902798e99ae32fa1bad",
+    "source-patches.json": "1a0fd2cb1cbbb8963cc350f37c47d8fafd87cf31f5fbd1525f10f2509e9b79f4",
+    "teardown-probes.json": "772a73f0c9ec240a8bd5eeb9fa63648001a121862bf45e7723f86d0332a626ac",
+    "web-animations-probe.log": "710b9cbccdd770787812f61dc70ed467d98740e329f7a99d9789e9d8a4a5e3a8",
+    "web-animations-repeat30.txt": "79770052c9e60747d6a89e2f9c465a25279aafee8f92bb2d166d05dcb23040f2"
+  }
+}

@@ -1,0 +1,21 @@
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.cpp(780,31): warning: unused variable 'enumerationAnimationFrameRatePreset' [-Wunused-const-variable]
+  780 | static constexpr ASCIILiteral enumerationAnimationFrameRatePreset[] = { "auto"_s, "low"_s, "high"_s, "highest"_s };
+      |                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.cpp(798,31): warning: unused variable 'enumerationImageDataPixelFormat' [-Wunused-const-variable]
+  798 | static constexpr ASCIILiteral enumerationImageDataPixelFormat[] = { "rgba-unorm8"_s, "rgba-float16"_s };
+      |                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.cpp(803,31): warning: unused variable 'enumerationPredefinedColorSpace' [-Wunused-const-variable]
+  803 | static constexpr ASCIILiteral enumerationPredefinedColorSpace[] = { "srgb"_s, "srgb-linear"_s };
+      |                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.cpp(3400,56): warning: unused function 'decodeRvDomSequenceUSVStringOrURLPatternInit' [-Wunused-function]
+ 3400 | std::optional<Vector<Variant<String, URLPatternInit>>> decodeRvDomSequenceUSVStringOrURLPatternInit(const RvDomSequenceUSVStringOrURLPatternInit* source, int32_t& status)
+      |                                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.cpp(3523,78): warning: unused function 'decodeRvDomSequencePairUSVStringAndUnionUndefinedOrUSVString' [-Wunused-function]
+ 3523 | std::optional<Vector<KeyValuePair<String, Variant<std::monostate, String>>>> decodeRvDomSequencePairUSVStringAndUnionUndefinedOrUSVString(const RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString* source, int32_t& status)
+      |                                                                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.cpp(3633,60): warning: unused function 'decodeRvDomUnionUnsignedLongOrAnimationFrameRatePreset' [-Wunused-function]
+ 3633 | std::optional<Variant<uint32_t, AnimationFrameRatePreset>> decodeRvDomUnionUnsignedLongOrAnimationFrameRatePreset(const RvDomUnionUnsignedLongOrAnimationFrameRatePreset* source, int32_t& status)
+      |                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+6 warnings generated.
+
+EXIT=0

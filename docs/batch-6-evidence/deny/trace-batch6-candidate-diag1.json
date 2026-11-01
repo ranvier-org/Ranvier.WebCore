@@ -1,0 +1,13 @@
+{
+ "runtime": "C:/wk/native-batch-6/artifacts/batch6-candidate-diag1/runtime",
+ "noGesture": true,
+ "gestureStatuses": [
+  0
+ ],
+ "deny": 0,
+ "cyclesUntilPointerlockerror": 1,
+ "events": [
+  "pointerlockerror"
+ ],
+ "hits": {}
+}

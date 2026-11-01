@@ -1,0 +1,53 @@
+{
+  "group": "A02",
+  "candidate": "waapi-candidate-4",
+  "codeHead": "1c611ff (glue unchanged through 37f45e1)",
+  "runtime": {
+    "brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
+    "brotlidec.dll": "d42e2160f76f29a91f8be01b009b585c45496219794e16eab90b3599b6f70a7f",
+    "harfbuzz-icu.dll": "27662b477f7cb0c20cee64543a06296a48a00a17b6c7b57629bb166a30d5b164",
+    "harfbuzz.dll": "b519b2abc7f446ca45bff77aae1708f45afc9f557698bcd7295837cce0f12bfa",
+    "icudt77.dll": "b00d2fb856f548608c137e771257a70d0722654535c6c00b371c0fab3e2b802c",
+    "icuin77.dll": "e3785739e1fcf2e38053bbb85ef5f0f5dab63f865cbda762da5258566085a240",
+    "icuuc77.dll": "189c623f996c41488c262867bae04a5bb33dd485bd423e0a8bec05c455a90902",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+    "jpeg62.dll": "394811c1b1bf1fd914248a145ba3fcad1f5f27c7009754ce08e48ccb0266b785",
+    "libpng16.dll": "8b46592c5ea338dd6b23ca380d6db64a7849c2a534fc465a006ec668645d8185",
+    "libsharpyuv.dll": "df165de83480692f494c23061ef9c40c10abe19a89b1fa9fae2f1cd5152c07a7",
+    "libwebp.dll": "550c5a4860f61d32a274fdd7b5c8cbe266eee28b3a3ca888195248ea1d5e0f71",
+    "libwebpdemux.dll": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163",
+    "libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
+    "libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
+    "RanvierWebCoreHost.dll": "4bef07baa1d8e94dff3ea0b16e317c1276624f2985004e7306e9d4dfe242424d",
+    "RanvierWebCoreHost.lib": "cce45704ea32a6a6a656a285cdf4d15aec3de26f447829a2eaa8e96f77d43b21",
+    "RanvierWebCoreHost.pdb": "8868aba0c228e9bc9281e9750298ee6a0b1484d69d39eb9d0f665b8bc88fda9e",
+    "WebCore.dll": "afbad904e173fa3b51fe752d81de3cb26c01cbd05db1cc776adcf4d90a5d8e3d",
+    "WebCore.lib": "a3cc8217cad0d63b4a72daa93c730b1e02003d2e4cbd5611c595b3b9bc0feebd",
+    "WebCore.pdb": "44bbb9081b7ca76918cde84fc194789da8b9bb3f2f1c8c3508a7947b7abf05c0",
+    "zlib1.dll": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93"
+  },
+  "batch": {
+    "raw": 92135,
+    "baselineRaw": 90743,
+    "webAnimations": 1286,
+    "webAnimationEffects": 106,
+    "teardownRecords": 106,
+    "teardownAllCollected": true
+  },
+  "repeat30": 30,
+  "oracleRepeat30": "ORACLE_REPEAT identical=30/30",
+  "qualifications": [
+    "numbers compare within 1e-3 (easing curve rounding)",
+    "typed (CSSNumericValue) durations and times are not produced by WebKit here; the result transports carry them",
+    "A01 qualifications apply (refused microtask drain on keyframe calls)"
+  ],
+  "files": {
+    "batch-green.json": "10200e7b1432d9e104073495678bdc38a794e940324db55a464a5f8184c252f1",
+    "effects-oracle-repeat30.txt": "4d6b7dbb0f03bb7579d5e04ae2dec5879075076fb000cf4e45a1861ed6086ea4",
+    "runtime-receipt.json": "3480b16d394c5f0d71191ff8dfb57581e39322550d2a10ffeb40c976805034af",
+    "source-patches.json": "d6bdc0032c0d635fe326b3daa55847a73adcf9ce9a2a4cdbd13363d265329bd8",
+    "teardown-probes.json": "772a73f0c9ec240a8bd5eeb9fa63648001a121862bf45e7723f86d0332a626ac",
+    "web-animation-effects-probe.log": "e1d68a43c84bc39018cd0e41b252079e1b4c60dde6a4dd964eb8838825fb63d0",
+    "web-animation-effects-repeat30.txt": "a2711e5edf7a669b0d18aed82205b94defafc6614b6540c93f920be7ea5bac01"
+  }
+}

@@ -1,0 +1,110 @@
+diff --git a/Source/WebCore/dom/PointerEvent.h b/Source/WebCore/dom/PointerEvent.h
+index f3cfb10..a290d40 100644
+--- a/Source/WebCore/dom/PointerEvent.h
++++ b/Source/WebCore/dom/PointerEvent.h
+@@ -41,7 +41,7 @@
+ #pragma clang diagnostic pop
+ #endif
+ 
+-#if ENABLE(TOUCH_EVENTS) && (PLATFORM(WPE) || PLATFORM(GTK))
++#if ENABLE(TOUCH_EVENTS) && (PLATFORM(WPE) || PLATFORM(GTK) || PLATFORM(WIN))
+ #include "PlatformTouchEvent.h"
+ #endif
+ 
+@@ -123,13 +123,13 @@ public:
+     static Ref<PointerEvent> create(const AtomString& type, MouseButton, const MouseEvent&, PointerID, const String& pointerType, CanBubble, IsCancelable);
+     static Ref<PointerEvent> create(const AtomString& type, PointerID, const String& pointerType, IsPrimary = IsPrimary::No);
+ 
+-#if ENABLE(TOUCH_EVENTS) && (PLATFORM(IOS_FAMILY) || PLATFORM(WPE) || PLATFORM(GTK))
++#if ENABLE(TOUCH_EVENTS) && (PLATFORM(IOS_FAMILY) || PLATFORM(WPE) || PLATFORM(GTK) || PLATFORM(WIN))
+     static Ref<PointerEvent> create(const PlatformTouchEvent&, const Vector<Ref<PointerEvent>>& coalescedEvents, const Vector<Ref<PointerEvent>>& predictedEvents, unsigned touchIndex, bool isPrimary, Ref<WindowProxy>&&, const DoublePoint& touchDelta = { });
+     static Ref<PointerEvent> create(const PlatformTouchEvent&, const Vector<Ref<PointerEvent>>& coalescedEvents, const Vector<Ref<PointerEvent>>& predictedEvents, CanBubble, IsCancelable, unsigned touchIndex, bool isPrimary, Ref<WindowProxy>&& view, const DoublePoint& touchDelta = { });
+     static Ref<PointerEvent> create(const AtomString& type, const PlatformTouchEvent&, const Vector<Ref<PointerEvent>>& coalescedEvents, const Vector<Ref<PointerEvent>>& predictedEvents, unsigned touchIndex, bool isPrimary, Ref<WindowProxy>&&, const DoublePoint& touchDelta = { });
+ #endif
+ 
+-#if ENABLE(TOUCH_EVENTS) && (PLATFORM(WPE) || PLATFORM(GTK))
++#if ENABLE(TOUCH_EVENTS) && (PLATFORM(WPE) || PLATFORM(GTK) || PLATFORM(WIN))
+     static unsigned pointerIdForTouchPoint(const PlatformTouchPoint&);
+ #endif
+ 
+@@ -218,7 +218,7 @@ private:
+     PointerEvent();
+     PointerEvent(const AtomString&, Init&&, IsTrusted);
+     PointerEvent(const AtomString& type, PointerID, const String& pointerType, IsPrimary);
+-#if ENABLE(TOUCH_EVENTS) && (PLATFORM(IOS_FAMILY) || PLATFORM(WPE) || PLATFORM(GTK))
++#if ENABLE(TOUCH_EVENTS) && (PLATFORM(IOS_FAMILY) || PLATFORM(WPE) || PLATFORM(GTK) || PLATFORM(WIN))
+     PointerEvent(const AtomString& type, const PlatformTouchEvent&, const Vector<Ref<PointerEvent>>& coalescedEvents, const Vector<Ref<PointerEvent>>& predictedEvents, CanBubble canBubble, IsCancelable isCancelable, unsigned touchIndex, bool isPrimary, Ref<WindowProxy>&&, const DoublePoint& touchDelta = { });
+ #endif
+ 
+diff --git a/Source/WebCore/page/EventHandler.cpp b/Source/WebCore/page/EventHandler.cpp
+index 6b75aea..95406df 100644
+--- a/Source/WebCore/page/EventHandler.cpp
++++ b/Source/WebCore/page/EventHandler.cpp
+@@ -5574,7 +5574,7 @@ Expected<bool, RemoteFrameGeometryTransformer> EventHandler::handleTouchEvent(co
+         if (!targetFrame)
+             continue;
+ 
+-#if PLATFORM(WPE) || PLATFORM(GTK)
++#if PLATFORM(WPE) || PLATFORM(GTK) || PLATFORM(WIN)
+         RefPtr<EventTarget> pointerTarget = touchTarget;
+ 
+         if (pointState != PlatformTouchPoint::TouchPressed) {
+diff --git a/Source/WebCore/page/PointerCaptureController.cpp b/Source/WebCore/page/PointerCaptureController.cpp
+index a066648..0b324ca 100644
+--- a/Source/WebCore/page/PointerCaptureController.cpp
++++ b/Source/WebCore/page/PointerCaptureController.cpp
+@@ -213,7 +213,7 @@ bool PointerCaptureController::preventsCompatibilityMouseEventsForIdentifier(Poi
+     return capturingData && capturingData->preventsCompatibilityMouseEvents;
+ }
+ 
+-#if ENABLE(TOUCH_EVENTS) && (PLATFORM(IOS_FAMILY) || PLATFORM(WPE) || PLATFORM(GTK))
++#if ENABLE(TOUCH_EVENTS) && (PLATFORM(IOS_FAMILY) || PLATFORM(WPE) || PLATFORM(GTK) || PLATFORM(WIN))
+ static bool hierarchyHasCapturingEventListeners(Element* target, const AtomString& eventName)
+ {
+     for (RefPtr<ContainerNode> currentNode = target; currentNode; currentNode = currentNode->parentInComposedTree()) {
+@@ -383,7 +383,7 @@ void PointerCaptureController::dispatchEventForTouchAtIndex(EventTarget& target,
+     capturingData->state = CapturingData::State::Finished;
+     capturingData->previousTarget = nullptr;
+ }
+-#endif // ENABLE(TOUCH_EVENTS) && (PLATFORM(IOS_FAMILY) || PLATFORM(WPE) || PLATFORM(GTK))
++#endif // ENABLE(TOUCH_EVENTS) && (PLATFORM(IOS_FAMILY) || PLATFORM(WPE) || PLATFORM(GTK) || PLATFORM(WIN))
+ 
+ void PointerCaptureController::clearUnmatchedMouseDown(PointerID pointerID)
+ {
+@@ -571,7 +571,7 @@ void PointerCaptureController::cancelPointer(PointerID pointerId, const IntPoint
+     capturingData->pendingTargetOverride = nullptr;
+     capturingData->state = CapturingData::State::Cancelled;
+ 
+-#if ENABLE(TOUCH_EVENTS) && (PLATFORM(IOS_FAMILY) || PLATFORM(WPE) || PLATFORM(GTK))
++#if ENABLE(TOUCH_EVENTS) && (PLATFORM(IOS_FAMILY) || PLATFORM(WPE) || PLATFORM(GTK) || PLATFORM(WIN))
+     capturingData->previousTarget = nullptr;
+ #endif
+ 
+diff --git a/Source/WebCore/page/PointerCaptureController.h b/Source/WebCore/page/PointerCaptureController.h
+index 118fc0c..16fc5d8 100644
+--- a/Source/WebCore/page/PointerCaptureController.h
++++ b/Source/WebCore/page/PointerCaptureController.h
+@@ -63,7 +63,7 @@ public:
+ 
+     RefPtr<PointerEvent> pointerEventForMouseEvent(const MouseEvent&, PointerID, const String& pointerType);
+ 
+-#if ENABLE(TOUCH_EVENTS) && (PLATFORM(IOS_FAMILY) || PLATFORM(WPE) || PLATFORM(GTK))
++#if ENABLE(TOUCH_EVENTS) && (PLATFORM(IOS_FAMILY) || PLATFORM(WPE) || PLATFORM(GTK) || PLATFORM(WIN))
+     void dispatchEventForTouchAtIndex(EventTarget&, const PlatformTouchEvent&, unsigned, bool isPrimary, WindowProxy&, const DoublePoint&);
+ #endif
+ 
+@@ -88,12 +88,12 @@ private:
+         WeakPtr<Document, WeakPtrImplWithEventTargetData> activeDocument;
+         RefPtr<Element> pendingTargetOverride;
+         RefPtr<Element> targetOverride;
+-#if ENABLE(TOUCH_EVENTS) && (PLATFORM(IOS_FAMILY) || PLATFORM(WPE) || PLATFORM(GTK))
++#if ENABLE(TOUCH_EVENTS) && (PLATFORM(IOS_FAMILY) || PLATFORM(WPE) || PLATFORM(GTK) || PLATFORM(WIN))
+         RefPtr<Element> previousTarget;
+ #endif
+         bool hasAnyElement() const {
+             return pendingTargetOverride || targetOverride
+-#if ENABLE(TOUCH_EVENTS) && (PLATFORM(IOS_FAMILY) || PLATFORM(WPE) || PLATFORM(GTK))
++#if ENABLE(TOUCH_EVENTS) && (PLATFORM(IOS_FAMILY) || PLATFORM(WPE) || PLATFORM(GTK) || PLATFORM(WIN))
+                 || previousTarget
+ #endif
+                 ;

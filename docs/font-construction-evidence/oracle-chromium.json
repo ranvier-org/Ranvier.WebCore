@@ -1,0 +1,289 @@
+{
+ "browser": "156.0.8078.4",
+ "fallbackWidth": 43.984375,
+ "bytes": {
+  "ahemTtf": {
+   "initial": "loaded",
+   "loaded": [
+    "resolved",
+    "loaded"
+   ],
+   "status": "loaded"
+  },
+  "ahemCff": {
+   "initial": "loaded",
+   "loaded": [
+    "resolved",
+    "loaded"
+   ],
+   "status": "loaded"
+  },
+  "robotoOtf": {
+   "initial": "loaded",
+   "loaded": [
+    "resolved",
+    "loaded"
+   ],
+   "status": "loaded"
+  },
+  "robotoWoff": {
+   "initial": "loaded",
+   "loaded": [
+    "resolved",
+    "loaded"
+   ],
+   "status": "loaded"
+  },
+  "robotoWoff2": {
+   "initial": "loaded",
+   "loaded": [
+    "resolved",
+    "loaded"
+   ],
+   "status": "loaded"
+  },
+  "invalid": {
+   "initial": "error",
+   "loaded": [
+    "rejected",
+    "SyntaxError"
+   ],
+   "status": "error"
+  },
+  "empty": {
+   "initial": "error",
+   "loaded": [
+    "rejected",
+    "SyntaxError"
+   ],
+   "status": "error"
+  },
+  "arrayBuffer": {
+   "initial": "loaded",
+   "loaded": [
+    "resolved",
+    "loaded"
+   ],
+   "status": "loaded"
+  }
+ },
+ "descriptors": {
+  "defaults": {
+   "family": "RvDefault",
+   "style": "normal",
+   "weight": "normal",
+   "stretch": "normal",
+   "unicodeRange": "U+0-10FFFF",
+   "featureSettings": "normal",
+   "display": "auto",
+   "sizeAdjust": "100%",
+   "ascentOverride": "normal"
+  },
+  "given": {
+   "family": "RvDesc",
+   "style": "italic",
+   "weight": "bold",
+   "stretch": "condensed",
+   "unicodeRange": "U+0-7F",
+   "featureSettings": "\"liga\" 0",
+   "display": "swap",
+   "sizeAdjust": "90%",
+   "ascentOverride": "normal"
+  },
+  "errors": {
+   "weight": {
+    "status": "error",
+    "loaded": [
+     "rejected",
+     "SyntaxError"
+    ]
+   },
+   "style": {
+    "status": "error",
+    "loaded": [
+     "rejected",
+     "SyntaxError"
+    ]
+   },
+   "stretch": {
+    "status": "error",
+    "loaded": [
+     "rejected",
+     "SyntaxError"
+    ]
+   },
+   "unicodeRange": {
+    "status": "error",
+    "loaded": [
+     "rejected",
+     "SyntaxError"
+    ]
+   },
+   "display": {
+    "status": "error",
+    "loaded": [
+     "rejected",
+     "SyntaxError"
+    ]
+   },
+   "featureSettings": {
+    "status": "error",
+    "loaded": [
+     "rejected",
+     "SyntaxError"
+    ]
+   },
+   "sizeAdjust": {
+    "status": "error",
+    "loaded": [
+     "rejected",
+     "SyntaxError"
+    ]
+   }
+  },
+  "setters": {
+   "weight=300": [
+    "ok",
+    "300"
+   ],
+   "weight=heavy": [
+    "threw",
+    "SyntaxError",
+    "300"
+   ],
+   "style=oblique 10deg": [
+    "ok",
+    "oblique 10deg"
+   ],
+   "family=Renamed": [
+    "ok",
+    "Renamed"
+   ],
+   "unicodeRange=U+20-7E": [
+    "ok",
+    "U+20-7E"
+   ],
+   "display=later": [
+    "threw",
+    "SyntaxError",
+    "swap"
+   ]
+  },
+  "nulFamily": "Rv\u0000Nul",
+  "urlBadDescriptor": {
+   "status": "error",
+   "load": [
+    "rejected",
+    "SyntaxError"
+   ]
+  },
+  "badSource": {
+   "status": "error",
+   "loaded": [
+    "rejected",
+    "SyntaxError"
+   ]
+  }
+ },
+ "requested": [
+  "https://t02.test/ahem.ttf",
+  "https://t02.test/missing.ttf",
+  "https://t02.test/broken.ttf",
+  "https://t02.test/ahem2.ttf"
+ ],
+ "url": {
+  "initial": [
+   "unloaded",
+   "unloaded",
+   "unloaded",
+   "unloaded"
+  ],
+  "afterLoad": "loading",
+  "checkWhileLoading": true,
+  "url": [
+   "resolved",
+   "loaded"
+  ],
+  "missing": [
+   "rejected",
+   "NetworkError"
+  ],
+  "broken": [
+   "rejected",
+   "NetworkError"
+  ],
+  "skipped": [
+   "resolved",
+   "loaded"
+  ],
+  "reloadFailed": [
+   "rejected",
+   "NetworkError"
+  ],
+  "loadAgain": [
+   "resolved",
+   "loaded"
+  ],
+  "statuses": [
+   "loaded",
+   "error",
+   "error",
+   "loaded"
+  ]
+ },
+ "set": {
+  "initial": {
+   "size": 1,
+   "names": [
+    "RvCss"
+   ]
+  },
+  "widthBefore": 43.984375,
+  "checkBefore": true,
+  "addReturnsSet": true,
+  "afterAdd": {
+   "size": 3,
+   "names": [
+    "RvCss",
+    "RvAdded",
+    "RvSecond"
+   ],
+   "hasA": true,
+   "hasCss": true
+  },
+  "widthAfterAdd": 80,
+  "checkAfterAdd": true,
+  "addUrlUnloaded": {
+   "status": "unloaded",
+   "check": false
+  },
+  "addCss": "ok",
+  "deleteCss": false,
+  "deleteA": true,
+  "deleteAgain": false,
+  "afterDelete": {
+   "size": 3,
+   "names": [
+    "RvCss",
+    "RvSecond",
+    "RvLazy"
+   ]
+  },
+  "widthAfterDelete": 43.984375,
+  "afterClear": {
+   "size": 1,
+   "names": [
+    "RvCss"
+   ],
+   "hasA": false,
+   "statusA": "loaded"
+  },
+  "widthAfterClear": 43.984375
+ },
+ "reload": {
+  "size": 1,
+  "names": [
+   "RvCss:unloaded"
+  ]
+ }
+}

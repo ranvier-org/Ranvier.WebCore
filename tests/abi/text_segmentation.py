@@ -15,7 +15,7 @@ import sys
 import threading
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
-ABI = 54
+ABI = 59
 GRANULARITIES = ['grapheme', 'word', 'sentence', 'line']
 pointer, integer = ctypes.c_void_p, ctypes.c_int32
 
@@ -142,6 +142,24 @@ def verify(native_directory, abi, record=None):
         lone = units('\ud800x')
         actual, _ = segment('grapheme', 'en', '\ud800x')
         expect(actual == [[0, '\ud800'], [1, 'x']], 'a lone surrogate is its own grapheme')
+        # UAX #29 GB3-GB5 hold on every ICU: CR LF is one grapheme, and CR and LF alone are each one grapheme.
+        line_ends = {
+            '\r\nx': [[0, '\r\n'], [2, 'x']],
+            '\r': [[0, '\r']],
+            '\n': [[0, '\n']],
+            'x\r': [[0, 'x'], [1, '\r']],
+            'x\r\n': [[0, 'x'], [1, '\r\n']],
+            '\r\n\r\n': [[0, '\r\n'], [2, '\r\n']],
+            '\n\r': [[0, '\n'], [1, '\r']],
+            'a\r\nb': [[0, 'a'], [1, '\r\n'], [3, 'b']],
+        }
+        for text, expected in line_ends.items():
+            for locale in (None, 'en'):
+                actual, _ = segment('grapheme', locale, text)
+                expect(actual == expected, f'graphemes of {text!r} ({locale!r}): {actual!r}')
+                for granularity in GRANULARITIES[1:]:
+                    actual, _ = segment(granularity, locale, text)
+                    expect(all(s in {e[0] for e in expected} for s, *_ in actual), f'{granularity} of {text!r} ({locale!r}) splits a grapheme: {actual!r}')
         statuses = []
         worker = threading.Thread(target=lambda: statuses.append(segment_raw(0, None, b'a\x00', 1, ctypes.byref(TextSegments()))))
         worker.start()

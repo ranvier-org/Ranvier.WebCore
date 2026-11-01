@@ -17,7 +17,7 @@ from utf8_inputs import Utf8
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, WRONG_THREAD, BUFFER_TOO_SMALL, UNSUPPORTED, DETACHED, WRONG_INTERFACE = 0, -1, -2, -6, -9, -10, -11
-ABI = 54
+ABI = 59
 KINDS = ['activedescendant', 'controls', 'describedby', 'details', 'errormessage', 'flowto', 'labelledby', 'owns']
 NAME, DESCRIPTION = 0, 1
 # Steps where WebKit differs from Chromium (docs/element-internals-evidence), keyed by step, with the measured
@@ -52,10 +52,10 @@ def verify(native_directory):
         ax_release = p.bind('rv_ax_release', None, [P])
         ax_string = p.bind('rv_ax_string', I, [P, I, P, I, ctypes.POINTER(I)])
         node_release = p.bind('rv_node_release', None, [P])
-        set_attribute = p.bind('rv_element_set_attribute', I, [P, ctypes.c_char_p, ctypes.c_char_p])
+        set_attribute = p.bind('rv_element_set_attribute', I, [P, ctypes.c_char_p, Utf8])
         remove_attribute = p.bind('rv_dom_element_remove_attribute', I, [P, Utf8])
         remove = p.bind('rv_dom_element_remove', I, [P])
-        by_id = p.bind('rv_document_get_element_by_id', P, [P, ctypes.c_char_p])
+        by_id = p.bind('rv_document_get_element_by_id', P, [P, Utf8])
         callback = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_int32)(lambda *a: None)
         set_accessibility = p.bind('rv_host_set_accessibility', I, [P, I, ctypes.c_void_p, P])
         p.load(oracle['page'], standalone=False)
@@ -68,7 +68,7 @@ def verify(native_directory):
         root = P()
         p.expect(p.bind('rv_dom_element_attach_shadow', I, [P, P, ctypes.POINTER(P)])(nodes['host'], ctypes.cast(init, P), ctypes.byref(root)) == OK, 'attachShadow')
         inner = p.bind('rv_document_create_element', P, [P, ctypes.c_char_p])(p.host, b'span')
-        p.expect(set_attribute(inner, b'id', b'inner') == OK and p.bind('rv_node_set_text_content', I, [P, ctypes.c_char_p])(inner, b'Inner') == OK
+        p.expect(set_attribute(inner, b'id', b'inner') == OK and p.bind('rv_node_set_text_content', I, [P, Utf8])(inner, b'Inner') == OK
                  and p.bind('rv_node_append_child', I, [P, P])(root, inner) == OK, 'shadow span')
         nodes['inner'] = inner
         node_release(root)
@@ -161,7 +161,7 @@ def verify(native_directory):
 
         # Errors.
         value = Sequence()
-        text = p.bind('rv_document_create_text', P, [P, ctypes.c_char_p])(p.host, b'text')
+        text = p.bind('rv_document_create_text', P, [P, Utf8])(p.host, b'text')
         p.expect(getters['ariaLabelledByElements'](None, ctypes.byref(value)) == NULL_ARGUMENT
                  and getters['ariaLabelledByElements'](nodes['b'], None) == NULL_ARGUMENT, 'reflection nulls')
         p.expect(getters['ariaLabelledByElements'](text, ctypes.byref(value)) == WRONG_INTERFACE, 'a text node has no reflection')

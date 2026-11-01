@@ -161,6 +161,8 @@ and [<AllowNullLiteral>] ShadowRoot =
     abstract member elementFromPoint: x: float * y: float -> Element
     /// <summary>ShadowRoot.elementsFromPoint.</summary>
     abstract member elementsFromPoint: x: float * y: float -> (Element) array
+    /// <summary>ShadowRoot.getAnimations.</summary>
+    abstract member getAnimations: unit -> (WebAnimation) array
 
     /// <summary>ShadowRoot.styleSheets.</summary>
 #if FABLE_COMPILER
@@ -256,6 +258,8 @@ and [<AllowNullLiteral>] Document =
     abstract member ariaNotify: announcement: string -> unit
     /// <summary>Document.ariaNotify.</summary>
     abstract member ariaNotify: announcement: string * options: AriaNotifyOptions -> unit
+    /// <summary>Document.timeline.</summary>
+    abstract member timeline: DocumentTimeline with get
     /// <summary>Document.caretPositionFromPoint.</summary>
     abstract member caretPositionFromPoint: x: float * y: float * ?options: CaretPositionFromPointOptions -> CaretPosition
     /// <summary>Document.scrollingElement.</summary>
@@ -304,6 +308,8 @@ and [<AllowNullLiteral>] Document =
     abstract member visibilityState: VisibilityState with get
     /// <summary>Document.getSelection.</summary>
     abstract member getSelection: unit -> DOMSelection
+    /// <summary>Document.createTouchList.</summary>
+    abstract member createTouchList: [<System.ParamArray>] touches: Touch array -> TouchList
     /// <summary>Document.rootElement.</summary>
     abstract member rootElement: SVGSVGElement with get
     /// <summary>Document.getElementById.</summary>
@@ -314,6 +320,8 @@ and [<AllowNullLiteral>] Document =
     abstract member elementFromPoint: x: float * y: float -> Element
     /// <summary>Document.elementsFromPoint.</summary>
     abstract member elementsFromPoint: x: float * y: float -> (Element) array
+    /// <summary>Document.getAnimations.</summary>
+    abstract member getAnimations: unit -> (WebAnimation) array
 
     /// <summary>Document.styleSheets.</summary>
 #if FABLE_COMPILER
@@ -321,6 +329,10 @@ and [<AllowNullLiteral>] Document =
 #endif
     abstract member styleSheets: StyleSheetList with get
 
+    /// <summary>Document.pointerLockElement.</summary>
+    abstract member pointerLockElement: Element with get
+    /// <summary>Document.fonts.</summary>
+    abstract member fonts: FontFaceSet with get
 
 /// <summary>HTMLDocument in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLDocument =
@@ -475,6 +487,18 @@ and [<AllowNullLiteral>] Element =
     abstract member computedStyleMap: unit -> StylePropertyMapReadOnly
     /// <summary>Element.role.</summary>
     abstract member role: string with get, set
+
+    /// <summary>Element.animate.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.animate(((k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;}))($1), ((o)=>{if(o==null||typeof o!=='object')return o;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing', 'iterationComposite', 'composite', 'pseudoElement', 'id', 'timeline'])if(o[k]!==undefined)r[k]=o[k];const d=o.duration;r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;for(const k of ['rangeStart','rangeEnd']){const u=o[k];if(u!==undefined)r[k]=u!=null&&typeof u==='object'&&Array.isArray(u.fields)?u.fields[0]:u;}return r;})($2))")>]
+    abstract member __ranvier_animate: keyframes: (Keyframe) array * ?options: obj -> WebAnimation
+#else
+    abstract member animate: keyframes: (Keyframe) array -> WebAnimation
+    abstract member animate: keyframes: (Keyframe) array * options: float -> WebAnimation
+    abstract member animate: keyframes: (Keyframe) array * options: KeyframeAnimationOptions -> WebAnimation
+#endif
+    /// <summary>Element.getAnimations.</summary>
+    abstract member getAnimations: ?options: GetAnimationsOptions -> (WebAnimation) array
     /// <summary>Element.setHTMLUnsafe.</summary>
     abstract member setHTMLUnsafe: html: string -> unit
     /// <summary>Element.getHTML.</summary>
@@ -3283,6 +3307,50 @@ and [<AllowNullLiteral>] PointerEvent =
     /// <summary>PointerEvent.getPredictedEvents.</summary>
     abstract member getPredictedEvents: unit -> (PointerEvent) array
 
+/// <summary>Touch in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] Touch =
+    /// <summary>Touch.clientX.</summary>
+    abstract member clientX: float with get
+    /// <summary>Touch.clientY.</summary>
+    abstract member clientY: float with get
+    /// <summary>Touch.screenX.</summary>
+    abstract member screenX: float with get
+    /// <summary>Touch.screenY.</summary>
+    abstract member screenY: float with get
+    /// <summary>Touch.pageX.</summary>
+    abstract member pageX: float with get
+    /// <summary>Touch.pageY.</summary>
+    abstract member pageY: float with get
+    /// <summary>Touch.target.</summary>
+    abstract member target: EventTarget with get
+    /// <summary>Touch.identifier.</summary>
+    abstract member identifier: int with get
+
+/// <summary>TouchList in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] TouchList =
+    /// <summary>TouchList.length.</summary>
+    abstract member length: uint32 with get
+    /// <summary>TouchList.item.</summary>
+    abstract member item: index: uint32 -> Touch
+
+/// <summary>TouchEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] TouchEvent =
+    inherit UIEvent
+    /// <summary>TouchEvent.touches.</summary>
+    abstract member touches: TouchList with get
+    /// <summary>TouchEvent.targetTouches.</summary>
+    abstract member targetTouches: TouchList with get
+    /// <summary>TouchEvent.changedTouches.</summary>
+    abstract member changedTouches: TouchList with get
+    /// <summary>TouchEvent.ctrlKey.</summary>
+    abstract member ctrlKey: bool with get
+    /// <summary>TouchEvent.shiftKey.</summary>
+    abstract member shiftKey: bool with get
+    /// <summary>TouchEvent.altKey.</summary>
+    abstract member altKey: bool with get
+    /// <summary>TouchEvent.metaKey.</summary>
+    abstract member metaKey: bool with get
+
 /// <summary>WheelEvent in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] WheelEvent =
     inherit MouseEvent
@@ -3346,6 +3414,8 @@ and [<AllowNullLiteral>] InputEvent =
     abstract member data: string with get
     /// <summary>InputEvent.isComposing.</summary>
     abstract member isComposing: bool with get
+    /// <summary>InputEvent.dataTransfer.</summary>
+    abstract member dataTransfer: DataTransfer with get
     /// <summary>InputEvent.getTargetRanges.</summary>
     abstract member getTargetRanges: unit -> (StaticRange) array
 
@@ -5126,6 +5196,665 @@ and [<AllowNullLiteral>] FileReader =
     /// <summary>FileReader.abort.</summary>
     abstract member abort: unit -> unit
 
+/// <summary>FontFace in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] FontFace =
+    /// <summary>FontFace.family.</summary>
+    abstract member family: string with get, set
+    /// <summary>FontFace.style.</summary>
+    abstract member style: string with get, set
+    /// <summary>FontFace.weight.</summary>
+    abstract member weight: string with get, set
+    /// <summary>FontFace.width.</summary>
+    abstract member width: string with get, set
+    /// <summary>FontFace.stretch.</summary>
+    abstract member stretch: string with get, set
+    /// <summary>FontFace.unicodeRange.</summary>
+    abstract member unicodeRange: string with get, set
+    /// <summary>FontFace.featureSettings.</summary>
+    abstract member featureSettings: string with get, set
+    /// <summary>FontFace.display.</summary>
+    abstract member display: string with get, set
+    /// <summary>FontFace.ascentOverride.</summary>
+    abstract member ascentOverride: string with get, set
+    /// <summary>FontFace.descentOverride.</summary>
+    abstract member descentOverride: string with get, set
+    /// <summary>FontFace.lineGapOverride.</summary>
+    abstract member lineGapOverride: string with get, set
+    /// <summary>FontFace.sizeAdjust.</summary>
+    abstract member sizeAdjust: string with get, set
+    /// <summary>FontFace.status.</summary>
+    abstract member status: FontFaceLoadStatus with get
+
+/// <summary>FontFaceSet in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] FontFaceSet =
+    inherit EventTarget
+    /// <summary>FontFaceSet.has.</summary>
+    abstract member has: font: FontFace -> bool
+    /// <summary>FontFaceSet.size.</summary>
+    abstract member size: int with get
+    /// <summary>FontFaceSet.add.</summary>
+    abstract member add: font: FontFace -> FontFaceSet
+    /// <summary>FontFaceSet.delete.</summary>
+    abstract member delete: font: FontFace -> bool
+    /// <summary>FontFaceSet.clear.</summary>
+    abstract member clear: unit -> unit
+    /// <summary>FontFaceSet.check.</summary>
+    abstract member check: font: string * ?text: string -> bool
+    /// <summary>FontFaceSet.status.</summary>
+    abstract member status: FontFaceSetLoadStatus with get
+
+/// <summary>WebAnimation in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] WebAnimation =
+    inherit EventTarget
+    /// <summary>WebAnimation.id.</summary>
+    abstract member id: string with get, set
+    /// <summary>WebAnimation.effect.</summary>
+    abstract member effect: AnimationEffect with get, set
+    /// <summary>WebAnimation.timeline.</summary>
+    abstract member timeline: AnimationTimeline with get, set
+
+    /// <summary>WebAnimation.startTime.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.startTime")>]
+    abstract member __ranvier_get_startTime: unit -> obj
+
+    [<Fable.Core.Emit("$0.startTime = $1")>]
+    abstract member __ranvier_set_startTime: value: obj -> unit
+#else
+    abstract member startTime: (DoubleOrCSSNumericValue) option with get, set
+#endif
+
+    /// <summary>WebAnimation.currentTime.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.currentTime")>]
+    abstract member __ranvier_get_currentTime: unit -> obj
+
+    [<Fable.Core.Emit("$0.currentTime = $1")>]
+    abstract member __ranvier_set_currentTime: value: obj -> unit
+#else
+    abstract member currentTime: (DoubleOrCSSNumericValue) option with get, set
+#endif
+
+    /// <summary>WebAnimation.rangeStart.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.rangeStart")>]
+    abstract member __ranvier_get_rangeStart: unit -> obj
+
+    [<Fable.Core.Emit("$0.rangeStart = $1")>]
+    abstract member __ranvier_set_rangeStart: value: obj -> unit
+#else
+    abstract member rangeStart: TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString with get, set
+#endif
+
+    /// <summary>WebAnimation.rangeEnd.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.rangeEnd")>]
+    abstract member __ranvier_get_rangeEnd: unit -> obj
+
+    [<Fable.Core.Emit("$0.rangeEnd = $1")>]
+    abstract member __ranvier_set_rangeEnd: value: obj -> unit
+#else
+    abstract member rangeEnd: TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString with get, set
+#endif
+    /// <summary>WebAnimation.playbackRate.</summary>
+    abstract member playbackRate: float with get, set
+    /// <summary>WebAnimation.overallProgress.</summary>
+    abstract member overallProgress: (float) option with get
+    /// <summary>WebAnimation.playState.</summary>
+    abstract member playState: AnimationPlayState with get
+    /// <summary>WebAnimation.replaceState.</summary>
+    abstract member replaceState: AnimationReplaceState with get
+    /// <summary>WebAnimation.pending.</summary>
+    abstract member pending: bool with get
+    /// <summary>WebAnimation.cancel.</summary>
+    abstract member cancel: unit -> unit
+    /// <summary>WebAnimation.finish.</summary>
+    abstract member finish: unit -> unit
+    /// <summary>WebAnimation.play.</summary>
+    abstract member play: unit -> unit
+    /// <summary>WebAnimation.pause.</summary>
+    abstract member pause: unit -> unit
+    /// <summary>WebAnimation.updatePlaybackRate.</summary>
+    abstract member updatePlaybackRate: playbackRate: float -> unit
+    /// <summary>WebAnimation.reverse.</summary>
+    abstract member reverse: unit -> unit
+    /// <summary>WebAnimation.persist.</summary>
+    abstract member persist: unit -> unit
+    /// <summary>WebAnimation.commitStyles.</summary>
+    abstract member commitStyles: unit -> unit
+
+/// <summary>AnimationEffect in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] AnimationEffect =
+
+    /// <summary>AnimationEffect.getTiming.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.getTiming()")>]
+    abstract member __ranvier_getTiming: unit -> obj
+#else
+    abstract member getTiming: unit -> EffectTiming
+#endif
+
+    /// <summary>AnimationEffect.getComputedTiming.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.getComputedTiming()")>]
+    abstract member __ranvier_getComputedTiming: unit -> obj
+#else
+    abstract member getComputedTiming: unit -> ComputedEffectTiming
+#endif
+
+    /// <summary>AnimationEffect.updateTiming.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("((o,a0)=>o.updateTiming(((t)=>{if(t==null)return t;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing'])if(t[k]!==undefined)r[k]=t[k];const d=t.duration;if(d!==undefined)r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;return r;})(a0)))($0,$1)")>]
+#endif
+    abstract member updateTiming: ?timing: OptionalEffectTiming -> unit
+
+/// <summary>KeyframeEffect in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] KeyframeEffect =
+    inherit AnimationEffect
+    /// <summary>KeyframeEffect.target.</summary>
+    abstract member target: Element with get, set
+    /// <summary>KeyframeEffect.pseudoElement.</summary>
+    abstract member pseudoElement: string with get, set
+    /// <summary>KeyframeEffect.iterationComposite.</summary>
+    abstract member iterationComposite: IterationCompositeOperation with get, set
+    /// <summary>KeyframeEffect.composite.</summary>
+    abstract member composite: CompositeOperation with get, set
+
+    /// <summary>KeyframeEffect.getKeyframes.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("((o)=>((l)=>l.map((k)=>({offset:k.offset,computedOffset:k.computedOffset,easing:k.easing,composite:k.composite,properties:Object.keys(k).filter((n)=>!['offset','computedOffset','easing','composite'].includes(n)).map((n)=>({name:n,value:k[n]}))})))(o.getKeyframes()))($0)")>]
+#endif
+    abstract member getKeyframes: unit -> (ComputedKeyframe) array
+
+    /// <summary>KeyframeEffect.setKeyframes.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("((o,a0)=>o.setKeyframes(((k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;}))(a0)))($0,$1)")>]
+#endif
+    abstract member setKeyframes: keyframes: (Keyframe) array -> unit
+
+/// <summary>CustomEffect in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CustomEffect =
+    inherit AnimationEffect
+
+/// <summary>AnimationTimeline in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] AnimationTimeline =
+
+    /// <summary>AnimationTimeline.currentTime.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.currentTime")>]
+    abstract member __ranvier_get_currentTime: unit -> obj
+#else
+    abstract member currentTime: (DoubleOrCSSNumericValue) option with get
+#endif
+
+    /// <summary>AnimationTimeline.duration.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.duration")>]
+    abstract member __ranvier_get_duration: unit -> obj
+#else
+    abstract member duration: (DoubleOrCSSNumericValue) option with get
+#endif
+
+/// <summary>DocumentTimeline in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] DocumentTimeline =
+    inherit AnimationTimeline
+
+    /// <summary>DocumentTimeline.animate.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.animate($1, $2)")>]
+    abstract member __ranvier_animate: callback: CustomEffectCallback * ?options: obj -> WebAnimation
+#else
+    abstract member animate: callback: CustomEffectCallback -> WebAnimation
+    abstract member animate: callback: CustomEffectCallback * options: float -> WebAnimation
+    abstract member animate: callback: CustomEffectCallback * options: CustomAnimationOptions -> WebAnimation
+#endif
+
+/// <summary>ScrollTimeline in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ScrollTimeline =
+    inherit AnimationTimeline
+    /// <summary>ScrollTimeline.source.</summary>
+    abstract member source: Element with get
+    /// <summary>ScrollTimeline.axis.</summary>
+    abstract member axis: ScrollAxis with get
+
+/// <summary>ViewTimeline in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ViewTimeline =
+    inherit ScrollTimeline
+    /// <summary>ViewTimeline.subject.</summary>
+    abstract member subject: Element with get
+    /// <summary>ViewTimeline.startOffset.</summary>
+    abstract member startOffset: CSSNumericValue with get
+    /// <summary>ViewTimeline.endOffset.</summary>
+    abstract member endOffset: CSSNumericValue with get
+
+/// <summary>CSSAnimation in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSAnimation =
+    inherit WebAnimation
+    /// <summary>CSSAnimation.animationName.</summary>
+    abstract member animationName: string with get
+
+/// <summary>CSSTransition in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSTransition =
+    inherit WebAnimation
+    /// <summary>CSSTransition.transitionProperty.</summary>
+    abstract member transitionProperty: string with get
+
+/// <summary>DataTransfer in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] DataTransfer =
+    /// <summary>DataTransfer.dropEffect.</summary>
+    abstract member dropEffect: string with get, set
+    /// <summary>DataTransfer.effectAllowed.</summary>
+    abstract member effectAllowed: string with get, set
+    /// <summary>DataTransfer.items.</summary>
+    abstract member items: DataTransferItemList with get
+    /// <summary>DataTransfer.setDragImage.</summary>
+    abstract member setDragImage: image: Element * x: int * y: int -> unit
+    /// <summary>DataTransfer.types.</summary>
+    abstract member types: (string) array with get
+    /// <summary>DataTransfer.getData.</summary>
+    abstract member getData: format: string -> string
+    /// <summary>DataTransfer.setData.</summary>
+    abstract member setData: format: string * data: string -> unit
+    /// <summary>DataTransfer.clearData.</summary>
+    abstract member clearData: ?format: string -> unit
+    /// <summary>DataTransfer.files.</summary>
+    abstract member files: FileList with get
+
+/// <summary>DataTransferItemList in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] DataTransferItemList =
+    /// <summary>DataTransferItemList.length.</summary>
+    abstract member length: int with get
+
+    /// <summary>DataTransferItemList.item.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("($0[$1] ?? null)")>]
+#endif
+    abstract member item: index: uint32 -> DataTransferItem
+
+    /// <summary>DataTransferItemList.add.</summary>
+    abstract member add: data: string * ``type``: string -> DataTransferItem
+    /// <summary>DataTransferItemList.add.</summary>
+    abstract member add: file: File -> DataTransferItem
+    /// <summary>DataTransferItemList.remove.</summary>
+    abstract member remove: index: uint32 -> unit
+    /// <summary>DataTransferItemList.clear.</summary>
+    abstract member clear: unit -> unit
+
+/// <summary>DataTransferItem in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] DataTransferItem =
+    /// <summary>DataTransferItem.kind.</summary>
+    abstract member kind: string with get
+    /// <summary>DataTransferItem.type.</summary>
+    abstract member ``type``: string with get
+    /// <summary>DataTransferItem.getAsFile.</summary>
+    abstract member getAsFile: unit -> File
+
+/// <summary>ClipboardEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ClipboardEvent =
+    inherit Event
+    /// <summary>ClipboardEvent.clipboardData.</summary>
+    abstract member clipboardData: DataTransfer with get
+
+/// <summary>DragEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] DragEvent =
+    inherit MouseEvent
+    /// <summary>DragEvent.dataTransfer.</summary>
+    abstract member dataTransfer: DataTransfer with get
+
+/// <summary>HTMLCanvasElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLCanvasElement =
+    inherit HTMLElement
+    /// <summary>HTMLCanvasElement.width.</summary>
+    abstract member width: uint32 with get, set
+    /// <summary>HTMLCanvasElement.height.</summary>
+    abstract member height: uint32 with get, set
+
+/// <summary>CanvasRenderingContext2D in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CanvasRenderingContext2D =
+    /// <summary>CanvasRenderingContext2D.canvas.</summary>
+    abstract member canvas: HTMLCanvasElement with get
+    /// <summary>CanvasRenderingContext2D.save.</summary>
+    abstract member save: unit -> unit
+    /// <summary>CanvasRenderingContext2D.restore.</summary>
+    abstract member restore: unit -> unit
+    /// <summary>CanvasRenderingContext2D.reset.</summary>
+    abstract member reset: unit -> unit
+    /// <summary>CanvasRenderingContext2D.beginLayer.</summary>
+    abstract member beginLayer: unit -> unit
+    /// <summary>CanvasRenderingContext2D.endLayer.</summary>
+    abstract member endLayer: unit -> unit
+    /// <summary>CanvasRenderingContext2D.scale.</summary>
+    abstract member scale: x: float * y: float -> unit
+    /// <summary>CanvasRenderingContext2D.rotate.</summary>
+    abstract member rotate: angle: float -> unit
+    /// <summary>CanvasRenderingContext2D.translate.</summary>
+    abstract member translate: x: float * y: float -> unit
+    /// <summary>CanvasRenderingContext2D.transform.</summary>
+    abstract member transform: a: float * b: float * c: float * d: float * e: float * f: float -> unit
+    /// <summary>CanvasRenderingContext2D.getTransform.</summary>
+    abstract member getTransform: unit -> DOMMatrix
+    /// <summary>CanvasRenderingContext2D.setTransform.</summary>
+    abstract member setTransform: a: float * b: float * c: float * d: float * e: float * f: float -> unit
+    /// <summary>CanvasRenderingContext2D.setTransform.</summary>
+    abstract member setTransform: ?transform: DOMMatrix2DInit -> unit
+    /// <summary>CanvasRenderingContext2D.resetTransform.</summary>
+    abstract member resetTransform: unit -> unit
+    /// <summary>CanvasRenderingContext2D.globalAlpha.</summary>
+    abstract member globalAlpha: float with get, set
+    /// <summary>CanvasRenderingContext2D.globalCompositeOperation.</summary>
+    abstract member globalCompositeOperation: string with get, set
+    /// <summary>CanvasRenderingContext2D.imageSmoothingEnabled.</summary>
+    abstract member imageSmoothingEnabled: bool with get, set
+    /// <summary>CanvasRenderingContext2D.imageSmoothingQuality.</summary>
+    abstract member imageSmoothingQuality: ImageSmoothingQuality with get, set
+
+    /// <summary>CanvasRenderingContext2D.strokeStyle.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.strokeStyle")>]
+    abstract member __ranvier_get_strokeStyle: unit -> obj
+
+    [<Fable.Core.Emit("$0.strokeStyle = $1")>]
+    abstract member __ranvier_set_strokeStyle: value: obj -> unit
+#else
+    abstract member strokeStyle: DOMStringOrCanvasGradientOrCanvasPattern with get, set
+#endif
+
+    /// <summary>CanvasRenderingContext2D.fillStyle.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.fillStyle")>]
+    abstract member __ranvier_get_fillStyle: unit -> obj
+
+    [<Fable.Core.Emit("$0.fillStyle = $1")>]
+    abstract member __ranvier_set_fillStyle: value: obj -> unit
+#else
+    abstract member fillStyle: DOMStringOrCanvasGradientOrCanvasPattern with get, set
+#endif
+    /// <summary>CanvasRenderingContext2D.createLinearGradient.</summary>
+    abstract member createLinearGradient: x0: float * y0: float * x1: float * y1: float -> CanvasGradient
+    /// <summary>CanvasRenderingContext2D.createRadialGradient.</summary>
+    abstract member createRadialGradient: x0: float * y0: float * r0: float * x1: float * y1: float * r1: float -> CanvasGradient
+    /// <summary>CanvasRenderingContext2D.createConicGradient.</summary>
+    abstract member createConicGradient: angle: float * x: float * y: float -> CanvasGradient
+
+    /// <summary>CanvasRenderingContext2D.createPattern.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.createPattern($1, $2)")>]
+    abstract member __ranvier_createPattern: image: obj * repetition: string -> CanvasPattern
+#else
+    abstract member createPattern: image: HTMLImageElement * repetition: string -> CanvasPattern
+    abstract member createPattern: image: SVGImageElement * repetition: string -> CanvasPattern
+    abstract member createPattern: image: HTMLCanvasElement * repetition: string -> CanvasPattern
+    abstract member createPattern: image: ImageBitmap * repetition: string -> CanvasPattern
+    abstract member createPattern: image: CSSImageValue * repetition: string -> CanvasPattern
+#endif
+    /// <summary>CanvasRenderingContext2D.shadowOffsetX.</summary>
+    abstract member shadowOffsetX: float with get, set
+    /// <summary>CanvasRenderingContext2D.shadowOffsetY.</summary>
+    abstract member shadowOffsetY: float with get, set
+    /// <summary>CanvasRenderingContext2D.shadowBlur.</summary>
+    abstract member shadowBlur: float with get, set
+    /// <summary>CanvasRenderingContext2D.shadowColor.</summary>
+    abstract member shadowColor: string with get, set
+    /// <summary>CanvasRenderingContext2D.filter.</summary>
+    abstract member filter: string with get, set
+    /// <summary>CanvasRenderingContext2D.clearRect.</summary>
+    abstract member clearRect: x: float * y: float * w: float * h: float -> unit
+    /// <summary>CanvasRenderingContext2D.fillRect.</summary>
+    abstract member fillRect: x: float * y: float * w: float * h: float -> unit
+    /// <summary>CanvasRenderingContext2D.strokeRect.</summary>
+    abstract member strokeRect: x: float * y: float * w: float * h: float -> unit
+    /// <summary>CanvasRenderingContext2D.beginPath.</summary>
+    abstract member beginPath: unit -> unit
+    /// <summary>CanvasRenderingContext2D.fill.</summary>
+    abstract member fill: ?fillRule: CanvasFillRule -> unit
+    /// <summary>CanvasRenderingContext2D.fill.</summary>
+    abstract member fill: path: Path2D * ?fillRule: CanvasFillRule -> unit
+    /// <summary>CanvasRenderingContext2D.stroke.</summary>
+    abstract member stroke: unit -> unit
+    /// <summary>CanvasRenderingContext2D.stroke.</summary>
+    abstract member stroke: path: Path2D -> unit
+    /// <summary>CanvasRenderingContext2D.clip.</summary>
+    abstract member clip: ?fillRule: CanvasFillRule -> unit
+    /// <summary>CanvasRenderingContext2D.clip.</summary>
+    abstract member clip: path: Path2D * ?fillRule: CanvasFillRule -> unit
+    /// <summary>CanvasRenderingContext2D.isPointInPath.</summary>
+    abstract member isPointInPath: x: float * y: float * ?fillRule: CanvasFillRule -> bool
+    /// <summary>CanvasRenderingContext2D.isPointInPath.</summary>
+    abstract member isPointInPath: path: Path2D * x: float * y: float * ?fillRule: CanvasFillRule -> bool
+    /// <summary>CanvasRenderingContext2D.isPointInStroke.</summary>
+    abstract member isPointInStroke: x: float * y: float -> bool
+    /// <summary>CanvasRenderingContext2D.isPointInStroke.</summary>
+    abstract member isPointInStroke: path: Path2D * x: float * y: float -> bool
+    /// <summary>CanvasRenderingContext2D.fillText.</summary>
+    abstract member fillText: text: string * x: float * y: float * ?maxWidth: float -> unit
+    /// <summary>CanvasRenderingContext2D.strokeText.</summary>
+    abstract member strokeText: text: string * x: float * y: float * ?maxWidth: float -> unit
+    /// <summary>CanvasRenderingContext2D.measureText.</summary>
+    abstract member measureText: text: string -> TextMetrics
+
+    /// <summary>CanvasRenderingContext2D.drawImage.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.drawImage($1, $2, $3)")>]
+    abstract member __ranvier_drawImage: image: obj * dx: float * dy: float -> unit
+#else
+    abstract member drawImage: image: HTMLImageElement * dx: float * dy: float -> unit
+    abstract member drawImage: image: SVGImageElement * dx: float * dy: float -> unit
+    abstract member drawImage: image: HTMLCanvasElement * dx: float * dy: float -> unit
+    abstract member drawImage: image: ImageBitmap * dx: float * dy: float -> unit
+    abstract member drawImage: image: CSSImageValue * dx: float * dy: float -> unit
+#endif
+
+    /// <summary>CanvasRenderingContext2D.drawImage.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.drawImage($1, $2, $3, $4, $5)")>]
+    abstract member __ranvier_drawImage: image: obj * dx: float * dy: float * dw: float * dh: float -> unit
+#else
+    abstract member drawImage: image: HTMLImageElement * dx: float * dy: float * dw: float * dh: float -> unit
+    abstract member drawImage: image: SVGImageElement * dx: float * dy: float * dw: float * dh: float -> unit
+    abstract member drawImage: image: HTMLCanvasElement * dx: float * dy: float * dw: float * dh: float -> unit
+    abstract member drawImage: image: ImageBitmap * dx: float * dy: float * dw: float * dh: float -> unit
+    abstract member drawImage: image: CSSImageValue * dx: float * dy: float * dw: float * dh: float -> unit
+#endif
+
+    /// <summary>CanvasRenderingContext2D.drawImage.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.drawImage($1, $2, $3, $4, $5, $6, $7, $8, $9)")>]
+    abstract member __ranvier_drawImage:
+        image: obj * sx: float * sy: float * sw: float * sh: float * dx: float * dy: float * dw: float * dh: float -> unit
+#else
+    abstract member drawImage:
+        image: HTMLImageElement * sx: float * sy: float * sw: float * sh: float * dx: float * dy: float * dw: float * dh: float -> unit
+
+    abstract member drawImage:
+        image: SVGImageElement * sx: float * sy: float * sw: float * sh: float * dx: float * dy: float * dw: float * dh: float -> unit
+
+    abstract member drawImage:
+        image: HTMLCanvasElement * sx: float * sy: float * sw: float * sh: float * dx: float * dy: float * dw: float * dh: float -> unit
+
+    abstract member drawImage:
+        image: ImageBitmap * sx: float * sy: float * sw: float * sh: float * dx: float * dy: float * dw: float * dh: float -> unit
+
+    abstract member drawImage:
+        image: CSSImageValue * sx: float * sy: float * sw: float * sh: float * dx: float * dy: float * dw: float * dh: float -> unit
+#endif
+    /// <summary>CanvasRenderingContext2D.createImageData.</summary>
+    abstract member createImageData: sw: int * sh: int * ?settings: ImageDataSettings -> ImageData
+    /// <summary>CanvasRenderingContext2D.createImageData.</summary>
+    abstract member createImageData: imagedata: ImageData -> ImageData
+    /// <summary>CanvasRenderingContext2D.getImageData.</summary>
+    abstract member getImageData: sx: int * sy: int * sw: int * sh: int * ?settings: ImageDataSettings -> ImageData
+    /// <summary>CanvasRenderingContext2D.putImageData.</summary>
+    abstract member putImageData: imagedata: ImageData * dx: int * dy: int -> unit
+    /// <summary>CanvasRenderingContext2D.putImageData.</summary>
+    abstract member putImageData: imagedata: ImageData * dx: int * dy: int * dirtyX: int * dirtyY: int * dirtyWidth: int * dirtyHeight: int -> unit
+    /// <summary>CanvasRenderingContext2D.lineWidth.</summary>
+    abstract member lineWidth: float with get, set
+    /// <summary>CanvasRenderingContext2D.lineCap.</summary>
+    abstract member lineCap: CanvasLineCap with get, set
+    /// <summary>CanvasRenderingContext2D.lineJoin.</summary>
+    abstract member lineJoin: CanvasLineJoin with get, set
+    /// <summary>CanvasRenderingContext2D.miterLimit.</summary>
+    abstract member miterLimit: float with get, set
+    /// <summary>CanvasRenderingContext2D.setLineDash.</summary>
+    abstract member setLineDash: segments: (float) array -> unit
+    /// <summary>CanvasRenderingContext2D.getLineDash.</summary>
+    abstract member getLineDash: unit -> (float) array
+    /// <summary>CanvasRenderingContext2D.lineDashOffset.</summary>
+    abstract member lineDashOffset: float with get, set
+    /// <summary>CanvasRenderingContext2D.font.</summary>
+    abstract member font: string with get, set
+    /// <summary>CanvasRenderingContext2D.textAlign.</summary>
+    abstract member textAlign: CanvasTextAlign with get, set
+    /// <summary>CanvasRenderingContext2D.textBaseline.</summary>
+    abstract member textBaseline: CanvasTextBaseline with get, set
+    /// <summary>CanvasRenderingContext2D.direction.</summary>
+    abstract member direction: CanvasDirection with get, set
+    /// <summary>CanvasRenderingContext2D.letterSpacing.</summary>
+    abstract member letterSpacing: string with get, set
+    /// <summary>CanvasRenderingContext2D.wordSpacing.</summary>
+    abstract member wordSpacing: string with get, set
+    /// <summary>CanvasRenderingContext2D.closePath.</summary>
+    abstract member closePath: unit -> unit
+    /// <summary>CanvasRenderingContext2D.moveTo.</summary>
+    abstract member moveTo: x: float * y: float -> unit
+    /// <summary>CanvasRenderingContext2D.lineTo.</summary>
+    abstract member lineTo: x: float * y: float -> unit
+    /// <summary>CanvasRenderingContext2D.quadraticCurveTo.</summary>
+    abstract member quadraticCurveTo: cpx: float * cpy: float * x: float * y: float -> unit
+    /// <summary>CanvasRenderingContext2D.bezierCurveTo.</summary>
+    abstract member bezierCurveTo: cp1x: float * cp1y: float * cp2x: float * cp2y: float * x: float * y: float -> unit
+    /// <summary>CanvasRenderingContext2D.arcTo.</summary>
+    abstract member arcTo: x1: float * y1: float * x2: float * y2: float * radius: float -> unit
+    /// <summary>CanvasRenderingContext2D.rect.</summary>
+    abstract member rect: x: float * y: float * w: float * h: float -> unit
+
+    /// <summary>CanvasRenderingContext2D.roundRect.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.roundRect($1, $2, $3, $4, $5)")>]
+    abstract member __ranvier_roundRectList: x: float * y: float * w: float * h: float * radii: obj -> unit
+#else
+    abstract member roundRect: x: float * y: float * w: float * h: float * radii: (UnrestrictedDoubleOrDOMPointInit) array -> unit
+#endif
+
+    /// <summary>CanvasRenderingContext2D.roundRect.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.roundRect($1, $2, $3, $4, $5)")>]
+    abstract member __ranvier_roundRect: x: float * y: float * w: float * h: float * ?radii: obj -> unit
+#else
+    abstract member roundRect: x: float * y: float * w: float * h: float -> unit
+    abstract member roundRect: x: float * y: float * w: float * h: float * radii: float -> unit
+    abstract member roundRect: x: float * y: float * w: float * h: float * radii: DOMPointInit -> unit
+#endif
+    /// <summary>CanvasRenderingContext2D.arc.</summary>
+    abstract member arc: x: float * y: float * radius: float * startAngle: float * endAngle: float * ?anticlockwise: bool -> unit
+
+    /// <summary>CanvasRenderingContext2D.ellipse.</summary>
+    abstract member ellipse:
+        x: float * y: float * radiusX: float * radiusY: float * rotation: float * startAngle: float * endAngle: float * ?anticlockwise: bool -> unit
+
+/// <summary>CanvasGradient in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CanvasGradient =
+    /// <summary>CanvasGradient.addColorStop.</summary>
+    abstract member addColorStop: offset: float * color: string -> unit
+
+/// <summary>CanvasPattern in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CanvasPattern =
+    /// <summary>CanvasPattern.setTransform.</summary>
+    abstract member setTransform: ?transform: DOMMatrix2DInit -> unit
+
+/// <summary>ImageData in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ImageData =
+    /// <summary>ImageData.width.</summary>
+    abstract member width: uint32 with get
+    /// <summary>ImageData.height.</summary>
+    abstract member height: uint32 with get
+
+/// <summary>Path2D in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] Path2D =
+    /// <summary>Path2D.addPath.</summary>
+    abstract member addPath: path: Path2D * ?transform: DOMMatrix2DInit -> unit
+    /// <summary>Path2D.closePath.</summary>
+    abstract member closePath: unit -> unit
+    /// <summary>Path2D.moveTo.</summary>
+    abstract member moveTo: x: float * y: float -> unit
+    /// <summary>Path2D.lineTo.</summary>
+    abstract member lineTo: x: float * y: float -> unit
+    /// <summary>Path2D.quadraticCurveTo.</summary>
+    abstract member quadraticCurveTo: cpx: float * cpy: float * x: float * y: float -> unit
+    /// <summary>Path2D.bezierCurveTo.</summary>
+    abstract member bezierCurveTo: cp1x: float * cp1y: float * cp2x: float * cp2y: float * x: float * y: float -> unit
+    /// <summary>Path2D.arcTo.</summary>
+    abstract member arcTo: x1: float * y1: float * x2: float * y2: float * radius: float -> unit
+    /// <summary>Path2D.rect.</summary>
+    abstract member rect: x: float * y: float * w: float * h: float -> unit
+
+    /// <summary>Path2D.roundRect.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.roundRect($1, $2, $3, $4, $5)")>]
+    abstract member __ranvier_roundRectList: x: float * y: float * w: float * h: float * radii: obj -> unit
+#else
+    abstract member roundRect: x: float * y: float * w: float * h: float * radii: (UnrestrictedDoubleOrDOMPointInit) array -> unit
+#endif
+
+    /// <summary>Path2D.roundRect.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.roundRect($1, $2, $3, $4, $5)")>]
+    abstract member __ranvier_roundRect: x: float * y: float * w: float * h: float * ?radii: obj -> unit
+#else
+    abstract member roundRect: x: float * y: float * w: float * h: float -> unit
+    abstract member roundRect: x: float * y: float * w: float * h: float * radii: float -> unit
+    abstract member roundRect: x: float * y: float * w: float * h: float * radii: DOMPointInit -> unit
+#endif
+    /// <summary>Path2D.arc.</summary>
+    abstract member arc: x: float * y: float * radius: float * startAngle: float * endAngle: float * ?anticlockwise: bool -> unit
+
+    /// <summary>Path2D.ellipse.</summary>
+    abstract member ellipse:
+        x: float * y: float * radiusX: float * radiusY: float * rotation: float * startAngle: float * endAngle: float * ?anticlockwise: bool -> unit
+
+/// <summary>ImageBitmap in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ImageBitmap =
+    /// <summary>ImageBitmap.width.</summary>
+    abstract member width: uint32 with get
+    /// <summary>ImageBitmap.height.</summary>
+    abstract member height: uint32 with get
+    /// <summary>ImageBitmap.close.</summary>
+    abstract member close: unit -> unit
+
+/// <summary>ImageBitmapRenderingContext in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ImageBitmapRenderingContext =
+    /// <summary>ImageBitmapRenderingContext.canvas.</summary>
+    abstract member canvas: HTMLCanvasElement with get
+    /// <summary>ImageBitmapRenderingContext.transferFromImageBitmap.</summary>
+    abstract member transferFromImageBitmap: bitmap: ImageBitmap -> unit
+
+/// <summary>TextMetrics in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] TextMetrics =
+    /// <summary>TextMetrics.width.</summary>
+    abstract member width: float with get
+    /// <summary>TextMetrics.actualBoundingBoxLeft.</summary>
+    abstract member actualBoundingBoxLeft: float with get
+    /// <summary>TextMetrics.actualBoundingBoxRight.</summary>
+    abstract member actualBoundingBoxRight: float with get
+    /// <summary>TextMetrics.fontBoundingBoxAscent.</summary>
+    abstract member fontBoundingBoxAscent: float with get
+    /// <summary>TextMetrics.fontBoundingBoxDescent.</summary>
+    abstract member fontBoundingBoxDescent: float with get
+    /// <summary>TextMetrics.actualBoundingBoxAscent.</summary>
+    abstract member actualBoundingBoxAscent: float with get
+    /// <summary>TextMetrics.actualBoundingBoxDescent.</summary>
+    abstract member actualBoundingBoxDescent: float with get
+    /// <summary>TextMetrics.emHeightAscent.</summary>
+    abstract member emHeightAscent: float with get
+    /// <summary>TextMetrics.emHeightDescent.</summary>
+    abstract member emHeightDescent: float with get
+    /// <summary>TextMetrics.hangingBaseline.</summary>
+    abstract member hangingBaseline: float with get
+    /// <summary>TextMetrics.alphabeticBaseline.</summary>
+    abstract member alphabeticBaseline: float with get
+    /// <summary>TextMetrics.ideographicBaseline.</summary>
+    abstract member ideographicBaseline: float with get
+
 /// <summary>HTMLUnknownElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLUnknownElement =
     inherit HTMLElement
@@ -5137,10 +5866,6 @@ and [<AllowNullLiteral>] HTMLAttachmentElement =
 /// <summary>HTMLAudioElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLAudioElement =
     inherit HTMLMediaElement
-
-/// <summary>HTMLCanvasElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLCanvasElement =
-    inherit HTMLElement
 
 /// <summary>HTMLEmbedElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLEmbedElement =
@@ -5180,14 +5905,6 @@ and [<AllowNullLiteral>] HTMLVideoElement =
 
 /// <summary>CustomElementRegistry in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] CustomElementRegistry = interface end
-
-/// <summary>ClipboardEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] ClipboardEvent =
-    inherit Event
-
-/// <summary>DragEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] DragEvent =
-    inherit MouseEvent
 
 /// <summary>GamepadEvent in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] GamepadEvent =
@@ -5241,10 +5958,6 @@ and [<AllowNullLiteral>] TextTrackList =
 
 /// <summary>TimeRanges in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] TimeRanges = interface end
-
-/// <summary>TouchEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] TouchEvent =
-    inherit UIEvent
 
 /// <summary>ARIAMixin in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] ARIAMixin =
@@ -5488,6 +6201,12 @@ and [<AllowNullLiteral>] Slottable =
     /// <summary>Slottable.assignedSlot.</summary>
     abstract member assignedSlot: HTMLSlotElement with get
 
+/// <summary>UnrestrictedDoubleOrCSSNumericValueOrDOMString in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] UnrestrictedDoubleOrCSSNumericValueOrDOMString =
+    | UnrestrictedDouble of float
+    | CSSNumericValue of CSSNumericValue
+    | DOMString of string
+
 /// <summary>DOMStringOrElementCreationOptions in the scoped DOM interface model.</summary>
 and [<RequireQualifiedAccess>] DOMStringOrElementCreationOptions =
     | DOMString of string
@@ -5502,6 +6221,18 @@ and [<RequireQualifiedAccess>] BooleanOrImportNodeOptions =
 and [<RequireQualifiedAccess>] BooleanOrScrollIntoViewOptions =
     | Boolean of bool
     | ScrollIntoViewOptions of ScrollIntoViewOptions
+
+/// <summary>TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString =
+    | TimelineRangeOffset of TimelineRangeOffset
+    | CSSNumericValue of CSSNumericValue
+    | CSSOMKeywordValue of CSSKeywordValue
+    | DOMString of string
+
+/// <summary>UnrestrictedDoubleOrKeyframeAnimationOptions in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] UnrestrictedDoubleOrKeyframeAnimationOptions =
+    | UnrestrictedDouble of float
+    | KeyframeAnimationOptions of KeyframeAnimationOptions
 
 /// <summary>BooleanOrUnrestrictedDoubleOrDOMString in the scoped DOM interface model.</summary>
 and [<RequireQualifiedAccess>] BooleanOrUnrestrictedDoubleOrDOMString =
@@ -5575,6 +6306,35 @@ and [<RequireQualifiedAccess>] USVStringOrURLPatternInit =
     | USVString of string
     | URLPatternInit of URLPatternInit
 
+/// <summary>UnrestrictedDoubleOrDOMString in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] UnrestrictedDoubleOrDOMString =
+    | UnrestrictedDouble of float
+    | DOMString of string
+
+/// <summary>UnrestrictedDoubleOrCustomAnimationOptions in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] UnrestrictedDoubleOrCustomAnimationOptions =
+    | UnrestrictedDouble of float
+    | CustomAnimationOptions of CustomAnimationOptions
+
+/// <summary>DOMStringOrCanvasGradientOrCanvasPattern in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] DOMStringOrCanvasGradientOrCanvasPattern =
+    | DOMString of string
+    | CanvasGradient of CanvasGradient
+    | CanvasPattern of CanvasPattern
+
+/// <summary>HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue =
+    | HTMLImageElement of HTMLImageElement
+    | SVGImageElement of SVGImageElement
+    | HTMLCanvasElement of HTMLCanvasElement
+    | ImageBitmap of ImageBitmap
+    | CSSStyleImageValue of CSSImageValue
+
+/// <summary>UnrestrictedDoubleOrDOMPointInit in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] UnrestrictedDoubleOrDOMPointInit =
+    | UnrestrictedDouble of float
+    | DOMPointInit of DOMPointInit
+
 /// <summary>NodeOrDOMString in the scoped DOM interface model.</summary>
 and [<RequireQualifiedAccess>] NodeOrDOMString =
     | Node of Node
@@ -5590,6 +6350,31 @@ and [<AllowNullLiteral; DomDictionary>] AddEventListenerOptions() =
     inherit EventListenerOptions()
     member val passive: (bool) option = None with get, set
     member val once: bool = false with get, set
+
+/// <summary>EffectTiming in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] EffectTiming() =
+    member val delay: float = 0 with get, set
+    member val endDelay: float = 0 with get, set
+    member val fill: FillMode = FillMode.Auto with get, set
+    member val iterationStart: float = 0.0 with get, set
+    member val iterations: float = 1.0 with get, set
+
+    member val duration: UnrestrictedDoubleOrCSSNumericValueOrDOMString =
+        UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString "auto" with get, set
+
+    member val direction: PlaybackDirection = PlaybackDirection.Normal with get, set
+    member val easing: string = "linear" with get, set
+
+/// <summary>KeyframeEffectOptions in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] KeyframeEffectOptions() =
+    inherit EffectTiming()
+    member val iterationComposite: IterationCompositeOperation = IterationCompositeOperation.Replace with get, set
+    member val composite: CompositeOperation = CompositeOperation.Replace with get, set
+    member val pseudoElement: string = null with get, set
+
+/// <summary>DocumentTimelineOptions in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] DocumentTimelineOptions() =
+    member val originTime: float = 0 with get, set
 
 /// <summary>GetRootNodeOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] GetRootNodeOptions() =
@@ -5643,6 +6428,53 @@ and [<AllowNullLiteral; DomDictionary>] ScrollToOptions() =
     member val behavior: ScrollBehavior = ScrollBehavior.Auto with get, set
     member val left: (float) option = None with get, set
     member val top: (float) option = None with get, set
+
+/// <summary>Keyframe in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] Keyframe() =
+    member val offset: (float) option = None with get, set
+    member val easing: (string) option = None with get, set
+    member val composite: (string) option = None with get, set
+    member val properties: (KeyframeProperty) array = [||] with get, set
+
+/// <summary>KeyframeProperty in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] KeyframeProperty() =
+    member val name: string = Unchecked.defaultof<_> with get, set
+    member val value: string = Unchecked.defaultof<_> with get, set
+
+/// <summary>KeyframeAnimationOptions in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] KeyframeAnimationOptions() =
+    member val delay: float = 0 with get, set
+    member val endDelay: float = 0 with get, set
+    member val fill: FillMode = FillMode.Auto with get, set
+    member val iterationStart: float = 0.0 with get, set
+    member val iterations: float = 1.0 with get, set
+
+    member val duration: UnrestrictedDoubleOrCSSNumericValueOrDOMString =
+        UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString "auto" with get, set
+
+    member val direction: PlaybackDirection = PlaybackDirection.Normal with get, set
+    member val easing: string = "linear" with get, set
+    member val iterationComposite: IterationCompositeOperation = IterationCompositeOperation.Replace with get, set
+    member val composite: CompositeOperation = CompositeOperation.Replace with get, set
+    member val pseudoElement: string = null with get, set
+    member val id: string = "" with get, set
+    member val timeline: (AnimationTimeline) option = None with get, set
+
+    member val rangeStart: TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString =
+        TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString.DOMString "normal" with get, set
+
+    member val rangeEnd: TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString =
+        TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString.DOMString "normal" with get, set
+
+
+/// <summary>TimelineRangeOffset in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] TimelineRangeOffset() =
+    member val rangeName: (string) option = None with get, set
+    member val offset: (CSSNumericValue) option = None with get, set
+
+/// <summary>GetAnimationsOptions in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] GetAnimationsOptions() =
+    member val subtree: bool = false with get, set
 
 /// <summary>ShowPopoverOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] ShowPopoverOptions() =
@@ -5721,10 +6553,69 @@ and [<AllowNullLiteral; DomDictionary>] URLPatternInit() =
     member val hash: (string) option = None with get, set
     member val baseURL: (string) option = None with get, set
 
+/// <summary>ComputedEffectTiming in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] ComputedEffectTiming() =
+    member val delay: float = 0 with get, set
+    member val endDelay: float = 0 with get, set
+    member val fill: FillMode = FillMode.Auto with get, set
+    member val iterationStart: float = 0.0 with get, set
+    member val iterations: float = 1.0 with get, set
+
+    member val duration: UnrestrictedDoubleOrCSSNumericValueOrDOMString =
+        UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString "auto" with get, set
+
+    member val direction: PlaybackDirection = PlaybackDirection.Normal with get, set
+    member val easing: string = "linear" with get, set
+    member val endTime: (DoubleOrCSSNumericValue) option = None with get, set
+    member val activeDuration: (DoubleOrCSSNumericValue) option = None with get, set
+    member val localTime: (DoubleOrCSSNumericValue) option = None with get, set
+    member val progress: (float) option = None with get, set
+    member val currentIteration: (float) option = None with get, set
+
+/// <summary>OptionalEffectTiming in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] OptionalEffectTiming() =
+    member val delay: (float) option = None with get, set
+    member val endDelay: (float) option = None with get, set
+    member val fill: (FillMode) option = None with get, set
+    member val iterationStart: (float) option = None with get, set
+    member val iterations: (float) option = None with get, set
+    member val duration: (UnrestrictedDoubleOrDOMString) option = None with get, set
+    member val direction: (PlaybackDirection) option = None with get, set
+    member val easing: (string) option = None with get, set
+
+/// <summary>ComputedKeyframe in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] ComputedKeyframe() =
+    member val offset: (float) option = None with get, set
+    member val computedOffset: float = Unchecked.defaultof<_> with get, set
+    member val easing: string = Unchecked.defaultof<_> with get, set
+    member val composite: string = Unchecked.defaultof<_> with get, set
+    member val properties: (KeyframeProperty) array = [||] with get, set
+
+/// <summary>CustomAnimationOptions in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] CustomAnimationOptions() =
+    member val delay: float = 0 with get, set
+    member val endDelay: float = 0 with get, set
+    member val fill: FillMode = FillMode.Auto with get, set
+    member val iterationStart: float = 0.0 with get, set
+    member val iterations: float = 1.0 with get, set
+
+    member val duration: UnrestrictedDoubleOrCSSNumericValueOrDOMString =
+        UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString "auto" with get, set
+
+    member val direction: PlaybackDirection = PlaybackDirection.Normal with get, set
+    member val easing: string = "linear" with get, set
+    member val id: string = "" with get, set
+
+/// <summary>ImageDataSettings in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] ImageDataSettings() = class end
+
 /// <summary>FocusOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] FocusOptions() =
     member val preventScroll: bool = false with get, set
     member val focusVisible: (bool) option = None with get, set
+
+/// <summary>CustomEffectCallback in the scoped DOM interface model.</summary>
+and CustomEffectCallback = float -> unit
 
 /// <summary>EventListener in the scoped DOM interface model.</summary>
 and EventListener = Event -> unit
@@ -5741,6 +6632,64 @@ and NodeFilterResult =
     | Accept = 1
     | Reject = 2
     | Skip = 3
+
+/// <summary>CompositeOperation in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] CompositeOperation =
+    | [<CompiledName("replace")>] Replace
+    | [<CompiledName("add")>] Add
+    | [<CompiledName("accumulate")>] Accumulate
+
+/// <summary>FillMode in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] FillMode =
+    | [<CompiledName("none")>] None
+    | [<CompiledName("forwards")>] Forwards
+    | [<CompiledName("backwards")>] Backwards
+    | [<CompiledName("both")>] Both
+    | [<CompiledName("auto")>] Auto
+
+/// <summary>IterationCompositeOperation in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] IterationCompositeOperation =
+    | [<CompiledName("replace")>] Replace
+    | [<CompiledName("accumulate")>] Accumulate
+
+/// <summary>PlaybackDirection in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] PlaybackDirection =
+    | [<CompiledName("normal")>] Normal
+    | [<CompiledName("reverse")>] Reverse
+    | [<CompiledName("alternate")>] Alternate
+    | [<CompiledName("alternate-reverse")>] AlternateReverse
+
+/// <summary>ScrollAxis in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] ScrollAxis =
+    | [<CompiledName("block")>] Block
+    | [<CompiledName("inline")>] Inline
+    | [<CompiledName("x")>] X
+    | [<CompiledName("y")>] Y
+
+/// <summary>AnimationPlayState in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] AnimationPlayState =
+    | [<CompiledName("idle")>] Idle
+    | [<CompiledName("running")>] Running
+    | [<CompiledName("paused")>] Paused
+    | [<CompiledName("finished")>] Finished
+
+/// <summary>AnimationReplaceState in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] AnimationReplaceState =
+    | [<CompiledName("active")>] Active
+    | [<CompiledName("removed")>] Removed
+    | [<CompiledName("persisted")>] Persisted
+
+/// <summary>FontFaceLoadStatus in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] FontFaceLoadStatus =
+    | [<CompiledName("unloaded")>] Unloaded
+    | [<CompiledName("loading")>] Loading
+    | [<CompiledName("loaded")>] Loaded
+    | [<CompiledName("error")>] Error
+
+/// <summary>FontFaceSetLoadStatus in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] FontFaceSetLoadStatus =
+    | [<CompiledName("loading")>] Loading
+    | [<CompiledName("loaded")>] Loaded
 
 /// <summary>AriaNotificationPriority in the scoped DOM interface model.</summary>
 and [<DomStringEnum; RequireQualifiedAccess>] AriaNotificationPriority =
@@ -5775,6 +6724,52 @@ and [<DomStringEnum; RequireQualifiedAccess>] VisibilityState =
     | [<CompiledName("hidden")>] Hidden
     | [<CompiledName("visible")>] Visible
 
+/// <summary>CanvasDirection in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] CanvasDirection =
+    | [<CompiledName("ltr")>] Ltr
+    | [<CompiledName("rtl")>] Rtl
+    | [<CompiledName("inherit")>] Inherit
+
+/// <summary>CanvasFillRule in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] CanvasFillRule =
+    | [<CompiledName("nonzero")>] Nonzero
+    | [<CompiledName("evenodd")>] Evenodd
+
+/// <summary>CanvasLineCap in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] CanvasLineCap =
+    | [<CompiledName("butt")>] Butt
+    | [<CompiledName("round")>] Round
+    | [<CompiledName("square")>] Square
+
+/// <summary>CanvasLineJoin in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] CanvasLineJoin =
+    | [<CompiledName("round")>] Round
+    | [<CompiledName("bevel")>] Bevel
+    | [<CompiledName("miter")>] Miter
+
+/// <summary>CanvasTextAlign in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] CanvasTextAlign =
+    | [<CompiledName("start")>] Start
+    | [<CompiledName("end")>] End
+    | [<CompiledName("left")>] Left
+    | [<CompiledName("right")>] Right
+    | [<CompiledName("center")>] Center
+
+/// <summary>CanvasTextBaseline in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] CanvasTextBaseline =
+    | [<CompiledName("top")>] Top
+    | [<CompiledName("hanging")>] Hanging
+    | [<CompiledName("middle")>] Middle
+    | [<CompiledName("alphabetic")>] Alphabetic
+    | [<CompiledName("ideographic")>] Ideographic
+    | [<CompiledName("bottom")>] Bottom
+
+/// <summary>ImageSmoothingQuality in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] ImageSmoothingQuality =
+    | [<CompiledName("low")>] Low
+    | [<CompiledName("medium")>] Medium
+    | [<CompiledName("high")>] High
+
 /// <summary>HighlightType in the scoped DOM interface model.</summary>
 and [<DomStringEnum; RequireQualifiedAccess>] HighlightType =
     | [<CompiledName("highlight")>] Highlight
@@ -5806,6 +6801,10 @@ module BrowserUnionAdapters =
     let private normalizeUSVString (_: string) : string =
         Fable.Core.Util.jsNative
 
+    [<Fable.Core.Emit("((v)=>{if(v==null||typeof v!=='object'||v.nodeType!==undefined)return false;try{globalThis.CSSStyleValue.prototype.toString.call(v);return false;}catch{return true;}})($0)")>]
+    let private isTimelineRangeOffset (_: obj) : bool =
+        Fable.Core.Util.jsNative
+
     [<Fable.Core.Emit("((v)=>{if(v==null)return false;try{globalThis.CSSNumericValue.prototype.type.call(v);return true;}catch{return false;}})($0)")>]
     let private isCSSNumericValue (_: obj) : bool =
         Fable.Core.Util.jsNative
@@ -5822,6 +6821,14 @@ module BrowserUnionAdapters =
     let private isCSSStyleValue (_: obj) : bool =
         Fable.Core.Util.jsNative
 
+    [<Fable.Core.Emit("Object.prototype.toString.call($0) === '[object CanvasGradient]'")>]
+    let private isCanvasGradient (_: obj) : bool =
+        Fable.Core.Util.jsNative
+
+    [<Fable.Core.Emit("Object.prototype.toString.call($0) === '[object CanvasPattern]'")>]
+    let private isCanvasPattern (_: obj) : bool =
+        Fable.Core.Util.jsNative
+
     [<Fable.Core.Emit("$0 != null && $0.nodeType === 1")>]
     let private isElement (_: obj) : bool =
         Fable.Core.Util.jsNative
@@ -5834,6 +6841,19 @@ module BrowserUnionAdapters =
     let private isRadioNodeList (_: obj) : bool =
         Fable.Core.Util.jsNative
 
+
+    let private boxUnrestrictedDoubleOrCSSNumericValueOrDOMString (value: UnrestrictedDoubleOrCSSNumericValueOrDOMString) : obj =
+        match value with
+        | UnrestrictedDoubleOrCSSNumericValueOrDOMString.UnrestrictedDouble value -> box value
+        | UnrestrictedDoubleOrCSSNumericValueOrDOMString.CSSNumericValue value -> box value
+        | UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString value -> box value
+
+    let private unboxUnrestrictedDoubleOrCSSNumericValueOrDOMString (value: obj) : UnrestrictedDoubleOrCSSNumericValueOrDOMString =
+        match value with
+        | :? float as arm -> UnrestrictedDoubleOrCSSNumericValueOrDOMString.UnrestrictedDouble arm
+        | arm when isCSSNumericValue arm -> UnrestrictedDoubleOrCSSNumericValueOrDOMString.CSSNumericValue (unbox<CSSNumericValue> arm)
+        | :? string as arm -> UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString arm
+        | _ -> failwith "Unexpected DOM union result"
 
     let private boxDOMStringOrElementCreationOptions (value: DOMStringOrElementCreationOptions) : obj =
         match value with
@@ -5849,6 +6869,33 @@ module BrowserUnionAdapters =
         match value with
         | BooleanOrScrollIntoViewOptions.Boolean value -> box value
         | BooleanOrScrollIntoViewOptions.ScrollIntoViewOptions value -> box value
+
+    let private boxTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString
+        (value: TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString)
+        : obj =
+        match value with
+        | TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString.TimelineRangeOffset value -> box value
+        | TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString.CSSNumericValue value -> box value
+        | TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString.CSSOMKeywordValue value -> box value
+        | TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString.DOMString value -> box value
+
+    let private unboxTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString
+        (value: obj)
+        : TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString =
+        match value with
+        | arm when isTimelineRangeOffset arm ->
+            TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString.TimelineRangeOffset (unbox<TimelineRangeOffset> arm)
+        | arm when isCSSNumericValue arm ->
+            TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString.CSSNumericValue (unbox<CSSNumericValue> arm)
+        | arm when isCSSOMKeywordValue arm ->
+            TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString.CSSOMKeywordValue (unbox<CSSKeywordValue> arm)
+        | :? string as arm -> TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString.DOMString arm
+        | _ -> failwith "Unexpected DOM union result"
+
+    let private boxUnrestrictedDoubleOrKeyframeAnimationOptions (value: UnrestrictedDoubleOrKeyframeAnimationOptions) : obj =
+        match value with
+        | UnrestrictedDoubleOrKeyframeAnimationOptions.UnrestrictedDouble value -> box value
+        | UnrestrictedDoubleOrKeyframeAnimationOptions.KeyframeAnimationOptions value -> box value
 
     let private boxBooleanOrUnrestrictedDoubleOrDOMString (value: BooleanOrUnrestrictedDoubleOrDOMString) : obj =
         match value with
@@ -6027,10 +7074,86 @@ module BrowserUnionAdapters =
         | USVStringOrURLPatternInit.USVString value -> box (normalizeUSVString value)
         | USVStringOrURLPatternInit.URLPatternInit value -> box value
 
+    let private boxUnrestrictedDoubleOrDOMString (value: UnrestrictedDoubleOrDOMString) : obj =
+        match value with
+        | UnrestrictedDoubleOrDOMString.UnrestrictedDouble value -> box value
+        | UnrestrictedDoubleOrDOMString.DOMString value -> box value
+
+    let private boxUnrestrictedDoubleOrCustomAnimationOptions (value: UnrestrictedDoubleOrCustomAnimationOptions) : obj =
+        match value with
+        | UnrestrictedDoubleOrCustomAnimationOptions.UnrestrictedDouble value -> box value
+        | UnrestrictedDoubleOrCustomAnimationOptions.CustomAnimationOptions value -> box value
+
+    let private boxDOMStringOrCanvasGradientOrCanvasPattern (value: DOMStringOrCanvasGradientOrCanvasPattern) : obj =
+        match value with
+        | DOMStringOrCanvasGradientOrCanvasPattern.DOMString value -> box value
+        | DOMStringOrCanvasGradientOrCanvasPattern.CanvasGradient value -> box value
+        | DOMStringOrCanvasGradientOrCanvasPattern.CanvasPattern value -> box value
+
+    let private unboxDOMStringOrCanvasGradientOrCanvasPattern (value: obj) : DOMStringOrCanvasGradientOrCanvasPattern =
+        match value with
+        | :? string as arm -> DOMStringOrCanvasGradientOrCanvasPattern.DOMString arm
+        | arm when isCanvasGradient arm -> DOMStringOrCanvasGradientOrCanvasPattern.CanvasGradient (unbox<CanvasGradient> arm)
+        | arm when isCanvasPattern arm -> DOMStringOrCanvasGradientOrCanvasPattern.CanvasPattern (unbox<CanvasPattern> arm)
+        | _ -> failwith "Unexpected DOM union result"
+
+    let private boxHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue
+        (value: HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue)
+        : obj =
+        match value with
+        | HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue.HTMLImageElement value -> box value
+        | HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue.SVGImageElement value -> box value
+        | HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue.HTMLCanvasElement value -> box value
+        | HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue.ImageBitmap value -> box value
+        | HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue.CSSStyleImageValue value -> box value
+
+    let private boxUnrestrictedDoubleOrDOMPointInit (value: UnrestrictedDoubleOrDOMPointInit) : obj =
+        match value with
+        | UnrestrictedDoubleOrDOMPointInit.UnrestrictedDouble value -> box value
+        | UnrestrictedDoubleOrDOMPointInit.DOMPointInit value -> box value
+
     let private boxNodeOrDOMString (value: NodeOrDOMString) : obj =
         match value with
         | NodeOrDOMString.Node value -> box value
         | NodeOrDOMString.DOMString value -> box value
+
+    [<Fable.Core.Emit("$0[$1]")>]
+    let private rawField (_: obj) (_: string) : obj =
+        Fable.Core.Util.jsNative
+
+    let private resultDictEffectTiming (raw: obj) : EffectTiming =
+        let value = unbox<EffectTiming> raw
+        value.duration <- unboxUnrestrictedDoubleOrCSSNumericValueOrDOMString (rawField raw "duration")
+        value
+
+    let private resultDictComputedEffectTiming (raw: obj) : ComputedEffectTiming =
+        let value = unbox<ComputedEffectTiming> raw
+        value.duration <- unboxUnrestrictedDoubleOrCSSNumericValueOrDOMString (rawField raw "duration")
+        let endTimeField = rawField raw "endTime"
+
+        value.endTime <-
+            (if isNull endTimeField then
+                 None
+             else
+                 Some (unboxDoubleOrCSSNumericValue endTimeField))
+
+        let activeDurationField = rawField raw "activeDuration"
+
+        value.activeDuration <-
+            (if isNull activeDurationField then
+                 None
+             else
+                 Some (unboxDoubleOrCSSNumericValue activeDurationField))
+
+        let localTimeField = rawField raw "localTime"
+
+        value.localTime <-
+            (if isNull localTimeField then
+                 None
+             else
+                 Some (unboxDoubleOrCSSNumericValue localTimeField))
+
+        value
 
     type Document with
         member this.createElement(localName: string) : Element =
@@ -6070,6 +7193,15 @@ module BrowserUnionAdapters =
 
         member this.scrollIntoView(arg: ScrollIntoViewOptions) : unit =
             this.__ranvier_scrollIntoView (?arg = Some (box arg))
+
+        member this.animate(keyframes: (Keyframe) array) : WebAnimation =
+            this.__ranvier_animate (keyframes, ?options = None)
+
+        member this.animate(keyframes: (Keyframe) array, options: float) : WebAnimation =
+            this.__ranvier_animate (keyframes, ?options = Some (box options))
+
+        member this.animate(keyframes: (Keyframe) array, options: KeyframeAnimationOptions) : WebAnimation =
+            this.__ranvier_animate (keyframes, ?options = Some (box options))
 
 
     type HTMLElement with
@@ -6302,6 +7434,195 @@ module BrowserUnionAdapters =
 
         member this.test(input: URLPatternInit, ?baseURL: string) : bool =
             this.__ranvier_test (?input = Some (box input), ?baseURL = baseURL)
+
+
+    type WebAnimation with
+        member this.startTime
+            with get (): (DoubleOrCSSNumericValue) option =
+                let value = this.__ranvier_get_startTime ()
+
+                if isNull value then
+                    None
+                else
+                    Some (unboxDoubleOrCSSNumericValue value)
+            and set (value: (DoubleOrCSSNumericValue) option) =
+                this.__ranvier_set_startTime (
+                    value
+                    |> Option.map boxDoubleOrCSSNumericValue
+                    |> Option.defaultValue null
+                )
+
+        member this.currentTime
+            with get (): (DoubleOrCSSNumericValue) option =
+                let value = this.__ranvier_get_currentTime ()
+
+                if isNull value then
+                    None
+                else
+                    Some (unboxDoubleOrCSSNumericValue value)
+            and set (value: (DoubleOrCSSNumericValue) option) =
+                this.__ranvier_set_currentTime (
+                    value
+                    |> Option.map boxDoubleOrCSSNumericValue
+                    |> Option.defaultValue null
+                )
+
+        member this.rangeStart
+            with get (): TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString =
+                let value = this.__ranvier_get_rangeStart ()
+                unboxTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString value
+            and set (value: TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString) =
+                this.__ranvier_set_rangeStart (boxTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString value)
+
+        member this.rangeEnd
+            with get (): TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString =
+                let value = this.__ranvier_get_rangeEnd ()
+                unboxTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString value
+            and set (value: TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString) =
+                this.__ranvier_set_rangeEnd (boxTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString value)
+
+
+    type AnimationEffect with
+        member this.getTiming() : EffectTiming =
+            resultDictEffectTiming (this.__ranvier_getTiming ())
+
+        member this.getComputedTiming() : ComputedEffectTiming =
+            resultDictComputedEffectTiming (this.__ranvier_getComputedTiming ())
+
+
+    type AnimationTimeline with
+        member this.currentTime: (DoubleOrCSSNumericValue) option =
+            let value = this.__ranvier_get_currentTime ()
+
+            if isNull value then
+                None
+            else
+                Some (unboxDoubleOrCSSNumericValue value)
+
+        member this.duration: (DoubleOrCSSNumericValue) option =
+            let value = this.__ranvier_get_duration ()
+
+            if isNull value then
+                None
+            else
+                Some (unboxDoubleOrCSSNumericValue value)
+
+
+    type DocumentTimeline with
+        member this.animate(callback: CustomEffectCallback) : WebAnimation =
+            this.__ranvier_animate (callback, ?options = None)
+
+        member this.animate(callback: CustomEffectCallback, options: float) : WebAnimation =
+            this.__ranvier_animate (callback, ?options = Some (box options))
+
+        member this.animate(callback: CustomEffectCallback, options: CustomAnimationOptions) : WebAnimation =
+            this.__ranvier_animate (callback, ?options = Some (box options))
+
+
+    type CanvasRenderingContext2D with
+        member this.strokeStyle
+            with get (): DOMStringOrCanvasGradientOrCanvasPattern =
+                let value = this.__ranvier_get_strokeStyle ()
+                unboxDOMStringOrCanvasGradientOrCanvasPattern value
+            and set (value: DOMStringOrCanvasGradientOrCanvasPattern) =
+                this.__ranvier_set_strokeStyle (boxDOMStringOrCanvasGradientOrCanvasPattern value)
+
+        member this.fillStyle
+            with get (): DOMStringOrCanvasGradientOrCanvasPattern =
+                let value = this.__ranvier_get_fillStyle ()
+                unboxDOMStringOrCanvasGradientOrCanvasPattern value
+            and set (value: DOMStringOrCanvasGradientOrCanvasPattern) =
+                this.__ranvier_set_fillStyle (boxDOMStringOrCanvasGradientOrCanvasPattern value)
+
+        member this.createPattern(image: HTMLImageElement, repetition: string) : CanvasPattern =
+            this.__ranvier_createPattern (box image, repetition)
+
+        member this.createPattern(image: SVGImageElement, repetition: string) : CanvasPattern =
+            this.__ranvier_createPattern (box image, repetition)
+
+        member this.createPattern(image: HTMLCanvasElement, repetition: string) : CanvasPattern =
+            this.__ranvier_createPattern (box image, repetition)
+
+        member this.createPattern(image: ImageBitmap, repetition: string) : CanvasPattern =
+            this.__ranvier_createPattern (box image, repetition)
+
+        member this.createPattern(image: CSSImageValue, repetition: string) : CanvasPattern =
+            this.__ranvier_createPattern (box image, repetition)
+
+        member this.drawImage(image: HTMLImageElement, dx: float, dy: float) : unit =
+            this.__ranvier_drawImage (box image, dx, dy)
+
+        member this.drawImage(image: SVGImageElement, dx: float, dy: float) : unit =
+            this.__ranvier_drawImage (box image, dx, dy)
+
+        member this.drawImage(image: HTMLCanvasElement, dx: float, dy: float) : unit =
+            this.__ranvier_drawImage (box image, dx, dy)
+
+        member this.drawImage(image: ImageBitmap, dx: float, dy: float) : unit =
+            this.__ranvier_drawImage (box image, dx, dy)
+
+        member this.drawImage(image: CSSImageValue, dx: float, dy: float) : unit =
+            this.__ranvier_drawImage (box image, dx, dy)
+
+        member this.drawImage(image: HTMLImageElement, dx: float, dy: float, dw: float, dh: float) : unit =
+            this.__ranvier_drawImage (box image, dx, dy, dw, dh)
+
+        member this.drawImage(image: SVGImageElement, dx: float, dy: float, dw: float, dh: float) : unit =
+            this.__ranvier_drawImage (box image, dx, dy, dw, dh)
+
+        member this.drawImage(image: HTMLCanvasElement, dx: float, dy: float, dw: float, dh: float) : unit =
+            this.__ranvier_drawImage (box image, dx, dy, dw, dh)
+
+        member this.drawImage(image: ImageBitmap, dx: float, dy: float, dw: float, dh: float) : unit =
+            this.__ranvier_drawImage (box image, dx, dy, dw, dh)
+
+        member this.drawImage(image: CSSImageValue, dx: float, dy: float, dw: float, dh: float) : unit =
+            this.__ranvier_drawImage (box image, dx, dy, dw, dh)
+
+        member this.drawImage
+            (image: HTMLImageElement, sx: float, sy: float, sw: float, sh: float, dx: float, dy: float, dw: float, dh: float)
+            : unit =
+            this.__ranvier_drawImage (box image, sx, sy, sw, sh, dx, dy, dw, dh)
+
+        member this.drawImage(image: SVGImageElement, sx: float, sy: float, sw: float, sh: float, dx: float, dy: float, dw: float, dh: float) : unit =
+            this.__ranvier_drawImage (box image, sx, sy, sw, sh, dx, dy, dw, dh)
+
+        member this.drawImage
+            (image: HTMLCanvasElement, sx: float, sy: float, sw: float, sh: float, dx: float, dy: float, dw: float, dh: float)
+            : unit =
+            this.__ranvier_drawImage (box image, sx, sy, sw, sh, dx, dy, dw, dh)
+
+        member this.drawImage(image: ImageBitmap, sx: float, sy: float, sw: float, sh: float, dx: float, dy: float, dw: float, dh: float) : unit =
+            this.__ranvier_drawImage (box image, sx, sy, sw, sh, dx, dy, dw, dh)
+
+        member this.drawImage(image: CSSImageValue, sx: float, sy: float, sw: float, sh: float, dx: float, dy: float, dw: float, dh: float) : unit =
+            this.__ranvier_drawImage (box image, sx, sy, sw, sh, dx, dy, dw, dh)
+
+        member this.roundRect(x: float, y: float, w: float, h: float, radii: (UnrestrictedDoubleOrDOMPointInit) array) : unit =
+            this.__ranvier_roundRectList (x, y, w, h, box (Array.map boxUnrestrictedDoubleOrDOMPointInit radii))
+
+        member this.roundRect(x: float, y: float, w: float, h: float) : unit =
+            this.__ranvier_roundRect (x, y, w, h, ?radii = None)
+
+        member this.roundRect(x: float, y: float, w: float, h: float, radii: float) : unit =
+            this.__ranvier_roundRect (x, y, w, h, ?radii = Some (box radii))
+
+        member this.roundRect(x: float, y: float, w: float, h: float, radii: DOMPointInit) : unit =
+            this.__ranvier_roundRect (x, y, w, h, ?radii = Some (box radii))
+
+
+    type Path2D with
+        member this.roundRect(x: float, y: float, w: float, h: float, radii: (UnrestrictedDoubleOrDOMPointInit) array) : unit =
+            this.__ranvier_roundRectList (x, y, w, h, box (Array.map boxUnrestrictedDoubleOrDOMPointInit radii))
+
+        member this.roundRect(x: float, y: float, w: float, h: float) : unit =
+            this.__ranvier_roundRect (x, y, w, h, ?radii = None)
+
+        member this.roundRect(x: float, y: float, w: float, h: float, radii: float) : unit =
+            this.__ranvier_roundRect (x, y, w, h, ?radii = Some (box radii))
+
+        member this.roundRect(x: float, y: float, w: float, h: float, radii: DOMPointInit) : unit =
+            this.__ranvier_roundRect (x, y, w, h, ?radii = Some (box radii))
 
 
     type ChildNode with

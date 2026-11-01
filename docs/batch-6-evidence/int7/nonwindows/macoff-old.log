@@ -1,0 +1,86 @@
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.red.cpp(1167,26): error: use of undeclared identifier 'Touch'
+ 1167 | std::optional<Vector<Ref<Touch>>> decodeRvDomSequenceTouch(const RvDomSequenceTouch* source, int32_t& status)
+      |                          ^~~~~
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.red.cpp(1169,78): error: no viable conversion from returned value of type 'const nullopt_t' to function return type 'int'
+ 1169 |     if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+      |                                                                              ^~~~~~~~~~~~
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.red.cpp(1170,105): error: no viable conversion from returned value of type 'const nullopt_t' to function return type 'int'
+ 1170 |     if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+      |                                                                                                         ^~~~~~~~~~~~
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.red.cpp(1171,16): error: use of undeclared identifier 'Touch'
+ 1171 |     Vector<Ref<Touch>> result;
+      |                ^~~~~
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.red.cpp(1174,72): error: no viable conversion from returned value of type 'const nullopt_t' to function return type 'int'
+ 1174 |         if (!source->items[i]) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+      |                                                                        ^~~~~~~~~~~~
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.red.cpp(1175,16): error: use of undeclared identifier 'Touch'
+ 1175 |         RefPtr<Touch> item = reinterpret_cast<Touch*>(source->items[i]);
+      |                ^~~~~
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.red.cpp(1175,47): error: unknown type name 'Touch'
+ 1175 |         RefPtr<Touch> item = reinterpret_cast<Touch*>(source->items[i]);
+      |                                               ^
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.red.cpp(1176,82): error: no viable conversion from returned value of type 'const nullopt_t' to function return type 'int'
+ 1176 |         if (source->items[i] && !item) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+      |                                                                                  ^~~~~~~~~~~~
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.red.cpp(1179,23): error: use of undeclared identifier 'Touch'
+ 1179 |     return Vector<Ref<Touch>> { std::move(result) };
+      |                       ^~~~~
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.red.cpp(1186,47): error: unknown type name 'Touch'
+ 1186 |         if (value->items[i]) reinterpret_cast<Touch*>(value->items[i])->deref();
+      |                                               ^
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.red.cpp(1186,71): error: member access into incomplete type 'RvTouch' (aka 'struct RvTouch')
+ 1186 |         if (value->items[i]) reinterpret_cast<Touch*>(value->items[i])->deref();
+      |                                                                       ^
+C:\wk\native-batch-6\host\dom\..\RanvierWebCoreAbi.h(2487,16): note: forward declaration of 'RvTouch'
+ 2487 | typedef struct RvTouch RvTouch;
+      |                ^
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.red.cpp(1200,21): error: use of undeclared identifier 'Touch'
+ 1200 |         storeHandle<Touch>(value[i], &result->items[i]);
+      |                     ^~~~~
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.red.cpp(5708,26): error: unknown type name 'Touch'
+ 5708 |         reinterpret_cast<Touch*>(handle)->deref();
+      |                          ^
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.red.cpp(5708,41): error: member access into incomplete type 'RvTouch' (aka 'struct RvTouch')
+ 5708 |         reinterpret_cast<Touch*>(handle)->deref();
+      |                                         ^
+C:\wk\native-batch-6\host\dom\..\RanvierWebCoreAbi.h(2487,16): note: forward declaration of 'RvTouch'
+ 2487 | typedef struct RvTouch RvTouch;
+      |                ^
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.red.cpp(5715,22): error: unknown type name 'Touch'
+ 5715 |     reinterpret_cast<Touch*>(handle)->ref();
+      |                      ^
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.red.cpp(5715,37): error: member access into incomplete type 'RvTouch' (aka 'struct RvTouch')
+ 5715 |     reinterpret_cast<Touch*>(handle)->ref();
+      |                                     ^
+C:\wk\native-batch-6\host\dom\..\RanvierWebCoreAbi.h(2487,16): note: forward declaration of 'RvTouch'
+ 2487 | typedef struct RvTouch RvTouch;
+      |                ^
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.red.cpp(5722,26): error: unknown type name 'TouchList'; did you mean 'RvTouchList'?
+ 5722 |         reinterpret_cast<TouchList*>(handle)->deref();
+      |                          ^~~~~~~~~
+      |                          RvTouchList
+C:\wk\native-batch-6\host\dom\../RanvierWebCoreDom.h(58,28): note: 'RvTouchList' declared here
+   58 | typedef struct RvTouchList RvTouchList;
+      |                            ^
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.red.cpp(5722,45): error: member access into incomplete type 'RvTouchList' (aka 'struct RvTouchList')
+ 5722 |         reinterpret_cast<TouchList*>(handle)->deref();
+      |                                             ^
+C:\wk\native-batch-6\host\dom\../RanvierWebCoreDom.h(58,16): note: forward declaration of 'RvTouchList'
+   58 | typedef struct RvTouchList RvTouchList;
+      |                ^
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.red.cpp(5729,22): error: unknown type name 'TouchList'; did you mean 'RvTouchList'?
+ 5729 |     reinterpret_cast<TouchList*>(handle)->ref();
+      |                      ^~~~~~~~~
+      |                      RvTouchList
+C:\wk\native-batch-6\host\dom\../RanvierWebCoreDom.h(58,28): note: 'RvTouchList' declared here
+   58 | typedef struct RvTouchList RvTouchList;
+      |                            ^
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.red.cpp(5729,41): error: member access into incomplete type 'RvTouchList' (aka 'struct RvTouchList')
+ 5729 |     reinterpret_cast<TouchList*>(handle)->ref();
+      |                                         ^
+C:\wk\native-batch-6\host\dom\../RanvierWebCoreDom.h(58,16): note: forward declaration of 'RvTouchList'
+   58 | typedef struct RvTouchList RvTouchList;
+      |                ^
+20 errors generated.
+
+EXIT=1

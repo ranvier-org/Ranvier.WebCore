@@ -1,0 +1,1820 @@
+{
+ "browser": "Chromium 156.0.8078.4",
+ "cases": [
+  {
+   "name": "opacity fill both",
+   "created": {
+    "id": "",
+    "playState": "paused",
+    "timelineIsDocument": true,
+    "target": "a",
+    "composite": "replace",
+    "pseudoElement": null
+   },
+   "points": [
+    {
+     "time": 0,
+     "currentTime": 0,
+     "playState": "paused",
+     "values": {
+      "opacity": "0"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        255,
+        255,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        255,
+        255,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 500,
+     "currentTime": 500,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.5"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        127,
+        127,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        127,
+        127,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 1000,
+     "currentTime": 1000,
+     "playState": "paused",
+     "values": {
+      "opacity": "1"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "opacity fill none",
+   "created": {
+    "id": "",
+    "playState": "paused",
+    "timelineIsDocument": true,
+    "target": "a",
+    "composite": "replace",
+    "pseudoElement": null
+   },
+   "points": [
+    {
+     "time": 0,
+     "currentTime": 0,
+     "playState": "paused",
+     "values": {
+      "opacity": "0"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        255,
+        255,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        255,
+        255,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 500,
+     "currentTime": 500,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.25"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        191,
+        191,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        191,
+        191,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 1000,
+     "currentTime": 1000,
+     "playState": "paused",
+     "values": {
+      "opacity": "1"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "transform",
+   "created": {
+    "id": "",
+    "playState": "paused",
+    "timelineIsDocument": true,
+    "target": "b",
+    "composite": "replace",
+    "pseudoElement": null
+   },
+   "points": [
+    {
+     "time": 0,
+     "currentTime": 0,
+     "playState": "paused",
+     "values": {
+      "transform": "matrix(1, 0, 0, 1, 0, 0)"
+     },
+     "samples": [
+      {
+       "x": 70,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      },
+      {
+       "x": 70,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 500,
+     "currentTime": 500,
+     "playState": "paused",
+     "values": {
+      "transform": "matrix(1, 0, 0, 1, 50, 0)"
+     },
+     "samples": [
+      {
+       "x": 70,
+       "y": 20,
+       "rgb": [
+        255,
+        255,
+        255
+       ]
+      },
+      {
+       "x": 120,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 1000,
+     "currentTime": 1000,
+     "playState": "paused",
+     "values": {
+      "transform": "matrix(1, 0, 0, 1, 100, 0)"
+     },
+     "samples": [
+      {
+       "x": 70,
+       "y": 20,
+       "rgb": [
+        255,
+        255,
+        255
+       ]
+      },
+      {
+       "x": 170,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "delay no fill",
+   "created": {
+    "id": "",
+    "playState": "paused",
+    "timelineIsDocument": true,
+    "target": "a",
+    "composite": "replace",
+    "pseudoElement": null
+   },
+   "points": [
+    {
+     "time": 0,
+     "currentTime": 0,
+     "playState": "paused",
+     "values": {
+      "opacity": "1"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 250,
+     "currentTime": 250,
+     "playState": "paused",
+     "values": {
+      "opacity": "1"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 500,
+     "currentTime": 500,
+     "playState": "paused",
+     "values": {
+      "opacity": "0"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        255,
+        255,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        255,
+        255,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 1000,
+     "currentTime": 1000,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.5"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        127,
+        127,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        127,
+        127,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 1500,
+     "currentTime": 1500,
+     "playState": "paused",
+     "values": {
+      "opacity": "1"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "delay fill backwards",
+   "created": {
+    "id": "",
+    "playState": "paused",
+    "timelineIsDocument": true,
+    "target": "a",
+    "composite": "replace",
+    "pseudoElement": null
+   },
+   "points": [
+    {
+     "time": 0,
+     "currentTime": 0,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.2"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        204,
+        204,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        204,
+        204,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 250,
+     "currentTime": 250,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.2"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        204,
+        204,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        204,
+        204,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 1000,
+     "currentTime": 1000,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.6"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        102,
+        102,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        102,
+        102,
+        255
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "direction reverse",
+   "created": {
+    "id": "",
+    "playState": "paused",
+    "timelineIsDocument": true,
+    "target": "a",
+    "composite": "replace",
+    "pseudoElement": null
+   },
+   "points": [
+    {
+     "time": 0,
+     "currentTime": 0,
+     "playState": "paused",
+     "values": {
+      "opacity": "1"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 250,
+     "currentTime": 250,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.75"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        64,
+        64,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        64,
+        64,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 1000,
+     "currentTime": 1000,
+     "playState": "paused",
+     "values": {
+      "opacity": "0"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        255,
+        255,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        255,
+        255,
+        255
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "direction alternate x2",
+   "created": {
+    "id": "",
+    "playState": "paused",
+    "timelineIsDocument": true,
+    "target": "a",
+    "composite": "replace",
+    "pseudoElement": null
+   },
+   "points": [
+    {
+     "time": 250,
+     "currentTime": 250,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.25"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        191,
+        191,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        191,
+        191,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 1250,
+     "currentTime": 1250,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.75"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        64,
+        64,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        64,
+        64,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 2000,
+     "currentTime": 2000,
+     "playState": "paused",
+     "values": {
+      "opacity": "0"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        255,
+        255,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        255,
+        255,
+        255
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "direction alternate-reverse x2",
+   "created": {
+    "id": "",
+    "playState": "paused",
+    "timelineIsDocument": true,
+    "target": "a",
+    "composite": "replace",
+    "pseudoElement": null
+   },
+   "points": [
+    {
+     "time": 250,
+     "currentTime": 250,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.75"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        64,
+        64,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        64,
+        64,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 1250,
+     "currentTime": 1250,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.25"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        191,
+        191,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        191,
+        191,
+        255
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "composite add transform",
+   "created": {
+    "id": "",
+    "playState": "paused",
+    "timelineIsDocument": true,
+    "target": "c",
+    "composite": "add",
+    "pseudoElement": null
+   },
+   "points": [
+    {
+     "time": 0,
+     "currentTime": 0,
+     "playState": "paused",
+     "values": {
+      "transform": "matrix(1, 0, 0, 1, 10, 0)"
+     },
+     "samples": [
+      {
+       "x": 130,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      },
+      {
+       "x": 130,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 500,
+     "currentTime": 500,
+     "playState": "paused",
+     "values": {
+      "transform": "matrix(1, 0, 0, 1, 60, 0)"
+     },
+     "samples": [
+      {
+       "x": 130,
+       "y": 20,
+       "rgb": [
+        255,
+        255,
+        255
+       ]
+      },
+      {
+       "x": 180,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 1000,
+     "currentTime": 1000,
+     "playState": "paused",
+     "values": {
+      "transform": "matrix(1, 0, 0, 1, 110, 0)"
+     },
+     "samples": [
+      {
+       "x": 130,
+       "y": 20,
+       "rgb": [
+        255,
+        255,
+        255
+       ]
+      },
+      {
+       "x": 230,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "composite accumulate transform",
+   "created": {
+    "id": "",
+    "playState": "paused",
+    "timelineIsDocument": true,
+    "target": "c",
+    "composite": "accumulate",
+    "pseudoElement": null
+   },
+   "points": [
+    {
+     "time": 500,
+     "currentTime": 500,
+     "playState": "paused",
+     "values": {
+      "transform": "matrix(1, 0, 0, 1, 60, 0)"
+     },
+     "samples": [
+      {
+       "x": 130,
+       "y": 20,
+       "rgb": [
+        255,
+        255,
+        255
+       ]
+      },
+      {
+       "x": 180,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "composite replace transform",
+   "created": {
+    "id": "",
+    "playState": "paused",
+    "timelineIsDocument": true,
+    "target": "c",
+    "composite": "replace",
+    "pseudoElement": null
+   },
+   "points": [
+    {
+     "time": 500,
+     "currentTime": 500,
+     "playState": "paused",
+     "values": {
+      "transform": "matrix(1, 0, 0, 1, 50, 0)"
+     },
+     "samples": [
+      {
+       "x": 130,
+       "y": 20,
+       "rgb": [
+        255,
+        255,
+        255
+       ]
+      },
+      {
+       "x": 170,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "keyframe composite add opacity",
+   "created": {
+    "id": "",
+    "playState": "paused",
+    "timelineIsDocument": true,
+    "target": "e",
+    "composite": "replace",
+    "pseudoElement": null
+   },
+   "points": [
+    {
+     "time": 0,
+     "currentTime": 0,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.5"
+     },
+     "samples": [
+      {
+       "x": 70,
+       "y": 70,
+       "rgb": [
+        127,
+        127,
+        255
+       ]
+      },
+      {
+       "x": 70,
+       "y": 70,
+       "rgb": [
+        127,
+        127,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 500,
+     "currentTime": 500,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.625"
+     },
+     "samples": [
+      {
+       "x": 70,
+       "y": 70,
+       "rgb": [
+        96,
+        96,
+        255
+       ]
+      },
+      {
+       "x": 70,
+       "y": 70,
+       "rgb": [
+        96,
+        96,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 1000,
+     "currentTime": 1000,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.75"
+     },
+     "samples": [
+      {
+       "x": 70,
+       "y": 70,
+       "rgb": [
+        64,
+        64,
+        255
+       ]
+      },
+      {
+       "x": 70,
+       "y": 70,
+       "rgb": [
+        64,
+        64,
+        255
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "offsets",
+   "created": {
+    "id": "",
+    "playState": "paused",
+    "timelineIsDocument": true,
+    "target": "a",
+    "composite": "replace",
+    "pseudoElement": null
+   },
+   "points": [
+    {
+     "time": 400,
+     "currentTime": 400,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.4"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        153,
+        153,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        153,
+        153,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 800,
+     "currentTime": 800,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.8"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        51,
+        51,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        51,
+        51,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 900,
+     "currentTime": 900,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.9"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        25,
+        25,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        25,
+        25,
+        255
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "keyframe easing step-end",
+   "created": {
+    "id": "",
+    "playState": "paused",
+    "timelineIsDocument": true,
+    "target": "a",
+    "composite": "replace",
+    "pseudoElement": null
+   },
+   "points": [
+    {
+     "time": 500,
+     "currentTime": 500,
+     "playState": "paused",
+     "values": {
+      "opacity": "0"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        255,
+        255,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        255,
+        255,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 1000,
+     "currentTime": 1000,
+     "playState": "paused",
+     "values": {
+      "opacity": "1"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "timing easing steps",
+   "created": {
+    "id": "",
+    "playState": "paused",
+    "timelineIsDocument": true,
+    "target": "a",
+    "composite": "replace",
+    "pseudoElement": null
+   },
+   "points": [
+    {
+     "time": 300,
+     "currentTime": 300,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.25"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        191,
+        191,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        191,
+        191,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 600,
+     "currentTime": 600,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.5"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        127,
+        127,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        127,
+        127,
+        255
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "two properties and id",
+   "created": {
+    "id": "two",
+    "playState": "paused",
+    "timelineIsDocument": true,
+    "target": "d",
+    "composite": "replace",
+    "pseudoElement": null
+   },
+   "points": [
+    {
+     "time": 500,
+     "currentTime": 500,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.5",
+      "transform": "matrix(1.5, 0, 0, 1.5, 0, 0)"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 70,
+       "rgb": [
+        127,
+        127,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 70,
+       "rgb": [
+        127,
+        127,
+        255
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "camelCase property",
+   "created": {
+    "id": "",
+    "playState": "paused",
+    "timelineIsDocument": true,
+    "target": "f",
+    "composite": "replace",
+    "pseudoElement": null
+   },
+   "points": [
+    {
+     "time": 500,
+     "currentTime": 500,
+     "playState": "paused",
+     "values": {
+      "background-color": "rgb(128, 0, 128)"
+     },
+     "samples": [
+      {
+       "x": 120,
+       "y": 120,
+       "rgb": [
+        128,
+        0,
+        128
+       ]
+      },
+      {
+       "x": 120,
+       "y": 120,
+       "rgb": [
+        128,
+        0,
+        128
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "implicit from keyframe",
+   "created": {
+    "id": "",
+    "playState": "paused",
+    "timelineIsDocument": true,
+    "target": "e",
+    "composite": "replace",
+    "pseudoElement": null
+   },
+   "points": [
+    {
+     "time": 0,
+     "currentTime": 0,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.5"
+     },
+     "samples": [
+      {
+       "x": 70,
+       "y": 70,
+       "rgb": [
+        127,
+        127,
+        255
+       ]
+      },
+      {
+       "x": 70,
+       "y": 70,
+       "rgb": [
+        127,
+        127,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 500,
+     "currentTime": 500,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.75"
+     },
+     "samples": [
+      {
+       "x": 70,
+       "y": 70,
+       "rgb": [
+        64,
+        64,
+        255
+       ]
+      },
+      {
+       "x": 70,
+       "y": 70,
+       "rgb": [
+        64,
+        64,
+        255
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "KeyframeEffect and Animation on document.timeline",
+   "created": {
+    "id": "",
+    "playState": "paused",
+    "timelineIsDocument": true,
+    "target": "b",
+    "composite": "replace",
+    "pseudoElement": null
+   },
+   "points": [
+    {
+     "time": 500,
+     "currentTime": 500,
+     "playState": "paused",
+     "values": {
+      "transform": "matrix(1, 0, 0, 1, 20, 0)"
+     },
+     "samples": [
+      {
+       "x": 70,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      },
+      {
+       "x": 90,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      }
+     ]
+    },
+    {
+     "time": 1000,
+     "currentTime": 1000,
+     "playState": "paused",
+     "values": {
+      "transform": "matrix(1, 0, 0, 1, 40, 0)"
+     },
+     "samples": [
+      {
+       "x": 70,
+       "y": 20,
+       "rgb": [
+        255,
+        255,
+        255
+       ]
+      },
+      {
+       "x": 110,
+       "y": 20,
+       "rgb": [
+        0,
+        0,
+        255
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "KeyframeEffect and Animation on the default timeline",
+   "created": {
+    "id": "",
+    "playState": "paused",
+    "timelineIsDocument": true,
+    "target": "b",
+    "composite": "replace",
+    "pseudoElement": null
+   },
+   "points": [
+    {
+     "time": 500,
+     "currentTime": 500,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.5"
+     },
+     "samples": [
+      {
+       "x": 70,
+       "y": 20,
+       "rgb": [
+        127,
+        127,
+        255
+       ]
+      },
+      {
+       "x": 70,
+       "y": 20,
+       "rgb": [
+        127,
+        127,
+        255
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "KeyframeEffect copy",
+   "created": {
+    "id": "",
+    "playState": "paused",
+    "timelineIsDocument": true,
+    "target": "b",
+    "composite": "replace",
+    "pseudoElement": null
+   },
+   "points": [
+    {
+     "time": 500,
+     "currentTime": 500,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.25"
+     },
+     "samples": [
+      {
+       "x": 70,
+       "y": 20,
+       "rgb": [
+        191,
+        191,
+        255
+       ]
+      },
+      {
+       "x": 70,
+       "y": 20,
+       "rgb": [
+        191,
+        191,
+        255
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "number options",
+   "created": {
+    "id": "",
+    "playState": "paused",
+    "timelineIsDocument": true,
+    "target": "a",
+    "composite": "replace",
+    "pseudoElement": null
+   },
+   "points": [
+    {
+     "time": 500,
+     "currentTime": 500,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.25"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        191,
+        191,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        191,
+        191,
+        255
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "timeline option document.timeline",
+   "created": {
+    "id": "",
+    "playState": "paused",
+    "timelineIsDocument": true,
+    "target": "a",
+    "composite": "replace",
+    "pseudoElement": null
+   },
+   "points": [
+    {
+     "time": 500,
+     "currentTime": 500,
+     "playState": "paused",
+     "values": {
+      "opacity": "0.5"
+     },
+     "samples": [
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        127,
+        127,
+        255
+       ]
+      },
+      {
+       "x": 20,
+       "y": 20,
+       "rgb": [
+        127,
+        127,
+        255
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "errors": [
+  {
+   "name": "unsorted offsets",
+   "ok": false,
+   "exception": "TypeError"
+  },
+  {
+   "name": "offset above one",
+   "ok": false,
+   "exception": "TypeError"
+  },
+  {
+   "name": "offset NaN",
+   "ok": false,
+   "exception": "TypeError"
+  },
+  {
+   "name": "invalid keyframe easing",
+   "ok": false,
+   "exception": "TypeError"
+  },
+  {
+   "name": "invalid keyframe composite",
+   "ok": false,
+   "exception": "TypeError"
+  },
+  {
+   "name": "invalid timing easing",
+   "ok": false,
+   "exception": "TypeError"
+  },
+  {
+   "name": "negative duration",
+   "ok": false,
+   "exception": "TypeError"
+  },
+  {
+   "name": "NaN duration",
+   "ok": false,
+   "exception": "TypeError"
+  },
+  {
+   "name": "negative iterations",
+   "ok": false,
+   "exception": "TypeError"
+  },
+  {
+   "name": "null keyframes",
+   "ok": true,
+   "playState": "running",
+   "hasEffect": true,
+   "timeline": "document",
+   "currentTime": 0,
+   "keyframes": 0
+  },
+  {
+   "name": "empty keyframes",
+   "ok": true,
+   "playState": "running",
+   "hasEffect": true,
+   "timeline": "document",
+   "currentTime": 0,
+   "keyframes": 0
+  },
+  {
+   "name": "unknown property ignored",
+   "ok": true,
+   "playState": "running",
+   "hasEffect": true,
+   "timeline": "document",
+   "currentTime": 0,
+   "keyframes": 2
+  },
+  {
+   "name": "invalid value kept",
+   "ok": true,
+   "playState": "running",
+   "hasEffect": true,
+   "timeline": "document",
+   "currentTime": 0,
+   "keyframes": 2
+  },
+  {
+   "name": "invalid pseudo",
+   "ok": false,
+   "exception": "SyntaxError"
+  },
+  {
+   "name": "KeyframeEffect null target",
+   "ok": true,
+   "playState": "idle",
+   "hasEffect": true,
+   "timeline": "document",
+   "currentTime": null,
+   "keyframes": 1
+  },
+  {
+   "name": "Animation without effect",
+   "ok": true,
+   "playState": "idle",
+   "hasEffect": false,
+   "timeline": "document",
+   "currentTime": null,
+   "keyframes": null
+  },
+  {
+   "name": "Animation null timeline",
+   "ok": true,
+   "playState": "running",
+   "hasEffect": true,
+   "timeline": "null",
+   "currentTime": 0,
+   "keyframes": 1
+  }
+ ]
+}

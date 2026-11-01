@@ -136,7 +136,7 @@ def verify(native_directory):
             identifier = ('detached-' + str(serial)).encode()
             markup = b'<style id="' + identifier + b'">' + css + b'</style>'
             call('rv_dom_element_set_inner_html', [pointer, Utf8], body, markup)
-            style = own(bind('rv_document_get_element_by_id', pointer, [pointer, string])(host, identifier), 'rv_node_release')
+            style = own(bind('rv_document_get_element_by_id', pointer, [pointer, Utf8])(host, identifier), 'rv_node_release')
             sheet = handle('rv_dom_html_style_element_get_sheet', [pointer], style, release='rv_dom_style_sheet_release')
             return style, sheet
 
@@ -207,7 +207,7 @@ def verify(native_directory):
         css = b'@position-try --shared {top:11px;left:13px;width:37px} .d21-anchor{anchor-name:--d21-anchor;width:10px;height:10px} .d21-survivor{position:absolute;position-anchor:--d21-anchor;top:anchor(bottom);left:anchor(left);width:220px;height:10px;position-try-fallbacks:--shared}'
         markup = b'<style id="cow-first">' + css + b'</style><style id="cow-survivor">' + css + b'</style><div style="position:relative;width:160px;height:80px;overflow:hidden"><div class="d21-anchor"></div><div id="survivor" class="d21-survivor"></div></div>'
         call('rv_dom_element_set_inner_html', [pointer, Utf8], body, markup)
-        find = bind('rv_document_get_element_by_id', pointer, [pointer, string])
+        find = bind('rv_document_get_element_by_id', pointer, [pointer, Utf8])
         first_node = own(find(host, b'cow-first'), 'rv_node_release')
         survivor_node = own(find(host, b'cow-survivor'), 'rv_node_release')
         probe = own(find(host, b'survivor'), 'rv_node_release')
@@ -226,9 +226,9 @@ def verify(native_directory):
             return text('rv_element_computed_style', [pointer, string], probe, b'width')
 
         def fallback_layout():
-            call('rv_element_set_style', [pointer, string, string, integer], probe, b'position-try-fallbacks', b'none', 0)
+            call('rv_element_set_style', [pointer, string, Utf8, integer], probe, b'position-try-fallbacks', b'none', 0)
             expect(width() == '220px', 'anchored control without fallback overflows at original width')
-            call('rv_element_set_style', [pointer, string, string, integer], probe, b'position-try-fallbacks', b'--shared', 0)
+            call('rv_element_set_style', [pointer, string, Utf8, integer], probe, b'position-try-fallbacks', b'--shared', 0)
             expect(width() == '37px', 'surviving shared fallback produces actual constrained width')
 
         def edit_copy(top_value, left_value, width_value):

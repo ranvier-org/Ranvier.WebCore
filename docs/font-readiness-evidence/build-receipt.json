@@ -1,0 +1,57 @@
+{
+  "repoHead": "d247ceb091d9e60ff45ef4c42893feff601a1c5a",
+  "dirty": [
+    " M host/RanvierCapabilityCatalogue.inc",
+    " M host/RanvierResourceGlue.cpp",
+    " M host/RanvierResourceGlue.h",
+    " M host/RanvierWebCoreAbi.cpp",
+    " M host/RanvierWebCoreAbi.h",
+    " M tests/abi/Native.fs",
+    "?? docs/font-readiness-evidence/",
+    "?? docs/image-readiness-evidence/",
+    "?? tests/abi/font_readiness.py"
+  ],
+  "parent": "C:\\wk\\native-cascade-shadow\\artifacts\\native46-candidate-6",
+  "parentHead": "ed60fd4",
+  "sourceExemptions": {
+    "Source/WebCore/dom/DataTransfer.cpp": "implementation file; no unit of this build compiles it",
+    "Source/WebCore/loader/EmptyClients.h": "header diff carried by the patch series plus 4 final-to-override lines"
+  },
+  "hostGlueObjects": [
+    "C:/wk/native-cascade-shadow/artifacts/native46-candidate-6/090-RanvierInspectGlue.cpp.obj",
+    "C:/wk/native-coords/artifacts/coords-candidate-5/090-RanvierViewportGlue.cpp.obj",
+    "C:/wk/native-forms/artifacts/forms-candidate-4/RanvierEventGlue.cpp.obj",
+    "C:/wk/native-forms/artifacts/forms-candidate-4/RanvierSvgViewGlue.cpp.obj"
+  ],
+  "recompiled": [
+    "host/RanvierResourceGlue.cpp",
+    "host/RanvierWebCoreAbi.cpp",
+    "host/RanvierWebCoreDom.cpp",
+    "host/RanvierWebCoreUia.cpp",
+    "host/RanvierWebCoreD3D11.cpp"
+  ],
+  "runtimeSha256": {
+    "brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
+    "brotlidec.dll": "d42e2160f76f29a91f8be01b009b585c45496219794e16eab90b3599b6f70a7f",
+    "harfbuzz-icu.dll": "27662b477f7cb0c20cee64543a06296a48a00a17b6c7b57629bb166a30d5b164",
+    "harfbuzz.dll": "b519b2abc7f446ca45bff77aae1708f45afc9f557698bcd7295837cce0f12bfa",
+    "icudt77.dll": "b00d2fb856f548608c137e771257a70d0722654535c6c00b371c0fab3e2b802c",
+    "icuin77.dll": "e3785739e1fcf2e38053bbb85ef5f0f5dab63f865cbda762da5258566085a240",
+    "icuuc77.dll": "189c623f996c41488c262867bae04a5bb33dd485bd423e0a8bec05c455a90902",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+    "jpeg62.dll": "394811c1b1bf1fd914248a145ba3fcad1f5f27c7009754ce08e48ccb0266b785",
+    "libpng16.dll": "8b46592c5ea338dd6b23ca380d6db64a7849c2a534fc465a006ec668645d8185",
+    "libsharpyuv.dll": "df165de83480692f494c23061ef9c40c10abe19a89b1fa9fae2f1cd5152c07a7",
+    "libwebp.dll": "550c5a4860f61d32a274fdd7b5c8cbe266eee28b3a3ca888195248ea1d5e0f71",
+    "libwebpdemux.dll": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163",
+    "libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
+    "libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
+    "RanvierWebCoreHost.dll": "d033e89a703b273d9054708d966c00f02c2821d355010e2091269b5983228a04",
+    "RanvierWebCoreHost.lib": "a002f9fea547c7b27e2390edca81c1e10f5fbc4eed8ed8220e1d0e215912d453",
+    "RanvierWebCoreHost.pdb": "933e4567628e620b75abf9a8e84b3855a0343546a6868f01596f6f557ca84a0b",
+    "WebCore.dll": "3f65a916e2470702ede0a5c3295fe30452d330899929ad53b27c97afdff8cfc4",
+    "WebCore.lib": "29889ec6df1c85d1ffa38dd7ce7af394d83b9926eadbe6a664cdaa4582ac4adc",
+    "WebCore.pdb": "b2927942d7f254f6a512d318a9f0de051102585d4739080482dbb16051d82e42",
+    "zlib1.dll": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93"
+  }
+}

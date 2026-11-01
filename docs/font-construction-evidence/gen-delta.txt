@@ -1,0 +1,50 @@
+base HEAD; dom-api functions added 35 removed 0 changed 0
+  + rv_dom_document_get_fonts
+  + rv_dom_font_face_create
+  + rv_dom_font_face_get_ascent_override
+  + rv_dom_font_face_get_descent_override
+  + rv_dom_font_face_get_display
+  + rv_dom_font_face_get_family
+  + rv_dom_font_face_get_feature_settings
+  + rv_dom_font_face_get_line_gap_override
+  + rv_dom_font_face_get_size_adjust
+  + rv_dom_font_face_get_status
+  + rv_dom_font_face_get_stretch
+  + rv_dom_font_face_get_style
+  + rv_dom_font_face_get_unicode_range
+  + rv_dom_font_face_get_weight
+  + rv_dom_font_face_get_width
+  + rv_dom_font_face_set_add
+  + rv_dom_font_face_set_ascent_override
+  + rv_dom_font_face_set_check
+  + rv_dom_font_face_set_clear
+  + rv_dom_font_face_set_delete
+  + rv_dom_font_face_set_descent_override
+  + rv_dom_font_face_set_display
+  + rv_dom_font_face_set_family
+  + rv_dom_font_face_set_feature_settings
+  + rv_dom_font_face_set_get_size
+  + rv_dom_font_face_set_get_status
+  + rv_dom_font_face_set_has
+  + rv_dom_font_face_set_line_gap_override
+  + rv_dom_font_face_set_size_adjust
+  + rv_dom_font_face_set_stretch
+  + rv_dom_font_face_set_style
+  + rv_dom_font_face_set_unicode_range
+  + rv_dom_font_face_set_values
+  + rv_dom_font_face_set_weight
+  + rv_dom_font_face_set_width
+gen/dom-api.json: +2279 -0
+gen/Ranvier.Dom.fs: +61 -0
+gen/dom-report.txt: +12 -3
+    (extended list) -interfaces 281, functions 2681 (getters 1432, setters 646, operations 514, constructors 46, namespace operations 4, static operations 14, iterator snapshots 3,
+    (extended list) -  Document: 70
+    (extended list) -  Document.fonts: interface FontFaceSet outside gen/dom.json
+host/RanvierWebCoreDom.h: +144 -0
+host/RanvierWebCoreDom.cpp: +39 -0
+host/dom/RanvierDomGlue.h: +39 -0
+host/dom/RanvierDomGlue.cpp: +696 -1
+    (extended list) -    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", 
+tests/abi/NativeDom.fs: +168 -0
+host/RanvierCapabilityCatalogue.inc: +5 -0
+GEN_DELTA=PASS

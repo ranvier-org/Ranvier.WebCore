@@ -1,0 +1,4 @@
+media queries PASS: 401 assertions, 6 fixture steps, 5 with Chromium, 1 run(s)
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+
+EXIT_CODE=0

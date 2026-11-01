@@ -18,9 +18,15 @@ static constexpr const char* capabilityFacilityNames[] = {
     "shared-worker", "websocket", "webtransport", "file-system", "push", "inspector", "remote-inspector",
     "jsc-inspector", "jit", "dfg-jit", "ftl-jit", "webassembly", "webassembly-bbq-jit", "webassembly-omg-jit",
     "accessibility", "accessibility-uia", "accessibility-events", "clipboard", "clipboard-read-callback",
-    "clipboard-write-callback", "drop", "drag-out", "popups", "tooltip", "input", "ime", "frame", "scroll",
+    "clipboard-write-callback", "clipboard-file-write-callback", "clipboard-files", "drop", "drag-out", "data-transfer-files",
+    "range-replacement", "popups", "tooltip", "input", "ime", "frame", "scroll",
     "speech-synthesis", "gamepad", "spellcheck", "pdfjs", "wk-web-extensions", "notifications", "diagnostics",
-    "inspector-frontend", "cascade-diagnostics"
+    "inspector-frontend", "cascade-diagnostics", "media-preferences", "media-color-scheme", "media-reduced-motion",
+    "media-contrast", "media-pointer", "media-hover", "media-text-scale", "media-forced-colors", "media-contrast-less",
+    "media-reduced-transparency", "media-reduced-data",
+    "screen-wake-lock", "sleep-disabler-callback",
+    "notification-presenter", "media-capabilities", "media-decoding-provider", "media-encoding-provider",
+    "snapshot-options", "snapshot-display-p3", "image-encoding-png", "image-encoding-jpeg", "image-encoding-webp"
 };
 
 static constexpr const char* capabilityHostFacilityNames[] = { "clipboard", "drop", "tooltip", "input", "ime", "scroll" };
@@ -227,6 +233,9 @@ static CapabilityResult capabilityQuery(RvHost& host, int category, const char* 
     if (!std::strcmp(name, "resource-callback")) { result.facts[1] = 1; result.boolean(!!host.resourceHandler); }
     else if (!std::strcmp(name, "clipboard-read-callback")) { result.facts[1] = 1; result.boolean(!!host.clipboardRead); }
     else if (!std::strcmp(name, "clipboard-write-callback")) { result.facts[1] = 1; result.boolean(!!host.clipboardWrite); }
+    else if (!std::strcmp(name, "clipboard-file-write-callback")) { result.facts[1] = 1; result.boolean(!!host.clipboardWriteFile); }
+    else if (!std::strcmp(name, "clipboard-files") || !std::strcmp(name, "data-transfer-files") || !std::strcmp(name, "range-replacement"))
+        result.facts[1] = rv_abi_has(name);
     else if (!std::strcmp(name, "popups")) { result.facts[1] = 1; result.boolean(!!host.popupCallback); }
     else if (!std::strcmp(name, "drag-out")) { result.facts[1] = 1; result.boolean(!!host.dragStartCallback); }
     else if (!std::strcmp(name, "frame")) { result.facts[1] = 1; result.boolean(!!host.frameCallback); }
@@ -235,8 +244,43 @@ static CapabilityResult capabilityQuery(RvHost& host, int category, const char* 
     else if (!std::strcmp(name, "accessibility-uia")) result.facts[1] = rv_abi_has(name);
     else if (!std::strcmp(name, "diagnostics")) { result.facts[1] = 1; result.boolean(host.diagnostics); }
     else if (!std::strcmp(name, "cascade-diagnostics")) { result.facts[1] = 1; result.boolean(host.diagnostics); }
+    // Supplied by rv_host_set_media_preferences: enabled while the host supplies a value other than the default.
+    else if (!std::strcmp(name, "media-preferences")) {
+        auto& m = host.mediaPreferences;
+        result.facts[1] = 1;
+        result.boolean(m.color_scheme || m.reduced_motion || m.contrast || m.pointer || m.hover || m.any_pointer || m.any_hover || m.text_scale);
+    } else if (!std::strcmp(name, "media-color-scheme")) { result.facts[1] = 1; result.boolean(host.mediaPreferences.color_scheme); }
+    else if (!std::strcmp(name, "media-reduced-motion")) { result.facts[1] = 1; result.boolean(host.mediaPreferences.reduced_motion); }
+    else if (!std::strcmp(name, "media-contrast")) { result.facts[1] = 1; result.boolean(host.mediaPreferences.contrast); }
+    else if (!std::strcmp(name, "media-pointer")) { result.facts[1] = 1; result.boolean(host.mediaPreferences.pointer || host.mediaPreferences.any_pointer); }
+    else if (!std::strcmp(name, "media-hover")) { result.facts[1] = 1; result.boolean(host.mediaPreferences.hover || host.mediaPreferences.any_hover); }
+    else if (!std::strcmp(name, "media-text-scale")) { result.facts[1] = 1; result.boolean(host.mediaPreferences.text_scale); }
+    // WebCore evaluates forced-colors as none and prefers-contrast less as never, and has no reduced-transparency or
+    // reduced-data feature.
+    else if (!std::strcmp(name, "media-forced-colors") || !std::strcmp(name, "media-contrast-less")
+        || !std::strcmp(name, "media-reduced-transparency") || !std::strcmp(name, "media-reduced-data")) result.facts[1] = 0;
+    // Granted only by an application policy; the display stays awake only through a sleep disabler callback.
+    else if (!std::strcmp(name, "screen-wake-lock")) { result.facts[1] = 1; result.boolean(!!host.wakeLockPolicy); }
+    else if (!std::strcmp(name, "sleep-disabler-callback")) { result.facts[1] = 1; result.boolean(sleepDisablerCallbackSet); }
+    else if (!std::strcmp(name, "notification-presenter")) { result.facts[1] = 1; result.boolean(!!host.notificationPresenter); }
     // No flavor ships a developer-tools frontend (WebInspectorUI) or connects one to the page's inspector controller.
     else if (!std::strcmp(name, "inspector-frontend")) { result.facts[1] = 0; result.facts[4] = 0; }
+    else if (!std::strcmp(name, "media-capabilities")) result.facts[1] = rv_abi_has(name);
+    else if (!std::strcmp(name, "snapshot-options")) result.facts[1] = rv_abi_has(name);
+    // A display-p3 snapshot needs the engine's DisplayP3 destination color space, compiled out on some flavors.
+    else if (!std::strcmp(name, "snapshot-display-p3")) {
+        result.facts[1] = snapshotDisplayP3() ? 1 : 0;
+        result.facts[4] = result.facts[1];
+    } else if (!std::strncmp(name, "image-encoding-", 15)) {
+        result.facts[1] = MIMETypeRegistry::isSupportedImageMIMETypeForEncoding(makeString("image/"_s, String::fromUTF8(name + 15))) ? 1 : 0;
+        result.facts[4] = result.facts[1];
+    }
+    // A media engine configuration provider answers MediaCapabilities queries; without one every valid query is unsupported.
+    else if (!std::strcmp(name, "media-decoding-provider") || !std::strcmp(name, "media-encoding-provider")) {
+        auto provider = ranvier_media_capabilities_provider(!std::strcmp(name, "media-encoding-provider"));
+        result.facts[1] = provider;
+        result.facts[4] = provider;
+    }
     else if (capabilityContains(capabilityHostFacilityNames, name)) result.facts[1] = 1;
     if (result.kind == 1) result.facts[2] = result.number ? 1 : 0;
     return result;

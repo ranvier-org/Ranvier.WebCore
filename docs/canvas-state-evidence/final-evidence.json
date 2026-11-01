@@ -1,0 +1,43 @@
+{
+ "group": "R03 canvas state, transforms and compositing (ranvier-org/Ranvier.WebCore#92)",
+ "nativeHead": "304103956ec91dd76d17fb4ef884869b969db216",
+ "runtimeSourceHead": "304103956ec91dd76d17fb4ef884869b969db216",
+ "abi": 55,
+ "runtime": {
+  "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+  "RanvierWebCoreHost.dll": "43fade8296691b8863ab4c7c95b944abc4065cfa0e7ba1930716a94e01ba96a4",
+  "WebCore.dll": "2bfea4195b245cd58394b013eeb5a58e1324922e4a61395dfd761a7f85f1a46b"
+ },
+ "canvasStateAssertions": 475,
+ "repeat30": {
+  "runs": 30,
+  "distinct": [
+   "PASS: canvas_state 475 assertions"
+  ]
+ },
+ "fullBatchRaw": 91748,
+ "probes": 66,
+ "teardownProbes": 106,
+ "qualifications": [
+  "canvas layers (beginLayer/endLayer) return RV_ERR_UNSUPPORTED: CanvasLayersEnabled stays off and Chromium 156 has no layers to compare with",
+  "WebKit accepts its own operator names darker, plus-darker, plus-lighter and clear, which Chromium ignores (engine difference)",
+  "viewport_scroll counted 3231 instead of 3232 once while another probe ran in parallel; its rerun and 5 standalone runs on the R02 and R03 runtimes count 3232 (viewport-scroll-timing-3231.log); the probe has a timing-dependent count outside this group"
+ ],
+ "files": {
+  "batch-results.json": "019b63aeaebcc675aac9ee778eb35495a4242c0e1793844bda50f61da7f40fb9",
+  "build_state_candidate.py": "2facccc501ea5fa22a1578b7b197d00f6bfcbc740d662f567184b330ac7ee8ef",
+  "canvas-state-repeat30.txt": "1ec69bf295b3d7018a72fe6cf0a75f90367360c0e4dcfe667d16b32e03340196",
+  "canvas-state-report.json": "0b6c99f6df1a431f355f26c505d3765c2b703ccd311dea568452987b8f0a7d58",
+  "make_state_evidence.py": "b48fb9d280b968b612989b219ff23bf5bafa2a842505b0a6230d09c3c4edaa78",
+  "red-chromium.json": "db3d4d5d91a909396eb90f002bb9eee827f782741117e946f40398893c263dfc",
+  "red-native.json": "548acfa5bad731822dd5a6eff485f2ea08c0b5a367876df380457d7dc6c38579",
+  "red_chromium.mjs": "5cfaea6e54dfd1d71bda8c47b7ef9d945336aa5bd6d734acc3adf24c42d12ba9",
+  "red_native.py": "89a552d9b4d38eac8789b78442405d61f259f442f04c6433702148400d762c0b",
+  "repeat30.sh": "e2a8e4eb366f66c2957e787b0987080a2c264816d4f7837e9e691612b88d7ea0",
+  "run_state_full_batch.py": "1b8484b871cd3626bd4d2ece07fb84b7640eb2f839f5e26ccb51595ef1a4c936",
+  "runtime-receipt.json": "0582372cbbb170ce722653009031021e9e72d58b75126acc1ab80a488f58cf0c",
+  "source-patches.json": "b3efab39d38d4e94480410e126936069190ed966b65caab868518345604f809b",
+  "teardown-probes.json": "3a2481b4a66ecacfee964dafaeab20b96adb02e55175b912b57ae1639b4ea015",
+  "viewport-scroll-timing-3231.log": "361e501c736def7e52717eb1d92b9d1710c62798c15d309e980f13cafb853126"
+ }
+}

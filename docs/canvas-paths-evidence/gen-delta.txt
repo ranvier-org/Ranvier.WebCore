@@ -1,0 +1,74 @@
+base 3018e23; dom-api functions added 38 removed 0 changed 0
+  rv_dom_canvas_rendering_context2_d_stroke_rect
+  rv_dom_canvas_rendering_context2_d_begin_path
+  rv_dom_canvas_rendering_context2_d_fill_1
+  rv_dom_canvas_rendering_context2_d_fill_2
+  rv_dom_canvas_rendering_context2_d_stroke_0
+  rv_dom_canvas_rendering_context2_d_stroke_1
+  rv_dom_canvas_rendering_context2_d_clip_1
+  rv_dom_canvas_rendering_context2_d_clip_2
+  rv_dom_canvas_rendering_context2_d_is_point_in_path_3
+  rv_dom_canvas_rendering_context2_d_is_point_in_path_4
+  rv_dom_canvas_rendering_context2_d_is_point_in_stroke_2
+  rv_dom_canvas_rendering_context2_d_is_point_in_stroke_3
+  rv_dom_canvas_rendering_context2_d_close_path
+  rv_dom_canvas_rendering_context2_d_move_to
+  rv_dom_canvas_rendering_context2_d_line_to
+  rv_dom_canvas_rendering_context2_d_quadratic_curve_to
+  rv_dom_canvas_rendering_context2_d_bezier_curve_to
+  rv_dom_canvas_rendering_context2_d_arc_to
+  rv_dom_canvas_rendering_context2_d_rect
+  rv_dom_canvas_rendering_context2_d_round_rect_5_list
+  rv_dom_canvas_rendering_context2_d_round_rect_5_value
+  rv_dom_canvas_rendering_context2_d_arc
+  rv_dom_canvas_rendering_context2_d_ellipse
+  rv_dom_path2_d_create_0
+  rv_dom_path2_d_create_1_path
+  rv_dom_path2_d_create_1_d
+  rv_dom_path2_d_add_path
+  rv_dom_path2_d_close_path
+  rv_dom_path2_d_move_to
+  rv_dom_path2_d_line_to
+  rv_dom_path2_d_quadratic_curve_to
+  rv_dom_path2_d_bezier_curve_to
+  rv_dom_path2_d_arc_to
+  rv_dom_path2_d_rect
+  rv_dom_path2_d_round_rect_5_list
+  rv_dom_path2_d_round_rect_5_value
+  rv_dom_path2_d_arc
+  rv_dom_path2_d_ellipse
+section with additions: interfaces
+section with additions: contractInterfaces
+section with additions: enumerations
+section with additions: containers
+-  CanvasRenderingContext2D: 5
++  CanvasRenderingContext2D: 28
++  Path2D: 15
+-  CanvasRenderingContext2D.arc: outside the gen/dom.json memberSelections
+-  CanvasRenderingContext2D.arcTo: outside the gen/dom.json memberSelections
+-  CanvasRenderingContext2D.beginPath: outside the gen/dom.json memberSelections
+-  CanvasRenderingContext2D.bezierCurveTo: outside the gen/dom.json memberSelections
+-  CanvasRenderingContext2D.clip: outside the gen/dom.json memberSelections
+-  CanvasRenderingContext2D.clip: outside the gen/dom.json memberSelections
+-  CanvasRenderingContext2D.closePath: outside the gen/dom.json memberSelections
+-  CanvasRenderingContext2D.ellipse: outside the gen/dom.json memberSelections
+-  CanvasRenderingContext2D.fill: outside the gen/dom.json memberSelections
+-  CanvasRenderingContext2D.fill: outside the gen/dom.json memberSelections
+-  CanvasRenderingContext2D.isPointInPath: outside the gen/dom.json memberSelections
+-  CanvasRenderingContext2D.isPointInPath: outside the gen/dom.json memberSelections
+-  CanvasRenderingContext2D.isPointInStroke: outside the gen/dom.json memberSelections
+-  CanvasRenderingContext2D.isPointInStroke: outside the gen/dom.json memberSelections
+-  CanvasRenderingContext2D.lineTo: outside the gen/dom.json memberSelections
+-  CanvasRenderingContext2D.moveTo: outside the gen/dom.json memberSelections
+-  CanvasRenderingContext2D.quadraticCurveTo: outside the gen/dom.json memberSelections
+-  CanvasRenderingContext2D.rect: outside the gen/dom.json memberSelections
+-  CanvasRenderingContext2D.roundRect: outside the gen/dom.json memberSelections
+-  CanvasRenderingContext2D.roundRect: outside the gen/dom.json memberSelections
+-  CanvasRenderingContext2D.stroke: outside the gen/dom.json memberSelections
+-  CanvasRenderingContext2D.stroke: outside the gen/dom.json memberSelections
+-  CanvasRenderingContext2D.strokeRect: outside the gen/dom.json memberSelections
+handle retain/release: rv_dom_path2_d_retain, rv_dom_path2_d_release
+windows check: interfaces 286, functions 2728 (getters 1436, setters 649, operations 551, constructors 49, namespace operations 4, static operations 14, iterator snapshots 3, context operations 22), handle types 66, constants 206, enumerations 12, dictionaries 44, stubs 0, left out 832
+wsl ubuntu check: interfaces 286, functions 2728 (getters 1436, setters 649, operations 551, constructors 49, namespace operations 4, static operations 14, iterator snapshots 3, context operations 22), handle types 66, constants 206, enumerations 12, dictionaries 44, stubs 0, left out 832
+exit=0
+OK

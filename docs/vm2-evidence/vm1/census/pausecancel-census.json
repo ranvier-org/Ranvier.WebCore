@@ -1,0 +1,36 @@
+{
+ "scenario": "pausecancel",
+ "config": "census",
+ "drain": false,
+ "results": {
+  "pending after pause": true,
+  "log before drain": {
+   "promises": [
+    "a:ready:AbortError",
+    "a:finished:AbortError"
+   ],
+   "events": [
+    "a:cancel:null:number"
+   ],
+   "hooks": {}
+  }
+ },
+ "hits": {
+  "- | VM::drainMicrotasks": 3,
+  "- | VM::drainMicrotasks | census": {},
+  "- | WebCore checkpoint": 1,
+  "- | WebCore checkpoint | census": {},
+  "settle page | WebCore checkpoint": 2,
+  "settle page | WebCore checkpoint | census": {},
+  "settle page | VM::drainMicrotasks": 2,
+  "settle page | VM::drainMicrotasks | census": {},
+  "animate 1000ms | VM::drainMicrotasks": 2,
+  "animate 1000ms | VM::drainMicrotasks | census": {},
+  "frames after cancel | WebCore checkpoint": 8,
+  "frames after cancel | WebCore checkpoint | census": {},
+  "frames after cancel | VM::drainMicrotasks": 8,
+  "frames after cancel | VM::drainMicrotasks | census": {},
+  "host destroy | VM::drainMicrotasks": 3,
+  "host destroy | VM::drainMicrotasks | census": {}
+ }
+}

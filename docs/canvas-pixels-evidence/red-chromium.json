@@ -1,0 +1,253 @@
+{
+ "browser": "156.0.8078.4",
+ "construct": {
+  "width": 2,
+  "height": 3,
+  "length": 24,
+  "colorSpace": "srgb",
+  "pixelFormat": "rgba-unorm8",
+  "zero": true,
+  "dataType": "Uint8ClampedArray"
+ },
+ "constructErrors": {
+  "zeroWidth": "IndexSizeError",
+  "zeroHeight": "IndexSizeError",
+  "huge": "IndexSizeError",
+  "notMultipleOf4": "InvalidStateError",
+  "notMultipleOfRow": "IndexSizeError",
+  "heightMismatch": "IndexSizeError",
+  "emptyData": "InvalidStateError",
+  "p3": "display-p3",
+  "badColorSpace": "TypeError"
+ },
+ "constructFromData": {
+  "width": 1,
+  "height": 2,
+  "data": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ]
+ },
+ "createImageData": {
+  "negative": [
+   3,
+   2
+  ],
+  "zero": "IndexSizeError",
+  "copyOf": [
+   1,
+   2,
+   true
+  ],
+  "colorSpace": "srgb"
+ },
+ "roundTrip": [
+  255,
+  0,
+  0,
+  255,
+  0,
+  255,
+  0,
+  255,
+  0,
+  0,
+  255,
+  255,
+  0,
+  0,
+  0,
+  0,
+  255,
+  255,
+  255,
+  128,
+  0,
+  0,
+  0,
+  255,
+  200,
+  100,
+  50,
+  255,
+  1,
+  2,
+  3,
+  255
+ ],
+ "outside": [
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0
+ ],
+ "negativeRect": [
+  255,
+  0,
+  0,
+  255,
+  0,
+  255,
+  0,
+  255
+ ],
+ "getErrors": {
+  "zeroWidth": "IndexSizeError",
+  "zeroHeight": "IndexSizeError"
+ },
+ "getColorSpace": "srgb",
+ "putIgnoresState": [
+  9,
+  8,
+  7,
+  255
+ ],
+ "dirty": {
+  "inside": [
+   0,
+   0,
+   255,
+   255
+  ],
+  "corner": [
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ "dirtyNegative": {
+  "at5": [
+   0,
+   0,
+   255,
+   255
+  ],
+  "at6": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "at4": [
+   0,
+   0,
+   255,
+   255
+  ]
+ },
+ "putPartlyOutside": "ok",
+ "partlyOutsidePixel": [
+  0,
+  0,
+  255,
+  255
+ ],
+ "drawCanvas": {
+  "left": [
+   255,
+   0,
+   0,
+   255
+  ],
+  "right": [
+   0,
+   0,
+   255,
+   255
+  ],
+  "beyond": [
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ "drawCanvasScaled": {
+  "left": [
+   255,
+   0,
+   0,
+   255
+  ],
+  "right": [
+   0,
+   0,
+   255,
+   255
+  ]
+ },
+ "drawCanvasSubRect": {
+  "left": [
+   0,
+   0,
+   255,
+   255
+  ],
+  "right": [
+   0,
+   0,
+   255,
+   255
+  ],
+  "beyond": [
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ "drawErrors": {
+  "zeroSizeCanvas": "InvalidStateError",
+  "zeroSourceRect": "ok",
+  "nonFinite": "ok",
+  "emptyImage": "ok"
+ },
+ "drawImage": {
+  "natural": [
+   2,
+   2
+  ],
+  "pixels": [
+   255,
+   0,
+   0,
+   255,
+   0,
+   255,
+   0,
+   255,
+   0,
+   0,
+   255,
+   255,
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ "drawBroken": "InvalidStateError",
+ "imageDataDataWritable": [
+  255,
+  0
+ ]
+}

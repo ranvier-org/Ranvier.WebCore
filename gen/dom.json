@@ -17,8 +17,31 @@
     "browserWellFormedUnions and browserWellFormedSetters list the unions and interfaces whose USVString inputs the",
     "Fable browser provider converts to well-formed strings. Every generated string input is UTF-8 with an explicit byte",
     "length; sequenceStringSpans only names the string sequences of its interfaces Utf8.",
-    "elementArrayReflections lists [Reflect] FrozenArray<Element>? attributes bound to the engine's element array reflection: the getter returns a snapshot sequence, or none for null; the setter takes a sequence, or none to clear."
+    "elementArrayReflections lists [Reflect] FrozenArray<Element>? attributes bound to the engine's element array reflection: the getter returns a snapshot sequence, or none for null; the setter takes a sequence, or none to clear.",
+    "syntheticIdl names repository IDL files that define dictionaries only, the native transports of JavaScript object arguments.",
+    "argumentTypes retypes Interface.member.argument (by the declaring interface or mixin), and argumentAdapters converts",
+    "the decoded argument ({value}) to the C++ the member takes, keyed by the generated function's interface.",
+    "globalObjectMembers lists the Interface.member operations whose [CallWith=CurrentGlobalObject] receives the document global object.",
+    "customConstructors replaces a [Custom] constructor with the IDL signature its custom binding implements; presenceArguments",
+    "gives an optional nullable argument a name_present flag, so absent and null stay distinct. constructors overloads gives",
+    "an overload, by argument count, its own factory settings.",
+    "optionalObjectMembers lists optional nullable object or node dictionary members passed as Rv<Root>* const* (RvNode* const*): NULL absent, a pointer to NULL null.",
+    "absentObjectMembers lists optional nonnullable object dictionary members without a default, passed as Rv<Root>*: NULL absent; in a result dictionary the member is a new reference, or NULL, that the dictionary's release drops.",
+    "unionFieldDefaults lists dictionary union members with a string arm whose IDL string default the glue assigns, for a C++ struct that leaves the member empty; a present field replaces it.",
+    "setterExpressions maps Interface.member to the C++ a setter calls with {value}, for a member whose C++ type differs from its IDL type.",
+    "browserArgumentConversions maps Interface.member.argument to the JavaScript function the Fable provider applies to an argument: Keyframe sequences become the browser's keyframe objects.",
+    "settingsDocuments maps an interface to the C++ that reads the Document whose settings gate its [EnabledBySetting] members; null returns RV_ERR_DETACHED.",
+    "callbackObjectRoots also lists callback functions (callback X = ...), whose handles the host creates; the generator binds their release and retain.",
+    "argumentHostChecks maps an object handle root to the C++ predicate (argument, receiver) that tells whether an argument belongs to the receiver's host: another host returns RV_ERR_WRONG_HOST.",
+    "customOperations replaces a [Custom] operation with the signature its native binding implements, and callExpressions names the C++ an operation calls.",
+    "syntheticDictionaries lists the dictionaries of syntheticIdl, which no WebKit IDL file defines.",
+    "contextDocuments names the C++ document of an object whose operations take a checked context Document: another document returns RV_ERR_WRONG_HOST.",
+    "resultValueOverloads adds C++ overloads that convert a result dictionary field to its IDL transport type.",
+    "browserResultConversions maps Interface.member to the JavaScript function the Fable provider applies to the browser's result: getKeyframes gives ComputedKeyframe objects.",
+    "browserIndexedGetters lists named IDL getters that browsers expose only as an indexed property; the Fable binding reads $0[index], null when absent.",
+    "webcoreNames lists the WebCore names that this file's C++ snippets use and no IDL definition declares; the glue writes them WebCore::<name>."
   ],
+  "webcoreNames": ["LiveNodeList", "RanvierCollectionLike", "WebAnimationTime"],
   "attributeBridges": {
     "Document.adoptedStyleSheets": {
       "sequenceElement": "CSSStyleSheet",
@@ -248,6 +271,91 @@
     "FileReader": {
       "receiver": "Document",
       "factory": "FileReader::create"
+    },
+    "Text": {
+      "receiver": "Document",
+      "factory": "Text::create"
+    },
+    "Comment": {
+      "receiver": "Document",
+      "factory": "Comment::create"
+    },
+    "DocumentFragment": {
+      "receiver": "Document",
+      "factory": "DocumentFragment::create"
+    },
+    "Range": {
+      "receiver": "Document",
+      "factory": "Range::create"
+    },
+    "Document": {
+      "receiver": "Document",
+      "factory": "Document::create"
+    },
+    "StaticRange": {
+      "receiver": "Document",
+      "factory": "StaticRange::create",
+      "passReceiver": false
+    },
+    "InputEvent": {
+      "receiver": "Document",
+      "factory": "InputEvent::create",
+      "passReceiver": false
+    },
+    "WheelEvent": {
+      "receiver": "Document",
+      "factory": "WheelEvent::create",
+      "passReceiver": false
+    },
+    "PointerEvent": {
+      "receiver": "Document",
+      "factory": "PointerEvent::create",
+      "passReceiver": false
+    },
+    "DataTransfer": {
+      "receiver": "Document",
+      "factory": "DataTransfer::create",
+      "passReceiver": false
+    },
+    "KeyframeEffect": {
+      "receiver": "Document",
+      "factory": "KeyframeEffect::create",
+      "globalObject": "callWith",
+      "overloads": {
+        "1": {
+          "globalObject": false,
+          "passReceiver": false
+        }
+      }
+    },
+    "DocumentTimeline": {
+      "receiver": "Document",
+      "factory": "DocumentTimeline::create"
+    },
+    "WebAnimation": {
+      "receiver": "Document",
+      "factory": "[](Document& document, AnimationEffect* effect, std::optional<RefPtr<AnimationTimeline>>&& timeline) -> Ref<WebAnimation> { return timeline ? WebAnimation::create(document, effect, timeline->get()) : WebAnimation::create(document, effect); }"
+    },
+    "FontFace": {
+      "receiver": "Document",
+      "factory": "FontFace::create"
+    },
+    "Path2D": {
+      "receiver": "Document",
+      "factory": "Path2D::create",
+      "passReceiver": false
+    },
+    "ScrollTimeline": {
+      "receiver": "Document",
+      "factory": "ScrollTimeline::create"
+    },
+    "ViewTimeline": {
+      "receiver": "Document",
+      "factory": "ViewTimeline::create"
+    },
+    "CustomEffect": {
+      "receiver": "Document",
+      "factory": "CustomEffect::create"
     }
   },
   "dictionaryCppTypes": {
@@ -266,7 +374,15 @@
     "HashChangeEventInit": "HashChangeEvent::Init",
     "MediaQueryListEventInit": "MediaQueryListEvent::Init",
     "PopStateEventInit": "PopStateEvent::Init",
-    "CompositionEventInit": "CompositionEvent::Init"
+    "CompositionEventInit": "CompositionEvent::Init",
+    "InputEventInit": "InputEvent::Init",
+    "WheelEventInit": "WheelEvent::Init",
+    "PointerEventInit": "PointerEvent::Init",
+    "StaticRangeInit": "StaticRange::Init",
+    "Keyframe": "Ranvier::Keyframe",
+    "KeyframeProperty": "Ranvier::KeyframeProperty",
+    "FontFaceDescriptors": "FontFace::Descriptors",
+    "ComputedKeyframe": "Ranvier::ComputedKeyframe"
   },
   "dictionaryObjectMembers": [
     "FormDataEventInit.formData"
@@ -380,9 +496,20 @@
     "StylePropertyMap": "Document",
     "DOMMatrix": "Document",
     "DOMFormData": "Document",
-    "URLSearchParams": "Document"
+    "URLSearchParams": "Document",
+    "DataTransfer": "Document",
+    "DataTransferItemList": "Document",
+    "DataTransferItem": "Document",
+    "KeyframeEffect": "Document",
+    "AnimationEffect": "Document",
+    "CanvasGradient": "Document",
+    "CustomEffect": "Document"
   },
   "finiteNumberInputs": [
+    "CanvasGradient.addColorStop",
+    "CanvasRenderingContext2D.createLinearGradient",
+    "CanvasRenderingContext2D.createRadialGradient",
+    "CanvasRenderingContext2D.createConicGradient",
     "CSSUnitValue",
     "SVGSVGElement",
     "SVGGeometryElement",
@@ -552,6 +679,9 @@
     "UIEvent",
     "MouseEvent",
     "PointerEvent",
+    "Touch",
+    "TouchList",
+    "TouchEvent",
     "WheelEvent",
     "KeyboardEvent",
     "FocusEvent",
@@ -680,7 +810,33 @@
     "VisualViewport",
     "Highlight",
     "HighlightRegistry",
-    "FileReader"
+    "FileReader",
+    "FontFace",
+    "FontFaceSet",
+    "WebAnimation",
+    "AnimationEffect",
+    "KeyframeEffect",
+    "CustomEffect",
+    "AnimationTimeline",
+    "DocumentTimeline",
+    "ScrollTimeline",
+    "ViewTimeline",
+    "CSSAnimation",
+    "CSSTransition",
+    "DataTransfer",
+    "DataTransferItemList",
+    "DataTransferItem",
+    "ClipboardEvent",
+    "DragEvent",
+    "HTMLCanvasElement",
+    "CanvasRenderingContext2D",
+    "CanvasGradient",
+    "CanvasPattern",
+    "ImageData",
+    "Path2D",
+    "ImageBitmap",
+    "ImageBitmapRenderingContext",
+    "TextMetrics"
   ],
   "skipDirectories": [
     "Modules/",
@@ -705,7 +861,10 @@
     "svgTags": "svg/svgtags.in",
     "dictionaries": [
       "EventListenerOptions",
-      "AddEventListenerOptions"
+      "AddEventListenerOptions",
+      "KeyframeEffectOptions",
+      "DocumentTimelineOptions",
+      "EffectTiming"
     ],
     "interfaces": [
       "SVGElement",
@@ -716,8 +875,6 @@
       "CSSStyleSheet",
       "CSSStyleProperties",
       "CustomElementRegistry",
-      "ClipboardEvent",
-      "DragEvent",
       "ErrorEvent",
       "FormDataEvent",
       "GamepadEvent",
@@ -741,8 +898,7 @@
       "SubmitEvent",
       "TextTrack",
       "TextTrackList",
-      "TimeRanges",
-      "TouchEvent"
+      "TimeRanges"
     ],
     "aliases": {
       "CSSAnimationEvent": "AnimationEvent",
@@ -777,7 +933,10 @@
     "DOMPointReadOnly",
     "DOMMatrixReadOnly",
     "CSSTransformComponent",
-    "Event"
+    "Event",
+    "AnimationEffect",
+    "AnimationTimeline",
+    "WebAnimation"
   ],
   "interfaceHeaders": {
     "SVGAnimatedInteger": "svg/properties/SVGAnimatedPropertyImpl.h",
@@ -815,12 +974,15 @@
     "HashChangeEvent",
     "MediaQueryListEvent",
     "PopStateEvent",
-    "CustomEvent"
+    "CustomEvent",
+    "ClipboardEvent"
   ],
   "castVia": {
     "SVGAnimationElement": "SVGElement",
     "RadioNodeList": "LiveNodeList",
-    "CSSConditionRule": "CSSGroupingRule"
+    "CSSConditionRule": "CSSGroupingRule",
+    "CSSAnimation": "WebAnimation",
+    "CSSTransition": "WebAnimation"
   },
   "atomArguments": [
     "StyleSheetList.namedItem",
@@ -870,7 +1032,6 @@
     "Document.wasDiscarded",
     "Document.fullscreen",
     "Document.fullscreenElement",
-    "Document.pointerLockElement",
     "Document.immersiveElement",
     "Document.immersiveEnabled",
     "Document.captureEvents",
@@ -911,7 +1072,11 @@
     "AnimationEventInit.animation",
     "CSSTransitionEvent.animation",
     "TransitionEventInit.animation",
-    "UIEventInit.view"
+    "UIEventInit.view",
+    "CustomAnimationOptions.frameRate",
+    "DocumentTimeline.maximumFrameRate",
+    "DataTransferItem.getAsString",
+    "DataTransferItem.webkitGetAsEntry"
   ],
   "namespaceBindings": {
     "DOMCSSNamespace": {
@@ -932,14 +1097,18 @@
     "DOMMatrixReadOnly": {
       "receiver": "Document",
       "members": [
-        "fromMatrix"
+        "fromMatrix",
+        "fromFloat32Array",
+        "fromFloat64Array"
       ],
       "feature": "dom-geometry-matrix-readonly"
     },
     "DOMMatrix": {
       "receiver": "Document",
       "members": [
-        "fromMatrix"
+        "fromMatrix",
+        "fromFloat32Array",
+        "fromFloat64Array"
       ],
       "feature": "dom-geometry-matrix"
     },
@@ -1000,6 +1169,13 @@
         "createObjectURL": "blob-urls",
         "revokeObjectURL": "blob-urls"
       }
+    },
+    "Document": {
+      "receiver": "Document",
+      "members": [
+        "parseHTMLUnsafe"
+      ],
+      "feature": "dom-document-parse-html"
     }
   },
   "iterableBindings": {
@@ -1011,6 +1187,9 @@
     },
     "URLSearchParams": {
       "feature": "dom-url-search-params-entries"
+    },
+    "FontFaceSet": {
+      "feature": "dom-font-face-set-values"
     }
   },
   "windowBindings": {
@@ -1053,10 +1232,14 @@
           "Skip": 3
         }
       }
+    },
+    "CustomEffectCallback": {
+      "contract": "float -> unit"
     }
   },
   "byteSpanTypes": [
-    "BufferSource"
+    "BufferSource",
+    "BinaryData"
   ],
   "typedArrayViewTypes": [
     "ArrayBufferView"
@@ -1098,21 +1281,32 @@
   },
   "creationGatedInterfaces": {
     "CaretPosition": "Document.caretPositionFromPoint",
-    "VisualViewport": "DOMWindow.visualViewport"
+    "VisualViewport": "DOMWindow.visualViewport",
+    "DataTransferItemList": "DataTransfer.items",
+    "DataTransferItem": "DataTransferItemList.item"
   },
   "contextSettingsObjects": [
-    "FileReader"
+    "FileReader",
+    "FontFace",
+    "FontFaceSet"
   ],
   "eventTargetObjects": {
     "FileReader": {},
     "VisualViewport": {
       "attached": "impl->frame()"
-    }
+    },
+    "WebAnimation": {},
+    "FontFaceSet": {}
   },
   "resultDictionaries": [
     "URLPatternResult",
     "URLPatternComponentResult",
-    "URLPatternInit"
+    "URLPatternInit",
+    "TimelineRangeOffset",
+    "EffectTiming",
+    "ComputedEffectTiming",
+    "ComputedKeyframe",
+    "KeyframeProperty"
   ],
   "sequenceStringSpans": [
     "URLSearchParams"
@@ -1127,7 +1321,12 @@
   },
   "getterExpressions": {
     "AnimationPlaybackEvent.currentTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->currentTime()) return CSSNumberish { *time }; return std::nullopt; }()",
-    "AnimationPlaybackEvent.timelineTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->timelineTime()) return CSSNumberish { *time }; return std::nullopt; }()"
+    "AnimationPlaybackEvent.timelineTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->timelineTime()) return CSSNumberish { *time }; return std::nullopt; }()",
+    "WebAnimation.startTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->bindingsStartTime()) return CSSNumberish { *time }; return std::nullopt; }()",
+    "WebAnimation.currentTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->bindingsCurrentTime()) return CSSNumberish { *time }; return std::nullopt; }()",
+    "AnimationTimeline.currentTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->currentTime()) return CSSNumberish { *time }; return std::nullopt; }()",
+    "AnimationTimeline.duration": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->duration()) return CSSNumberish { *time }; return std::nullopt; }()",
+    "ViewTimeline.subject": "RefPtr<Element> { const_cast<Element*>(impl->subject()) }"
   },
   "setlikeBindings": {
     "Highlight": {
@@ -1137,6 +1336,218 @@
   "maplikeBindings": {
     "HighlightRegistry": {
       "adapter": "RanvierCollectionLike"
+    }
+  },
+  "memberSelections": {
+    "HTMLCanvasElement": [
+      "width",
+      "height"
+    ],
+    "CanvasRenderingContext2D": [
+      "canvas",
+      "fillStyle",
+      "fillRect",
+      "clearRect",
+      "createImageData",
+      "getImageData",
+      "putImageData",
+      "drawImage",
+      "strokeRect",
+      "beginPath",
+      "closePath",
+      "moveTo",
+      "lineTo",
+      "quadraticCurveTo",
+      "bezierCurveTo",
+      "arcTo",
+      "rect",
+      "roundRect",
+      "arc",
+      "ellipse",
+      "fill",
+      "stroke",
+      "clip",
+      "isPointInPath",
+      "isPointInStroke",
+      "save",
+      "restore",
+      "reset",
+      "scale",
+      "rotate",
+      "translate",
+      "transform",
+      "getTransform",
+      "setTransform",
+      "resetTransform",
+      "globalAlpha",
+      "globalCompositeOperation",
+      "filter",
+      "beginLayer",
+      "endLayer",
+      "strokeStyle",
+      "createLinearGradient",
+      "createRadialGradient",
+      "createConicGradient",
+      "createPattern",
+      "lineWidth",
+      "lineCap",
+      "lineJoin",
+      "miterLimit",
+      "setLineDash",
+      "getLineDash",
+      "lineDashOffset",
+      "shadowOffsetX",
+      "shadowOffsetY",
+      "shadowBlur",
+      "shadowColor",
+      "imageSmoothingEnabled",
+      "imageSmoothingQuality",
+      "font",
+      "textAlign",
+      "textBaseline",
+      "direction",
+      "letterSpacing",
+      "wordSpacing",
+      "fillText",
+      "strokeText",
+      "measureText"
+    ],
+    "CanvasGradient": [
+      "addColorStop"
+    ],
+    "CanvasPattern": [
+      "setTransform"
+    ],
+    "ImageBitmap": [
+      "width",
+      "height",
+      "close"
+    ],
+    "ImageBitmapRenderingContext": [
+      "canvas",
+      "transferFromImageBitmap"
+    ],
+    "ImageData": [
+      "width",
+      "height",
+      "colorSpace",
+      "pixelFormat"
+    ]
+  },
+  "unionSetterOverloads": [
+    "CanvasRenderingContext2D.fillStyle",
+    "CanvasRenderingContext2D.strokeStyle"
+  ],
+  "dictionaryEventTargetMembers": [
+    "MouseEventInit.relatedTarget"
+  ],
+  "referenceDictionaries": [
+    "StaticRangeInit"
+  ],
+  "typedArrayInputTypes": [
+    "Float32Array",
+    "Float64Array"
+  ],
+  "idlDefaultDictionaries": [
+    "PointerEventInit"
+  ],
+  "browserIndexedGetters": [
+    "DataTransferItemList.item"
+  ],
+  "syntheticIdl": [
+    "gen/RanvierKeyframes.idl"
+  ],
+  "argumentTypes": {
+    "Animatable.animate.keyframes": "sequence<Keyframe>?",
+    "KeyframeEffect.constructor.keyframes": "sequence<Keyframe>?",
+    "KeyframeEffect.setKeyframes.keyframes": "sequence<Keyframe>?"
+  },
+  "argumentAdapters": {
+    "Element.animate.keyframes": {
+      "wrap": "Ranvier::keyframesCall(*global, {value}, [&](JSC::Strong<JSC::JSObject>&& keyframesObject) { return {call}; })",
+      "argument": "std::move(keyframesObject)",
+      "header": "RanvierKeyframes.h",
+      "note": "keyframes NULL or present 0 is null; WebKit processes the keyframes as a script-built array of objects, and an error it leaves on the VM returns RV_ERR_DOM_EXCEPTION with its WebIDL name"
+    },
+    "KeyframeEffect.constructor.keyframes": {
+      "wrap": "Ranvier::keyframesCall(*global, {value}, [&](JSC::Strong<JSC::JSObject>&& keyframesObject) { return {call}; })",
+      "argument": "std::move(keyframesObject)",
+      "header": "RanvierKeyframes.h",
+      "note": "keyframes NULL or present 0 is null; WebKit processes the keyframes as a script-built array of objects, and an error it leaves on the VM returns RV_ERR_DOM_EXCEPTION with its WebIDL name"
+    },
+    "KeyframeEffect.setKeyframes.keyframes": {
+      "wrap": "Ranvier::keyframesCall(*global, {value}, [&](JSC::Strong<JSC::JSObject>&& keyframesObject) { return {call}; })",
+      "argument": "std::move(keyframesObject)",
+      "header": "RanvierKeyframes.h",
+      "note": "keyframes NULL or present 0 is null; WebKit processes the keyframes as a script-built array of objects, and an error it leaves on the VM returns RV_ERR_DOM_EXCEPTION with its WebIDL name"
+    }
+  },
+  "globalObjectMembers": [
+    "Element.animate",
+    "KeyframeEffect.setKeyframes"
+  ],
+  "customConstructors": {
+    "WebAnimation": {
+      "idl": "constructor(optional AnimationEffect? effect = null, optional AnimationTimeline? timeline);"
+    }
+  },
+  "presenceArguments": [
+    "WebAnimation.constructor.timeline"
+  ],
+  "optionalObjectMembers": [
+    "KeyframeAnimationOptions.timeline",
+    "ScrollTimelineOptions.source"
+  ],
+  "setterExpressions": {
+    "WebAnimation.startTime": "[&](auto&& time) { return impl->setBindingsStartTime(time ? std::optional<WebAnimationTime> { WebAnimationTime { *time } } : std::nullopt); }({value})",
+    "WebAnimation.currentTime": "[&](auto&& time) { return impl->setBindingsCurrentTime(time ? std::optional<WebAnimationTime> { WebAnimationTime { *time } } : std::nullopt); }({value})"
+  },
+  "browserArgumentConversions": {
+    "Animatable.animate.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})",
+    "Element.animate.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})",
+    "KeyframeEffect.setKeyframes.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})",
+    "Element.animate.options": "(o)=>{if(o==null||typeof o!=='object')return o;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing', 'iterationComposite', 'composite', 'pseudoElement', 'id', 'timeline'])if(o[k]!==undefined)r[k]=o[k];const d=o.duration;r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;for(const k of ['rangeStart','rangeEnd']){const u=o[k];if(u!==undefined)r[k]=u!=null&&typeof u==='object'&&Array.isArray(u.fields)?u.fields[0]:u;}return r;}",
+    "AnimationEffect.updateTiming.timing": "(t)=>{if(t==null)return t;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing'])if(t[k]!==undefined)r[k]=t[k];const d=t.duration;if(d!==undefined)r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;return r;}"
+  },
+  "unionArgumentConversions": [
+    "CanvasImageSource"
+  ],
+  "customOperations": {
+    "KeyframeEffect.getKeyframes": {
+      "idl": "sequence<ComputedKeyframe> getKeyframes();"
+    }
+  },
+  "callExpressions": {
+    "KeyframeEffect.getKeyframes": "Ranvier::computedKeyframes(*impl)"
+  },
+  "syntheticDictionaries": [
+    "Keyframe",
+    "KeyframeProperty",
+    "ComputedKeyframe"
+  ],
+  "contextDocuments": {
+    "AnimationEffect": "[&]() -> Document* { auto* effect = dynamicDowncast<KeyframeEffect>(impl.get()); return effect ? effect->document() : nullptr; }()",
+    "KeyframeEffect": "impl->document()"
+  },
+  "resultValueOverloads": [
+    "CSSNumberish resultValue(const WebAnimationTime& value) { return value; }"
+  ],
+  "browserResultConversions": {
+    "KeyframeEffect.getKeyframes": "(l)=>l.map((k)=>({offset:k.offset,computedOffset:k.computedOffset,easing:k.easing,composite:k.composite,properties:Object.keys(k).filter((n)=>!['offset','computedOffset','easing','composite'].includes(n)).map((n)=>({name:n,value:k[n]}))}))"
+  },
+  "absentObjectMembers": [
+    "TimelineRangeOffset.offset"
+  ],
+  "unionFieldDefaults": [
+    "ViewTimelineOptions.inset"
+  ],
+  "settingsDocuments": {
+    "DocumentTimeline": "impl->document()"
+  },
+  "argumentHostChecks": {
+    "CustomEffectCallback": {
+      "check": "Ranvier::customEffectCallbackMatches",
+      "header": "RanvierCustomEffects.h"
     }
   }
 }

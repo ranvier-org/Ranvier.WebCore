@@ -1,0 +1,4 @@
+canvas_pixels: 297 assertions PASS
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+
+EXIT_CODE=0

@@ -1,0 +1,71 @@
+{
+  "repoHead": "2ae2fce569d85df45ee1696ff84ae1bdab0726c1",
+  "dirty": [
+    " M gen/Ranvier.Dom.fs",
+    " M gen/dom-api.json",
+    " M gen/dom-report.txt",
+    " M gen/dom.json",
+    " M host/RanvierWebCoreDom.cpp",
+    " M host/RanvierWebCoreDom.h",
+    " M host/dom/RanvierDomGlue.cpp",
+    " M host/dom/RanvierDomGlue.h",
+    " M tests/abi/NativeDom.fs",
+    "?? docs/canvas-text-evidence/"
+  ],
+  "parent": "C:\\wk\\native-canvas-r04\\artifacts\\paints-candidate-1",
+  "parentHead": "65fe9d9",
+  "sourceExemptions": {
+    "Source/WebCore/Headers.cmake": "build list; this build runs no CMake generation",
+    "Source/WebCore/animation/WebAnimation.cpp": "implementation file; no unit of this build compiles it",
+    "Source/WebCore/html/ImageBitmap.cpp": "implementation file; no unit of this build compiles it",
+    "Source/WebCore/html/ImageBitmap.h": "header diff adds 2 static member declarations or comments only (a later root patch)",
+    "Source/WebCore/animation/WebAnimationPromiseObserver.h": "new header of a later root patch; asserted absent from every recompiled unit include log"
+  },
+  "exemptHeadersInRecompiledUnits": {
+    "000-RanvierDomGlue.cpp.obj.log": [
+      "Source/WebCore/html/ImageBitmap.h"
+    ],
+    "091-RanvierResourceGlue.cpp.obj.log": [
+      "Source/WebCore/html/ImageBitmap.h"
+    ]
+  },
+  "hostGlueObjects": [
+    "C:/wk/native-canvas-r04/artifacts/paints-candidate-1/090-RanvierCanvasGlue.cpp.obj",
+    "C:/wk/native-cascade-shadow/artifacts/native46-candidate-6/090-RanvierInspectGlue.cpp.obj",
+    "C:/wk/native-coords/artifacts/coords-candidate-5/090-RanvierViewportGlue.cpp.obj",
+    "C:/wk/native-forms/artifacts/forms-candidate-4/RanvierEventGlue.cpp.obj",
+    "C:/wk/native-forms/artifacts/forms-candidate-4/RanvierSvgViewGlue.cpp.obj"
+  ],
+  "recompiled": [
+    "host/dom/RanvierDomGlue.cpp",
+    "host/RanvierResourceGlue.cpp",
+    "host/RanvierWebCoreAbi.cpp",
+    "host/RanvierWebCoreDom.cpp",
+    "host/RanvierWebCoreUia.cpp",
+    "host/RanvierWebCoreD3D11.cpp"
+  ],
+  "runtimeSha256": {
+    "brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
+    "brotlidec.dll": "d42e2160f76f29a91f8be01b009b585c45496219794e16eab90b3599b6f70a7f",
+    "harfbuzz-icu.dll": "27662b477f7cb0c20cee64543a06296a48a00a17b6c7b57629bb166a30d5b164",
+    "harfbuzz.dll": "b519b2abc7f446ca45bff77aae1708f45afc9f557698bcd7295837cce0f12bfa",
+    "icudt77.dll": "b00d2fb856f548608c137e771257a70d0722654535c6c00b371c0fab3e2b802c",
+    "icuin77.dll": "e3785739e1fcf2e38053bbb85ef5f0f5dab63f865cbda762da5258566085a240",
+    "icuuc77.dll": "189c623f996c41488c262867bae04a5bb33dd485bd423e0a8bec05c455a90902",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+    "jpeg62.dll": "394811c1b1bf1fd914248a145ba3fcad1f5f27c7009754ce08e48ccb0266b785",
+    "libpng16.dll": "8b46592c5ea338dd6b23ca380d6db64a7849c2a534fc465a006ec668645d8185",
+    "libsharpyuv.dll": "df165de83480692f494c23061ef9c40c10abe19a89b1fa9fae2f1cd5152c07a7",
+    "libwebp.dll": "550c5a4860f61d32a274fdd7b5c8cbe266eee28b3a3ca888195248ea1d5e0f71",
+    "libwebpdemux.dll": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163",
+    "libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
+    "libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
+    "RanvierWebCoreHost.dll": "239566cd1d11c92d12476b7290b83c3f80892cb17a616b5201fcab8b0bff37ac",
+    "RanvierWebCoreHost.lib": "9cfd90c51f7e32aedd2ebaea4822ff5bc2ece71d90f2ac963cb6f59c2a61874a",
+    "RanvierWebCoreHost.pdb": "b4cba9c9511c97120b847a3e365c27c8f9179b64ea6dac717856cac7c1b3d7e8",
+    "WebCore.dll": "d96d90c90c3bc37b6157ee02ba4eafa89ba5d45a95ac48cebc056d380fc0b9c6",
+    "WebCore.lib": "4abb98ada96b6735c838df42e05b1f65a6b1b7b6024c81ac85503d38f722f2a0",
+    "WebCore.pdb": "7cf88b630f75a0f92163d83ebab7aa16cd483f6cbd41737400ee105a52fd03ad",
+    "zlib1.dll": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93"
+  }
+}

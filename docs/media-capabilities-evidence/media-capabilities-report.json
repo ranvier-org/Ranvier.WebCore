@@ -1,0 +1,174 @@
+{
+ "browser": "156.0.8078.4",
+ "decoding": [
+  {
+   "name": "file avc1",
+   "supported": 0,
+   "smooth": 0,
+   "powerEfficient": 0
+  },
+  {
+   "name": "file vp9",
+   "supported": 0,
+   "smooth": 0,
+   "powerEfficient": 0
+  },
+  {
+   "name": "file vp8",
+   "supported": 0,
+   "smooth": 0,
+   "powerEfficient": 0
+  },
+  {
+   "name": "file av1",
+   "supported": 0,
+   "smooth": 0,
+   "powerEfficient": 0
+  },
+  {
+   "name": "file opus",
+   "supported": 0,
+   "smooth": 0,
+   "powerEfficient": 0
+  },
+  {
+   "name": "file aac",
+   "supported": 0,
+   "smooth": 0,
+   "powerEfficient": 0
+  },
+  {
+   "name": "file audio and video",
+   "supported": 0,
+   "smooth": 0,
+   "powerEfficient": 0
+  },
+  {
+   "name": "file unknown container",
+   "supported": 0,
+   "smooth": 0,
+   "powerEfficient": 0
+  },
+  {
+   "name": "file hdr pq rec2020",
+   "supported": 0,
+   "smooth": 0,
+   "powerEfficient": 0
+  },
+  {
+   "name": "media-source vp8",
+   "supported": 0,
+   "smooth": 0,
+   "powerEfficient": 0
+  },
+  {
+   "name": "webrtc vp8",
+   "supported": 0,
+   "smooth": 0,
+   "powerEfficient": 0
+  },
+  {
+   "name": "audio full",
+   "supported": 0,
+   "smooth": 0,
+   "powerEfficient": 0
+  },
+  {
+   "name": "invalid empty",
+   "error": "TypeError"
+  },
+  {
+   "name": "invalid bucket without codecs",
+   "error": "TypeError"
+  },
+  {
+   "name": "invalid two codecs",
+   "error": "TypeError"
+  },
+  {
+   "name": "invalid zero framerate",
+   "error": "TypeError"
+  },
+  {
+   "name": "invalid audio type as video",
+   "error": "TypeError"
+  },
+  {
+   "name": "invalid video type as audio",
+   "error": "TypeError"
+  },
+  {
+   "name": "invalid empty content type",
+   "error": "TypeError"
+  },
+  {
+   "name": "invalid not a mime type",
+   "error": "TypeError"
+  },
+  {
+   "name": "extra parameter",
+   "supported": 0,
+   "smooth": 0,
+   "powerEfficient": 0
+  }
+ ],
+ "encoding": [
+  {
+   "name": "record vp8",
+   "supported": 0,
+   "smooth": 0,
+   "powerEfficient": 0
+  },
+  {
+   "name": "record opus",
+   "supported": 0,
+   "smooth": 0,
+   "powerEfficient": 0
+  },
+  {
+   "name": "webrtc vp8",
+   "supported": 0,
+   "smooth": 0,
+   "powerEfficient": 0
+  },
+  {
+   "name": "invalid empty",
+   "error": "TypeError"
+  },
+  {
+   "name": "invalid zero framerate",
+   "error": "TypeError"
+  }
+ ],
+ "differences": {
+  "decoding": {
+   "invalid bucket without codecs": {
+    "webkit": "TypeError",
+    "chromium": "resolve"
+   },
+   "invalid two codecs": {
+    "webkit": "TypeError",
+    "chromium": "resolve"
+   },
+   "extra parameter": {
+    "webkit": "resolve",
+    "chromium": "TypeError"
+   }
+  },
+  "encoding": {
+   "record vp8": {
+    "webkit": "resolve",
+    "chromium": "TypeError"
+   },
+   "record opus": {
+    "webkit": "resolve",
+    "chromium": "TypeError"
+   }
+  }
+ },
+ "providers": {
+  "media-decoding-provider": 0,
+  "media-encoding-provider": 0
+ },
+ "assertions": 365
+}

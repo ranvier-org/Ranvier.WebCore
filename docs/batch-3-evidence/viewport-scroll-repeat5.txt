@@ -1,0 +1,8 @@
+SLOT /c/wk/slots/native-1 2026-10-31T16:32:18Z
+run 1 idle: PASS viewport_scroll: 2156 assertions
+run 2 idle: PASS viewport_scroll: 2156 assertions
+run 3 idle: PASS viewport_scroll: 2156 assertions
+run 4 idle: PASS viewport_scroll: 2156 assertions
+run 5 loaded (16 busy workers): PASS viewport_scroll: 2156 assertions
+DONE 2026-10-31T16:34:10Z
+RELEASED /c/wk/slots/native-1

@@ -1,0 +1,21 @@
+{
+ "runtime": "C:/wk/native-canvas/artifacts/canvas-candidate-4/runtime",
+ "webcore": "cbbe6f30c27f8c1fc9e24a5365bfd4470f39f7ad9b80a264291ddc1c329c66ba",
+ "scenario": "40x20 canvas at (0,0) with CSS size, 2D context via rv_canvas_get_context, fillStyle #ff0000, fillRect(0,0,20,20); temporary diagnostic ranvier_canvas_debug (not committed) reads the context buffer",
+ "log": [
+  "0",
+  "debug [1, 0, 255, 0, 0, 255, 1, 0, 0]",
+  "rect [0.0, 0.0, 40.0, 20.0]",
+  "row0 220 [(0, 0), (314, 7), (314, 8)] [(316, 77), (316, 78), (316, 79)] (0, 0) (316, 79)",
+  "0 [255, 255, 255, 255] [255, 255, 255, 255]",
+  "1 [255, 255, 255, 255] [255, 255, 255, 255]",
+  "2 [255, 255, 255, 255] [255, 255, 255, 255]",
+  "snap 0 40 20 [0, 0, 0, 0]"
+ ],
+ "reading": {
+  "debug": "[bufferCreated=1, getImageDataStatus=0, r,g,b,a at (5,5)=255,0,0,255, hasRenderer=1, (unused), hasAcceleratedCompositing=0]",
+  "hostPaint(5,5)": "[255,255,255,255] white page: canvas bitmap not painted",
+  "elementSnapshot(5,5)": "[0,0,0,0]"
+ },
+ "cause": "HTMLCanvasElement::createElementRenderer and isReplaced return a RenderHTMLCanvas only when frame->script().canExecuteScripts(); the host sets setScriptEnabled(false), so a canvas renders its fallback content (RenderBlockFlow) and never paints its bitmap (spec: scripting disabled -> fallback content)."
+}

@@ -1,0 +1,318 @@
+{
+ "browser": "156.0.8078.4",
+ "defaults": {
+  "strokeStyle": "#000000",
+  "lineWidth": 1,
+  "lineCap": "butt",
+  "lineJoin": "miter",
+  "miterLimit": 10,
+  "lineDash": [],
+  "lineDashOffset": 0,
+  "shadowOffsetX": 0,
+  "shadowOffsetY": 0,
+  "shadowBlur": 0,
+  "shadowColor": "rgba(0, 0, 0, 0)",
+  "imageSmoothingEnabled": true,
+  "imageSmoothingQuality": "low"
+ },
+ "lineWidthKept": 4,
+ "miterLimitKept": 3,
+ "lineCapRound": "round",
+ "lineJoinBevel": "bevel",
+ "lineDash": [
+  4,
+  2
+ ],
+ "lineDashOdd": [
+  1,
+  2,
+  3,
+  1,
+  2,
+  3
+ ],
+ "lineDashNegativeKept": [
+  1,
+  2,
+  3,
+  1,
+  2,
+  3
+ ],
+ "lineDashNaNKept": [
+  1,
+  2,
+  3,
+  1,
+  2,
+  3
+ ],
+ "lineDashOffsetKept": 1.5,
+ "shadowBlurKept": 3,
+ "shadowColorRgba": "rgba(0, 0, 255, 0.5)",
+ "shadowColorKept": "rgba(0, 0, 255, 0.5)",
+ "smoothingOff": false,
+ "qualityHigh": "high",
+ "strokeStyleHex": "#00ff00",
+ "strokeStyleKept": "#00ff00",
+ "caps": {
+  "buttInside": [
+   255,
+   0,
+   0,
+   255
+  ],
+  "buttBeyond": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "squareBeyond": [
+   255,
+   0,
+   0,
+   255
+  ],
+  "squareFar": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "edgeOutside": [
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ "dash": {
+  "on": [
+   0,
+   0,
+   255,
+   255
+  ],
+  "off": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "on2": [
+   0,
+   0,
+   255,
+   255
+  ]
+ },
+ "dashOffset": {
+  "at2": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "at6": [
+   0,
+   255,
+   0,
+   255
+  ]
+ },
+ "linear": {
+  "left": [
+   253,
+   0,
+   2,
+   255
+  ],
+  "middle": [
+   126,
+   0,
+   130,
+   255
+  ],
+  "right": [
+   2,
+   0,
+   253,
+   255
+  ]
+ },
+ "radial": {
+  "centre": [
+   0,
+   237,
+   0,
+   255
+  ],
+  "half": [
+   0,
+   115,
+   0,
+   255
+  ],
+  "outside": [
+   0,
+   0,
+   0,
+   255
+  ]
+ },
+ "conic": {
+  "east": [
+   250,
+   0,
+   5,
+   255
+  ],
+  "west": [
+   6,
+   0,
+   250,
+   255
+  ]
+ },
+ "emptyGradient": [
+  231,
+  0,
+  23,
+  255
+ ],
+ "addColorStopErrors": {
+  "below": "IndexSizeError",
+  "above": "IndexSizeError",
+  "nan": "TypeError",
+  "color": "SyntaxError"
+ },
+ "createGradientNonFinite": "TypeError",
+ "radialNegative": "IndexSizeError",
+ "fillStyleIsGradient": true,
+ "patternRepeat": {
+  "a": [
+   255,
+   0,
+   0,
+   255
+  ],
+  "b": [
+   0,
+   0,
+   255,
+   255
+  ],
+  "c": [
+   255,
+   0,
+   0,
+   255
+  ],
+  "d": [
+   0,
+   0,
+   255,
+   255
+  ]
+ },
+ "patternNoRepeat": {
+  "inside": [
+   255,
+   0,
+   0,
+   255
+  ],
+  "outside": [
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ "patternRepeatX": {
+  "row": [
+   255,
+   0,
+   0,
+   255
+  ],
+  "below": [
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ "patternEmptyRepetition": true,
+ "patternBadRepetition": "SyntaxError",
+ "patternScaled": {
+  "red": [
+   255,
+   0,
+   0,
+   255
+  ],
+  "blue": [
+   0,
+   0,
+   255,
+   255
+  ],
+  "redAgain": [
+   255,
+   0,
+   0,
+   255
+  ]
+ },
+ "patternSetTransformConflict": "TypeError",
+ "patternZeroSizeSource": "InvalidStateError",
+ "strokeStyleIsPattern": true,
+ "shadow": {
+  "shape": [
+   255,
+   0,
+   0,
+   255
+  ],
+  "shadow": [
+   0,
+   0,
+   255,
+   255
+  ],
+  "none": [
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ "shadowBlurred": {
+  "centre": [
+   0,
+   0,
+   255,
+   249
+  ],
+  "edgeOut": [
+   0,
+   0,
+   255,
+   63
+  ],
+  "far": [
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ "shadowTransparentDefault": [
+  0,
+  0,
+  0,
+  0
+ ]
+}

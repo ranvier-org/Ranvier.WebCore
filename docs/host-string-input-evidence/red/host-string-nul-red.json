@@ -1,0 +1,267 @@
+{
+  "abi": 51,
+  "runtime": "C:/wk/native-strings/artifacts/native43-candidate-3/runtime",
+  "browser": "156.0.8078.4",
+  "cases": 37,
+  "differ": 36,
+  "byFamily": {
+    "attribute": {
+      "cases": 5,
+      "differ": 5
+    },
+    "ax": {
+      "cases": 2,
+      "differ": 2
+    },
+    "clipboard": {
+      "cases": 3,
+      "differ": 2
+    },
+    "ime": {
+      "cases": 2,
+      "differ": 2
+    },
+    "low": {
+      "cases": 7,
+      "differ": 7
+    },
+    "markup": {
+      "cases": 8,
+      "differ": 8
+    },
+    "text": {
+      "cases": 10,
+      "differ": 10
+    }
+  },
+  "casesDiffer": {
+    "M1": {
+      "family": "markup",
+      "op": "loadHtml",
+      "observed": "a",
+      "expected": "abtail"
+    },
+    "M2": {
+      "family": "markup",
+      "op": "loadHtml",
+      "observed": "a",
+      "expected": "a\ufffdbtail"
+    },
+    "M3": {
+      "family": "markup",
+      "op": "loadHtmlInner",
+      "observed": "<!--a-->",
+      "expected": "<!--a\ufffdb-->tail"
+    },
+    "M4": {
+      "family": "markup",
+      "op": "loadHtmlTitle",
+      "observed": "a",
+      "expected": "a\ufffdb"
+    },
+    "M5": {
+      "family": "markup",
+      "op": "loadSvg",
+      "observed": false,
+      "expected": true
+    },
+    "M7": {
+      "family": "markup",
+      "op": "parseFragment",
+      "observed": "a",
+      "expected": "abc"
+    },
+    "M8": {
+      "family": "markup",
+      "op": "parseFragmentComment",
+      "observed": "a",
+      "expected": "a\ufffdb"
+    },
+    "M9": {
+      "family": "markup",
+      "op": "setInnerHtml",
+      "observed": "<textarea>a</textarea>",
+      "expected": "<textarea>a\ufffdb</textarea><i>c</i>"
+    },
+    "T1": {
+      "family": "text",
+      "op": "setTextContent",
+      "observed": "a",
+      "expected": "a\u0000b"
+    },
+    "T2": {
+      "family": "text",
+      "op": "createText",
+      "observed": "a",
+      "expected": "a\u0000b"
+    },
+    "T3": {
+      "family": "text",
+      "op": "createComment",
+      "observed": "a",
+      "expected": "a\u0000b"
+    },
+    "T4": {
+      "family": "text",
+      "op": "setStringTextContent",
+      "observed": "a",
+      "expected": "a\u0000b"
+    },
+    "T5": {
+      "family": "text",
+      "op": "setStringData",
+      "observed": "a",
+      "expected": "a\u0000b"
+    },
+    "T6": {
+      "family": "text",
+      "op": "setStringValueInput",
+      "observed": "a",
+      "expected": "a\u0000b"
+    },
+    "T7": {
+      "family": "text",
+      "op": "setStringValueTextarea",
+      "observed": "a",
+      "expected": "a\u0000b"
+    },
+    "T8": {
+      "family": "text",
+      "op": "setStringTitleDocument",
+      "observed": "a",
+      "expected": "a\u0000b"
+    },
+    "T9": {
+      "family": "text",
+      "op": "setStringTitleElement",
+      "observed": "a",
+      "expected": "a\u0000b"
+    },
+    "T10": {
+      "family": "text",
+      "op": "setStringValueOption",
+      "observed": "a",
+      "expected": "a\u0000b"
+    },
+    "A1": {
+      "family": "attribute",
+      "op": "setAttribute",
+      "observed": "a",
+      "expected": "a\u0000b"
+    },
+    "A2": {
+      "family": "attribute",
+      "op": "getElementById",
+      "observed": "a",
+      "expected": "a\u0000b"
+    },
+    "A3": {
+      "family": "attribute",
+      "op": "classAdd",
+      "observed": "a",
+      "expected": "a\u0000b"
+    },
+    "A4": {
+      "family": "attribute",
+      "op": "classContains",
+      "observed": false,
+      "expected": true
+    },
+    "A5": {
+      "family": "attribute",
+      "op": "classRemove",
+      "observed": "a\u0000b",
+      "expected": "a"
+    },
+    "I1": {
+      "family": "ime",
+      "op": "imeComposition",
+      "observed": "status -9",
+      "expected": "a\u0000b"
+    },
+    "I2": {
+      "family": "ime",
+      "op": "imeCommit",
+      "observed": "a",
+      "expected": "a\u0000b"
+    },
+    "X1": {
+      "family": "ax",
+      "op": "axSetValueInput",
+      "observed": "a",
+      "expected": "a\u0000b"
+    },
+    "X2": {
+      "family": "ax",
+      "op": "axSetValueTextarea",
+      "observed": "a",
+      "expected": "a\u0000b"
+    },
+    "C1": {
+      "family": "clipboard",
+      "op": "clipboardOffer",
+      "observed": "a",
+      "expected": "a\u0000b"
+    },
+    "C3": {
+      "family": "clipboard",
+      "op": "dragDataAdd",
+      "observed": "a",
+      "expected": "a\u0000b"
+    },
+    "L1": {
+      "family": "low",
+      "op": "setStyleCustom",
+      "observed": "a",
+      "expected": "a\ufffdb"
+    },
+    "L2": {
+      "family": "low",
+      "op": "setStyleContent",
+      "observed": "\"a\"",
+      "expected": "\"a\ufffdb\""
+    },
+    "L3": {
+      "family": "low",
+      "op": "hostKeyChar",
+      "observed": "a",
+      "expected": "a\u0000b"
+    },
+    "L4": {
+      "family": "low",
+      "op": "nodeListenerType",
+      "observed": [
+        true,
+        true
+      ],
+      "expected": [
+        true,
+        false
+      ]
+    },
+    "L5": {
+      "family": "low",
+      "op": "createEventType",
+      "observed": "a",
+      "expected": "a\u0000b"
+    },
+    "L6": {
+      "family": "low",
+      "op": "constructEventType",
+      "observed": "a",
+      "expected": "a\u0000b"
+    },
+    "L7": {
+      "family": "low",
+      "op": "targetListenerType",
+      "observed": [
+        true,
+        true
+      ],
+      "expected": [
+        true,
+        false
+      ]
+    }
+  }
+}

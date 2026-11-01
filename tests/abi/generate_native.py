@@ -86,6 +86,8 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
     """The F# parameter type, with its marshalling attribute, for the C parameter."""
     if ctype == "int32_t":
         return "int", ""
+    if ctype == "uint32_t":
+        return "uint32", ""
     if ctype == "uint64_t":
         return "uint64", ""
     if ctype == "int64_t":
@@ -116,17 +118,24 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
     if ctype == "int32_t*":
         # A string getter's length is passed as a one-element array, as readString passes it.
         return ("int[]", "") if name == "length" else ("int&", "")
-    if ctype == "const RvScreenMetrics*":
+    if ctype in ("const RvScreenMetrics*", "const RvMediaPreferences*", "const RvPointerSample*",
+                 "const RvMediaVideoConfiguration*", "const RvMediaAudioConfiguration*", "const RvSnapshotOptions*"):
+        return "nativeint", ""
+    if ctype == "const RvCanvas2DSettings*":
+        return "nativeint", ""
+    if ctype == "const RvImageBitmapOptions*":
         return "nativeint", ""
     if ctype == "const RvEventInit*":
         return "EventInit&", ""
+    if ctype == "const RvNotificationOptions*":
+        return "NotificationOptions&", ""
     if ctype == "const uint16_t*":
         return "uint16[]", "[<In>] "
     if ctype == "RvTextSegments*":
         return "TextSegments&", ""
     if ctype == "void**":
         return "nativeint&", ""
-    if ctype == "RvGpuFrame**":
+    if ctype in ("RvGpuFrame**", "RvCanvasRenderingContext2D**"):
         return "nativeint&", ""
     if re.fullmatch(r"Rv\w+\*\*", ctype):
         return "nativeint[]", ""
@@ -174,6 +183,22 @@ def generated(header: str) -> str:
         "    val mutable relatedTarget: nativeint",
         "    val mutable customDetailJson: nativeint",
         "",
+        "/// <summary>The <c>RvNotificationOptions</c> of the header; strings are caller-owned UTF-8 bytes with lengths.</summary>",
+        "[<Struct; StructLayout(LayoutKind.Sequential)>]",
+        "type NotificationOptions =",
+        "    val mutable size: int",
+        "    val mutable dir: int",
+        "    val mutable silent: int",
+        "    val mutable body_length: int",
+        "    val mutable tag_length: int",
+        "    val mutable lang_length: int",
+        "    val mutable icon_length: int",
+        "    val mutable reserved: int",
+        "    val mutable body: nativeint",
+        "    val mutable tag: nativeint",
+        "    val mutable lang: nativeint",
+        "    val mutable icon: nativeint",
+        "",
         "/// <summary>The <c>RvTextSegments</c> of the header: owned until <c>rv_text_segments_release</c>.</summary>",
         "[<Struct; StructLayout(LayoutKind.Sequential)>]",
         "type TextSegments =",
@@ -207,13 +232,77 @@ def generated(header: str) -> str:
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
         "type ResourceCompletion = delegate of context: nativeint * outcome: int * width: int * height: int -> unit",
         "",
+        "/// <summary>",
+        "/// The <c>RvFontsEventCallback</c> of the header: <c>families</c> and <c>familyLengths</c> point to <c>count</c> UTF-8",
+        "/// family names and their byte counts, valid only during the call.",
+        "/// </summary>",
+        "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+        "type FontsEventCallback =",
+        "    delegate of context: nativeint * kind: int * families: nativeint * familyLengths: nativeint * count: int -> unit",
+        "",
         "/// <summary>The <c>RvFrameCallback</c> of the header.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
         "type FrameCallback = delegate of context: nativeint -> unit",
         "",
+        "/// <summary>The <c>RvCustomEffectTick</c> of the header: the progress a rendering update computed.</summary>",
+        "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+        "type CustomEffectTick = delegate of context: nativeint * progress: float -> unit",
+        "",
+        "/// <summary>The <c>RvCustomEffectRelease</c> of the header.</summary>",
+        "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+        "type CustomEffectRelease = delegate of context: nativeint -> unit",
+        "",
         "/// <summary>The <c>RvResizeCallback</c> of the header.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
         "type ResizeCallback = delegate of context: nativeint * target: nativeint * width: float * height: float -> unit",
+        "",
+        "/// <summary>The <c>RvResizeEntry</c> of the header; valid only during the <c>RvResizeEntriesCallback</c> call.</summary>",
+        "[<Struct; StructLayout(LayoutKind.Sequential)>]",
+        "type ResizeEntry =",
+        "    val mutable size: int",
+        "    val mutable hasDevicePixel: int",
+        "    val mutable target: nativeint",
+        "    val mutable contentX: float",
+        "    val mutable contentY: float",
+        "    val mutable contentWidth: float",
+        "    val mutable contentHeight: float",
+        "    val mutable contentInlineSize: float",
+        "    val mutable contentBlockSize: float",
+        "    val mutable borderInlineSize: float",
+        "    val mutable borderBlockSize: float",
+        "    val mutable devicePixelInlineSize: float",
+        "    val mutable devicePixelBlockSize: float",
+        "",
+        "/// <summary>The <c>RvResizeEntriesCallback</c> of the header; <c>entries</c> points to <c>count</c> <c>ResizeEntry</c> values.</summary>",
+        "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+        "type ResizeEntriesCallback = delegate of context: nativeint * observer: nativeint * entries: nativeint * count: int -> unit",
+        "",
+        "/// <summary>The <c>RvIntersectionEntry</c> of the header; valid only during the <c>RvIntersectionEntriesCallback</c> call.</summary>",
+        "[<Struct; StructLayout(LayoutKind.Sequential)>]",
+        "type IntersectionEntry =",
+        "    val mutable size: int",
+        "    val mutable isIntersecting: int",
+        "    val mutable target: nativeint",
+        "    val mutable time: float",
+        "    val mutable hasRootBounds: int",
+        "    val mutable reserved: int",
+        "    val mutable rootX: float",
+        "    val mutable rootY: float",
+        "    val mutable rootWidth: float",
+        "    val mutable rootHeight: float",
+        "    val mutable boundsX: float",
+        "    val mutable boundsY: float",
+        "    val mutable boundsWidth: float",
+        "    val mutable boundsHeight: float",
+        "    val mutable intersectionX: float",
+        "    val mutable intersectionY: float",
+        "    val mutable intersectionWidth: float",
+        "    val mutable intersectionHeight: float",
+        "    val mutable intersectionRatio: float",
+        "",
+        "/// <summary>The <c>RvIntersectionEntriesCallback</c> of the header; <c>entries</c> points to <c>count</c> <c>IntersectionEntry</c> values.</summary>",
+        "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+        "type IntersectionEntriesCallback = delegate of context: nativeint * observer: nativeint * entries: nativeint * count: int -> unit",
         "",
         "/// <summary>The <c>RvIntersectionCallback</c> of the header.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
@@ -224,13 +313,17 @@ def generated(header: str) -> str:
         "type PopupCallback =",
         "    delegate of context: nativeint * popup: nativeint * action: int * x: int * y: int * width: int * height: int * selected: int -> unit",
         "",
-        "/// <summary>The <c>RvClipboardWrite</c> of the header; <c>type</c> and <c>data</c> are NUL-terminated UTF-8.</summary>",
+        "/// <summary>The <c>RvClipboardWrite</c> of the header; <c>type</c> is NUL-terminated UTF-8, <c>data</c> is <c>dataLength</c> UTF-8 bytes.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
-        "type ClipboardWrite = delegate of context: nativeint * ``type``: nativeint * data: nativeint * first: int -> unit",
+        "type ClipboardWrite = delegate of context: nativeint * ``type``: nativeint * data: nativeint * dataLength: int * first: int -> unit",
         "",
         "/// <summary>The <c>RvClipboardRead</c> of the header.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
         "type ClipboardRead = delegate of context: nativeint * request: nativeint -> unit",
+        "",
+        "/// <summary>The <c>RvClipboardWriteFile</c> of the header; <c>file</c> is a borrowed File handle.</summary>",
+        "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+        "type ClipboardWriteFile = delegate of context: nativeint * file: nativeint * first: int -> unit",
         "",
         "/// <summary>The <c>RvDragStartCallback</c> of the header.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",

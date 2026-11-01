@@ -2,10 +2,19 @@
 #include "RanvierWebCoreAbi.h"
 #include "dom/RanvierDomGlue.h"
 #include "RanvierSvgViewGlue.h"
+#include "RanvierImageEncoding.h"
+#include <wtf/text/Base64.h>
 #include "RanvierResourceGlue.h"
 #include "RanvierEventGlue.h"
+#include "RanvierTransferGlue.h"
+#include "RanvierPointerGlue.h"
 #include "RanvierViewportGlue.h"
+#include "RanvierCanvasGlue.h"
+#include "RanvierCanvasExportGlue.h"
+#include "RanvierCanvasPixelsGlue.h"
 #include "RanvierInspectGlue.h"
+#include "RanvierWakeLockGlue.h"
+#include "RanvierNotificationGlue.h"
 #include <atomic>
 #include <string>
 #include <vector>
@@ -101,6 +110,7 @@
 #include <WebCore/SharedBuffer.h>
 #include <WebCore/SubresourceLoader.h>
 #include <WebCore/Chrome.h>
+#include <WebCore/AbstractRange.h>
 #include <WebCore/ClipboardEvent.h>
 #include <WebCore/DragActions.h>
 #include <WebCore/DragClient.h>
@@ -109,6 +119,7 @@
 #include <WebCore/HTMLNames.h>
 #include <wtf/SetForScope.h>
 #include <wtf/HashMap.h>
+#include <wtf/text/StringHash.h>
 #include <WebCore/DragEvent.h>
 #include <WebCore/VisiblePosition.h>
 #include <WebCore/DataTransfer.h>
@@ -125,6 +136,7 @@
 #include <WebCore/ResizeObserver.h>
 #include <WebCore/ResizeObserverCallback.h>
 #include <WebCore/ResizeObserverEntry.h>
+#include <WebCore/ResizeObserverSize.h>
 #include <WebCore/CSSAnimation.h>
 #include <WebCore/CSSComputedStyleDeclaration.h>
 #include <WebCore/CSSStyleDeclaration.h>
@@ -163,6 +175,18 @@
 #include <WebCore/MouseEventTypes.h>
 #include <WebCore/PlatformKeyboardEvent.h>
 #include <WebCore/PlatformMouseEvent.h>
+#include <WebCore/Navigator.h>
+#include <WebCore/PointerCaptureController.h>
+#include <WebCore/PointerEvent.h>
+#include <WebCore/PointerEventTypeNames.h>
+#if ENABLE(POINTER_LOCK)
+#include <WebCore/PointerLockController.h>
+#endif
+#if ENABLE(TOUCH_EVENTS)
+#include <WebCore/PlatformTouchEvent.h>
+#include <WebCore/PlatformTouchPoint.h>
+#include <WebCore/RemoteFrameGeometryTransformer.h>
+#endif
 #include <WebCore/PlatformWheelEvent.h>
 #include <WebCore/ScrollingCoordinatorTypes.h>
 #include <WebCore/WheelEvent.h>
@@ -182,6 +206,13 @@
 #include <wtf/MainThread.h>
 #include <wtf/ProcessID.h>
 #include <wtf/RunLoop.h>
+#if USE(GLIB)
+#include <glib.h>
+#endif
+#if PLATFORM(COCOA)
+#include <CoreFoundation/CoreFoundation.h>
+#include <WebCore/MainThreadSharedTimer.h>
+#endif
 #include <wtf/HexNumber.h>
 #include <wtf/text/MakeString.h>
 #include <wtf/text/TextBreakIterator.h>
@@ -230,20 +261,30 @@ private:
         wantUpdate();
         return true;
     }
-    void setCursor(const Cursor&) final;
+    void setCursor(const WebCore::Cursor&) final;
     void mouseDidMoveOverElement(const HitTestResult&, OptionSet<PlatformEventModifier>, const String& toolTip, TextDirection) final;
     RefPtr<PopupMenu> createPopupMenu(PopupMenuClient&) const final;
+    // The pointing devices of rv_host_set_media_preferences.
+    bool hoverSupportedByPrimaryPointingDevice() const final;
+    bool hoverSupportedByAnyAvailablePointingDevice() const final;
+    std::optional<PointerCharacteristics> pointerCharacteristicsOfPrimaryPointingDevice() const final;
+    OptionSet<PointerCharacteristics> pointerCharacteristicsOfAllAvailablePointingDevices() const final;
 #if USE(AX_EMBEDDER_NOTIFICATIONS)
     void postAccessibilityNotification(AccessibilityObject&, AXNotification) final;
 #endif
     void invalidate(const IntRect&);
     void wantUpdate();
+#if ENABLE(POINTER_LOCK)
+    void requestPointerLock(CompletionHandler<void(PointerLockRequestResult)>&&) final;
+    // The host ends a lock at once: the platform cursor has no state to restore.
+    void requestPointerUnlock(CompletionHandler<void(bool)>&& completion) final { completion(true); }
+#endif
 };
 
 // The RV_CURSOR_* value of a WebCore cursor.
-static int32_t cursorValue(Cursor::Type type)
+static int32_t cursorValue(WebCore::Cursor::Type type)
 {
-    using enum Cursor::Type;
+    using enum WebCore::Cursor::Type;
     switch (type) {
     case Hand: return RV_CURSOR_POINTER;
     case IBeam: return RV_CURSOR_TEXT;
@@ -502,6 +543,31 @@ private:
 // The host whose rv_host_mouse call is running; the drag client reads it, having no page of its own.
 static RvHost* inputHost;
 
+// The dragstart event's data transfer of the drag being started. WebCore moves its data, image and effects into the
+// drag's own data transfer, but not its item list, which holds the Files dragstart listeners added.
+static RefPtr<DataTransfer>& dragStartTransfer()
+{
+    static NeverDestroyed<RefPtr<DataTransfer>> transfer;
+    return transfer;
+}
+
+class RvDragStartCapture final : public EventListener {
+public:
+    static Ref<RvDragStartCapture> create() { return adoptRef(*new RvDragStartCapture); }
+
+private:
+    RvDragStartCapture()
+        : EventListener(CPPEventListenerType)
+    {
+    }
+
+    void handleEvent(ScriptExecutionContext&, Event& event) final
+    {
+        if (auto* drag = dynamicDowncast<DragEvent>(event))
+            dragStartTransfer() = drag->dataTransfer();
+    }
+};
+
 // Hands drags out of the page to the app's drag start callback, in the App drag style.
 class RvDragClient final : public DragClient {
     void willPerformDragDestinationAction(DragDestinationAction, const DragData&) final { }
@@ -566,10 +632,11 @@ static Ref<Page> createPage(IntSize viewportSize, RvScreenOrientationManager& or
     }();
     UNUSED_VARIABLE(prewarmed);
     auto configuration = pageConfigurationWithEmptyClients(std::nullopt, PAL::SessionID::defaultSessionID());
-    // The empty clients' sandbox, except that forms may submit: a submission reaches RvFrameLoaderClient.
+    // The empty clients' sandbox, except that forms may submit, a submission reaching RvFrameLoaderClient, and an element
+    // may request pointer lock, which the app grants or denies (rv_host_pointer_lock_resolve).
     configuration.mainFrameCreationParameters = PageConfiguration::LocalMainFrameCreationParameters { CompletionHandler<UniqueRef<LocalFrameLoaderClient>(LocalFrame&, FrameLoader&)> { [](auto&, auto& loader) -> UniqueRef<LocalFrameLoaderClient> {
         return makeUniqueRefWithoutRefCountedCheck<RvFrameLoaderClient>(loader);
-    } }, SandboxFlags::all() - SandboxFlag::Forms, ReferrerPolicy::EmptyString };
+    } }, SandboxFlags::all() - SandboxFlags { SandboxFlag::Forms, SandboxFlag::PointerLock }, ReferrerPolicy::EmptyString };
     configuration.chromeClient = makeUniqueRef<RvChromeClient>();
     configuration.editorClient = makeUniqueRef<RvEditorClient>();
     configuration.dragClient = makeUnique<RvDragClient>();
@@ -586,9 +653,22 @@ static Ref<Page> createPage(IntSize viewportSize, RvScreenOrientationManager& or
     page->settings().setPopoverHintEnabled(true);
     page->settings().setScreenOrientationAPIEnabled(true);
     page->settings().setVisualViewportAPIEnabled(true);
+    // CanvasRenderingContext2D.filter, as Chromium ships it; canvas layers stay off.
+    page->settings().setCanvasFiltersEnabled(true);
     page->settings().setInteractiveFormValidationEnabled(true);
+    page->settings().setDataTransferItemsEnabled(true);
+#if ENABLE(POINTER_LOCK)
+    page->settings().setPointerLockEnabled(true);
+#endif
+    page->settings().setAltitudeAngleEnabled(true);
+    page->settings().setAzimuthAngleEnabled(true);
+    // CustomEffect and DocumentTimeline.animate, which the host's native callbacks drive; scripts stay disabled.
+    page->settings().setWebAnimationsCustomEffectsEnabled(true);
     // Markup arrives decoded, so the document's encoding, which form submission and URL query encoding use, is UTF-8.
     page->settings().setDefaultTextEncodingName("UTF-8"_s);
+    // RV_MEDIA_DEFAULT's motion and contrast: no preference, independent of the OS accessibility settings.
+    page->settings().setForcedPrefersReducedMotionAccessibilityValue(ForcedAccessibilityValue::Off);
+    page->settings().setForcedPrefersContrastAccessibilityValue(ForcedAccessibilityValue::Off);
 #if ENABLE(VIDEO)
     page->settings().setMediaEnabled(false);
 #endif
@@ -716,6 +796,11 @@ struct RvHost {
     void* resourceContext { nullptr };
     RvFormSubmissionHandler formSubmissionHandler { nullptr };
     void* formSubmissionContext { nullptr };
+    RvWakeLockPolicy wakeLockPolicy { nullptr };
+    void* wakeLockContext { nullptr };
+    RvNotificationPresenter notificationPresenter { nullptr };
+    void* notificationContext { nullptr };
+    int32_t notificationPermission { RV_NOTIFICATION_DEFAULT };
 #if RANVIER_COMPOSITING
     // rv_host_create sets RV_COMPOSITING_WHEN_NEEDED.
     int32_t compositingMode { RV_COMPOSITING_OFF };
@@ -743,6 +828,8 @@ struct RvHost {
     RvClipboardWrite clipboardWrite { nullptr };
     RvClipboardRead clipboardRead { nullptr };
     void* clipboardContext { nullptr };
+    RvClipboardWriteFile clipboardWriteFile { nullptr };
+    void* clipboardWriteFileContext { nullptr };
     int32_t dragStyle { RV_DRAG_DOM };
     // The element under a drag from outside, which received dragenter.
     RefPtr<Element> dragTarget;
@@ -750,9 +837,13 @@ struct RvHost {
     IntPoint pressPoint;
     RvDragStartCallback dragStartCallback { nullptr };
     void* dragStartContext { nullptr };
+    // The document whose dragstart events the host captures, for the files listeners add to the item list.
+    WeakPtr<Document, WeakPtrImplWithEventTargetData> dragStartDocument;
     bool accessibility { false };
     // rv_host_set_diagnostics: the rv_host_inspect_* calls read the document only while set.
     bool diagnostics { false };
+    // rv_host_set_media_preferences: the preferences last supplied.
+    RvMediaPreferences mediaPreferences { sizeof(RvMediaPreferences) };
     RvAxCallback axCallback { nullptr };
     void* axContext { nullptr };
     // Accessibility events posted since the last delivery, and whether a delivery is scheduled.
@@ -767,6 +858,14 @@ struct RvHost {
     PlatformDisplayID displayID { 0 };
     // The app's screen, from rv_host_set_screen; until then the screen follows the host size.
     std::optional<ScreenData> screen;
+    // The mouse buttons rv_host_mouse holds down, as MouseEvent.buttons, and the last mouse or pen position outside
+    // pointer lock: the position the page sees while the pointer is locked, and the origin of rv_host_mouse's movement.
+    int32_t mouseButtons { 0 };
+    std::optional<DoublePoint> pointerPosition;
+#if ENABLE(POINTER_LOCK)
+    // The page's pending pointer-lock request, answered by rv_host_pointer_lock_resolve.
+    CompletionHandler<void(PointerLockRequestResult)> pointerLockRequest;
+#endif
 
     void requestFrame()
     {
@@ -785,7 +884,20 @@ void RvChromeClient::invalidate(const IntRect& rect)
     host->requestFrame();
 }
 
-void RvChromeClient::setCursor(const Cursor& cursor)
+#if ENABLE(POINTER_LOCK)
+void RvChromeClient::requestPointerLock(CompletionHandler<void(PointerLockRequestResult)>&& completion)
+{
+    // An unfocused window cannot take the pointer, and a request waits for the app's answer.
+    if (!host || !host->page->focusController().isFocused() || host->pointerLockRequest) {
+        completion(PointerLockRequestResult::Failure);
+        return;
+    }
+    host->pointerLockRequest = WTF::move(completion);
+    host->requestFrame();
+}
+#endif
+
+void RvChromeClient::setCursor(const WebCore::Cursor& cursor)
 {
     if (host)
         host->cursor = cursorValue(cursor.type());
@@ -863,6 +975,11 @@ void RvChromeClient::wantUpdate()
 static bool onOwningThread() { return isMainThread(); }
 
 static bool segmentationInitialized;
+
+// The first rv_host_create installed the process's SleepDisablerClient.
+static bool sleepDisablersInstalled;
+// rv_set_sleep_disabler_callback set a callback.
+static bool sleepDisablerCallbackSet;
 
 // The hosts alive on the owning thread, for routing a page's loads to its host.
 static Vector<RvHost*> liveHosts;
@@ -1076,7 +1193,7 @@ private:
 
 // The pasteboard, blob registry and media strategies follow TestWebKitAPI's
 // Tests/WebCore/TestPlatformStrategies.cpp (Copyright (C) 2026 Apple Inc., BSD-2-Clause): stubs that
-// a document without scripts, media and editing commands leaves uncalled.
+// a document without scripts, media and editing commands leaves uncalled, except the Cocoa named pasteboards.
 class RvPasteboardStrategy final : public PasteboardStrategy {
 public:
 #if PLATFORM(IOS_FAMILY)
@@ -1087,21 +1204,77 @@ public:
     void updateSupportedTypeIdentifiers(const Vector<String>&, const String&, const PasteboardContext*) final { }
 #endif
 #if PLATFORM(COCOA)
-    void getTypes(Vector<String>&, const String&, const PasteboardContext*) final { }
-    RefPtr<SharedBuffer> bufferForType(const String&, const String&, const PasteboardContext*) final { return nullptr; }
+    // Cocoa's Pasteboard (platform/mac/PasteboardMac.mm, platform/cocoa/PasteboardCocoa.mm) stores every named
+    // pasteboard through this strategy; Windows and GLib hold a drag's data in the Pasteboard itself. Each named
+    // pasteboard is held in memory: its types in declaration order, a string or buffer per type, and a change count
+    // that setTypes increments, as NSPasteboard's clearContents does. getTypes lists the types holding a value.
+    void getTypes(Vector<String>& types, const String& name, const PasteboardContext*) final
+    {
+        auto& store = pasteboard(name);
+        types.clear();
+        for (auto& type : store.types) {
+            if (store.strings.contains(type) || store.buffers.contains(type))
+                types.append(type);
+        }
+    }
+    RefPtr<SharedBuffer> bufferForType(const String& type, const String& name, const PasteboardContext*) final
+    {
+        return pasteboard(name).buffers.get(type);
+    }
     void getPathnamesForType(Vector<String>&, const String&, const String&, const PasteboardContext*) final { }
-    String stringForType(const String&, const String&, const PasteboardContext*) final { return { }; }
-    Vector<String> allStringsForType(const String&, const String&, const PasteboardContext*) final { return { }; }
-    int64_t changeCount(const String&, const PasteboardContext*) final { return 0; }
+    String stringForType(const String& type, const String& name, const PasteboardContext*) final
+    {
+        return pasteboard(name).strings.get(type);
+    }
+    Vector<String> allStringsForType(const String& type, const String& name, const PasteboardContext*) final
+    {
+        auto& strings = pasteboard(name).strings;
+        auto found = strings.find(type);
+        if (found == strings.end())
+            return { };
+        return { found->value };
+    }
+    int64_t changeCount(const String& name, const PasteboardContext*) final { return pasteboard(name).changeCount; }
     Color color(const String&, const PasteboardContext*) final { return { }; }
     URL url(const String&, const PasteboardContext*) final { return { }; }
     int getNumberOfFiles(const String&, const PasteboardContext*) final { return 0; }
-    int64_t addTypes(const Vector<String>&, const String&, const PasteboardContext*) final { return 0; }
-    int64_t setTypes(const Vector<String>&, const String&, const PasteboardContext*) final { return 0; }
-    int64_t setBufferForType(SharedBuffer*, const String&, const String&, const PasteboardContext*) final { return 0; }
-    int64_t setURL(const PasteboardURL&, const String&, const PasteboardContext*) final { return 0; }
-    int64_t setColor(const Color&, const String&, const PasteboardContext*) final { return 0; }
-    int64_t setStringForType(const String&, const String&, const String&, const PasteboardContext*) final { return 0; }
+    int64_t addTypes(const Vector<String>& types, const String& name, const PasteboardContext*) final
+    {
+        auto& store = pasteboard(name);
+        for (auto& type : types)
+            declare(store, type);
+        return store.changeCount;
+    }
+    int64_t setTypes(const Vector<String>& types, const String& name, const PasteboardContext*) final
+    {
+        auto& store = pasteboard(name);
+        ++store.changeCount;
+        store.types.clear();
+        store.strings.clear();
+        store.buffers.clear();
+        for (auto& type : types)
+            declare(store, type);
+        return store.changeCount;
+    }
+    int64_t setBufferForType(SharedBuffer* buffer, const String& type, const String& name, const PasteboardContext*) final
+    {
+        auto& store = pasteboard(name);
+        declare(store, type);
+        if (buffer)
+            store.buffers.set(type, Ref { *buffer });
+        else
+            store.buffers.remove(type);
+        return store.changeCount;
+    }
+    int64_t setURL(const PasteboardURL&, const String& name, const PasteboardContext*) final { return pasteboard(name).changeCount; }
+    int64_t setColor(const Color&, const String& name, const PasteboardContext*) final { return pasteboard(name).changeCount; }
+    int64_t setStringForType(const String& value, const String& type, const String& name, const PasteboardContext*) final
+    {
+        auto& store = pasteboard(name);
+        declare(store, type);
+        store.strings.set(type, value);
+        return store.changeCount;
+    }
     int64_t writeWebArchive(LegacyWebArchive&, const String&) final { return 0; }
     bool containsURLStringSuitableForLoading(const String&, const PasteboardContext*) final { return false; }
     String urlStringSuitableForLoading(const String&, String&, const PasteboardContext*) final { return { }; }
@@ -1127,6 +1300,29 @@ public:
     void getTypes(Vector<String>&) final { }
     void writeToPasteboard(const PasteboardWebContent&) final { }
     void writeToPasteboard(const String&, const String&) final { }
+#endif
+
+#if PLATFORM(COCOA)
+private:
+    struct NamedPasteboard {
+        Vector<String> types;
+        HashMap<String, String> strings;
+        HashMap<String, Ref<SharedBuffer>> buffers;
+        int64_t changeCount { 0 };
+    };
+
+    NamedPasteboard& pasteboard(const String& name)
+    {
+        return m_pasteboards.ensure(name, [] { return NamedPasteboard { }; }).iterator->value;
+    }
+
+    static void declare(NamedPasteboard& store, const String& type)
+    {
+        if (!store.types.contains(type))
+            store.types.append(type);
+    }
+
+    HashMap<String, NamedPasteboard> m_pasteboards;
 #endif
 };
 
@@ -1285,6 +1481,30 @@ static RvNode* handle(Ref<Node>&& node) { return reinterpret_cast<RvNode*>(&node
 
 static String utf8(const char* text) { return String::fromUTF8(text); }
 
+// A hand-written UTF-8 input and its byte count; -1 is the null string. Returns std::nullopt for a length below -1,
+// NULL data with a positive length, or invalid UTF-8.
+static std::optional<String> utf8Input(const uint8_t* data, int32_t length)
+{
+    if (length == -1)
+        return String();
+    if (length < -1 || (!data && length > 0))
+        return std::nullopt;
+    if (!length)
+        return emptyString();
+    String value = String::fromUTF8(std::span<const uint8_t> { data, static_cast<size_t>(length) });
+    if (value.isNull())
+        return std::nullopt;
+    return value;
+}
+
+// A hand-written UTF-8 input that cannot be null: -1 also returns std::nullopt.
+static std::optional<String> requiredUtf8(const uint8_t* data, int32_t length)
+{
+    if (length == -1)
+        return std::nullopt;
+    return utf8Input(data, length);
+}
+
 static RvNode* handleOrNull(Node* node) { return node ? handle(Ref { *node }) : nullptr; }
 
 static RvEvent* eventHandle(Ref<Event>&& event) { return reinterpret_cast<RvEvent*>(&event.leakRef()); }
@@ -1320,9 +1540,17 @@ static_assert(sizeof(void*) != 8 || (sizeof(RvEventInit) == 112 && offsetof(RvEv
 static_assert(sizeof(RvScreenMetrics) == 36 && offsetof(RvScreenMetrics, avail_left) == 12 && offsetof(RvScreenMetrics, orientation) == 32);
 
 
+static_assert(sizeof(RvIntersectionEntry) == 136 && offsetof(RvIntersectionEntry, target) == 8 && offsetof(RvIntersectionEntry, time) == 16
+    && offsetof(RvIntersectionEntry, hasRootBounds) == 24 && offsetof(RvIntersectionEntry, rootX) == 32 && offsetof(RvIntersectionEntry, intersectionRatio) == 128);
+static_assert(sizeof(RvResizeEntry) == 96 && offsetof(RvResizeEntry, target) == 8 && offsetof(RvResizeEntry, contentX) == 16 && offsetof(RvResizeEntry, devicePixelBlockSize) == 88);
+static_assert(sizeof(void*) != 8 || (sizeof(RvNotificationOptions) == 64 && offsetof(RvNotificationOptions, reserved) == 28
+    && offsetof(RvNotificationOptions, body) == 32 && offsetof(RvNotificationOptions, icon) == 56));
 static_assert(sizeof(RvWindowMetrics) == 32 && offsetof(RvWindowMetrics, outerHeight) == 16 && offsetof(RvWindowMetrics, devicePixelRatio) == 24);
+static_assert(sizeof(RvMediaVideoConfiguration) == 64 && offsetof(RvMediaVideoConfiguration, bitrate) == 32 && offsetof(RvMediaVideoConfiguration, transfer_function) == 60);
+static_assert(sizeof(RvSnapshotOptions) == 64 && offsetof(RvSnapshotOptions, scale) == 8 && offsetof(RvSnapshotOptions, x) == 24 && offsetof(RvSnapshotOptions, quality) == 64 - 8);
+static_assert(sizeof(RvMediaAudioConfiguration) == 64 && offsetof(RvMediaAudioConfiguration, bitrate) == 40 && offsetof(RvMediaAudioConfiguration, spatial_rendering) == 56);
 
-int32_t rv_abi_version(void) { return 54; }
+int32_t rv_abi_version(void) { return 59; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -1346,10 +1574,26 @@ int32_t rv_abi_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "font-load"))
         return 1;
+    if (!std::strcmp(feature, "font-readiness"))
+        return 1;
+    if (!std::strcmp(feature, "font-face-load"))
+        return 1;
+    if (!std::strcmp(feature, "animation-promises"))
+        return 1;
     if (!std::strcmp(feature, "event-construction"))
         return 1;
     if (!std::strcmp(feature, "input-state"))
         return 1;
+    if (!std::strcmp(feature, "pointer-input"))
+        return 1;
+#if ENABLE(TOUCH_EVENTS)
+    if (!std::strcmp(feature, "touch-input"))
+        return 1;
+#endif
+#if ENABLE(POINTER_LOCK)
+    if (!std::strcmp(feature, "pointer-lock"))
+        return 1;
+#endif
     if (!std::strcmp(feature, "viewport"))
         return 1;
     if (!std::strcmp(feature, "dom-binary-values"))
@@ -1364,20 +1608,47 @@ int32_t rv_abi_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "form-submission"))
         return 1;
+    if (!std::strcmp(feature, "animation-custom-effects"))
+        return 1;
     if (!std::strcmp(feature, "text-segmentation"))
         return 1;
     if (!std::strcmp(feature, "diagnostics"))
         return 1;
+    if (!std::strcmp(feature, "canvas-context"))
+        return 1;
+    if (!std::strcmp(feature, "canvas-filters"))
+        return 1;
+    if (!std::strcmp(feature, "canvas-pixels"))
+        return 1;
+    if (!std::strcmp(feature, "canvas-export"))
+        return 1;
+    if (!std::strcmp(feature, "image-bitmaps"))
+        return 1;
     if (!std::strcmp(feature, "cascade-diagnostics"))
+        return 1;
+    if (!std::strcmp(feature, "media-preferences"))
+        return 1;
+    if (!std::strcmp(feature, "wake-locks"))
+        return 1;
+    if (!std::strcmp(feature, "notifications"))
+        return 1;
+    if (!std::strcmp(feature, "media-capabilities"))
+        return 1;
+    if (!std::strcmp(feature, "snapshot-options"))
         return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "accessibility-uia"))
         return 1;
 #endif
-    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop", "drag-out", "accessibility", "accessibility-text", "svg-document" }) {
+    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop", "drag-out", "clipboard-files", "range-replacement", "accessibility", "accessibility-text", "svg-document", "resize-entries", "intersection-entries" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
+#if !PLATFORM(GTK) && !PLATFORM(WPE)
+    // GTK and WPE keep file access out of drops (DataTransfer::allowsFileAccess); a paste carries files everywhere.
+    if (!std::strcmp(feature, "data-transfer-files"))
+        return 1;
+#endif
 #if RANVIER_COMPOSITING
     if (!std::strcmp(feature, "compositing"))
         return 1;
@@ -1395,6 +1666,16 @@ int32_t rv_abi_has(const char* feature)
         return 1;
 #endif
     return 0;
+}
+
+// Whether rv_host_snapshot accepts RV_SNAPSHOT_DISPLAY_P3.
+static constexpr bool snapshotDisplayP3()
+{
+#if ENABLE(DESTINATION_COLOR_SPACE_DISPLAY_P3)
+    return true;
+#else
+    return false;
+#endif
 }
 
 #include "RanvierCapabilities.inc"
@@ -1460,6 +1741,88 @@ int32_t rv_host_set_screen(RvHost* host, const RvScreenMetrics* metrics)
     publishScreens();
     host->page->screenPropertiesDidChange();
     host->orientation->setOrientation(static_cast<ScreenOrientationType>(metrics->orientation));
+    return RV_OK;
+}
+
+bool RvChromeClient::hoverSupportedByPrimaryPointingDevice() const
+{
+    return host && host->mediaPreferences.hover == RV_MEDIA_HOVER;
+}
+
+bool RvChromeClient::hoverSupportedByAnyAvailablePointingDevice() const
+{
+    return host && host->mediaPreferences.any_hover == RV_MEDIA_HOVER;
+}
+
+std::optional<PointerCharacteristics> RvChromeClient::pointerCharacteristicsOfPrimaryPointingDevice() const
+{
+    auto pointer = host ? host->mediaPreferences.pointer : RV_MEDIA_DEFAULT;
+    if (pointer == RV_MEDIA_POINTER_COARSE)
+        return PointerCharacteristics::Coarse;
+    if (pointer == RV_MEDIA_POINTER_FINE)
+        return PointerCharacteristics::Fine;
+    return std::nullopt;
+}
+
+OptionSet<PointerCharacteristics> RvChromeClient::pointerCharacteristicsOfAllAvailablePointingDevices() const
+{
+    switch (host ? host->mediaPreferences.any_pointer : RV_MEDIA_DEFAULT) {
+    case RV_MEDIA_POINTER_COARSE: return PointerCharacteristics::Coarse;
+    case RV_MEDIA_POINTER_FINE: return PointerCharacteristics::Fine;
+    case RV_MEDIA_POINTER_COARSE_AND_FINE: return { PointerCharacteristics::Coarse, PointerCharacteristics::Fine };
+    default: return { };
+    }
+}
+
+// RV_MEDIA_DEFAULT is no preference on every platform. ForcedAccessibilityValue::System would read the OS setting on
+// Cocoa (ThemeMac::userPrefersReducedMotion and userPreferredContrast, platform/mac/ThemeMac.mm).
+static ForcedAccessibilityValue forcedAccessibilityValue(int32_t preference)
+{
+    return preference == RV_MEDIA_PREFERENCE ? ForcedAccessibilityValue::On : ForcedAccessibilityValue::Off;
+}
+
+int32_t rv_host_set_media_preferences(RvHost* host, const RvMediaPreferences* preferences)
+{
+    if (!host || !preferences)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    auto within = [](int32_t value, int32_t last) { return value >= RV_MEDIA_DEFAULT && value <= last; };
+    auto scale = preferences->text_scale;
+    if (preferences->size < sizeof(RvMediaPreferences) || !within(preferences->color_scheme, RV_MEDIA_DARK)
+        || !within(preferences->reduced_motion, RV_MEDIA_PREFERENCE) || !within(preferences->contrast, RV_MEDIA_PREFERENCE)
+        || !within(preferences->pointer, RV_MEDIA_POINTER_FINE) || !within(preferences->hover, RV_MEDIA_HOVER)
+        || !within(preferences->any_pointer, RV_MEDIA_POINTER_COARSE_AND_FINE) || !within(preferences->any_hover, RV_MEDIA_HOVER)
+        || !(scale == 0 || (scale >= 0.25f && scale <= 8)))
+        return RV_ERR_UNSUPPORTED;
+    auto previous = host->mediaPreferences;
+    host->mediaPreferences = *preferences;
+    host->mediaPreferences.size = sizeof(RvMediaPreferences);
+    auto& page = host->page.get();
+    if (previous.color_scheme != preferences->color_scheme)
+        page.setUseColorAppearance(preferences->color_scheme == RV_MEDIA_DARK, page.useElevatedUserInterfaceLevel());
+    if (previous.reduced_motion != preferences->reduced_motion || previous.contrast != preferences->contrast) {
+        page.settings().setForcedPrefersReducedMotionAccessibilityValue(forcedAccessibilityValue(preferences->reduced_motion));
+        page.settings().setForcedPrefersContrastAccessibilityValue(forcedAccessibilityValue(preferences->contrast));
+        page.accessibilitySettingsDidChange();
+    }
+    if (previous.pointer != preferences->pointer || previous.hover != preferences->hover
+        || previous.any_pointer != preferences->any_pointer || previous.any_hover != preferences->any_hover)
+        page.updateStyleAfterChangeInEnvironment();
+    if (previous.text_scale != scale)
+        host->frame().setTextZoomFactor(scale ? scale : 1);
+    return RV_OK;
+}
+
+int32_t rv_host_media_preferences(RvHost* host, RvMediaPreferences* preferences)
+{
+    if (!host || !preferences)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (preferences->size < sizeof(RvMediaPreferences))
+        return RV_ERR_UNSUPPORTED;
+    *preferences = host->mediaPreferences;
     return RV_OK;
 }
 
@@ -1676,6 +2039,8 @@ RvHost* rv_host_create(int32_t width, int32_t height)
 #endif
         initialized = true;
         segmentationInitialized = true;
+        ranvier_sleep_disabler_install();
+        sleepDisablersInstalled = true;
     }
     if (!onOwningThread() || width <= 0 || height <= 0)
         return nullptr;
@@ -1686,6 +2051,7 @@ RvHost* rv_host_create(int32_t width, int32_t height)
     static PlatformDisplayID nextDisplayID = 0x52560000;
     host->displayID = ++nextDisplayID;
     ranvier_page_set_display(reinterpret_cast<RvNode*>(&host->document()), host->displayID);
+    ranvier_notifications_attach(reinterpret_cast<RvNode*>(&host->document()));
     host->noScript.emplace(host->document().vm());
 #if RANVIER_COMPOSITING
     applyCompositingMode(*host, RV_COMPOSITING_WHEN_NEEDED);
@@ -1737,46 +2103,66 @@ int32_t rv_host_set_accelerated_compositing(RvHost* host, int32_t mode)
 #endif
 }
 
+// Denies a pending pointer-lock request and ends a held lock, as a platform window losing focus does.
+static void releasePointerLock(RvHost& host)
+{
+#if ENABLE(POINTER_LOCK)
+    if (auto completion = std::exchange(host.pointerLockRequest, { }))
+        completion(PointerLockRequestResult::Failure);
+    auto& controller = host.page->pointerLockController();
+    if (controller.element() && !controller.lockPending())
+        controller.didLosePointerLock();
+#else
+    UNUSED_PARAM(host);
+#endif
+}
+
 void rv_host_destroy(RvHost* host)
 {
     if (!host || !onOwningThread())
         return;
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
+    ranvier_notifications_drop(reinterpret_cast<RvNode*>(&host->document()));
+    ranvier_custom_effect_callbacks_revoke_document(reinterpret_cast<RvNode*>(&host->document()));
     rv_host_detach_uia(host);
     rv_host_set_accelerated_compositing(host, RV_COMPOSITING_OFF);
     host->noScript.reset();
     rv_host_set_accessibility(host, 0, nullptr, nullptr);
+    releasePointerLock(*host);
     static_cast<RvChromeClient&>(host->page->chrome().client()).host = nullptr;
     liveHosts.removeFirst(host);
     delete host;
     publishScreens();
 }
 
-int32_t rv_host_load_html(RvHost* host, const char* html)
+int32_t rv_host_load_html(RvHost* host, const uint8_t* html, int32_t html_length)
 {
-    if (!host || !html)
+    auto markup = requiredUtf8(html, html_length);
+    if (!host || !markup)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
-    loadHTML(host->frame(), utf8(html));
+    ranvier_custom_effect_callbacks_revoke_document(reinterpret_cast<RvNode*>(&host->document()));
+    loadHTML(host->frame(), *markup);
     // The new document posts accessibility notifications once its cache exists.
     if (host->accessibility)
         host->document().axObjectCache();
     return RV_OK;
 }
 
-int32_t rv_host_load_svg(RvHost* host, const char* svg)
+int32_t rv_host_load_svg(RvHost* host, const uint8_t* svg, int32_t svg_length)
 {
-    if (!host || !svg)
+    auto markup = requiredUtf8(svg, svg_length);
+    if (!host || !markup)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
-    loadDocument(host->frame(), utf8(svg), "image/svg+xml"_s);
+    loadDocument(host->frame(), *markup, "image/svg+xml"_s);
     if (host->accessibility)
         host->document().axObjectCache();
     return RV_OK;
@@ -1815,6 +2201,48 @@ int32_t rv_font_load(RvHost* host, const char* family, const uint8_t* data, int3
     return ranvier_resource_load_font(reinterpret_cast<RvNode*>(&host->document()), family, data, length, completion, context, operation);
 }
 
+static int32_t fontFaceOperation(RvHost* host, RvFontFace* face, int32_t load, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !face || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_font_face_load(reinterpret_cast<RvNode*>(&host->document()), face, load, completion, context, operation);
+}
+
+int32_t rv_font_face_load(RvHost* host, RvFontFace* face, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    return fontFaceOperation(host, face, 1, completion, context, operation);
+}
+
+int32_t rv_font_face_loaded(RvHost* host, RvFontFace* face, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    return fontFaceOperation(host, face, 0, completion, context, operation);
+}
+
+static int32_t animationPromise(RvHost* host, RvEventTarget* animation, int32_t finished, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !animation || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_animation_promise(reinterpret_cast<RvNode*>(&host->document()), animation, finished, completion, context, operation);
+}
+
+int32_t rv_animation_ready(RvHost* host, RvEventTarget* animation, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    return animationPromise(host, animation, 0, completion, context, operation);
+}
+
+int32_t rv_animation_finished(RvHost* host, RvEventTarget* animation, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    return animationPromise(host, animation, 1, completion, context, operation);
+}
+
 int32_t rv_resource_cancel(uint64_t operation)
 {
     return ranvier_resource_cancel(operation);
@@ -1823,6 +2251,67 @@ int32_t rv_resource_cancel(uint64_t operation)
 int32_t rv_resource_release(uint64_t operation)
 {
     return ranvier_resource_release(operation);
+}
+
+int32_t rv_fonts_status(RvHost* host, int32_t* status)
+{
+    if (!host || !status)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_fonts_status(reinterpret_cast<RvNode*>(&host->document()), status);
+}
+
+int32_t rv_fonts_check(RvHost* host, const uint8_t* font, int32_t font_length, const uint8_t* text, int32_t text_length, int32_t* loaded)
+{
+    if (!host || !font || font_length < 0 || text_length < 0 || (text_length && !text) || !loaded)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_fonts_check(reinterpret_cast<RvNode*>(&host->document()), font, font_length, text, text_length, loaded);
+}
+
+int32_t rv_fonts_load(RvHost* host, const uint8_t* font, int32_t font_length, const uint8_t* text, int32_t text_length, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !font || font_length < 0 || text_length < 0 || (text_length && !text) || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_fonts_load(reinterpret_cast<RvNode*>(&host->document()), font, font_length, text, text_length, completion, context, operation);
+}
+
+int32_t rv_fonts_ready(RvHost* host, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_fonts_ready(reinterpret_cast<RvNode*>(&host->document()), completion, context, operation);
+}
+
+int32_t rv_fonts_watch(RvHost* host, RvFontsEventCallback callback, void* context, RvFontsWatch** watch)
+{
+    if (!host || !callback || !watch)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_fonts_watch(reinterpret_cast<RvNode*>(&host->document()), callback, context, watch);
+}
+
+void rv_fonts_unwatch(RvFontsWatch* watch)
+{
+    if (onOwningThread())
+        ranvier_fonts_unwatch(watch);
 }
 
 int32_t rv_host_scripts_enabled(RvHost* host)
@@ -1867,11 +2356,12 @@ RvNode* rv_document_head(RvHost* host)
     return head ? handle(head.releaseNonNull()) : nullptr;
 }
 
-RvNode* rv_document_get_element_by_id(RvHost* host, const char* elementId)
+RvNode* rv_document_get_element_by_id(RvHost* host, const uint8_t* elementId, int32_t elementId_length)
 {
-    if (!host || !elementId || !onOwningThread())
+    auto identifier = requiredUtf8(elementId, elementId_length);
+    if (!host || !identifier || !onOwningThread())
         return nullptr;
-    RefPtr element = host->document().getElementById(utf8(elementId));
+    RefPtr element = host->document().getElementById(*identifier);
     return element ? handle(element.releaseNonNull()) : nullptr;
 }
 
@@ -1885,11 +2375,12 @@ RvNode* rv_document_create_element(RvHost* host, const char* tagName)
     return handle(element.releaseReturnValue());
 }
 
-RvNode* rv_document_create_text(RvHost* host, const char* data)
+RvNode* rv_document_create_text(RvHost* host, const uint8_t* data, int32_t data_length)
 {
-    if (!host || !data || !onOwningThread())
+    auto text = requiredUtf8(data, data_length);
+    if (!host || !text || !onOwningThread())
         return nullptr;
-    return handle(host->document().createTextNode(utf8(data)));
+    return handle(host->document().createTextNode(WTF::move(*text)));
 }
 
 int32_t rv_node_append_child(RvNode* parent, RvNode* child)
@@ -1901,25 +2392,27 @@ int32_t rv_node_append_child(RvNode* parent, RvNode* child)
     return status(node(parent)->appendChild(*node(child)));
 }
 
-int32_t rv_node_set_text_content(RvNode* target, const char* text)
+int32_t rv_node_set_text_content(RvNode* target, const uint8_t* text, int32_t text_length)
 {
-    if (!target || !text)
+    auto value = requiredUtf8(text, text_length);
+    if (!target || !value)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
-    return status(node(target)->setTextContent(utf8(text)));
+    return status(node(target)->setTextContent(WTF::move(*value)));
 }
 
-int32_t rv_element_set_attribute(RvNode* target, const char* name, const char* value)
+int32_t rv_element_set_attribute(RvNode* target, const char* name, const uint8_t* value, int32_t value_length)
 {
-    if (!target || !name || !value)
+    auto attributeValue = requiredUtf8(value, value_length);
+    if (!target || !name || !attributeValue)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     RefPtr element = dynamicDowncast<Element>(*node(target));
     if (!element)
         return RV_ERR_NOT_ELEMENT;
-    auto result = element->setAttribute(AtomString::fromUTF8(name), AtomString::fromUTF8(value));
+    auto result = element->setAttribute(AtomString::fromUTF8(name), AtomString { *attributeValue });
     return status(result);
 }
 
@@ -2188,13 +2681,14 @@ int32_t rv_host_paint_rgba_rect(RvHost* host, uint8_t* rgba, int32_t length, int
     return paintArea(*host, rgba, length, { x, y, width, height });
 }
 
-RvListener* rv_node_add_event_listener(RvNode* target, const char* type, int32_t capture,
+RvListener* rv_node_add_event_listener(RvNode* target, const uint8_t* type, int32_t type_length, int32_t capture,
     RvEventCallback callback, void* context)
 {
-    if (!target || !type || !callback || !onOwningThread())
+    auto eventType = requiredUtf8(type, type_length);
+    if (!target || !eventType || !callback || !onOwningThread())
         return nullptr;
     auto* listener = new RvListener { RvEventListener::create(callback, context), *node(target),
-        AtomString::fromUTF8(type), !!(capture & RV_LISTENER_CAPTURE) };
+        AtomString { *eventType }, !!(capture & RV_LISTENER_CAPTURE) };
     AddEventListenerOptions options;
     options.capture = listener->capture;
     if (capture & RV_LISTENER_PASSIVE_SPECIFIED)
@@ -2234,15 +2728,16 @@ int32_t rv_listener_remove(RvListener* listener)
     return RV_OK;
 }
 
-int32_t rv_node_dispatch_event(RvNode* target, const char* type, int32_t bubbles, int32_t cancelable,
+int32_t rv_node_dispatch_event(RvNode* target, const uint8_t* type, int32_t type_length, int32_t bubbles, int32_t cancelable,
     int32_t* defaultPrevented)
 {
-    if (!target || !type)
+    auto eventType = requiredUtf8(type, type_length);
+    if (!target || !eventType)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     Ref protectedTarget = *node(target);
-    Ref dispatched = Event::create(AtomString::fromUTF8(type), bubbles ? Event::CanBubble::Yes : Event::CanBubble::No,
+    Ref dispatched = Event::create(AtomString { *eventType }, bubbles ? Event::CanBubble::Yes : Event::CanBubble::No,
         cancelable ? Event::IsCancelable::Yes : Event::IsCancelable::No);
     auto status = dispatchCountingFailures([&] { protectedTarget->dispatchEvent(dispatched); });
     if (defaultPrevented)
@@ -2311,11 +2806,12 @@ RvNode* rv_host_document(RvHost* host)
     return handleOrNull(&host->document());
 }
 
-RvNode* rv_document_create_comment(RvHost* host, const char* data)
+RvNode* rv_document_create_comment(RvHost* host, const uint8_t* data, int32_t data_length)
 {
-    if (!host || !data || !onOwningThread())
+    auto text = requiredUtf8(data, data_length);
+    if (!host || !text || !onOwningThread())
         return nullptr;
-    return handle(host->document().createComment(utf8(data)));
+    return handle(host->document().createComment(WTF::move(*text)));
 }
 
 RvNode* rv_document_create_fragment(RvHost* host)
@@ -2333,14 +2829,15 @@ RvNode* rv_document_import_node(RvHost* host, RvNode* source, int32_t deep)
     return imported.hasException() ? nullptr : handle(imported.releaseReturnValue());
 }
 
-RvNode* rv_node_parse_fragment(RvNode* context, const char* markup)
+RvNode* rv_node_parse_fragment(RvNode* context, const uint8_t* markup, int32_t markup_length)
 {
-    if (!context || !markup || !onOwningThread())
+    auto source = requiredUtf8(markup, markup_length);
+    if (!context || !source || !onOwningThread())
         return nullptr;
     Ref range = WebCore::Range::create(node(context)->document());
     if (range->selectNodeContents(*node(context)).hasException())
         return nullptr;
-    auto fragment = range->createContextualFragment(Variant<Ref<TrustedHTML>, String> { utf8(markup) });
+    auto fragment = range->createContextualFragment(Variant<Ref<TrustedHTML>, String> { WTF::move(*source) });
     return fragment.hasException() ? nullptr : handle(fragment.releaseReturnValue());
 }
 
@@ -2423,45 +2920,47 @@ int32_t rv_node_get_string(RvNode* target, int32_t property, char* buffer, int32
     return RV_ERR_UNSUPPORTED;
 }
 
-int32_t rv_node_set_string(RvNode* target, int32_t property, const char* value)
+int32_t rv_node_set_string(RvNode* target, int32_t property, const uint8_t* value, int32_t value_length)
 {
-    if (!target || !value)
+    auto parsed = requiredUtf8(value, value_length);
+    if (!target || !parsed)
         return RV_ERR_NULL_ARGUMENT;
+    auto& text = *parsed;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     auto& subject = *node(target);
     switch (property) {
     case RV_STRING_TEXT_CONTENT:
-        return status(subject.setTextContent(utf8(value)));
+        return status(subject.setTextContent(String { text }));
     case RV_STRING_INNER_HTML:
         if (RefPtr element = dynamicDowncast<Element>(subject))
-            return status(element->setInnerHTML(Variant<Ref<TrustedHTML>, String> { utf8(value) }));
+            return status(element->setInnerHTML(Variant<Ref<TrustedHTML>, String> { text }));
         return RV_ERR_NOT_ELEMENT;
     case RV_STRING_DATA:
         if (RefPtr data = dynamicDowncast<CharacterData>(subject)) {
-            data->setData(utf8(value));
+            data->setData(text);
             return RV_OK;
         }
         return RV_ERR_UNSUPPORTED;
     case RV_STRING_VALUE:
         if (RefPtr input = dynamicDowncast<HTMLInputElement>(subject))
-            return status(input->setValue(utf8(value)));
+            return status(input->setValue(text));
         if (RefPtr area = dynamicDowncast<HTMLTextAreaElement>(subject))
-            return status(area->setValue(utf8(value)));
+            return status(area->setValue(text));
         if (RefPtr select = dynamicDowncast<HTMLSelectElement>(subject)) {
-            select->setValue(utf8(value));
+            select->setValue(text);
             return RV_OK;
         }
         if (RefPtr option = dynamicDowncast<HTMLOptionElement>(subject))
-            return status(option->setAttribute(AtomString::fromUTF8("value"), AtomString::fromUTF8(value)));
+            return status(option->setAttribute(AtomString::fromUTF8("value"), AtomString { text }));
         return RV_ERR_NOT_INPUT;
     case RV_STRING_TITLE:
         if (RefPtr document = dynamicDowncast<Document>(subject)) {
-            document->setTitle(utf8(value));
+            document->setTitle(String { text });
             return RV_OK;
         }
         if (RefPtr element = dynamicDowncast<Element>(subject))
-            return status(element->setAttribute(AtomString::fromUTF8("title"), AtomString::fromUTF8(value)));
+            return status(element->setAttribute(AtomString::fromUTF8("title"), AtomString { text }));
         return RV_ERR_NOT_ELEMENT;
     }
     return RV_ERR_UNSUPPORTED;
@@ -2591,11 +3090,11 @@ static RvEventTarget* targetHandleOrNull(EventTarget* target)
     return reinterpret_cast<RvEventTarget*>(target);
 }
 
-RvEvent* rv_host_construct_event(RvHost* host, int32_t kind, const char* type, const RvEventInit* init)
+RvEvent* rv_host_construct_event(RvHost* host, int32_t kind, const uint8_t* type, int32_t type_length, const RvEventInit* init)
 {
-    if (!host || !type || !init || !onOwningThread())
+    if (!host || !init || !onOwningThread())
         return nullptr;
-    return ranvier_event_construct(reinterpret_cast<RvNode*>(&host->document()), kind, type, init);
+    return ranvier_event_construct(reinterpret_cast<RvNode*>(&host->document()), kind, type, type_length, init);
 }
 
 int32_t rv_custom_event_detail_json(RvEvent* handle, char* buffer, int32_t capacity, int32_t* length)
@@ -2659,12 +3158,13 @@ int32_t rv_event_target_equals(RvEventTarget* left, RvEventTarget* right)
     return left && right && eventTarget(left) == eventTarget(right) ? 1 : 0;
 }
 
-RvListener* rv_event_target_add_listener(RvEventTarget* target, const char* type, int32_t flags, RvEventCallback callback, void* context)
+RvListener* rv_event_target_add_listener(RvEventTarget* target, const uint8_t* type, int32_t type_length, int32_t flags, RvEventCallback callback, void* context)
 {
-    if (!target || !type || !callback || !onOwningThread())
+    auto eventType = requiredUtf8(type, type_length);
+    if (!target || !eventType || !callback || !onOwningThread())
         return nullptr;
     auto* listener = new RvListener { RvEventListener::create(callback, context), *eventTarget(target),
-        AtomString::fromUTF8(type), !!(flags & RV_LISTENER_CAPTURE) };
+        AtomString { *eventType }, !!(flags & RV_LISTENER_CAPTURE) };
     AddEventListenerOptions options;
     options.capture = listener->capture;
     if (flags & RV_LISTENER_PASSIVE_SPECIFIED)
@@ -2753,9 +3253,10 @@ int32_t rv_media_query_media(RvEventTarget* target, char* buffer, int32_t capaci
     return ranvier_media_query_media(target, buffer, capacity, length);
 }
 
-RvEvent* rv_host_create_event(RvHost* host, int32_t eventInterface, const char* type, int32_t bubbles, int32_t cancelable)
+RvEvent* rv_host_create_event(RvHost* host, int32_t eventInterface, const uint8_t* type, int32_t type_length, int32_t bubbles, int32_t cancelable)
 {
-    if (!host || !type || !onOwningThread())
+    auto eventType = requiredUtf8(type, type_length);
+    if (!host || !eventType || !onOwningThread())
         return nullptr;
     String name;
     switch (eventInterface) {
@@ -2783,7 +3284,7 @@ RvEvent* rv_host_create_event(RvHost* host, int32_t eventInterface, const char* 
     if (created.hasException())
         return nullptr;
     Ref result = created.releaseReturnValue();
-    result->initEvent(AtomString::fromUTF8(type), !!bubbles, !!cancelable);
+    result->initEvent(AtomString { *eventType }, !!bubbles, !!cancelable);
     return eventHandle(WTF::move(result));
 }
 
@@ -3034,6 +3535,51 @@ void rv_collect_garbage_eden(void)
         commonVM().heap.collectNow(JSC::Sync, JSC::CollectionScope::Eden);
 }
 
+// Hands each live host's queued notification requests to its presenter; a host without one drops them. A presenter
+// may destroy any host, so each host is looked up again before its next request.
+static void deliverNotificationRequests()
+{
+    for (auto* host : Vector<RvHost*> { liveHosts }) {
+        int32_t request = 0;
+        RvEventTarget* target = nullptr;
+        while (liveHosts.contains(host) && ranvier_notifications_take(reinterpret_cast<RvNode*>(&host->document()), &request, &target)) {
+            if (auto presenter = host->notificationPresenter)
+                presenter(host->notificationContext, host, target, request);
+            rv_event_target_release(target);
+        }
+    }
+}
+
+#if PLATFORM(COCOA)
+// RunLoop::cycle() waits up to 50 ms for a source on Cocoa. Zero-limit passes deliver the pending sources without
+// waiting; the kernel can deliver a due timer's port message after them, so a due WebCore shared timer fires directly.
+static void cycleCocoaRunLoop()
+{
+    constexpr int maximumSourcePasses = 64;
+    for (int pass = 0; pass < maximumSourcePasses; ++pass) {
+        if (CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, true) != kCFRunLoopRunHandledSource)
+            break;
+    }
+    if (CFRunLoopGetNextTimerFireDate(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode) <= CFAbsoluteTimeGetCurrent())
+        MainThreadSharedTimer::restartSharedTimer();
+}
+#elif USE(GLIB)
+// The GLib analogue of cycleCocoaRunLoop: a GLib iteration dispatches only the highest-priority band of ready sources
+// (RunLoop work at 0, the WebCore shared timer at 10 on WPE). Non-blocking passes continue while a source is due.
+static void cycleGLibRunLoop()
+{
+    constexpr int maximumSourcePasses = 64;
+    GMainContext* context = g_main_context_get_thread_default();
+    if (!context)
+        context = g_main_context_default();
+    for (int pass = 0; pass < maximumSourcePasses; ++pass) {
+        RunLoop::cycle();
+        if (!g_main_context_pending(context))
+            break;
+    }
+}
+#endif
+
 int32_t rv_run_loop_cycle(int32_t milliseconds)
 {
     if (milliseconds < 0)
@@ -3043,8 +3589,15 @@ int32_t rv_run_loop_cycle(int32_t milliseconds)
     auto deadline = MonotonicTime::now() + Seconds::fromMilliseconds(milliseconds);
     int32_t cycles = 0;
     do {
+#if PLATFORM(COCOA)
+        cycleCocoaRunLoop();
+#elif USE(GLIB)
+        cycleGLibRunLoop();
+#else
         RunLoop::cycle();
+#endif
         ++cycles;
+        deliverNotificationRequests();
         if (MonotonicTime::now() < deadline)
             WTF::sleep(1_ms);
     } while (MonotonicTime::now() < deadline);
@@ -3118,6 +3671,150 @@ int32_t rv_host_set_form_submission_handler(RvHost* host, RvFormSubmissionHandle
     host->formSubmissionHandler = handler;
     host->formSubmissionContext = handler ? context : nullptr;
     return RV_OK;
+}
+
+int32_t rv_host_set_wake_lock_policy(RvHost* host, RvWakeLockPolicy policy, void* context)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    host->wakeLockPolicy = policy;
+    host->wakeLockContext = policy ? context : nullptr;
+    return RV_OK;
+}
+
+int32_t rv_wake_lock_request(RvHost* host, int32_t type, RvEventTarget** sentinel)
+{
+    if (!host || !sentinel)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    struct Decision {
+        RvHost* host;
+        int32_t type;
+    } decision { host, type };
+    auto decide = [](void* context) -> int32_t {
+        auto& decision = *static_cast<Decision*>(context);
+        auto* policy = decision.host->wakeLockPolicy;
+        return policy ? policy(decision.host->wakeLockContext, decision.host, decision.type) : 0;
+    };
+    return ranvier_wake_lock_request(reinterpret_cast<RvNode*>(&host->document()), type, decide, &decision, sentinel);
+}
+
+int32_t rv_wake_lock_release(RvEventTarget* sentinel)
+{
+    if (!sentinel)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_wake_lock_release(sentinel);
+}
+
+int32_t rv_wake_lock_state(RvEventTarget* sentinel, int32_t* released, int32_t* type)
+{
+    if (!sentinel || !released || !type)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_wake_lock_state(sentinel, released, type);
+}
+
+int32_t rv_host_release_wake_locks(RvHost* host)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_wake_lock_release_all(reinterpret_cast<RvNode*>(&host->document()));
+}
+
+int32_t rv_set_sleep_disabler_callback(RvSleepDisablerCallback callback, void* context)
+{
+    if (!sleepDisablersInstalled || !onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    ranvier_sleep_disabler_set_callback(callback, callback ? context : nullptr);
+    sleepDisablerCallbackSet = !!callback;
+    return RV_OK;
+}
+
+int32_t rv_host_set_notification_presenter(RvHost* host, RvNotificationPresenter presenter, void* context)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    host->notificationPresenter = presenter;
+    host->notificationContext = presenter ? context : nullptr;
+    ranvier_notifications_configure(reinterpret_cast<RvNode*>(&host->document()), host->notificationPermission, !!presenter);
+    return RV_OK;
+}
+
+int32_t rv_host_set_notification_permission(RvHost* host, int32_t permission)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (permission < RV_NOTIFICATION_DEFAULT || permission > RV_NOTIFICATION_GRANTED)
+        return RV_ERR_UNSUPPORTED;
+    host->notificationPermission = permission;
+    ranvier_notifications_configure(reinterpret_cast<RvNode*>(&host->document()), permission, !!host->notificationPresenter);
+    return RV_OK;
+}
+
+int32_t rv_host_notification_permission(RvHost* host, int32_t* permission)
+{
+    if (!host || !permission)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_notifications_permission(reinterpret_cast<RvNode*>(&host->document()), permission);
+}
+
+int32_t rv_notification_create(RvHost* host, const uint8_t* title, int32_t title_length, const RvNotificationOptions* options, RvEventTarget** notification)
+{
+    if (!host || !notification)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_notification_create(reinterpret_cast<RvNode*>(&host->document()), title, title_length, options, notification);
+}
+
+int32_t rv_notification_close(RvEventTarget* notification)
+{
+    if (!notification)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_notification_close(notification);
+}
+
+int32_t rv_notification_report(RvEventTarget* notification, int32_t event)
+{
+    if (!notification)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_notification_report(notification, event);
+}
+
+int32_t rv_notification_string(RvEventTarget* notification, int32_t field, uint8_t* buffer, int32_t capacity, int32_t* length)
+{
+    if (!notification || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_notification_string(notification, field, buffer, capacity, length);
+}
+
+int32_t rv_notification_flags(RvEventTarget* notification, int32_t* dir, int32_t* silent)
+{
+    if (!notification || !dir || !silent)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_notification_flags(notification, dir, silent);
 }
 
 int32_t rv_host_set_resource_handler(RvHost* host, RvResourceHandler handler, void* context)
@@ -3261,6 +3958,89 @@ template<typename Handle> static int32_t handleInput(RvHost& host, Handle&& hand
     return status == RV_OK ? (handled ? 1 : 0) : status;
 }
 
+// A mouse or pen sample as WebCore's platform event, with the fields its constructor leaves at their defaults.
+class RvPlatformPointerEvent final : public PlatformMouseEvent {
+public:
+    RvPlatformPointerEvent(const RvPointerSample& sample, const DoublePoint& position, PlatformEvent::Type type, PointerID pointerId, double force)
+        : PlatformMouseEvent(position, position, sample.button == RV_BUTTON_NONE ? MouseButton::None : static_cast<MouseButton>(sample.button),
+            type, sample.clickCount, platformModifiers(sample.modifiers), MonotonicTime::now(), force, SyntheticClickType::NoTap,
+            MouseEventInputSource::UserDriven, pointerId)
+    {
+        m_pointerType = sample.pointerType == RV_POINTER_TYPE_PEN ? penPointerEventType() : mousePointerEventType();
+        m_buttons = static_cast<unsigned short>(sample.buttons);
+        m_movementDelta = { sample.movementX, sample.movementY };
+        m_unadjustedMovementDelta = m_movementDelta;
+    }
+};
+
+static constexpr PointerID penPointerBase = 1u << 30;
+
+static bool pointerLocked(RvHost& host)
+{
+#if ENABLE(POINTER_LOCK)
+    auto& controller = host.page->pointerLockController();
+    return controller.element() && !controller.lockPending();
+#else
+    UNUSED_PARAM(host);
+    return false;
+#endif
+}
+
+// Sends one mouse or pen sample down WebCore's mouse path, which dispatches its pointer events and the compatibility
+// mouse events. Under pointer lock the page sees the position from before the lock.
+static int32_t dispatchMouseSample(RvHost& host, const RvPointerSample& sample)
+{
+    static constexpr PlatformEvent::Type types[] = { PlatformEvent::Type::MouseMoved, PlatformEvent::Type::MousePressed, PlatformEvent::Type::MouseReleased };
+    DoublePoint position { sample.x, sample.y };
+    if (pointerLocked(host) && host.pointerPosition)
+        position = *host.pointerPosition;
+    else
+        host.pointerPosition = position;
+    bool pen = sample.pointerType == RV_POINTER_TYPE_PEN;
+    double force = std::isnan(sample.pressure) ? (sample.buttons ? 0.5 : 0) : std::clamp<double>(sample.pressure, 0, 1);
+    PointerID pointerId = pen ? penPointerBase + static_cast<PointerID>(sample.id) : mousePointerID;
+    // A pen contact the platform withdrew ends as a release.
+    int32_t action = sample.action == RV_POINTER_CANCEL ? RV_POINTER_UP : sample.action;
+    RvPlatformPointerEvent event(sample, position, types[action], pointerId, force);
+    PointerEvent::PenGeometry geometry { sample.tiltX, sample.tiltY, sample.twist, std::clamp(sample.tangentialPressure, -1.f, 1.f), sample.width, sample.height };
+    Ref frame = host.frame();
+    if (action == RV_POINTER_DOWN) {
+        host.pressPoint = flooredIntPoint(position);
+        if (host.dragStyle == RV_DRAG_APP && host.dragStartCallback && host.dragStartDocument.get() != &host.document()) {
+            AddEventListenerOptions capture;
+            capture.capture = true;
+            host.document().addEventListener(eventNames().dragstartEvent, RvDragStartCapture::create(), capture);
+            host.dragStartDocument = host.document();
+        }
+    }
+    // The drag client finds the host of a drag that starts during this call here.
+    SetForScope dragHost { inputHost, &host };
+    return handleInput(host, [&] {
+        std::optional<PointerEvent::PendingPenGeometryScope> penScope;
+        if (pen)
+            penScope.emplace(geometry);
+        auto& handler = frame->eventHandler();
+        switch (action) {
+        case RV_POINTER_MOVE:
+            return handler.mouseMoved(event).wasHandled();
+        case RV_POINTER_DOWN:
+            return handler.handleMousePressEvent(event).wasHandled();
+        default:
+            return handler.handleMouseReleaseEvent(event).wasHandled();
+        }
+    });
+}
+
+static int32_t mouseButtonBit(int32_t button)
+{
+    switch (button) {
+    case RV_BUTTON_LEFT: return 1;
+    case RV_BUTTON_RIGHT: return 2;
+    case RV_BUTTON_MIDDLE: return 4;
+    default: return 0;
+    }
+}
+
 int32_t rv_host_mouse(RvHost* host, int32_t action, int32_t x, int32_t y, int32_t button, int32_t clickCount, int32_t modifiers)
 {
     if (!host)
@@ -3269,26 +4049,200 @@ int32_t rv_host_mouse(RvHost* host, int32_t action, int32_t x, int32_t y, int32_
         return RV_ERR_WRONG_THREAD;
     if (action < RV_MOUSE_MOVE || action > RV_MOUSE_UP || button < RV_BUTTON_NONE || button > RV_BUTTON_RIGHT || clickCount < 0)
         return RV_ERR_UNSUPPORTED;
-    static constexpr PlatformEvent::Type types[] = { PlatformEvent::Type::MouseMoved, PlatformEvent::Type::MousePressed, PlatformEvent::Type::MouseReleased };
-    DoublePoint position { static_cast<double>(x), static_cast<double>(y) };
-    PlatformMouseEvent mouse(position, position, button == RV_BUTTON_NONE ? MouseButton::None : static_cast<MouseButton>(button),
-        types[action], clickCount, platformModifiers(modifiers), MonotonicTime::now(), 0, SyntheticClickType::NoTap, MouseEventInputSource::UserDriven);
-    Ref frame = host->frame();
     if (action == RV_MOUSE_DOWN)
-        host->pressPoint = { x, y };
-    // The drag client finds the host of a drag that starts during this call here.
-    SetForScope dragHost { inputHost, host };
-    return handleInput(*host, [&] {
-        auto& handler = frame->eventHandler();
-        switch (action) {
-        case RV_MOUSE_MOVE:
-            return handler.mouseMoved(mouse).wasHandled();
-        case RV_MOUSE_DOWN:
-            return handler.handleMousePressEvent(mouse).wasHandled();
-        default:
-            return handler.handleMouseReleaseEvent(mouse).wasHandled();
+        host->mouseButtons |= mouseButtonBit(button);
+    else if (action == RV_MOUSE_UP)
+        host->mouseButtons &= ~mouseButtonBit(button);
+    RvPointerSample sample { };
+    sample.size = sizeof sample;
+    sample.pointerType = RV_POINTER_TYPE_MOUSE;
+    sample.action = action;
+    sample.x = x;
+    sample.y = y;
+    sample.button = button;
+    sample.buttons = host->mouseButtons;
+    sample.modifiers = modifiers;
+    sample.clickCount = clickCount;
+    sample.pressure = std::numeric_limits<float>::quiet_NaN();
+    sample.width = 1;
+    sample.height = 1;
+    // The movement since the previous sample. Under pointer lock an app sends relative movement through rv_host_pointer.
+    if (host->pointerPosition && !pointerLocked(*host)) {
+        sample.movementX = x - host->pointerPosition->x();
+        sample.movementY = y - host->pointerPosition->y();
+    }
+    return dispatchMouseSample(*host, sample);
+}
+
+#if ENABLE(TOUCH_EVENTS)
+class RvPlatformTouchPoint final : public PlatformTouchPoint {
+public:
+    explicit RvPlatformTouchPoint(const RvPointerSample& sample)
+    {
+        static constexpr State states[] = { TouchMoved, TouchPressed, TouchReleased, TouchCancelled, TouchStationary };
+        m_id = static_cast<unsigned>(sample.id);
+        m_state = states[sample.action];
+        m_pos = { sample.x, sample.y };
+        m_screenPos = m_pos;
+        m_radius = { sample.width / 2, sample.height / 2 };
+        m_rotationAngle = static_cast<float>(sample.twist);
+        m_twist = static_cast<float>(sample.twist);
+        m_force = std::isnan(sample.pressure) ? 0 : std::clamp(sample.pressure, 0.f, 1.f);
+    }
+};
+
+class RvPlatformTouchEvent final : public PlatformTouchEvent {
+public:
+    RvPlatformTouchEvent(const RvPointerSample* samples, int32_t count, int32_t modifiers)
+    {
+        bool pressed = false;
+        bool released = false;
+        bool cancelled = false;
+        for (int32_t index = 0; index < count; ++index) {
+            m_touchPoints.append(RvPlatformTouchPoint(samples[index]));
+            pressed |= samples[index].action == RV_POINTER_DOWN;
+            released |= samples[index].action == RV_POINTER_UP;
+            cancelled |= samples[index].action == RV_POINTER_CANCEL;
         }
+        m_type = cancelled ? Type::TouchCancel : pressed ? Type::TouchStart : released ? Type::TouchEnd : Type::TouchMove;
+        m_modifiers = platformModifiers(modifiers);
+        m_timestamp = MonotonicTime::now();
+    }
+};
+#endif
+
+static bool validSample(const RvPointerSample& sample)
+{
+    return sample.size == static_cast<int32_t>(sizeof(RvPointerSample)) && sample.pointerType >= RV_POINTER_TYPE_MOUSE
+        && sample.pointerType <= RV_POINTER_TYPE_TOUCH && sample.id >= 0 && sample.action >= RV_POINTER_MOVE
+        && sample.action <= RV_POINTER_STATIONARY && sample.button >= RV_BUTTON_NONE && sample.button <= RV_BUTTON_RIGHT
+        && sample.clickCount >= 0 && sample.buttons >= 0 && sample.buttons <= 0xffff && std::isfinite(sample.x) && std::isfinite(sample.y)
+        && sample.width >= 0 && sample.height >= 0;
+}
+
+int32_t rv_host_pointer(RvHost* host, const RvPointerSample* samples, int32_t count)
+{
+    if (!host || !samples)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (count < 1)
+        return RV_ERR_UNSUPPORTED;
+    for (int32_t index = 0; index < count; ++index) {
+        if (!validSample(samples[index]))
+            return RV_ERR_UNSUPPORTED;
+    }
+    if (samples[0].pointerType != RV_POINTER_TYPE_TOUCH) {
+        // One mouse or pen sample per call; stationary belongs to touch frames, and only a pen contact is cancelled.
+        if (count != 1 || samples[0].action == RV_POINTER_STATIONARY || (samples[0].pointerType == RV_POINTER_TYPE_MOUSE && samples[0].action == RV_POINTER_CANCEL))
+            return RV_ERR_UNSUPPORTED;
+        return dispatchMouseSample(*host, samples[0]);
+    }
+#if ENABLE(TOUCH_EVENTS)
+    bool changed = false;
+    for (int32_t index = 0; index < count; ++index) {
+        if (samples[index].pointerType != RV_POINTER_TYPE_TOUCH)
+            return RV_ERR_UNSUPPORTED;
+        changed |= samples[index].action != RV_POINTER_STATIONARY;
+        for (int32_t other = 0; other < index; ++other) {
+            if (samples[other].id == samples[index].id)
+                return RV_ERR_UNSUPPORTED;
+        }
+    }
+    if (!changed)
+        return RV_ERR_UNSUPPORTED;
+    RvPlatformTouchEvent event(samples, count, samples[0].modifiers);
+    Ref frame = host->frame();
+    Ref page = host->page;
+    return handleInput(*host, [&] {
+        auto result = frame->eventHandler().handleTouchEvent(event);
+        // An ended contact leaves the pointer state, as a platform view reports after the touch: until then WebCore
+        // dispatches no pointer events for mouse or pen input.
+        for (int32_t index = 0; index < count; ++index) {
+            if (samples[index].action == RV_POINTER_UP || samples[index].action == RV_POINTER_CANCEL)
+                page->pointerCaptureController().touchWithIdentifierWasRemoved(mousePointerID + 1 + static_cast<PointerID>(samples[index].id));
+        }
+        return result && *result;
     });
+#else
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+int32_t rv_host_set_max_touch_points(RvHost* host, int32_t value)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (value < 0)
+        return RV_ERR_UNSUPPORTED;
+    Navigator::setEmbedderMaxTouchPoints(host->page.get(), value);
+    return RV_OK;
+}
+
+int32_t rv_host_pointer_lock_state(RvHost* host, int32_t* state, RvNode** element)
+{
+    if (!host || !state)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_pointer_lock_state(reinterpret_cast<RvNode*>(&host->document()), state, element);
+}
+
+int32_t rv_host_pointer_lock_resolve(RvHost* host, int32_t granted)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+#if ENABLE(POINTER_LOCK)
+    if (!host->pointerLockRequest)
+        return RV_ERR_UNSUPPORTED;
+    auto completion = std::exchange(host->pointerLockRequest, { });
+    return dispatchCountingFailures([&] {
+        completion(granted ? PointerLockRequestResult::Success : PointerLockRequestResult::Failure);
+    });
+#else
+    UNUSED_PARAM(granted);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+int32_t rv_host_pointer_lock_lose(RvHost* host)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_pointer_lock_lose(reinterpret_cast<RvNode*>(&host->document()));
+}
+
+int32_t rv_element_request_pointer_lock(RvNode* element, int32_t unadjustedMovement)
+{
+    if (!element)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_element_request_pointer_lock(element, unadjustedMovement);
+}
+
+int32_t rv_touch_geometry(RvTouch* touch, RvTouchGeometry* geometry)
+{
+    if (!touch || !geometry)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_touch_geometry(touch, geometry);
+}
+
+int32_t rv_document_exit_pointer_lock(RvNode* document)
+{
+    if (!document)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_document_exit_pointer_lock(document);
 }
 
 int32_t rv_host_wheel(RvHost* host, int32_t x, int32_t y, float deltaX, float deltaY, int32_t modifiers)
@@ -3334,9 +4288,10 @@ static std::pair<String, int> legacyKey(const String& key, const String& code)
     return { key, virtualKey };
 }
 
-int32_t rv_host_key(RvHost* host, int32_t action, const char* key, const char* code, const char* text, int32_t modifiers, int32_t repeat)
+int32_t rv_host_key(RvHost* host, int32_t action, const char* key, const char* code, const uint8_t* text, int32_t text_length, int32_t modifiers, int32_t repeat)
 {
-    if (!host || !key || !code)
+    auto keyText = utf8Input(text, text_length);
+    if (!host || !key || !code || !keyText)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
@@ -3345,7 +4300,7 @@ int32_t rv_host_key(RvHost* host, int32_t action, const char* key, const char* c
     static constexpr PlatformEvent::Type types[] = { PlatformEvent::Type::RawKeyDown, PlatformEvent::Type::KeyUp, PlatformEvent::Type::Char };
     auto keyValue = utf8(key);
     auto codeValue = utf8(code);
-    auto characters = action == RV_KEY_CHAR && text ? utf8(text) : String { emptyString() };
+    auto characters = action == RV_KEY_CHAR && !keyText->isNull() ? *keyText : String { emptyString() };
     auto [identifier, virtualKey] = legacyKey(keyValue, codeValue);
     PlatformKeyboardEvent keyboard(types[action], characters, characters, keyValue, codeValue, identifier, virtualKey,
         !!repeat, false, modifiers & RV_MODIFIER_ALT, platformModifiers(modifiers), MonotonicTime::now());
@@ -3366,6 +4321,8 @@ int32_t rv_host_set_focused(RvHost* host, int32_t focused)
             focus.setFocusedFrame(&host->frame());
         focus.setActive(!!focused);
         focus.setFocused(!!focused);
+        if (!focused)
+            releasePointerLock(*host);
     });
 }
 
@@ -3554,6 +4511,39 @@ int32_t rv_blob_read_bytes(RvBlob* handle, uint8_t* buffer, int64_t capacity, in
     return RV_OK;
 }
 
+// The bytes of an in-memory blob, or nullopt for one backed by a file on disk.
+static std::optional<Vector<uint8_t>> blobBytes(Blob& blob)
+{
+    auto* handle = reinterpret_cast<RvBlob*>(&blob);
+    int64_t length = 0;
+    auto status = rv_blob_read_bytes(handle, nullptr, 0, &length);
+    if (status != RV_OK && status != RV_ERR_BUFFER_TOO_SMALL)
+        return std::nullopt;
+    Vector<uint8_t> bytes(static_cast<size_t>(length));
+    if (length && rv_blob_read_bytes(handle, bytes.mutableSpan().data(), length, &length) != RV_OK)
+        return std::nullopt;
+    return bytes;
+}
+
+// The contents of a File handle for a drop or a paste: RV_ERR_WRONG_INTERFACE for a Blob that is not a File.
+static int32_t transferFile(RvBlob* handle, RanvierTransferFile& result)
+{
+    auto& blob = *reinterpret_cast<Blob*>(handle);
+    if (!blob.isFile())
+        return RV_ERR_WRONG_INTERFACE;
+    auto bytes = blobBytes(blob);
+    if (!bytes)
+        return RV_ERR_UNSUPPORTED;
+    result = { static_cast<File&>(blob).name(), blob.type(), WTF::move(*bytes) };
+    return RV_OK;
+}
+
+// Whether a string payload names the type the engine reserves for files.
+static bool reservedTransferType(const String& type)
+{
+    return equalLettersIgnoringASCIICase(type, "files"_s);
+}
+
 int32_t rv_file_list_create(RvBlob* const* files, int32_t count, RvFileList** result)
 {
     if (!result || count < 0 || (count && !files))
@@ -3594,6 +4584,35 @@ int32_t rv_blob_url_read(RvHost* host, const uint8_t* url, int32_t url_length, R
     if (!liveHosts.contains(host))
         return RV_ERR_UNSUPPORTED;
     return ranvier_blob_url_read(reinterpret_cast<RvNode*>(&host->document()), url, url_length, completion, context, operation);
+}
+
+int32_t rv_media_decoding_info(RvHost* host, int32_t type, const RvMediaVideoConfiguration* video, const RvMediaAudioConfiguration* audio,
+    RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_media_capabilities_query(reinterpret_cast<RvNode*>(&host->document()), 0, type, video, audio, completion, context, operation);
+}
+
+int32_t rv_media_encoding_info(RvHost* host, int32_t type, const RvMediaVideoConfiguration* video, const RvMediaAudioConfiguration* audio,
+    RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_media_capabilities_query(reinterpret_cast<RvNode*>(&host->document()), 1, type, video, audio, completion, context, operation);
+}
+
+int32_t rv_media_capabilities_info(uint64_t operation, int32_t* supported, int32_t* smooth, int32_t* power_efficient)
+{
+    return ranvier_media_capabilities_info(operation, supported, smooth, power_efficient);
 }
 
 int32_t rv_blob_read_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length)
@@ -3678,13 +4697,14 @@ template<typename Edit> static int32_t compose(RvHost& host, Edit&& edit)
     }) < 0 ? RV_ERR_LISTENER_FAILED : RV_OK;
 }
 
-int32_t rv_host_ime_set_composition(RvHost* host, const char* text, int32_t selectionStart, int32_t selectionEnd)
+int32_t rv_host_ime_set_composition(RvHost* host, const uint8_t* text, int32_t text_length, int32_t selectionStart, int32_t selectionEnd)
 {
-    if (!host || !text)
+    auto input = requiredUtf8(text, text_length);
+    if (!host || !input)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
-    auto composition = utf8(text);
+    auto composition = WTF::move(*input);
     if (selectionStart < 0 || selectionEnd < selectionStart || static_cast<unsigned>(selectionEnd) > composition.length())
         return RV_ERR_UNSUPPORTED;
     Vector<CompositionUnderline> underlines;
@@ -3695,13 +4715,14 @@ int32_t rv_host_ime_set_composition(RvHost* host, const char* text, int32_t sele
     });
 }
 
-int32_t rv_host_ime_commit(RvHost* host, const char* text)
+int32_t rv_host_ime_commit(RvHost* host, const uint8_t* text, int32_t text_length)
 {
-    if (!host || !text)
+    auto input = requiredUtf8(text, text_length);
+    if (!host || !input)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
-    auto committed = utf8(text);
+    auto committed = WTF::move(*input);
     return compose(*host, [&](Editor& editor) { editor.confirmComposition(committed); });
 }
 
@@ -3746,16 +4767,17 @@ int32_t rv_host_ime_rect(RvHost* host, int32_t* x, int32_t* y, int32_t* width, i
 
 static Element* elementOf(RvNode* handle) { return handle ? dynamicDowncast<Element>(*node(handle)) : nullptr; }
 
-int32_t rv_element_class(RvNode* target, const char* token, int32_t operation)
+int32_t rv_element_class(RvNode* target, const uint8_t* token, int32_t token_length, int32_t operation)
 {
-    if (!target || !token)
+    auto input = requiredUtf8(token, token_length);
+    if (!target || !input)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     RefPtr element = elementOf(target);
     if (!element)
         return RV_ERR_NOT_ELEMENT;
-    auto name = AtomString::fromUTF8(token);
+    auto name = AtomString { *input };
     Ref classes = element->classList();
     std::optional<bool> force;
     switch (operation) {
@@ -3778,9 +4800,10 @@ int32_t rv_element_class(RvNode* target, const char* token, int32_t operation)
     return result.returnValue() ? 1 : 0;
 }
 
-int32_t rv_element_set_style(RvNode* target, const char* property, const char* value, int32_t important)
+int32_t rv_element_set_style(RvNode* target, const char* property, const uint8_t* value, int32_t value_length, int32_t important)
 {
-    if (!target || !property || !value)
+    auto input = requiredUtf8(value, value_length);
+    if (!target || !property || !input)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
@@ -3788,7 +4811,7 @@ int32_t rv_element_set_style(RvNode* target, const char* property, const char* v
     if (!element)
         return RV_ERR_NOT_ELEMENT;
     Ref<CSSStyleDeclaration> style = element->cssomStyle();
-    return status(style->setProperty(utf8(property), utf8(value), important ? "important"_s : emptyString()));
+    return status(style->setProperty(utf8(property), *input, important ? "important"_s : emptyString()));
 }
 
 int32_t rv_element_get_style(RvNode* target, const char* property, char* buffer, int32_t capacity, int32_t* length)
@@ -4134,6 +5157,29 @@ RvNode* rv_animation_target(RvAnimation* handle)
     return handleOrNull(effect ? effect->target() : nullptr);
 }
 
+RvEventTarget* rv_animation_as_event_target(RvAnimation* handle)
+{
+    if (!handle || !onOwningThread())
+        return nullptr;
+    return targetHandleOrNull(static_cast<EventTarget*>(animation(handle)));
+}
+
+RvCustomEffectCallback* rv_custom_effect_callback_create(RvHost* host, RvCustomEffectTick tick, void* context, RvCustomEffectRelease release)
+{
+    if (!host || !tick || !onOwningThread() || !liveHosts.contains(host))
+        return nullptr;
+    return ranvier_custom_effect_callback_create(reinterpret_cast<RvNode*>(&host->document()), tick, context, release);
+}
+
+int32_t rv_custom_effect_callback_revoke(RvCustomEffectCallback* callback)
+{
+    if (!callback)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_custom_effect_callback_revoke(callback);
+}
+
 RvNode* rv_node_retain(RvNode* target)
 {
     if (!target || !onOwningThread())
@@ -4148,9 +5194,45 @@ struct RvObserver {
     RefPtr<IntersectionObserverCallback> delivery;
     RefPtr<ResizeObserverCallback> resizeDelivery;
     RvResizeCallback resizeCallback { nullptr };
+    RvResizeEntriesCallback entriesCallback { nullptr };
     RvIntersectionCallback intersectionCallback { nullptr };
+    RvIntersectionEntriesCallback intersectionEntriesCallback { nullptr };
     void* context { nullptr };
 };
+
+// The entries' targets stay alive while the source vector does.
+static Vector<RvIntersectionEntry> intersectionEntries(const Vector<Ref<IntersectionObserverEntry>>& entries)
+{
+    Vector<RvIntersectionEntry> copies;
+    copies.reserveInitialCapacity(entries.size());
+    for (auto& entry : entries) {
+        RvIntersectionEntry copy { };
+        copy.size = sizeof(RvIntersectionEntry);
+        copy.isIntersecting = entry->isIntersecting() ? 1 : 0;
+        copy.target = reinterpret_cast<RvNode*>(&entry->target());
+        copy.time = entry->time();
+        if (auto* root = entry->rootBounds()) {
+            copy.hasRootBounds = 1;
+            copy.rootX = root->x();
+            copy.rootY = root->y();
+            copy.rootWidth = root->width();
+            copy.rootHeight = root->height();
+        }
+        auto& bounds = entry->boundingClientRect();
+        copy.boundsX = bounds.x();
+        copy.boundsY = bounds.y();
+        copy.boundsWidth = bounds.width();
+        copy.boundsHeight = bounds.height();
+        auto& intersection = entry->intersectionRect();
+        copy.intersectionX = intersection.x();
+        copy.intersectionY = intersection.y();
+        copy.intersectionWidth = intersection.width();
+        copy.intersectionHeight = intersection.height();
+        copy.intersectionRatio = entry->intersectionRatio();
+        copies.append(copy);
+    }
+    return copies;
+}
 
 // WebCore registers a resize observer with its document only when it has a callback object; a native callback
 // function is never delivered to.
@@ -4171,6 +5253,32 @@ private:
 
     CallbackResult<void> invoke(ResizeObserver&, const Vector<Ref<ResizeObserverEntry>>& entries, ResizeObserver&) final
     {
+        if (owner && owner->entriesCallback) {
+            Vector<RvResizeEntry> copies;
+            copies.reserveInitialCapacity(entries.size());
+            for (auto& entry : entries) {
+                RvResizeEntry copy { };
+                copy.size = sizeof(RvResizeEntry);
+                copy.target = reinterpret_cast<RvNode*>(&entry->target());
+                auto& rect = entry->contentRect();
+                copy.contentX = rect.x();
+                copy.contentY = rect.y();
+                copy.contentWidth = rect.width();
+                copy.contentHeight = rect.height();
+                if (!entry->contentBoxSize().isEmpty()) {
+                    copy.contentInlineSize = entry->contentBoxSize()[0]->inlineSize();
+                    copy.contentBlockSize = entry->contentBoxSize()[0]->blockSize();
+                }
+                if (!entry->borderBoxSize().isEmpty()) {
+                    copy.borderInlineSize = entry->borderBoxSize()[0]->inlineSize();
+                    copy.borderBlockSize = entry->borderBoxSize()[0]->blockSize();
+                }
+                copies.append(copy);
+            }
+            // The entries keep their targets alive for the call; the callback may release the observer.
+            owner->entriesCallback(owner->context, owner, copies.span().data(), static_cast<int32_t>(copies.size()));
+            return { };
+        }
         for (auto& entry : entries) {
             if (!owner)
                 break;
@@ -4203,6 +5311,12 @@ private:
 
     CallbackResult<void> invoke(IntersectionObserver&, const Vector<Ref<IntersectionObserverEntry>>& entries, IntersectionObserver&) final
     {
+        if (owner && owner->intersectionEntriesCallback) {
+            auto copies = intersectionEntries(entries);
+            // The entries keep their targets alive for the call; the callback may release the observer.
+            owner->intersectionEntriesCallback(owner->context, owner, copies.span().data(), static_cast<int32_t>(copies.size()));
+            return { };
+        }
         for (auto& entry : entries) {
             if (!owner)
                 break;
@@ -4226,6 +5340,21 @@ RvObserver* rv_host_observe_resize(RvHost* host, RvResizeCallback callback, void
     Ref delivery = RvResizeDelivery::create(document.get());
     auto* observer = new RvObserver;
     observer->resizeCallback = callback;
+    observer->context = context;
+    observer->resize = ResizeObserver::create(document.get(), delivery.copyRef());
+    delivery->owner = observer;
+    observer->resizeDelivery = WTF::move(delivery);
+    return observer;
+}
+
+RvObserver* rv_host_observe_resize_entries(RvHost* host, RvResizeEntriesCallback callback, void* context)
+{
+    if (!host || !callback || !onOwningThread())
+        return nullptr;
+    Ref document = host->document();
+    Ref delivery = RvResizeDelivery::create(document.get());
+    auto* observer = new RvObserver;
+    observer->entriesCallback = callback;
     observer->context = context;
     observer->resize = ResizeObserver::create(document.get(), delivery.copyRef());
     delivery->owner = observer;
@@ -4261,6 +5390,93 @@ RvObserver* rv_host_observe_intersection(RvHost* host, RvIntersectionCallback ca
     return observer;
 }
 
+static std::optional<String> marginOf(const uint8_t* text, int32_t length)
+{
+    if (!text)
+        return "0px"_s;
+    auto margin = String::fromUTF8(std::span<const char8_t> { reinterpret_cast<const char8_t*>(text), static_cast<size_t>(length) });
+    if (margin.isNull())
+        return std::nullopt;
+    return margin;
+}
+
+int32_t rv_host_observe_intersection_entries(RvHost* host, RvIntersectionEntriesCallback callback, void* context, RvNode* root,
+    const uint8_t* rootMargin, int32_t rootMargin_length, const uint8_t* scrollMargin, int32_t scrollMargin_length,
+    const double* thresholds, int32_t thresholdCount, RvObserver** observer)
+{
+    if (observer)
+        *observer = nullptr;
+    if (!host || !callback || !observer || rootMargin_length < 0 || scrollMargin_length < 0 || thresholdCount < 0
+        || (rootMargin_length && !rootMargin) || (scrollMargin_length && !scrollMargin) || (thresholdCount && !thresholds))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    Ref document = host->document();
+    IntersectionObserver::Init init;
+    if (root) {
+        Ref rootNode = *node(root);
+        if (!is<Element>(rootNode) && !is<Document>(rootNode))
+            return RV_ERR_NOT_ELEMENT;
+        if (&rootNode->document() != document.ptr()) {
+            RefPtr page = rootNode->document().page();
+            return page && hostForPage(page.get()) ? RV_ERR_WRONG_HOST : RV_ERR_DETACHED;
+        }
+        if (RefPtr element = dynamicDowncast<Element>(rootNode))
+            init.root = Variant<Ref<Element>, Ref<Document>> { Ref { *element } };
+        else
+            init.root = Variant<Ref<Element>, Ref<Document>> { document.copyRef() };
+    }
+    auto parsedRootMargin = marginOf(rootMargin, rootMargin_length);
+    auto parsedScrollMargin = marginOf(scrollMargin, scrollMargin_length);
+    if (!parsedRootMargin || !parsedScrollMargin)
+        return fail(Exception { ExceptionCode::SyntaxError, "The margin is not valid UTF-8."_s });
+    init.rootMargin = WTF::move(*parsedRootMargin);
+    init.scrollMargin = WTF::move(*parsedScrollMargin);
+    if (thresholdCount)
+        init.threshold = Vector<double> { std::span { thresholds, static_cast<size_t>(thresholdCount) } };
+    else
+        init.threshold = 0.0;
+    Ref delivery = RvIntersectionDelivery::create(document.get());
+    auto created = IntersectionObserver::create(document.get(), delivery.copyRef(), WTF::move(init));
+    if (created.hasException())
+        return fail(created.exception());
+    auto* result = new RvObserver;
+    result->intersection = created.releaseReturnValue();
+    result->intersectionEntriesCallback = callback;
+    result->context = context;
+    delivery->owner = result;
+    result->delivery = WTF::move(delivery);
+    *observer = result;
+    return RV_OK;
+}
+
+int32_t rv_observer_take_records(RvObserver* observer, RvIntersectionEntriesCallback sink, void* context)
+{
+    if (!observer || !sink)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!observer->intersection)
+        return RV_ERR_UNSUPPORTED;
+    auto records = ranvier_intersection_take_records(*observer->intersection);
+    auto copies = intersectionEntries(records);
+    sink(context, observer, copies.span().data(), static_cast<int32_t>(copies.size()));
+    return RV_OK;
+}
+
+int32_t rv_host_now(RvHost* host, double* milliseconds)
+{
+    if (!host || !milliseconds)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_document_now(reinterpret_cast<RvNode*>(&host->document()), milliseconds);
+}
+
 int32_t rv_observer_observe(RvObserver* observer, RvNode* target)
 {
     if (!observer || !target)
@@ -4277,6 +5493,21 @@ int32_t rv_observer_observe(RvObserver* observer, RvNode* target)
     return RV_OK;
 }
 
+int32_t rv_observer_observe_box(RvObserver* observer, RvNode* target, int32_t box)
+{
+    if (!observer || !target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!observer->resize || (box != RV_RESIZE_BOX_CONTENT && box != RV_RESIZE_BOX_BORDER))
+        return RV_ERR_UNSUPPORTED;
+    RefPtr element = elementOf(target);
+    if (!element)
+        return RV_ERR_NOT_ELEMENT;
+    ranvier_resize_observe_box(*observer->resize, *element, box == RV_RESIZE_BOX_BORDER);
+    return RV_OK;
+}
+
 int32_t rv_observer_unobserve(RvObserver* observer, RvNode* target)
 {
     if (!observer || !target)
@@ -4290,6 +5521,19 @@ int32_t rv_observer_unobserve(RvObserver* observer, RvNode* target)
         observer->resize->unobserve(*element);
     else
         observer->intersection->unobserve(*element);
+    return RV_OK;
+}
+
+int32_t rv_observer_disconnect(RvObserver* observer)
+{
+    if (!observer)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (observer->resize)
+        observer->resize->disconnect();
+    else
+        observer->intersection->disconnect();
     return RV_OK;
 }
 
@@ -4334,6 +5578,122 @@ int32_t rv_element_snapshot(RvNode* target, uint8_t* rgba, int32_t length, int32
         return RV_ERR_BUFFER_TOO_SMALL;
     std::memcpy(rgba, pixels->bytes().data(), required);
     return RV_OK;
+}
+
+// Paints the subject's area, or the viewport's for a null subject, at scale into a new buffer in colorSpace.
+// rect is the painted area in CSS pixels: the element's paint bounds or the viewport, intersected with the crop.
+static RefPtr<ImageBuffer> captureSnapshot(RvHost& host, Node* subject, const RvSnapshotOptions& options, float scale,
+    const DestinationColorSpace& colorSpace, int32_t& status)
+{
+    status = RV_ERR_PAINT_FAILED;
+    host.document().updateLayoutIgnorePendingStylesheets();
+    RefPtr view = host.frame().view();
+    if (!view)
+        return nullptr;
+    view->updateLayoutAndStyleIfNeededRecursive();
+    IntRect rect { { }, host.size };
+    if (subject) {
+        CheckedPtr renderer = subject->renderer();
+        if (!renderer)
+            return nullptr;
+        LayoutRect elementRect;
+        rect = snappedIntRect(renderer->subtreePaintRootRect(elementRect, RenderObject::RespectTransforms::Yes));
+    }
+    if (options.crop) {
+        auto area = enclosingIntRect(FloatRect { static_cast<float>(options.x), static_cast<float>(options.y),
+            static_cast<float>(options.width), static_cast<float>(options.height) });
+        area.moveBy(rect.location());
+        rect.intersect(area);
+    }
+    if (rect.isEmpty()) {
+        status = RV_ERR_UNSUPPORTED;
+        return nullptr;
+    }
+    auto buffer = ImageBuffer::create(FloatSize { rect.size() }, RenderingMode::Unaccelerated, RenderingPurpose::Snapshot, scale,
+        colorSpace, PixelFormat::BGRA8);
+    if (!buffer)
+        return nullptr;
+    buffer->context().translate(-rect.x(), -rect.y());
+    host.inFrame = true;
+    auto behavior = view->paintBehavior();
+    if (subject) {
+        // As rv_element_snapshot paints it: the subtree alone, over a transparent base background.
+        auto background = view->baseBackgroundColor();
+        view->setBaseBackgroundColor(Color::transparentBlack);
+        view->paintContentsForSnapshot(buffer->context(), rect, subject, LocalFrameView::IncludeSelection, LocalFrameView::DocumentCoordinates);
+        view->setBaseBackgroundColor(background);
+    } else {
+        // As rv_host_paint_rgba's CPU path paints the viewport.
+        view->setPaintBehavior(behavior | PaintBehavior::FlattenCompositingLayers);
+        view->paint(buffer->context(), rect);
+    }
+    view->setPaintBehavior(behavior);
+    host.inFrame = false;
+    if (host.updateWanted)
+        host.requestFrame();
+    buffer->flushDrawingContext();
+    status = RV_OK;
+    return buffer;
+}
+
+int32_t rv_host_snapshot(RvHost* host, RvNode* element, const RvSnapshotOptions* options, RvResourceCompletion completion,
+    void* context, uint64_t* operation)
+{
+    if (!host || !options || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host) || options->size != static_cast<int32_t>(sizeof(RvSnapshotOptions)))
+        return RV_ERR_UNSUPPORTED;
+    float scale = options->scale == 0 ? host->deviceScale : static_cast<float>(options->scale);
+    if (!(scale >= 0.25f && scale <= 8))
+        return RV_ERR_UNSUPPORTED;
+    if (options->crop != 0 && options->crop != 1)
+        return RV_ERR_UNSUPPORTED;
+    if (options->crop && !(std::isfinite(options->x) && std::isfinite(options->y) && options->width > 0 && options->height > 0
+        && std::isfinite(options->width) && std::isfinite(options->height)))
+        return RV_ERR_UNSUPPORTED;
+    const DestinationColorSpace* colorSpace = nullptr;
+    if (options->color_space == RV_SNAPSHOT_SRGB)
+        colorSpace = &DestinationColorSpace::SRGB();
+#if ENABLE(DESTINATION_COLOR_SPACE_DISPLAY_P3)
+    else if (options->color_space == RV_SNAPSHOT_DISPLAY_P3)
+        colorSpace = &DestinationColorSpace::DisplayP3();
+#endif
+    if (!colorSpace || !Ranvier::Internal::imageEncodingSupported(options->encoding))
+        return RV_ERR_UNSUPPORTED;
+    RefPtr<Node> subject;
+    if (element) {
+        subject = node(element);
+        if (&subject->document() != &host->document())
+            return RV_ERR_WRONG_HOST;
+    }
+    int32_t status = RV_OK;
+    auto buffer = captureSnapshot(*host, subject.get(), *options, scale, *colorSpace, status);
+    if (!buffer)
+        return status;
+    Vector<uint8_t> bytes;
+    IntSize pixelSize;
+    if (options->encoding == RV_IMAGE_ENCODING_RGBA8) {
+        PixelBufferFormat format { AlphaPremultiplication::Unpremultiplied, PixelFormat::RGBA8, *colorSpace };
+        auto pixels = buffer->getPixelBuffer(format, IntRect { { }, buffer->truncatedLogicalSize() });
+        if (!pixels)
+            return RV_ERR_PAINT_FAILED;
+        pixelSize = pixels->size();
+        bytes.append(pixels->bytes());
+    } else {
+        pixelSize = buffer->backendSize();
+        bytes = Ranvier::Internal::encodeImage(WTF::move(buffer), options->encoding, options->quality);
+        if (bytes.isEmpty())
+            return RV_ERR_PAINT_FAILED;
+    }
+    return ranvier_resource_settled_bytes(reinterpret_cast<RvNode*>(&host->document()), bytes.span().data(),
+        static_cast<int64_t>(bytes.size()), pixelSize.width(), pixelSize.height(), completion, context, operation);
+}
+
+int32_t rv_snapshot_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length)
+{
+    return ranvier_resource_bytes(operation, buffer, capacity, length);
 }
 
 int32_t rv_host_set_popup_handler(RvHost* host, RvPopupCallback callback, void* context)
@@ -4409,6 +5769,8 @@ int32_t rv_host_tooltip(RvHost* host, char* buffer, int32_t capacity, int32_t* l
 
 struct RvClipboardRequest {
     Vector<std::pair<String, String>> items;
+    Vector<RanvierTransferFile> files;
+    bool denied { false };
 };
 
 int32_t rv_host_set_clipboard(RvHost* host, int32_t style, RvClipboardWrite write, RvClipboardRead read, void* context)
@@ -4430,13 +5792,51 @@ int32_t rv_host_set_clipboard(RvHost* host, int32_t style, RvClipboardWrite writ
     return RV_OK;
 }
 
-int32_t rv_clipboard_offer(RvClipboardRequest* request, const char* type, const char* data)
+int32_t rv_clipboard_offer(RvClipboardRequest* request, const char* type, const uint8_t* data, int32_t data_length)
 {
-    if (!request || !type || !data)
+    auto input = requiredUtf8(data, data_length);
+    if (!request || !type || !input)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
-    request->items.append({ utf8(type), utf8(data) });
+    auto name = utf8(type);
+    if (reservedTransferType(name))
+        return RV_ERR_UNSUPPORTED;
+    request->items.append({ WTF::move(name), WTF::move(*input) });
+    return RV_OK;
+}
+
+int32_t rv_clipboard_offer_file(RvClipboardRequest* request, RvBlob* file)
+{
+    if (!request || !file)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RanvierTransferFile contents;
+    if (auto status = transferFile(file, contents); status != RV_OK)
+        return status;
+    request->files.append(WTF::move(contents));
+    return RV_OK;
+}
+
+int32_t rv_clipboard_deny(RvClipboardRequest* request)
+{
+    if (!request)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    request->denied = true;
+    return RV_OK;
+}
+
+int32_t rv_host_set_clipboard_file_write(RvHost* host, RvClipboardWriteFile write, void* context)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    host->clipboardWriteFile = write;
+    host->clipboardWriteFileContext = write ? context : nullptr;
     return RV_OK;
 }
 
@@ -4461,10 +5861,17 @@ static int32_t copyOrCut(RvHost& host, bool cut)
     Ref event = ClipboardEvent::create(cut ? eventNames().cutEvent : eventNames().copyEvent, dataTransfer.copyRef());
     target->dispatchEvent(event);
     Vector<std::pair<String, String>> items;
-    if (event->defaultPrevented()) {
-        for (auto& type : dataTransfer->types(document))
-            items.append({ type, dataTransfer->getData(document, type) });
-    } else {
+    Vector<Ref<File>> files;
+    bool cancelled = event->defaultPrevented();
+    if (cancelled) {
+        for (auto& type : dataTransfer->types(document)) {
+            if (!reservedTransferType(type))
+                items.append({ type, dataTransfer->getData(document, type) });
+        }
+        files = ranvierTransferFiles(dataTransfer, document);
+    }
+    dataTransfer->makeInvalidForSecurity();
+    if (!cancelled) {
         auto range = frame->selection().selection().toNormalizedRange();
         if (!range || !(cut ? editor.canCut() : editor.canCopy()))
             return 0;
@@ -4476,8 +5883,16 @@ static int32_t copyOrCut(RvHost& host, bool cut)
     if (host.clipboardStyle == RV_CLIPBOARD_APP && host.clipboardWrite) {
         bool first = true;
         for (auto& [type, data] : items) {
-            host.clipboardWrite(host.clipboardContext, type.utf8().data(), data.utf8().data(), first ? 1 : 0);
+            auto bytes = data.utf8();
+            host.clipboardWrite(host.clipboardContext, type.utf8().data(), reinterpret_cast<const uint8_t*>(bytes.data()),
+                static_cast<int32_t>(bytes.length()), first ? 1 : 0);
             first = false;
+        }
+        if (host.clipboardWriteFile) {
+            for (auto& file : files) {
+                host.clipboardWriteFile(host.clipboardWriteFileContext, reinterpret_cast<RvBlob*>(file.ptr()), first ? 1 : 0);
+                first = false;
+            }
         }
     }
     return 1;
@@ -4491,13 +5906,15 @@ static int32_t paste(RvHost& host, bool plain)
     RvClipboardRequest request;
     if (host.clipboardStyle == RV_CLIPBOARD_APP && host.clipboardRead)
         host.clipboardRead(host.clipboardContext, &request);
-    auto pasteboard = makeUnique<StaticPasteboard>();
+    if (request.denied)
+        return fail(Exception { ExceptionCode::NotAllowedError, "The app denied access to its clipboard."_s });
+    Vector<std::pair<String, String>> strings;
     String text;
     String html;
     for (auto& [type, data] : request.items) {
         if (plain && type != "text/plain"_s)
             continue;
-        pasteboard->writeString(type, data);
+        strings.append({ type, data });
         if (type == "text/plain"_s)
             text = data;
         else if (type == "text/html"_s)
@@ -4506,9 +5923,11 @@ static int32_t paste(RvHost& host, bool plain)
     RefPtr target = clipboardTarget(document);
     if (!target)
         return 0;
+    auto pasteboard = ranvierTransferPasteboard(strings, plain ? Vector<RanvierTransferFile> { } : request.files);
     Ref dataTransfer = DataTransfer::createForCopyAndPaste(document, DataTransfer::StoreMode::Readonly, WTF::move(pasteboard));
     Ref event = ClipboardEvent::create(eventNames().pasteEvent, dataTransfer.copyRef());
     target->dispatchEvent(event);
+    dataTransfer->makeInvalidForSecurity();
     if (event->defaultPrevented())
         return 1;
     auto& editor = frame->editor();
@@ -4577,6 +5996,7 @@ int32_t rv_host_edit(RvHost* host, int32_t command)
 
 struct RvDragData {
     Vector<std::pair<String, String>> items;
+    Vector<RanvierTransferFile> files;
 };
 
 int32_t rv_host_set_drag(RvHost* host, int32_t style)
@@ -4597,11 +6017,28 @@ RvDragData* rv_drag_data_create(void)
     return new RvDragData;
 }
 
-int32_t rv_drag_data_add(RvDragData* data, const char* type, const char* value)
+int32_t rv_drag_data_add(RvDragData* data, const char* type, const uint8_t* value, int32_t value_length)
 {
-    if (!data || !type || !value)
+    auto input = requiredUtf8(value, value_length);
+    if (!data || !type || !input)
         return RV_ERR_NULL_ARGUMENT;
-    data->items.append({ utf8(type), utf8(value) });
+    auto name = utf8(type);
+    if (reservedTransferType(name))
+        return RV_ERR_UNSUPPORTED;
+    data->items.append({ WTF::move(name), WTF::move(*input) });
+    return RV_OK;
+}
+
+int32_t rv_drag_data_add_file(RvDragData* data, RvBlob* file)
+{
+    if (!data || !file)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RanvierTransferFile contents;
+    if (auto status = transferFile(file, contents); status != RV_OK)
+        return status;
+    data->files.append(WTF::move(contents));
     return RV_OK;
 }
 
@@ -4645,14 +6082,12 @@ static String dragItem(const RvDragData* data, ASCIILiteral type)
     return { };
 }
 
-static Ref<DataTransfer> dropTransfer(Document& document, const RvDragData* data, int32_t allowed)
+// The data transfer of a drag event from outside: protected for dragenter, dragover and dragleave, read-only for drop.
+static Ref<DataTransfer> dropTransfer(Document& document, const RvDragData* data, int32_t allowed, bool drop = false)
 {
-    auto pasteboard = makeUnique<StaticPasteboard>();
-    if (data) {
-        for (auto& [type, value] : data->items)
-            pasteboard->writeString(type, value);
-    }
-    return DataTransfer::createForDrop(document, WTF::move(pasteboard), dragOperations(allowed), false);
+    if (!data)
+        return ranvierDropTransfer(document, { }, { }, allowed, drop);
+    return ranvierDropTransfer(document, data->items, data->files, allowed, drop);
 }
 
 // Fires a trusted drag event at the target and returns whether a listener cancelled it.
@@ -4664,6 +6099,9 @@ static bool fireDrag(Document& document, Element& target, const AtomString& type
         Event::IsComposed::Yes, MonotonicTime::now(), document.windowProxy(), 0, point, point, 0, 0, platformModifiers(modifiers),
         MouseButton::Left, 1, related, 0, SyntheticClickType::NoTap, dataTransfer);
     target.dispatchEvent(event);
+    // As in WebCore's EventHandler: the data store is unreadable once its event is over.
+    if (dataTransfer)
+        dataTransfer->makeInvalidForSecurity();
     return event->defaultPrevented();
 }
 
@@ -4712,10 +6150,10 @@ int32_t rv_host_drag(RvHost* host, int32_t action, int32_t x, int32_t y, int32_t
             return;
         host->dragTarget = nullptr;
         if (operation == RV_DROP_NONE) {
-            fireDrag(document, *target, eventNames().dragleaveEvent, over.ptr(), point, modifiers);
+            fireDrag(document, *target, eventNames().dragleaveEvent, dropTransfer(document, data, allowed).ptr(), point, modifiers);
             return;
         }
-        if (fireDrag(document, *target, eventNames().dropEvent, dropTransfer(document, data, allowed).ptr(), point, modifiers))
+        if (fireDrag(document, *target, eventNames().dropEvent, dropTransfer(document, data, allowed, true).ptr(), point, modifiers))
             return;
         if (!editableForDrop(*target) || !hasText) {
             operation = RV_DROP_NONE;
@@ -4738,9 +6176,14 @@ int32_t rv_host_drag(RvHost* host, int32_t action, int32_t x, int32_t y, int32_t
 struct RvDrag {
     RvHost* host;
     Vector<std::pair<String, String>> items;
+    // The Files dragstart listeners added to the item list.
+    Vector<Ref<File>> files;
     // The dragged element; null for a selection.
     RefPtr<Element> source;
     IntPoint start;
+    // The element and offset of setDragImage, when a dragstart listener called it.
+    RefPtr<Element> image;
+    IntPoint imageOffset;
 };
 
 static int32_t dropMask(OptionSet<DragOperation> operations)
@@ -4773,10 +6216,12 @@ void RvDragClient::startDrag(DragItem item, DataTransfer& dataTransfer, Frame&, 
     auto* host = inputHost;
     if (!host || !host->dragStartCallback)
         return;
-    auto* drag = new RvDrag { host, { }, nullptr, host->pressPoint };
+    auto* drag = new RvDrag { host, { }, { }, nullptr, host->pressPoint, nullptr, { } };
     // The DataTransfer is no longer readable; its pasteboard holds the page's data and WebCore's own.
     auto& pasteboard = dataTransfer.pasteboard();
     for (auto& type : pasteboard.typesForLegacyUnsafeBindings()) {
+        if (reservedTransferType(type))
+            continue;
         auto value = pasteboard.readString(type);
         if (value.isEmpty())
             value = pasteboard.readStringInCustomData(type);
@@ -4794,6 +6239,9 @@ void RvDragClient::startDrag(DragItem item, DataTransfer& dataTransfer, Frame&, 
     }
     if (item.sourceAction != DragSourceAction::Selection)
         drag->source = dragSource(host->document(), host->pressPoint);
+    if (RefPtr started = std::exchange(dragStartTransfer(), nullptr))
+        drag->files = ranvierTransferFiles(*started, host->document());
+    ranvierTransferDragImage(dataTransfer, drag->image, drag->imageOffset);
     host->dragStartCallback(host->dragStartContext, reinterpret_cast<RvDrag*>(drag), drag->start.x(), drag->start.y(),
         dropMask(dataTransfer.sourceOperationMask()));
 }
@@ -4838,7 +6286,35 @@ RvDragData* rv_drag_data(RvDrag* drag)
 {
     if (!drag)
         return nullptr;
-    return new RvDragData { drag->items };
+    if (!onOwningThread())
+        return nullptr;
+    auto* data = new RvDragData { drag->items, { } };
+    for (auto& file : drag->files) {
+        RanvierTransferFile contents;
+        if (transferFile(reinterpret_cast<RvBlob*>(file.ptr()), contents) == RV_OK)
+            data->files.append(WTF::move(contents));
+    }
+    return data;
+}
+
+int32_t rv_drag_file_count(RvDrag* drag)
+{
+    if (!drag)
+        return RV_ERR_NULL_ARGUMENT;
+    return static_cast<int32_t>(drag->files.size());
+}
+
+int32_t rv_drag_file(RvDrag* drag, int32_t index, RvBlob** result)
+{
+    if (!drag || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (index < 0 || static_cast<size_t>(index) >= drag->files.size())
+        return RV_ERR_UNSUPPORTED;
+    Ref file = drag->files[index];
+    *result = reinterpret_cast<RvBlob*>(&file.leakRef());
+    return RV_OK;
 }
 
 int32_t rv_drag_image(RvDrag* drag, uint8_t* rgba, int32_t length, int32_t* width, int32_t* height, int32_t* offsetX, int32_t* offsetY)
@@ -4847,10 +6323,15 @@ int32_t rv_drag_image(RvDrag* drag, uint8_t* rgba, int32_t length, int32_t* widt
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
+    auto scale = drag->host->deviceScale;
+    if (drag->image) {
+        *offsetX = static_cast<int32_t>(drag->imageOffset.x() * scale);
+        *offsetY = static_cast<int32_t>(drag->imageOffset.y() * scale);
+        return rv_element_snapshot(reinterpret_cast<RvNode*>(drag->image.get()), rgba, length, width, height);
+    }
     if (!drag->source)
         return RV_ERR_UNSUPPORTED;
     auto rect = drag->source->boundingClientRect();
-    auto scale = drag->host->deviceScale;
     *offsetX = static_cast<int32_t>((drag->start.x() - rect.x()) * scale);
     *offsetY = static_cast<int32_t>((drag->start.y() - rect.y()) * scale);
     return rv_element_snapshot(reinterpret_cast<RvNode*>(drag->source.get()), rgba, length, width, height);
@@ -4875,6 +6356,25 @@ int32_t rv_drag_end(RvDrag* drag, int32_t x, int32_t y, int32_t operation)
     });
     host.document().updateStyleIfNeeded();
     return status;
+}
+
+int32_t rv_host_replace_range(RvHost* host, RvAbstractRange* range, const uint8_t* text, int32_t text_length)
+{
+    auto input = requiredUtf8(text, text_length);
+    if (!host || !range || !input)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    auto& abstract = *reinterpret_cast<AbstractRange*>(range);
+    if (&abstract.startContainer().document() != &host->document() || &abstract.endContainer().document() != &host->document())
+        return RV_ERR_WRONG_HOST;
+    auto bytes = input->utf8();
+    int32_t result = 0;
+    auto status = dispatchCountingFailures([&] {
+        result = ranvier_replace_range(range, reinterpret_cast<const uint8_t*>(bytes.data()), static_cast<int32_t>(bytes.length()));
+    });
+    host->document().updateStyleIfNeeded();
+    return status == RV_OK ? result : status;
 }
 
 // Accessibility: the tree of WebCore's accessibility objects, as docs/ACCESSIBILITY.md describes.
@@ -5593,10 +7093,12 @@ int32_t rv_ax_action(RvAxNode* handle, int32_t action)
     return RV_ERR_UNSUPPORTED;
 }
 
-int32_t rv_ax_set_value(RvAxNode* handle, const char* value)
+int32_t rv_ax_set_value(RvAxNode* handle, const uint8_t* value, int32_t value_length)
 {
-    if (!value)
+    auto parsed = requiredUtf8(value, value_length);
+    if (!parsed)
         return RV_ERR_NULL_ARGUMENT;
+    auto& text = *parsed;
     if (auto status = axStatus(handle))
         return status;
     Ref object = *axObject(handle);
@@ -5604,14 +7106,14 @@ int32_t rv_ax_set_value(RvAxNode* handle, const char* value)
         return 0;
     // A form field's value changes as a user's edit does, with input and change.
     if (RefPtr input = dynamicDowncast<HTMLInputElement>(object->node())) {
-        auto result = input->setValue(utf8(value), DispatchInputAndChangeEvent);
+        auto result = input->setValue(text, DispatchInputAndChangeEvent);
         return result.hasException() ? fail(result.exception()) : 1;
     }
     if (RefPtr area = dynamicDowncast<HTMLTextAreaElement>(object->node())) {
-        area->setValue(utf8(value), DispatchInputAndChangeEvent);
+        area->setValue(text, DispatchInputAndChangeEvent);
         return 1;
     }
-    return object->setValue(utf8(value)) ? 1 : 0;
+    return object->setValue(text) ? 1 : 0;
 }
 
 int32_t rv_ax_set_number(RvAxNode* handle, double value)
@@ -5926,8 +7428,8 @@ int32_t rv_text_segment(int32_t granularity, const char* locale, const uint16_t*
     auto type = types[granularity];
     auto* units = reinterpret_cast<const UChar*>(text);
     UErrorCode status = U_ZERO_ERROR;
-    // An ICU iterator of the same type reports the locale, and serves words and sentences, whose WTF iterators
-    // ignore the locale.
+    // An ICU iterator of the same type reports the locale, and serves graphemes, words and sentences, so graphemes
+    // follow UAX #29 on every platform (WTF's caret iterator uses CFString clusters on Cocoa, which split CR LF).
     UBreakIterator* icu = ubrk_open(type, icuLocale, length ? units : u"", length, &status);
     if (U_FAILURE(status) || !icu)
         return textSegmentFailure(result, RV_ERR_UNSUPPORTED);
@@ -5936,12 +7438,9 @@ int32_t rv_text_segment(int32_t granularity, const char* locale, const uint16_t*
     Vector<int32_t> starts;
     Vector<int32_t> wordLike;
     if (length) {
-        if (granularity == RV_SEGMENT_GRAPHEME || granularity == RV_SEGMENT_LINE) {
+        if (granularity == RV_SEGMENT_LINE) {
             StringView view { std::span<const char16_t> { reinterpret_cast<const char16_t*>(text), static_cast<size_t>(length) } };
-            TextBreakIterator::Mode mode = TextBreakIterator::CaretMode { };
-            if (granularity == RV_SEGMENT_LINE)
-                mode = TextBreakIterator::LineMode { TextBreakIterator::LineMode::Behavior::Default };
-            CachedTextBreakIterator iterator(view, { }, mode, AtomString { String::fromLatin1(icuLocale) });
+            CachedTextBreakIterator iterator(view, { }, TextBreakIterator::LineMode { TextBreakIterator::LineMode::Behavior::Default }, AtomString { String::fromLatin1(icuLocale) });
             unsigned position = 0;
             while (position < static_cast<unsigned>(length)) {
                 starts.append(static_cast<int32_t>(position));
@@ -5962,12 +7461,14 @@ int32_t rv_text_segment(int32_t granularity, const char* locale, const uint16_t*
     if (length && granularity != RV_SEGMENT_GRAPHEME) {
         // A boundary inside a grapheme cluster joins its two segments, so no segment splits a grapheme; a joined
         // word is word-like when either part is.
-        StringView view { std::span<const char16_t> { reinterpret_cast<const char16_t*>(text), static_cast<size_t>(length) } };
-        CachedTextBreakIterator graphemes(view, { }, TextBreakIterator::CaretMode { }, AtomString { String::fromLatin1(icuLocale) });
+        status = U_ZERO_ERROR;
+        UBreakIterator* graphemes = ubrk_open(UBRK_CHARACTER, icuLocale, units, length, &status);
+        if (U_FAILURE(status) || !graphemes)
+            return textSegmentFailure(result, RV_ERR_UNSUPPORTED);
         Vector<int32_t> keptStarts;
         Vector<int32_t> keptWordLike;
         for (size_t index = 0; index < starts.size(); ++index) {
-            if (index && !graphemes.isBoundary(static_cast<unsigned>(starts[index]))) {
+            if (index && !ubrk_isBoundary(graphemes, starts[index])) {
                 if (granularity == RV_SEGMENT_WORD)
                     keptWordLike.last() |= wordLike[index];
                 continue;
@@ -5976,6 +7477,7 @@ int32_t rv_text_segment(int32_t granularity, const char* locale, const uint16_t*
             if (granularity == RV_SEGMENT_WORD)
                 keptWordLike.append(wordLike[index]);
         }
+        ubrk_close(graphemes);
         starts = WTF::move(keptStarts);
         wordLike = WTF::move(keptWordLike);
     }
@@ -6017,4 +7519,153 @@ void rv_text_segments_release(RvTextSegments* segments)
     std::free(segments->word_like);
     std::free(segments->locale);
     *segments = { };
+}
+
+int32_t rv_canvas_get_context(RvNode* canvas, int32_t type, const RvCanvas2DSettings* settings, RvCanvasRenderingContext2D** context)
+{
+    if (!canvas || !context)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_canvas_get_context(canvas, type, settings, context);
+}
+
+int32_t rv_canvas_context_2d_attributes(RvCanvasRenderingContext2D* context, RvCanvas2DSettings* settings)
+{
+    if (!context || !settings)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_canvas_context_2d_attributes(context, settings);
+}
+
+int32_t rv_image_data_create(uint32_t width, uint32_t height, const uint8_t* bytes, int64_t length, int32_t colorSpace, int32_t pixelFormat, RvImageData** result)
+{
+    if (!result || (!bytes && length))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_image_data_create(width, height, bytes, length, colorSpace, pixelFormat, result);
+}
+
+int32_t rv_image_data_layout(RvImageData* data, RvImageDataLayout* layout)
+{
+    if (!data || !layout)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_image_data_layout(data, layout);
+}
+
+int32_t rv_image_data_read(RvImageData* data, int64_t offset, uint8_t* buffer, int64_t length)
+{
+    if (!data || (!buffer && length))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_image_data_read(data, offset, buffer, length);
+}
+
+int32_t rv_image_data_write(RvImageData* data, int64_t offset, const uint8_t* bytes, int64_t length)
+{
+    if (!data || (!bytes && length))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_image_data_write(data, offset, bytes, length);
+}
+
+// The canvas's encoded bitmap for rv_canvas_encode, rv_canvas_to_data_url and rv_canvas_to_blob: RV_OK with empty bytes
+// for a zero-size canvas.
+static int32_t encodeCanvas(RvNode* canvas, int32_t encoding, double quality, Vector<uint8_t>& bytes)
+{
+    if (encoding == RV_IMAGE_ENCODING_RGBA8 || !Ranvier::Internal::imageEncodingSupported(encoding))
+        return RV_ERR_UNSUPPORTED;
+    RefPtr<ImageBuffer> buffer;
+    if (auto code = Ranvier::canvasExportBuffer(canvas, buffer))
+        return code;
+    if (!buffer)
+        return RV_OK;
+    bytes = Ranvier::Internal::encodeImage(WTF::move(buffer), encoding, quality);
+    if (bytes.isEmpty())
+        return fail(Exception { ExceptionCode::EncodingError });
+    return RV_OK;
+}
+
+int32_t rv_canvas_encode(RvNode* canvas, int32_t encoding, double quality, uint8_t* buffer, int64_t capacity, int64_t* length)
+{
+    if (!canvas || !length || capacity < 0 || (capacity && !buffer))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    Vector<uint8_t> bytes;
+    if (auto code = encodeCanvas(canvas, encoding, quality, bytes))
+        return code;
+    *length = static_cast<int64_t>(bytes.size());
+    if (capacity < *length)
+        return RV_ERR_BUFFER_TOO_SMALL;
+    if (!bytes.isEmpty())
+        std::memcpy(buffer, bytes.span().data(), bytes.size());
+    return RV_OK;
+}
+
+int32_t rv_canvas_to_data_url(RvNode* canvas, int32_t encoding, double quality, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!canvas || !length || capacity < 0 || (capacity && !buffer))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    Vector<uint8_t> bytes;
+    if (auto code = encodeCanvas(canvas, encoding, quality, bytes))
+        return code;
+    if (bytes.isEmpty())
+        return copyString("data:,"_s, buffer, capacity, length);
+    return copyString(makeString("data:"_s, Ranvier::Internal::imageEncodingMIMEType(encoding), ";base64,"_s, base64EncodeToString(bytes.span())), buffer, capacity, length);
+}
+
+int32_t rv_canvas_to_blob(RvNode* canvas, int32_t encoding, double quality, RvBlob** blob)
+{
+    if (!canvas || !blob)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    *blob = nullptr;
+    Vector<uint8_t> bytes;
+    if (auto code = encodeCanvas(canvas, encoding, quality, bytes))
+        return code;
+    if (bytes.isEmpty())
+        return RV_OK;
+    auto type = Ranvier::Internal::imageEncodingMIMEType(encoding).utf8();
+    return ranvier_canvas_create_blob(canvas, bytes.span().data(), static_cast<int64_t>(bytes.size()), type.data(), blob);
+}
+
+int32_t rv_canvas_get_bitmap_context(RvNode* canvas, RvImageBitmapRenderingContext** context)
+{
+    if (!canvas || !context)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_canvas_get_bitmap_context(canvas, context);
+}
+
+int32_t rv_image_bitmap_create(RvHost* host, int32_t kind, void* source, const RvImageBitmapOptions* options,
+    RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !source || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_image_bitmap_create(reinterpret_cast<RvNode*>(&host->document()), kind, source, options, completion, context, operation);
+}
+
+int32_t rv_image_bitmap_result(uint64_t operation, RvImageBitmap** bitmap)
+{
+    return ranvier_image_bitmap_result(operation, bitmap);
+}
+
+int32_t rv_image_bitmap_error(uint64_t operation, char* buffer, int32_t capacity, int32_t* length)
+{
+    return ranvier_image_bitmap_error(operation, buffer, capacity, length);
 }

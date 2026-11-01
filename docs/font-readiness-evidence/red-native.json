@@ -1,0 +1,36 @@
+{
+ "runtimeSha256": "30d05791c6c94a62adaa449b8d1f544c5f85f1ffab4b128c01dbc5e1ccf0000c",
+ "steps": [
+  {
+   "name": "font requested, response held",
+   "width": 57.7734375,
+   "heldUrls": [
+    "https://t01.test/ahem.ttf"
+   ]
+  },
+  {
+   "name": "response served",
+   "width": 80.0
+  }
+ ],
+ "abi": 54,
+ "features": {
+  "font-load": 1,
+  "image-decode": 1,
+  "font-readiness": 0,
+  "fonts": 0
+ },
+ "exports": {
+  "rv_fonts_status": false,
+  "rv_fonts_check": false,
+  "rv_fonts_load": false,
+  "rv_fonts_ready": false,
+  "rv_fonts_watch": false,
+  "rv_fonts_unwatch": false,
+  "rv_font_load": true,
+  "rv_image_decode": true,
+  "rv_resource_cancel": true,
+  "rv_resource_release": true
+ },
+ "gap": "ABI30 has no FontFaceSet status, check, load or ready, and no loading events: a host can see the late font only as a changed layout width, polled after an unknown number of run-loop cycles."
+}

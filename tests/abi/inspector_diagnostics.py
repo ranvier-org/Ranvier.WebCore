@@ -20,9 +20,10 @@ import time
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
+from utf8_inputs import Utf8
 
 OK, NULL_ARGUMENT, WRONG_THREAD, NOT_ELEMENT, BUFFER_TOO_SMALL, UNSUPPORTED = 0, -1, -2, -4, -6, -9
-ABI = 54
+ABI = 59
 AHEM_SHA256 = '63d2abd0041c3e3b4b52ad8d382353b53c51c6785e76ce56ed9dacad2d2e31c4'
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 RENDER_TREE, MATCHED_RULES = 1, 2
@@ -126,7 +127,7 @@ class Diagnostics:
 
 def wait_for_ahem(p):
     """Cycles until the pinned font lays out the inline span 20px wide; a hang guard, counting no assertions."""
-    find = p.bind('rv_document_get_element_by_id', p.pointer, [p.pointer, ctypes.c_char_p])
+    find = p.bind('rv_document_get_element_by_id', p.pointer, [p.pointer, Utf8])
     rect = p.bind('rv_element_rect', p.integer, [p.pointer] + [ctypes.POINTER(p.double)] * 4)
     release = p.bind('rv_node_release', None, [p.pointer])
     cycle = p.bind('rv_run_loop_cycle', p.integer, [p.integer])

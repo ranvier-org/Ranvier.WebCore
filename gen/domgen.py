@@ -80,7 +80,8 @@ UNMAPPED = ["Custom", "EnabledForWorld", "EnabledByQuirk", "ForwardToMapLike", "
             "PrivateIdentifier", "LegacyFactoryFunction"]
 # CallWith values the glue supplies from the node's document.
 # How the glue reaches a document for the settings of [EnabledBySetting], by the root of an interface other than a node.
-SETTINGS_DOCUMENT = {"AbstractRange": "impl->startContainer().document()", "DOMStringMap": "impl->element().document()"}
+SETTINGS_DOCUMENT = {"AbstractRange": "impl->startContainer().document()", "DOMStringMap": "impl->element().document()",
+                     "CanvasRenderingContext2D": "impl->canvas().document()"}
 # ArrayBufferView element kinds of typedArrayViewTypes: (macro suffix, JSC view, element size), indexed by value.
 TYPED_ARRAY_VIEW_KINDS = [('INT8', 'Int8Array', 1), ('UINT8', 'Uint8Array', 1), ('UINT8_CLAMPED', 'Uint8ClampedArray', 1),
                           ('INT16', 'Int16Array', 2), ('UINT16', 'Uint16Array', 2), ('INT32', 'Int32Array', 4),
@@ -139,6 +140,24 @@ def snake(name: str) -> str:
     name = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", name)
     name = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", name)
     return name.lower()
+
+
+# The WebCore names the glue's hand-written runtime refers to that no IDL definition declares.
+RUNTIME_WEBCORE_NAMES = {"ActiveDOMObject", "EventInterfaceType", "Exception", "ExceptionCode", "ExceptionOr", "HTMLNames",
+                         "parseEnumerationFromString"}
+
+CPP_TOKEN = re.compile(r'//[^\n]*|/\*.*?\*/|"(?:\\.|[^"\\\n])*"|\'(?:\\.|[^\'\\\n])*\'|^[ \t]*#[^\n]*|'
+                       r'\)\s*->|(?:::|\.|->|~)\s*[A-Za-z_]\w*|[A-Za-z_]\w*', re.S | re.M)
+
+
+def qualify_webcore(text: str, names) -> str:
+    """text with each unqualified reference to one of names written WebCore::<name>. Comments, string and character
+    literals, preprocessor lines, member accesses and names after :: are kept as written; a trailing return type
+    after ") ->" is qualified."""
+    def replace(match):
+        token = match.group(0)
+        return f"WebCore::{token}" if token in names else token
+    return CPP_TOKEN.sub(replace, text)
 
 
 def wk_ucfirst(name: str) -> str:
@@ -229,7 +248,12 @@ class World:
         self.interfaces = {}  # name -> Interface (the non-partial definition)
         self.partials = {}  # name -> [Interface]
         self.includes = {}  # target -> [(mixin, attrs)]
-        self.typedefs = {}
+        self.typedefs = {}  # name -> the last definition read; typedef() selects the definition a reference resolves to
+        self.file_typedefs = {}  # (file, name) -> the definition in that file
+        self.typedef_files = {}  # name -> [file], each file that defines the typedef
+        # Union typedef name -> {(condition, arm)}: the arms inside #if branches, which the parser drops and an engine
+        # build that enables the condition holds in its Variant.
+        self.conditional_arms = {}
         self.enums = {}  # name -> (values, attrs, file)
         self.dictionaries = {}  # name -> idl.Dictionary, with its partials' members
         self.callbacks = set()
@@ -244,7 +268,10 @@ class World:
             relative = path.relative_to(self.webcore).as_posix()
             if relative.startswith("bindings/scripts/test/"):
                 continue
-            document = idl.parse(path.read_text(encoding="utf-8"), relative)
+            text = path.read_text(encoding="utf-8")
+            document = idl.parse(text, relative)
+            for name, arms in idl.conditional_union_arms(text).items():
+                self.conditional_arms.setdefault(name, set()).update(arms)
             for namespace in document.namespaces:
                 if namespace.partial:
                     if not self.skipped(relative):
@@ -258,7 +285,7 @@ class World:
                     self.interfaces[interface.name] = interface
             for target, mixin, attrs in document.includes:
                 self.includes.setdefault(target, []).append((mixin, attrs, relative))
-            self.typedefs.update(document.typedefs)
+            self.add_typedefs(relative, document.typedefs)
             for name, (values, attrs) in document.enums.items():
                 self.enums[name] = (values, attrs, relative)
             for name, dictionary in document.dictionaries.items():
@@ -268,6 +295,59 @@ class World:
                 elif name not in self.dictionaries or not self.skipped(relative):
                     self.dictionaries[name] = dictionary
             self.callbacks |= document.callbacks
+        # syntheticIdl names repository IDL files that define dictionaries only: native transports of a JavaScript
+        # object argument, such as the keyframe sequence of Element.animate. They merge after WebKit's files.
+        synthetic = set()
+        for relative in config.get("syntheticIdl", []):
+            document = idl.parse((ROOT / relative).read_text(encoding="utf-8"), pathlib.PurePosixPath(relative).name)
+            if document.interfaces or document.namespaces or document.includes or document.enums or document.callbacks:
+                raise SystemExit(f"{relative}: a synthetic IDL file defines dictionaries only")
+            for name, dictionary in document.dictionaries.items():
+                if name in self.dictionaries:
+                    raise SystemExit(f"{relative}: dictionary {name} already exists in WebKit's IDL")
+                self.dictionaries[name] = dictionary
+                synthetic.add(name)
+            self.add_typedefs(pathlib.PurePosixPath(relative).name, document.typedefs)
+        if synthetic != set(config.get("syntheticDictionaries", [])):
+            raise SystemExit(f"syntheticDictionaries must list exactly the dictionaries of syntheticIdl: {sorted(synthetic)}")
+        # customConstructors replaces a [Custom] IDL constructor with the signature its custom binding implements.
+        for name, custom in config.get("customConstructors", {}).items():
+            interface = self.interfaces[name]
+            parser = idl.Parser(custom["idl"], interface.file)
+            replacement = parser.member(name)
+            if replacement is None or replacement.kind != "constructor":
+                raise SystemExit(f"customConstructors: {name} needs a constructor declaration")
+            found = [index for index, member in enumerate(interface.members)
+                     if member.kind == "constructor" and "Custom" in member.attrs]
+            if len(found) != 1:
+                raise SystemExit(f"customConstructors: {name} has no single [Custom] constructor")
+            replacement.file = interface.file
+            interface.members[found[0]] = replacement
+        # customOperations replaces a [Custom] IDL operation with the signature its native binding implements; its
+        # callExpressions entry names the C++ that computes the result.
+        for key, custom in config.get("customOperations", {}).items():
+            name, operation = key.split(".")
+            interface = self.interfaces[name]
+            replacement = idl.Parser(custom["idl"], interface.file).member(name)
+            if replacement is None or replacement.kind != "operation" or replacement.name != operation:
+                raise SystemExit(f"customOperations: {key} needs an operation declaration of that name")
+            found = [index for index, member in enumerate(interface.members)
+                     if member.kind == "operation" and member.name == operation and "Custom" in member.attrs]
+            if len(found) != 1:
+                raise SystemExit(f"customOperations: {key} has no single [Custom] operation")
+            replacement.file = interface.file
+            interface.members[found[0]] = replacement
+        # argumentTypes retypes an argument, keyed Interface.member.argument by the declaring interface or mixin:
+        # an `object` argument takes the synthetic dictionary transport its argumentAdapters entry converts.
+        retyped = dict(config.get("argumentTypes", {}))
+        for interface in [*self.interfaces.values(), *(p for ps in self.partials.values() for p in ps)]:
+            for member in interface.members:
+                for argument in member.arguments or []:
+                    key = f"{interface.name}.{member.name}.{argument.name}"
+                    if key in retyped:
+                        argument.type = idl.Parser(retyped.pop(key), interface.file).type()
+        if retyped:
+            raise SystemExit(f"argumentTypes names arguments the IDL files do not declare: {sorted(retyped)}")
         # A setlike or maplike declaration is a member only of an interface gen/dom.json binds it for.
         bound = {'setlike': set(config.get('setlikeBindings', {})), 'maplike': set(config.get('maplikeBindings', {}))}
         for interface in [*self.interfaces.values(), *(p for ps in self.partials.values() for p in ps)]:
@@ -314,6 +394,13 @@ class World:
         self.contract_dictionary_fields = {name: self.dictionary_fields(name)
                                            for name in self.contract_config.get("dictionaries", [])}
 
+    def event_target_object(self, name):
+        """An interface whose handle is an RvEventTarget: an eventTargetObjects interface or a scoped subtype of one."""
+        chain = self.chain(name)
+        objects = self.config.get("eventTargetObjects", {})
+        return (chain[-1] == "EventTarget" and any(item in objects for item in chain[:-1])
+                and all(item in self.scope for item in chain[:-1]))
+
     def public_name(self, name):
         return self.contract_aliases.get(name, name)
 
@@ -351,6 +438,8 @@ class World:
         return found
 
     def cpp_class(self, name):
+        if name not in self.interfaces and name in self.callbacks:
+            return name  # a callback function names its WebCore callback class
         interface = self.interfaces[name]
         return interface.attrs.get("ImplementedAs", name) if isinstance(interface.attrs.get("ImplementedAs"), str) else name
 
@@ -393,12 +482,34 @@ class World:
         result.attrs = attrs
         return result
 
+    def add_typedefs(self, file, typedefs):
+        for name, definition in typedefs.items():
+            self.typedefs[name] = definition
+            self.file_typedefs[(file, name)] = definition
+            self.typedef_files.setdefault(name, []).append(file)
+
+    def typedef(self, t: idl.Type) -> idl.Type:
+        """The definition a reference to typedef t.name resolves to, as WebKit's bindings generator resolves it.
+
+        A file that defines the typedef resolves its own references to that definition. A reference from any other
+        file resolves to the one shared definition, and fails the run when the files define the typedef differently.
+        """
+        local = self.file_typedefs.get((t.file, t.name))
+        if local is not None:
+            return local
+        files = self.typedef_files[t.name]
+        if len({repr(self.file_typedefs[(file, t.name)]) for file in files}) > 1:
+            raise SystemExit(f"typedef {t.name} is defined differently in {', '.join(files)}; "
+                             f"{t.file or 'a type outside the IDL files'} references it without a definition of its own")
+        return self.typedefs[t.name]
+
     def resolve(self, t: idl.Type) -> idl.Type:
         flatten = False
         while t.name in self.typedefs:
             flatten |= t.name in self.config.get('flattenUnionTypedefs', [])
-            target = self.typedefs[t.name]
-            t = idl.Type(target.name, t.nullable or target.nullable, target.subtypes, {**target.attrs, **t.attrs})
+            target = self.typedef(t)
+            t = idl.Type(target.name, t.nullable or target.nullable, target.subtypes, {**target.attrs, **t.attrs},
+                         target.file)
         if flatten:
             if t.name != 'union':
                 raise Unsupported('configured union flattening requires a union typedef')
@@ -458,12 +569,34 @@ class World:
             configured_object = f"{name}.{member.name}" in self.config.get("dictionaryObjectMembers", [])
             if configured_object and (mapped.kind != "object" or not member.required or mapped.nullable):
                 raise SystemExit(f"{name}.{member.name}: dictionary object members must be required nonnullable object handles")
-            if (mapped.kind in ("object", "event") and not configured_object) or mapped.interface == "EventTarget":
+            event_target = (mapped.interface == "EventTarget"
+                            and f"{name}.{member.name}" in self.config.get("dictionaryEventTargetMembers", []))
+            optional_object = f"{name}.{member.name}" in self.config.get("optionalObjectMembers", [])
+            if optional_object:
+                # Rv<Root>* const* (or RvNode* const*): NULL for absent, a pointer to NULL for null, else the handle.
+                if mapped.kind not in ("object", "node") or member.required or member.default is not None or not mapped.nullable:
+                    raise SystemExit(f"{name}.{member.name}: optional object members must be optional nullable object or node handles without a default")
+                mapped.optional_handle = True
+                configured_object = True
+            if f"{name}.{member.name}" in self.config.get("absentObjectMembers", []):
+                # Rv<Root>*: NULL for absent, else the handle; the IDL member is optional, nonnullable and has no default.
+                if mapped.kind != "object" or member.required or member.default is not None or mapped.nullable:
+                    raise SystemExit(f"{name}.{member.name}: absent object members must be optional nonnullable object handles without a default")
+                mapped.absent_handle = True
+                configured_object = True
+            if (mapped.kind in ("object", "event") and not configured_object) or (mapped.interface == "EventTarget" and not event_target):
                 raise Unsupported(f"dictionary {name}: member {member.name} of type {member.type}")
             found.append((member, mapped))
         return found
 
     def map(self, t: idl.Type, nested=False) -> Mapped:
+        if t.name in self.config.get('byteSpanTypes', []) and t.name in self.typedefs:
+            # A byte-span typedef, such as BinaryData, maps to bytes before its union resolves.
+            if t.nullable or self.typedef(t).nullable:
+                raise Unsupported(f'nullable byte span {t.name}')
+            if not nested:
+                raise Unsupported(f'byte span {t.name} outside a union or sequence input')
+            return Mapped('bytes', False, 'RvDomByteSpan', label=t.name)
         t = self.resolve(t)
         if t.name == "undefined":
             return Mapped("void")
@@ -485,6 +618,13 @@ class World:
             if not nested:
                 raise Unsupported(f'byte span {t.name} outside a union or sequence input')
             return Mapped('bytes', False, 'RvDomByteSpan', label=t.name)
+        if t.name in self.config.get('typedArrayInputTypes', []):
+            element = {'Float32Array': 'float', 'Float64Array': 'double'}.get(t.name)
+            if element is None:
+                raise SystemExit(f'typedArrayInputTypes: {t.name} has no C element type')
+            if t.nullable or nested:
+                raise Unsupported(f'typed array input {t.name} that is nullable or inside a union or sequence')
+            return Mapped('typedinput', False, element, label=t.name)
         if t.name in self.config.get('typedArrayViewTypes', []):
             if t.nullable:
                 raise Unsupported(f'nullable typed array view {t.name}')
@@ -508,7 +648,7 @@ class World:
                     raise Unsupported(f"interface {t.name} outside gen/dom.json")
                 return Mapped("event", t.nullable, interface=t.name, cls=self.cpp_class(t.name))
             root = chain[-1]
-            if root not in self.scope and not (root == "EventTarget" and t.name in self.config.get("eventTargetObjects", {})):
+            if root not in self.scope and not (root == "EventTarget" and self.event_target_object(t.name)):
                 raise Unsupported(f"interface {t.name} outside gen/dom.json")
             return Mapped("object", t.nullable, interface=t.name, root=root, cls=self.cpp_class(t.name))
         if t.name == "union":
@@ -560,6 +700,9 @@ class World:
         if t.name in self.dictionaries:
             self.dictionary_fields(t.name)
             return Mapped("dict", t.nullable, interface=t.name)
+        if t.name in self.callbacks and t.name in self.config.get("callbackObjectRoots", {}):
+            # A callback function root is a refcounted handle of the host's native implementation.
+            return Mapped("object", t.nullable, interface=t.name, root=t.name, cls=t.name)
         if t.name in self.callbacks or t.name in ("EventHandler", "OnErrorEventHandler", "OnBeforeUnloadEventHandler"):
             raise Unsupported(f"callback {t.name}")
         raise Unsupported(f"type {t}")
@@ -580,9 +723,33 @@ class Function:
         self.unused = False  # a stub, whose parameters the glue does not read
 
 
+def guarded_body(condition, body, otherwise):
+    """A function body that runs only where the build declares its types, and runs otherwise elsewhere."""
+    if not condition:
+        return body
+    return [f"#if {condition}"] + body + ["#else"] + otherwise + ["#endif"]
+
+
 def c_name(name):
     name = snake(name) if not name.isupper() else name.lower()
     return name + "_" if name in RESERVED or name in C_KEYWORDS else name
+
+
+def overload_suffix(member, overloads):
+    """The name suffix of an overload: its argument count, then, when another overload has the same count, the
+    first argument that differs from it by name, or by type when the names are the same (`list` for a sequence,
+    `value` otherwise)."""
+    count = len(member.arguments)
+    suffix = f"_{count}"
+    others = [o for o in overloads if o is not member and len(o.arguments) == count]
+    for index, argument in enumerate(member.arguments):
+        differing = [o.arguments[index] for o in others if str(o.arguments[index].type) != str(argument.type)]
+        if not differing:
+            continue
+        if all(other.name != argument.name for other in differing):
+            return f"{suffix}_{c_name(argument.name)}"
+        return f"{suffix}_{'list' if argument.type.name == 'sequence' else 'value'}"
+    return suffix
 
 
 class Generator(ComplexGeneratorMixin):
@@ -640,15 +807,24 @@ class Generator(ComplexGeneratorMixin):
             chain = self.world.chain(name)
             if "Node" not in chain and "Event" not in chain:
                 root = chain[-1]
-                if root == "EventTarget" and name in self.world.config.get("eventTargetObjects", {}):
-                    # An event target handle is the RvEventTarget of the hand-written event ABI.
-                    if chain != [name, root]:
-                        raise SystemExit(f"{name}: an event target object must derive directly from EventTarget")
+                if root == "EventTarget" and self.world.event_target_object(name):
+                    # An event target handle is the RvEventTarget of the hand-written event ABI. A subtype of an
+                    # eventTargetObjects interface (CSSAnimation of WebAnimation) casts through it (castVia).
+                    objects = self.world.config.get("eventTargetObjects", {})
+                    if name not in objects and self.world.config.get("castVia", {}).get(name) not in objects:
+                        raise SystemExit(f"{name}: a subtype of an event target object needs castVia to it")
+                elif root == "EventTarget" and name in self.world.config.get("eventTargetObjects", {}):
+                    raise SystemExit(f"{name}: an event target object must derive directly from EventTarget")
                 elif root not in self.world.scope:
                     raise SystemExit(f"{name}: gen/dom.json lists an interface without its base {root}, which names the handle")
                 if root == name:
                     self.handles.append(name)
             self.interface(name)
+        for name in self.world.config.get("callbackObjectRoots", {}):
+            if name in self.world.callbacks and name not in self.world.interfaces:
+                # A callback function root has no interface of its own: only the handle's release and retain.
+                self.headers.add(f"{name}.h")
+                self.handles.append(name)
         for name, binding in self.world.config.get("namespaceBindings", {}).items():
             self.namespace(name, binding)
         for name, bindings in self.world.config.get("windowBindings", {}).items():
@@ -687,7 +863,8 @@ class Generator(ComplexGeneratorMixin):
         self.runtime_queries = []
         for root in self.world.config.get("runtimeTypeRoots", []):
             # An Event root reads an RvEvent handle; every other root is a scoped object handle.
-            if root not in self.handles and root != "Event":
+            event_target = root in self.world.config.get("eventTargetObjects", {})
+            if root not in self.handles and root != "Event" and not event_target:
                 raise SystemExit(f"{root}: runtime type query requires a scoped object-handle root")
             # Extras are interfaces outside the scope that the query still names, such as CustomEvent.
             extras = self.world.config.get("runtimeTypeExtras", {}).get(root, [])
@@ -707,7 +884,7 @@ class Generator(ComplexGeneratorMixin):
                 "interfaces": interfaces + [root],
                 "names": [self.world.public_name(name) if public else name for name in interfaces + [root]],
                 "extras": extras,
-                "parameters": [{"ctype": f"Rv{root}*", "name": "target"}, {"ctype": "char*", "name": "buffer"},
+                "parameters": [{"ctype": "RvEventTarget*" if event_target else f"Rv{root}*", "name": "target"}, {"ctype": "char*", "name": "buffer"},
                                {"ctype": "int32_t", "name": "capacity"}, {"ctype": "int32_t*", "name": "length"}],
             })
 
@@ -879,18 +1056,26 @@ class Generator(ComplexGeneratorMixin):
         if name not in self.world.scope:
             raise SystemExit(f'{name}: iterable snapshot requires a scoped interface')
         members = [member for member in self.world.members(name) if member.kind == 'iterable']
-        if len(members) != 1 or members[0].type.subtypes[0].name != 'pair':
-            raise SystemExit(f'{name}: iterable snapshot requires one key/value iterable')
-        if self.world.config.get('objectContexts', {}).get(name) != 'Document':
+        if len(members) != 1:
+            raise SystemExit(f'{name}: iterable snapshot requires one iterable')
+        # A key/value iterable snapshots its entries; a value iterable of object handles, such as FontFaceSet's,
+        # its values.
+        paired = members[0].type.subtypes[0].name == 'pair'
+        if self.world.config.get('objectContexts', {}).get(name) != 'Document' and name not in self.world.config.get('contextSettingsObjects', []):
             raise SystemExit(f'{name}: iterable snapshot requires a checked Document context')
         member = members[0]
         mapped = self.world.map(member.type)
         entry_type = self.transport_cpp(mapped.subtypes[0])
-        function = Function(name, member, 'iterator_snapshot', f'{snake(name)}_entries', [],
-                            f'{name}.entries: owned snapshot of the engine key/value iterable')
+        if not paired and mapped.subtypes[0].kind not in ('node', 'object'):
+            raise SystemExit(f'{name}: a value iterable snapshot requires object handle values')
+        operation = 'entries' if paired else 'values'
+        description = 'key/value' if paired else 'value'
+        function = Function(name, member, 'iterator_snapshot', f'{snake(name)}_{operation}', [],
+                            f'{name}.{operation}: owned snapshot of the engine {description} iterable')
         function.feature = binding['feature']
+        append = 'WTF::move(*entry)' if paired else 'entry.releaseNonNull()'
         call = (f'([&]() {{ Vector<{entry_type}> entries; auto iterator = impl->createIterator(&{{call_with_bare}}); '
-                'while (auto entry = iterator.next()) entries.append(WTF::move(*entry)); return entries; })()')
+                f'while (auto entry = iterator.next()) entries.append({append}); return entries; }})()')
         self.finish(function, name, member, [], [], mapped, call, ['document'])
         self.namespace_features.append((function.feature, []))
 
@@ -1095,7 +1280,7 @@ class Generator(ComplexGeneratorMixin):
                     self.skip(name, member, str(error))
             plain = self.plain_overload(name, op_name, supported)
             for index, (member, args, returns) in enumerate(supported):
-                suffix = "" if len(supported) == 1 or index == plain else f"_{len(member.arguments)}"
+                suffix = "" if len(supported) == 1 or index == plain else overload_suffix(member, [m for m, _, _ in supported])
                 self.operation(name, member, args, returns, suffix)
 
     def special_name(self, member):
@@ -1173,6 +1358,9 @@ class Generator(ComplexGeneratorMixin):
         label = f"{interface}.{member.name}"
         if label in self.exclude or member.name in self.exclude:
             return "excluded by gen/dom.json"
+        selection = self.world.config.get("memberSelections", {}).get(interface)
+        if selection is not None and member.name not in selection:
+            return "outside the gen/dom.json memberSelections"
         if member.kind == 'operation' and member.special == 'stringifier' and interface not in self.world.config.get('stringifiers', []):
             return 'stringifier outside configured binding'
         if not member.name:
@@ -1191,12 +1379,16 @@ class Generator(ComplexGeneratorMixin):
                 return f"[{key}]"
         return None
 
-    def call_with(self, values):
-        """The C++ expressions CallWith supplies, or raises Unsupported."""
+    def call_with(self, values, key=None):
+        """The C++ expressions CallWith supplies, or raises Unsupported. CurrentGlobalObject is supplied only to the
+        Interface.member operations gen/dom.json's globalObjectMembers lists."""
         found = []
         for value in values:
             if value in DOCUMENT_CALL_WITH:
                 found.append("document")
+            elif value == "CurrentGlobalObject" and key in self.world.config.get("globalObjectMembers", []):
+                # The document's global object: created with its window, never entered for script by the glue.
+                found.append("global")
             else:
                 raise Unsupported(f"[CallWith={value}]")
         return found
@@ -1238,7 +1430,7 @@ class Generator(ComplexGeneratorMixin):
             return (f"([&]() -> {cls}* {{ auto& event = {value}; return event.interfaceType() == EventInterfaceType::{cls} "
                     f"? static_cast<{cls}*>(&event) : nullptr; }}())")
         via = self.world.config.get("castVia", {}).get(cls)
-        if via:
+        if via and via != root:
             self.headers.add(f"{via}.h")
             return (f"([&]() -> {cls}* {{ auto* base = dynamicDowncast<{via}>({value}); "
                     f"return base ? dynamicDowncast<{cls}>(*base) : nullptr; }}())")
@@ -1301,11 +1493,16 @@ class Generator(ComplexGeneratorMixin):
             return "impl->getNameAttribute()"
         return f"impl->attributeWithoutSynchronization({attribute})"
 
-    def setting_check(self, interface, chain, setting):
+    def setting_check(self, interface, chain, setting, context=False):
         """The glue that returns RV_ERR_UNSUPPORTED while a setting of [EnabledBySetting] is off, as WebKit's
-        bindings hide the member then: A&B needs both, A|B either."""
+        bindings hide the member then: A&B needs both, A|B either. context is whether the member takes the
+        checked Document of objectContexts, whose settings then apply."""
         lines = []
-        if "Node" in chain:
+        if context:
+            lines = ["RefPtr settingsDocument = dynamicDowncast<Document>(*nodeOf(context));", "if (!settingsDocument)",
+                     "    return RV_ERR_WRONG_INTERFACE;"]
+            document = "(*settingsDocument)"
+        elif "Node" in chain:
             document = "impl->document()"
         elif "Event" in chain:
             # An event reaches the settings through its target's document; one without a node target has none.
@@ -1328,6 +1525,12 @@ class Generator(ComplexGeneratorMixin):
             document = "(*settingsDocument)"
         elif chain[-1] in SETTINGS_DOCUMENT:
             document = SETTINGS_DOCUMENT[chain[-1]]
+        elif interface in self.world.config.get("settingsDocuments", {}):
+            # An object that holds its document weakly: a destroyed document detaches it.
+            self.headers.add("Document.h")
+            lines = [f"RefPtr<Document> settingsDocument = {self.world.config['settingsDocuments'][interface]};",
+                     "if (!settingsDocument)", "    return RV_ERR_DETACHED;"]
+            document = "(*settingsDocument)"
         elif interface in self.world.config.get("contextSettingsObjects", []):
             # An ActiveDOMObject reaches the settings through its script execution context, a Document on the host.
             self.headers |= {"ContextDestructionObserverInlines.h", "Document.h"}
@@ -1390,6 +1593,10 @@ class Generator(ComplexGeneratorMixin):
         absent = mapped.nullable or (not member.required and member.default is None)
         if mapped.kind == "string":
             return "RvDomUtf8StringInput"
+        if mapped.kind == "node" and mapped.interface == "EventTarget":
+            return "RvEventTarget*"
+        if getattr(mapped, "optional_handle", False):
+            return f"{mapped.handle}* const*"
         if mapped.kind in ("node", "object"):
             return f"{mapped.handle}*"
         if mapped.kind == "dict":
@@ -1398,6 +1605,23 @@ class Generator(ComplexGeneratorMixin):
             return f"const {mapped.ctype}*"
         ctype = mapped.ctype
         return f"const {ctype}*" if absent else ctype
+
+    def idl_defaults(self, dictionary, target):
+        """Assigns the IDL defaults of the dictionary's own members where the C++ struct defaults differ from them."""
+        lines = []
+        for member in self.world.dictionaries[dictionary].members:
+            default = member.default
+            if default is None or "Conditional" in member.attrs or "EnabledBySetting" in member.attrs:
+                continue
+            cpp_field = member.attrs.get("ImplementedAs", member.name)
+            mapped = self.world.map(member.type)
+            if mapped.kind == "string" and default == '""':
+                lines.append(f"{target}.{cpp_field} = emptyString();")
+            elif mapped.kind == "string" and default.startswith('"'):
+                lines.append(f"{target}.{cpp_field} = {default}_s;")
+            elif mapped.kind in ("number", "bool") and re.fullmatch(r"-?[0-9.]+|true|false", default):
+                lines.append(f"{target}.{cpp_field} = {default};")
+        return lines
 
     def dictionary_object_prefix(self, pointer, struct, cpp, target, dictionary, objects, argument):
         """Reads a dictionary's one required object member first: its C++ struct holds a Ref and has no default."""
@@ -1423,6 +1647,34 @@ class Generator(ComplexGeneratorMixin):
         covered = f"{pointer}->size >= offsetof({struct}, {field}) + sizeof({pointer}->{field})"
         ctype = self.field_ctype(member, mapped, dictionary)
         lines = []
+        if getattr(mapped, "absent_handle", False):
+            self.headers.add(f"{mapped.cls}.h")
+            root = self.world.cpp_class(mapped.root)
+            source = f"reinterpret_cast<{root}*>({pointer}->{field})"
+            cast = source if root == mapped.cls else self.cast_expression(mapped.cls, root, f"*{source}")
+            lines += [f"if ({covered} && {pointer}->{field}) {{", f"    RefPtr<{mapped.cls}> value = {cast};", "    if (!value)",
+                      "        return RV_ERR_WRONG_INTERFACE;", f"    {target}.{cpp_field} = std::move(value);", "}"]
+            return lines
+        if getattr(mapped, "optional_handle", False) and mapped.kind == "node":
+            self.headers.add(f"{mapped.cls}.h")
+            lines += [f"if ({covered} && {pointer}->{field}) {{", f"    RefPtr<{mapped.cls}> value;", f"    if (*{pointer}->{field}) {{"]
+            if mapped.cls == "Node":
+                lines.append(f"        value = nodeOf(*{pointer}->{field});")
+            else:
+                lines += [f"        value = dynamicDowncast<{mapped.cls}>(*nodeOf(*{pointer}->{field}));", "        if (!value)",
+                          "            return RV_ERR_WRONG_INTERFACE;"]
+            lines += ["    }", f"    {target}.{cpp_field} = std::move(value);", "}"]
+            return lines
+        if getattr(mapped, "optional_handle", False):
+            self.headers.add(f"{mapped.cls}.h")
+            root = self.world.cpp_class(mapped.root)
+            source = f"reinterpret_cast<{root}*>(*{pointer}->{field})"
+            cast = source if root == mapped.cls else self.cast_expression(mapped.cls, root, f"*{source}")
+            lines += [f"if ({covered} && {pointer}->{field}) {{",
+                      f"    RefPtr<{mapped.cls}> value = *{pointer}->{field} ? {cast} : nullptr;",
+                      f"    if (*{pointer}->{field} && !value)", "        return RV_ERR_WRONG_INTERFACE;",
+                      f"    {target}.{cpp_field} = std::move(value);", "}"]
+            return lines
         if mapped.kind == "object":
             raise Unsupported(f"dictionary object member {member.name} outside a derived dictionary argument")
         if member.required:
@@ -1444,7 +1696,10 @@ class Generator(ComplexGeneratorMixin):
         elif mapped.kind == "node":
             self.headers.add(f"{mapped.cls}.h")
             lines.append(f"if ({covered} && {pointer}->{field}) {{")
-            if mapped.cls == "Node":
+            if mapped.cls == "EventTarget":
+                # An RvEventTarget is the EventTarget pointer of the hand-written event ABI.
+                lines.append(f"    {target}.{cpp_field} = reinterpret_cast<EventTarget*>({pointer}->{field});")
+            elif mapped.cls == "Node":
                 lines.append(f"    {target}.{cpp_field} = nodeOf({pointer}->{field});")
             else:
                 lines.append(f"    RefPtr value = dynamicDowncast<{mapped.cls}>(*nodeOf({pointer}->{field}));")
@@ -1483,6 +1738,10 @@ class Generator(ComplexGeneratorMixin):
         bridge = self.world.config.get("attributeBridges", {}).get(f"{interface}.{member.name}")
         if bridge:
             return bridge["setter"].replace("{value}", value)
+        # A C++ setter whose type differs from the IDL type, written through the configured conversion of {value}.
+        expression = self.world.config.get("setterExpressions", {}).get(f"{interface}.{member.name}")
+        if expression:
+            return expression.replace("{value}", value)
         if interface == 'SVGAnimatedString' and member.name == 'baseVal':
             self.headers.add('TrustedScriptURL.h')
         attribute = self.reflect(member, True)
@@ -1495,6 +1754,10 @@ class Generator(ComplexGeneratorMixin):
             if implemented_by:
                 self.headers.add(f"{implemented_by}.h")
                 return f"WebCore::{implemented_by}::{name}(*impl{{call_with}}, {value})"
+            if f"{interface}.{member.name}" in self.world.config.get("unionSetterOverloads", []):
+                # The C++ setter is overloaded per union arm, String&& or RefPtr<T>&&: call the overload of the held arm.
+                return (f"WTF::switchOn({value}, [&](auto&& arm) {{ if constexpr (std::is_same_v<std::remove_cvref_t<decltype(arm)>, String>) "
+                        f"impl->{name}(std::move(arm)); else impl->{name}(RefPtr {{ std::move(arm) }}); }})")
             return f"impl->{name}({{call_with_lead}}{value})"
         t = self.world.resolve(member.type).name
         if t == "boolean":
@@ -1566,6 +1829,8 @@ class Generator(ComplexGeneratorMixin):
 
     def constructor(self, interface, member, overloaded=False):
         configured = self.world.config["constructors"][interface]
+        # overloads gives an overload, by its argument count, its own factory settings.
+        configured = {**configured, **configured.get("overloads", {}).get(str(len(member.arguments)), {})}
         receiver = configured["receiver"]
         if receiver not in self.world.scope:
             raise SystemExit(f"{interface}: constructor receiver {receiver} is outside scope")
@@ -1578,7 +1843,14 @@ class Generator(ComplexGeneratorMixin):
                 arguments = f"*impl{', ' if arguments else ''}{arguments}"
             call = f"{configured['factory']}({arguments})"
             note = ""
-            if configured.get('globalObject'):
+            constructor_call_with = []
+            if configured.get('globalObject') == 'callWith':
+                # The receiver Document's global object, as [CallWith=CurrentGlobalObject] supplies it to an operation.
+                if receiver != 'Document':
+                    raise SystemExit(f"{interface}: a globalObject constructor requires a Document receiver")
+                call = f"{configured['factory']}({{call_with_lead}}{arguments})"
+                constructor_call_with = ['global']
+            elif configured.get('globalObject'):
                 # [CallWith=CurrentGlobalObject] receives the Document's global object, absent without a frame.
                 if receiver != 'Document':
                     raise SystemExit(f"{interface}: a globalObject constructor requires a Document receiver")
@@ -1589,24 +1861,28 @@ class Generator(ComplexGeneratorMixin):
                 note = "; RV_ERR_DOM_EXCEPTION (InvalidStateError) for a document without a browsing context"
             function = Function(interface, member, "constructor", f"{snake(interface)}_create", [],
                                 f"{interface}.constructor: target is the {receiver} of the constructed object{note}")
-            self.finish(function, receiver, member, member.arguments, args, returns, call, [])
+            self.finish(function, receiver, member, member.arguments, args, returns, call, constructor_call_with)
             if overloaded:
                 locked = self.lock.get(function.name)
                 if not locked or function.params != [tuple(parameter) for parameter in locked['params']]:
-                    function.name += f'_{len(member.arguments)}'
+                    siblings = [m for m in self.world.members(interface) if m.kind == 'constructor']
+                    function.name += overload_suffix(member, siblings)
         except Unsupported as error:
             self.skip(interface, member, f"constructor: {error}")
 
     def operation(self, interface, member, args, returns, suffix):
         try:
-            call_with = self.call_with(attr_list(member.attrs.get("CallWith")))
+            call_with = self.call_with(attr_list(member.attrs.get("CallWith")), f"{interface}.{member.name}")
         except Unsupported as error:
             self.skip(interface, member, str(error))
             return
         name = member.attrs.get("ImplementedAs", member.name)
         implemented_by = member.attrs.get("ImplementedBy")
         placeholders = ", ".join(f"{{arg{i}}}" for i in range(len(args)))
-        if implemented_by:
+        expression = self.world.config.get("callExpressions", {}).get(f"{interface}.{member.name}")
+        if expression:
+            call = expression
+        elif implemented_by:
             self.headers.add(f"{implemented_by}.h")
             call = f"WebCore::{implemented_by}::{name}(*impl{{call_with}}{', ' if placeholders else ''}{placeholders})"
         else:
@@ -1700,11 +1976,16 @@ class Generator(ComplexGeneratorMixin):
                     params.append((ctype, name))
                     passed.append(f"!!{name}" if mapped.kind == "bool" else name)
             elif mapped.kind == "enum":
-                if function.kind != "setter":
-                    raise Unsupported(f"enumeration {mapped.enum} argument")
+                if mapped.nullable or (argument.optional and argument.default is None):
+                    raise Unsupported(f"optional enumeration {mapped.enum} argument without a default")
                 self.enums_used[mapped.enum] = self.world.enums[mapped.enum]
                 params.append(("int32_t", name))
-                prepare.append(f"auto a{index} = enumerationFromIndex<std::remove_cvref_t<decltype({self.getter_call(interface, member, mapped)})>>({name}, {enum_table(mapped.enum)});")
+                if function.kind == "setter":
+                    cpp_enum = f"std::remove_cvref_t<decltype({self.getter_call(interface, member, mapped)})>"
+                else:
+                    # An operation argument names the enumeration's C++ type, the IDL name unless ImplementedAs renames it.
+                    cpp_enum = self.world.enums[mapped.enum][1].get("ImplementedAs", mapped.enum)
+                prepare.append(f"auto a{index} = enumerationFromIndex<{cpp_enum}>({name}, {enum_table(mapped.enum)});")
                 prepare.append(f"if (!a{index})")
                 prepare.append("    return RV_ERR_UNSUPPORTED;")
                 passed.append(f"*a{index}")
@@ -1719,17 +2000,58 @@ class Generator(ComplexGeneratorMixin):
                 else:
                     notes.append(f"{name} may be NULL for the IDL default")
                 cpp = self.dictionary_cpp(mapped.interface)
-                objects = [(field_member, field_mapped) for field_member, field_mapped in fields if field_mapped.kind == "object"]
-                if objects:
+                objects = [(field_member, field_mapped) for field_member, field_mapped in fields
+                           if field_mapped.kind == "object" and not getattr(field_mapped, "optional_handle", False)
+                           and not getattr(field_mapped, "absent_handle", False)]
+                reference = mapped.interface in self.world.config.get("referenceDictionaries", [])
+                target = f"a{index}"
+                if reference:
+                    # The C++ struct holds a Ref per required node, so the fields are read into a stage first.
+                    if objects or argument.optional or self.world.dictionaries[mapped.interface].base:
+                        raise SystemExit(f"{mapped.interface}: a reference dictionary must be a required argument with no base or object member")
+                    target = f"stage{index}"
+                    prepare.append("struct {")
+                    for field_member, field_mapped in fields:
+                        cpp_field = field_member.attrs.get("ImplementedAs", field_member.name)
+                        if field_mapped.kind == "node":
+                            prepare.append(f"    RefPtr<{field_mapped.cls}> {cpp_field};")
+                        else:
+                            prepare.append(f"    std::remove_cvref_t<decltype(std::declval<{cpp}&>().{cpp_field})> {cpp_field} {{ }};")
+                    prepare.append(f"}} {target};")
+                elif objects:
                     prepare += self.dictionary_object_prefix(name, struct, cpp, f"a{index}", mapped.interface, objects, argument)
                 else:
                     prepare.append(f"{cpp} a{index} {{ }};")
+                    if mapped.interface in self.world.config.get("idlDefaultDictionaries", []):
+                        prepare += self.idl_defaults(mapped.interface, f"a{index}")
+                for field_member, field_mapped in fields:
+                    label = f"{mapped.interface}.{field_member.name}"
+                    if label in self.world.config.get("unionFieldDefaults", []):
+                        # The C++ struct leaves the member empty; the IDL default applies whether or not options is NULL.
+                        default = field_member.default or ""
+                        if (field_mapped.kind != "union" or not default.startswith('"')
+                                or not any(child.kind == "string" for child in field_mapped.subtypes)):
+                            raise SystemExit(f"{label}: unionFieldDefaults takes a union member with a string arm and a string default")
+                        prepare.append(f"{target}.{field_member.attrs.get('ImplementedAs', field_member.name)} = String {{ {default}_s }};")
                 prepare.append(f"if ({name}) {{")
                 for field_member, field_mapped in fields:
-                    if field_mapped.kind == "object":
+                    if (field_mapped.kind == "object" and not getattr(field_mapped, "optional_handle", False)
+                            and not getattr(field_mapped, "absent_handle", False)):
                         continue
-                    prepare += ["    " + line for line in self.dictionary_field(name, struct, f"a{index}", field_member, field_mapped, mapped.interface)]
+                    prepare += ["    " + line for line in self.dictionary_field(name, struct, target, field_member, field_mapped, mapped.interface)]
                 prepare.append("}")
+                if reference:
+                    values = []
+                    for field_member, field_mapped in fields:
+                        cpp_field = field_member.attrs.get("ImplementedAs", field_member.name)
+                        if field_mapped.kind == "node":
+                            if not field_member.required or field_mapped.nullable:
+                                raise SystemExit(f"{mapped.interface}.{field_member.name}: reference dictionary nodes must be required")
+                            prepare += [f"if (!{target}.{cpp_field})", "    return RV_ERR_NULL_ARGUMENT;"]
+                            values.append(f".{cpp_field} = {target}.{cpp_field}.releaseNonNull()")
+                        else:
+                            values.append(f".{cpp_field} = std::move({target}.{cpp_field})")
+                    prepare.append(f"{cpp} a{index} {{ {', '.join(values)} }};")
                 if svg_matrix_binding:
                     prepare += [f'auto matrixValidation{index} = DOMMatrixReadOnly::validateAndFixup(a{index});',
                                 f'if (matrixValidation{index}.hasException())',
@@ -1760,8 +2082,25 @@ class Generator(ComplexGeneratorMixin):
                 prepare += [f"if (status{index} != RV_OK) return status{index};"]
                 if mapped.kind == "sequence" and not mapped.nullable:
                     passed.append(f"DomSequenceArgument<{self.transport_cpp(mapped.subtypes[0])}> {{ std::move(*a{index}) }}")
+                elif mapped.kind == "union" and argument.type.name in self.world.config.get("unionArgumentConversions", []):
+                    # The engine's Variant of this typedef holds its arms in another order or holds arms of other
+                    # build flags: convert the held arm into it.
+                    target = argument.type.name
+                    passed.append(f"WTF::switchOn(std::move(*a{index}), [](auto&& arm) -> {target} {{ return {target} {{ std::move(arm) }}; }})")
                 else:
                     passed.append(f"std::move(*a{index})")
+            elif mapped.kind == 'typedinput':
+                if argument.optional or argument.variadic:
+                    raise Unsupported('optional or variadic typed array input')
+                params += [(f'const {mapped.ctype}*', name), ('int32_t', f'{name}_count')]
+                checks.append(f'({name}_count >= 0 && ({name}_count == 0 || {name}))')
+                bytes = f'std::span<const uint8_t> {{ reinterpret_cast<const uint8_t*>({name}), static_cast<size_t>({name}_count) * sizeof({mapped.ctype}) }}'
+                prepare += [f'RefPtr buffer{index} = JSC::ArrayBuffer::tryCreate({name}_count ? {bytes} : std::span<const uint8_t> {{ }});',
+                            f'RefPtr a{index} = buffer{index} ? JSC::{mapped.label}::tryCreate(WTF::move(buffer{index}), 0, static_cast<size_t>({name}_count)) : nullptr;',
+                            f'if (!a{index})',
+                            f'    return Ranvier::recordException(Exception {{ ExceptionCode::RangeError, "The array could not be allocated."_s }});']
+                passed.append(f'a{index}.releaseNonNull()')
+                notes.append(f'{name} holds {name}_count elements, copied into a new {mapped.label}')
             elif mapped.kind == 'typedarray':
                 if 'ReturnValue' not in argument.attrs or argument.optional or argument.variadic:
                     raise Unsupported('typed array view argument without [ReturnValue]')
@@ -1798,13 +2137,45 @@ class Generator(ComplexGeneratorMixin):
                     prepare.append(f"RefPtr<{mapped.cls}> a{index} = {name} ? {cast} : nullptr;")
                     prepare.append(f"if ({name} && !a{index})")
                     prepare.append("    return RV_ERR_WRONG_INTERFACE;")
-                passed.append(f"a{index}.get()" if maybe_null else f"HandleArg<{mapped.cls}> {{ a{index}.get() }}")
-                if maybe_null:
+                host_check = self.world.config.get("argumentHostChecks", {}).get(mapped.root) if mapped.kind == "object" else None
+                if host_check:
+                    # The argument belongs to one host's document: a receiver of another host returns RV_ERR_WRONG_HOST.
+                    self.headers.add(host_check["header"])
+                    prepare.append(f"if (a{index} && !{host_check['check']}(*a{index}, *impl))")
+                    prepare.append("    return RV_ERR_WRONG_HOST;")
+                    notes.append(f"RV_ERR_WRONG_HOST for a {name} of another host's document")
+                presence = f"{function.interface}.{member.name}.{argument.name}" in self.world.config.get("presenceArguments", [])
+                if presence:
+                    # An optional nullable argument whose absence differs from null: name_present 0 is absent.
+                    if not (optional_no_default and mapped.nullable):
+                        raise SystemExit(f"presenceArguments: {function.interface}.{member.name}.{argument.name} must be optional, nullable and without a default")
+                    params.append(("int32_t", f"{name}_present"))
+                    passed.append(f"{name}_present ? std::optional<RefPtr<{mapped.cls}>> {{ a{index} }} : std::nullopt")
+                    notes.append(f"{name}_present 0 means absent; with {name}_present 1, a NULL {name} means null")
+                else:
+                    passed.append(f"a{index}.get()" if maybe_null else f"HandleArg<{mapped.cls}> {{ a{index}.get() }}")
+                if maybe_null and not presence:
                     notes.append(f"{name} may be NULL")
                 if "ReturnValue" in argument.attrs:
                     return_value = (index, mapped)
             else:
                 raise Unsupported(f"{mapped.kind} argument")
+        # argumentAdapters converts a decoded argument to the C++ type the member takes ({value}), keyed
+        # Interface.member.argument by the function's interface.
+        wraps = []
+        for index, argument in enumerate(arguments):
+            adapter = self.world.config.get("argumentAdapters", {}).get(f"{function.interface}.{member.name}.{argument.name}")
+            if adapter and adapter.get("wrap"):
+                # The adapter wraps the whole call ({call}) and hands the converted argument in as adapter["argument"].
+                wraps.append((adapter["wrap"], passed[index]))
+                passed[index] = adapter["argument"]
+            elif adapter:
+                passed[index] = adapter["cpp"].replace("{value}", passed[index])
+            if adapter:
+                if adapter.get("header"):
+                    self.headers.add(adapter["header"])
+                if adapter.get("note"):
+                    notes.append(adapter["note"])
         prepare += self.setter_value_checks(function, mapped_args)
         # The result.
         sink = None
@@ -1817,6 +2188,8 @@ class Generator(ComplexGeneratorMixin):
             sink = ("returnvalue", index)
         elif returns.kind == 'typedarray':
             raise Unsupported('typed array view result')
+        elif returns.kind == 'typedinput':
+            raise Unsupported(f'type {returns.label}')
         elif returns.kind == "string":
             params += [("char*", "buffer"), ("int32_t", "capacity"), ("int32_t*", "length")]
             checks.append("length")
@@ -1910,32 +2283,51 @@ class Generator(ComplexGeneratorMixin):
                 raise SystemExit(f"creationGatedInterfaces: {factory} does not check [EnabledBySetting={setting}]")
             setting = None
         if setting:
-            body += self.setting_check(interface, chain, setting)
+            body += self.setting_check(interface, chain, setting, bool(call_with and "Node" not in chain and context_receiver))
             notes.append(f"RV_ERR_UNSUPPORTED while the setting {setting} is off")
         if call_with:
-            if "Node" not in chain:
+            if "Node" not in chain and not context_receiver and interface in self.world.config.get("contextSettingsObjects", []):
+                # An ActiveDOMObject's script execution context is a Document on the host.
+                self.headers |= {"ContextDestructionObserverInlines.h", "Document.h"}
+                body += ['RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());',
+                         'if (!contextDocument)', '    return RV_ERR_DETACHED;',
+                         'Ref document = contextDocument.releaseNonNull();']
+            elif "Node" not in chain:
                 if not context_receiver:
                     raise Unsupported("[CallWith] on an interface other than a node")
                 body += ['RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));',
                          'if (!contextDocument)', '    return RV_ERR_WRONG_INTERFACE;',
                          'Ref document = contextDocument.releaseNonNull();']
+                # contextDocuments names the object's own document: a context of another document is the wrong host.
+                own = self.world.config.get("contextDocuments", {}).get(interface)
+                if own:
+                    body += [f'if (auto* own = {own}; own && own != document.ptr())', '    return RV_ERR_WRONG_HOST;']
+                    notes.append("RV_ERR_WRONG_HOST for a context other than the object's document")
             else:
                 body.append("Ref document = impl->document();")
+            if "global" in call_with:
+                body += ["auto* global = document->globalObject();", "if (!global)",
+                         '    return Ranvier::recordException(Exception { ExceptionCode::InvalidStateError, "The document has no global object."_s });']
+                notes.append("RV_ERR_DOM_EXCEPTION (InvalidStateError) for a document without a global object")
         attached = self.world.config.get("eventTargetObjects", {}).get(interface, {}).get("attached")
         if attached:
             body += [f"if (!({attached}))", "    return RV_ERR_DETACHED;"]
             notes.append("RV_ERR_DETACHED once the object's window has no frame")
         body += getattr(function, 'context_checks', [])
 
+        supplied = ["*global" if value == "global" else "document.get()" for value in call_with]
+
         def with_context(text):
-            text = text.replace("{call_with}", "".join(", document.get()" for _ in call_with))
-            text = text.replace("{call_with_bare}", ", ".join("document.get()" for _ in call_with))
-            return text.replace("{call_with_lead}", "".join("document.get(), " for _ in call_with))
+            text = text.replace("{call_with}", "".join(f", {value}" for value in supplied))
+            text = text.replace("{call_with_bare}", ", ".join(supplied))
+            return text.replace("{call_with_lead}", "".join(f"{value}, " for value in supplied))
         # An enumeration setter names its getter's call in a decltype, which takes the same context.
         body += [with_context(line) for line in prepare]
         expression = with_context(call)
         for index, value in enumerate(passed):
             expression = expression.replace(f"{{arg{index}}}", value)
+        for template, value in wraps:
+            expression = with_context(template).replace("{value}", value).replace("{call}", expression)
         if sink is None:
             body.append(f"return invoke([&]() -> decltype(auto) {{ return {expression}; }});")
         elif isinstance(sink, tuple) and sink[0] == 'copyback':
@@ -2175,6 +2567,8 @@ class Generator(ComplexGeneratorMixin):
                     note += ", required"
                 elif member.default is not None:
                     note += f", default {member.default}"
+                elif getattr(mapped, "optional_handle", False):
+                    note += ", NULL for absent, a pointer to NULL for null"
                 elif ctype.endswith("*"):
                     note += ", NULL for absent"
                 if mapped.kind == "enum":
@@ -2280,6 +2674,33 @@ class Generator(ComplexGeneratorMixin):
             lines.append(f"int32_t rv_dom_{function.name}({params_text(function.params)}) {{ return ranvier_dom_{function.name}({args}); }}")
         return "\n".join(lines) + "\n"
 
+    def conditional_arm_includes(self, headers):
+        """Guarded includes of the arm types that a union typedef of a generated function's arguments or result holds
+        only in a build that enables a condition: the engine's Variant of the typedef needs those types complete."""
+        def names(t):
+            if t is not None:
+                yield t.name
+                for subtype in t.subtypes:
+                    yield from names(subtype)
+        used = set()
+        for function in self.functions:
+            member = function.member
+            if member is not None:
+                used.update(names(member.type))
+                for argument in member.arguments:
+                    used.update(names(argument.type))
+        guarded = {}
+        for name in sorted(used & set(self.world.conditional_arms)):
+            for condition, arm in self.world.conditional_arms[name]:
+                cls = self.world.cpp_class(arm) if arm in self.world.interfaces else arm
+                header = self.interface_headers.get(f'{cls}.h', f'{cls}.h')
+                if header not in headers:
+                    guarded.setdefault(condition, set()).add(header)
+        lines = []
+        for condition, group in sorted(guarded.items()):
+            lines += [f'#if {condition}'] + [f'#include "{header}"' for header in sorted(group)] + ['#endif']
+        return lines
+
     def glue(self):
         lines = [
             "// The glue of the generated DOM functions, compiled into WebCore by patch 0012 (config/common.cmake names this",
@@ -2289,7 +2710,9 @@ class Generator(ComplexGeneratorMixin):
             '#include "RanvierDomGlue.h"',
             "",
         ]
-        lines += [f'#include "{h}"' for h in sorted({self.interface_headers.get(header, header) for header in self.headers})]
+        headers = {self.interface_headers.get(header, header) for header in self.headers}
+        lines += [f'#include "{h}"' for h in sorted(headers)]
+        lines += self.conditional_arm_includes(headers)
         for enum, (_, _, file) in sorted(self.enums_used.items()):
             lines.append(f'#include "JS{pathlib.PurePosixPath(file).stem}.h"')
         lines += ["", RUNTIME, ""]
@@ -2300,7 +2723,7 @@ class Generator(ComplexGeneratorMixin):
             quoted = ", ".join(f'"{v}"_s' for v in values)
             lines.append(f"static constexpr ASCIILiteral {enum_table(enum)}[] = {{ {quoted} }};")
         lines += self.complex_runtime()
-        lines += ["", "using namespace WebCore;", "", 'extern "C" {', ""]
+        lines += ["", 'extern "C" {', ""]
         lines.append("int32_t ranvier_dom_has(const char* feature)")
         lines.append("{")
         lines.append("    if (!feature)")
@@ -2325,9 +2748,11 @@ class Generator(ComplexGeneratorMixin):
         lines.append("    return 0;")
         lines.append("}")
         lines.append("")
-        for name in self.complex_used:
-            lines += [f"void ranvier_dom_{transport_token(name)}_release({name}* value)", "{",
-                      f"    if (isMainThread()) clear{name}(value);", "}", ""]
+        for name, mapped in self.complex_used.items():
+            condition = self.type_condition(mapped)
+            lines += [f"void ranvier_dom_{transport_token(name)}_release({name}* value)", "{"]
+            lines += guarded_body(condition, [f"    if (isMainThread()) clear{name}(value);"], ["    UNUSED_PARAM(value);"])
+            lines += ["}", ""]
         for name, struct in self.result_dicts.items():
             lines += [f"void ranvier_dom_{snake(name)}_release({struct}* value)", "{",
                       f"    if (isMainThread()) releaseDict{struct}(value);", "}", ""]
@@ -2337,22 +2762,14 @@ class Generator(ComplexGeneratorMixin):
                        else f'reinterpret_cast<{cls}*>(handle)->deref();')
             retain = (f'retainTrackedHandle(reinterpret_cast<{cls}*>(handle));' if cls in self.tracked_roots
                       else f'reinterpret_cast<{cls}*>(handle)->ref();')
-            lines += [
-                f"void ranvier_dom_{snake(name)}_release(Rv{name}* handle)",
-                "{",
-                "    if (handle && isMainThread())",
-                f"        {release}",
-                "}",
-                "",
-                f"Rv{name}* ranvier_dom_{snake(name)}_retain(Rv{name}* handle)",
-                "{",
-                "    if (!handle || !isMainThread())",
-                "        return nullptr;",
-                f"    {retain}",
-                "    return handle;",
-                "}",
-                "",
-            ]
+            interface = self.world.interfaces.get(name)
+            condition = self.conditional(interface) if interface is not None else None
+            lines += [f"void ranvier_dom_{snake(name)}_release(Rv{name}* handle)", "{"]
+            lines += guarded_body(condition, ["    if (handle && isMainThread())", f"        {release}"], ["    UNUSED_PARAM(handle);"])
+            lines += ["}", "", f"Rv{name}* ranvier_dom_{snake(name)}_retain(Rv{name}* handle)", "{"]
+            lines += guarded_body(condition, ["    if (!handle || !isMainThread())", "        return nullptr;", f"    {retain}", "    return handle;"],
+                                  ["    UNUSED_PARAM(handle);", "    return nullptr;"])
+            lines += ["}", ""]
         for function in self.functions:
             lines.append(f"// {function.comment}")
             lines.append(f"int32_t ranvier_dom_{function.name}({params_text(function.params)})")
@@ -2377,6 +2794,10 @@ class Generator(ComplexGeneratorMixin):
                       "    if (!target || !length)", "        return RV_ERR_NULL_ARGUMENT;",
                       "    if (!isMainThread())", "        return RV_ERR_WRONG_THREAD;",
                       f"    auto* impl = reinterpret_cast<{self.world.cpp_class(root)}*>(target);"]
+            if root in self.world.config.get("eventTargetObjects", {}):
+                # An event target of another interface is not this root: RV_ERR_WRONG_INTERFACE.
+                lines[-1] = f"    RefPtr impl = dynamicDowncast<{self.world.cpp_class(root)}>(*reinterpret_cast<EventTarget*>(target));"
+                lines += ["    if (!impl)", "        return RV_ERR_WRONG_INTERFACE;"]
             for interface, exposed in zip(query['interfaces'][:-1], query['names']):
                 conditional = self.conditional(self.world.interfaces[interface])
                 if conditional:
@@ -2387,7 +2808,23 @@ class Generator(ComplexGeneratorMixin):
                     lines.append("#endif")
             lines += [f'    return copyString("{query["names"][-1]}"_s, buffer, capacity, length);', "}", ""]
         lines += ["} // extern \"C\"", ""]
-        return "\n".join(lines)
+        return qualify_webcore("\n".join(lines), self.webcore_names())
+
+    def webcore_names(self):
+        """The unqualified C++ names of WebCore's IDL interfaces, namespaces, callbacks, dictionaries, enumerations and
+        typedefs, of RUNTIME_WEBCORE_NAMES and of gen/dom.json's webcoreNames. The glue names each one as
+        WebCore::<name>: a macOS SDK declares some, such as Comment and Rect, in the global namespace."""
+        world = self.world
+        names = set(RUNTIME_WEBCORE_NAMES) | set(world.config.get("webcoreNames", []))
+        names |= set(world.enums) | set(world.typedefs) | set(world.callbacks)
+        names |= {world.cpp_class(name) for name in world.interfaces}
+        names |= {self.dictionary_cpp(name) for name in world.dictionaries}
+        for name, definition in world.namespaces.items():
+            names.add(definition.attrs.get("ImplementedAs", name))
+            for scope in [definition, *world.namespace_partials.get(name, [])]:
+                names |= {value for value in [scope.attrs.get("ImplementedBy")]
+                          + [member.attrs.get("ImplementedBy") for member in scope.members] if isinstance(value, str)}
+        return {name for name in names if re.fullmatch(r"[A-Za-z_]\w*", name)}
 
     def const_getter_runtime(self):
         if not self.const_getters_used:
@@ -2612,8 +3049,6 @@ String lastExceptionMessage() { return latestMessage; }
 
 namespace {
 
-using namespace WebCore;
-
 Node* nodeOf(RvNode* handle) { return reinterpret_cast<Node*>(handle); }
 Event* eventOf(RvEvent* handle) { return reinterpret_cast<Event*>(handle); }
 
@@ -2728,6 +3163,7 @@ template<typename E, size_t N> std::optional<E> enumerationFromIndex(int32_t ind
 
 template<typename T> struct Unwrapped { using Type = T; };
 template<typename T> struct Unwrapped<std::optional<T>> { using Type = T; };
+template<typename T, typename Traits> struct Unwrapped<Markable<T, Traits>> { using Type = T; };
 
 // Copies a dictionary field into the C++ dictionary's member, which may be optional.
 template<typename T, typename V> void assignValue(T& field, V value)

@@ -1,0 +1,66 @@
+{
+ "group": "R12",
+ "issue": "ranvier-org/Ranvier.WebCore#98",
+ "abi": 54,
+ "abiNote": "placeholder ABI54; stacked on B06; root assigns NativeNN/ABI at integration",
+ "sharedEncoding": {
+  "branch": "codex/native-api-image-encoding",
+  "head": "22bc8ea605ca794902e28113de04b977d4e7d1f8",
+  "unit": "host/RanvierImageEncoding.{h,cpp}"
+ },
+ "candidate": "artifacts/snapshot-candidate-2",
+ "parent": "C:/wk/native-media-caps/artifacts/media-candidate-2",
+ "candidateBuildHead": "32c0678ae1ff21ed3bf3d456fcabd8b73d0a86cf",
+ "runtime": {
+  "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+  "RanvierWebCoreHost.dll": "064a9bf9d114ce4b71fcfeb430fc57cd18467cb03b33bb702fdaad6a54718a3c",
+  "WebCore.dll": "1e0bcceaef998dc3399d2fb28e81df68fa92ed5173d881069ce9245d972fa471"
+ },
+ "batch": {
+  "probes": 63,
+  "rawAssertions": 91696,
+  "teardownRecords": 104,
+  "baseline": "C:/wk/native-media-caps/docs/media-capabilities-evidence/batch-green.json (B06: 91114 raw)",
+  "added": {
+   "snapshot_options": 579,
+   "abi_layouts": "21 -> 24"
+  },
+  "allExit0": true,
+  "viewportScroll": "count not asserted: viewport_scroll counts p.update() in a smooth-scroll settle loop that breaks at scrollend; 3231 seen twice under load, 3232 in this batch and 16/16 quiet runs on the B06 and parent runtimes"
+ },
+ "repeat30": {
+  "runs": 30,
+  "distinctLines": 1,
+  "line": "PASS snapshot_options: 579 assertions; facilities {\"snapshot-options\": 1, \"snapshot-display-p3\": 0, \"image-encoding-png\": 1, \"image-encoding-jpeg\": 1, \"image-encoding-webp\": 1}"
+ },
+ "red": {
+  "native": "red-native.json",
+  "chromium": "red-chromium.json",
+  "probe": "red-probe.log (snapshot_options on the B06 runtime)"
+ },
+ "qualifications": [
+  "Capture paints during rv_host_snapshot and encodes there; delivery is deferred to rv_run_loop_cycle, never inside the call. cancel/release/new document/host destroy keep a reached snapshot (rv_resource_* contract).",
+  "display-p3 returns RV_ERR_UNSUPPORTED on slim (ENABLE_DESTINATION_COLOR_SPACE_DISPLAY_P3 off); snapshot-display-p3 reports 0. No silent sRGB.",
+  "Layout snaps boxes to the host device pixels: at a scale other than the device scale, or a fractional device scale, edge pixels are partly covered; the probe asserts interior pixels with a half-device-pixel margin there.",
+  "The viewport snapshot always takes the CPU path (FlattenCompositingLayers), as rv_host_paint_rgba does without compositing.",
+  "JPEG default quality is the Skia encoder default, not Chromium toBlob 0.92; out-of-range/NaN quality equals the default (bytes identical). WEBP at quality 1 is lossless (VP8L) and embeds an ICCP chunk (VP8X).",
+  "Browser facade: an ordinary browser context has no DOM capture member (Chromium 156: drawElementImage/drawElement/layoutSubtree absent, getDisplayMedia unavailable); BrowserSnapshots reports Available=false and raises NotSupportedException."
+ ],
+ "files": {
+  "batch-green.json": "d916c446df9d4f17ceb6a35ae8e93b9a4658684b13897745073313cf3def908b",
+  "build_snapshot_candidate.py": "acd310129507c6db3b5210bfd3452bd5d673b0ad0376a0dc31c44898b93773b1",
+  "red-chromium.json": "e9c3361506f65d2c6452b7a3fa918259fba5ff46e81aa0e0e7291472cbd7a469",
+  "red-native.json": "3b2b4a29429fdf7bb22ff13d1d3b149920d44c2dadf61ddfa7e5215d45924d86",
+  "red-probe.log": "4dfa7557803fdf9a62bf8464a79285fb87263823441437dd75fb4a5414e2a189",
+  "red_chromium.mjs": "f84743dba182564f2bfb7605c3f3275dd25c081e3b9a306076d11807ed2aef10",
+  "red_native.py": "d1133e9b12400d09f2649125e6fda4cc33662eb1e2357b161750ee319c6a3813",
+  "repeat30.sh": "94e8563e5dc1a8f8250561a11bfad60f1ea9aa5a74fa69707be7fbb524d17368",
+  "run_snapshot_full_batch.py": "9bb7fc6cec30e23756442f870cfc681066ea0c28bde81f4ede761153c408fd1d",
+  "runtime-receipt.json": "f6bd37b196afe64e74fe35f90880cf9d81adda1783ea6961b9c0a91b0b739f85",
+  "snapshot-options-probe.log": "5fc8b411c20d5abbede0d42c82b01b02f44c37da611feae9dc9bc4926d132ad4",
+  "snapshot-options-repeat30.txt": "b18d17e75134060a2314eb679d934ae5f1d5b72474127b079dbbb3d39aca9637",
+  "snapshot-options-report.json": "ae5a49f629b8380bd3484e538376c5eb3dde695319e5a8eca1e8054d81966e43",
+  "source-patches.json": "9b1aecd1f26d982e4a8eb8a60d4e944fab4b65efb0184c5f7aa0d1ce41e9c9df",
+  "teardown-probes.json": "263c729dc539fcce1f0738a1299bf5852c5eb4a6838f9caf7abb99ef436dd33c"
+ }
+}

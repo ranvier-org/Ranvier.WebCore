@@ -1,0 +1,47 @@
+{
+ "abi": 30,
+ "exports": {
+  "rv_canvas_get_context_2d": false,
+  "rv_canvas_get_context": false,
+  "rv_canvas_context_type": false,
+  "rv_canvas_context_2d_attributes": false,
+  "rv_dom_html_canvas_element_get_width": false,
+  "rv_dom_html_canvas_element_set_width": false,
+  "rv_dom_html_canvas_element_get_height": false,
+  "rv_dom_html_canvas_element_set_height": false,
+  "rv_dom_canvas_rendering_context2_d_get_canvas": false,
+  "rv_dom_canvas_rendering_context2_d_get_fill_style": false,
+  "rv_dom_canvas_rendering_context2_d_set_fill_style": false,
+  "rv_dom_canvas_rendering_context2_d_fill_rect": false,
+  "rv_dom_canvas_rendering_context2_d_clear_rect": false,
+  "rv_dom_canvas_rendering_context2_d_release": false,
+  "rv_dom_canvas_rendering_context2_d_retain": false
+ },
+ "abiHas": {
+  "canvas-context": 0,
+  "dom:HTMLCanvasElement": 0,
+  "dom:CanvasRenderingContext2D": 0,
+  "dom-generated": 1
+ },
+ "attributes": {
+  "id": "c",
+  "width": "40",
+  "height": "20"
+ },
+ "snapshotSizeStatus": -6,
+ "snapshotStatus": 0,
+ "snapshotSize": [
+  320,
+  160
+ ],
+ "snapshotDistinctPixels": [
+  [
+   0,
+   0,
+   0,
+   0
+  ]
+ ],
+ "getContext": "required native binding is absent: rv_canvas_get_context_2d",
+ "red": true
+}

@@ -1,0 +1,265 @@
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(226,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+  226 | #if RANVIER_COMPOSITING
+      |     ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(260,26): error: reference to 'Cursor' is ambiguous
+  260 |     void setCursor(const Cursor&) final;
+      |                          ^
+C:\wk\native-batch-6\docs\batch-6-evidence\mac3\carbon-globals.h(69,23): note: candidate found by name lookup is 'Cursor'
+   69 | RANVIER_CARBON_GLOBAL(Cursor)
+      |                       ^
+C:\wk\pointer-build\WebCore\PrivateHeaders\WebCore/HostWindow.h(39,7): note: candidate found by name lookup is 'WebCore::Cursor'
+   39 | class Cursor;
+      |       ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(281,28): error: reference to 'Cursor' is ambiguous
+  281 | static int32_t cursorValue(Cursor::Type type)
+      |                            ^
+C:\wk\native-batch-6\docs\batch-6-evidence\mac3\carbon-globals.h(69,23): note: candidate found by name lookup is 'Cursor'
+   69 | RANVIER_CARBON_GLOBAL(Cursor)
+      |                       ^
+C:\wk\pointer-build\WebCore\PrivateHeaders\WebCore/HostWindow.h(39,7): note: candidate found by name lookup is 'WebCore::Cursor'
+   39 | class Cursor;
+      |       ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(283,16): error: reference to 'Cursor' is ambiguous
+  283 |     using enum Cursor::Type;
+      |                ^
+C:\wk\native-batch-6\docs\batch-6-evidence\mac3\carbon-globals.h(69,23): note: candidate found by name lookup is 'Cursor'
+   69 | RANVIER_CARBON_GLOBAL(Cursor)
+      |                       ^
+C:\wk\pointer-build\WebCore\PrivateHeaders\WebCore/HostWindow.h(39,7): note: candidate found by name lookup is 'WebCore::Cursor'
+   39 | class Cursor;
+      |       ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(283,24): error: unknown type name Type
+  283 |     using enum Cursor::Type;
+      |                        ^~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(285,10): error: use of undeclared identifier 'Hand'; did you mean 'rand'?
+  285 |     case Hand: return RV_CURSOR_POINTER;
+      |          ^~~~
+      |          rand
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\stdlib.h(352,37): note: 'rand' declared here
+  352 | _Check_return_ _ACRTIMP int __cdecl rand(void);
+      |                                     ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(286,10): error: use of undeclared identifier 'IBeam'
+  286 |     case IBeam: return RV_CURSOR_TEXT;
+      |          ^~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(287,10): error: use of undeclared identifier 'VerticalText'
+  287 |     case VerticalText: return RV_CURSOR_VERTICAL_TEXT;
+      |          ^~~~~~~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(288,10): error: use of undeclared identifier 'Cross'
+  288 |     case Cross: return RV_CURSOR_CROSSHAIR;
+      |          ^~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(289,10): error: use of undeclared identifier 'Move'
+  289 |     case Move: return RV_CURSOR_MOVE;
+      |          ^~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(290,10): error: use of undeclared identifier 'MiddlePanning'
+  290 |     case MiddlePanning:
+      |          ^~~~~~~~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(291,10): error: use of undeclared identifier 'EastPanning'
+  291 |     case EastPanning:
+      |          ^~~~~~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(292,10): error: use of undeclared identifier 'NorthPanning'
+  292 |     case NorthPanning:
+      |          ^~~~~~~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(293,10): error: use of undeclared identifier 'NorthEastPanning'
+  293 |     case NorthEastPanning:
+      |          ^~~~~~~~~~~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(294,10): error: use of undeclared identifier 'NorthWestPanning'
+  294 |     case NorthWestPanning:
+      |          ^~~~~~~~~~~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(295,10): error: use of undeclared identifier 'SouthPanning'
+  295 |     case SouthPanning:
+      |          ^~~~~~~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(296,10): error: use of undeclared identifier 'SouthEastPanning'
+  296 |     case SouthEastPanning:
+      |          ^~~~~~~~~~~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(297,10): error: use of undeclared identifier 'SouthWestPanning'
+  297 |     case SouthWestPanning:
+      |          ^~~~~~~~~~~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(298,10): error: use of undeclared identifier 'WestPanning'
+  298 |     case WestPanning: return RV_CURSOR_ALL_SCROLL;
+      |          ^~~~~~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(299,10): error: use of undeclared identifier 'Wait'
+  299 |     case Wait: return RV_CURSOR_WAIT;
+      |          ^~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(300,10): error: use of undeclared identifier 'Progress'
+  300 |     case Progress: return RV_CURSOR_PROGRESS;
+      |          ^~~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(301,10): error: use of undeclared identifier 'Help'
+  301 |     case Help: return RV_CURSOR_HELP;
+      |          ^~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(302,10): error: use of undeclared identifier 'ContextMenu'
+  302 |     case ContextMenu: return RV_CURSOR_CONTEXT_MENU;
+      |          ^~~~~~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(303,10): error: use of undeclared identifier 'Cell'
+  303 |     case Cell: return RV_CURSOR_CELL;
+      |          ^~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(304,10): error: use of undeclared identifier 'Alias'
+  304 |     case Alias: return RV_CURSOR_ALIAS;
+      |          ^~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(305,10): error: use of undeclared identifier 'Copy'
+  305 |     case Copy: return RV_CURSOR_COPY;
+      |          ^~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(306,10): error: use of undeclared identifier 'NoDrop'
+  306 |     case NoDrop: return RV_CURSOR_NO_DROP;
+      |          ^~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(307,10): error: use of undeclared identifier 'NotAllowed'; did you mean 'WTF::portAllowed'?
+  307 |     case NotAllowed: return RV_CURSOR_NOT_ALLOWED;
+      |          ^~~~~~~~~~
+      |          WTF::portAllowed
+C:\wk\pointer-build\WTF\Headers\wtf/URL.h(324,25): note: 'WTF::portAllowed' declared here
+  324 | WTF_EXPORT_PRIVATE bool portAllowed(const URL&); // Disallow ports that should never be used for Web resources.
+      |                         ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(308,10): error: use of undeclared identifier 'Grab'
+  308 |     case Grab: return RV_CURSOR_GRAB;
+      |          ^~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(309,10): error: use of undeclared identifier 'Grabbing'
+  309 |     case Grabbing: return RV_CURSOR_GRABBING;
+      |          ^~~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(310,10): error: use of undeclared identifier 'ZoomIn'
+  310 |     case ZoomIn: return RV_CURSOR_ZOOM_IN;
+      |          ^~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(311,10): error: use of undeclared identifier 'ZoomOut'
+  311 |     case ZoomOut: return RV_CURSOR_ZOOM_OUT;
+      |          ^~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(312,10): error: use of undeclared identifier 'None'
+  312 |     case None: return RV_CURSOR_NONE;
+      |          ^~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(313,10): error: use of undeclared identifier 'ColumnResize'
+  313 |     case ColumnResize: return RV_CURSOR_COL_RESIZE;
+      |          ^~~~~~~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(314,10): error: use of undeclared identifier 'RowResize'
+  314 |     case RowResize: return RV_CURSOR_ROW_RESIZE;
+      |          ^~~~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(315,10): error: use of undeclared identifier 'NorthResize'
+  315 |     case NorthResize: return RV_CURSOR_N_RESIZE;
+      |          ^~~~~~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(316,10): error: use of undeclared identifier 'EastResize'
+  316 |     case EastResize: return RV_CURSOR_E_RESIZE;
+      |          ^~~~~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(317,10): error: use of undeclared identifier 'SouthResize'
+  317 |     case SouthResize: return RV_CURSOR_S_RESIZE;
+      |          ^~~~~~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(318,10): error: use of undeclared identifier 'WestResize'
+  318 |     case WestResize: return RV_CURSOR_W_RESIZE;
+      |          ^~~~~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(319,10): error: use of undeclared identifier 'NorthEastResize'
+  319 |     case NorthEastResize: return RV_CURSOR_NE_RESIZE;
+      |          ^~~~~~~~~~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(320,10): error: use of undeclared identifier 'NorthWestResize'
+  320 |     case NorthWestResize: return RV_CURSOR_NW_RESIZE;
+      |          ^~~~~~~~~~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(321,10): error: use of undeclared identifier 'SouthEastResize'
+  321 |     case SouthEastResize: return RV_CURSOR_SE_RESIZE;
+      |          ^~~~~~~~~~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(322,10): error: use of undeclared identifier 'SouthWestResize'
+  322 |     case SouthWestResize: return RV_CURSOR_SW_RESIZE;
+      |          ^~~~~~~~~~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(323,10): error: use of undeclared identifier 'EastWestResize'
+  323 |     case EastWestResize: return RV_CURSOR_EW_RESIZE;
+      |          ^~~~~~~~~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(324,10): error: use of undeclared identifier 'NorthSouthResize'
+  324 |     case NorthSouthResize: return RV_CURSOR_NS_RESIZE;
+      |          ^~~~~~~~~~~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(325,10): error: use of undeclared identifier 'NorthEastSouthWestResize'; did you mean 'northEastSouthWestResizeCursor'?
+  325 |     case NorthEastSouthWestResize: return RV_CURSOR_NESW_RESIZE;
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~
+      |          northEastSouthWestResizeCursor
+C:\wk\pointer-build\WebCore\PrivateHeaders\WebCore/Cursor.h(208,24): note: 'northEastSouthWestResizeCursor' declared here
+  208 | const Cursor& NODELETE northEastSouthWestResizeCursor();
+      |                        ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(326,10): error: use of undeclared identifier 'NorthWestSouthEastResize'; did you mean 'northWestSouthEastResizeCursor'?
+  326 |     case NorthWestSouthEastResize: return RV_CURSOR_NWSE_RESIZE;
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~
+      |          northWestSouthEastResizeCursor
+C:\wk\pointer-build\WebCore\PrivateHeaders\WebCore/Cursor.h(209,24): note: 'northWestSouthEastResizeCursor' declared here
+  209 | const Cursor& NODELETE northWestSouthEastResizeCursor();
+      |                        ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(327,10): error: use of undeclared identifier 'Custom'
+  327 |     case Custom: return RV_CURSOR_CUSTOM;
+      |          ^~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(328,10): error: use of undeclared identifier 'Invalid'; did you mean 'tag_SCRIPT_LOGATTR::fInvalid'?
+  328 |     case Invalid:
+      |          ^~~~~~~
+      |          tag_SCRIPT_LOGATTR::fInvalid
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um\usp10.h(813,13): note: 'tag_SCRIPT_LOGATTR::fInvalid' declared here
+  813 |     BYTE    fInvalid        :1;     // Invalid character sequence
+      |             ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(328,10): error: invalid use of non-static data member 'fInvalid'
+  328 |     case Invalid:
+      |          ^~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(329,10): error: use of undeclared identifier 'Pointer'
+  329 |     case Pointer: return RV_CURSOR_DEFAULT;
+      |          ^~~~~~~
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(698,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+  698 | #if RANVIER_COMPOSITING
+      |     ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(797,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+  797 | #if RANVIER_COMPOSITING
+      |     ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(839,70): warning: missing field 'color_scheme' initializer [-Wmissing-field-initializers]
+  839 |     RvMediaPreferences mediaPreferences { sizeof(RvMediaPreferences) };
+      |                                                                      ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(893,38): error: reference to 'Cursor' is ambiguous
+  893 | void RvChromeClient::setCursor(const Cursor& cursor)
+      |                                      ^
+C:\wk\native-batch-6\docs\batch-6-evidence\mac3\carbon-globals.h(69,23): note: candidate found by name lookup is 'Cursor'
+   69 | RANVIER_CARBON_GLOBAL(Cursor)
+      |                       ^
+C:\wk\pointer-build\WebCore\PrivateHeaders\WebCore/HostWindow.h(39,7): note: candidate found by name lookup is 'WebCore::Cursor'
+   39 | class Cursor;
+      |       ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(1566,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+ 1566 | #if RANVIER_COMPOSITING
+      |     ^
+In file included from C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp:1595:
+C:\wk\native-batch-6\host\RanvierCapabilities.inc(115,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+  115 | #if RANVIER_COMPOSITING
+      |     ^
+C:\wk\native-batch-6\host\RanvierCapabilities.inc(204,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+  204 | #if RANVIER_COMPOSITING
+      |     ^
+C:\wk\native-batch-6\host\RanvierCapabilities.inc(211,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+  211 | #if RANVIER_COMPOSITING && defined(_WIN32)
+      |     ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(1599,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+ 1599 | #if RANVIER_COMPOSITING
+      |     ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(1961,107): warning: missing field 'dirty' initializer [-Wmissing-field-initializers]
+ 1961 |     auto* host = new RvHost { createPage({ width, height }, orientation), { width, height }, std::nullopt };
+      |                                                                                                           ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(1969,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+ 1969 | #if RANVIER_COMPOSITING
+      |     ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(1977,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+ 1977 | #if RANVIER_COMPOSITING
+      |     ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(1995,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+ 1995 | #if RANVIER_COMPOSITING
+      |     ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(2338,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+ 2338 | #if RANVIER_COMPOSITING
+      |     ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(2398,24): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+ 2398 | #if defined(_WIN32) && RANVIER_COMPOSITING
+      |                        ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(2412,24): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+ 2412 | #if defined(_WIN32) && RANVIER_COMPOSITING
+      |                        ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(2470,24): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+ 2470 | #if defined(_WIN32) && RANVIER_COMPOSITING
+      |                        ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(2487,24): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+ 2487 | #if defined(_WIN32) && RANVIER_COMPOSITING
+      |                        ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(2513,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+ 2513 | #if RANVIER_COMPOSITING
+      |     ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(4874,62): warning: missing field 'customElementRegistry' initializer [-Wmissing-field-initializers]
+ 4874 |     auto root = element->attachShadow({ ShadowRootMode::Open });
+      |                                                              ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.old.cpp(5320,52): warning: conditional expression between different enumeration types ('(unnamed enum at C:\wk\native-batch-6\host\RanvierWebCoreAbi.h:2149:1)' and '(unnamed enum at C:\wk\native-batch-6\host\RanvierWebCoreAbi.h:1069:1)') is deprecated [-Wdeprecated-anon-enum-enum-conversion]
+ 5320 |             return page && hostForPage(page.get()) ? RV_ERR_WRONG_HOST : RV_ERR_DETACHED;
+      |                                                    ^ ~~~~~~~~~~~~~~~~~   ~~~~~~~~~~~~~~~
+21 warnings and 51 errors generated.
+
+ERRORS=51
+EXIT=1

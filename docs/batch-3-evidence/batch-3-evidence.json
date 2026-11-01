@@ -1,0 +1,75 @@
+{
+ "candidate": "artifacts/batch3-candidate-1 (built at 65af85a4, parent C:/wk/native-batch-2/artifacts/batch2-candidate-2)",
+ "abi": 56,
+ "nativeVersion": "0.1.0-preview.48",
+ "raw": 95780,
+ "teardownRecords": 115,
+ "probes": 73,
+ "allExitZero": true,
+ "batchHead": "9791c825e2868537d967a994c810eb9a8ce28dbe",
+ "runtime": {
+  "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+  "RanvierWebCoreHost.dll": "bdb9bfe4f159b7f550a66f30b11f70ac434168813f0fab256826a56ecb202d5e",
+  "WebCore.dll": "86f810194b4b7fa39e2f43471cce100f7ce6d5594aa492192d6c1a18ca182034"
+ },
+ "expected": {
+  "baseline": "batch-2 batch2-candidate-2-batch 93953 raw + 111 teardown",
+  "deltas": {
+   "R01 canvas_context": 205,
+   "D17 value_factories": 398,
+   "T01 font_readiness": 82,
+   "R09 image_readiness": 23,
+   "B10 wake_locks": 115,
+   "B09 notifications": 149,
+   "I07+T09+T04 data_transfer": 851,
+   "abi_layouts 23->27 (B09 RvNotificationOptions)": 4
+  },
+  "teardownDeltas": {
+   "B10 wake lock sentinel": 2,
+   "B09 notification": 2
+  },
+  "raw": 95780,
+  "teardown": 115
+ },
+ "ownPatchUnits": {
+  "UnifiedSource-dom-6.cpp.obj": {
+   "disassemblyEqual": true,
+   "ownerObject": "C:/wk/native-dnd/artifacts/dnd-candidate-9/100-UnifiedSource-dom-6.cpp.obj",
+   "laterPatchFilesReaching": []
+  },
+  "UnifiedSource-html-6.cpp.obj": {
+   "disassemblyEqual": true,
+   "ownerObject": "C:/wk/native-canvas/artifacts/canvas-candidate-5/001-UnifiedSource-html-6.cpp.obj",
+   "laterPatchFilesReaching": [
+    "Source/WebCore/page/Navigator.h"
+   ]
+  }
+ },
+ "laterPatchExemptions": {
+  "Source/WebCore/dom/Element.cpp": {
+   "unit": "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-9.cpp.obj",
+   "laterPatches": [
+    "C:/wk/native-pointer/patches/0044-pointer-event-pen-geometry.patch"
+   ],
+   "seriesLines": 8,
+   "laterLines": 2
+  }
+ },
+ "viewportScroll": {
+  "batchCount": 3232,
+  "fixedCount": 2156,
+  "fixCommit": "cd471f4",
+  "repeat": "5/5 identical at 2156 on batch3-candidate-1 (run 5 alongside 16 busy workers): viewport-scroll-repeat5.txt",
+  "rawAfterFix": 94704,
+  "note": "settle() no longer counts rv_host_update inside its scroll wait loops; retires the G05 qualification"
+ },
+ "files": {
+  "batch-results.json": "3c6952e193b4cb379f9ba649cb7b2b81f2673f36406f23f842d6bb1bb8f5b301",
+  "batch.log": "251281f97fad221eb30bdce0f74fbcbb161ada689e8bcdda1d07e04a99e72baf",
+  "runtime-receipt.json": "6087179748cfc99d8ee8ce9881b56c2167f948f5db58aba4f415546178abd2c3",
+  "source-patches.json": "a39548d0689640c91a63d079e4f24c475eb8806fff369b90aaa6e657c5c26345",
+  "teardown-probes.json": "ae3f35d0c811752bdca960d8ecabb254ec1fec4d34800c5f22da7289fc6e60be",
+  "viewport-scroll-repeat5.txt": "17ba956901107af25a40f1b9d3ff6278e59226bcbcf7a5864d1ae20afc3f9668",
+  "allocation-absence.json": "829c27333f8130221fa4e2d8739680a450aa2132305928838997e911aa67f2e9"
+ }
+}

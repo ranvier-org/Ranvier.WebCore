@@ -21,6 +21,9 @@ The explicit host implementation allowlist describes these bounded facilities:
 
 - Clipboard: RvEditorClient and rv_host_set_clipboard DOM clipboard integration.
 - Drop: native drag event dispatch and text insertion through the host drag client.
+- Clipboard and drop files (clipboard-files, data-transfer-files): app File payloads through the host transfer
+  pasteboard, and page files through clipboard-file-write-callback and rv_drag_file.
+- Range replacement: rv_host_replace_range insertReplacementText edits.
 - Tooltip: RvChromeClient tooltip state and rv_host_tooltip retrieval.
 - Input: rv_host_mouse/rv_host_key event handling and editor dispatch.
 - IME: rv_host_ime_set_composition/commit/cancel/rect editor operations.
@@ -43,3 +46,15 @@ reported separately from private Windows source/runtime proof.
 
 S06 view selection is a separately scoped host operation in the same producer
 cohort. Capability discovery never invokes it or changes SVG state.
+
+B06 adds three facilities. "media-capabilities" is implemented when rv_abi_has reports the
+rv_media_decoding_info family. "media-decoding-provider" and "media-encoding-provider" are implemented
+and available when a media engine configuration provider answers MediaCapabilities queries. No current
+flavor has one (the engine's providers are Cocoa and GStreamer only), so every valid query answers
+unsupported, not smooth and not power efficient. Neither facility enables playback, a codec or a setting.
+
+R12 adds "snapshot-options" (implemented when rv_abi_has reports rv_host_snapshot), "snapshot-display-p3"
+(implemented and available when the engine compiles the DisplayP3 destination color space, which slim does not)
+and "image-encoding-png", "image-encoding-jpeg" and "image-encoding-webp" (the engine's encoders for
+MIMETypeRegistry::isSupportedImageMIMETypeForEncoding). A snapshot never substitutes another color space or
+encoding for one the flavor lacks.

@@ -18,6 +18,10 @@ on:
         description: Runtime identifiers to build, comma-separated (empty for all)
         type: string
         default: ''
+      clean:
+        description: Build from scratch, without restoring the cached build tree
+        type: boolean
+        default: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -34,6 +38,7 @@ jobs:
       - run: python -I tests/test_package_contract.py
       - run: python -I tests/test_release.py
       - run: python -I tests/test_publish_gate.py
+      - run: python -I tests/test_probes.py
       - run: python -I tests/test_host_prepare.py
       - run: python -I tests/generator/test_domgen.py
       - run: python -I scripts/capability_catalogue.py --check
@@ -196,9 +201,22 @@ jobs:
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 360
+    permissions:
+      contents: read
+      # Deleting the build tree a run has superseded (docs/CI.md, "Build tree").
+      actions: write
     env:
       FLAVOR: ${{ inputs.flavor || 'slim' }}
       RANVIER_WORK: ${{ matrix.work }}
+      BUILD_DIR: ${{ matrix.work }}/build-${{ inputs.flavor || 'slim' }}
+      # The build tree is restored on every run but a clean one, and saved where later runs can restore it: a
+      # branch's runs see its own entries and the default branch's, a pull request's its own and its base's, a tag
+      # only the default branch's.
+      TREE_RESTORE: ${{ !(github.event_name == 'workflow_dispatch' && inputs.clean) }}
+      TREE_SAVE: >-
+        ${{ (github.event_name != 'pull_request' &&
+             (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/codex/batch-'))) ||
+            (github.event_name == 'pull_request' && startsWith(github.head_ref, 'codex/batch-')) }}
     steps:
       - uses: actions/checkout@v4
 
@@ -210,21 +228,6 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-
-      # Each downloaded dependency has its own cache, restored before it is needed and saved as soon as it is
-      # fetched, so a later failure does not discard it and a package host's outage only matters on a miss.
-      - name: Cache keys
-        id: keys
-        shell: python
-        run: |
-          import hashlib, json, os
-          pins = json.load(open('pins.json'))
-          rid = '${{ matrix.rid }}'
-          # Keyed on the pins each one uses, not the whole file, which also holds the package version.
-          llvm = pins['llvm'].get(rid, {}).get('sha256', 'none')
-          vcpkg = hashlib.sha256(json.dumps([pins['vcpkg'], pins['webkit'], pins['icu']]).encode()).hexdigest()[:16]
-          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
-              out.write(f"llvm=llvm-{rid}-{llvm}\nvcpkg=vcpkg-{rid}-{os.environ['FLAVOR']}-{vcpkg}\n")
 
       - name: Restore gperf
         id: gperf
@@ -305,17 +308,12 @@ jobs:
             df -h $env:RANVIER_WORK
           }
 
-      - name: Restore vcpkg archives and downloads
-        id: vcpkg
-        if: runner.os == 'Windows'
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            C:\rw\vcpkg-archives
-            C:\rw\vcpkg-downloads
-          # Archives are named by their ABI hash, so an older entry's archives are used where they still match.
-          key: ${{ steps.keys.outputs.vcpkg }}-${{ hashFiles('config/**') }}
-          restore-keys: vcpkg-${{ matrix.rid }}-${{ env.FLAVOR }}-
+      # Each downloaded dependency has its own cache, restored before it is needed and saved as soon as it is
+      # fetched, so a later failure does not discard it and a package host's outage only matters on a miss. The
+      # keys name the toolchain, so this step follows the tool installs (scripts/build_cache.py keys, docs/CI.md).
+      - name: Cache keys
+        id: keys
+        run: python -I scripts/build_cache.py keys --rid ${{ matrix.rid }} --flavor ${{ env.FLAVOR }}
 
       - name: Restore LLVM
         id: llvm
@@ -343,21 +341,87 @@ jobs:
       - name: Apply patches and install the host
         run: python scripts/build.py prepare --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
 
+      # The CMake and ninja tree of an earlier build: exact on the same toolchain and inputs, otherwise the newest
+      # with the same patches and config, then the newest with the same WebKit pin and toolchain (docs/CI.md).
+      - name: Restore the build tree
+        id: tree
+        if: env.TREE_RESTORE == 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.BUILD_DIR }}
+          key: ${{ steps.keys.outputs.tree }}
+          restore-keys: ${{ steps.keys.outputs.tree-restore }}
+
+      # A restored tree holds vcpkg_installed under the same vcpkg key, so vcpkg installs nothing and needs no archives.
+      - name: Restore vcpkg archives
+        id: vcpkg
+        if: runner.os == 'Windows' && steps.tree.outputs.cache-matched-key == ''
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\rw\vcpkg-archives
+          # Archives are named by their ABI hash, so an older entry's archives are used where they still match.
+          key: ${{ steps.keys.outputs.vcpkg }}
+          restore-keys: ${{ steps.keys.outputs.vcpkg-prefix }}
+
+      # Sources of the ports vcpkg builds, which it needs only when an archive is missing.
+      - name: Restore vcpkg downloads
+        id: downloads
+        if: runner.os == 'Windows' && steps.vcpkg.outcome == 'success' && steps.vcpkg.outputs.cache-hit != 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\rw\vcpkg-downloads
+          key: ${{ steps.keys.outputs.downloads }}
+          restore-keys: ${{ steps.keys.outputs.downloads-prefix }}
+
+      # Gives the unchanged sources the times recorded with the tree, so that ninja rebuilds only what changed, and
+      # deletes the tree's CMakeCache.txt, so that configure sets the options a clean configure would.
+      - name: Match source times to the build tree
+        run: python -I scripts/build_cache.py normalise --build "${{ env.BUILD_DIR }}" --source "${{ env.RANVIER_WORK }}/src" --clear-unknown
+
       - name: Configure (installs vcpkg packages on Windows)
         run: python scripts/build.py configure --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
 
-      - name: Save vcpkg archives and downloads
-        # Only after a successful install: an entry saved under a key is never replaced.
-        if: runner.os == 'Windows' && steps.vcpkg.outputs.cache-hit != 'true'
+      # Only after a successful install: an entry saved under a key is never replaced.
+      - name: Save vcpkg archives
+        if: steps.vcpkg.outcome == 'success' && steps.vcpkg.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
-          path: |
-            C:\rw\vcpkg-archives
-            C:\rw\vcpkg-downloads
-          key: ${{ steps.keys.outputs.vcpkg }}-${{ hashFiles('config/**') }}
+          path: C:\rw\vcpkg-archives
+          key: ${{ steps.keys.outputs.vcpkg }}
+
+      - name: Save vcpkg downloads
+        if: steps.downloads.outcome == 'success' && steps.downloads.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: C:\rw\vcpkg-downloads
+          key: ${{ steps.keys.outputs.downloads }}
 
       - name: Build
         run: python scripts/build.py build --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
+
+      # Right after the build, so that a later failure keeps it. An exact hit has nothing new to save.
+      - name: Save the build tree
+        id: save-tree
+        if: env.TREE_SAVE == 'true' && steps.tree.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.BUILD_DIR }}
+          key: ${{ steps.keys.outputs.tree }}
+
+      # The entry this run restored and has now replaced, when it is this ref's own: one tree per runtime and ref
+      # keeps the cache inside the repository's 10 GB. An entry of another ref (the base branch's) is not deleted.
+      - name: Delete the superseded build tree
+        if: >-
+          steps.save-tree.outcome == 'success' && steps.tree.outputs.cache-matched-key != '' &&
+          steps.tree.outputs.cache-matched-key != steps.keys.outputs.tree
+        continue-on-error: true
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STALE: ${{ steps.tree.outputs.cache-matched-key }}
+        run: |
+          gh api --method DELETE "repos/$GITHUB_REPOSITORY/actions/caches?key=$STALE&ref=$GITHUB_REF" \
+            || echo "no entry $STALE under $GITHUB_REF"
 
       - name: Package
         run: python scripts/build.py package --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
@@ -384,267 +448,18 @@ jobs:
         # no staged library names the build tree. On Linux, loading is untested and the step checks the manifest.
         run: python scripts/build.py smoke --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
 
-      - name: Exercise typed DOM transport against the packaged native host
-        if: matrix.rid == 'win-x64' && env.FLAVOR == 'slim'
-        run: python -I tests/generator/native_types.py --native-dir "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+      # Every probe in scripts/probes.py that applies to the runtime, each with its own condition and timeout. The
+      # step runs them all and fails at the end when any failed, so one run reports every failing probe.
+      - name: Run the probes
+        run: python -I scripts/probes.py run --rid ${{ matrix.rid }} --flavor ${{ env.FLAVOR }} --work "${{ env.RANVIER_WORK }}"
 
-      - name: Verify document-scoped CSS support queries
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/css_supports.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify live computed styles and pseudo-elements
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/computed_style.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify fragment rectangle lists and retained snapshots
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/fragment_rectangles.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify paused animation effects after keyframe edits
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/keyframe_rules.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify counter style name and rendered marker edits
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/counter_style_rules.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify retained CSSOM settings context and isolated descriptor edits
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/detached_cssom_context.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify custom property registration and interpolation
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/custom_properties.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify typed CSS value parsing and owned segments
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/typed_style_values.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify typed style maps
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/style_property_maps.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify declared typed map mutation isolation
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/declared_style_maps.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify typed style map entry snapshots
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/style_map_entries.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify geometry values and retained mutable points
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/geometry_values.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify matrix values and transformations
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/matrix_values.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify typed CSS transform components
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/css_transforms.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify SVG shapes, text and SMIL timing
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/svg_surfaces.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native" --webkit-source "${{ env.RANVIER_WORK }}/src"
-
-      - name: Verify SVG gradients, patterns and stops
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/svg_paint_servers.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify every SVG filter primitive and light source
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/svg_filters.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify SVG clipping, masks and markers
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/svg_clip_mask_marker.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify SVG reuse, content and resource loads
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/svg_resources.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify image decode readiness without JavaScript
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/image_decode.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify font readiness without JavaScript
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/font_load.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native" --webkit-source "${{ env.RANVIER_WORK }}/src"
-
-      - name: Verify SVGTests lists after attribute removal
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/svg_tests_lists.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify typed MathML elements, styling and focus
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/mathml_surface.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify typed and custom event construction and standalone targets
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/event_construction.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify the window event target, activation, touch capacity and pointer capture
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/focus_input.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify window metrics, visibility, media queries and viewport event order
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/viewport_events.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify form collections, FormData and submit events against the Chromium oracle
-        if: env.FLAVOR == 'slim'
-        run: python -I -X utf8 tests/abi/form_collections.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify fractional viewport and element scrolling against the Chromium oracle
-        if: env.FLAVOR == 'slim'
-        run: python -I -X utf8 tests/abi/viewport_scroll.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify dialogs, popovers and command invokers against the Chromium oracle
-        if: env.FLAVOR == 'slim'
-        run: python -I -X utf8 tests/abi/dialog_popover.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify Blob, File and FileList values against the Chromium oracle
-        if: env.FLAVOR == 'slim'
-        run: python -I -X utf8 tests/abi/binary_values.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify caret hit testing against the Chromium oracle
-        if: env.FLAVOR == 'slim'
-        run: python -I -X utf8 tests/abi/caret_hit.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native" --webkit-source "${{ env.RANVIER_WORK }}/src"
-
-      - name: Verify crypto.getRandomValues and crypto.randomUUID against the Chromium oracle
-        if: env.FLAVOR == 'slim'
-        run: python -I -X utf8 tests/abi/crypto_random.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify the app-set screen and orientation against the Chromium oracle
-        if: env.FLAVOR == 'slim'
-        run: python -I -X utf8 tests/abi/screen_metrics.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify URL, URLSearchParams and URLPattern against the Chromium oracle
-        if: env.FLAVOR == 'slim'
-        run: python -I -X utf8 tests/abi/url_values.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify the WPT URL and URLPattern corpus against the Chromium record
-        if: env.FLAVOR == 'slim'
-        run: python -I -X utf8 tests/abi/url_wpt.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify grapheme, word, sentence and line segmentation against the Chromium oracle
-        if: env.FLAVOR == 'slim'
-        run: python -I -X utf8 tests/abi/text_segmentation.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-      - name: Verify the C layouts of the ABI structs against ctypes and the F# interop
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/abi_layouts.py
-
-      - name: Verify coordinate-space conversion against the Chromium oracle
-        if: env.FLAVOR == 'slim'
-        run: python -I -X utf8 tests/abi/coordinate_spaces.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify ARIA element reflection and accessibility relations against the Chromium oracle
-        if: env.FLAVOR == 'slim'
-        run: python -I -X utf8 tests/abi/aria_relations.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify the visual viewport, page scale and obscured insets against the Chromium oracle
-        if: env.FLAVOR == 'slim'
-        run: python -I -X utf8 tests/abi/visual_viewport.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify custom highlight registries, ordered highlights and their painted ranges against the Chromium oracle
-        if: env.FLAVOR == 'slim'
-        run: python -I -X utf8 tests/abi/custom_highlights.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native" --webkit-source "${{ env.RANVIER_WORK }}/src"
-
-      - name: Verify blob URLs, blob reads and FileReader against the Chromium oracle
-        if: env.FLAVOR == 'slim'
-        run: python -I -X utf8 tests/abi/blob_urls.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify form submission keeps the host document
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/form_navigation.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify form submission reporting against the Chromium oracle
-        if: env.FLAVOR == 'slim'
-        run: python -I -X utf8 tests/abi/form_submission.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify event detail adapters against the Chromium oracle
-        if: env.FLAVOR == 'slim'
-        run: python -I -X utf8 tests/abi/event_details.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify U+0000 round trips of generated string inputs against the Chromium oracle
-        if: env.FLAVOR == 'slim'
-        run: python -I -X utf8 tests/abi/string_nul.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify the native inspector diagnostics against the Chromium box-model oracle
-        if: env.FLAVOR == 'slim'
-        run: python -I -X utf8 tests/abi/inspector_diagnostics.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native" --webkit-source "${{ env.RANVIER_WORK }}/src"
-
-      - name: Verify the native cascade diagnostics against the shared conformance fixture
-        if: env.FLAVOR == 'slim'
-        run: python -I -X utf8 tests/abi/cascade_diagnostics.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify passive capability catalogue and live host observations
-        run: python -I tests/abi/capabilities.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify explicit current SVG document view selection
-        run: python -I tests/abi/svg_view_selection.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify SVG document parsing, guards and transitions
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/svg_documents.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify SVG view coordinates and paint
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/svg_view_controls.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify concrete SVG animation effects
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/svg_animation_variants.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify table element surfaces
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/table_surface.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify reflected element attributes
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/element_reflection.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify area element surfaces
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/area_surface.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify CSSOM rule surfaces
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/cssom_surface.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify SVG geometry and value bindings
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/svg_geometry.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Verify shared SVG/MathML members
-        if: env.FLAVOR == 'slim'
-        run: python -I tests/abi/svg_mathml_surface.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-
-      - name: Build Windows UI Automation OS clients
-        if: matrix.rid == 'win-x64' && env.FLAVOR == 'slim'
-        run: >-
-          python -I tests/uia/run.py --stage "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}"
-          --build-dir "${{ env.RANVIER_WORK }}/build-${{ env.FLAVOR }}" --build-only
-
-      - name: Exercise Windows UI Automation and teardown
-        if: matrix.rid == 'win-x64' && env.FLAVOR == 'slim'
-        shell: pwsh
-        run: |
-          python -I tests/uia/check_exports.py "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          foreach ($mode in @('explicit', 'host', 'window', 'sync', 'overflow')) {
-            python -I tests/uia/run.py --stage "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}" --run-only --teardown $mode
-            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          }
-
-      - name: Build and exercise the accessibility cache lifetime probe
-        if: matrix.rid == 'win-x64' && env.FLAVOR == 'slim'
-        shell: pwsh
-        run: |
-          python -I tests/uia/run.py --stage "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}" --build-dir "${{ env.RANVIER_WORK }}/build-${{ env.FLAVOR }}" --cache-probe --build-only
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python -I tests/uia/run.py --stage "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}" --cache-probe --run-only --teardown cache
+      - name: Upload the probe logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: probe-logs-${{ matrix.rid }}-${{ env.FLAVOR }}
+          path: ${{ env.RANVIER_WORK }}/probe-logs
+          if-no-files-found: ignore
 
       - name: Upload the CMake logs on failure
         if: failure()

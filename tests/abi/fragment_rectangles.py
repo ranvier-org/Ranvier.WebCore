@@ -78,7 +78,7 @@ def verify(native_directory):
             </style><div id="box"><span id="wrapped">alpha beta gamma delta epsilon zeta eta theta</span></div>
             <div id="hidden">hidden</div>'''
         expect(bind('rv_dom_element_set_inner_html', integer, [pointer, Utf8])(body, markup) == 0, 'insert wrapped text')
-        find = bind('rv_document_get_element_by_id', pointer, [pointer, ctypes.c_char_p])
+        find = bind('rv_document_get_element_by_id', pointer, [pointer, Utf8])
         wrapped, hidden, box = (find(host, name) for name in [b'wrapped', b'hidden', b'box'])
         nodes.extend([wrapped, hidden, box])
         expect(all([wrapped, hidden, box]), 'find fixture elements')

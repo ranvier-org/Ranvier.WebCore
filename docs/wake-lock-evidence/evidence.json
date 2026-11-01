@@ -1,0 +1,185 @@
+{
+  "group": "B10",
+  "issue": "ranvier-org/Ranvier.WebCore#118",
+  "candidate": "wake-candidate-2",
+  "parent": "native46-candidate-6 (09732f9, preview.46/ABI54); batch-1 d247ceb0",
+  "placeholderAbi": 54,
+  "runtime": {
+    "brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
+    "brotlidec.dll": "d42e2160f76f29a91f8be01b009b585c45496219794e16eab90b3599b6f70a7f",
+    "harfbuzz-icu.dll": "27662b477f7cb0c20cee64543a06296a48a00a17b6c7b57629bb166a30d5b164",
+    "harfbuzz.dll": "b519b2abc7f446ca45bff77aae1708f45afc9f557698bcd7295837cce0f12bfa",
+    "icudt77.dll": "b00d2fb856f548608c137e771257a70d0722654535c6c00b371c0fab3e2b802c",
+    "icuin77.dll": "e3785739e1fcf2e38053bbb85ef5f0f5dab63f865cbda762da5258566085a240",
+    "icuuc77.dll": "189c623f996c41488c262867bae04a5bb33dd485bd423e0a8bec05c455a90902",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+    "jpeg62.dll": "394811c1b1bf1fd914248a145ba3fcad1f5f27c7009754ce08e48ccb0266b785",
+    "libpng16.dll": "8b46592c5ea338dd6b23ca380d6db64a7849c2a534fc465a006ec668645d8185",
+    "libsharpyuv.dll": "df165de83480692f494c23061ef9c40c10abe19a89b1fa9fae2f1cd5152c07a7",
+    "libwebp.dll": "550c5a4860f61d32a274fdd7b5c8cbe266eee28b3a3ca888195248ea1d5e0f71",
+    "libwebpdemux.dll": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163",
+    "libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
+    "libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
+    "RanvierWebCoreHost.dll": "f3731727f2e14d1dd34990590765fb0ad1208e4a6894606a59408c47e7be5a57",
+    "WebCore.dll": "26d1cd1ef081bfb491253af793272e9ca0015c41c1884b18ae34b402391eb65e",
+    "zlib1.dll": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93"
+  },
+  "srcPatchesPastSeries": {
+    "0040": {
+      "file": "Source/WebCore/loader/EmptyClients.h",
+      "diffSha256": "8e525884bd48af05c39783b1932877b4118ab82c8b9bc71fd43f65d520d3c08a",
+      "changedLines": [
+        "-class EmptyChromeClient : public ChromeClient {",
+        "+class WEBCORE_EXPORT EmptyChromeClient : public ChromeClient {",
+        "-    RefPtr<PopupMenu> createPopupMenu(PopupMenuClient&) const final;",
+        "+    RefPtr<PopupMenu> createPopupMenu(PopupMenuClient&) const override;",
+        "-    bool hoverSupportedByPrimaryPointingDevice() const final { return false; };",
+        "-    bool hoverSupportedByAnyAvailablePointingDevice() const final { return false; }",
+        "-    std::optional<PointerCharacteristics> pointerCharacteristicsOfPrimaryPointingDevice() const final { return std::nullopt; };",
+        "-    OptionSet<PointerCharacteristics> pointerCharacteristicsOfAllAvailablePointingDevices() const final { return { }; }",
+        "+    bool hoverSupportedByPrimaryPointingDevice() const override { return false; };",
+        "+    bool hoverSupportedByAnyAvailablePointingDevice() const override { return false; }",
+        "+    std::optional<PointerCharacteristics> pointerCharacteristicsOfPrimaryPointingDevice() const override { return std::nullopt; };",
+        "+    OptionSet<PointerCharacteristics> pointerCharacteristicsOfAllAvailablePointingDevices() const override { return { }; }",
+        "-    void invalidateRootView(const IntRect&) final { }",
+        "+    void invalidateRootView(const IntRect&) override { }",
+        "-    void invalidateContentsForSlowScroll(const IntRect&) final { }",
+        "+    void invalidateContentsForSlowScroll(const IntRect&) override { }",
+        "-    void mouseDidMoveOverElement(const HitTestResult&, OptionSet<PlatformEventModifier>, const String&, TextDirection) final { }",
+        "+    void mouseDidMoveOverElement(const HitTestResult&, OptionSet<PlatformEventModifier>, const String&, TextDirection) override { }",
+        "-    void setCursor(const Cursor&) final { }",
+        "+    void setCursor(const Cursor&) override { }",
+        "-    void triggerRenderingUpdate() final { }",
+        "+    void triggerRenderingUpdate() override { }",
+        "-    bool isEmptyChromeClient() const final { return true; }",
+        "+    bool isEmptyChromeClient() const override { return true; }"
+      ],
+      "reachedBy": [
+        "RanvierWebCoreAbi.cpp"
+      ]
+    }
+  },
+  "native": {
+    "assertions": 115,
+    "measured": {
+      "ungranted-request": "NotAllowedError",
+      "unknown-type": "TypeError",
+      "default-type": "screen",
+      "distinct-sentinels": true,
+      "release-log": [
+        [
+          "a-on",
+          "release",
+          false,
+          false,
+          true,
+          true
+        ],
+        [
+          "a-listener"
+        ],
+        [
+          "after-release-call",
+          true
+        ],
+        [
+          "after-await",
+          true
+        ],
+        [
+          "second-release",
+          true
+        ],
+        [
+          "b-listener"
+        ]
+      ],
+      "hidden-release": [
+        [
+          "a",
+          "release"
+        ],
+        [
+          "b",
+          "release"
+        ]
+      ],
+      "hidden-request": "NotAllowedError",
+      "document-teardown": {
+        "released": true,
+        "events": []
+      }
+    },
+    "qualified": [
+      "detached-request",
+      "document-teardown",
+      "hidden-release",
+      "hidden-request",
+      "permissions-policy-header",
+      "permissions-policy-none"
+    ]
+  },
+  "chromium": {
+    "browser": "156.0.8078.4",
+    "casesSha256": "2488495cf699e489b90076eb0ea8674359320666afb3db1cf46a91e2f3fc42fb",
+    "assertions": 9,
+    "measured": {
+      "ungranted-request": "NotAllowedError",
+      "unknown-type": "TypeError",
+      "default-type": "screen",
+      "distinct-sentinels": true,
+      "release-log": [
+        [
+          "a-on",
+          "release",
+          false,
+          false,
+          true,
+          true
+        ],
+        [
+          "a-listener"
+        ],
+        [
+          "after-release-call",
+          true
+        ],
+        [
+          "after-await",
+          true
+        ],
+        [
+          "second-release",
+          true
+        ],
+        [
+          "b-listener"
+        ]
+      ],
+      "document-teardown": {
+        "released": false,
+        "events": []
+      },
+      "detached-request": "NotAllowedError",
+      "permissions-policy-none": "NotAllowedError",
+      "permissions-policy-header": "NotAllowedError"
+    },
+    "unmeasured": [
+      "hidden-release",
+      "hidden-request"
+    ]
+  },
+  "repeat": {
+    "native": "30/30",
+    "chromium": "30/30"
+  },
+  "fullBatch": {
+    "raw": 90858,
+    "teardown": 106,
+    "baseline": {
+      "raw": 90743,
+      "teardown": 104
+    },
+    "probes": 64
+  }
+}

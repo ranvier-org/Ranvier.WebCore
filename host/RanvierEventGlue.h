@@ -12,11 +12,18 @@
 // - ranvier_event_glue_invalidate_document drops the detail roots of the document events.
 // - ranvier_window_event_target returns a new reference to the document's LocalDOMWindow as an EventTarget, or NULL.
 // - ranvier_window_max_touch_points writes Navigator.maxTouchPoints of the document's window.
+// - ranvier_custom_effect_callback_create returns a new CustomEffectCallback reference of the document, or NULL. Its
+//   ticks are queued during the rendering update and delivered from the run loop; revoke stops them, queued ones
+//   included, and ranvier_custom_effect_callbacks_revoke_document revokes every callback of the document.
 extern "C" {
-WEBCORE_EXPORT RvEvent* ranvier_event_construct(RvNode* document, int32_t kind, const char* type, const RvEventInit* init);
+WEBCORE_EXPORT RvEvent* ranvier_event_construct(RvNode* document, int32_t kind, const uint8_t* type, int32_t typeLength, const RvEventInit* init);
 WEBCORE_EXPORT int32_t ranvier_custom_event_detail_json(RvEvent*, char* buffer, int32_t capacity, int32_t* length);
 WEBCORE_EXPORT RvEventTarget* ranvier_event_target_create(RvNode* document);
 WEBCORE_EXPORT void ranvier_event_glue_invalidate_document(RvNode* document);
 WEBCORE_EXPORT RvEventTarget* ranvier_window_event_target(RvNode* document);
 WEBCORE_EXPORT int32_t ranvier_window_max_touch_points(RvNode* document, int32_t* value);
+WEBCORE_EXPORT RvCustomEffectCallback* ranvier_custom_effect_callback_create(RvNode* document, RvCustomEffectTick tick, void* context,
+    RvCustomEffectRelease release);
+WEBCORE_EXPORT int32_t ranvier_custom_effect_callback_revoke(RvCustomEffectCallback*);
+WEBCORE_EXPORT void ranvier_custom_effect_callbacks_revoke_document(RvNode* document);
 }

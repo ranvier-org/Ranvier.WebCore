@@ -1,0 +1,86 @@
+{
+  "groups": {
+    "I03": "https://github.com/ranvier-org/Ranvier.WebCore/issues/101",
+    "I04": "https://github.com/ranvier-org/Ranvier.WebCore/issues/102",
+    "I06": "https://github.com/ranvier-org/Ranvier.WebCore/issues/103"
+  },
+  "status": "lane-green (private, not accepted)",
+  "sourceHead": "d63116ffa099c7193bf0ae7d9933a5bd0f4b66cb",
+  "base": "codex/batch-1 d1ff8ace (Native46/ABI54, placeholder ABI)",
+  "runtime": "pointer-candidate-4",
+  "build": "full private rebuild C:/wk/pointer-build (ENABLE_TOUCH_EVENTS and ENABLE_POINTER_LOCK on). Once this config lands, every later candidate needs a full rebuild: both flags are in cmakeconfig.h.",
+  "srcPatches": {
+    "0044-pointer-event-pen-geometry.patch": "a741cfd1be40aba536cdf820b07d15dd0cd0e5ebea8e1b9ab25554629d0ad62f",
+    "0045-touch-pointer-events-win.patch": "7a172723db052b587f188b095310cede112443f6f33669de5a5772c51387b67e",
+    "0046-pointer-capture-pen-mouse-path.patch": "cd25edf3a7b5d69db9e869d1c87c730f427dcb7554db81ef92510355aec76242",
+    "0047-navigator-embedder-max-touch-points.patch": "984f160513f533c8a5f13436b6524ffbd30aa82dbdc1256f852fdbcdbcb890b2"
+  },
+  "batch": {
+    "raw": 91405,
+    "probes": 66,
+    "baselineUnchanged": true,
+    "new": {
+      "touch_input": 429,
+      "pen_input": 80,
+      "pointer_lock": 153
+    },
+    "teardownRecords": 104
+  },
+  "repeat30": {
+    "touch_input": {
+      "runs": 30,
+      "passed": 30,
+      "counts": [
+        429
+      ]
+    },
+    "pen_input": {
+      "runs": 30,
+      "passed": 30,
+      "counts": [
+        80
+      ]
+    },
+    "pointer_lock": {
+      "runs": 30,
+      "passed": 30,
+      "counts": [
+        153
+      ]
+    }
+  },
+  "red": {
+    "native": "red-native.json",
+    "nativeSha256": "eaca087b0da28283c55ad1d673435fa1a5e3e242f698cfa71e6924268ee0019c",
+    "penCapture": "red-pen-capture.json"
+  },
+  "oracle": {
+    "chromium": "oracle-chromium.json",
+    "sha256": "a66d7a897edf721fe49bbf6f3291dc99fecf2cc4b3f66c2750359ac6037199e9"
+  },
+  "domReportDelta": [
+    "Touch 8",
+    "TouchList 2",
+    "TouchEvent 7 (contract-only before)",
+    "Document 70 -> 72 (createTouchList, pointerLockElement)"
+  ],
+  "capabilityCatalogueDelta": [
+    "dom:Touch",
+    "dom:TouchList",
+    "dom:TouchEvent",
+    "pointer-input",
+    "touch-input",
+    "pointer-lock",
+    "build:ENABLE_POINTER_LOCK",
+    "build:ENABLE_TOUCH_EVENTS"
+  ],
+  "qualifications": [
+    "macOS keeps ENABLE_TOUCH_EVENTS off (iOS-only touch paths): touch-input is absent, rv_host_pointer refuses touch frames with RV_ERR_UNSUPPORTED, and touch_input.py checks that branch.",
+    "WebKit dispatches pointermove for a stationary touch contact at its unchanged position; Chromium does not. The shared fixture checks only changed contacts.",
+    "WebKit exposes touch radii, rotation and force only as the prefixed webkit* members; rv_touch_geometry reads them.",
+    "Touch input dispatches no compatibility mouse events or click: the app sends rv_host_mouse for taps it treats as clicks.",
+    "Unadjusted pointer-lock movement is unsupported (NotSupportedError); a request from an unfocused window is refused with WrongDocumentError and pointerlockerror.",
+    "Headless Chromium grants requestPointerLock without a gesture; WebKit requires one (NotAllowedError), so the gesture refusal is native-only.",
+    "Pen coalesced and predicted events carry the sample geometry; the host delivers no extra coalesced samples."
+  ]
+}

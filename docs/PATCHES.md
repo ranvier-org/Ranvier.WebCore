@@ -357,6 +357,71 @@ the patch a non-empty `shadowRoots` list returned a text node of the control's u
 `tests/abi/caret_hit.py` replays the Chromium 156 oracle `tests/fixtures/caret-hit-oracle.json` with and without
 `shadowRoots`; its text-control points give `INPUT@1` both ways at device scales 1, 1.5 and 2.
 
+## 0043-media-capabilities-native-query
+
+`MediaCapabilitiesNativeQuery.h` declares `queryMediaDecodingInfo` and `queryMediaEncodingInfo`, defined at the end
+of `MediaCapabilities.cpp`: `decodingInfo()` and `encodingInfo()` for an embedder, without JavaScript or a promise.
+They run the file's own configuration validation, completing with TypeError for an invalid configuration, and its
+gather path: settings, allowed container and codec types, the VP9 gate, the WebRTC route and the media engine
+configuration factories. The promise path, `MediaCapabilities.h`, the navigator and every setting are unchanged.
+The new header is included only by `MediaCapabilities.cpp` and the host, so the patch recompiles one unified source.
+
+`tests/abi/media_capabilities.py` checks each case of `tests/fixtures/media-capabilities-cases.json` through
+`rv_media_decoding_info` and `rv_media_encoding_info`.
+
+## 0049-image-bitmap-crop-completion-handler
+
+`ImageBitmap::createCompletionHandler(context, source, options, sx, sy, sw, sh, handler)` is
+`createImageBitmap(image, sx, sy, sw, sh, options)` for an embedder, without JavaScript or a promise. It completes
+with RangeError for a zero `sw` or `sh`, normalises a negative rectangle as the promise path does, and runs the
+existing per-source crop overloads, which stay private. The promise path is unchanged. The header gains one static
+member function, so the eight unified sources that include `ImageBitmap.h` recompile with unchanged layouts.
+
+`tests/abi/canvas_export.py` creates cropped bitmaps through `rv_image_bitmap_create`. Without the patch the host glue
+has no public crop entry point: `docs/canvas-export-evidence/red-patch-0049-compile.log`.
+
+## 0050-image-bitmap-unaccelerated-buffers
+
+An ImageBitmap's buffer is accelerated only where a canvas's is: under `USE(CA)` or `USE(SKIA)`, `bufferRenderingMode`
+returns Unaccelerated when `canvasUsesAcceleratedDrawing` is off, the setting `CanvasBase::shouldAccelerate()` reads.
+The GTK and WPE `hardwareAccelerationEnabled` check stays. Cocoa enables the setting by default and keeps accelerated
+bitmaps. The change is inside `ImageBitmap.cpp` and recompiles one unified source.
+
+Without the patch every `createImageBitmap` on the slim Windows build creates an accelerated Skia buffer, whose
+Ganesh stub aborts the process: `docs/canvas-export-evidence/red-patch-0050.log` (`red_bitmap_buffer.py`).
+## 0051-web-animation-promise-observer
+
+`WebAnimationPromiseObserver.h` declares `setWebAnimationPromiseObserver`, a process-wide function pointer that
+`WebAnimation.cpp` calls each time a ready or finished promise settles: with no code when it resolves, and with
+`AbortError` when `cancel()` or a reset of the pending tasks schedules its rejection. The engine rejects those promises
+in a microtask, which a host that disallows VM entry never runs, so the observer reports the rejection when it is
+scheduled. The pointer is a file static: no class layout changes, `WebAnimation.h` is untouched, and an unset observer
+leaves the engine's behaviour unchanged. `Headers.cmake` lists the header among the private framework headers.
+
+`tests/abi/animation_lifecycle.py` checks `rv_animation_ready` and `rv_animation_finished` against the Chromium 156
+oracle `tests/fixtures/animation-lifecycle-oracle.json`. Evidence: `docs/animation-lifecycle-evidence/native-evidence.json`.
+
+## 0052-eventloop-checkpoint-microtasks
+
+While the VM disallows entry, `EventLoopTaskGroup::queueMicrotask` queues a C++ microtask as a checkpoint task
+(`runAtEndOfMicrotaskCheckpoint`) instead of wrapping it in a JavaScript microtask cell. A microtask checkpoint runs
+checkpoint tasks in queueing order without entering the VM, so the engine's C++ microtasks (Web Animations AbortError
+rejections and asynchronous finish, among others) run under a host that disallows VM entry. On the main thread a
+`RunLoop` dispatch performs that checkpoint, once for every event loop that queued a checkpoint task before it ran; the
+event loop's own timer and scheduled state are untouched, so task latency is the same as without the patch. Other
+threads schedule their event loop. With VM entry allowed the function is unchanged. The change is one file,
+`EventLoop.cpp`, with no class layout change, and recompiles one unified source.
+
+The first revision scheduled the window event loop instead. Document::considerSpeculationRules then queued a C++
+microtask from the style-recalc timer, inside the Windows shared-timer message, where `MainThreadSharedTimer` defers a
+zero-delay timer through a timer queue; `ThreadTimers::updateSharedTimer` ignores a later zero-delay start while both
+fire times are past, so every task queued afterwards waited milliseconds for that post. `tests/abi/event_loop_latency.py`
+reproduces it (a denied pointer-lock request delivered after thousands of turns) and passes with this revision.
+
+Without the patch, `cancel()` of an animation with a pending pause queues its rejection as a JavaScript microtask, and
+the armed VM-entry crash (`crashOnDisallowedVMEntry`) aborts the host at the next checkpoint. Evidence:
+`docs/batch-6-evidence/` (first revision) and `docs/vm2-evidence/`.
+
 ## Working on the series
 
 ```

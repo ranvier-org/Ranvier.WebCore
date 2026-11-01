@@ -1,0 +1,693 @@
+{
+ "comment": "Differences of tests/abi/data_transfer.py from the Chromium oracle tests/fixtures/data-transfer-oracle.json: each path (case.key[.index]) with both recorded values and its reason. An entry with \"platforms\" applies only on those platforms.",
+ "differences": [
+  {
+   "path": "constructed.afterFile.types",
+   "native": [
+    "text/plain",
+    "text/html",
+    "application/x-custom"
+   ],
+   "chromium": [
+    "text/plain",
+    "text/html",
+    "application/x-custom",
+    "Files"
+   ],
+   "reason": "WebKit with custom pasteboard data off (DeprecatedGlobalSettings, every port's default) lists a DataTransfer's types from its pasteboard alone: a File added to the item list adds no \"Files\" type, and the item list exposes only the text/plain, text/html and text/uri-list strings."
+  },
+  {
+   "path": "constructed.afterFile.items",
+   "native": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ],
+    [
+     "file",
+     "text/plain"
+    ]
+   ],
+   "chromium": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ],
+    [
+     "string",
+     "application/x-custom"
+    ],
+    [
+     "file",
+     "text/plain"
+    ]
+   ],
+   "reason": "WebKit with custom pasteboard data off (DeprecatedGlobalSettings, every port's default) lists a DataTransfer's types from its pasteboard alone: a File added to the item list adds no \"Files\" type, and the item list exposes only the text/plain, text/html and text/uri-list strings."
+  },
+  {
+   "path": "constructed.removed",
+   "native": [
+    "text/html",
+    "application/x-custom"
+   ],
+   "chromium": [
+    "text/html",
+    "application/x-custom",
+    "Files"
+   ],
+   "reason": "WebKit with custom pasteboard data off (DeprecatedGlobalSettings, every port's default) lists a DataTransfer's types from its pasteboard alone: a File added to the item list adds no \"Files\" type, and the item list exposes only the text/plain, text/html and text/uri-list strings."
+  },
+  {
+   "path": "constructed.cleared",
+   "native": [
+    "application/x-custom"
+   ],
+   "chromium": [
+    "application/x-custom",
+    "Files"
+   ],
+   "reason": "WebKit with custom pasteboard data off (DeprecatedGlobalSettings, every port's default) lists a DataTransfer's types from its pasteboard alone: a File added to the item list adds no \"Files\" type, and the item list exposes only the text/plain, text/html and text/uri-list strings."
+  },
+  {
+   "path": "constructed.clearAll.types",
+   "native": [],
+   "chromium": [
+    "Files"
+   ],
+   "reason": "WebKit with custom pasteboard data off (DeprecatedGlobalSettings, every port's default) lists a DataTransfer's types from its pasteboard alone: a File added to the item list adds no \"Files\" type, and the item list exposes only the text/plain, text/html and text/uri-list strings."
+  },
+  {
+   "path": "drop.log.0.dt.items",
+   "native": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ]
+   ],
+   "chromium": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ],
+    [
+     "file",
+     "text/plain"
+    ],
+    [
+     "file",
+     "text/csv"
+    ]
+   ],
+   "reason": "In the protected mode of dragenter, dragover and dragleave WebKit's item list lists the strings, and of the files only promised image and media types (DataTransferItemList::ensureItems); Chromium lists every file item."
+  },
+  {
+   "path": "drop.log.0.dt.dropEffect",
+   "native": "none",
+   "chromium": "copy",
+   "reason": "WebKit leaves dropEffect uninitialized, read as \"none\", during the drag events until a listener sets it (EventHandler::dispatchDragEnterOrDragOverEvent); Chromium initializes it from effectAllowed."
+  },
+  {
+   "path": "drop.log.1.dt.items",
+   "native": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ]
+   ],
+   "chromium": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ],
+    [
+     "file",
+     "text/plain"
+    ],
+    [
+     "file",
+     "text/csv"
+    ]
+   ],
+   "reason": "In the protected mode of dragenter, dragover and dragleave WebKit's item list lists the strings, and of the files only promised image and media types (DataTransferItemList::ensureItems); Chromium lists every file item."
+  },
+  {
+   "path": "drop.log.1.dt.dropEffect",
+   "native": "none",
+   "chromium": "copy",
+   "reason": "WebKit leaves dropEffect uninitialized, read as \"none\", during the drag events until a listener sets it (EventHandler::dispatchDragEnterOrDragOverEvent); Chromium initializes it from effectAllowed."
+  },
+  {
+   "path": "drop.log.2.dt.items",
+   "native": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ]
+   ],
+   "chromium": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ],
+    [
+     "file",
+     "text/plain"
+    ],
+    [
+     "file",
+     "text/csv"
+    ]
+   ],
+   "reason": "In the protected mode of dragenter, dragover and dragleave WebKit's item list lists the strings, and of the files only promised image and media types (DataTransferItemList::ensureItems); Chromium lists every file item."
+  },
+  {
+   "path": "drop.log.2.dt.dropEffect",
+   "native": "none",
+   "chromium": "copy",
+   "reason": "WebKit leaves dropEffect uninitialized, read as \"none\", during the drag events until a listener sets it (EventHandler::dispatchDragEnterOrDragOverEvent); Chromium initializes it from effectAllowed."
+  },
+  {
+   "path": "drop.log.3.dt.dropEffect",
+   "native": "none",
+   "chromium": "copy",
+   "reason": "WebKit leaves dropEffect uninitialized, read as \"none\", during the drag events until a listener sets it (EventHandler::dispatchDragEnterOrDragOverEvent); Chromium initializes it from effectAllowed."
+  },
+  {
+   "path": "drop.after.dragenter.items",
+   "native": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ]
+   ],
+   "chromium": [],
+   "reason": "WebKit keeps an item list it built during the event after the data store is invalidated (DataTransfer::makeInvalidForSecurity leaves the cached items); its types, data and files are empty, as in Chromium."
+  },
+  {
+   "path": "drop.after.dragenter.dropEffect",
+   "native": "none",
+   "chromium": "copy",
+   "reason": "WebKit leaves dropEffect uninitialized, read as \"none\", during the drag events until a listener sets it (EventHandler::dispatchDragEnterOrDragOverEvent); Chromium initializes it from effectAllowed."
+  },
+  {
+   "path": "drop.after.dragover.items",
+   "native": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ]
+   ],
+   "chromium": [],
+   "reason": "WebKit keeps an item list it built during the event after the data store is invalidated (DataTransfer::makeInvalidForSecurity leaves the cached items); its types, data and files are empty, as in Chromium."
+  },
+  {
+   "path": "drop.after.dragover.dropEffect",
+   "native": "none",
+   "chromium": "copy",
+   "reason": "WebKit leaves dropEffect uninitialized, read as \"none\", during the drag events until a listener sets it (EventHandler::dispatchDragEnterOrDragOverEvent); Chromium initializes it from effectAllowed."
+  },
+  {
+   "path": "drop.after.drop.items",
+   "platforms": [
+    "win32",
+    "darwin"
+   ],
+   "native": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ],
+    [
+     "file",
+     "text/plain"
+    ],
+    [
+     "file",
+     "text/csv"
+    ]
+   ],
+   "chromium": [],
+   "reason": "WebKit keeps an item list it built during the event after the data store is invalidated (DataTransfer::makeInvalidForSecurity leaves the cached items); its types, data and files are empty, as in Chromium."
+  },
+  {
+   "path": "drop.after.drop.items",
+   "platforms": [
+    "linux"
+   ],
+   "native": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ]
+   ],
+   "chromium": [],
+   "reason": "WebKit keeps an item list it built during the event after the data store is invalidated (DataTransfer::makeInvalidForSecurity leaves the cached items); its types, data and files are empty, as in Chromium. The list holds no file items: KNOWN BUG #156 (https://github.com/ranvier-org/Ranvier.WebCore/issues/156)"
+  },
+  {
+   "path": "drop.after.drop.dropEffect",
+   "native": "none",
+   "chromium": "copy",
+   "reason": "WebKit leaves dropEffect uninitialized, read as \"none\", during the drag events until a listener sets it (EventHandler::dispatchDragEnterOrDragOverEvent); Chromium initializes it from effectAllowed."
+  },
+  {
+   "path": "paste.log.0.dt.html",
+   "native": "<u>P</u>Q",
+   "chromium": "<html><head></head><body><u>P</u>Q</body></html>",
+   "reason": "Chromium wraps clipboard HTML in an html/head/body document; the App clipboard style hands the page the app's markup as given."
+  },
+  {
+   "path": "paste.log.0.dt.files.0.2",
+   "native": 70,
+   "chromium": 88,
+   "reason": "Chromium re-encodes a clipboard image as PNG; the App clipboard style hands the page the app's bytes."
+  },
+  {
+   "path": "paste.log.1.dt.types",
+   "native": [
+    "text/plain",
+    "text/html"
+   ],
+   "chromium": [
+    "text/plain",
+    "text/html",
+    "Files"
+   ],
+   "reason": "WebKit's beforeinput and input dataTransfer of a paste carries text/plain and text/html only (ReplaceSelectionCommand::inputEventDataTransfer); Chromium also carries the pasted files."
+  },
+  {
+   "path": "paste.log.1.dt.html",
+   "native": "<u>P</u>Q",
+   "chromium": "<html><head></head><body><u>P</u>Q</body></html>",
+   "reason": "Chromium wraps clipboard HTML in an html/head/body document; the App clipboard style hands the page the app's markup as given."
+  },
+  {
+   "path": "paste.log.1.dt.files",
+   "native": [],
+   "chromium": [
+    [
+     "image.png",
+     "image/png",
+     88
+    ]
+   ],
+   "reason": "WebKit's beforeinput and input dataTransfer of a paste carries text/plain and text/html only (ReplaceSelectionCommand::inputEventDataTransfer); Chromium also carries the pasted files."
+  },
+  {
+   "path": "paste.log.1.dt.items",
+   "native": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ]
+   ],
+   "chromium": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ],
+    [
+     "file",
+     "image/png"
+    ]
+   ],
+   "reason": "WebKit's beforeinput and input dataTransfer of a paste carries text/plain and text/html only (ReplaceSelectionCommand::inputEventDataTransfer); Chromium also carries the pasted files."
+  },
+  {
+   "path": "paste.log.2.dt.types",
+   "native": [
+    "text/plain",
+    "text/html"
+   ],
+   "chromium": [
+    "text/plain",
+    "text/html",
+    "Files"
+   ],
+   "reason": "WebKit's beforeinput and input dataTransfer of a paste carries text/plain and text/html only (ReplaceSelectionCommand::inputEventDataTransfer); Chromium also carries the pasted files."
+  },
+  {
+   "path": "paste.log.2.dt.html",
+   "native": "<u>P</u>Q",
+   "chromium": "<html><head></head><body><u>P</u>Q</body></html>",
+   "reason": "Chromium wraps clipboard HTML in an html/head/body document; the App clipboard style hands the page the app's markup as given."
+  },
+  {
+   "path": "paste.log.2.dt.files",
+   "native": [],
+   "chromium": [
+    [
+     "image.png",
+     "image/png",
+     88
+    ]
+   ],
+   "reason": "WebKit's beforeinput and input dataTransfer of a paste carries text/plain and text/html only (ReplaceSelectionCommand::inputEventDataTransfer); Chromium also carries the pasted files."
+  },
+  {
+   "path": "paste.log.2.dt.items",
+   "native": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ]
+   ],
+   "chromium": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ],
+    [
+     "file",
+     "image/png"
+    ]
+   ],
+   "reason": "WebKit's beforeinput and input dataTransfer of a paste carries text/plain and text/html only (ReplaceSelectionCommand::inputEventDataTransfer); Chromium also carries the pasted files."
+  },
+  {
+   "path": "paste.after.paste.items",
+   "native": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ],
+    [
+     "file",
+     "image/png"
+    ]
+   ],
+   "chromium": [],
+   "reason": "WebKit keeps an item list it built during the event after the data store is invalidated (DataTransfer::makeInvalidForSecurity leaves the cached items); its types, data and files are empty, as in Chromium."
+  },
+  {
+   "path": "paste.after.beforeinput.types",
+   "native": [
+    "text/plain",
+    "text/html"
+   ],
+   "chromium": [
+    "text/plain",
+    "text/html",
+    "Files"
+   ],
+   "reason": "WebKit's beforeinput and input dataTransfer of a paste carries text/plain and text/html only (ReplaceSelectionCommand::inputEventDataTransfer); Chromium also carries the pasted files."
+  },
+  {
+   "path": "paste.after.beforeinput.html",
+   "native": "<u>P</u>Q",
+   "chromium": "<html><head></head><body><u>P</u>Q</body></html>",
+   "reason": "Chromium wraps clipboard HTML in an html/head/body document; the App clipboard style hands the page the app's markup as given."
+  },
+  {
+   "path": "paste.after.beforeinput.files",
+   "native": [],
+   "chromium": [
+    [
+     "image.png",
+     "image/png",
+     88
+    ]
+   ],
+   "reason": "WebKit's beforeinput and input dataTransfer of a paste carries text/plain and text/html only (ReplaceSelectionCommand::inputEventDataTransfer); Chromium also carries the pasted files."
+  },
+  {
+   "path": "paste.after.beforeinput.items",
+   "native": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ]
+   ],
+   "chromium": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ],
+    [
+     "file",
+     "image/png"
+    ]
+   ],
+   "reason": "WebKit's beforeinput and input dataTransfer of a paste carries text/plain and text/html only (ReplaceSelectionCommand::inputEventDataTransfer); Chromium also carries the pasted files."
+  },
+  {
+   "path": "paste.after.input.types",
+   "native": [
+    "text/plain",
+    "text/html"
+   ],
+   "chromium": [
+    "text/plain",
+    "text/html",
+    "Files"
+   ],
+   "reason": "WebKit's beforeinput and input dataTransfer of a paste carries text/plain and text/html only (ReplaceSelectionCommand::inputEventDataTransfer); Chromium also carries the pasted files."
+  },
+  {
+   "path": "paste.after.input.html",
+   "native": "<u>P</u>Q",
+   "chromium": "<html><head></head><body><u>P</u>Q</body></html>",
+   "reason": "Chromium wraps clipboard HTML in an html/head/body document; the App clipboard style hands the page the app's markup as given."
+  },
+  {
+   "path": "paste.after.input.files",
+   "native": [],
+   "chromium": [
+    [
+     "image.png",
+     "image/png",
+     88
+    ]
+   ],
+   "reason": "WebKit's beforeinput and input dataTransfer of a paste carries text/plain and text/html only (ReplaceSelectionCommand::inputEventDataTransfer); Chromium also carries the pasted files."
+  },
+  {
+   "path": "paste.after.input.items",
+   "native": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ]
+   ],
+   "chromium": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ],
+    [
+     "file",
+     "image/png"
+    ]
+   ],
+   "reason": "WebKit's beforeinput and input dataTransfer of a paste carries text/plain and text/html only (ReplaceSelectionCommand::inputEventDataTransfer); Chromium also carries the pasted files."
+  },
+  {
+   "path": "paste.html",
+   "native": "<u>P</u>Q<br>",
+   "chromium": "<u>P</u>Q",
+   "reason": "WebKit's paste into contenteditable keeps a trailing placeholder <br> after the replaced selection; Chromium does not."
+  },
+  {
+   "path": "drop.log.0.dt.types",
+   "platforms": [
+    "linux"
+   ],
+   "native": [
+    "text/plain",
+    "text/html"
+   ],
+   "chromium": [
+    "text/plain",
+    "text/html",
+    "Files"
+   ],
+   "reason": "KNOWN BUG #156 (https://github.com/ranvier-org/Ranvier.WebCore/issues/156)"
+  },
+  {
+   "path": "drop.log.1.dt.types",
+   "platforms": [
+    "linux"
+   ],
+   "native": [
+    "text/plain",
+    "text/html"
+   ],
+   "chromium": [
+    "text/plain",
+    "text/html",
+    "Files"
+   ],
+   "reason": "KNOWN BUG #156 (https://github.com/ranvier-org/Ranvier.WebCore/issues/156)"
+  },
+  {
+   "path": "drop.log.2.dt.types",
+   "platforms": [
+    "linux"
+   ],
+   "native": [
+    "text/plain",
+    "text/html"
+   ],
+   "chromium": [
+    "text/plain",
+    "text/html",
+    "Files"
+   ],
+   "reason": "KNOWN BUG #156 (https://github.com/ranvier-org/Ranvier.WebCore/issues/156)"
+  },
+  {
+   "path": "drop.log.3.dt.types",
+   "platforms": [
+    "linux"
+   ],
+   "native": [
+    "text/plain",
+    "text/html"
+   ],
+   "chromium": [
+    "text/plain",
+    "text/html",
+    "Files"
+   ],
+   "reason": "KNOWN BUG #156 (https://github.com/ranvier-org/Ranvier.WebCore/issues/156)"
+  },
+  {
+   "path": "drop.log.3.dt.files",
+   "platforms": [
+    "linux"
+   ],
+   "native": [],
+   "chromium": [
+    [
+     "note.txt",
+     "text/plain",
+     10
+    ],
+    [
+     "table.csv",
+     "text/csv",
+     3
+    ]
+   ],
+   "reason": "KNOWN BUG #156 (https://github.com/ranvier-org/Ranvier.WebCore/issues/156)"
+  },
+  {
+   "path": "drop.log.3.dt.items",
+   "platforms": [
+    "linux"
+   ],
+   "native": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ]
+   ],
+   "chromium": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ],
+    [
+     "file",
+     "text/plain"
+    ],
+    [
+     "file",
+     "text/csv"
+    ]
+   ],
+   "reason": "KNOWN BUG #156 (https://github.com/ranvier-org/Ranvier.WebCore/issues/156)"
+  }
+ ]
+}

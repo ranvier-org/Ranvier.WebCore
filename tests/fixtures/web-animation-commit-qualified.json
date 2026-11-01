@@ -1,0 +1,43 @@
+{
+ "comment": "WebKit commitStyles results that differ from the Chromium oracle by engine behaviour. The probe asserts the native value here and that the oracle still records the Chromium value, so either engine changing is caught.",
+ "cases": {
+  "opacity and transform": {
+   "field": "committed/afterCancel",
+   "reason": "WebKit serializes the style attribute with the important declaration after the normal one; the declarations, values and priorities are the same.",
+   "webkit": "margin-top: 0px; color: rgb(1, 2, 3) !important; transform: translateX(50px); opacity: 0.5;",
+   "webkitDarwinReason": "WebAnimation::commitStyles (WebAnimation.cpp) sets the targeted properties in the iteration order of a HashSet<AnimatableCSSProperty>, hashed by CSSPropertyID. The Mac port enables ENABLE_TEXT_AUTOSIZING (OptionsMac.cmake), which adds the high-priority -webkit-text-size-adjust (CSSProperties.json) ahead of them: opacity and transform become 208 and 313 (207 and 312 on Linux), which land in buckets 6 and 7 of the 8-slot table (6 and 5 on Linux), so opacity is set first.",
+   "webkitDarwin": "margin-top: 0px; color: rgb(1, 2, 3) !important; opacity: 0.5; transform: translateX(50px);",
+   "chromium": "color: rgb(1, 2, 3) !important; margin-top: 0px; transform: translateX(50px); opacity: 0.5;"
+  },
+  "over an important inline value": {
+   "field": "all",
+   "reason": "WebKit commits the animation effect value (0.5) and replaces the important inline declaration; Chromium commits the computed value with the important inline declaration (0.2). Both drop the priority.",
+   "webkit": {
+    "committed": "opacity: 0.5;",
+    "afterCancel": "opacity: 0.5;",
+    "inline": {
+     "opacity": [
+      "0.5",
+      ""
+     ]
+    },
+    "computed": {
+     "opacity": "0.5"
+    }
+   },
+   "chromium": {
+    "committed": "opacity: 0.2;",
+    "afterCancel": "opacity: 0.2;",
+    "inline": {
+     "opacity": [
+      "0.2",
+      ""
+     ]
+    },
+    "computed": {
+     "opacity": "0.2"
+    }
+   }
+  }
+ }
+}

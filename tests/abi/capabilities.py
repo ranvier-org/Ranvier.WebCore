@@ -7,6 +7,9 @@ from pathlib import Path
 import sys
 import threading
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
+
 def verify(directory):
     checks = 0
 
@@ -24,9 +27,7 @@ def verify(directory):
     integer, pointer = (ctypes.c_int32, ctypes.c_void_p)
 
     def bind(name, returns, arguments):
-        function = getattr(library, name)
-        function.restype, function.argtypes = (returns, arguments)
-        return function
+        return bind_utf8(library, name, returns, arguments)
     has = bind('rv_abi_has', integer, [ctypes.c_char_p])
     expect(has(b'capabilities') == 1, 'H07 introspection surface must be advertised')
     count = bind('rv_capability_count', integer, [integer])
@@ -136,7 +137,7 @@ def verify(directory):
                 expect(get_fact(4,'video',1) == 0, 'Compiled-out video is an authoritative negative')
                 absent = integer(42)
                 expect(kind(host,1,b'media',ctypes.byref(absent)) == 0 and absent.value == 0, 'Compiled-out media setting is absent rather than false')
-        expect(bind('rv_host_load_html',integer,[pointer,ctypes.c_char_p])(host,b'<!doctype html><body>replacement') == 0,'Document replacement')
+        expect(bind('rv_host_load_html',integer,[pointer,Utf8])(host,b'<!doctype html><body>replacement') == 0,'Document replacement')
         document = bind('rv_host_document',pointer,[pointer])(host)
         expect(bool(document),'Current document handle')
         try:

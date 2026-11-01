@@ -17,13 +17,14 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
+from utf8_inputs import Utf8
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, WRONG_THREAD, UNSUPPORTED, DETACHED, WRONG_HOST = 0, -1, -2, -9, -10, -12
 NODE, PAGE, CLIENT, HOST, DEVICE = range(5)
 SPACES = {NODE: 'node', PAGE: 'page', CLIENT: 'client', HOST: 'host', DEVICE: 'device'}
 BORDER, PADDING, CONTENT, MARGIN = range(4)
-ABI = 54
+ABI = 59
 TOLERANCE = 1 / 64
 CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_void_p)
 QUALIFIED_3D = ('a perspective() function, the perspective property or preserve-3d in the chain: the slim software path '
@@ -57,7 +58,7 @@ def verify(native_directory):
         mouse = p.bind('rv_host_mouse', I, [P, I, I, I, I, I, I])
         number = p.bind('rv_event_number', I, [P, I, ctypes.POINTER(D)])
         event_target = p.bind('rv_event_target', P, [P, I])
-        add_listener = p.bind('rv_node_add_event_listener', P, [P, ctypes.c_char_p, I, CALLBACK, P])
+        add_listener = p.bind('rv_node_add_event_listener', P, [P, Utf8, I, CALLBACK, P])
         remove_listener = p.bind('rv_listener_remove', I, [P])
         set_scale = p.bind('rv_host_set_page_scale', I, [P, D, I, I])
         set_device = p.bind('rv_host_set_device_scale', I, [P, ctypes.c_float])
@@ -71,8 +72,8 @@ def verify(native_directory):
         document_of = p.bind('rv_host_document', P, [P])
         host_create = p.bind('rv_host_create', P, [I, I])
         host_destroy = p.bind('rv_host_destroy', None, [P])
-        load_html = p.bind('rv_host_load_html', I, [P, ctypes.c_char_p])
-        by_id = p.bind('rv_document_get_element_by_id', P, [P, ctypes.c_char_p])
+        load_html = p.bind('rv_host_load_html', I, [P, Utf8])
+        by_id = p.bind('rv_document_get_element_by_id', P, [P, Utf8])
         remove = p.bind('rv_node_remove', I, [P])
         relative = p.bind('rv_node_relative', P, [P, I])
 

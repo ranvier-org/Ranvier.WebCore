@@ -1,0 +1,6 @@
+rv_host_update and page loads attempt a VM entry the host refuses (DisallowVMEntry), on every page, before A09.
+Probe: C:/wk/waapi-fx-artifacts/red/update_vm_entry.py <runtime> tests/abi (child process per mode; crashOnDisallowedVMEntry
+armed after the page load, then 3 x rv_host_update + rv_run_loop_cycle(0)).
+C:/wk/native-waapi/artifacts/waapi-candidate-3/runtime: plain exit 3221226505 armed True;animation exit 3221226505 armed True;
+artifacts/fx-candidate-1/runtime: plain exit 3221226505 armed True;animation exit 3221226505 armed True;
+exit 3221226505 = 0xC0000409 (abort after the armed refused-VM-entry crash). Same on the parent: pre-existing, joins root's VM-entry investigation (C:/wk/waapi-artifacts/preexisting-vm-entry.md).

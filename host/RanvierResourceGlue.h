@@ -15,18 +15,44 @@
 //   them. Operations that already reached a terminal outcome keep it and stay registered until released.
 // - A terminal image operation holds no Document, Element or CachedImage. A font operation that succeeded holds its
 //   FontFace in the document's FontFaceSet until release or document invalidation, which remove it.
+// - An animation promise operation is delivered only from a run-loop turn, or by cancel/release; it holds its
+//   animation until its terminal outcome.
 // - A blob read holds its bytes, type and error name from its terminal outcome until release.
+// - A settled-bytes operation (a snapshot) holds a copy of its bytes and its pixel size until release; it is SUCCEEDED
+//   when it starts and delivered on a later run-loop turn.
+// - A media capability query holds no engine object; it keeps its MediaCapabilitiesInfo from its terminal outcome
+//   until release. A configuration the engine rejects is not registered and records the exception.
 extern "C" {
 WEBCORE_EXPORT int32_t ranvier_resource_decode_image(RvNode* document, RvNode* target, RvResourceCompletion, void* context, uint64_t* operation);
 WEBCORE_EXPORT int32_t ranvier_resource_load_font(RvNode* document, const char* family, const uint8_t* bytes, int32_t length, RvResourceCompletion, void* context, uint64_t* operation);
+// A FontFace's load (load 1, FontFace.load()) or loaded (load 0) promise: see rv_font_face_load in RanvierWebCoreAbi.h.
+WEBCORE_EXPORT int32_t ranvier_font_face_load(RvNode* document, RvFontFace* face, int32_t load, RvResourceCompletion, void* context, uint64_t* operation);
+WEBCORE_EXPORT int32_t ranvier_animation_promise(RvNode* document, RvEventTarget* animation, int32_t finished, RvResourceCompletion, void* context, uint64_t* operation);
 WEBCORE_EXPORT int32_t ranvier_resource_cancel(uint64_t operation);
 WEBCORE_EXPORT int32_t ranvier_resource_release(uint64_t operation);
 WEBCORE_EXPORT void ranvier_resource_invalidate_document(RvNode* document);
+WEBCORE_EXPORT int32_t ranvier_fonts_status(RvNode* document, int32_t* status);
+WEBCORE_EXPORT int32_t ranvier_fonts_check(RvNode* document, const uint8_t* font, int32_t fontLength, const uint8_t* text, int32_t textLength, int32_t* loaded);
+WEBCORE_EXPORT int32_t ranvier_fonts_load(RvNode* document, const uint8_t* font, int32_t fontLength, const uint8_t* text, int32_t textLength, RvResourceCompletion, void* context, uint64_t* operation);
+WEBCORE_EXPORT int32_t ranvier_fonts_ready(RvNode* document, RvResourceCompletion, void* context, uint64_t* operation);
+WEBCORE_EXPORT int32_t ranvier_fonts_watch(RvNode* document, RvFontsEventCallback, void* context, RvFontsWatch** watch);
+WEBCORE_EXPORT void ranvier_fonts_unwatch(RvFontsWatch*);
 WEBCORE_EXPORT int32_t ranvier_blob_read(RvNode* document, RvBlob* blob, int32_t mode, RvResourceCompletion, void* context, uint64_t* operation);
 WEBCORE_EXPORT int32_t ranvier_blob_url_read(RvNode* document, const uint8_t* url, int32_t url_length, RvResourceCompletion, void* context, uint64_t* operation);
 WEBCORE_EXPORT int32_t ranvier_blob_read_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length);
 WEBCORE_EXPORT int32_t ranvier_blob_read_type(uint64_t operation, char* buffer, int32_t capacity, int32_t* length);
 WEBCORE_EXPORT int32_t ranvier_blob_read_error(uint64_t operation, char* buffer, int32_t capacity, int32_t* length);
+WEBCORE_EXPORT int32_t ranvier_media_capabilities_query(RvNode* document, int32_t encoding, int32_t type, const RvMediaVideoConfiguration*, const RvMediaAudioConfiguration*, RvResourceCompletion, void* context, uint64_t* operation);
+WEBCORE_EXPORT int32_t ranvier_media_capabilities_info(uint64_t operation, int32_t* supported, int32_t* smooth, int32_t* power_efficient);
+// 1 when a media engine configuration provider answers decoding (encoding 0) or encoding (1) queries, else 0.
+WEBCORE_EXPORT int32_t ranvier_media_capabilities_provider(int32_t encoding);
+WEBCORE_EXPORT int32_t ranvier_resource_settled_bytes(RvNode* document, const uint8_t* bytes, int64_t length, int32_t width, int32_t height, RvResourceCompletion, void* context, uint64_t* operation);
+WEBCORE_EXPORT int32_t ranvier_resource_bytes(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length);
+// createImageBitmap: an operation with the contract above that holds its ImageBitmap or DOMException name from its
+// terminal outcome until release.
+WEBCORE_EXPORT int32_t ranvier_image_bitmap_create(RvNode* document, int32_t kind, void* source, const RvImageBitmapOptions*, RvResourceCompletion, void* context, uint64_t* operation);
+WEBCORE_EXPORT int32_t ranvier_image_bitmap_result(uint64_t operation, RvImageBitmap** bitmap);
+WEBCORE_EXPORT int32_t ranvier_image_bitmap_error(uint64_t operation, char* buffer, int32_t capacity, int32_t* length);
 WEBCORE_EXPORT int32_t ranvier_file_reader_result(RvEventTarget* reader, int32_t* kind, uint8_t* buffer, int64_t capacity, int64_t* length);
 WEBCORE_EXPORT int32_t ranvier_file_reader_error(RvEventTarget* reader, char* buffer, int32_t capacity, int32_t* length);
 }

@@ -1,0 +1,55 @@
+{
+  "group": "A05",
+  "candidate": "waapi-candidate-5",
+  "codeHead": "c072cd7",
+  "runtime": {
+    "brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
+    "brotlidec.dll": "d42e2160f76f29a91f8be01b009b585c45496219794e16eab90b3599b6f70a7f",
+    "harfbuzz-icu.dll": "27662b477f7cb0c20cee64543a06296a48a00a17b6c7b57629bb166a30d5b164",
+    "harfbuzz.dll": "b519b2abc7f446ca45bff77aae1708f45afc9f557698bcd7295837cce0f12bfa",
+    "icudt77.dll": "b00d2fb856f548608c137e771257a70d0722654535c6c00b371c0fab3e2b802c",
+    "icuin77.dll": "e3785739e1fcf2e38053bbb85ef5f0f5dab63f865cbda762da5258566085a240",
+    "icuuc77.dll": "189c623f996c41488c262867bae04a5bb33dd485bd423e0a8bec05c455a90902",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+    "jpeg62.dll": "394811c1b1bf1fd914248a145ba3fcad1f5f27c7009754ce08e48ccb0266b785",
+    "libpng16.dll": "8b46592c5ea338dd6b23ca380d6db64a7849c2a534fc465a006ec668645d8185",
+    "libsharpyuv.dll": "df165de83480692f494c23061ef9c40c10abe19a89b1fa9fae2f1cd5152c07a7",
+    "libwebp.dll": "550c5a4860f61d32a274fdd7b5c8cbe266eee28b3a3ca888195248ea1d5e0f71",
+    "libwebpdemux.dll": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163",
+    "libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
+    "libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
+    "RanvierWebCoreHost.dll": "000f86dabba7e6edd497619306ed28b8612ef8a6d37917d2d07fb0c95b04cee4",
+    "RanvierWebCoreHost.lib": "0a88275cb9fe1aa1764f3f53e90be89f2bb5f2c768f82964ec8617633c2361c1",
+    "RanvierWebCoreHost.pdb": "5591003f6006083e0225254cf66ec485c8df18df404744f1900d32261dfe1892",
+    "WebCore.dll": "a8c9299086b6361e312ef51c50d64b0067f50926f7e0568c4ab084c7478d1d52",
+    "WebCore.lib": "8ce85fbbb0258a11fab77834e7a2ea5ff9fb4d9fea5c2fd4c31574a9477b5b39",
+    "WebCore.pdb": "76ec31c0196813c3760622a7d0050db92fe6152513a45fb60c2271dc1c3b99e5",
+    "zlib1.dll": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93"
+  },
+  "batch": {
+    "raw": 92390,
+    "baselineRaw": 90743,
+    "lane": {
+      "web_animations": 1286,
+      "web_animation_effects": 106,
+      "web_animation_commit": 70,
+      "web_animation_discovery": 185
+    },
+    "teardownRecords": 108,
+    "teardownAllCollected": true,
+    "batchEvidence": "a05/batch-green.json"
+  },
+  "probe": "web_animation_discovery",
+  "assertions": 185,
+  "repeat30": 30,
+  "oracleRepeat30": "ORACLE_REPEAT identical=30/30",
+  "files": {
+    "batch-green.json": "ad9dcce2f45c83bb142ef9150009eafa9a475e2bc2a00c4bc886a1a409d2d0a9",
+    "discovery-oracle-repeat30.txt": "4d6b7dbb0f03bb7579d5e04ae2dec5879075076fb000cf4e45a1861ed6086ea4",
+    "runtime-receipt.json": "e51e5159e515e55e51ce437a7cd5d3ebf77b0f680d569ba36bf36a064c1d0794",
+    "source-patches.json": "ed4f8016d0c832af9a6232a33a25559233c2117eab8b0d31c42bbccae75f83ed",
+    "teardown-probes.json": "ddc093804f37ad431d3f01ec3be5c15c2150d254a6ca12234cd25d475830e79d",
+    "web-animation-discovery-repeat30.txt": "70dd9f847ae8838b8e84e8ee3e746594eccfa804b01a2c24484b08a999c19f0c",
+    "web_animation_discovery.log": "98979501337987151545780018971af516a02b7d189cca90babc6ae0a89eb7cb"
+  }
+}

@@ -55,7 +55,7 @@ let run (outDir: string) =
 
     host.Update ()
 
-    rv_element_set_style (box.Handle, "width", "150px", 0)
+    rv_element_set_style (box.Handle, "width", utf8 "150px", utf8Length "150px", 0)
     |> check "resize box"
 
     host.Update ()
@@ -64,7 +64,7 @@ let run (outDir: string) =
     rv_observer_unobserve (resize, box.Handle)
     |> check "unobserve resize"
 
-    rv_element_set_style (box.Handle, "width", "120px", 0)
+    rv_element_set_style (box.Handle, "width", utf8 "120px", utf8Length "120px", 0)
     |> check "resize box again"
 
     host.Update ()

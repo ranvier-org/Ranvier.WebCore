@@ -127,6 +127,8 @@ F# contract quotes names such as ``font-family`` with double backticks.
   `scrollTo(options)` is `rv_dom_element_scroll_to_1`).
 - An unnamed getter, setter or deleter takes the C++ name WebKit's bindings call: `item` and `setItem` for an
   index, `namedItem`, `setNamedItem` and `deleteNamedProperty` for a name (`rv_dom_dom_string_map_named_item`).
+  `browserIndexedGetters` names getters WebKit's IDL names but browsers expose only as an indexed property, such
+  as `DataTransferItemList.item`: the Fable binding reads `list[index]`, null when absent.
 - Constants are `RV_DOM_<INTERFACE>_<NAME>` (`RV_DOM_NODE_ELEMENT_NODE`); enumeration values
   `RV_DOM_<ENUM>_<VALUE>` (`RV_DOM_SHADOW_ROOT_MODE_OPEN`).
 
@@ -249,7 +251,8 @@ The glue calls each member as WebKit's JavaScript bindings do (`CodeGenerator.pm
 - `[Reflect]`, `[ReflectURL]` and `[ReflectSetter]` read and write the content attribute as
   `GetterExpression` and `SetterExpression` do (`hasAttributeWithoutSynchronization`, `integralAttribute`,
   `getIdAttribute`, `setAttributeWithoutSynchronization`, `getElementAttributeForBindings`, ...);
-- `[CallWith]` that names the document or script execution context passes the node's document.
+- `[CallWith]` that names the document or script execution context passes the node's document, or the checked
+  Document of `objectContexts`; that Document's settings also decide the member's `[EnabledBySetting]`.
 
 C++ signatures differ from member to member and change between WebKit commits in ways the IDL does not show:
 a getter returns `String`, `const AtomString&` or `ExceptionOr<String>`; a node comes back as `Element*`,
@@ -297,7 +300,7 @@ conditional/grouping rules, layers, scopes, imports, namespaces, nested declarat
 descriptors, counter styles, position fallbacks, starting styles and view-transition rule metadata.
 Rule and descriptor setting guards use their owning stylesheet's document, or its constructor document
 for constructed sheets; a detached object without either returns `RV_ERR_UNSUPPORTED` for gated members.
-The host enables the existing anchor-positioning and font-metric descriptor settings. CSS generator
+The host enables the existing anchor-positioning, font-metric descriptor and DataTransferItem settings. CSS generator
 fixtures under `css/scripts/test/` are excluded from runtime partial interfaces.
 
 Sheet constructors, asynchronous replacement and adopted-sheet lists still need their native bridges;
@@ -313,8 +316,7 @@ reports its nearest scoped ancestor. Query names are reported separately from th
 An `Event` root reads an `RvEvent` handle (`rv_dom_event_get_interface_name`). A root listed in
 `runtimeTypePublicNames` reports the exposed interface name, `AnimationEvent` for `CSSAnimationEvent`, and
 `runtimeTypeExtras` names unscoped interfaces the query still reports, such as `CustomEvent`. An event outside
-both reports its nearest generated base: a `DragEvent` reads `MouseEvent`, a `TextEvent` `UIEvent`, a
-`ClipboardEvent` `Event`.
+both reports its nearest generated base: a `TextEvent` reads `UIEvent`.
 
 A constructor with `"globalObject": true` serves `[CallWith=CurrentGlobalObject]`: the factory receives the
 receiver Document's global object first, and a document without a browsing context, such as one of a destroyed
@@ -376,6 +378,65 @@ for an interface it needs.
 3. Build. A compile error in `RanvierDomGlue.cpp` names a C++ signature the templates do not cover: add the
    member to `atomArguments` or `exclude`, or teach the generator the case.
 4. Test it in `tests/abi/Dom.fs`.
+
+## JavaScript object arguments and custom constructors (Web Animations)
+
+Keyframes are an `object` in WebIDL, read by WebKit's own keyframe processing from a JavaScript object. Six
+`gen/dom.json` keys give the generated functions those members without new C++ in WebKit:
+
+- `syntheticIdl` names repository IDL files of dictionaries only. `gen/RanvierKeyframes.idl` defines `Keyframe`
+  (`offset`, `easing`, `composite`, `properties`) and `KeyframeProperty` (`name`, `value`), the keyframe-sequence form
+  a script writes: `[{ offset: 0.5, easing: "ease-in", opacity: "0" }, ...]`. Every string is a UTF-8 span with a byte
+  length; `offset` is `const double*`, NULL for a null offset.
+- `argumentTypes` retypes `Animatable.animate.keyframes`, `KeyframeEffect.constructor.keyframes` and
+  `KeyframeEffect.setKeyframes.keyframes` to `sequence<Keyframe>?`; a NULL sequence, or `present` 0, is null keyframes.
+- `argumentAdapters` converts the decoded sequence with `Ranvier::KeyframesArgument` (`host/dom/RanvierKeyframes.h`):
+  under the JavaScript lock, an array of plain objects in the document's global object, one per keyframe, each
+  property a string. WebKit's processing of an unmodified array takes its fast path, so the call never enters the VM
+  and the host's `DisallowVMEntry` holds; the argument clears any exception the processing left on the VM, and the
+  member's `ExceptionOr` reports it as `RV_ERR_DOM_EXCEPTION` with the WebIDL name (TypeError for unsorted or
+  out-of-range offsets and bad easing or composite strings).
+- `globalObjectMembers` supplies `[CallWith=CurrentGlobalObject]` to the listed operations from the target's
+  document (`Element.animate`) or the checked `context` Document (`KeyframeEffect.setKeyframes`). A document without
+  a global object fails with InvalidStateError.
+- `customConstructors` replaces WebAnimation's `[Custom]` constructor with the signature its binding implements,
+  `constructor(optional AnimationEffect? effect = null, optional AnimationTimeline? timeline)`. `presenceArguments`
+  gives `timeline` a `timeline_present` flag: 0 is absent (the document timeline), 1 with NULL is no timeline.
+- `optionalObjectMembers` passes `KeyframeAnimationOptions.timeline` as `RvAnimationTimeline* const*`: NULL absent, a
+  pointer to NULL null. `setterExpressions`, like `getterExpressions`, converts `Animation.startTime` and `currentTime`
+  between `CSSNumberish` milliseconds and `WebAnimationTime`. `constructors` `overloads` gives KeyframeEffect's copy
+  constructor its own factory settings.
+
+A02 adds five more keys:
+- `customOperations` replaces KeyframeEffect's `[Custom]` getKeyframes with `sequence<ComputedKeyframe> getKeyframes()`,
+  and `callExpressions` computes it with `Ranvier::computedKeyframes`. The binding mirrors WebKit's: custom properties by
+  name, then each property by IDL attribute name, each with its string value.
+- `syntheticDictionaries` lists the dictionaries of `syntheticIdl` (Keyframe, KeyframeProperty, ComputedKeyframe),
+  which no WebKit IDL file defines.
+- `contextDocuments` names an effect's document. updateTiming and setKeyframes return `RV_ERR_WRONG_HOST` for a
+  context Document other than the effect's own.
+- Result dictionaries may hold enumerations (as the index) and `CSSNumberish` unions.
+- `resultValueOverloads` converts the `WebAnimationTime` fields of EffectTiming and ComputedEffectTiming.
+
+A05 makes CSSAnimation and CSSTransition subtypes of an `eventTargetObjects` interface: their functions take the same
+`RvEventTarget` and cast through WebAnimation (`castVia`), and `runtimeTypeRoots` names WebAnimation, so
+`rv_dom_web_animation_get_interface_name` reports WebAnimation, CSSAnimation or CSSTransition. It returns
+`RV_ERR_WRONG_INTERFACE` for an event target that is not an animation.
+
+Animation timelines (A07, A08) extend two keys:
+
+- `optionalObjectMembers` also takes node handles: `ScrollTimelineOptions.source` is `RvNode* const*`. NULL is absent
+  (the document's scrolling element) and a pointer to NULL is a null source (an inactive timeline).
+- `absentObjectMembers` passes an optional nonnullable object member without a default as `Rv<Root>*`, NULL for
+  absent: `TimelineRangeOffset.offset` is an `RvCSSStyleValue*`. In a result dictionary (`resultDictionaries`
+  `TimelineRangeOffset`, the dictionary arm of `Animation.rangeStart` and `rangeEnd`) the member is a new reference, or
+  NULL, which the dictionary's release drops.
+- `unionFieldDefaults` assigns `ViewTimelineOptions.inset` its IDL default "auto" before the options are read: the C++
+  struct leaves the member empty, and a present field replaces it.
+
+The Animation handle is an `RvEventTarget` (`eventTargetObjects`): `finish`, `cancel` and `remove` events reach
+`rv_event_target_add_listener`, and `rv_animation_as_event_target` maps the hand-written CSS-animation handle to it.
+`tests/abi/web_animations.py` replays `tests/fixtures/web-animations-cases.json` against the Chromium oracle.
 
 ## Known gaps
 

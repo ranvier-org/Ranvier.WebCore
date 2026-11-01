@@ -1,0 +1,47 @@
+{
+ "initial": [
+  "ro:a:100.0x50.0",
+  "ro:v:100.0x50.0",
+  "ro:z:100.0x50.0",
+  "ro:f:100.5x33.25",
+  "ro:bb:70.0x20.0",
+  "ro:inl:0.0x0.0",
+  "ro:hid:0.0x0.0",
+  "ro:svg:200.0x100.0",
+  "ro:r:30.0x40.0"
+ ],
+ "order": [
+  "ro2:f:100.5x33.25",
+  "ro1:bb:70.0x20.0",
+  "ro1:a:100.0x50.0",
+  "io:a",
+  "|",
+  "ro2:f:120.0x33.25",
+  "ro1:bb:90.0x20.0",
+  "ro1:a:120.0x50.0"
+ ],
+ "depth": [
+  "outer:200.0",
+  "mid:150.0",
+  "deep:100.0",
+  "|deeper",
+  "mid:140.0",
+  "deep:90.0",
+  "|after1",
+  "|shallower",
+  "mid:130.0",
+  "|after1",
+  "outer:190.0"
+ ],
+ "stop": [
+  "ro:a:100.0x50.0",
+  "ro:bb:70.0x20.0",
+  "|",
+  "|unobserved",
+  "|released"
+ ],
+ "statusNotElement": -4,
+ "scale2": [
+  "scale2:f:100.5x33.25"
+ ]
+}

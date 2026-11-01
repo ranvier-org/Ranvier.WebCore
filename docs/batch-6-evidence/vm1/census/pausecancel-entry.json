@@ -1,0 +1,24 @@
+{
+ "scenario": "pausecancel",
+ "config": "entry",
+ "drain": false,
+ "results": {
+  "pending after pause": true,
+  "log before drain": {
+   "promises": [
+    "a:ready:AbortError",
+    "a:finished:AbortError"
+   ],
+   "events": [
+    "a:cancel:null:number"
+   ],
+   "hooks": {}
+  }
+ },
+ "hits": {
+  "- | enqueue C++ microtask": 1,
+  "- | ENTRY-REFUSED checkVMEntryPermission": 1,
+  "settle page | ENTRY-REFUSED checkVMEntryPermission": 1,
+  "frames after cancel | ENTRY-REFUSED checkVMEntryPermission": 6
+ }
+}

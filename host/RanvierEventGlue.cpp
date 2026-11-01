@@ -1,5 +1,7 @@
 #include "config.h"
 #include "RanvierEventGlue.h"
+#include "ContextDestructionObserverInlines.h"
+#include "CustomEffectCallback.h"
 #include "CustomEvent.h"
 #include "Document.h"
 #include "Event.h"
@@ -17,8 +19,10 @@
 #include <JavaScriptCore/JSONObject.h>
 #include <JavaScriptCore/Strong.h>
 #include <JavaScriptCore/StrongInlines.h>
+#include <wtf/HashSet.h>
 #include <wtf/MainThread.h>
 #include <wtf/NeverDestroyed.h>
+#include <wtf/RunLoop.h>
 #include <wtf/Vector.h>
 #include <wtf/WeakPtr.h>
 #include <cstring>
@@ -31,6 +35,90 @@ struct DetailRoot {
     WeakPtr<Event> event;
     WeakPtr<Document, WeakPtrImplWithEventTargetData> document;
     JSC::Strong<JSC::Unknown> detail;
+};
+
+// The application's CustomEffectCallback: WebKit invokes it inside the rendering update, which queues the progress;
+// the run loop delivers the queue after the update has returned.
+class HostCustomEffectCallback final : public CustomEffectCallback {
+public:
+    static Ref<HostCustomEffectCallback> create(Document& document, RvCustomEffectTick tick, void* context, RvCustomEffectRelease release)
+    {
+        return adoptRef(*new HostCustomEffectCallback(document, tick, context, release));
+    }
+
+    ~HostCustomEffectCallback()
+    {
+        live().remove(this);
+        if (m_release)
+            m_release(m_context);
+    }
+
+    static HashSet<HostCustomEffectCallback*>& live()
+    {
+        static NeverDestroyed<HashSet<HostCustomEffectCallback*>> value;
+        return value;
+    }
+
+    void revoke() { m_tick = nullptr; }
+    bool revoked() const { return !m_tick; }
+
+    // Runs the tick unless revoked or the document stopped since the update queued it.
+    void deliver(double progress)
+    {
+        if (m_tick && canInvokeCallback())
+            m_tick(m_context, progress);
+    }
+
+private:
+    HostCustomEffectCallback(Document& document, RvCustomEffectTick tick, void* context, RvCustomEffectRelease release)
+        : CustomEffectCallback(&document)
+        , m_tick(tick)
+        , m_context(context)
+        , m_release(release)
+    {
+        live().add(this);
+    }
+
+    CallbackResult<void> invoke(double progress) final { return invokeRethrowingException(progress); }
+
+    CallbackResult<void> invokeRethrowingException(double progress) final
+    {
+        if (m_tick && canInvokeCallback())
+            enqueue(*this, progress);
+        return { };
+    }
+
+    bool hasCallback() const final { return true; }
+
+    static void enqueue(HostCustomEffectCallback& callback, double progress)
+    {
+        pending().append({ Ref { callback }, progress });
+        if (std::exchange(deliveryScheduled(), true))
+            return;
+        RunLoop::mainSingleton().dispatch([] {
+            deliveryScheduled() = false;
+            // Ticks queued by an update a tick runs go to a new queue, delivered on a later turn.
+            auto ticks = std::exchange(pending(), { });
+            for (auto& [callback, progress] : ticks)
+                callback->deliver(progress);
+        });
+    }
+
+    static Vector<std::pair<Ref<HostCustomEffectCallback>, double>>& pending()
+    {
+        static NeverDestroyed<Vector<std::pair<Ref<HostCustomEffectCallback>, double>>> value;
+        return value;
+    }
+
+    static bool& deliveryScheduled()
+    {
+        static bool value;
+        return value;
+    }
+
+    RvCustomEffectTick m_tick;
+    void* m_context;
+    RvCustomEffectRelease m_release;
 };
 
 Vector<DetailRoot>& roots()
@@ -82,14 +170,15 @@ Document* documentOf(RvNode* handle)
 
 }
 
-RvEvent* ranvier_event_construct(RvNode* documentHandle, int32_t kind, const char* type, const RvEventInit* init)
+RvEvent* ranvier_event_construct(RvNode* documentHandle, int32_t kind, const uint8_t* type, int32_t typeLength, const RvEventInit* init)
 {
-    if (!isMainThread() || !type || !init || init->size != static_cast<int32_t>(sizeof(RvEventInit)))
+    if (!isMainThread() || typeLength < 0 || (!type && typeLength) || !init || init->size != static_cast<int32_t>(sizeof(RvEventInit)))
         return nullptr;
     auto* document = documentOf(documentHandle);
-    if (!document || !validUtf8(type) || !validUtf8(init->key) || !validUtf8(init->code) || !validUtf8(init->customDetailJson))
+    auto typeName = typeLength ? String::fromUTF8(std::span<const uint8_t> { type, static_cast<size_t>(typeLength) }) : emptyString();
+    if (!document || typeName.isNull() || !validUtf8(init->key) || !validUtf8(init->code) || !validUtf8(init->customDetailJson))
         return nullptr;
-    auto name = AtomString::fromUTF8(type);
+    auto name = AtomString { typeName };
     RefPtr<Event> result;
     switch (kind) {
     case RV_CONSTRUCT_EVENT: {
@@ -248,4 +337,40 @@ int32_t ranvier_window_max_touch_points(RvNode* documentHandle, int32_t* value)
         return RV_ERR_UNSUPPORTED;
     *value = window->navigator().maxTouchPoints();
     return RV_OK;
+}
+
+RvCustomEffectCallback* ranvier_custom_effect_callback_create(RvNode* documentHandle, RvCustomEffectTick tick, void* context,
+    RvCustomEffectRelease release)
+{
+    if (!documentHandle || !tick || !isMainThread())
+        return nullptr;
+    auto* document = documentOf(documentHandle);
+    if (!document)
+        return nullptr;
+    CustomEffectCallback* callback = &HostCustomEffectCallback::create(*document, tick, context, release).leakRef();
+    return reinterpret_cast<RvCustomEffectCallback*>(callback);
+}
+
+int32_t ranvier_custom_effect_callback_revoke(RvCustomEffectCallback* handle)
+{
+    if (!handle)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* callback = static_cast<HostCustomEffectCallback*>(reinterpret_cast<CustomEffectCallback*>(handle));
+    if (!HostCustomEffectCallback::live().contains(callback))
+        return RV_ERR_WRONG_INTERFACE;
+    callback->revoke();
+    return RV_OK;
+}
+
+void ranvier_custom_effect_callbacks_revoke_document(RvNode* documentHandle)
+{
+    if (!documentHandle || !isMainThread())
+        return;
+    auto* document = documentOf(documentHandle);
+    for (auto* callback : HostCustomEffectCallback::live()) {
+        if (callback->scriptExecutionContext() == document)
+            callback->revoke();
+    }
 }

@@ -1,0 +1,22 @@
+{
+ "comment": "A03 Animation lifecycle. markup is the page; program is the state-machine walk on one animation (#a, opacity 0 to 1, 1000 ms); each 'state' step records playState, pending, replaceState, startTime presence and playbackRate, and currentTime unless timed is set (then only its presence: WebKit sets the hold time of a pending pause from the ready time, Chromium from the time of the pause() call). awaitReady waits for the ready promise. scenarios are the promise and event orderings, replayed identically by the probe and the oracle.",
+ "markup": "<!doctype html><html><head><style>html,body{margin:0;background:white}.box{width:40px;height:40px;background:rgb(0,0,255)}</style></head><body><div id=\"a\" class=\"box\"></div><div id=\"b\" class=\"box\"></div><div id=\"c\" class=\"box\"></div></body></html>",
+ "program": [
+  {"op": "animate", "duration": 1000}, {"op": "state", "label": "animate"},
+  {"op": "pause"}, {"op": "state", "label": "pause while pending", "sameReady": true},
+  {"op": "play"}, {"op": "state", "label": "play while pending", "sameReady": true},
+  {"op": "updatePlaybackRate", "value": 2}, {"op": "state", "label": "updatePlaybackRate(2) pending"},
+  {"op": "awaitReady"}, {"op": "state", "label": "after ready", "timed": true},
+  {"op": "seek", "value": 500}, {"op": "pause"}, {"op": "state", "label": "pause running"},
+  {"op": "awaitReady"}, {"op": "state", "label": "paused ready", "timed": true},
+  {"op": "reverse"}, {"op": "state", "label": "reverse paused", "timed": true},
+  {"op": "awaitReady"}, {"op": "state", "label": "reverse ready", "timed": true},
+  {"op": "finish"}, {"op": "state", "label": "finish (rate -2)"},
+  {"op": "play"}, {"op": "state", "label": "play from finished", "sameFinished": true},
+  {"op": "cancel"}, {"op": "state", "label": "cancel"},
+  {"op": "cancel"}, {"op": "state", "label": "cancel idle"},
+  {"op": "setPlaybackRate", "value": 0}, {"op": "play"}, {"op": "state", "label": "play rate 0"},
+  {"op": "cancel"}, {"op": "updatePlaybackRate", "value": 1}, {"op": "persist"}, {"op": "state", "label": "persist"}
+ ],
+ "scenarios": ["finish()", "cancel pending", "cancel running", "cancel in listener", "cancel in ready", "replace", "rewind finished"]
+}
