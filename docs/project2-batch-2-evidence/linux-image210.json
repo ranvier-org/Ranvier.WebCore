@@ -1,0 +1,145 @@
+{
+  "issue": "https://github.com/ranvier-org/Ranvier.WebCore/issues/210",
+  "base": "e9397dabc74ff9d9657a0a8d88783b6d039ec714",
+  "abi": 60,
+  "change": "WPE host target embeds six pinned stockPNG GResources with automatic GLib registration and internal getter; no WebKit engine patch/publicversion or ABI allocation",
+  "red": "Frozenfinal227 lacks missingImage alias; original diagnostic gives0iconpixels, publicGIOcontrol203; newreal regression catches missingImage before firsthost",
+  "red_log_sha256": "8083b5bd0d0669cf889b8e49523c7c3c05beffac6c04fdb4e5aacdc91d9fb28d",
+  "discovery_receipt": "C:/wk/project2/image210-discovery.json",
+  "runtime": {
+    "runtime": "/home/shaya/rw/project2-resource210-runtime/libRanvierWebCoreHost.so",
+    "sha256": "66c64ceec8e410bf0a47f4f4513103a2487587e67a6290ba6978da02175f4300",
+    "bytes": 110513928,
+    "rv_exports_unchanged": 3575,
+    "resource_getter_exported": false
+  },
+  "cpu": {
+    "result": "PASS",
+    "assertions": 135,
+    "resources": {
+      "missingImage": {
+        "bytes": 449,
+        "sha256": "c13b9dcf2f6a41033e540d85de3d1e30054bd3b54c0b35229b5a77bd403a7229"
+      },
+      "missingImage@2x": {
+        "bytes": 755,
+        "sha256": "40b23dc2728d8499608654a4b89cfd5ad4bd04a09b5b27e4927004e167d41bf7"
+      },
+      "missingImage@3x": {
+        "bytes": 1172,
+        "sha256": "99e0c1a9d026c61ea3ed12a7ad14087b0ceeac04b08caba7ab648c0ae8be5ed4"
+      },
+      "panIcon": {
+        "bytes": 140,
+        "sha256": "1f0018318f073a57aa89ae175bec415a2aef08404c72e535b8fefeb428590329"
+      },
+      "textAreaResizeCorner": {
+        "bytes": 86,
+        "sha256": "16d9c626d3faf3907a10819493d53d43ab4a09a0eeafec92e1492afbb03c4c8b"
+      },
+      "textAreaResizeCorner@2x": {
+        "bytes": 167,
+        "sha256": "4557192b829da5e271abf02024cc0a7e1ae2153b79b98682a330bfa48c1e57bf"
+      }
+    },
+    "host_cycles": 3,
+    "document_frames": 6,
+    "icon_inner_nonwhite_pixels": [
+      203,
+      203,
+      203,
+      203,
+      203,
+      203
+    ],
+    "transport": "CPU paint",
+    "cpu_paint_api_calls": 6,
+    "held_after_host_destroy": false
+  },
+  "gpu": {
+    "result": "PASS",
+    "assertions": 178,
+    "resources": {
+      "missingImage": {
+        "bytes": 449,
+        "sha256": "c13b9dcf2f6a41033e540d85de3d1e30054bd3b54c0b35229b5a77bd403a7229"
+      },
+      "missingImage@2x": {
+        "bytes": 755,
+        "sha256": "40b23dc2728d8499608654a4b89cfd5ad4bd04a09b5b27e4927004e167d41bf7"
+      },
+      "missingImage@3x": {
+        "bytes": 1172,
+        "sha256": "99e0c1a9d026c61ea3ed12a7ad14087b0ceeac04b08caba7ab648c0ae8be5ed4"
+      },
+      "panIcon": {
+        "bytes": 140,
+        "sha256": "1f0018318f073a57aa89ae175bec415a2aef08404c72e535b8fefeb428590329"
+      },
+      "textAreaResizeCorner": {
+        "bytes": 86,
+        "sha256": "16d9c626d3faf3907a10819493d53d43ab4a09a0eeafec92e1492afbb03c4c8b"
+      },
+      "textAreaResizeCorner@2x": {
+        "bytes": 167,
+        "sha256": "4557192b829da5e271abf02024cc0a7e1ae2153b79b98682a330bfa48c1e57bf"
+      }
+    },
+    "host_cycles": 3,
+    "document_frames": 6,
+    "icon_inner_nonwhite_pixels": [
+      203,
+      203,
+      203,
+      203,
+      203,
+      203
+    ],
+    "transport": "EGLImage",
+    "cpu_paint_api_calls": 0,
+    "held_after_host_destroy": true
+  },
+  "focus": [
+    {
+      "name": "icons-cpu",
+      "exit": 0,
+      "log": "icons-cpu.log",
+      "sha256": "545a1888561bff391bfe85430fbda1d19073fed437c9c1749ea7e2d4bb48c2b9"
+    },
+    {
+      "name": "icons-egl",
+      "exit": 0,
+      "log": "icons-egl.log",
+      "sha256": "6b1a0b7213ea54d0c74ce47fdf2cadb39ecba49fdb5512269b53eb7d28a4a5bd"
+    },
+    {
+      "name": "filedrop-privacy",
+      "exit": 0,
+      "log": "filedrop-privacy.log",
+      "sha256": "feb1bf4beafd2f4854b436935c3208501a00c5b10411f1856cea10519a82012b"
+    },
+    {
+      "name": "a11-pixels",
+      "exit": 0,
+      "log": "a11-pixels.log",
+      "sha256": "5d20d96a2872291aeabfbe80dd7b4b812bd9533686c04f30f3a0584008edc6c0"
+    },
+    {
+      "name": "egl-context",
+      "exit": 0,
+      "log": "egl-context.log",
+      "sha256": "8356b306f43fe885d1eaa131633f12d3ae44637fceaae1c0fe8fcb2e0504cd06"
+    },
+    {
+      "name": "reattach",
+      "exit": 0,
+      "log": "reattach.log",
+      "sha256": "862bf1619e90959474647854436fc9fc2b0c72f05abf2920d2f40bdc040afe5f"
+    }
+  ],
+  "build": "3Ninjaedges:generateC,compileC,hostlink;-j4;existing CMakeCache/absolutehostsourcepaths preserved;all3575rv_exports unchanged; generatedgetter internal",
+  "unit": "python -m unittest discover -s tests:82run,80passed,2existingplatformskips",
+  "scope_limits": "CPU paint path validated onGPUbuild; standalone protectedWSLslim cache still borrows preexisting/home/shaya/ci3-repo, so not modified/migrated or claimed rebuilt; linux-arm64 routes supplied but not locally executed",
+  "serena_error": "get_symbols_overview: ValueError relative_path=C:/wk/project2-linux-gpu/tests/gpu/linux_view_transition_pixels.py points outside project root C:/Users/shaya/RiderProjects/Ranvier; bounded native reads used under parent-authorized fallback",
+  "retention": "A1/final227 raw/stages/packages/manifests unchanged; newwarmruntime copied to distinct project2-resource210-runtime inode"
+}

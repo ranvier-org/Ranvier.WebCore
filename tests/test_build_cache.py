@@ -293,6 +293,35 @@ class BuildCacheTests(unittest.TestCase):
         command = next(line for line in workflow.splitlines() if 'scripts/build_cache.py normalise' in line)
         self.assertIn('--clear-unknown', command)
 
+    def test_cache_format_migration_uses_new_primary_key_and_keeps_legacy_restore_prefix(self):
+        rid = 'win-x64' if os.name == 'nt' else 'linux-x64'
+        result = subprocess.run(
+            [sys.executable, '-I', str(SCRIPT), 'keys', '--rid', rid, '--flavor', 'slim'],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        values = {}
+        lines = iter(result.stdout.splitlines())
+        for line in lines:
+            if line.startswith('tree-restore<<EOF'):
+                values['tree-restore'] = next(lines)
+                values['tree-restore-legacy'] = next(lines)
+                self.assertEqual(next(lines), 'EOF')
+            elif '=' in line:
+                name, value = line.split('=', 1)
+                values[name] = value
+
+        tree_key = values['tree']
+        legacy_key = tree_key.removesuffix('-manifest-v2')
+        restore_prefixes = values['tree-restore'].splitlines()
+        legacy_restore_prefix = values['tree-restore-legacy']
+        self.assertNotEqual(tree_key, legacy_key)
+        self.assertTrue(tree_key.endswith('-manifest-v2'))
+        self.assertTrue(legacy_key.startswith(restore_prefixes[0]))
+        self.assertTrue(legacy_key.startswith(legacy_restore_prefix))
+
     def test_legacy_manifest_without_raw_identity_is_a_cache_miss(self):
         self.assertEqual(self.run_cache('record').returncode, 0)
         manifest = self.manifest()

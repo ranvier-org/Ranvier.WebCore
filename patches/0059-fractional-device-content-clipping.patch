@@ -1,0 +1,30 @@
+diff --git a/Source/WebCore/rendering/BackgroundPainter.cpp b/Source/WebCore/rendering/BackgroundPainter.cpp
+--- a/Source/WebCore/rendering/BackgroundPainter.cpp
++++ b/Source/WebCore/rendering/BackgroundPainter.cpp
+@@ -49,6 +49,7 @@
+ #include "StyleBoxShadow.h"
+ #include "StylePrimitiveNumericTypes+Evaluation.h"
+ #include "TextBoxPainter.h"
++#include <cmath>
+ 
+ namespace WebCore {
+ 
+@@ -435,8 +436,17 @@
+                 scrolledPaintRect.y() + m_renderer.borderTop() + (includePadding ? m_renderer.paddingTop() : 0_lu),
+                 scrolledPaintRect.width() - bLeft - bRight - (includePadding ? pLeft + pRight : 0_lu),
+                 scrolledPaintRect.height() - m_renderer.borderTop() - m_renderer.borderBottom() - (includePadding ? m_renderer.paddingTop() + m_renderer.paddingBottom() : 0_lu));
++            auto borderPixels = [deviceScaleFactor](LayoutUnit border) {
++                return std::round(border.toDouble() * deviceScaleFactor);
++            };
++            double pixelX = scrolledPaintRect.x().toDouble() * deviceScaleFactor + borderPixels(bLeft)
++                + (includePadding ? pLeft.toDouble() * deviceScaleFactor : 0);
++            double pixelY = scrolledPaintRect.y().toDouble() * deviceScaleFactor + borderPixels(m_renderer.borderTop())
++                + (includePadding ? m_renderer.paddingTop().toDouble() * deviceScaleFactor : 0);
++            FloatRect preciseClip(pixelX / deviceScaleFactor, pixelY / deviceScaleFactor,
++                clipRect.width().toFloat(), clipRect.height().toFloat());
+             backgroundClipStateSaver.save();
+-            context.clip(clipRect);
++            context.clip(preciseClip);
+         }
+         break;
+     }

@@ -428,7 +428,9 @@ def keys(args):
     core = files_digest('patches', 'config', 'scripts/build.py', 'scripts/patches.py')
     host = files_digest('host')
     base = f'tree-{rid}-{flavor}-{webkit[:12]}-{tool}-'
-    lines['tree'] = f'{base}{core}-{host}'
+    # A restored cache with an older source-manifest format is cleared by normalise. Give the
+    # migrated tree a new primary key so Actions can save it after the legacy prefix restore.
+    lines['tree'] = f'{base}{core}-{host}-manifest-v{FORMAT}'
     lines['tree-restore'] = f'{base}{core}-\n{base}'
     lines['toolchain'] = json.dumps(tools)
     text = ''.join(f'{name}<<EOF\n{value}\nEOF\n' if '\n' in value else f'{name}={value}\n' for name, value in lines.items())

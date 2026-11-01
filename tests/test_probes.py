@@ -110,6 +110,17 @@ class WorkflowTests(unittest.TestCase):
         self.assertFalse(probes.applies(gpu, 'linux-x64', 'slim'))
         self.assertTrue(probes.applies(every, 'linux-x64', 'lean'))
 
+    def test_svg_error_pixels_use_real_egl_frames_on_both_linux_gpu_rids(self):
+        for rid in ['linux-x64', 'linux-arm64']:
+            selected = [entry for entry in probes.PROBES if probes.applies(entry, rid, 'gpu')]
+            frames = [entry for entry in selected if any(
+                'svg_image_error_paint.py' in command and '--gpu' in command
+                for command in entry['commands'])]
+            self.assertEqual(len(frames), 1, rid)
+            self.assertEqual(frames[0]['env'], {'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
+            self.assertFalse(probes.applies(frames[0], rid, 'slim'))
+            self.assertFalse(probes.applies(frames[0], 'win-x64', 'gpu'))
+
     def test_linux_gpu_runs_the_complete_reviewed_common_and_gpu_catalogue(self):
         for rid in ['linux-x64', 'linux-arm64']:
             selected = [entry for entry in probes.PROBES if probes.applies(entry, rid, 'gpu')]
@@ -120,7 +131,6 @@ class WorkflowTests(unittest.TestCase):
             for entry in selected:
                 if entry['rid'] is not None:
                     self.assertEqual(entry['rid'], rid)
-
     def test_linux_gpu_selects_real_transition_snapshot_pixels_for_both_linux_rids(self):
         for rid in ['linux-x64', 'linux-arm64']:
             selected = [entry for entry in probes.PROBES if probes.applies(entry, rid, 'gpu')]

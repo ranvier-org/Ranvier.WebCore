@@ -1,11 +1,12 @@
 """#55 (G10) resize observation probe against an actual runtime directory. Replays tests/fixtures/resize-observation-cases.json
-through rv_host_observe_resize_entries and rv_observer_observe_box, at device scales 1 and 2, and compares the ordered
+through rv_host_observe_resize_entries and rv_observer_observe_box, at device scales 1, 1.5 and 2, and compares the ordered
 deliveries and final entry values with the Chromium oracle tests/fixtures/resize-observation-oracle.json. Every step
 that changes layout is followed by rv_host_update, which runs the rendering update; counts of notifications are
 never asserted apart from that ordered log. Also checks argument and thread errors, the unchanged v15
 rv_host_observe_resize, and teardown: an observer outliving its target, document replacement, release inside a
 callback and host destroy. Differences listed in tests/fixtures/resize-observation-qualified.json are recorded, not
-failed."""
+failed. Original G10 CSS parity remains checked at scales 1 and 2; extended CSS values are recorded against Chromium
+and must remain equal to the frozen native T2 checkpoint. Device values are compared at all three scales."""
 
 import argparse
 import ctypes
@@ -21,6 +22,8 @@ FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, WRONG_THREAD, NOT_ELEMENT, UNSUPPORTED = 0, -1, -2, -4, -9
 ABI = 60
 BOXES = {None: None, 'content-box': 0, 'border-box': 1, 'device-pixel-content-box': 2}
+LEGACY_CSS_SCENARIOS = frozenset(['contentBox', 'borderBox', 'defaultBox', 'boxChanges', 'verticalChange', 'reobserve',
+                                'order', 'observerOrder', 'beforeIntersection', 'depth', 'stop', 'lifecycle'])
 D = ctypes.c_double
 
 
@@ -79,14 +82,14 @@ class Scene:
             for index in range(count):
                 entry = entries[index]
                 self.n.expect(entry.size == ctypes.sizeof(Entry), 'entry size')
-                self.n.expect(entry.hasDevicePixel == 0 and entry.devicePixelInlineSize == 0 and entry.devicePixelBlockSize == 0,
-                              'no device-pixel content box (Ranvier.WebCore#146)')
+                self.n.expect(entry.hasDevicePixel == 1, 'entry has the sampled device-pixel content box')
                 target = self.name_of(entry.target)
                 ids.append(target)
                 self.entries.append({'o': name, 't': target,
                                      'rect': [number(entry.contentX), number(entry.contentY), number(entry.contentWidth), number(entry.contentHeight)],
                                      'content': [number(entry.contentInlineSize), number(entry.contentBlockSize)],
-                                     'border': [number(entry.borderInlineSize), number(entry.borderBlockSize)]})
+                                     'border': [number(entry.borderInlineSize), number(entry.borderBlockSize)],
+                                     'device': [number(entry.devicePixelInlineSize), number(entry.devicePixelBlockSize)]})
             self.log.append(name + ':' + ','.join(ids))
             for target in ids:
                 hit = next((a for a in self.armed if a[0] == name and a[1] == target), None)
@@ -115,6 +118,8 @@ class Scene:
             n.ok('rv_observer_disconnect', [P], self.observers[args[0]])
         elif kind == 'style':
             n.ok('rv_element_set_style', [P, ctypes.c_char_p, Utf8, I], self.node(args[0]), args[1].encode(), args[2].encode(), 0)
+        elif kind == 'attribute':
+            n.ok('rv_element_set_attribute', [P, ctypes.c_char_p, Utf8], self.node(args[0]), args[1].encode(), args[2].encode())
         elif kind == 'update':
             self.update()
             self.log.append('|')
@@ -154,9 +159,12 @@ class Scene:
             n.ok('rv_element_set_attribute', [P, ctypes.c_char_p, Utf8], element, b'style', args[1].encode())
             self.nodes[args[0]] = element
         elif kind == 'append':
-            body = n.bind('rv_document_body', P, [P])(self.host)
-            n.ok('rv_node_append_child', [P, P], body, self.node(args[0]))
-            self.release_node(body)
+            if len(args) > 1:
+                n.ok('rv_node_append_child', [P, P], self.node(args[1]), self.node(args[0]))
+            else:
+                body = n.bind('rv_document_body', P, [P])(self.host)
+                n.ok('rv_node_append_child', [P, P], body, self.node(args[0]))
+                self.release_node(body)
         elif kind == 'remove':
             n.ok('rv_node_remove', [P], self.node(args[0]))
         else:
@@ -200,7 +208,8 @@ def errors(native, cases, report):
         n.expect(observe_box(observer, None, 0) == NULL_ARGUMENT, 'observe_box NULL element')
         n.expect(observe_box(observer, a, 3) == UNSUPPORTED, 'observe_box unknown box')
         n.expect(observe_box(observer, a, -1) == UNSUPPORTED, 'observe_box negative box')
-        n.expect(observe_box(observer, a, 2) == UNSUPPORTED, 'observe_box device-pixel-content-box (Ranvier.WebCore#146)')
+        n.expect(observe_box(observer, a, 2) == OK, 'observe_box device-pixel-content-box')
+        n.ok('rv_observer_disconnect', [P], observer)
         document = n.bind('rv_host_document', P, [P])(scene.host)
         n.expect(observe_box(observer, document, 0) == NOT_ELEMENT, 'observe_box document')
         scene.release_node(document)
@@ -247,6 +256,29 @@ def legacy(native, cases, report, entries):
         expected = [[e['t'], e['rect'][2], e['rect'][3]] for e in entries if e['t'] in ('a', 'v', 'f')] + [['a', 120, 50]]
         n.expect(got == expected, 'v15 callback ' + str(got))
         report['legacy'] = got
+    finally:
+        scene.close()
+
+
+def scale_change(native, cases, oracle, report):
+    scene = Scene(native, cases['markup'])
+    try:
+        scene.step(['element', 'pixel', 'position:absolute;left:0;top:0;width:100.25px;height:33.25px'])
+        scene.step(['append', 'pixel'])
+        for name, box in [('c', 'content-box'), ('d', 'device-pixel-content-box')]:
+            scene.step(['create', name])
+            scene.step(['observe', name, 'pixel', box])
+        scene.update()
+        for scale in [1.5, 2]:
+            native.ok('rv_host_set_device_scale', [P, ctypes.c_float], scene.host, scale)
+            scene.update()
+        content = [entry for entry in scene.entries if entry['o'] == 'c']
+        device = [entry for entry in scene.entries if entry['o'] == 'd']
+        native.expect(len(content) == 1 and len(device) == 3, 'device scale changes only the device box')
+        expected = [next(entry['device'] for entry in oracle['scales'][scale]['devicePixelOffset']['entries']
+                         if entry['o'] == 'd') for scale in ['1', '1.5', '2']]
+        native.expect([entry['device'] for entry in device] == expected, 'device scale uses the measured pixel size')
+        report['scaleChange'] = scene.entries
     finally:
         scene.close()
 
@@ -334,10 +366,21 @@ def teardown(native, cases, report):
 
 def compare(native, oracle, results, report, qualified):
     """Compares each scenario's log and statuses, and each entry field by field where both sides have the same entries."""
+    scales = {'1', '1.5', '2'}
+    scenarios = {scenario['name'] for scenario in json.loads((FIXTURES / 'resize-observation-cases.json').read_text())['scenarios']}
+    native.expect(set(oracle['scales']) == scales, 'oracle scale coverage')
+    native.expect(set(results) == scales, 'native scale coverage')
+    for scale in scales:
+        native.expect(set(oracle['scales'][scale]) == scenarios, f'oracle scenario coverage at {scale}')
+        native.expect(set(results[scale]) == scenarios, f'native scenario coverage at {scale}')
     differences = {}
+    strict_differences = set()
+    device_count = 0
 
-    def differ(key, got, want, scale):
+    def differ(key, got, want, scale, strict=True):
         differences.setdefault(key, {'native': got, 'chromium': want, 'scales': []})['scales'].append(scale)
+        if strict:
+            strict_differences.add(key)
 
     for scale, scenarios in results.items():
         for name, got in scenarios.items():
@@ -346,7 +389,19 @@ def compare(native, oracle, results, report, qualified):
                 native.expect(True, 'compared')
                 if got[key] != want[key]:
                     differ(f'{name}.{key}', got[key], want[key], scale)
-            expected = [{k: v for k, v in e.items() if k != 'device'} for e in want['entries']]
+            expected = want['entries']
+            by_identity = {}
+            for entry in expected:
+                by_identity.setdefault((entry['o'], entry['t']), []).append(entry['device'])
+            for entry in got['entries']:
+                identity = (entry['o'], entry['t'])
+                candidates = by_identity.get(identity, [])
+                native.expect(bool(candidates), f'device pixel entry missing from oracle: {scale}/{name}/{identity}')
+                device = candidates.pop(0)
+                native.expect(entry['device'] == device,
+                              f'device pixel mismatch: {scale}/{name}/{identity}: {entry["device"]} != {device}')
+                device_count += 1
+            native.expect(not any(by_identity.values()), f'device pixel delivery missing: {scale}/{name}')
             if [(e['o'], e['t']) for e in got['entries']] != [(e['o'], e['t']) for e in expected]:
                 differ(f'{name}.entries', got['entries'], expected, scale)
                 continue
@@ -354,10 +409,32 @@ def compare(native, oracle, results, report, qualified):
                 for field in ['rect', 'content', 'border']:
                     native.expect(True, 'compared')
                     if mine[field] != theirs[field]:
-                        differ(f"{name}.entries.{mine['t']}.{field}", mine[field], theirs[field], scale)
+                        differ(f"{name}.entries.{mine['t']}.{field}", mine[field], theirs[field], scale,
+                               strict=scale in ('1', '2') and name in LEGACY_CSS_SCENARIOS)
     report['differences'] = differences
+    report['comparedDeviceEntries'] = device_count
+    report['extendedCssDifferences'] = {key: value for key, value in differences.items() if key not in strict_differences}
+    baseline = json.loads((FIXTURES / 'resize-observation-native-t2.json').read_text())
+    changed_css = []
+    css_count = 0
+    for scale, scenarios in results.items():
+        for name in baseline['originalScenarios']:
+            mine = scenarios[name]['entries']
+            previous = baseline['results'][scale][name]['entries']
+            native.expect([(entry['o'], entry['t']) for entry in mine] == [(entry['o'], entry['t']) for entry in previous],
+                          f'native CSS baseline entry identities changed: {scale}/{name}')
+            for index, (entry, prior) in enumerate(zip(mine, previous)):
+                for field in ['rect', 'content', 'border']:
+                    css_count += 1
+                    if entry[field] != prior[field]:
+                        changed_css.append({'scale': scale, 'scenario': name, 'entry': index, 'field': field,
+                                            'native': entry[field], 'baseline': prior[field]})
+    report['comparedNativeCssFields'] = css_count
+    report['nativeCssBaselineSource'] = baseline['source']
+    report['changedNativeCssFields'] = changed_css
+    native.expect(not changed_css, 'native CSS baseline changed: ' + json.dumps(changed_css))
     keys = set(differences)
-    unqualified = sorted(keys - set(qualified))
+    unqualified = sorted(strict_differences - set(qualified))
     native.expect(not unqualified, 'unqualified differences: ' + json.dumps({k: differences[k] for k in unqualified}))
     native.expect(not set(qualified) - keys, 'qualified differences that no longer occur: ' + str(sorted(set(qualified) - keys)))
 
@@ -369,20 +446,33 @@ def verify(native_directory):
     native = Native(native_directory)
     native.expect(native.bind('rv_abi_version', I, [])() == ABI, 'ABI version ' + str(ABI))
     has = native.bind('rv_abi_has', I, [ctypes.c_char_p])
-    for feature in ['resize-entries', 'observers']:
+    for feature in ['resize-entries', 'resize-device-pixel-content-box', 'observers']:
         native.expect(has(feature.encode()) == 1, feature + ' advertised')
     report = {'browser': oracle['browser'], 'platform': sys.platform}
-    results = {'1': replay(native, cases, 1), '2': replay(native, cases, 2)}
+    results = {str(scale): replay(native, cases, scale) for scale in [1, 1.5, 2]}
     report['results'] = results
     errors(native, cases, report)
     legacy(native, cases, report, results['1']['contentBox']['entries'])
+    scale_change(native, cases, oracle, report)
     teardown(native, cases, report)
     for scale in results:
         # The qualified scenarios still hold their native contracts.
         sanitized = ['error:Script error.' if item.startswith('error:') else item for item in oracle['scales'][scale]['depth']['log']]
         native.expect(results[scale]['depth']['log'] == sanitized, 'loop error at the same point')
         native.expect(results[scale]['observerOrder']['log'] == ['o2:f', 'o1:a', '|', 'o2:f', 'o1:a', '|'], 'first-observe order')
-        native.expect(results[scale]['devicePixel']['statuses'] == ['unsupported', 'unsupported'], 'device-pixel unsupported')
+        for name in ['devicePixelOffset', 'devicePixelVerticalOffset']:
+            entries = results[scale][name]['entries']
+            content = [entry for entry in entries if entry['o'] == 'c']
+            device = [entry for entry in entries if entry['o'] == 'd']
+            native.expect(len(content) == 1 and len(device) == 2, name + ' delivers only the device box after movement')
+            native.expect(device[0]['content'] == device[1]['content'] and device[0]['device'] != device[1]['device'],
+                          name + ' changes snapped pixels without changing the CSS content size')
+        transformed = results[scale]['devicePixelTransform']['entries']
+        content = [entry for entry in transformed if entry['o'] == 'c']
+        device = [entry for entry in transformed if entry['o'] == 'd']
+        native.expect(len(content) == 1 and len(device) == 4, 'painting boundary changes only device box notifications')
+        native.expect(device[0]['device'] == device[2]['device'] and device[1]['device'] == device[3]['device'],
+                      'transform and removal restore the corresponding snapped size')
     compare(native, oracle, results, report, qualified)
     report['qualified'] = sorted(qualified)
     report['assertions'] = native.assertions

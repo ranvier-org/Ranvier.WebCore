@@ -55,4 +55,7 @@
 0054-wpe-standalone-compositor.patch
 0055-wpe-static-pasteboard-file-drops.patch
 0058-wpe-skia-backing-context.patch
+0056-device-pixel-content-box.patch
+0059-fractional-device-content-clipping.patch
+0061-svg-failed-image-paint.patch
 0060-openssl-okp-backend.patch
