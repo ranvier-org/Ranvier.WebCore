@@ -38,6 +38,7 @@ CASES = [
     ('RFC7748 normal peer first 1 bit', 'bytes', bytes([X_SHARED[0] & 0x80])),
     ('RFC7748 normal peer first 7 bits', 'bytes', bytes([X_SHARED[0] & 0xfe])),
     ('RFC7748 normal peer first 9 bits', 'bytes', X_SHARED[:1] + bytes([X_SHARED[1] & 0x80])),
+    ('X25519 all-zero peer with one output bit', 'error', 'OperationError'),
 ]
 
 
@@ -129,7 +130,8 @@ def run_focused_x(arguments):
     clear = bind('clear', [], None)
     rows = []
     try:
-        for scenario in [19, 20, 21, 22]:
+        selected = [16, 19, 23, 10, 18, 20, 21, 22] if arguments.trial_x else [19, 20, 21, 22]
+        for scenario in selected:
             name, kind, expected = CASES[scenario]
             n.expect(begin(page.document, scenario) == 0, name + ' starts')
             initial = status()
@@ -150,7 +152,8 @@ def run_focused_x(arguments):
                          'pass': passed})
             clear()
         report = {'result': 'PASS' if all(row['pass'] for row in rows) else 'FAIL', 'rows': rows,
-                  'sourceFixture': 'f56b1c924bb24389ae2a3a3bc2d9b90982cbfd37 plus four explicit controls',
+                  'sourceFixture': 'f56b1c924bb24389ae2a3a3bc2d9b90982cbfd37 plus five explicit X25519 controls',
+                  'selectedScenarios': selected,
                   'fullRfc7748Secret': X_SHARED.hex(), 'allZeroPeerHex': '00' * 32,
                   'vectorSource': 'https://www.rfc-editor.org/rfc/rfc7748.html#section-6.1',
                   'contractSource': 'https://w3c.github.io/webcrypto/#x25519-operations',
@@ -171,5 +174,6 @@ if __name__ == '__main__':
     parser.add_argument('--bridge-library', required=True)
     parser.add_argument('--report', required=True)
     parser.add_argument('--focused-x', action='store_true')
+    parser.add_argument('--trial-x', action='store_true')
     arguments = parser.parse_args()
-    (run_focused_x if arguments.focused_x else run)(arguments)
+    (run_focused_x if arguments.focused_x or arguments.trial_x else run)(arguments)

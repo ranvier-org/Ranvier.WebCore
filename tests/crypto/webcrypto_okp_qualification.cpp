@@ -241,7 +241,7 @@ extern "C" WEBCORE_EXPORT int32_t ranvier_test_okp_key_ports(void* documentHandl
 
 extern "C" WEBCORE_EXPORT int32_t ranvier_test_okp_begin(void* documentHandle, int32_t scenario)
 {
-    if (!isMainThread() || !documentHandle || scenario < 0 || scenario > 22)
+    if (!isMainThread() || !documentHandle || scenario < 0 || scenario > 23)
         return -1;
     auto* document = dynamicDowncast<Document>(reinterpret_cast<Node*>(documentHandle));
     if (!document || !document->isFullyActive())
@@ -283,7 +283,7 @@ extern "C" WEBCORE_EXPORT int32_t ranvier_test_okp_begin(void* documentHandle, i
         }
     } else {
         auto privateKey = rfcPrivate(*algorithm, scenario == 9 ? bobSeed : aliceSeed)->key;
-        auto publicData = (scenario == 10 || scenario == 18 || scenario == 19) ? decodeHex("0000000000000000000000000000000000000000000000000000000000000000") : decodeHex(scenario == 9 ? alicePublic : bobPublic);
+        auto publicData = (scenario == 10 || scenario == 18 || scenario == 19 || scenario == 23) ? decodeHex("0000000000000000000000000000000000000000000000000000000000000000") : decodeHex(scenario == 9 ? alicePublic : bobPublic);
         auto publicKey = importKey(*algorithm, CryptoKeyFormat::Raw, WTF::move(publicData), true, 0)->key;
         if (!privateKey || !publicKey)
             return -5;
@@ -296,7 +296,7 @@ extern "C" WEBCORE_EXPORT int32_t ranvier_test_okp_begin(void* documentHandle, i
         CryptoAlgorithmX25519Params parameters(CryptoAlgorithmIdentifier::X25519, WTF::move(init));
         std::optional<size_t> length = scenario == 14 ? 264 : scenario == 15 ? 128 : (scenario == 16 || scenario == 19) ? 0 : 256;
         if (scenario >= 20)
-            length = scenario == 20 ? 1 : scenario == 21 ? 7 : 9;
+            length = (scenario == 20 || scenario == 23) ? 1 : scenario == 21 ? 7 : 9;
         if (scenario == 17 || scenario == 18)
             length = std::nullopt;
         RefPtr<CryptoKey> baseKey = scenario == 12 ? publicKey : privateKey;
