@@ -51,3 +51,4 @@
 0050-image-bitmap-unaccelerated-buffers.patch
 0051-web-animation-promise-observer.patch
 0052-eventloop-checkpoint-microtasks.patch
+0054-wpe-standalone-compositor.patch

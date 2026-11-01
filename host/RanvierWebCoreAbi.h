@@ -184,11 +184,21 @@ enum { RV_GPU_RGBA8_PREMULTIPLIED = 1 };
  * Writes NULL to *frame on failure. The frame owns its resources independently of host/renderer/window;
  * it remains valid over resize or rv_host_destroy and must be released on the owner thread. */
 RV_EXPORT int32_t rv_host_acquire_d3d11_frame(RvHost*, void* consumerDevice, RvGpuFrame** frame);
+/* Linux GPU startup: call on the future host thread before the first host, with the initialized EGLDisplay
+ * used by the consumer. The display is borrowed for the process lifetime; the host never terminates it.
+ * Reconfiguration after the first host or to a different display returns RV_ERR_UNSUPPORTED. */
+RV_EXPORT int32_t rv_configure_egl_display(void* display);
+/* Linux EGLImage transport; requires the configured display's consumer context current on the owner thread.
+ * Restores that context before returning. There is no CPU fallback. Held frames survive resize/host destruction.
+ * linux_egl.py verifies image import, pixels, ownership and teardown with independent producer/consumer contexts. */
+RV_EXPORT int32_t rv_host_acquire_egl_frame(RvHost*, RvGpuFrame** frame);
 /* Returns a borrowed ID3D11Texture2D*, physical dimensions and RV_GPU_RGBA8_PREMULTIPLIED. Row 0 is the
  * top of the page; channels are sRGB bytes with premultiplied alpha. SDL imports this pointer with
  * SDL_PROP_TEXTURE_CREATE_D3D11_TEXTURE_POINTER and uses SDL_BLENDMODE_BLEND_PREMULTIPLIED (or NONE for
  * an opaque final image). The texture is consumer-locked until release. Do not update or retain it for
- * GPU use after frame release. SDL may retain its COM reference, but must destroy its wrapper before
+ * GPU use after frame release. On Linux the handle is an EGLImage for glEGLImageTargetTexture2DOES, imported
+ * into a texture in the configured display; delete that texture and finish consumer use before release.
+ * SDL may retain its COM reference, but must destroy its wrapper before
  * presenting a different resource. All arguments are required and calls use the host owner thread. */
 RV_EXPORT int32_t rv_gpu_frame_info(RvGpuFrame*, void** texture, int32_t* width, int32_t* height, int32_t* format);
 /* Before release, flush the SDL draw batch (SDL_FlushRenderer) or SDL_RenderPresent. Release flushes
