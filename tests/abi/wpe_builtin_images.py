@@ -42,7 +42,7 @@ def resources(native):
     return result
 
 
-def gpu_pixels(native, consumer, host, destroy_host):
+def gpu_pixels(native, consumer, host, destroy_host, frame_width=WIDTH, frame_height=HEIGHT):
     consumer.activate()
     frame, texture, framebuffer = P(), U(), U()
     native.ok('rv_host_acquire_egl_frame', [P, P], host, C.byref(frame))
@@ -51,7 +51,7 @@ def gpu_pixels(native, consumer, host, destroy_host):
         image, width, height, format_ = P(), I(), I(), I()
         native.ok('rv_gpu_frame_info', [P, P, P, P, P], frame,
                   C.byref(image), C.byref(width), C.byref(height), C.byref(format_))
-        native.expect(bool(image.value) and (width.value, height.value, format_.value) == (WIDTH, HEIGHT, 1),
+        native.expect(bool(image.value) and (width.value, height.value, format_.value) == (frame_width, frame_height, 1),
                       'RGBA EGLImage dimensions and format')
         if destroy_host:
             destroy_host()
@@ -64,8 +64,8 @@ def gpu_pixels(native, consumer, host, destroy_host):
         bind(consumer.gl, 'glBindFramebuffer', None, [U, U])(0x8D40, framebuffer)
         bind(consumer.gl, 'glFramebufferTexture2D', None, [U, U, U, U, I])(0x8D40, 0x8CE0, 0x0DE1, texture, 0)
         native.expect(bind(consumer.gl, 'glCheckFramebufferStatus', U, [U])(0x8D40) == 0x8CD5, 'import framebuffer')
-        pixels = (C.c_ubyte * (WIDTH * HEIGHT * 4))()
-        bind(consumer.gl, 'glReadPixels', None, [I, I, I, I, U, U, P])(0, 0, WIDTH, HEIGHT, 0x1908, 0x1401, pixels)
+        pixels = (C.c_ubyte * (frame_width * frame_height * 4))()
+        bind(consumer.gl, 'glReadPixels', None, [I, I, I, I, U, U, P])(0, 0, frame_width, frame_height, 0x1908, 0x1401, pixels)
         native.expect(bind(consumer.gl, 'glGetError', U, [])() == 0, 'imported pixels')
         return bytes(pixels)
     finally:
