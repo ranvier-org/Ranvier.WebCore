@@ -229,8 +229,14 @@ def verify(directory, evidence_json=None):
         ok(on_path['rect'](data, 50, 30, 5, 5), 'rect after copying')
         report['pathData'] = [hit(25, 25, path=data), hit(35, 25, path=data), hit(25, 25, path=copy), hit(52, 32, path=copy), hit(52, 32, path=data)]
         expect(report['pathData'] == [True, False, True, False, True], 'path data and copy: ' + str(report['pathData']))
+        # The parse stops at the first error and keeps the segments before it.
         invalid = new_path('M 0 0 L bogus')
-        expect(not hit(0, 0, path=invalid), 'invalid path data makes an empty path, without an error')
+        # 'M 0 0' remains: a subpath of one point. CoreGraphics counts that point as inside it: PathCG::contains closes
+        # the subpath and calls CGPathContainsPoint (Source/WebCore/platform/graphics/cg/PathCG.cpp). Skia does not.
+        expect(hit(0, 0, path=invalid) == (sys.platform == 'darwin'), 'invalid path data keeps its first point, without an error')
+        expect(not hit(1, 1, path=invalid), 'invalid path data encloses no area')
+        prefix = new_path('M 40 0 h10 v10 h-10 Z L bogus M 60 0 h10 v10 h-10 Z')
+        expect(hit(45, 5, path=prefix) and not hit(65, 5, path=prefix), 'invalid path data keeps the segments before the error only')
         empty_data = new_path('')
         expect(not hit(0, 0, path=empty_data), 'empty path data')
 

@@ -362,9 +362,18 @@ def verify(directory, evidence_json=None):
         # Chromium's blur(2px) alphas at the centre, the inside and outside edge columns, and 5px out: 249, 148, 104, 3,
         # over white. A blur kernel may differ by a few levels, so each channel is within BLUR_TOLERANCE.
         report['filter']['blur'] = pixels((45, 15), (40, 15), (39, 15), (35, 15))
-        for (label, actual), alpha_value in zip(zip(['centre', 'inside edge', 'outside edge', 'far'], report['filter']['blur']), [249, 148, 104, 3]):
-            level = round(255 * (1 - alpha_value / 255))
-            near(actual, [255, level, level, 255], 'blur(2px) ' + label, BLUR_TOLERANCE)
+        labels = ['centre', 'inside edge', 'outside edge', 'far']
+        if sys.platform == 'darwin':
+            # Cocoa blurs in software with Accelerate: vImageBoxConvolve_ARGB8888 three times with the kernel size 4
+            # rounded up to 5, edge-extended, each pass a rounded 5x5 average (FEGaussianBlurSoftwareApplier::boxBlurAccelerated,
+            # Source/WebCore/platform/graphics/filters/software/FEGaussianBlurSoftwareApplier.cpp). Skia blurs with a Gaussian.
+            # Those passes give the alphas 235, 141, 104, 8.
+            for label, actual, alpha_value in zip(labels, report['filter']['blur'], [235, 141, 104, 8]):
+                expect(actual == [255, 255 - alpha_value, 255 - alpha_value, 255], 'blur(2px) ' + label + ': ' + str(actual))
+        else:
+            for label, actual, alpha_value in zip(labels, report['filter']['blur'], [249, 148, 104, 3]):
+                level = round(255 * (1 - alpha_value / 255))
+                near(actual, [255, level, level, 255], 'blur(2px) ' + label, BLUR_TOLERANCE)
         expect({k: report['filter'][k] for k in ['initial', 'blurString', 'invalidKept']} == {'initial': 'none', 'blurString': 'blur(2px)', 'invalidKept': 'blur(2px)'},
                'filter strings: ' + str(report['filter']))
         expect(report['filter']['pixels'][:2] == [[0, 255, 255, 255], RED], 'invert and none filters: ' + str(report['filter']['pixels']))
