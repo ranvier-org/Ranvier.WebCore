@@ -26,6 +26,11 @@ def probe(name, *commands, rid=None, flavor=('slim', 'gpu'), timeout=TIMEOUT, en
 
 
 PROBES = [
+    *[probe('Verify fixed content clipping masks and complete pointwise paint stability',
+            f'python -I tests/abi/background_content_clip_regression.py --native-directory {{native}} --rid {rid} --report {{work}}/background-content-clipping-regression.json',
+            rid=rid, flavor='gpu',
+            env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'} if rid.startswith('linux') else None)
+      for rid in ['linux-x64', 'win-x64']],
     *[probe('Verify SVG image failures through real EGLImage frames',
             'python -I tests/abi/svg_image_error_paint.py --native-directory {native} --gpu',
             rid=rid, flavor='gpu',
