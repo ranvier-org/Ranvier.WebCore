@@ -58,15 +58,17 @@ class PackagedGpuTests(unittest.TestCase):
 
                 def execute(command, **kwargs):
                     calls.append((command, kwargs))
-                    self.assertEqual(Path(command[-1]).read_bytes(), b'packaged host')
+                    self.assertEqual(Path(command[3]).read_bytes(), b'packaged host')
 
                 with self.subTest(rid=rid), patch('subprocess.run', side_effect=execute):
                     probe.verify(self.package(Path(directory), rid=rid), gpu=True)
-                self.assertEqual(len(calls), 1)
-                command, options = calls[0]
-                self.assertTrue(Path(command[2]).as_posix().endswith('tests/gpu/linux_egl.py'))
-                self.assertEqual(options['env']['EGL_PLATFORM'], 'surfaceless')
-                self.assertEqual(options['env']['LIBGL_ALWAYS_SOFTWARE'], '1')
+                self.assertEqual(len(calls), 2)
+                self.assertEqual(calls[1][0], calls[0][0] + ['--context-lifecycle'])
+                for command, options in calls:
+                    self.assertTrue(Path(command[2]).as_posix().endswith('tests/gpu/linux_egl.py'))
+                    self.assertEqual(options['env']['EGL_PLATFORM'], 'surfaceless')
+                    self.assertEqual(options['env']['LIBGL_ALWAYS_SOFTWARE'], '1')
+                    self.assertTrue(options['check'])
 
 
 if __name__ == '__main__':

@@ -27,7 +27,9 @@ def probe(name, *commands, rid=None, flavor='slim', timeout=TIMEOUT, env=None):
 
 PROBES = [
     *[probe('Verify Linux shared EGLImage frames and retained lifetimes',
-            'python -I tests/gpu/linux_egl.py {native}/libRanvierWebCoreHost.so', rid=rid, flavor='gpu',
+            'python -I tests/gpu/linux_egl.py {native}/libRanvierWebCoreHost.so',
+            'python -I tests/gpu/linux_egl.py {native}/libRanvierWebCoreHost.so --context-lifecycle',
+            rid=rid, flavor='gpu',
             env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
       for rid in ['linux-x64', 'linux-arm64']],
     probe('Verify Windows shared D3D11 frames and bounded lifetimes',

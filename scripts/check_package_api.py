@@ -36,8 +36,9 @@ def verify(package, gpu=False):
                 raise ValueError('Package has no native payload for ' + rid)
         if gpu and rid.startswith('linux-'):
             environment = dict(os.environ, EGL_PLATFORM='surfaceless', LIBGL_ALWAYS_SOFTWARE='1')
-            subprocess.run([sys.executable, '-I', str(root / 'tests/gpu/linux_egl.py'),
-                            str(destination / 'libRanvierWebCoreHost.so')], check=True, env=environment)
+            for arguments in [[], ['--context-lifecycle']]:
+                subprocess.run([sys.executable, '-I', str(root / 'tests/gpu/linux_egl.py'),
+                                str(destination / 'libRanvierWebCoreHost.so'), *arguments], check=True, env=environment)
         elif gpu:
             sdl = destination.parent / 'sdl'
             subprocess.run([sys.executable, '-I', str(root / 'scripts/sdl_runtime.py'), '--out', str(sdl)], check=True)
