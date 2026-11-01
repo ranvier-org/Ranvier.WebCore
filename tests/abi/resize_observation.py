@@ -366,6 +366,13 @@ def teardown(native, cases, report):
 
 def compare(native, oracle, results, report, qualified):
     """Compares each scenario's log and statuses, and each entry field by field where both sides have the same entries."""
+    scales = {'1', '1.5', '2'}
+    scenarios = {scenario['name'] for scenario in json.loads((FIXTURES / 'resize-observation-cases.json').read_text())['scenarios']}
+    native.expect(set(oracle['scales']) == scales, 'oracle scale coverage')
+    native.expect(set(results) == scales, 'native scale coverage')
+    for scale in scales:
+        native.expect(set(oracle['scales'][scale]) == scenarios, f'oracle scenario coverage at {scale}')
+        native.expect(set(results[scale]) == scenarios, f'native scenario coverage at {scale}')
     differences = {}
     strict_differences = set()
     device_count = 0

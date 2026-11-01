@@ -44,6 +44,16 @@ class ResizeScope(unittest.TestCase):
         with self.assertRaises(AssertionError):
             self.compare()
 
+    def test_missing_fractional_scale_cannot_reduce_the_contract(self):
+        del self.results['1.5']
+        with self.assertRaisesRegex(AssertionError, 'scale coverage'):
+            self.compare()
+
+    def test_missing_integer_translation_scenario_cannot_reduce_the_contract(self):
+        del self.results['1.5']['devicePixelIntegerTranslation']
+        with self.assertRaisesRegex(AssertionError, 'scenario coverage'):
+            self.compare()
+
 
 if __name__ == '__main__':
     unittest.main()
