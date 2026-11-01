@@ -479,6 +479,7 @@ static constexpr const char* capabilityAbiNames[] = {
     "data-transfer-files",
     "compositing",
     "presentation-d3d11",
+    "presentation-egl",
     "accessibility-events",
 };
 static constexpr CapabilityBuildFlag capabilityBuildFlags[] = {
@@ -495,6 +496,13 @@ static constexpr CapabilityBuildFlag capabilityBuildFlags[] = {
     {"build:ENABLE_API_TESTS", ENABLE_API_TESTS},
 #else
     {"build:ENABLE_API_TESTS", -1},
+#endif
+#if defined(RV_CAP_ENABLE_ASYNC_SCROLLING)
+    {"build:ENABLE_ASYNC_SCROLLING", RV_CAP_ENABLE_ASYNC_SCROLLING},
+#elif defined(ENABLE_ASYNC_SCROLLING)
+    {"build:ENABLE_ASYNC_SCROLLING", ENABLE_ASYNC_SCROLLING},
+#else
+    {"build:ENABLE_ASYNC_SCROLLING", -1},
 #endif
 #if defined(RV_CAP_ENABLE_BUBBLEWRAP_SANDBOX)
     {"build:ENABLE_BUBBLEWRAP_SANDBOX", RV_CAP_ENABLE_BUBBLEWRAP_SANDBOX},
@@ -901,6 +909,13 @@ static constexpr CapabilityBuildFlag capabilityBuildFlags[] = {
     {"build:USE_NETWORK_STUB", USE_NETWORK_STUB},
 #else
     {"build:USE_NETWORK_STUB", -1},
+#endif
+#if defined(RV_CAP_USE_RANVIER_STANDALONE_COMPOSITOR)
+    {"build:USE_RANVIER_STANDALONE_COMPOSITOR", RV_CAP_USE_RANVIER_STANDALONE_COMPOSITOR},
+#elif defined(USE_RANVIER_STANDALONE_COMPOSITOR)
+    {"build:USE_RANVIER_STANDALONE_COMPOSITOR", USE_RANVIER_STANDALONE_COMPOSITOR},
+#else
+    {"build:USE_RANVIER_STANDALONE_COMPOSITOR", -1},
 #endif
 #if defined(RV_CAP_USE_SQLITE_STUB)
     {"build:USE_SQLITE_STUB", RV_CAP_USE_SQLITE_STUB},

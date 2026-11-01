@@ -1,0 +1,251 @@
+{
+  "checkedAtUtc": "2026-11-01T13:13:50.099663+00:00",
+  "repository": "ranvier-org/Ranvier.WebCore",
+  "groups": [
+    120,
+    70,
+    217,
+    156
+  ],
+  "requested": {
+    "abi": 60,
+    "nativeVersion": "0.1.1-preview.2",
+    "newRuntimeTypeKinds": []
+  },
+  "packages": [
+    {
+      "id": "Ranvier.WebCore",
+      "version": "0.1.1-preview.2",
+      "indexStatus": 200,
+      "latestListedVersions": [
+        "0.1.0-preview.21",
+        "0.1.0-preview.22",
+        "0.1.0-preview.46"
+      ],
+      "targetListed": false,
+      "exactPackageStatus": 404,
+      "absent": true
+    },
+    {
+      "id": "Ranvier.WebCore.Native",
+      "version": "0.1.1-preview.2",
+      "indexStatus": 200,
+      "latestListedVersions": [
+        "0.1.0-preview.21",
+        "0.1.0-preview.22",
+        "0.1.0-preview.46"
+      ],
+      "targetListed": false,
+      "exactPackageStatus": 404,
+      "absent": true
+    },
+    {
+      "id": "Ranvier.WebCore.Native.win-x64",
+      "version": "0.1.1-preview.2",
+      "indexStatus": 200,
+      "latestListedVersions": [
+        "0.1.0-preview.21",
+        "0.1.0-preview.22",
+        "0.1.0-preview.46"
+      ],
+      "targetListed": false,
+      "exactPackageStatus": 404,
+      "absent": true
+    },
+    {
+      "id": "Ranvier.WebCore.Native.win-arm64",
+      "version": "0.1.1-preview.2",
+      "indexStatus": 200,
+      "latestListedVersions": [
+        "0.1.0-preview.21",
+        "0.1.0-preview.22",
+        "0.1.0-preview.46"
+      ],
+      "targetListed": false,
+      "exactPackageStatus": 404,
+      "absent": true
+    },
+    {
+      "id": "Ranvier.WebCore.Native.linux-x64",
+      "version": "0.1.1-preview.2",
+      "indexStatus": 200,
+      "latestListedVersions": [
+        "0.1.0-preview.21",
+        "0.1.0-preview.22",
+        "0.1.0-preview.46"
+      ],
+      "targetListed": false,
+      "exactPackageStatus": 404,
+      "absent": true
+    },
+    {
+      "id": "Ranvier.WebCore.Native.linux-arm64",
+      "version": "0.1.1-preview.2",
+      "indexStatus": 200,
+      "latestListedVersions": [
+        "0.1.0-preview.21",
+        "0.1.0-preview.22",
+        "0.1.0-preview.46"
+      ],
+      "targetListed": false,
+      "exactPackageStatus": 404,
+      "absent": true
+    },
+    {
+      "id": "Ranvier.WebCore.Native.osx-arm64",
+      "version": "0.1.1-preview.2",
+      "indexStatus": 200,
+      "latestListedVersions": [
+        "0.1.0-preview.21",
+        "0.1.0-preview.22",
+        "0.1.0-preview.46"
+      ],
+      "targetListed": false,
+      "exactPackageStatus": 404,
+      "absent": true
+    },
+    {
+      "id": "Ranvier.WebCore.Native.Gpu.win-x64",
+      "version": "0.1.1-preview.2",
+      "indexStatus": 200,
+      "latestListedVersions": [
+        "0.1.0-preview.7"
+      ],
+      "targetListed": false,
+      "exactPackageStatus": 404,
+      "absent": true
+    },
+    {
+      "id": "Ranvier.WebCore.Native.Gpu.linux-x64",
+      "version": "0.1.1-preview.2",
+      "indexStatus": 404,
+      "latestListedVersions": [],
+      "targetListed": false,
+      "exactPackageStatus": 404,
+      "absent": true
+    },
+    {
+      "id": "Ranvier.WebCore.Native.Gpu.linux-arm64",
+      "version": "0.1.1-preview.2",
+      "indexStatus": 404,
+      "latestListedVersions": [],
+      "targetListed": false,
+      "exactPackageStatus": 404,
+      "absent": true
+    }
+  ],
+  "tag": {
+    "name": "v0.1.1-preview.2",
+    "absent": true,
+    "response": {
+      "message": "Not Found",
+      "documentation_url": "https://docs.github.com/rest/git/refs#get-a-reference",
+      "status": "404"
+    }
+  },
+  "openPrs": [
+    {
+      "body": "## Summary\r\n\r\n- Reused build trees stay incremental on macOS and Windows: a restored tree no longer recompiles units whose inputs did not change (`scripts/build.py`, `scripts/build_cache.py`, `config/common.cmake`, `config/win-project.cmake`, the 0005 and 0007 stub patches). `docs/CI.md` describes the cache behaviour.\r\n  - macOS reran every generator (342 edges, 24 min) because generator rules named Python by the runner's versioned path; Python and Ruby are now named by links under `<work>/tools/stable` (junctions on Windows).\r\n  - win-arm64 recompiled 240 WebCore sources because patches 0005 and 0007 rewrote the stub event factory inputs on every configure; they now write only on a content change.\r\n  - win-x64 failed on a WebCore PCH after an image shipped another `cl.exe` under the same MSVC version; the Windows toolchain key now hashes `cl.exe` and the MSVC/SDK header paths and sizes, and clang-cl PCHs build with `-fno-pch-timestamp`. **The first Windows run after this merges rebuilds once.**\r\n  - `build_cache.py explain` prints ninja's first rebuild reasons before each build.\r\n- `pins.json` `package.version` is now `0.1.1-preview.2`, the next unreleased native version. `v0.1.1-preview.1` is tagged from `91fc950b` (#153).\r\n\r\nPart of the project 1 close-out tracked in #225. This is the last project 1 merge in this repo; its merge commit is where the next wave starts.\r\n\r\nMerge after the `v0.1.1-preview.1` tag run finishes: this PR changes the build-tree cache key (patches and config), and the tag restores main's current trees.\r\n\r\n\u00f0\u0178\u00a4\u2013 Generated with [Claude Code](https://claude.com/claude-code)\r\n",
+      "headRefName": "codex/ci-mac-cache",
+      "headRefOid": "8580e5432351550f74fe124772a9c7aab0720355",
+      "number": 226,
+      "title": "ci: keep reused build trees incremental; next version 0.1.1-preview.2",
+      "url": "https://github.com/ranvier-org/Ranvier.WebCore/pull/226"
+    },
+    {
+      "body": "Batch 5 (pipeline v2): canvas groups R02 paths/hit testing, R03 state/transforms/compositing, R04 paints, R05 text, R06 image/pixel operations, R07 export/bitmap transport, plus generator fixes (per-file typedef resolution, single-arm unions).\n\nStacked on batch 4 (base codex/batch-4); retarget after batch 4 merges.\n\nNumbers: ABI 58, Native 0.1.0-preview.50, DOM 0.1.0-alpha.53, Views 0.1.43 (absence receipt docs/batch-5-evidence/allocation-absence.json in WebCore).\n\nLocal proof on win-x64 (batch5-candidate-1): native full batch 99920 (batch 4 97854 + 2066 canvas), 123 teardown records, every batch-4 probe count unchanged; managed JIT 158 / AOT 158 / Chromium 108 PASS. Generator tests 124 on Windows and WSL Ubuntu. Full five-runtime matrix and acceptance proof run on this PR head.\n\n\u00f0\u0178\u00a4\u2013 Generated with [Claude Code](https://claude.com/claude-code)",
+      "headRefName": "codex/batch-5",
+      "headRefOid": "27c04fd0e9f27b5f86425a11e0f00c969856b7b0",
+      "number": 152,
+      "title": "feat: batch 5 native APIs (R02-R07 canvas 2D, generator fixes)",
+      "url": "https://github.com/ranvier-org/Ranvier.WebCore/pull/152"
+    },
+    {
+      "body": "Batch 4 (pipeline v2), stacked on batch 3. Merge after batch 3; this PR then retargets to the default branch.\n\nGroups: I03 touch input, I04 pen input, I06 pointer lock, A01 keyframe animation creation, T02 font construction and registration, B06 media capability queries, R12 snapshot and export options.\n\nNumbers: ABI 57, Native preview.49, DOM alpha.52, Views 0.1.42. Kinds: Touch 105, TouchList 106, WebAnimation/AnimationEffect/AnimationTimeline 107-109, FontFace 110, FontFaceSet 111. Patches 0044-0048 (pen geometry, touch guards, pointer lock, FontFace rejection); the build enables ENABLE_TOUCH_EVENTS and ENABLE_POINTER_LOCK.\n\nIntegration fixes: #145 length-delimited strings in the pointer, animation, font, media and snapshot probes; the image-encoding-png/jpeg/webp facility facts are registered and asserted against the encoder.\n\nLocal evidence (win-x64): native full batch 97854 raw + 117 teardown records; managed JIT 150 / AOT 150 / Chromium 102 PASS lines; generator checks on Windows and WSL Ubuntu. Non-Windows CI, 30x repeats and acceptance run on this head.\n\n\u00f0\u0178\u00a4\u2013 Generated with [Claude Code](https://claude.com/claude-code)\n",
+      "headRefName": "codex/batch-4",
+      "headRefOid": "b9992786f84e67ae6bdcaa58fd7b6f87f4b26970",
+      "number": 151,
+      "title": "feat: batch 4 native APIs (I03/I04/I06 pointer input, A01 animations, T02 font construction, B06 media capabilities, R12 snapshot options)",
+      "url": "https://github.com/ranvier-org/Ranvier.WebCore/pull/151"
+    },
+    {
+      "body": "Batch 3 (pipeline v2), stacked on batch 2. Merge after batch 2; this PR then retargets to the default branch.\n\nGroups: R01 canvas lifecycle, D17 value factories, T01 + R09 font and image readiness, B10 screen wake locks, B09 notifications, I07 + T09 + T04 DataTransfer/clipboard/drag and drop.\n\nNumbers: ABI 56, Native preview.48, DOM alpha.51, Views 0.1.41. DataTransfer kinds 102-104.\n\nIntegration fixes: #145 length-delimited strings in lane probes and Views listeners; `rv_host_replace_range` returns `RV_ERR_WRONG_HOST` for a range in another document; `viewport_scroll` counts no assertions in its settle loops (fixed count 2156).\n\nLocal evidence (win-x64): native full batch 95780 raw + 115 teardown over 73 probes; managed JIT 141 / AOT 141 / Chromium 97 PASS lines. Five-runtime CI, 30x repeats and acceptance run on this head.\n\n\u00f0\u0178\u00a4\u2013 Generated with [Claude Code](https://claude.com/claude-code)\n",
+      "headRefName": "codex/batch-3",
+      "headRefOid": "6e6e7fece832bc93fab1084c338c5fc206ecdd66",
+      "number": 150,
+      "title": "feat: batch 3 native APIs (canvas lifecycle, value factories, readiness, wake locks, notifications, DataTransfer)",
+      "url": "https://github.com/ranvier-org/Ranvier.WebCore/pull/150"
+    },
+    {
+      "body": "Batch 2 of the batch-merge pipeline, stacked on batch 1 (base codex/batch-1; it retargets to the default branch once batch 1 merges).\n\nGroups: #145 hand-written host string inputs, G10 resize observation, G11 intersection observation, G01 media queries + G15 OS preferences (carries WebKit patch 0040), the I01 listener-removal evidence probe, and the \"Some null means None\" managed cleanup. One additive ABI bump 54 -> 55; Native 0.1.0-preview.47, DOM alpha.50, Views 0.1.40 / backend alpha.40.\n\nEvery merge is a two-parent forward merge, and each lane head is an ancestor. Generated files were regenerated, not hand-merged; probes that still used the pre-#145 string ABI were ported. Local verification on a private win-x64 candidate: native batch 93953 raw + 111 teardown with every probe at its expected count; managed JIT 129, NativeAOT 129, Chromium 91 (a superset of batch 1 and of each lane). Generator checks pass on Windows and Linux.\n\nAcceptance runs the independent full proof on this head.\n\n\u00f0\u0178\u00a4\u2013 Generated with [Claude Code](https://claude.com/claude-code)\n",
+      "headRefName": "codex/batch-2",
+      "headRefOid": "7e2ffa06371fdda72c8938bba94b4d7a33dac9aa",
+      "number": 149,
+      "title": "feat: batch 2 native APIs (Native47/ABI55)",
+      "url": "https://github.com/ranvier-org/Ranvier.WebCore/pull/149"
+    },
+    {
+      "body": "Native29 / ABI37, feature `dom-window-scrolling`, for #50 (G05 fractional viewport scrolling).\n\n- Adds `rv_dom_window_get_scroll_x` and `rv_dom_window_get_scroll_y`.\n- Adds window `scroll`, `scroll_to` and `scroll_by`, each in a ScrollToOptions form and an x, y form.\n- The generator now binds readonly window attributes.\n- Qualifications: both engines keep whole-pixel offsets; native truncates where Chromium rounds. 13 of 16 oracle steps differ; the list is in the evidence.\n\nEvidence: `docs/viewport-scroll-evidence/final-evidence.json`. 41 probes and 47641 assertions pass, and 72/72 teardown cases expire. Stacked on the D13 PR.\n\n\u00f0\u0178\u00a4\u2013 Generated with [Claude Code](https://claude.com/claude-code)\n",
+      "headRefName": "codex/native-api-viewport-scroll",
+      "headRefOid": "dc0951a2034dc74cb69170ea34055b90cf1573c4",
+      "number": 141,
+      "title": "feat(dom): expose window scroll offsets and scrolling (Native29)",
+      "url": "https://github.com/ranvier-org/Ranvier.WebCore/pull/141"
+    },
+    {
+      "body": "Native28 / ABI36, for #22 (D13 form collections and events).\n\n- Generates form collections, FormData (with kind-tagged entries), SubmitEvent and FormDataEvent, and unexcludes requestSubmit and submit.\n- Generator fix: under Fable, a Fable adapter is no longer shadowed by an inherited intrinsic member, so `HTMLFormControlsCollection.namedItem` returns the union. A generator test covers this.\n- Qualifications: host documents never navigate on form submission; File entries are tags until H11.\n\nEvidence: `docs/forms-evidence/`. 42 probes and 44409 assertions pass. `form_collections` shows 0 mismatches against Chromium 156. 70 teardown cases pass. Stacked on the G02/G12 PR.\n\n\u00f0\u0178\u00a4\u2013 Generated with [Claude Code](https://claude.com/claude-code)\n",
+      "headRefName": "codex/native-api-forms",
+      "headRefOid": "cd90d0d4805d3943daa68c111c053537b6331f7a",
+      "number": 140,
+      "title": "feat(dom): expose form collections, FormData and submission events (Native28)",
+      "url": "https://github.com/ranvier-org/Ranvier.WebCore/pull/140"
+    },
+    {
+      "body": "Native27 / ABI35, feature `viewport`, for #47 (G02 viewport dimensions and scale) and #57 (G12 viewport and document event routing).\n\n- Adds `rv_host_window_metrics`, `rv_host_set_visible`, `rv_host_match_media`, `rv_media_query_matches` and `rv_media_query_media`.\n- Window events route through I12's window target.\n- Qualifications: native paint truncates where Chromium rounds; a scale-only change is reported in the next update; visibility is checked native-only.\n\nEvidence: `docs/viewport-evidence/final-evidence.json`. 40 probes and 43241 assertions pass, and 62/62 teardown cases expire. Stacked on the I12 PR.\n\n\u00f0\u0178\u00a4\u2013 Generated with [Claude Code](https://claude.com/claude-code)\n",
+      "headRefName": "codex/native-api-viewport",
+      "headRefOid": "202d00ab9dc3331a57be53cdad971c0292c4b0d8",
+      "number": 139,
+      "title": "feat(host): expose viewport metrics, visibility and media queries (Native27)",
+      "url": "https://github.com/ranvier-org/Ranvier.WebCore/pull/139"
+    },
+    {
+      "body": "Native26 / ABI34, feature `input-state`, for #107 (I12 native focus, activation and input).\n\n- `rv_host_window_event_target` returns a new reference to the document's window as an `RvEventTarget`. It stays valid after `rv_host_destroy`, and the host keeps one window for its lifetime.\n- `rv_host_max_touch_points`.\n- The first `rv_host_set_focused(1)` now fires one window focus event.\n- Merges the #137 generator fix 84dda644.\n\nPrivate evidence: `docs/focus-input-evidence/`. 37 probes and 42877 assertions pass, and 58 teardown cases expire. Stacked on #137; it merges after the release stack.\n\n\u00f0\u0178\u00a4\u2013 Generated with [Claude Code](https://claude.com/claude-code)\n",
+      "headRefName": "codex/native-api-focus-input",
+      "headRefOid": "483c0e5c9795952d61c736376347c9c627dc2625",
+      "number": 138,
+      "title": "feat(host): expose the window event target and touch points (Native26)",
+      "url": "https://github.com/ranvier-org/Ranvier.WebCore/pull/138"
+    },
+    {
+      "body": "## D01 filtered tree traversal (Native25/ABI33)\n\nRefs #17.\n\nAdds `Document.createTreeWalker`/`createNodeIterator`, `TreeWalker`, `NodeIterator` and the `NodeFilter` constants, generated over the engine's own traversal code, with host-created NodeFilters.\n\n- **Generator:** callback interfaces are parsed. `dom.json` `callbackObjectRoots.NodeFilter` makes NodeFilter an object handle root, with the generated `rv_dom_node_filter_retain`/`_release`, and excludes `NodeFilter.acceptNode`. `SHOW_ALL` (0xFFFFFFFF) is emitted as an unsigned `#define` and as an F# `u` literal.\n- **Host:** `rv_node_filter_create(target, callback, context, release)` wraps an `RvNodeFilterCallback` in an engine NodeFilter, and `rv_node_filter_context` returns the context of a host filter. The release callback runs once, after the last engine reference is dropped. A failing callback stops the traversal the way a throwing filter does: `RV_ERR_DOM_EXCEPTION`, with `rv_last_exception` naming ExistingExceptionError.\n- **Managed (`tests/abi/Traversal.fs`, shipped in Ranvier.WebCore):** `NodeFilter.Create`/`FunctionOf` and `traversing`. A filter exception is rethrown after the native call returns, as the same object with its stack, and never unwinds through native frames.\n- **Shared contract:** `NodeFilter = Node -> NodeFilterResult` (Accept=1, Reject=2, Skip=3). The factories take `root * ?whatToShow * ?filter`, and the `filter` getters return `(NodeFilter) option`.\n\n## Proof (private win-x64, unpublished)\n\n- **RED:** on Native23, `rv_node_filter_create` is absent.\n- **GREEN:** `tests/abi/tree_traversal.py` replays 39 cases (1688 steps, `tests/fixtures/tree-traversal-cases.json`) and matches the Chromium 156 oracle on every result, every filter call (count and order), all walker/iterator state, the getters and filter identity. The cases cover whatToShow masks, accept/skip/reject, every walker step method from 11 positions, iterator pre-removal steps, throwing filters, mutating filters and re-entrancy. The probe also checks the null/thread/interface errors and release-callback lifetime.\n- **Driver:** `TraversalProbe.fs` checks the managed rethrow, state kept after a throw, InvalidStateError on re-entrancy, and release of the managed function. Teardown adds 4 cases where walkers and iterators are held past host destroy (58 cases, all refs -1).\n- **Full batch:** 38 runs exit 0, with 49986 raw assertions. All 11 repository gates pass. Evidence: `docs/traversal-evidence/native25-final/final-evidence.json`. Allocation absence check: `docs/traversal-evidence/native25-allocation`.\n\n## Qualifications\n\n- **Re-entrant NodeIterator:** the inner call throws InvalidStateError, and the results match Chromium. Afterwards the reference node is null in both engines, where the DOM standard continues the iteration. Native reads it as NULL; Chromium's renderer crashes.\n- **acceptNode object form:** browser-only. The contract takes a function.\n- **`currentNode = null`:** returns `RV_ERR_NULL_ARGUMENT`; Chromium throws TypeError.\n\nStacked on #136 (I02, Native24/ABI32), which carries #135 and #133. Draft until the stack below lands.\n\n\u00f0\u0178\u00a4\u2013 Generated with [Claude Code](https://claude.com/claude-code)\n",
+      "headRefName": "codex/native-api-traversal",
+      "headRefOid": "84dda644317298e90287c6559a4e9c8c1ffb2986",
+      "number": 137,
+      "title": "feat(dom): expose filtered tree traversal with host NodeFilters (Native25/ABI33)",
+      "url": "https://github.com/ranvier-org/Ranvier.WebCore/pull/137"
+    },
+    {
+      "body": "Adds event construction and standalone EventTargets (Native24/ABI32) for I02, through host glue only, with no WebKit source change.\r\n\r\n- **`rv_host_construct_event`** builds events through the engine's real constructors: Event, CustomEvent, UIEvent, MouseEvent, KeyboardEvent and FocusEvent.\r\n  - It takes a size-prefixed `RvEventInit` with the base, UI, mouse, keyboard and focus fields, including `composed` and `relatedTarget`.\r\n  - CustomEvent.detail is a real engine value, parsed from JSON in the document realm with script entry still disallowed. WebCore-side glue keeps it reachable while the event lives, and drops it on document replacement or `rv_host_destroy`.\r\n  - `rv_custom_event_detail_json` returns it using the exact-byte UTF-8 protocol.\r\n- **Standalone targets:** `rv_host_create_event_target` creates an EventTargetConcrete, with retain and release.\r\n- **`rv_event_target_*` functions** add listeners to and dispatch on any EventTarget, and convert between nodes and targets.\r\n- **`rv_event_get_target` / `rv_event_get_related_target`** return EventTarget references. `RV_EVENT_CUSTOM` reports the CustomEvent interface.\r\n- `rv_node_*` is unchanged. The header documents ownership and teardown for constructed events, targets and their listeners.\r\n\r\n**Measured provider qualifications:** both this engine and Chromium expose a constructed MouseEvent's clientX/clientY as integers (12.5 reads 12). Chromium also reports button 0 for a constructed mouseover regardless of init.\r\n\r\n**Validation** (private win-x64 candidate, built on the frozen H05 Native22 objects):\r\n- `tests/abi/event_construction.py` fails against Native22 at the ABI version check and passes 82 assertions on Native24. The assertions include dispatch order, cancellation, target and currentTarget, relatedTarget, a GC-surviving detail, rejections, and teardown both before and after host destroy.\r\n- All 34 native probes pass.\r\n- The ABI driver frames and teardown runs exit 0.\r\n- Five repository gates pass.\r\n\r\nEvidence is in `docs/custom-events-evidence/`. Official multi-RID builds and the managed consumer remain separate.\r\n\r\nReleases after #135 in the native order. Stacks on #133. Refs #100.\r\n\r\n\u00f0\u0178\u00a4\u2013 Generated with [Claude Code](https://claude.com/claude-code)\r\n",
+      "headRefName": "codex/native-api-custom-events",
+      "headRefOid": "188aae0daedb48149ca3812b3fba261a6db6f1bc",
+      "number": 136,
+      "title": "feat(events): construct typed and custom events and standalone targets (I02, Native24/ABI32)",
+      "url": "https://github.com/ranvier-org/Ranvier.WebCore/pull/136"
+    },
+    {
+      "body": "Adds the S13 typed MathML surface. `MathMLMathElement` joins the generated model and the capability catalogue. The model is now 249 interfaces with 2,455 functions, 50 roots, 22 dictionaries and no stubs. The pinned IDL gives MathML elements no own members, so the shared `HTMLOrSVGOrMathMLElement` and `ElementCSSInlineStyle` members are now proven on real `math`, `mrow`, `mi`, `mo`, `mn`, `mfrac` and `msqrt` elements against measured Chromium 156:\n\n- identity and namespace\n- dataset, nonce, autofocus and tabIndex\n- focus/blur and Tab order\n- inline style and typed `attributeStyleMap`, including their layout and paint effects (padding shift, font scaling, background pixels, `math-style: compact`)\n- error handling: null, thread, subtype, undersized buffers\n- lifetime across host disposal\n\nTeardown gains six permanent release-after-destroy cases (node, dataset and style map, each attached and removed).\n\nValidation runs on a private win-x64 runtime, Native23/ABI31 (Host `454d3d67`, WebCore `693915b8`, JSC `95149cdc`):\n- 33 passing runs with 27,229 raw assertions, including MathML 371.\n- Full frames and 54 teardown cases.\n- Ten repository gates.\n- Allocation receipt: `docs/mathml-evidence/native23-allocation/allocation-absence.json`.\n- Evidence: `docs/mathml-evidence/native23-final/final-evidence.json`.\n\nQualifications:\n- Chromium does not expose `MathMLMathElement`.\n- The host always enables MathML, so the disabled-setting behaviour is unexercised.\n- The dataset missing-key value `\"\"` is the shared contract, not a native difference.\n\nStacks on #132. H05 (Native22) is forward-merged when it lands. Official multi-RID builds and consumers are separate.\n\nRefs #89.\n\n\u00f0\u0178\u00a4\u2013 Generated with [Claude Code](https://claude.com/claude-code)\n",
+      "headRefName": "codex/native-api-mathml",
+      "headRefOid": "af697001829289a07b4de74a967786ced7011973",
+      "number": 135,
+      "title": "feat(mathml): expose typed MathML elements (Native23/ABI31)",
+      "url": "https://github.com/ranvier-org/Ranvier.WebCore/pull/135"
+    }
+  ],
+  "otherAbi60Reservations": [],
+  "allocationAllowed": true,
+  "limitations": [
+    "NuGet CDN/index absence does not undo an accepted push; no matching publication/tag is recorded here.",
+    "Existing Project1 PR226 names preview.2 as next unreleased pins value; it is the provisional base, not a competing release.",
+    "Core and View versions remain unallocated until their integration checks."
+  ]
+}

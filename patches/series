@@ -52,3 +52,4 @@
 0051-web-animation-promise-observer.patch
 0052-eventloop-checkpoint-microtasks.patch
 0053-view-transition-settle-without-script.patch
+0054-wpe-standalone-compositor.patch

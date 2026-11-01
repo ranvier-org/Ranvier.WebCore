@@ -1,0 +1,18 @@
+{
+  "sourceBaseline": "5a846b642b94b75042073135e11e01c0545a00e3",
+  "newRuntimeTypeKinds": [],
+  "files": [
+    {
+      "file": "host/RanvierWebCoreAbi.h",
+      "existingConstants": 485,
+      "changedExisting": {},
+      "newConstants": {}
+    },
+    {
+      "file": "host/RanvierWebCoreDom.h",
+      "existingConstants": 391,
+      "changedExisting": {},
+      "newConstants": {}
+    }
+  ]
+}

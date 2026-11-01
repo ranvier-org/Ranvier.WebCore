@@ -6,6 +6,7 @@ if (ENABLE_WEBCORE)
         RanvierAbi/RanvierWebCoreDom.cpp
         RanvierAbi/RanvierWebCoreUia.cpp
         RanvierAbi/RanvierWebCoreD3D11.cpp
+        RanvierAbi/RanvierWebCoreEGL.cpp
         RanvierAbi/RanvierImageEncoding.cpp
     )
     set(RanvierWebCoreHost_LIBRARIES ${TestWebCore_LIBRARIES})
@@ -25,9 +26,10 @@ if (ENABLE_WEBCORE)
     # coordinated graphics replaces, and the GPU code that patch 0004's USE_GPU_STUB removes.
     if (USE_GRAPHICS_LAYER_TEXTURE_MAPPER AND NOT USE_GPU_STUB)
         list(APPEND RanvierWebCoreHost_DEFINITIONS RANVIER_COMPOSITING=1)
-        list(APPEND RanvierWebCoreHost_LIBRARIES ANGLE::GLES)
         if (WIN32)
-            list(APPEND RanvierWebCoreHost_LIBRARIES ANGLE::EGL d3d11 dxgi)
+            list(APPEND RanvierWebCoreHost_LIBRARIES ANGLE::GLES ANGLE::EGL d3d11 dxgi)
+        elseif (PORT STREQUAL "WPE")
+            list(APPEND RanvierWebCoreHost_LIBRARIES Epoxy::Epoxy)
         endif ()
     endif ()
 
