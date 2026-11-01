@@ -1,0 +1,216 @@
+{
+  "specification": {
+    "profile": "Web Cryptography API Level2 editors draft",
+    "editorDraftDate": "2026-10-22",
+    "publishedUrl": "https://w3c.github.io/webcrypto/",
+    "sourceCommit": "84ce201266f605a92f9ae790763db9f70a026ffa",
+    "sourceUrl": "https://raw.githubusercontent.com/w3c/webcrypto/84ce201266f605a92f9ae790763db9f70a026ffa/spec/Overview.html",
+    "sourceSha256": "d6fb0d30dec02eb7bc5c831542013188c9eb896a88e3c8b3fddf6223b7ce17c7",
+    "sourceBytes": 675222
+  },
+  "scope": "Selected target contract; not an implementation-completion claim",
+  "hmacImportKeySection": "31.6.4",
+  "hmacImportKeyUrl": "https://w3c.github.io/webcrypto/#hmac-operations-import-key",
+  "hmacImportOrderCases": [
+    {
+      "format": "raw",
+      "lengthPresent": false,
+      "lengthBits": 0,
+      "usages": [
+        "sign"
+      ],
+      "expected": "success"
+    },
+    {
+      "format": "raw",
+      "lengthPresent": false,
+      "lengthBits": 0,
+      "usages": [
+        "encrypt"
+      ],
+      "expected": "SyntaxError"
+    },
+    {
+      "format": "raw",
+      "lengthPresent": false,
+      "lengthBits": 0,
+      "usages": [],
+      "expected": "SyntaxError"
+    },
+    {
+      "format": "raw",
+      "lengthPresent": true,
+      "lengthBits": 0,
+      "usages": [
+        "sign"
+      ],
+      "expected": "DataError"
+    },
+    {
+      "format": "raw",
+      "lengthPresent": true,
+      "lengthBits": 0,
+      "usages": [
+        "encrypt"
+      ],
+      "expected": "DataError"
+    },
+    {
+      "format": "raw",
+      "lengthPresent": true,
+      "lengthBits": 0,
+      "usages": [],
+      "expected": "DataError"
+    },
+    {
+      "format": "jwk",
+      "lengthPresent": false,
+      "lengthBits": 0,
+      "usages": [
+        "sign"
+      ],
+      "expected": "success"
+    },
+    {
+      "format": "jwk",
+      "lengthPresent": false,
+      "lengthBits": 0,
+      "usages": [
+        "encrypt"
+      ],
+      "expected": "SyntaxError"
+    },
+    {
+      "format": "jwk",
+      "lengthPresent": false,
+      "lengthBits": 0,
+      "usages": [],
+      "expected": "SyntaxError"
+    },
+    {
+      "format": "jwk",
+      "lengthPresent": true,
+      "lengthBits": 0,
+      "usages": [
+        "sign"
+      ],
+      "expected": "DataError"
+    },
+    {
+      "format": "jwk",
+      "lengthPresent": true,
+      "lengthBits": 0,
+      "usages": [
+        "encrypt"
+      ],
+      "expected": "DataError"
+    },
+    {
+      "format": "jwk",
+      "lengthPresent": true,
+      "lengthBits": 0,
+      "usages": [],
+      "expected": "DataError"
+    },
+    {
+      "format": "spki",
+      "lengthPresent": false,
+      "lengthBits": 0,
+      "usages": [
+        "sign"
+      ],
+      "expected": "NotSupportedError"
+    },
+    {
+      "format": "spki",
+      "lengthPresent": false,
+      "lengthBits": 0,
+      "usages": [
+        "encrypt"
+      ],
+      "expected": "SyntaxError"
+    },
+    {
+      "format": "spki",
+      "lengthPresent": false,
+      "lengthBits": 0,
+      "usages": [],
+      "expected": "NotSupportedError"
+    },
+    {
+      "format": "spki",
+      "lengthPresent": true,
+      "lengthBits": 0,
+      "usages": [
+        "sign"
+      ],
+      "expected": "DataError"
+    },
+    {
+      "format": "spki",
+      "lengthPresent": true,
+      "lengthBits": 0,
+      "usages": [
+        "encrypt"
+      ],
+      "expected": "DataError"
+    },
+    {
+      "format": "spki",
+      "lengthPresent": true,
+      "lengthBits": 0,
+      "usages": [],
+      "expected": "DataError"
+    },
+    {
+      "format": "pkcs8",
+      "lengthPresent": false,
+      "lengthBits": 0,
+      "usages": [
+        "sign"
+      ],
+      "expected": "NotSupportedError"
+    },
+    {
+      "format": "pkcs8",
+      "lengthPresent": false,
+      "lengthBits": 0,
+      "usages": [
+        "encrypt"
+      ],
+      "expected": "SyntaxError"
+    },
+    {
+      "format": "pkcs8",
+      "lengthPresent": false,
+      "lengthBits": 0,
+      "usages": [],
+      "expected": "NotSupportedError"
+    },
+    {
+      "format": "pkcs8",
+      "lengthPresent": true,
+      "lengthBits": 0,
+      "usages": [
+        "sign"
+      ],
+      "expected": "DataError"
+    },
+    {
+      "format": "pkcs8",
+      "lengthPresent": true,
+      "lengthBits": 0,
+      "usages": [
+        "encrypt"
+      ],
+      "expected": "DataError"
+    },
+    {
+      "format": "pkcs8",
+      "lengthPresent": true,
+      "lengthBits": 0,
+      "usages": [],
+      "expected": "DataError"
+    }
+  ]
+}

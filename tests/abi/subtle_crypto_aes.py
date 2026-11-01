@@ -383,6 +383,19 @@ def check_wrapping(probe, page):
                     restored = probe.take(probe.unwrap(page, wrapped, wrapping, parameters, name='HMAC', format=format, usages=('sign',), options=algorithm('HMAC', 'SHA-256')), page)
                     n.expect(probe.bytes(probe.export(page, restored), page) == b'hmac wrapping target', 'HMAC target normalization and round trip')
 
+def check_hmac_import_order(probe, page):
+    profile = json.loads((FIXTURES / 'crypto-webcrypto-profile.json').read_text())
+    for case in profile['hmacImportOrderCases']:
+        with probe.check('dated ED HMAC import ' + json.dumps(case)):
+            options = algorithm('HMAC', 'SHA-256', 0 if case['lengthPresent'] else MISSING)
+            data = {'kty': 'oct', 'k': 'AQ'} if case['format'] == 'jwk' else b'\x01'
+            operation = probe.imported(page, 'HMAC', data, usages=case['usages'], format=case['format'], options=options)
+            if case['expected'] == 'success':
+                probe.take(operation, page)
+            else:
+                probe.error_is(page, operation, case['expected'])
+
+
 def check_lifetime(probe):
     n = probe.n
     raw = bytes(range(16))
@@ -436,7 +449,7 @@ def run(directory, bridge_library=None):
     probe = AesProbe(n, ctypes.CDLL(bridge_library) if bridge_library else n.library)
     page = Case(n, '<p>AES owner</p>')
     try:
-        for group in [check_generation, check_vectors, check_jwk, check_cipher_validation, check_wrapping]:
+        for group in [check_generation, check_vectors, check_jwk, check_cipher_validation, check_wrapping, check_hmac_import_order]:
             with probe.check(group.__name__):
                 group(probe, page)
         with probe.check('check_lifetime'):
