@@ -26,6 +26,11 @@ def probe(name, *commands, rid=None, flavor=('slim', 'gpu'), timeout=TIMEOUT, en
 
 
 PROBES = [
+    *[probe('Verify SVG image failures through real EGLImage frames',
+            'python -I tests/abi/svg_image_error_paint.py --native-directory {native} --gpu',
+            rid=rid, flavor='gpu',
+            env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
+      for rid in ['linux-x64', 'linux-arm64']],
     *[probe('Verify failed SVG images stay empty while HTML fallback icons remain visible',
             'python -I tests/abi/svg_image_error_paint.py --native-directory {native}',
             rid=rid, flavor=None,

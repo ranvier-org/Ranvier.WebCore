@@ -15,10 +15,18 @@ PAGE = '''<style>html,body{margin:0;background:white}img{position:absolute;left:
 EVENT = C.CFUNCTYPE(C.c_int32, C.c_void_p, C.c_void_p)
 
 
-def verify(directory):
+def verify(directory, gpu=False):
+    native = consumer = None
+    if gpu:
+        from form_collections import Native
+        from wpe_builtin_images import gpu_pixels
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'gpu'))
+        from linux_view_transition_pixels import Consumer
+        native = Native(directory)
+        consumer = Consumer(native)
     with SvgProbe(directory, 128, 64) as p:
         P, I = p.pointer, p.integer
-        p.call('rv_host_set_accelerated_compositing', [P, I], p.host, 0)
+        p.call('rv_host_set_accelerated_compositing', [P, I], p.host, 1 if gpu else 0)
         held, callback_failures, events, callbacks, listeners = {}, [], [], [], []
         finish = p.bind('rv_resource_load_finish', I, [P, C.c_char_p, I, C.c_char_p])
         fail = p.bind('rv_resource_load_fail', I, [P])
@@ -54,7 +62,11 @@ def verify(directory):
         def settle(label):
             for _ in range(5):
                 p.expect(p.bind('rv_run_loop_cycle', I, [I])(20) >= 0, 'image event cycle')
-            rgba = p.paint()
+            if gpu:
+                p.update()
+                rgba = gpu_pixels(native, consumer, p.host, None, p.width, p.height)
+            else:
+                rgba = p.paint()
             counts = [sum(p.pixel(rgba, x, y) != [255,255,255,255]
                           for y in range(10,38) for x in range(left+2,left+30)) for left in [8,64]]
             samples.append(dict(label=label, svg=p.pixel(rgba,20,20), html=p.pixel(rgba,76,20),
@@ -93,7 +105,10 @@ def verify(directory):
             p.expect(not held and not callback_failures, 'all resource callbacks complete successfully')
             result = dict(result='FAIL' if painting_failures else 'PASS', assertions=p.assertions,
                           samples=samples, events=events, painting_failures=painting_failures,
-                          renderer='CPU paint', gpu_claim=False)
+                          renderer='EGLImage' if gpu else 'CPU paint', gpu_claim=gpu,
+                          cpu_paint_api_calls=0 if gpu else len(samples),
+                          gpu_frames=len(samples) if gpu else 0,
+                          transport_assertions=native.assertions if gpu else 0)
             print(json.dumps(result), flush=True)
             p.expect(not painting_failures, 'failed SVG images must not paint the HTML placeholder: '+repr(painting_failures))
             return result
@@ -106,4 +121,6 @@ def verify(directory):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--native-directory', required=True)
-    verify(parser.parse_args().native_directory)
+    parser.add_argument('--gpu', action='store_true')
+    args = parser.parse_args()
+    verify(args.native_directory, args.gpu)
