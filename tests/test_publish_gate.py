@@ -20,6 +20,23 @@ def permits_publish(native='success', prebuilt='skipped', managed='success', con
     return eval(' '.join(expression.split()), {'__builtins__': {}}, {'startsWith': lambda value, prefix: value.startswith(prefix)})
 
 
+def permits_windows_gpu_cohort(native='success', prebuilt='skipped', publish='success', cancelled=False,
+                               event='push', ref='refs/tags/v0.1.1-preview.2'):
+    workflow = (ROOT / '.github/workflows/build.yml').read_text()
+    job = workflow.split('\n  windows-gpu-cohort:\n', 1)[1]
+    expression = job.split('if:', 1)[1].split('${{', 1)[1].split('}}', 1)[0]
+    success = all(status == 'success' for status in [native, prebuilt, publish])
+    # GitHub implicitly adds success() unless a status-check function is present in the actual condition.
+    if not re.search(r'\b(?:success|failure|cancelled|always)\s*\(', expression):
+        expression = 'success() && (' + expression + ')'
+    for name, value in [('github.event_name', event), ('github.ref', ref), ('needs.publish.result', publish)]:
+        expression = expression.replace(name, repr(value))
+    expression = expression.replace('!cancelled()', repr(not cancelled)).replace('success()', repr(success))
+    expression = expression.replace('&&', ' and ').replace('||', ' or ')
+    return eval(' '.join(expression.split()), {'__builtins__': {}},
+                {'startsWith': lambda value, prefix: value.startswith(prefix)})
+
+
 class PublishGateTests(unittest.TestCase):
     def test_a_failed_runtime_cannot_publish_an_uploaded_package(self):
         self.assertFalse(permits_publish(native='failure', managed='skipped'))
@@ -56,6 +73,19 @@ class PublishGateTests(unittest.TestCase):
 
 
 class GpuCohortTests(unittest.TestCase):
+    def test_successful_tag_publication_survives_the_skipped_optional_ancestor(self):
+        for native, prebuilt in [('success', 'skipped'), ('skipped', 'success')]:
+            with self.subTest(native=native, prebuilt=prebuilt):
+                self.assertTrue(permits_windows_gpu_cohort(native=native, prebuilt=prebuilt))
+
+    def test_gpu_recovery_dispatch_does_not_recurse_or_run_after_failed_publication(self):
+        self.assertFalse(permits_windows_gpu_cohort(event='workflow_dispatch'))
+        self.assertFalse(permits_windows_gpu_cohort(ref='refs/heads/main'))
+        self.assertFalse(permits_windows_gpu_cohort(cancelled=True))
+        for publish in ['failure', 'cancelled', 'skipped']:
+            with self.subTest(publish=publish):
+                self.assertFalse(permits_windows_gpu_cohort(publish=publish))
+
     def test_successful_version_tag_dispatches_only_the_matching_windows_gpu_cohort(self):
         workflow = (ROOT / '.github/workflows/build.yml').read_text()
         self.assertIn('\n  windows-gpu-cohort:\n', workflow)
