@@ -958,6 +958,13 @@ type RvDomCaretPositionFromPointOptions =
     val mutable size: uint32
     val mutable shadow_roots: nativeint
 
+/// <summary>The IDL dictionary StartViewTransitionOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomStartViewTransitionOptions =
+    val mutable size: uint32
+    val mutable update: nativeint
+    val mutable types: nativeint
+
 /// <summary>The IDL dictionary ShadowRootInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomShadowRootInit =
@@ -1678,6 +1685,13 @@ type RvDomUnionBooleanOrImportNodeOptions =
 /// <summary>ABI transport for Touch sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomSequenceTouch =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
+/// <summary>ABI transport for DOMString sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequenceDOMStringNullable =
     val mutable present: int
     val mutable count: int
     val mutable items: nativeint
@@ -2513,6 +2527,9 @@ extern void rv_dom_union_boolean_or_import_node_options_release(RvDomUnionBoolea
 extern void rv_dom_sequence_touch_release(RvDomSequenceTouch& value)
 
 [<DllImport(Lib)>]
+extern void rv_dom_sequence_dom_string_nullable_release(RvDomSequenceDOMStringNullable& value)
+
+[<DllImport(Lib)>]
 extern void rv_dom_sequence_element_nullable_release(RvDomSequenceElementNullable& value)
 
 [<DllImport(Lib)>]
@@ -3221,10 +3238,28 @@ extern void rv_dom_text_metrics_release(nativeint handle)
 extern nativeint rv_dom_text_metrics_retain(nativeint handle)
 
 [<DllImport(Lib)>]
+extern void rv_dom_view_transition_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_view_transition_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_view_transition_type_set_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_view_transition_type_set_retain(nativeint handle)
+
+[<DllImport(Lib)>]
 extern void rv_dom_custom_effect_callback_release(nativeint handle)
 
 [<DllImport(Lib)>]
 extern nativeint rv_dom_custom_effect_callback_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_view_transition_update_callback_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_view_transition_update_callback_retain(nativeint handle)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_rule_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -3590,6 +3625,9 @@ extern int rv_dom_document_get_hidden(nativeint target, int& result)
 extern int rv_dom_document_get_visibility_state(nativeint target, int& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_document_get_active_view_transition(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_document_get_root_element(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
@@ -3711,6 +3749,9 @@ extern int rv_dom_document_get_selection(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_create_touch_list(nativeint target, [<In>] RvDomSequenceTouch[] touches, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_document_start_view_transition(nativeint target, [<In>] RvDomStartViewTransitionOptions[] callback_options, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_prepend(nativeint target, [<In>] RvDomSequenceNodeOrDOMString[] nodes)
@@ -12008,6 +12049,15 @@ extern int rv_dom_text_metrics_get_alphabetic_baseline(nativeint target, float& 
 extern int rv_dom_text_metrics_get_ideographic_baseline(nativeint target, float& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_view_transition_get_types(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_view_transition_set_types(nativeint target, nativeint value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_view_transition_skip_transition(nativeint target)
+
+[<DllImport(Lib)>]
 extern int rv_dom_css_supports_2(nativeint target, byte[] property, int property_length, byte[] value, int value_length, int& result)
 
 [<DllImport(Lib)>]
@@ -12171,6 +12221,24 @@ extern int rv_dom_highlight_delete(nativeint target, nativeint value, int& resul
 
 [<DllImport(Lib)>]
 extern int rv_dom_highlight_clear(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_view_transition_type_set_size(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_view_transition_type_set_has(nativeint target, byte[] value, int value_length, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_view_transition_type_set_values(nativeint target, RvDomSequenceDOMString& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_view_transition_type_set_add(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_view_transition_type_set_delete(nativeint target, byte[] value, int value_length, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_view_transition_type_set_clear(nativeint target)
 
 [<DllImport(Lib)>]
 extern int rv_dom_highlight_registry_size(nativeint target, uint32& result)

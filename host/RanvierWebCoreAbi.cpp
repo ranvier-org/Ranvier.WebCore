@@ -1610,6 +1610,10 @@ int32_t rv_abi_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "animation-custom-effects"))
         return 1;
+#if !USE(GPU_STUB)
+    if (!std::strcmp(feature, "view-transitions"))
+        return 1;
+#endif
     if (!std::strcmp(feature, "text-segmentation"))
         return 1;
     if (!std::strcmp(feature, "diagnostics"))
@@ -2125,6 +2129,7 @@ void rv_host_destroy(RvHost* host)
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_notifications_drop(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_custom_effect_callbacks_revoke_document(reinterpret_cast<RvNode*>(&host->document()));
+    ranvier_view_transitions_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     rv_host_detach_uia(host);
     rv_host_set_accelerated_compositing(host, RV_COMPOSITING_OFF);
     host->noScript.reset();
@@ -2146,6 +2151,7 @@ int32_t rv_host_load_html(RvHost* host, const uint8_t* html, int32_t html_length
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_custom_effect_callbacks_revoke_document(reinterpret_cast<RvNode*>(&host->document()));
+    ranvier_view_transitions_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     loadHTML(host->frame(), *markup);
     // The new document posts accessibility notifications once its cache exists.
     if (host->accessibility)
@@ -2162,6 +2168,7 @@ int32_t rv_host_load_svg(RvHost* host, const uint8_t* svg, int32_t svg_length)
         return RV_ERR_WRONG_THREAD;
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
+    ranvier_view_transitions_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     loadDocument(host->frame(), *markup, "image/svg+xml"_s);
     if (host->accessibility)
         host->document().axObjectCache();
@@ -3589,6 +3596,7 @@ int32_t rv_run_loop_cycle(int32_t milliseconds)
     auto deadline = MonotonicTime::now() + Seconds::fromMilliseconds(milliseconds);
     int32_t cycles = 0;
     do {
+        ranvier_view_transitions_deliver();
 #if PLATFORM(COCOA)
         cycleCocoaRunLoop();
 #elif USE(GLIB)
@@ -3598,6 +3606,7 @@ int32_t rv_run_loop_cycle(int32_t milliseconds)
 #endif
         ++cycles;
         deliverNotificationRequests();
+        ranvier_view_transitions_deliver();
         if (MonotonicTime::now() < deadline)
             WTF::sleep(1_ms);
     } while (MonotonicTime::now() < deadline);
@@ -5178,6 +5187,39 @@ int32_t rv_custom_effect_callback_revoke(RvCustomEffectCallback* callback)
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     return ranvier_custom_effect_callback_revoke(callback);
+}
+
+RvViewTransitionUpdateCallback* rv_view_transition_update_callback_create(RvHost* host, RvViewTransitionUpdate update,
+    void* context, RvCustomEffectRelease release)
+{
+    if (!host || !onOwningThread() || !liveHosts.contains(host))
+        return nullptr;
+    return ranvier_view_transition_update_callback_create(reinterpret_cast<RvNode*>(&host->document()), update, context, release);
+}
+
+int32_t rv_view_transition_update_callback_revoke(RvViewTransitionUpdateCallback* callback)
+{
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_view_transition_update_callback_revoke(callback);
+}
+
+int32_t rv_view_transition_observe(RvHost* host, RvViewTransition* transition, RvViewTransitionSettled callback, void* context,
+    RvViewTransitionObserver** observer)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_DETACHED;
+    return ranvier_view_transition_observe(reinterpret_cast<RvNode*>(&host->document()), transition, callback, context, observer);
+}
+
+void rv_view_transition_observer_release(RvViewTransitionObserver* observer)
+{
+    if (onOwningThread())
+        ranvier_view_transition_observer_release(observer);
 }
 
 RvNode* rv_node_retain(RvNode* target)

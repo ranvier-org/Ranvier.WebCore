@@ -135,7 +135,7 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
         return "TextSegments&", ""
     if ctype == "void**":
         return "nativeint&", ""
-    if ctype in ("RvGpuFrame**", "RvCanvasRenderingContext2D**"):
+    if ctype in ("RvGpuFrame**", "RvCanvasRenderingContext2D**", "RvViewTransitionObserver**"):
         return "nativeint&", ""
     if re.fullmatch(r"Rv\w+\*\*", ctype):
         return "nativeint[]", ""
@@ -251,6 +251,14 @@ def generated(header: str) -> str:
         "/// <summary>The <c>RvCustomEffectRelease</c> of the header.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
         "type CustomEffectRelease = delegate of context: nativeint -> unit",
+        "",
+        "/// <summary>The native update callback; zero fulfills the update, nonzero rejects it with TypeError.</summary>",
+        "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+        "type ViewTransitionUpdate = delegate of context: nativeint -> int",
+        "",
+        "/// <summary>A transition promise outcome; errorName is a borrowed UTF-8 pointer, or zero on fulfillment.</summary>",
+        "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+        "type ViewTransitionSettled = delegate of context: nativeint * promise: int * errorName: nativeint -> unit",
         "",
         "/// <summary>The <c>RvResizeCallback</c> of the header.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",

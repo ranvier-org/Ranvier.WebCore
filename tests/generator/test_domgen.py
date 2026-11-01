@@ -60,6 +60,39 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_nullable_callback_dictionary_member_preserves_null_default(self):
+        (self.source / 'Source/WebCore/dom/Fixture.idl').write_text(IDL + '''
+callback ViewTransitionUpdateCallback = undefined();
+dictionary TransitionOptions { ViewTransitionUpdateCallback? update = null; };
+partial interface Document { undefined transition(optional TransitionOptions options = {}); };
+''')
+        config = dict(self.world.config)
+        config['callbackObjectRoots'] = {'ViewTransitionUpdateCallback': {'contract': 'unit -> bool'}}
+        config['nullableObjectMembers'] = ['TransitionOptions.update']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.run()
+        function = next(f for f in generator.functions if f.name == 'document_transition')
+        self.assertIn('RvViewTransitionUpdateCallback* update;', generator.header())
+        body = '\n'.join(function.body)
+        self.assertIn('TransitionOptions a0 { };', body)
+        self.assertIn('if (options->size >= offsetof(RvDomTransitionOptions, update)', body)
+        self.assertIn('a0.update = std::move(value);', body)
+
+    def test_call_checks_run_after_conversion_and_before_engine_entry(self):
+        config = dict(self.world.config)
+        config['callChecks'] = {'Node.checkOptions': {
+            'header': 'RanvierViewTransitions.h',
+            'lines': ['if (!a0.enabled)', '    return RV_ERR_UNSUPPORTED;'],
+            'note': 'RV_ERR_UNSUPPORTED when transition compositing is unavailable'
+        }}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.run()
+        function = next(f for f in generator.functions if f.name == 'node_check_options')
+        body = '\n'.join(function.body)
+        self.assertLess(body.index('assignValue(a0.enabled'), body.index('if (!a0.enabled)'))
+        self.assertLess(body.index('if (!a0.enabled)'), body.index('impl->checkOptions'))
+        self.assertIn('#include "RanvierViewTransitions.h"', generator.glue())
+
     def svg_matrix_generator(self, argument='optional DOMMatrix2DInit matrix = {}', configured=None):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''
