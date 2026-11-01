@@ -2,7 +2,7 @@
 # remote, the packed package is checked and loaded by smoke.py, and the GitHub release v<version> is created
 # with the packages attached. Creating the release pushes its tag; the tag's CI run builds the runtimes not
 # attached, checks the attached ones again on its own runners, and pushes every slim package to nuget.org.
-# Non-slim flavors use a subsequent same-tag dispatch after the default slim run completes (docs/CI.md).
+# Windows GPU follows the default slim tag run automatically; lean uses a same-tag dispatch (docs/CI.md).
 #
 #   release.py --rid win-x64 [--rid ...] [--flavor slim] [--work DIR] [--dry-run] [build.py options]
 #
@@ -57,6 +57,8 @@ for rid in args.rid:
         '--expect-version', version, '--expect-flavor', args.flavor, *(['--no-load'] if rid.startswith('linux') else []))
     if args.flavor == 'slim':
         run(sys.executable, '-I', root / 'scripts/check_package_api.py', '--package', package)
+    elif args.flavor == 'gpu' and (rid == 'win-x64' or rid.startswith('linux-')):
+        run(sys.executable, '-I', root / 'scripts/check_package_api.py', '--gpu', '--package', package)
     packages.append(package)
 
 if args.dry_run:
@@ -68,6 +70,8 @@ run('gh', 'release', 'create', tag, '--target', head, '--title', tag, '--notes',
     *(['--prerelease'] if '-' in version else []), *packages)
 if args.flavor == 'slim':
     print(f'{tag} created: its CI run checks these packages and publishes them with the rest', flush=True)
+elif args.flavor == 'gpu' and set(args.rid) == {'win-x64'}:
+    print(f'{tag} created: its slim tag run automatically dispatches the matching Windows x64 GPU cohort after publication', flush=True)
 else:
     print(f'{tag} created: wait for its default slim CI run to succeed, then dispatch this flavor on the same tag:', flush=True)
     print(subprocess.list2cmdline(['gh', 'workflow', 'run', 'build.yml', '--ref', tag,

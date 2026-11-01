@@ -16,7 +16,7 @@ import threading
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from utf8_inputs import Utf8, StringInput, bind as bind_utf8, string_input
 
-ABI = 59
+ABI = 60
 OK, NULL_ARGUMENT, WRONG_THREAD, DOM_EXCEPTION, BUFFER_TOO_SMALL, UNSUPPORTED, WRONG_INTERFACE = 0, -1, -2, -3, -6, -9, -11
 ROOT = Path(__file__).resolve().parents[2]
 i16, u16, i32, u32, f32, f64, p, cstr = (ctypes.c_int16, ctypes.c_uint16, ctypes.c_int32, ctypes.c_uint32, ctypes.c_float,

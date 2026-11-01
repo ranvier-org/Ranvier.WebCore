@@ -228,7 +228,13 @@
 // RANVIER_COMPOSITING: RanvierWebCoreHost.cmake defines it when WebCore has GraphicsLayerTextureMapper and the
 // GPU code (USE_GPU_STUB off).
 #if RANVIER_COMPOSITING
+#if defined(__linux__)
+#include <epoxy/egl.h>
+#include <epoxy/gl.h>
+#include "RanvierWebCoreEGL.h"
+#else
 #include <GLES2/gl2.h>
+#endif
 #include <WebCore/GLContext.h>
 #include <WebCore/GraphicsLayerTextureMapper.h>
 #include <WebCore/PlatformDisplay.h>
@@ -712,6 +718,17 @@ static GLContext* compositingContext()
     return context;
 }
 
+#if PLATFORM(WPE)
+static EGLDisplay configuredEGLDisplay { EGL_NO_DISPLAY };
+
+class RvEGLPlatformDisplay final : public PlatformDisplay {
+public:
+    explicit RvEGLPlatformDisplay(Ref<GLDisplay>&& display)
+        : PlatformDisplay(WTF::move(display)) { }
+    Type type() const final { return Type::Surfaceless; }
+};
+#endif
+
 // Composites the page's GraphicsLayerTextureMapper tree in this process, the way WebKit's
 // LayerTreeHostTextureMapper does, but into an offscreen framebuffer that paint reads back.
 //
@@ -722,8 +739,7 @@ struct RvCompositor final : GraphicsLayerClient {
     GLContext* context { nullptr };
     std::unique_ptr<TextureMapper> textureMapper;
     RefPtr<GraphicsLayer> root;
-    // The compositor's root layer, a child of root; and the view root paints, during composite.
-    GraphicsLayer* attached { nullptr };
+    // The view root paints during composite.
     LocalFrameView* view { nullptr };
     IntSize size;
     GLuint texture { 0 };
@@ -808,6 +824,8 @@ struct RvHost {
     std::unique_ptr<RvCompositor> compositor;
 #if defined(_WIN32)
     std::shared_ptr<RvD3D11Surface> presentationSurface;
+#elif defined(__linux__)
+    std::shared_ptr<RvEGLSurface> presentationSurface;
 #endif
 #endif
     float deviceScale { 1 };
@@ -1550,7 +1568,7 @@ static_assert(sizeof(RvMediaVideoConfiguration) == 64 && offsetof(RvMediaVideoCo
 static_assert(sizeof(RvSnapshotOptions) == 64 && offsetof(RvSnapshotOptions, scale) == 8 && offsetof(RvSnapshotOptions, x) == 24 && offsetof(RvSnapshotOptions, quality) == 64 - 8);
 static_assert(sizeof(RvMediaAudioConfiguration) == 64 && offsetof(RvMediaAudioConfiguration, bitrate) == 40 && offsetof(RvMediaAudioConfiguration, spatial_rendering) == 56);
 
-int32_t rv_abi_version(void) { return 59; }
+int32_t rv_abi_version(void) { return 60; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -1610,6 +1628,10 @@ int32_t rv_abi_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "animation-custom-effects"))
         return 1;
+#if RANVIER_COMPOSITING
+    if (!std::strcmp(feature, "view-transitions"))
+        return 1;
+#endif
     if (!std::strcmp(feature, "text-segmentation"))
         return 1;
     if (!std::strcmp(feature, "diagnostics"))
@@ -1644,8 +1666,7 @@ int32_t rv_abi_has(const char* feature)
         if (!std::strcmp(feature, name))
             return 1;
     }
-#if !PLATFORM(GTK) && !PLATFORM(WPE)
-    // GTK and WPE keep file access out of drops (DataTransfer::allowsFileAccess); a paste carries files everywhere.
+#if !PLATFORM(GTK)
     if (!std::strcmp(feature, "data-transfer-files"))
         return 1;
 #endif
@@ -1654,6 +1675,9 @@ int32_t rv_abi_has(const char* feature)
         return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "presentation-d3d11"))
+        return 1;
+#elif defined(__linux__)
+    if (!std::strcmp(feature, "presentation-egl"))
         return 1;
 #endif
 #endif
@@ -2022,6 +2046,26 @@ int32_t rv_diagnostic_live_count(void)
     return liveDiagnostics.load();
 }
 
+int32_t rv_configure_egl_display(void* display)
+{
+    if (!display)
+        return RV_ERR_NULL_ARGUMENT;
+#if PLATFORM(WPE) && RANVIER_COMPOSITING
+    JSC::initialize();
+    WTF::initializeMainThread();
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (PlatformDisplay::sharedDisplayIfExists() || (configuredEGLDisplay && configuredEGLDisplay != display))
+        return RV_ERR_UNSUPPORTED;
+    if (!eglQueryString(display, EGL_VERSION))
+        return RV_ERR_UNSUPPORTED;
+    configuredEGLDisplay = display;
+    return RV_OK;
+#else
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
 RvHost* rv_host_create(int32_t width, int32_t height)
 {
     static bool initialized;
@@ -2034,8 +2078,17 @@ RvHost* rv_host_create(int32_t width, int32_t height)
         DeprecatedGlobalSettings::setUsesOverlayScrollbars(true);
 #endif
 #if PLATFORM(GTK) || PLATFORM(WPE)
-        if (!PlatformDisplay::sharedDisplayIfExists())
+        if (!PlatformDisplay::sharedDisplayIfExists()) {
+#if PLATFORM(WPE) && RANVIER_COMPOSITING
+            if (configuredEGLDisplay) {
+                auto display = GLDisplay::create(configuredEGLDisplay);
+                if (!display)
+                    return nullptr;
+                PlatformDisplay::setSharedDisplay(std::make_unique<RvEGLPlatformDisplay>(display.releaseNonNull()));
+            } else
+#endif
             PlatformDisplay::setSharedDisplay(PlatformDisplaySurfaceless::create());
+        }
 #endif
         initialized = true;
         segmentationInitialized = true;
@@ -2125,6 +2178,7 @@ void rv_host_destroy(RvHost* host)
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_notifications_drop(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_custom_effect_callbacks_revoke_document(reinterpret_cast<RvNode*>(&host->document()));
+    ranvier_view_transitions_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     rv_host_detach_uia(host);
     rv_host_set_accelerated_compositing(host, RV_COMPOSITING_OFF);
     host->noScript.reset();
@@ -2146,6 +2200,7 @@ int32_t rv_host_load_html(RvHost* host, const uint8_t* html, int32_t html_length
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_custom_effect_callbacks_revoke_document(reinterpret_cast<RvNode*>(&host->document()));
+    ranvier_view_transitions_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     loadHTML(host->frame(), *markup);
     // The new document posts accessibility notifications once its cache exists.
     if (host->accessibility)
@@ -2162,6 +2217,7 @@ int32_t rv_host_load_svg(RvHost* host, const uint8_t* svg, int32_t svg_length)
         return RV_ERR_WRONG_THREAD;
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
+    ranvier_view_transitions_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     loadDocument(host->frame(), *markup, "image/svg+xml"_s);
     if (host->accessibility)
         host->document().axObjectCache();
@@ -2434,10 +2490,9 @@ static int32_t composite(RvCompositor& compositor, LocalFrameView& view, uint8_t
         return RV_ERR_PAINT_FAILED;
     while (frameRoot->parent() && frameRoot->parent() != compositor.root.get())
         frameRoot = frameRoot->parent();
-    if (compositor.attached != frameRoot.get()) {
+    if (frameRoot->parent() != compositor.root.get()) {
         compositor.root->removeAllChildren();
         compositor.root->addChild(*frameRoot);
-        compositor.attached = frameRoot.get();
     }
     // The content under the layers is repainted whole each frame.
     compositor.view = &view;
@@ -2456,6 +2511,9 @@ static int32_t composite(RvCompositor& compositor, LocalFrameView& view, uint8_t
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     // FlipY::Yes puts the page's first row at the framebuffer's first row, which glReadPixels returns first.
     compositor.textureMapper->beginPainting(TextureMapper::FlipY::Yes);
+#if ENABLE(DAMAGE_TRACKING)
+    rootLayer.layer().prepareForPainting(*compositor.textureMapper);
+#endif
     rootLayer.layer().paint(*compositor.textureMapper);
     compositor.textureMapper->endPainting();
     if (!rgba) {
@@ -2484,8 +2542,70 @@ static int32_t composite(RvCompositor& compositor, LocalFrameView& view, uint8_t
 struct RvGpuFrame {
 #if defined(_WIN32) && RANVIER_COMPOSITING
     std::shared_ptr<RvD3D11Surface> surface;
+#elif defined(__linux__) && RANVIER_COMPOSITING
+    std::shared_ptr<RvEGLSurface> surface;
 #endif
 };
+
+int32_t rv_host_acquire_egl_frame(RvHost* host, RvGpuFrame** frame)
+{
+    if (!frame)
+        return RV_ERR_NULL_ARGUMENT;
+    *frame = nullptr;
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+#if defined(__linux__) && RANVIER_COMPOSITING
+    if (!configuredEGLDisplay || eglGetCurrentDisplay() != configuredEGLDisplay || eglGetCurrentContext() == EGL_NO_CONTEXT
+        || host->deviceScale != 1 || host->compositingMode == RV_COMPOSITING_OFF || host->inFrame)
+        return RV_ERR_UNSUPPORTED;
+    if (host->presentationSurface && !host->presentationSurface->available())
+        return RV_ERR_UNSUPPORTED;
+    auto consumerContext = eglGetCurrentContext();
+    RvEGLContextScope contextScope;
+    auto result = [&]() -> int32_t {
+        SetForScope inFrame(host->inFrame, true);
+        host->frameRequested = false;
+        host->document().updateLayoutIgnorePendingStylesheets();
+        RefPtr view = host->frame().view();
+        if (!view)
+            return RV_ERR_PAINT_FAILED;
+        view->updateLayoutAndStyleIfNeededRecursive();
+        if (!view->clipLayer())
+            return RV_ERR_UNSUPPORTED;
+        if (host->compositor && host->compositor->size != host->size)
+            host->compositor = nullptr;
+        if (!host->compositor)
+            host->compositor = RvCompositor::create(host->size);
+        if (!host->compositor)
+            return RV_ERR_UNSUPPORTED;
+        if (!host->presentationSurface || !host->presentationSurface->matches(host->size.width(), host->size.height())) {
+            host->presentationSurface = RvEGLSurface::create(host->size.width(), host->size.height(), [] {
+                auto* context = compositingContext();
+                return context && context->makeContextCurrent();
+            });
+        }
+        auto surface = host->presentationSurface;
+        if (!surface || !surface->beginProducer())
+            return RV_ERR_UNSUPPORTED;
+        auto paintResult = composite(*host->compositor, *view, nullptr, surface->framebuffer());
+        if (paintResult != RV_OK || !surface->finishProducer(consumerContext)) {
+            surface->cancelProducer();
+            host->presentationSurface = nullptr;
+            return RV_ERR_PAINT_FAILED;
+        }
+        host->dirty = { };
+        *frame = new RvGpuFrame { WTF::move(surface) };
+        return RV_OK;
+    }();
+    if (host->updateWanted)
+        host->requestFrame();
+    return result;
+#else
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
 
 int32_t rv_host_acquire_d3d11_frame(RvHost* host, void* consumerDevice, RvGpuFrame** frame)
 {
@@ -2560,6 +2680,12 @@ int32_t rv_gpu_frame_info(RvGpuFrame* frame, void** texture, int32_t* width, int
     *height = frame->surface->height();
     *format = RV_GPU_RGBA8_PREMULTIPLIED;
     return RV_OK;
+#elif defined(__linux__) && RANVIER_COMPOSITING
+    *texture = frame->surface->image();
+    *width = frame->surface->width();
+    *height = frame->surface->height();
+    *format = RV_GPU_RGBA8_PREMULTIPLIED;
+    return RV_OK;
 #else
     return RV_ERR_UNSUPPORTED;
 #endif
@@ -2575,6 +2701,12 @@ int32_t rv_gpu_frame_release(RvGpuFrame* frame)
     bool released = frame->surface->releaseConsumer();
     delete frame;
     return released ? RV_OK : RV_ERR_PAINT_FAILED;
+#elif defined(__linux__) && RANVIER_COMPOSITING
+    bool released = frame->surface->releaseConsumer();
+    if (!released)
+        return RV_ERR_PAINT_FAILED;
+    delete frame;
+    return RV_OK;
 #else
     return RV_ERR_UNSUPPORTED;
 #endif
@@ -3589,6 +3721,7 @@ int32_t rv_run_loop_cycle(int32_t milliseconds)
     auto deadline = MonotonicTime::now() + Seconds::fromMilliseconds(milliseconds);
     int32_t cycles = 0;
     do {
+        ranvier_view_transitions_deliver();
 #if PLATFORM(COCOA)
         cycleCocoaRunLoop();
 #elif USE(GLIB)
@@ -3598,6 +3731,7 @@ int32_t rv_run_loop_cycle(int32_t milliseconds)
 #endif
         ++cycles;
         deliverNotificationRequests();
+        ranvier_view_transitions_deliver();
         if (MonotonicTime::now() < deadline)
             WTF::sleep(1_ms);
     } while (MonotonicTime::now() < deadline);
@@ -5178,6 +5312,39 @@ int32_t rv_custom_effect_callback_revoke(RvCustomEffectCallback* callback)
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     return ranvier_custom_effect_callback_revoke(callback);
+}
+
+RvViewTransitionUpdateCallback* rv_view_transition_update_callback_create(RvHost* host, RvViewTransitionUpdate update,
+    void* context, RvCustomEffectRelease release)
+{
+    if (!host || !onOwningThread() || !liveHosts.contains(host))
+        return nullptr;
+    return ranvier_view_transition_update_callback_create(reinterpret_cast<RvNode*>(&host->document()), update, context, release);
+}
+
+int32_t rv_view_transition_update_callback_revoke(RvViewTransitionUpdateCallback* callback)
+{
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_view_transition_update_callback_revoke(callback);
+}
+
+int32_t rv_view_transition_observe(RvHost* host, RvViewTransition* transition, RvViewTransitionSettled callback, void* context,
+    RvViewTransitionObserver** observer)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_DETACHED;
+    return ranvier_view_transition_observe(reinterpret_cast<RvNode*>(&host->document()), transition, callback, context, observer);
+}
+
+void rv_view_transition_observer_release(RvViewTransitionObserver* observer)
+{
+    if (onOwningThread())
+        ranvier_view_transition_observer_release(observer);
 }
 
 RvNode* rv_node_retain(RvNode* target)

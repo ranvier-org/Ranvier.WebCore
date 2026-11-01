@@ -11,6 +11,7 @@ import json
 import os
 from pathlib import Path
 import sys
+import tempfile
 import threading
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -21,7 +22,7 @@ FIXTURES = ROOT / 'tests/fixtures'
 P, I, U = ctypes.c_void_p, ctypes.c_int32, ctypes.c_uint32
 OK, NULL_ARGUMENT, WRONG_THREAD, DOM_EXCEPTION, BUFFER_TOO_SMALL, UNSUPPORTED, WRONG_INTERFACE = 0, -1, -2, -3, -6, -9, -11
 WRONG_HOST = -12
-ABI = 59
+ABI = 60
 MOUSE_MOVE, MOUSE_DOWN, MOUSE_UP, BUTTON_LEFT, BUTTON_NONE = 0, 1, 2, 0, -1
 DRAG_OVER, DRAG_LEAVE, DRAG_DROP, DRAG_APP = 0, 1, 2, 0
 CLIPBOARD_APP, EDIT_COPY, EDIT_CUT, EDIT_PASTE, EDIT_PASTE_PLAIN, EDIT_SELECT_ALL = 0, 0, 1, 2, 3, 4
@@ -177,6 +178,19 @@ class Probe:
         self.fn('rv_dom_data_transfer_item_list_release', None, [P])(items)
         return result
 
+    def expect_item_files_hidden(self, transfer, document, phase):
+        items = self.handle('rv_dom_data_transfer_get_items', [P, P], transfer, document)
+        length = I()
+        self.ok('rv_dom_data_transfer_item_list_get_length', [P, ctypes.POINTER(I)], items, ctypes.byref(length))
+        for index in range(length.value):
+            item = self.handle('rv_dom_data_transfer_item_list_item', [P, U], items, index)
+            file = self.handle('rv_dom_data_transfer_item_get_as_file', [P], item)
+            if file:
+                self.fn('rv_dom_blob_release', None, [P])(file)
+            self.expect(file is None, phase + ' getAsFile cannot disclose a file')
+            self.fn('rv_dom_data_transfer_item_release', None, [P])(item)
+        self.fn('rv_dom_data_transfer_item_list_release', None, [P])(items)
+
     def snapshot(self, transfer, document):
         if not transfer:
             return None
@@ -217,7 +231,7 @@ def run(directory, evidence):
     for name in ['dom:DataTransfer', 'dom:DataTransferItemList', 'dom:DataTransferItem', 'dom:DragEvent', 'dom:ClipboardEvent',
                  'clipboard-files', 'range-replacement', 'dom-constructor:DataTransfer', 'dom-constructor:InputEvent']:
         n.expect(has(name.encode()) == 1, name + ' advertised')
-    n.expect(has(b'data-transfer-files') == (0 if sys.platform.startswith('linux') else 1), 'data-transfer-files where drops carry files')
+    n.expect(has(b'data-transfer-files') == 1, 'data-transfer-files where drops carry files')
     results = {}
     host_create = n.fn('rv_host_create', P, [I, I])
     host_destroy = n.fn('rv_host_destroy', None, [P])
@@ -249,6 +263,8 @@ def run(directory, evidence):
             if during and transfer:
                 record.update(during(transfer))
             if transfer:
+                if kind in ('dragenter', 'dragover', 'dragleave'):
+                    n.expect_item_files_hidden(transfer, document, kind)
                 held.append((kind, transfer))
             if cancel:
                 n.ok('rv_dom_event_prevent_default', [P], event)
@@ -260,7 +276,9 @@ def run(directory, evidence):
 
     def after():
         result = {kind: n.snapshot(transfer, document) for kind, transfer in held}
-        for _, transfer in held:
+        for kind, transfer in held:
+            if kind not in ('beforeinput', 'input'):
+                n.expect_item_files_hidden(transfer, document, kind + ' after dispatch')
             release_transfer(transfer)
         held.clear()
         return result
@@ -365,11 +383,36 @@ def run(directory, evidence):
     for listener in listeners:
         remove(listener)
     listeners.clear()
-    if sys.platform.startswith('linux'):
-        # KNOWN BUG https://github.com/ranvier-org/Ranvier.WebCore/issues/156: DataTransfer::allowsFileAccess() is false for every GTK/WPE drag.
-        n.expect(drop_files == [] and 'Files' not in drop_types, 'linux drop exposes no files: ' + str(drop_types))
-    else:
-        n.expect(drop_files == [[name, kind, len(content.encode())] for name, content, kind in case['files']], 'files kept from the drop')
+    n.expect(drop_files == [[name, kind, len(content.encode())] for name, content, kind in case['files']], 'files kept from the drop')
+    n.expect('Files' in drop_types, 'a file drop advertises Files')
+
+    path_drop = []
+
+    def inspect_path_drop(context, event):
+        transfer = n.handle('rv_dom_drag_event_get_data_transfer', [P], event)
+        path_drop.append(n.snapshot(transfer, document))
+        release_transfer(transfer)
+        n.ok('rv_dom_event_prevent_default', [P], event)
+        return 0
+
+    path_listener = EVENT(inspect_path_drop)
+    n.keep.append(path_listener)
+    listener = listen(target, 'drop', 0, path_listener, None)
+    over_listener = listen(target, 'dragover', 0, accept, None)
+    with tempfile.TemporaryDirectory(prefix='ranvier-drag-file-privacy-') as temporary:
+        private = Path(temporary) / 'private.txt'
+        private.write_text('private disk sentinel', encoding='utf-8')
+        data = n.fn('rv_drag_data_create', P, [])()
+        n.ok('rv_drag_data_add', [P, ctypes.c_char_p, Utf8], data, b'text/plain', str(private))
+        n.ok('rv_drag_data_add', [P, ctypes.c_char_p, Utf8], data, b'text/uri-list', private.as_uri())
+        drag(host, DRAG_OVER, x, y, case['allowed'], data, 0)
+        drag(host, DRAG_DROP, x, y, case['allowed'], data, 0)
+        n.fn('rv_drag_data_release', None, [P])(data)
+    remove(listener)
+    remove(over_listener)
+    n.expect(len(path_drop) == 1 and path_drop[0]['files'] == [] and 'Files' not in path_drop[0]['types'],
+             'path and file URI strings do not disclose a disk File: ' + str(path_drop))
+    results['filePrivacy'] = {'diskPathStringsExposeFiles': False}
 
     # Reserved and unavailable formats are explicit.
     data = n.fn('rv_drag_data_create', P, [])()
@@ -674,9 +717,7 @@ def compare(n, results, spec, oracle, qualified):
     n.expect(out['image'][0] == BUFFER_TOO_SMALL and out['image'][1:3] == spec['dragOut']['imageSize']
              and out['image'][3:] == spec['dragOut']['imageOffset'], 'drag-out image is the setDragImage element at its offset')
     n.expect(out['allowed'] == 5, 'effectAllowed copyLink allows copy and link')
-    # KNOWN BUG #156 (https://github.com/ranvier-org/Ranvier.WebCore/issues/156): a Linux drop exposes no files.
-    fed_files = [] if sys.platform.startswith('linux') else [out['file']]
-    n.expect(out['fedOperation'] == 1 and out['fed'][-1]['files'] == fed_files, 'the drag fed back drops the page file')
+    n.expect(out['fedOperation'] == 1 and out['fed'][-1]['files'] == [out['file']], 'the drag fed back drops the page file')
     replace = results['replace']
     cancelled, applied = replace['cancelled'], replace['applied']
     n.expect(cancelled['status'] == 0 and cancelled['html'] == spec['replace']['html'], 'cancelled replacement changes nothing')
@@ -697,12 +738,8 @@ def compare(n, results, spec, oracle, qualified):
     for key in ('replaceNull', 'offerNull', 'denyNull', 'fileWriteNull', 'dragFileNull', 'dragFileCountNull'):
         n.expect(errors[key] == NULL_ARGUMENT, key)
     n.expect(errors['thread'] == {'replace': WRONG_THREAD, 'create': WRONG_THREAD, 'dragFile': WRONG_THREAD}, 'off-thread calls')
-    if sys.platform.startswith('linux'):
-        # KNOWN BUG #156: a Linux drop exposes no files, so none are held past the host.
-        n.expect(results['pastHost'] == [], 'linux drop holds no files past the host: ' + str(results['pastHost']))
-    else:
-        n.expect([f[:3] for f in results['pastHost']] == [[name, kind, len(content.encode())] for name, content, kind in spec['drop']['files']]
-                 and [f[3] for f in results['pastHost']] == [content for _, content, _ in spec['drop']['files']], 'dropped files outlive the host')
+    n.expect([f[:3] for f in results['pastHost']] == [[name, kind, len(content.encode())] for name, content, kind in spec['drop']['files']]
+             and [f[3] for f in results['pastHost']] == [content for _, content, _ in spec['drop']['files']], 'dropped files outlive the host')
     n.expect(len(recorded) == len(applicable), 'qualified paths are unique')
 
 

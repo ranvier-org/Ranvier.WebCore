@@ -310,6 +310,10 @@ and [<AllowNullLiteral>] Document =
     abstract member getSelection: unit -> DOMSelection
     /// <summary>Document.createTouchList.</summary>
     abstract member createTouchList: [<System.ParamArray>] touches: Touch array -> TouchList
+    /// <summary>Document.startViewTransition.</summary>
+    abstract member startViewTransition: ?callbackOptions: StartViewTransitionOptions -> ViewTransition
+    /// <summary>Document.activeViewTransition.</summary>
+    abstract member activeViewTransition: ViewTransition with get
     /// <summary>Document.rootElement.</summary>
     abstract member rootElement: SVGSVGElement with get
     /// <summary>Document.getElementById.</summary>
@@ -5855,6 +5859,16 @@ and [<AllowNullLiteral>] TextMetrics =
     /// <summary>TextMetrics.ideographicBaseline.</summary>
     abstract member ideographicBaseline: float with get
 
+/// <summary>ViewTransition in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ViewTransition =
+    /// <summary>ViewTransition.skipTransition.</summary>
+    abstract member skipTransition: unit -> unit
+    /// <summary>ViewTransition.types.</summary>
+    abstract member types: ViewTransitionTypeSet with get, set
+
+/// <summary>ViewTransitionTypeSet in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ViewTransitionTypeSet = interface end
+
 /// <summary>HTMLUnknownElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLUnknownElement =
     inherit HTMLElement
@@ -6401,6 +6415,11 @@ and [<AllowNullLiteral; DomDictionary>] AriaNotifyOptions() =
 and [<AllowNullLiteral; DomDictionary>] CaretPositionFromPointOptions() =
     member val shadowRoots: (ShadowRoot) array = [||] with get, set
 
+/// <summary>StartViewTransitionOptions in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] StartViewTransitionOptions() =
+    member val update: (ViewTransitionUpdateCallback) option = None with get, set
+    member val types: (string) array = null with get, set
+
 /// <summary>ShadowRootInit in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] ShadowRootInit() =
     member val mode: ShadowRootMode = Unchecked.defaultof<_> with get, set
@@ -6632,6 +6651,9 @@ and NodeFilterResult =
     | Accept = 1
     | Reject = 2
     | Skip = 3
+
+/// <summary>ViewTransitionUpdateCallback in the scoped DOM interface model.</summary>
+and ViewTransitionUpdateCallback = unit -> unit
 
 /// <summary>CompositeOperation in the scoped DOM interface model.</summary>
 and [<DomStringEnum; RequireQualifiedAccess>] CompositeOperation =

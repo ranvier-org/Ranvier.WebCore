@@ -1,0 +1,28 @@
+diff --git a/Source/WebCore/dom/DataTransfer.cpp b/Source/WebCore/dom/DataTransfer.cpp
+--- a/Source/WebCore/dom/DataTransfer.cpp
++++ b/Source/WebCore/dom/DataTransfer.cpp
+@@ -266,7 +266,10 @@ bool DataTransfer::allowsFileAccess() const
+ {
+ #if PLATFORM(COCOA)
+     return !forDrag() || forFileDrag();
+-#elif PLATFORM(GTK) || PLATFORM(WPE)
++#elif PLATFORM(WPE)
++    return m_pasteboard && m_pasteboard->fileContentState() == Pasteboard::FileContentState::InMemoryImage
++        && (!forDrag() || m_pasteboard->isStatic() || m_pasteboard->allowsInMemoryFileAccessForDrag());
++#elif PLATFORM(GTK)
+     // File drag access is disabled until https://webkit.org/b/271957 is resolved for GTK/WPE ports.
+     // In-memory image paste does not access files on disk, so it is safe to allow.
+     return !forDrag() && m_pasteboard && m_pasteboard->fileContentState() == Pasteboard::FileContentState::InMemoryImage;
+diff --git a/Source/WebCore/platform/Pasteboard.h b/Source/WebCore/platform/Pasteboard.h
+--- a/Source/WebCore/platform/Pasteboard.h
++++ b/Source/WebCore/platform/Pasteboard.h
+@@ -220,6 +220,9 @@
+     static bool canExposeURLToDOMWhenPasteboardContainsFiles(const String&);
+ 
+     virtual bool isStatic() const { return false; }
++#if PLATFORM(WPE)
++    virtual bool allowsInMemoryFileAccessForDrag() const { return false; }
++#endif
+ 
+     virtual WEBCORE_EXPORT bool hasData();
+     virtual WEBCORE_EXPORT Vector<String> typesSafeForBindings(const String& origin);

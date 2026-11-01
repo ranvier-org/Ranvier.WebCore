@@ -55,5 +55,26 @@ class PublishGateTests(unittest.TestCase):
         self.assertIn('python -I tests/test_publish_gate.py', workflow)
 
 
+class GpuCohortTests(unittest.TestCase):
+    def test_successful_version_tag_dispatches_only_the_matching_windows_gpu_cohort(self):
+        workflow = (ROOT / '.github/workflows/build.yml').read_text()
+        self.assertIn('\n  windows-gpu-cohort:\n', workflow)
+        job = workflow.split('\n  windows-gpu-cohort:\n', 1)[1]
+        self.assertIn('needs: publish', job)
+        self.assertIn("github.event_name == 'push'", job)
+        self.assertIn("startsWith(github.ref, 'refs/tags/v')", job)
+        self.assertIn("needs.publish.result == 'success'", job)
+        self.assertIn('actions: write', job)
+        self.assertIn('--ref "$GITHUB_REF_NAME"', job)
+        self.assertIn('--field flavor=gpu --field rids=win-x64', job)
+        self.assertIn('GH_TOKEN: ${{ github.token }}', job)
+
+    def test_flavor_runs_do_not_cancel_the_matching_slim_tag_run(self):
+        workflow = (ROOT / '.github/workflows/build.yml').read_text()
+        group = re.search(r'^  group: (.+)$', workflow, re.MULTILINE)[1]
+        self.assertIn("inputs.flavor || 'slim'", group)
+        self.assertIn('github.ref', group)
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -59,7 +59,8 @@ int32_t rv_host_set_drag(RvHost*, int32_t style);
      allowedOperations, data, modifiers)`.
   2. `data` is an `RvDragData` built with `rv_drag_data_create` and `rv_drag_data_add(type, data, data_length)`, with
      types such as `text/plain`, `text/html` and `text/uri-list`, and `rv_drag_data_add_file(file)` for files
-     (`rv_abi_has("data-transfer-files")`; Linux keeps files out of drops, as WebKit's GTK and WPE ports do).
+     (`rv_abi_has("data-transfer-files")`). WPE accepts the host's in-memory File payloads; its OS pasteboard
+     and disk-path access restrictions remain in place. GTK continues to report this capability unavailable.
      `dragenter`, `dragover` and `dragleave` see a protected `dataTransfer`, whose types are readable and whose
      data and files are not; `drop` sees a read-only one. Each is unreadable once its event is over.
   3. The host fires `dragenter` and `dragleave` as the element under the point changes, then `dragover`,

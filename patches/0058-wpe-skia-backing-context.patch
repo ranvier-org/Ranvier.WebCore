@@ -1,0 +1,26 @@
+diff --git a/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp b/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp
+index 9fee5e03f2..338b70a17a 100644
+--- a/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp
++++ b/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp
+@@ -406,6 +406,9 @@ void BitmapTexture::updateContents(GraphicsLayer* sourceLayer, const IntRect& ta
+ {
+     // Making an unconditionally unaccelerated buffer here is OK because this code
+     // isn't used by any platforms that respect the accelerated bit.
++#if PLATFORM(WPE) && USE(GRAPHICS_LAYER_TEXTURE_MAPPER) && USE(SKIA)
++    auto* glContext = GLContext::current();
++#endif
+     auto imageBuffer = ImageBuffer::create(targetRect.size(), RenderingMode::Unaccelerated, RenderingPurpose::Unspecified, 1, DestinationColorSpace::SRGB(), PixelFormat::BGRA8);
+     if (!imageBuffer)
+         return;
+@@ -422,6 +425,11 @@ void BitmapTexture::updateContents(GraphicsLayer* sourceLayer, const IntRect& ta
+     sourceLayer->paintGraphicsLayerContents(context, sourceRect);
+ 
+     auto image = ImageBuffer::sinkIntoNativeImage(WTF::move(imageBuffer));
++#if PLATFORM(WPE) && USE(GRAPHICS_LAYER_TEXTURE_MAPPER) && USE(SKIA)
++    // Painting an accelerated snapshot can leave Skia's context current.
++    if (glContext && !glContext->makeContextCurrent())
++        return;
++#endif
+     if (!image)
+         return;
+ 

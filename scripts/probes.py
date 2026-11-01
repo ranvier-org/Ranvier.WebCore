@@ -19,13 +19,31 @@ EXPRESSIONS = {'work': '${{ env.RANVIER_WORK }}', 'flavor': '${{ env.FLAVOR }}',
 NATIVE = '{work}/out/{flavor}/runtimes/{rid}/native'
 
 
-def probe(name, *commands, rid=None, flavor='slim', timeout=TIMEOUT):
-    """A probe: its commands, run when the runtime has the RID and the flavor (None matches every one)."""
+def probe(name, *commands, rid=None, flavor=('slim', 'gpu'), timeout=TIMEOUT, env=None):
+    """A probe: common contracts run on slim and GPU; explicit flavors restrict a probe, and None matches all."""
     return {'name': name, 'commands': [command.replace('{native}', NATIVE) for command in commands],
-            'rid': rid, 'flavor': flavor, 'timeout': timeout}
+            'rid': rid, 'flavor': flavor, 'timeout': timeout, 'env': dict(env or {})}
 
 
 PROBES = [
+    probe('Verify Windows same-document transition snapshot pixels',
+          'python -I tests/gpu/windows_view_transition_pixels.py --native-directory {native} --output {work}/gpu-transition-readback',
+          rid='win-x64', flavor='gpu'),
+    *[probe('Verify Linux same-document transition snapshot pixels',
+            'python -I tests/gpu/linux_view_transition_pixels.py --native-directory {native}',
+            rid=rid, flavor='gpu',
+            env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
+      for rid in ['linux-x64', 'linux-arm64']],
+    *[probe('Verify Linux shared EGLImage frames and retained lifetimes',
+            'python -I tests/gpu/linux_egl.py {native}/libRanvierWebCoreHost.so',
+            'python -I tests/gpu/linux_egl.py {native}/libRanvierWebCoreHost.so --context-lifecycle',
+            rid=rid, flavor='gpu',
+            env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
+      for rid in ['linux-x64', 'linux-arm64']],
+    probe('Verify Windows shared D3D11 frames and bounded lifetimes',
+          'python -I scripts/sdl_runtime.py --out {work}/tools/sdl3',
+          'python -I tests/gpu/run.py --native {native} --sdl {work}/tools/sdl3/SDL3.dll --teardown all',
+          rid='win-x64', flavor='gpu', timeout=1200),
     probe('Exercise typed DOM transport against the packaged native host',
           'python -I tests/generator/native_types.py --native-dir {native}', rid='win-x64'),
     probe('Verify document-scoped CSS support queries',
@@ -134,6 +152,11 @@ PROBES = [
           'python -I -X utf8 tests/abi/web_animation_effects.py --native-directory {native}'),
     probe('Verify Web Animations creation against the Chromium oracle',
           'python -I -X utf8 tests/abi/web_animations.py --native-directory {native}'),
+    *[probe('Verify default compositor root reattachment',
+            'python -I -X utf8 tests/gpu/compositor_reattach.py --native-directory {native}',
+            rid=rid, flavor='gpu',
+            env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'} if rid.startswith('linux-') else {})
+      for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],
     probe('Verify the Web Animations lifecycle and promises against the Chromium oracle',
           'python -I -X utf8 tests/abi/animation_lifecycle.py --native-directory {native}'),
     probe('Verify typed animation and transition events against the Chromium oracle',
@@ -142,6 +165,8 @@ PROBES = [
           'python -I -X utf8 tests/abi/animation_timelines.py --native-directory {native}'),
     probe('Verify Web Animations custom effects against the Chromium oracle',
           'python -I -X utf8 tests/abi/custom_effects.py --native-directory {native}'),
+    probe('Verify same-document view transitions and the slim compositing gate',
+          'python -I -X utf8 tests/abi/view_transitions.py --native-directory {native}', flavor=None),
     probe('Verify ARIA element reflection and accessibility relations against the Chromium oracle',
           'python -I -X utf8 tests/abi/aria_relations.py --native-directory {native}'),
     probe('Verify the visual viewport, page scale and obscured insets against the Chromium oracle',
@@ -239,7 +264,9 @@ def condition(entry):
 
 
 def applies(entry, rid, flavor):
-    return entry['rid'] in (None, rid) and entry['flavor'] in (None, flavor)
+    flavors = entry['flavor']
+    return entry['rid'] in (None, rid) and (flavors is None or flavor in (
+        flavors if isinstance(flavors, (tuple, list)) else (flavors,)))
 
 
 def workflow_text(command):
@@ -280,7 +307,7 @@ def kill(process):
             pass
 
 
-def execute(command, log, deadline):
+def execute(command, log, deadline, env=None):
     """Runs the command, copying its output to the job log and to the log file. Returns its exit code, or None when
     it outlived the deadline and was killed."""
     log.write(f'> {subprocess.list2cmdline(command)}\n'.encode())
@@ -288,7 +315,7 @@ def execute(command, log, deadline):
     sys.stdout.flush()
     options = {'creationflags': subprocess.CREATE_NEW_PROCESS_GROUP} if os.name == 'nt' else {'start_new_session': True}
     process = subprocess.Popen(command, cwd=root, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
-                               stderr=subprocess.STDOUT, **options)
+                               stderr=subprocess.STDOUT, env=dict(os.environ, **(env or {})), **options)
 
     def copy():
         for line in iter(process.stdout.readline, b''):
@@ -328,7 +355,7 @@ def run(args):
         outcome = 'PASS'
         with open(path, 'wb') as log:
             for command in entry['commands']:
-                code = execute(argv(command, values, args.no_dump), log, deadline)
+                code = execute(argv(command, values, args.no_dump), log, deadline, entry.get('env'))
                 if code is None:
                     outcome = f'FAIL (timed out after {timeout} s)'
                 elif code:
@@ -361,7 +388,8 @@ def list_probes(args):
         if args.rid and args.flavor and not applies(entry, args.rid, args.flavor):
             continue
         print(json.dumps({'name': entry['name'], 'if': condition(entry),
-                          'run': [workflow_text(command) for command in entry['commands']], 'timeout': entry['timeout']}))
+                          'run': [workflow_text(command) for command in entry['commands']], 'timeout': entry['timeout'],
+                          'env': entry.get('env', {})}))
     return 0
 
 

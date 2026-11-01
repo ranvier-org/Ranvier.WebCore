@@ -106,6 +106,8 @@ typedef struct RvPath2D RvPath2D;
 typedef struct RvImageBitmap RvImageBitmap;
 typedef struct RvImageBitmapRenderingContext RvImageBitmapRenderingContext;
 typedef struct RvTextMetrics RvTextMetrics;
+typedef struct RvViewTransition RvViewTransition;
+typedef struct RvViewTransitionTypeSet RvViewTransitionTypeSet;
 typedef struct RvDomUnionNodeOrDOMString RvDomUnionNodeOrDOMString;
 typedef struct RvDomSequenceNodeOrDOMString RvDomSequenceNodeOrDOMString;
 typedef struct RvDomSequenceCSSStyleSheet RvDomSequenceCSSStyleSheet;
@@ -115,6 +117,7 @@ typedef struct RvDomSequenceShadowRoot RvDomSequenceShadowRoot;
 typedef struct RvDomUnionDOMStringOrElementCreationOptions RvDomUnionDOMStringOrElementCreationOptions;
 typedef struct RvDomUnionBooleanOrImportNodeOptions RvDomUnionBooleanOrImportNodeOptions;
 typedef struct RvDomSequenceTouch RvDomSequenceTouch;
+typedef struct RvDomSequenceDOMStringNullable RvDomSequenceDOMStringNullable;
 typedef struct RvDomSequenceElementNullable RvDomSequenceElementNullable;
 typedef struct RvDomSequenceDOMString RvDomSequenceDOMString;
 typedef struct RvDomUnionBooleanOrScrollIntoViewOptions RvDomUnionBooleanOrScrollIntoViewOptions;
@@ -663,6 +666,14 @@ typedef struct RvDomCaretPositionFromPointOptions {
     uint32_t size;
     const RvDomSequenceShadowRoot* shadow_roots; /* sequence<ShadowRoot>, default [] */
 } RvDomCaretPositionFromPointOptions;
+
+/* The IDL dictionary StartViewTransitionOptions. size is sizeof(RvDomStartViewTransitionOptions) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomStartViewTransitionOptions {
+    uint32_t size;
+    RvViewTransitionUpdateCallback* update; /* ViewTransitionUpdateCallback?, default null */
+    const RvDomSequenceDOMStringNullable* types; /* sequence<DOMString>?, default null */
+} RvDomStartViewTransitionOptions;
 
 /* The IDL dictionary ShadowRootInit. size is sizeof(RvDomShadowRootInit) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
@@ -1379,6 +1390,7 @@ typedef struct RvDomSequenceShadowRoot RvDomSequenceShadowRoot;
 typedef struct RvDomUnionDOMStringOrElementCreationOptions RvDomUnionDOMStringOrElementCreationOptions;
 typedef struct RvDomUnionBooleanOrImportNodeOptions RvDomUnionBooleanOrImportNodeOptions;
 typedef struct RvDomSequenceTouch RvDomSequenceTouch;
+typedef struct RvDomSequenceDOMStringNullable RvDomSequenceDOMStringNullable;
 typedef struct RvDomSequenceElementNullable RvDomSequenceElementNullable;
 typedef struct RvDomSequenceDOMString RvDomSequenceDOMString;
 typedef struct RvDomUnionBooleanOrScrollIntoViewOptions RvDomUnionBooleanOrScrollIntoViewOptions;
@@ -1537,6 +1549,14 @@ struct RvDomSequenceTouch {
     int32_t present;
     int32_t count;
     RvTouch** items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceDOMStringNullable {
+    int32_t present;
+    int32_t count;
+    RvDomUtf8StringSpan* items;
 };
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
@@ -2328,6 +2348,7 @@ RV_EXPORT void rv_dom_sequence_shadow_root_release(RvDomSequenceShadowRoot* valu
 RV_EXPORT void rv_dom_union_dom_string_or_element_creation_options_release(RvDomUnionDOMStringOrElementCreationOptions* value);
 RV_EXPORT void rv_dom_union_boolean_or_import_node_options_release(RvDomUnionBooleanOrImportNodeOptions* value);
 RV_EXPORT void rv_dom_sequence_touch_release(RvDomSequenceTouch* value);
+RV_EXPORT void rv_dom_sequence_dom_string_nullable_release(RvDomSequenceDOMStringNullable* value);
 RV_EXPORT void rv_dom_sequence_element_nullable_release(RvDomSequenceElementNullable* value);
 RV_EXPORT void rv_dom_sequence_dom_string_release(RvDomSequenceDOMString* value);
 RV_EXPORT void rv_dom_union_boolean_or_scroll_into_view_options_release(RvDomUnionBooleanOrScrollIntoViewOptions* value);
@@ -2728,10 +2749,22 @@ RV_EXPORT RvImageBitmapRenderingContext* rv_dom_image_bitmap_rendering_context_r
 RV_EXPORT void rv_dom_text_metrics_release(RvTextMetrics*);
 /* Adds a reference to a TextMetrics and returns it. */
 RV_EXPORT RvTextMetrics* rv_dom_text_metrics_retain(RvTextMetrics*);
+/* Releases a handle to a ViewTransition. */
+RV_EXPORT void rv_dom_view_transition_release(RvViewTransition*);
+/* Adds a reference to a ViewTransition and returns it. */
+RV_EXPORT RvViewTransition* rv_dom_view_transition_retain(RvViewTransition*);
+/* Releases a handle to a ViewTransitionTypeSet. */
+RV_EXPORT void rv_dom_view_transition_type_set_release(RvViewTransitionTypeSet*);
+/* Adds a reference to a ViewTransitionTypeSet and returns it. */
+RV_EXPORT RvViewTransitionTypeSet* rv_dom_view_transition_type_set_retain(RvViewTransitionTypeSet*);
 /* Releases a handle to a CustomEffectCallback. */
 RV_EXPORT void rv_dom_custom_effect_callback_release(RvCustomEffectCallback*);
 /* Adds a reference to a CustomEffectCallback and returns it. */
 RV_EXPORT RvCustomEffectCallback* rv_dom_custom_effect_callback_retain(RvCustomEffectCallback*);
+/* Releases a handle to a ViewTransitionUpdateCallback. */
+RV_EXPORT void rv_dom_view_transition_update_callback_release(RvViewTransitionUpdateCallback*);
+/* Adds a reference to a ViewTransitionUpdateCallback and returns it. */
+RV_EXPORT RvViewTransitionUpdateCallback* rv_dom_view_transition_update_callback_retain(RvViewTransitionUpdateCallback*);
 /* Concrete scoped interface name of a CSSRule handle; borrows target. */
 RV_EXPORT int32_t rv_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* Concrete scoped interface name of a StyleSheet handle; borrows target. */
@@ -3006,6 +3039,9 @@ RV_EXPORT int32_t rv_dom_document_get_anchors(RvNode* target, RvHTMLCollection**
 RV_EXPORT int32_t rv_dom_document_get_hidden(RvNode* target, int32_t* result);
 /* Document.visibilityState getter: readonly attribute VisibilityState visibilityState */
 RV_EXPORT int32_t rv_dom_document_get_visibility_state(RvNode* target, int32_t* result);
+/* Document.activeViewTransition getter: readonly attribute ViewTransition? activeViewTransition; *result is a new
+ * reference, or NULL */
+RV_EXPORT int32_t rv_dom_document_get_active_view_transition(RvNode* target, RvViewTransition** result);
 /* Document.rootElement getter: readonly attribute SVGSVGElement? rootElement; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_document_get_root_element(RvNode* target, RvNode** result);
 /* Document.children getter: readonly attribute HTMLCollection children; *result is a new reference */
@@ -3109,6 +3145,11 @@ RV_EXPORT int32_t rv_dom_document_get_selection(RvNode* target, RvDOMSelection**
 /* Document.createTouchList(Touch touches) -> TouchList; *result is a new reference; RV_ERR_UNSUPPORTED where WebKit
  * builds without TOUCH_EVENTS */
 RV_EXPORT int32_t rv_dom_document_create_touch_list(RvNode* target, const RvDomSequenceTouch* touches, RvTouchList** result);
+/* Document.startViewTransition(optional StartViewTransitionOptions callbackOptions = {}) -> ViewTransition?;
+ * callback_options defaults to {} in IDL; callback_options may be NULL for the IDL default; *result is a new
+ * reference, or NULL; RV_ERR_UNSUPPORTED without GPU compositing; RV_ERR_WRONG_HOST for an update callback of another
+ * document */
+RV_EXPORT int32_t rv_dom_document_start_view_transition(RvNode* target, const RvDomStartViewTransitionOptions* callback_options, RvViewTransition** result);
 /* Document.prepend((Node or DOMString) nodes) -> undefined */
 RV_EXPORT int32_t rv_dom_document_prepend(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes);
 /* Document.append((Node or DOMString) nodes) -> undefined */
@@ -9815,6 +9856,14 @@ RV_EXPORT int32_t rv_dom_text_metrics_get_hanging_baseline(RvTextMetrics* target
 RV_EXPORT int32_t rv_dom_text_metrics_get_alphabetic_baseline(RvTextMetrics* target, double* result);
 /* TextMetrics.ideographicBaseline getter: readonly attribute double ideographicBaseline */
 RV_EXPORT int32_t rv_dom_text_metrics_get_ideographic_baseline(RvTextMetrics* target, double* result);
+/* ViewTransition */
+
+/* ViewTransition.types getter: attribute ViewTransitionTypeSet types; *result is a new reference */
+RV_EXPORT int32_t rv_dom_view_transition_get_types(RvViewTransition* target, RvViewTransitionTypeSet** result);
+/* ViewTransition.types setter: attribute ViewTransitionTypeSet types */
+RV_EXPORT int32_t rv_dom_view_transition_set_types(RvViewTransition* target, RvViewTransitionTypeSet* value);
+/* ViewTransition.skipTransition() -> undefined */
+RV_EXPORT int32_t rv_dom_view_transition_skip_transition(RvViewTransition* target);
 /* DOMCSSNamespace */
 
 /* CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths */
@@ -9995,6 +10044,21 @@ RV_EXPORT int32_t rv_dom_highlight_add(RvHighlight* target, RvAbstractRange* val
 RV_EXPORT int32_t rv_dom_highlight_delete(RvHighlight* target, RvAbstractRange* value, int32_t* result);
 /* Highlight.clear: setlike<AbstractRange> */
 RV_EXPORT int32_t rv_dom_highlight_clear(RvHighlight* target);
+/* ViewTransitionTypeSet */
+
+/* ViewTransitionTypeSet.size: setlike<DOMString> */
+RV_EXPORT int32_t rv_dom_view_transition_type_set_size(RvViewTransitionTypeSet* target, uint32_t* result);
+/* ViewTransitionTypeSet.has: setlike<DOMString> */
+RV_EXPORT int32_t rv_dom_view_transition_type_set_has(RvViewTransitionTypeSet* target, const uint8_t* value, int32_t value_length, int32_t* result);
+/* ViewTransitionTypeSet.values: setlike<DOMString>; *result is a snapshot copy in iteration order, unchanged by later
+ * mutation; *result owns its contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_view_transition_type_set_values(RvViewTransitionTypeSet* target, RvDomSequenceDOMString* result);
+/* ViewTransitionTypeSet.add: setlike<DOMString> */
+RV_EXPORT int32_t rv_dom_view_transition_type_set_add(RvViewTransitionTypeSet* target, const uint8_t* value, int32_t value_length);
+/* ViewTransitionTypeSet.delete: setlike<DOMString> */
+RV_EXPORT int32_t rv_dom_view_transition_type_set_delete(RvViewTransitionTypeSet* target, const uint8_t* value, int32_t value_length, int32_t* result);
+/* ViewTransitionTypeSet.clear: setlike<DOMString> */
+RV_EXPORT int32_t rv_dom_view_transition_type_set_clear(RvViewTransitionTypeSet* target);
 /* HighlightRegistry */
 
 /* HighlightRegistry.size: maplike<DOMString, Highlight> */

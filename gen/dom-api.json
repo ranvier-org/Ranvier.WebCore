@@ -1790,6 +1790,14 @@
     {
       "name": "TextMetrics",
       "base": null
+    },
+    {
+      "name": "ViewTransition",
+      "base": null
+    },
+    {
+      "name": "ViewTransitionTypeSet",
+      "base": null
     }
   ],
   "contractInterfaces": [
@@ -4643,6 +4651,24 @@
       "mixin": false,
       "contractOnly": false,
       "source": "html/TextMetrics.idl"
+    },
+    {
+      "name": "ViewTransition",
+      "idlName": "ViewTransition",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/ViewTransition.idl"
+    },
+    {
+      "name": "ViewTransitionTypeSet",
+      "idlName": "ViewTransitionTypeSet",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/ViewTransitionTypeSet.idl"
     },
     {
       "name": "HTMLUnknownElement",
@@ -13107,6 +13133,42 @@
     },
     {
       "interface": "Document",
+      "member": "activeViewTransition",
+      "contractOwner": "Document",
+      "kind": "getter",
+      "function": "rv_dom_document_get_active_view_transition",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvViewTransition**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "ViewTransition",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "ViewTransition",
+        "root": "ViewTransition",
+        "class": "ViewTransition",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Document",
       "member": "rootElement",
       "contractOwner": "Document",
       "kind": "getter",
@@ -16102,6 +16164,72 @@
         "enum": null,
         "label": null,
         "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "Document",
+      "member": "startViewTransition",
+      "contractOwner": "Document",
+      "kind": "operation",
+      "function": "rv_dom_document_start_view_transition",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomStartViewTransitionOptions*",
+          "name": "callback_options"
+        },
+        {
+          "ctype": "RvViewTransition**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "callbackOptions",
+          "idlType": "StartViewTransitionOptions",
+          "idl": {
+            "name": "StartViewTransitionOptions",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "StartViewTransitionOptions",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "ViewTransition",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "ViewTransition",
+        "root": "ViewTransition",
+        "class": "ViewTransition",
+        "enum": null,
+        "label": null,
+        "nullable": true,
         "atom": false,
         "subtypes": []
       },
@@ -168740,6 +168868,137 @@
       }
     },
     {
+      "interface": "ViewTransition",
+      "member": "types",
+      "contractOwner": "ViewTransition",
+      "kind": "getter",
+      "function": "rv_dom_view_transition_get_types",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvViewTransition*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvViewTransitionTypeSet**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "ViewTransitionTypeSet",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "ViewTransitionTypeSet",
+        "root": "ViewTransitionTypeSet",
+        "class": "ViewTransitionTypeSet",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "ViewTransition",
+      "member": "types",
+      "contractOwner": "ViewTransition",
+      "kind": "setter",
+      "function": "rv_dom_view_transition_set_types",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvViewTransition*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvViewTransitionTypeSet*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "ViewTransitionTypeSet",
+          "idl": {
+            "name": "ViewTransitionTypeSet",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "ViewTransitionTypeSet",
+            "root": "ViewTransitionTypeSet",
+            "class": "ViewTransitionTypeSet",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "ViewTransition",
+      "member": "skipTransition",
+      "contractOwner": "ViewTransition",
+      "kind": "operation",
+      "function": "rv_dom_view_transition_skip_transition",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvViewTransition*",
+          "name": "target"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
       "interface": "DOMCSSNamespace",
       "member": "supports",
       "contractOwner": "CSS",
@@ -172516,6 +172775,339 @@
       "stringInputs": "utf8-lengths"
     },
     {
+      "interface": "ViewTransitionTypeSet",
+      "member": "size",
+      "contractOwner": "ViewTransitionTypeSet",
+      "kind": "operation",
+      "function": "rv_dom_view_transition_type_set_size",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvViewTransitionTypeSet*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "ViewTransitionTypeSet",
+      "member": "has",
+      "contractOwner": "ViewTransitionTypeSet",
+      "kind": "operation",
+      "function": "rv_dom_view_transition_type_set_has",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvViewTransitionTypeSet*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "ViewTransitionTypeSet",
+      "member": "values",
+      "contractOwner": "ViewTransitionTypeSet",
+      "kind": "operation",
+      "function": "rv_dom_view_transition_type_set_values",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvViewTransitionTypeSet*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomSequenceDOMString*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "sequence",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceDOMString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "DOMString sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          }
+        ]
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "ViewTransitionTypeSet",
+      "member": "add",
+      "contractOwner": "ViewTransitionTypeSet",
+      "kind": "operation",
+      "function": "rv_dom_view_transition_type_set_add",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvViewTransitionTypeSet*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "ViewTransitionTypeSet",
+      "member": "delete",
+      "contractOwner": "ViewTransitionTypeSet",
+      "kind": "operation",
+      "function": "rv_dom_view_transition_type_set_delete",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvViewTransitionTypeSet*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "ViewTransitionTypeSet",
+      "member": "clear",
+      "contractOwner": "ViewTransitionTypeSet",
+      "kind": "operation",
+      "function": "rv_dom_view_transition_type_set_clear",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvViewTransitionTypeSet*",
+          "name": "target"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
       "interface": "HighlightRegistry",
       "member": "size",
       "contractOwner": "HighlightRegistry",
@@ -173578,6 +174170,35 @@
         ]
       },
       "releaseFunction": "rv_dom_sequence_touch_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceDOMStringNullable",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "DOMString sequence",
+        "nullable": true,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_dom_string_nullable_release"
     },
     {
       "mapping": {
@@ -177112,6 +177733,60 @@
               "nullable": false,
               "atom": false,
               "subtypes": []
+            }
+          ]
+        }
+      }
+    ],
+    "StartViewTransitionOptions": [
+      {
+        "name": "update",
+        "field": "update",
+        "ctype": "RvViewTransitionUpdateCallback*",
+        "required": false,
+        "default": "null",
+        "mapping": {
+          "kind": "object",
+          "ctype": null,
+          "interface": "ViewTransitionUpdateCallback",
+          "root": "ViewTransitionUpdateCallback",
+          "class": "ViewTransitionUpdateCallback",
+          "enum": null,
+          "label": null,
+          "nullable": true,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "types",
+        "field": "types",
+        "ctype": "const RvDomSequenceDOMStringNullable*",
+        "required": false,
+        "default": "null",
+        "mapping": {
+          "kind": "sequence",
+          "ctype": "RvDomSequenceDOMStringNullable",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": "DOMString sequence",
+          "nullable": true,
+          "atom": false,
+          "subtypes": [
+            {
+              "kind": "string",
+              "ctype": null,
+              "interface": null,
+              "root": null,
+              "class": null,
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": [],
+              "stringTransport": "utf8-lengths"
             }
           ]
         }

@@ -41,7 +41,11 @@
     "browserIndexedGetters lists named IDL getters that browsers expose only as an indexed property; the Fable binding reads $0[index], null when absent.",
     "webcoreNames lists the WebCore names that this file's C++ snippets use and no IDL definition declares; the glue writes them WebCore::<name>."
   ],
-  "webcoreNames": ["LiveNodeList", "RanvierCollectionLike", "WebAnimationTime"],
+  "webcoreNames": [
+    "LiveNodeList",
+    "RanvierCollectionLike",
+    "WebAnimationTime"
+  ],
   "attributeBridges": {
     "Document.adoptedStyleSheets": {
       "sequenceElement": "CSSStyleSheet",
@@ -382,7 +386,8 @@
     "Keyframe": "Ranvier::Keyframe",
     "KeyframeProperty": "Ranvier::KeyframeProperty",
     "FontFaceDescriptors": "FontFace::Descriptors",
-    "ComputedKeyframe": "Ranvier::ComputedKeyframe"
+    "ComputedKeyframe": "Ranvier::ComputedKeyframe",
+    "StartViewTransitionOptions": "Ranvier::ViewTransitionOptions"
   },
   "dictionaryObjectMembers": [
     "FormDataEventInit.formData"
@@ -836,7 +841,9 @@
     "Path2D",
     "ImageBitmap",
     "ImageBitmapRenderingContext",
-    "TextMetrics"
+    "TextMetrics",
+    "ViewTransition",
+    "ViewTransitionTypeSet"
   ],
   "skipDirectories": [
     "Modules/",
@@ -1235,6 +1242,9 @@
     },
     "CustomEffectCallback": {
       "contract": "float -> unit"
+    },
+    "ViewTransitionUpdateCallback": {
+      "contract": "unit -> unit"
     }
   },
   "byteSpanTypes": [
@@ -1326,11 +1336,15 @@
     "WebAnimation.currentTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->bindingsCurrentTime()) return CSSNumberish { *time }; return std::nullopt; }()",
     "AnimationTimeline.currentTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->currentTime()) return CSSNumberish { *time }; return std::nullopt; }()",
     "AnimationTimeline.duration": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->duration()) return CSSNumberish { *time }; return std::nullopt; }()",
-    "ViewTimeline.subject": "RefPtr<Element> { const_cast<Element*>(impl->subject()) }"
+    "ViewTimeline.subject": "RefPtr<Element> { const_cast<Element*>(impl->subject()) }",
+    "ViewTransition.types": "const_cast<ViewTransitionTypeSet*>(&impl->types())"
   },
   "setlikeBindings": {
     "Highlight": {
       "adapter": "RanvierCollectionLike"
+    },
+    "ViewTransitionTypeSet": {
+      "adapter": "RanvierViewTransitions"
     }
   },
   "maplikeBindings": {
@@ -1460,7 +1474,8 @@
   "argumentTypes": {
     "Animatable.animate.keyframes": "sequence<Keyframe>?",
     "KeyframeEffect.constructor.keyframes": "sequence<Keyframe>?",
-    "KeyframeEffect.setKeyframes.keyframes": "sequence<Keyframe>?"
+    "KeyframeEffect.setKeyframes.keyframes": "sequence<Keyframe>?",
+    "Document.startViewTransition.callbackOptions": "StartViewTransitionOptions"
   },
   "argumentAdapters": {
     "Element.animate.keyframes": {
@@ -1500,7 +1515,8 @@
   ],
   "setterExpressions": {
     "WebAnimation.startTime": "[&](auto&& time) { return impl->setBindingsStartTime(time ? std::optional<WebAnimationTime> { WebAnimationTime { *time } } : std::nullopt); }({value})",
-    "WebAnimation.currentTime": "[&](auto&& time) { return impl->setBindingsCurrentTime(time ? std::optional<WebAnimationTime> { WebAnimationTime { *time } } : std::nullopt); }({value})"
+    "WebAnimation.currentTime": "[&](auto&& time) { return impl->setBindingsCurrentTime(time ? std::optional<WebAnimationTime> { WebAnimationTime { *time } } : std::nullopt); }({value})",
+    "ViewTransition.types": "impl->setTypes(Ref { *a0 })"
   },
   "browserArgumentConversions": {
     "Animatable.animate.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})",
@@ -1518,7 +1534,8 @@
     }
   },
   "callExpressions": {
-    "KeyframeEffect.getKeyframes": "Ranvier::computedKeyframes(*impl)"
+    "KeyframeEffect.getKeyframes": "Ranvier::computedKeyframes(*impl)",
+    "Document.startViewTransition": "Ranvier::startViewTransition(*impl, {arg0})"
   },
   "syntheticDictionaries": [
     "Keyframe",
@@ -1549,5 +1566,20 @@
       "check": "Ranvier::customEffectCallbackMatches",
       "header": "RanvierCustomEffects.h"
     }
-  }
+  },
+  "callChecks": {
+    "Document.startViewTransition": {
+      "header": "RanvierViewTransitions.h",
+      "lines": [
+        "if (!Ranvier::viewTransitionsSupported(*impl))",
+        "    return RV_ERR_UNSUPPORTED;",
+        "if (a0.update && a0.update->scriptExecutionContext() != impl.get())",
+        "    return RV_ERR_WRONG_HOST;"
+      ],
+      "note": "RV_ERR_UNSUPPORTED without GPU compositing; RV_ERR_WRONG_HOST for an update callback of another document"
+    }
+  },
+  "nullableObjectMembers": [
+    "StartViewTransitionOptions.update"
+  ]
 }

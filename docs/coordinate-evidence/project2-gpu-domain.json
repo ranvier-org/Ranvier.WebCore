@@ -1,0 +1,307 @@
+{
+  "nativeSource": "2c2d60be0c04769720366fae75cdd4475ec1969b",
+  "runtimeSha256": {
+    "linux": "f86aff3abe5004702da8e7fc7010cc4a24fa578e3d933c66be89c94d341f5797",
+    "windows": "cfbf117c639d63b4d333e21ce0598623da234225d389b0122bf1337de8204250"
+  },
+  "runtimeBytesUnchanged": true,
+  "crossPlatformObservation": "All sampled forward, inverse and rejected-input results are identical on frozen Linux and Windows GPU runtimes.",
+  "domainMismatch": {
+    "originalFailure": "initial e page to node: status -9 for arbitrary page points including (0,0)",
+    "method": "Solve the eight homography coefficients from four independently sampled local/projected corner pairs. Invert the resulting two scalar projective equations at each page input; evaluate homogeneous w at that local point.",
+    "result": "Both fitted homographies are nonsingular. Every rejected sampled e/g inverse lies behind the projection plane (w<0); every positive-w sampled inverse succeeds. Known local points round-trip.",
+    "webkitBoundary": "TransformState::mappedPoint uses inverse().projectPoint. TransformationMatrix::projectPoint clamps w<=0; the host refuses the resulting invalid round-trip and leaves xy unchanged.",
+    "fits": [
+      {
+        "element": "e",
+        "homography": [
+          0.23860028340187875,
+          -0.4133095188679452,
+          216.11424255371094,
+          -0.5708278372529688,
+          0.556166172689426,
+          254.95025634765625,
+          -0.002038671182895429,
+          -0.0009958036068545932,
+          1
+        ],
+        "determinant": 0.5400557112895509,
+        "observations": [
+          {
+            "page": [
+              0,
+              0
+            ],
+            "homographyLocal": [
+              2185.168825200194,
+              1784.3676708618511
+            ],
+            "forwardHomogeneousW": -5.231720476296055,
+            "behindProjectionPlane": true,
+            "nativeStatus": -9
+          },
+          {
+            "page": [
+              17.25,
+              33.5
+            ],
+            "homographyLocal": [
+              5440.009721134025,
+              4261.614177130341
+            ],
+            "forwardHomogeneousW": -14.334121821756,
+            "behindProjectionPlane": true,
+            "nativeStatus": -9
+          },
+          {
+            "page": [
+              -12,
+              140.75
+            ],
+            "homographyLocal": [
+              -7307.1919895953,
+              -3143.072307795942
+            ],
+            "forwardHomogeneousW": 19.02684447778024,
+            "behindProjectionPlane": false,
+            "nativeStatus": 0
+          },
+          {
+            "page": [
+              305.5,
+              2.125
+            ],
+            "homographyLocal": [
+              53.25871561226317,
+              -398.82053013178063
+            ],
+            "forwardHomogeneousW": 1.2885699136361444,
+            "behindProjectionPlane": false,
+            "nativeStatus": 0
+          },
+          {
+            "page": [
+              240,
+              280
+            ],
+            "homographyLocal": [
+              40.00000449655722,
+              30.00000528840544
+            ],
+            "forwardHomogeneousW": 0.8885790300453302,
+            "behindProjectionPlane": false,
+            "nativeStatus": 0
+          }
+        ],
+        "localCorners": [
+          [
+            0,
+            0
+          ],
+          [
+            80,
+            0
+          ],
+          [
+            80,
+            60
+          ],
+          [
+            0,
+            60
+          ]
+        ],
+        "nativeProjectedCorners": [
+          [
+            216.11424255371094,
+            254.95025634765625
+          ],
+          [
+            281.0377502441406,
+            250.0686492919922
+          ],
+          [
+            270.7347412109375,
+            312.23248291015625
+          ],
+          [
+            203.47280883789062,
+            306.6415100097656
+          ]
+        ]
+      },
+      {
+        "element": "g",
+        "homography": [
+          0.240637160374989,
+          -0.9000707057932718,
+          221.02664184570312,
+          -0.5756894814672036,
+          -0.1491067221895127,
+          264.0755310058594,
+          -0.0020560328496555314,
+          -0.0032123082404012676,
+          1
+        ],
+        "determinant": 0.4797633313625347,
+        "observations": [
+          {
+            "page": [
+              0,
+              0
+            ],
+            "homographyLocal": [
+              369.52098335285143,
+              344.3586375867404
+            ],
+            "forwardHomogeneousW": -0.865933369583717,
+            "behindProjectionPlane": true,
+            "nativeStatus": -9
+          },
+          {
+            "page": [
+              17.25,
+              33.5
+            ],
+            "homographyLocal": [
+              423.8566026149242,
+              379.80446754188443
+            ],
+            "forwardHomogeneousW": -1.091512119345686,
+            "behindProjectionPlane": true,
+            "nativeStatus": -9
+          },
+          {
+            "page": [
+              -12,
+              140.75
+            ],
+            "homographyLocal": [
+              916.7794263912676,
+              459.20546002072865
+            ],
+            "forwardHomogeneousW": -2.3600380998106427,
+            "behindProjectionPlane": true,
+            "nativeStatus": -9
+          },
+          {
+            "page": [
+              305.5,
+              2.125
+            ],
+            "homographyLocal": [
+              -120.19622890617191,
+              2323.7262582005224
+            ],
+            "forwardHomogeneousW": -6.217397612618536,
+            "behindProjectionPlane": true,
+            "nativeStatus": -9
+          },
+          {
+            "page": [
+              240,
+              280
+            ],
+            "homographyLocal": [
+              29.57914229171902,
+              21.223027143241065
+            ],
+            "forwardHomogeneousW": 0.8710094068050974,
+            "behindProjectionPlane": false,
+            "nativeStatus": 0
+          }
+        ],
+        "localCorners": [
+          [
+            0,
+            0
+          ],
+          [
+            30,
+            0
+          ],
+          [
+            30,
+            20
+          ],
+          [
+            0,
+            20
+          ]
+        ],
+        "nativeProjectedCorners": [
+          [
+            221.02664184570312,
+            264.0755310058594
+          ],
+          [
+            243.2496337890625,
+            263.0287170410156
+          ],
+          [
+            240.53411865234375,
+            278.9501037597656
+          ],
+          [
+            216.96435546875,
+            279.0193176269531
+          ]
+        ]
+      }
+    ]
+  },
+  "fixtureCorrections": [
+    "Exercise all ordered space pairs in all six viewport states with points projected from each node box. Preserve global PAGE/CLIENT/HOST/DEVICE point coverage.",
+    "Assert eight explicit clipped-inverse rejections with unchanged xy on composited hosts, plus a successful projective inverse outside the element box.",
+    "Composited hosts must match the existing Chromium projective oracle, painted edge and hit target. Retain the existing software-only 3D qualification for non-composited hosts."
+  ],
+  "frozenWindows": {
+    "priorScratchAssertions": 8441,
+    "correctedFixtureAssertions": 8469,
+    "maxError": {
+      "nodeToPageVsChromium": 0.00021399869315509218,
+      "documentNodeIsPage": 0.0,
+      "pageToClient": 0.0,
+      "clientToPage": 0.0,
+      "pageToHost": 0.0,
+      "hostToPage": 0.0,
+      "pageToDevice": 0.0,
+      "deviceToPage": 0.0,
+      "nodeToClientVsRect": 0.0,
+      "roundTrip": 6.291359902370698e-05,
+      "boxQuad": 0.0
+    },
+    "qualified": {},
+    "clippedInverse": {
+      "e:page": -9,
+      "e:client": -9,
+      "e:host": -9,
+      "e:device": -9,
+      "g:page": -9,
+      "g:client": -9,
+      "g:host": -9,
+      "g:device": -9
+    },
+    "perspectivePaint": {
+      "convertedLeftEdge": 53.98295593261719,
+      "firstRedColumn": 54,
+      "chromiumLeftEdge": 53.98297615999104,
+      "hits": {
+        "(3.0, 50.0)": "q",
+        "(97.0, 50.0)": "q",
+        "(50.0, 3.0)": "q",
+        "(50.0, 97.0)": "q",
+        "chromium-only 56,100": "q"
+      }
+    },
+    "result": "PASS"
+  },
+  "remainingLinuxRegression": {
+    "result": "RED, not accepted",
+    "assertion": "perspective() row and column contain painted red pixels",
+    "observation": "After the second painter document load, the full probe reads 76800 white pixels despite correct converted corners. The same failure remains with the separate 0058 Skia-context fix.",
+    "traceOnlyRuntimeSha256": "bbb231fc15bd7dc56eb6d70adb3a866129237f74137808324582fec123f3a4be",
+    "trace": "On reload, a new root reuses the previous raw root address while its WeakPtr witness and actual parent are null and the container has zero children. The shared dynamic-root investigation owns the product fix.",
+    "whiteFrameAssertionRetained": true
+  }
+}

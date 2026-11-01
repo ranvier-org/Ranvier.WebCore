@@ -248,10 +248,6 @@
   },
   {
    "path": "drop.after.drop.items",
-   "platforms": [
-    "win32",
-    "darwin"
-   ],
    "native": [
     [
      "string",
@@ -272,24 +268,6 @@
    ],
    "chromium": [],
    "reason": "WebKit keeps an item list it built during the event after the data store is invalidated (DataTransfer::makeInvalidForSecurity leaves the cached items); its types, data and files are empty, as in Chromium."
-  },
-  {
-   "path": "drop.after.drop.items",
-   "platforms": [
-    "linux"
-   ],
-   "native": [
-    [
-     "string",
-     "text/plain"
-    ],
-    [
-     "string",
-     "text/html"
-    ]
-   ],
-   "chromium": [],
-   "reason": "WebKit keeps an item list it built during the event after the data store is invalidated (DataTransfer::makeInvalidForSecurity leaves the cached items); its types, data and files are empty, as in Chromium. The list holds no file items: KNOWN BUG #156 (https://github.com/ranvier-org/Ranvier.WebCore/issues/156)"
   },
   {
    "path": "drop.after.drop.dropEffect",
@@ -569,125 +547,6 @@
    "native": "<u>P</u>Q<br>",
    "chromium": "<u>P</u>Q",
    "reason": "WebKit's paste into contenteditable keeps a trailing placeholder <br> after the replaced selection; Chromium does not."
-  },
-  {
-   "path": "drop.log.0.dt.types",
-   "platforms": [
-    "linux"
-   ],
-   "native": [
-    "text/plain",
-    "text/html"
-   ],
-   "chromium": [
-    "text/plain",
-    "text/html",
-    "Files"
-   ],
-   "reason": "KNOWN BUG #156 (https://github.com/ranvier-org/Ranvier.WebCore/issues/156)"
-  },
-  {
-   "path": "drop.log.1.dt.types",
-   "platforms": [
-    "linux"
-   ],
-   "native": [
-    "text/plain",
-    "text/html"
-   ],
-   "chromium": [
-    "text/plain",
-    "text/html",
-    "Files"
-   ],
-   "reason": "KNOWN BUG #156 (https://github.com/ranvier-org/Ranvier.WebCore/issues/156)"
-  },
-  {
-   "path": "drop.log.2.dt.types",
-   "platforms": [
-    "linux"
-   ],
-   "native": [
-    "text/plain",
-    "text/html"
-   ],
-   "chromium": [
-    "text/plain",
-    "text/html",
-    "Files"
-   ],
-   "reason": "KNOWN BUG #156 (https://github.com/ranvier-org/Ranvier.WebCore/issues/156)"
-  },
-  {
-   "path": "drop.log.3.dt.types",
-   "platforms": [
-    "linux"
-   ],
-   "native": [
-    "text/plain",
-    "text/html"
-   ],
-   "chromium": [
-    "text/plain",
-    "text/html",
-    "Files"
-   ],
-   "reason": "KNOWN BUG #156 (https://github.com/ranvier-org/Ranvier.WebCore/issues/156)"
-  },
-  {
-   "path": "drop.log.3.dt.files",
-   "platforms": [
-    "linux"
-   ],
-   "native": [],
-   "chromium": [
-    [
-     "note.txt",
-     "text/plain",
-     10
-    ],
-    [
-     "table.csv",
-     "text/csv",
-     3
-    ]
-   ],
-   "reason": "KNOWN BUG #156 (https://github.com/ranvier-org/Ranvier.WebCore/issues/156)"
-  },
-  {
-   "path": "drop.log.3.dt.items",
-   "platforms": [
-    "linux"
-   ],
-   "native": [
-    [
-     "string",
-     "text/plain"
-    ],
-    [
-     "string",
-     "text/html"
-    ]
-   ],
-   "chromium": [
-    [
-     "string",
-     "text/plain"
-    ],
-    [
-     "string",
-     "text/html"
-    ],
-    [
-     "file",
-     "text/plain"
-    ],
-    [
-     "file",
-     "text/csv"
-    ]
-   ],
-   "reason": "KNOWN BUG #156 (https://github.com/ranvier-org/Ranvier.WebCore/issues/156)"
   }
  ]
 }

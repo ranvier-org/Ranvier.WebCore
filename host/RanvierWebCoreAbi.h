@@ -184,14 +184,27 @@ enum { RV_GPU_RGBA8_PREMULTIPLIED = 1 };
  * Writes NULL to *frame on failure. The frame owns its resources independently of host/renderer/window;
  * it remains valid over resize or rv_host_destroy and must be released on the owner thread. */
 RV_EXPORT int32_t rv_host_acquire_d3d11_frame(RvHost*, void* consumerDevice, RvGpuFrame** frame);
+/* Linux GPU startup: call on the future host thread before the first host, with the initialized EGLDisplay
+ * used by the consumer. The display is borrowed for the process lifetime; the host never terminates it.
+ * Reconfiguration after the first host or to a different display returns RV_ERR_UNSUPPORTED. */
+RV_EXPORT int32_t rv_configure_egl_display(void* display);
+/* Linux EGLImage transport; requires the configured display's consumer context current on the owner thread.
+ * Restores that context before returning. There is no CPU fallback. Held frames survive resize/host destruction.
+ * linux_egl.py verifies image import, pixels, ownership and teardown with independent producer/consumer contexts. */
+RV_EXPORT int32_t rv_host_acquire_egl_frame(RvHost*, RvGpuFrame** frame);
 /* Returns a borrowed ID3D11Texture2D*, physical dimensions and RV_GPU_RGBA8_PREMULTIPLIED. Row 0 is the
  * top of the page; channels are sRGB bytes with premultiplied alpha. SDL imports this pointer with
  * SDL_PROP_TEXTURE_CREATE_D3D11_TEXTURE_POINTER and uses SDL_BLENDMODE_BLEND_PREMULTIPLIED (or NONE for
  * an opaque final image). The texture is consumer-locked until release. Do not update or retain it for
- * GPU use after frame release. SDL may retain its COM reference, but must destroy its wrapper before
+ * GPU use after frame release. On Linux the handle is an EGLImage for glEGLImageTargetTexture2DOES, imported
+ * into a texture in the configured display; delete that texture and finish consumer use before release.
+ * SDL may retain its COM reference, but must destroy its wrapper before
  * presenting a different resource. All arguments are required and calls use the host owner thread. */
 RV_EXPORT int32_t rv_gpu_frame_info(RvGpuFrame*, void** texture, int32_t* width, int32_t* height, int32_t* format);
-/* Before release, flush the SDL draw batch (SDL_FlushRenderer) or SDL_RenderPresent. Release flushes
+/* Before release, flush the SDL draw batch (SDL_FlushRenderer) or SDL_RenderPresent. On Linux, destroy imported
+ * textures and keep the acquisition's exact consumer context current and alive through release; another context
+ * returns RV_ERR_PAINT_FAILED and retains the frame for retry. linux_egl.py verifies the context mismatch case.
+ * Release flushes
  * the consumer immediate context, returns the keyed mutex to the producer and frees this frame handle.
  * The SDL wrapper and all frame handles must be disposed before unloading their native DLLs. */
 RV_EXPORT int32_t rv_gpu_frame_release(RvGpuFrame*);
@@ -1628,6 +1641,27 @@ RV_EXPORT RvCustomEffectCallback* rv_custom_effect_callback_create(RvHost*, RvCu
 /* Stops the callback: no tick runs after this returns, including ticks already queued. A second call does nothing.
  * rv_host_load_html and rv_host_destroy revoke every callback of the host. */
 RV_EXPORT int32_t rv_custom_effect_callback_revoke(RvCustomEffectCallback*);
+
+typedef struct RvViewTransition RvViewTransition;
+typedef struct RvViewTransitionUpdateCallback RvViewTransitionUpdateCallback;
+typedef struct RvViewTransitionObserver RvViewTransitionObserver;
+/* Runs after old-state capture from rv_run_loop_cycle. Zero completes the update; nonzero rejects it with TypeError. */
+typedef int32_t (*RvViewTransitionUpdate)(void* context);
+/* promise is 0 (updateCallbackDone), 1 (ready), or 2 (finished); errorName is NULL on fulfillment, otherwise a
+ * borrowed UTF-8 exception name valid until the callback returns. Each promise is reported once. */
+typedef void (*RvViewTransitionSettled)(void* context, int32_t promise, const char* errorName);
+/* Returns a new callback reference of the current document, released with rv_dom_view_transition_update_callback_release.
+ * release runs once after the engine drops its last reference. Host replacement or destruction revokes update. */
+RV_EXPORT RvViewTransitionUpdateCallback* rv_view_transition_update_callback_create(RvHost*, RvViewTransitionUpdate update,
+    void* context, RvCustomEffectRelease release);
+/* Stops future application updates; a pending engine callback rejects with TypeError. */
+RV_EXPORT int32_t rv_view_transition_update_callback_revoke(RvViewTransitionUpdateCallback*);
+/* Observes all three promises. Delivery is deferred to rv_run_loop_cycle, including already-settled promises.
+ * Returns RV_ERR_WRONG_HOST for a transition from another document. Replacement/destruction stops delivery. */
+RV_EXPORT int32_t rv_view_transition_observe(RvHost*, RvViewTransition* transition, RvViewTransitionSettled callback, void* context,
+    RvViewTransitionObserver** observer);
+/* Stops delivery and releases the observer. May be called from its callback. */
+RV_EXPORT void rv_view_transition_observer_release(RvViewTransitionObserver*);
 /* rv_node_add_event_listener for any EventTarget; remove the listener with rv_listener_remove. */
 RV_EXPORT RvListener* rv_event_target_add_listener(RvEventTarget*, const uint8_t* type, int32_t type_length, int32_t flags, RvEventCallback callback, void* context);
 /* rv_node_dispatch for any EventTarget. */

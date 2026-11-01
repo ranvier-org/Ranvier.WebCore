@@ -15,7 +15,7 @@ HEAD = 'a' * 40
 
 
 class ReleaseTests(unittest.TestCase):
-    def invoke(self, flavor, dirty=False, tagged=False):
+    def invoke(self, flavor, dirty=False, tagged=False, rids=('win-x64',), dry_run=True):
         calls = []
 
         def run(command, **kwargs):
@@ -32,11 +32,21 @@ class ReleaseTests(unittest.TestCase):
                 output = HEAD if tagged else ''
             return subprocess.CompletedProcess(command, 0, stdout=output, stderr='')
 
-        arguments = ['release.py', '--rid', 'win-x64', '--flavor', flavor, '--dry-run', '--work', str(ROOT / 'artifacts/release-proof')]
-        with patch.object(sys, 'argv', arguments), patch('subprocess.run', side_effect=run), contextlib.redirect_stdout(io.StringIO()):
-            with self.assertRaises(SystemExit) as completed:
+        arguments = ['release.py', '--flavor', flavor, '--work', str(ROOT / 'artifacts/release-proof')]
+        for rid in rids:
+            arguments.extend(['--rid', rid])
+        if dry_run:
+            arguments.append('--dry-run')
+        transcript = io.StringIO()
+        with patch.object(sys, 'argv', arguments), patch('subprocess.run', side_effect=run), contextlib.redirect_stdout(transcript):
+            try:
                 runpy.run_path(str(ROOT / 'scripts/release.py'), run_name='__main__')
-        return completed.exception.code, calls
+            except SystemExit as completed:
+                code = completed.code
+            else:
+                code = None
+        self.transcript = transcript.getvalue()
+        return code, calls
 
     def test_gpu_dry_run_builds_and_checks_the_gpu_package(self):
         code, calls = self.invoke('gpu')
@@ -74,9 +84,41 @@ class ReleaseTests(unittest.TestCase):
         self.assertGreater(probe_index, smoke_index)
         smoke, probe = calls[smoke_index], calls[probe_index]
         self.assertEqual(probe[probe.index('--package') + 1], smoke[smoke.index('--package') + 1])
-        for flavor in ['gpu', 'lean']:
-            _, calls = self.invoke(flavor)
-            self.assertFalse(any(any(value.endswith('check_package_api.py') for value in command) for command in calls))
+        _, calls = self.invoke('lean')
+        self.assertFalse(any(any(value.endswith('check_package_api.py') for value in command) for command in calls))
+
+    def test_windows_gpu_release_checks_shared_frames_from_the_packed_payload(self):
+        code, calls = self.invoke('gpu')
+        self.assertIsNone(code)
+        smoke_index = next(index for index, command in enumerate(calls) if any(value.endswith('smoke.py') for value in command))
+        frame_checks = [(index, command) for index, command in enumerate(calls)
+                        if any(value.endswith('check_package_api.py') for value in command)]
+        self.assertEqual(len(frame_checks), 1)
+        index, probe = frame_checks[0]
+        self.assertGreater(index, smoke_index)
+        self.assertIn('--gpu', probe)
+        smoke = calls[smoke_index]
+        self.assertEqual(probe[probe.index('--package') + 1], smoke[smoke.index('--package') + 1])
+
+    def test_linux_gpu_release_checks_the_packed_egl_payload(self):
+        for rid in ['linux-x64', 'linux-arm64']:
+            with self.subTest(rid=rid):
+                code, calls = self.invoke('gpu', rids=(rid,))
+                self.assertIsNone(code)
+                frames = [command for command in calls if any(value.endswith('check_package_api.py') for value in command)]
+                self.assertEqual(len(frames), 1)
+                self.assertIn('--gpu', frames[0])
+
+    def test_only_windows_x64_gpu_release_uses_automatic_only_guidance(self):
+        self.invoke('gpu', dry_run=False)
+        self.assertIn('automatically dispatches', self.transcript)
+        self.assertNotIn('gh workflow run', self.transcript)
+        for rids in [('linux-x64',), ('osx-arm64',), ('win-arm64',), ('win-x64', 'linux-x64')]:
+            with self.subTest(rids=rids):
+                self.invoke('gpu', rids=rids, dry_run=False)
+                self.assertIn('gh workflow run', self.transcript)
+                self.assertIn('--field flavor=gpu', self.transcript)
+                self.assertIn('--field rids=' + ','.join(rids), self.transcript)
 
     def test_gpu_release_still_rejects_dirty_source(self):
         code, calls = self.invoke('gpu', dirty=True)

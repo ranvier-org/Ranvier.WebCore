@@ -10,6 +10,30 @@ import unittest
 
 
 class HostPrepare(unittest.TestCase):
+    def test_view_transitions_require_the_host_compositor(self):
+        compiler=shutil.which('c++') or shutil.which('clang++')
+        if not compiler:self.skipTest('A C++ compiler is not available')
+        root=Path(__file__).resolve().parents[1]
+        source=(root/'host/RanvierWebCoreAbi.cpp').read_text()
+        capability=source.split('int32_t rv_abi_has(const char* feature)',1)[1].split('\n}\n',1)[0]
+        with tempfile.TemporaryDirectory() as temporary:
+            directory=Path(temporary)
+            program=directory/'capability.cpp'
+            program.write_text('#include <cstdint>\n#include <cstring>\n#include <initializer_list>\n'
+                '#define USE(feature) USE_##feature\n#define ENABLE(feature) 0\n#define PLATFORM(feature) 0\n'
+                'int ranvier_dom_has(const char*) { return 0; }\n'
+                'int32_t rv_abi_has(const char* feature)'+capability+'\n}\n'
+                'int main() { return rv_abi_has("view-transitions") != EXPECT_SUPPORTED; }\n')
+            for name,stub,compositor,expected in [('windows-slim',1,0,0),('wpe-slim',0,0,0),('gpu',0,1,1)]:
+                with self.subTest(profile=name):
+                    executable=directory/(name+('.exe' if os.name=='nt' else ''))
+                    result=subprocess.run([compiler,'-std=c++20',f'-DUSE_GPU_STUB={stub}',
+                        f'-DRANVIER_COMPOSITING={compositor}',f'-DEXPECT_SUPPORTED={expected}',
+                        str(program),'-o',str(executable)],capture_output=True,text=True)
+                    self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+                    self.assertEqual(subprocess.run([str(executable)]).returncode,0,
+                        name+' must advertise view transitions only with the host compositor')
+
     def test_refreshes_an_old_cached_embedder_source_list(self):
         cmake=os.environ.get('RANVIER_CMAKE') or shutil.which('cmake')
         if not cmake:self.skipTest('CMake is not available')
@@ -35,7 +59,8 @@ class HostPrepare(unittest.TestCase):
             exec(compile(ast.Module(body=[prepare],type_ignores=[]),'<actual-prepare>','exec'),scope)
             scope['prepare']()
             installed=api/'RanvierAbi'
-            for filename in ['RanvierWebCoreAbi.cpp','RanvierCapabilities.inc','RanvierCapabilityCatalogue.inc','RanvierSvgViewGlue.h','RanvierEventGlue.h','RanvierViewportGlue.h','RanvierInspectGlue.h','RanvierWakeLockGlue.h','RanvierNotificationGlue.h','RanvierTransferGlue.h']:
+            for filename in ['RanvierWebCoreAbi.cpp','RanvierWebCoreEGL.h','RanvierWebCoreEGL.cpp','RanvierCapabilities.inc','RanvierCapabilityCatalogue.inc','RanvierSvgViewGlue.h','RanvierEventGlue.h','RanvierViewportGlue.h','RanvierInspectGlue.h','RanvierWakeLockGlue.h','RanvierNotificationGlue.h','RanvierTransferGlue.h']:
+                self.assertTrue((installed/filename).exists(), 'prepare must install ' + filename)
                 self.assertEqual((installed/filename).read_bytes(),(root/'host'/filename).read_bytes())
             self.assertIn('#include "RanvierCapabilities.inc"',(installed/'RanvierWebCoreAbi.cpp').read_text())
             self.assertIn('#include "RanvierCapabilityCatalogue.inc"',(installed/'RanvierCapabilities.inc').read_text())

@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/mnt/c/wk/project2-linux-gpu/tests/abi/data_transfer.py", line 751, in <module>
+    run(arguments.native_directory, arguments.evidence)
+  File "/mnt/c/wk/project2-linux-gpu/tests/abi/data_transfer.py", line 386, in run
+    n.expect(drop_files == [[name, kind, len(content.encode())] for name, content, kind in case['files']], 'files kept from the drop')
+  File "/mnt/c/wk/project2-linux-gpu/tests/abi/data_transfer.py", line 87, in expect
+    raise AssertionError(label)
+AssertionError: files kept from the drop

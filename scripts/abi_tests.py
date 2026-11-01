@@ -177,6 +177,7 @@ with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
     probe([sys.executable, '-I', '-X', 'utf8', tests / 'animation_events.py', '--native-directory', out])
     probe([sys.executable, '-I', '-X', 'utf8', tests / 'animation_timelines.py', '--native-directory', out])
     probe([sys.executable, '-I', '-X', 'utf8', tests / 'custom_effects.py', '--native-directory', out])
+    probe([sys.executable, '-I', '-X', 'utf8', tests / 'view_transitions.py', '--native-directory', out])
     probe([sys.executable, '-I', tests / 'form_navigation.py', '--native-directory', out])
     probe([sys.executable, '-I', '-X', 'utf8', tests / 'form_submission.py', '--native-directory', out])
     probe([sys.executable, '-I', '-X', 'utf8', tests / 'event_details.py', '--native-directory', out])
