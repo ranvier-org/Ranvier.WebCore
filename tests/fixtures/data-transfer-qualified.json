@@ -1,5 +1,5 @@
 {
- "comment": "Differences of tests/abi/data_transfer.py from the Chromium oracle tests/fixtures/data-transfer-oracle.json: each path (case.key[.index]) with both recorded values and its reason.",
+ "comment": "Differences of tests/abi/data_transfer.py from the Chromium oracle tests/fixtures/data-transfer-oracle.json: each path (case.key[.index]) with both recorded values and its reason. An entry with \"platforms\" applies only on those platforms.",
  "differences": [
   {
    "path": "constructed.afterFile.types",
@@ -547,6 +547,125 @@
    "native": "<u>P</u>Q<br>",
    "chromium": "<u>P</u>Q",
    "reason": "WebKit's paste into contenteditable keeps a trailing placeholder <br> after the replaced selection; Chromium does not."
+  },
+  {
+   "path": "drop.log.0.dt.types",
+   "platforms": [
+    "linux"
+   ],
+   "native": [
+    "text/plain",
+    "text/html"
+   ],
+   "chromium": [
+    "text/plain",
+    "text/html",
+    "Files"
+   ],
+   "reason": "KNOWN BUG #156 (https://github.com/ranvier-org/Ranvier.WebCore/issues/156)"
+  },
+  {
+   "path": "drop.log.1.dt.types",
+   "platforms": [
+    "linux"
+   ],
+   "native": [
+    "text/plain",
+    "text/html"
+   ],
+   "chromium": [
+    "text/plain",
+    "text/html",
+    "Files"
+   ],
+   "reason": "KNOWN BUG #156 (https://github.com/ranvier-org/Ranvier.WebCore/issues/156)"
+  },
+  {
+   "path": "drop.log.2.dt.types",
+   "platforms": [
+    "linux"
+   ],
+   "native": [
+    "text/plain",
+    "text/html"
+   ],
+   "chromium": [
+    "text/plain",
+    "text/html",
+    "Files"
+   ],
+   "reason": "KNOWN BUG #156 (https://github.com/ranvier-org/Ranvier.WebCore/issues/156)"
+  },
+  {
+   "path": "drop.log.3.dt.types",
+   "platforms": [
+    "linux"
+   ],
+   "native": [
+    "text/plain",
+    "text/html"
+   ],
+   "chromium": [
+    "text/plain",
+    "text/html",
+    "Files"
+   ],
+   "reason": "KNOWN BUG #156 (https://github.com/ranvier-org/Ranvier.WebCore/issues/156)"
+  },
+  {
+   "path": "drop.log.3.dt.files",
+   "platforms": [
+    "linux"
+   ],
+   "native": [],
+   "chromium": [
+    [
+     "note.txt",
+     "text/plain",
+     10
+    ],
+    [
+     "table.csv",
+     "text/csv",
+     3
+    ]
+   ],
+   "reason": "KNOWN BUG #156 (https://github.com/ranvier-org/Ranvier.WebCore/issues/156)"
+  },
+  {
+   "path": "drop.log.3.dt.items",
+   "platforms": [
+    "linux"
+   ],
+   "native": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ]
+   ],
+   "chromium": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ],
+    [
+     "file",
+     "text/plain"
+    ],
+    [
+     "file",
+     "text/csv"
+    ]
+   ],
+   "reason": "KNOWN BUG #156 (https://github.com/ranvier-org/Ranvier.WebCore/issues/156)"
   }
  ]
 }

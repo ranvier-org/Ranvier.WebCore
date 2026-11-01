@@ -626,7 +626,10 @@ def differences(native, chromium, prefix):
 
 
 def compare(n, results, spec, oracle, qualified):
-    recorded = {item['path']: item for item in qualified['differences']}
+    # An entry with "platforms" applies only there; every other entry applies on every platform.
+    platform = 'linux' if sys.platform.startswith('linux') else sys.platform
+    applicable = [item for item in qualified['differences'] if platform in item.get('platforms', [platform])]
+    recorded = {item['path']: item for item in applicable}
     found = []
     for case in ('constructed', 'drop', 'paste'):
         native = {key: value for key, value in results[case].items() if key in oracle[case]}
@@ -694,7 +697,7 @@ def compare(n, results, spec, oracle, qualified):
     n.expect(errors['thread'] == {'replace': WRONG_THREAD, 'create': WRONG_THREAD, 'dragFile': WRONG_THREAD}, 'off-thread calls')
     n.expect([f[:3] for f in results['pastHost']] == [[name, kind, len(content.encode())] for name, content, kind in spec['drop']['files']]
              and [f[3] for f in results['pastHost']] == [content for _, content, _ in spec['drop']['files']], 'dropped files outlive the host')
-    n.expect(len(recorded) == len(qualified['differences']), 'qualified paths are unique')
+    n.expect(len(recorded) == len(applicable), 'qualified paths are unique')
 
 
 if __name__ == '__main__':
