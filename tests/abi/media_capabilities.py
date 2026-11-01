@@ -247,8 +247,8 @@ def verify(native_directory):
         # Without a provider the answer is reached inside the starting call and delivered later. Cancel, release, a new
         # document and rv_host_destroy keep a reached answer; with a provider the outcome ends CANCELLED or INVALIDATED
         # when the provider has not answered yet.
-        def reached(provider, fallback):
-            return [(SUCCEEDED, 0, 0)] if not provider else None
+        def reached(inside, fallback):
+            return [(SUCCEEDED, 0, 0)] if inside else None
 
         def settled(context_value, expected, fallback, label):
             outcome = deliveries.get(context_value)
@@ -257,15 +257,22 @@ def verify(native_directory):
             else:
                 expect(outcome == expected, label + ' ' + str(outcome))
 
-        decoder, encoder = providers['media-decoding-provider'], providers['media-encoding-provider']
+        # True when the decoding or encoding answer is reached inside the starting call.
+        decoding_inside = not providers['media-decoding-provider']
+        encoding_inside = not providers['media-encoding-provider']
+        if sys.platform == 'darwin':
+            # The Cocoa decoding provider calls back inside createDecodingConfiguration
+            # (createMediaPlayerDecodingConfigurationCocoa, PlatformMediaEngineConfigurationFactoryCocoa.cpp), so the
+            # file query answer is reached inside the starting call.
+            decoding_inside = True
         token = pending(context_value=1001)
         expect(cancel(token) == OK, 'cancel')
-        settled(1001, reached(decoder, CANCELLED), CANCELLED, 'cancel delivers the reached answer before it returns')
+        settled(1001, reached(decoding_inside, CANCELLED), CANCELLED, 'cancel delivers the reached answer before it returns')
         cycle(1)
         expect(release(token) == OK and release(token) == OK and len(deliveries[1001]) == 1, 'one delivery after cancel')
         token = pending(encoding, context_value=1002)
         expect(release(token) == OK, 'release')
-        settled(1002, reached(encoder, CANCELLED), CANCELLED, 'release delivers the reached answer before it returns')
+        settled(1002, reached(encoding_inside, CANCELLED), CANCELLED, 'release delivers the reached answer before it returns')
         expect(info(token, *map(ctypes.byref, values)) == UNSUPPORTED and [v.value for v in values] == [7, 7, 7], 'info after release')
         cycle(1)
         expect(len(deliveries[1002]) == 1, 'nothing after release')
@@ -278,10 +285,10 @@ def verify(native_directory):
         # A new document before delivery.
         token = pending(context_value=1004)
         expect(load_html(p.host, b'<!doctype html><body>next') == OK, 'new document')
-        if not decoder:
+        if decoding_inside:
             expect(1004 not in deliveries, 'a reached answer is not delivered inside rv_host_load_html')
             drain(1004)
-        settled(1004, reached(decoder, INVALIDATED), INVALIDATED, 'new document keeps the reached answer')
+        settled(1004, reached(decoding_inside, INVALIDATED), INVALIDATED, 'new document keeps the reached answer')
         expect((info(token, *map(ctypes.byref, values)) == OK) == (deliveries[1004][0][0] == SUCCEEDED), 'info follows the outcome')
         expect(release(token) == OK and len(deliveries[1004]) == 1, 'one delivery after a new document')
         # A delivered answer survives a new document until release.
@@ -296,10 +303,10 @@ def verify(native_directory):
         expect(load_html(second, b'<!doctype html><body>second') == OK, 'second document')
         token = pending(host=second, context_value=1006)
         host_destroy(second)
-        if not decoder:
+        if decoding_inside:
             expect(1006 not in deliveries, 'a reached answer is not delivered inside rv_host_destroy')
             drain(1006)
-        settled(1006, reached(decoder, INVALIDATED), INVALIDATED, 'host destroy keeps the reached answer')
+        settled(1006, reached(decoding_inside, INVALIDATED), INVALIDATED, 'host destroy keeps the reached answer')
         expect(release(token) == OK and len(deliveries[1006]) == 1, 'one delivery after host destroy')
 
         # No query changes a media facility or the script setting.

@@ -665,6 +665,9 @@ static Ref<Page> createPage(IntSize viewportSize, RvScreenOrientationManager& or
     page->settings().setWebAnimationsCustomEffectsEnabled(true);
     // Markup arrives decoded, so the document's encoding, which form submission and URL query encoding use, is UTF-8.
     page->settings().setDefaultTextEncodingName("UTF-8"_s);
+    // RV_MEDIA_DEFAULT's motion and contrast: no preference, independent of the OS accessibility settings.
+    page->settings().setForcedPrefersReducedMotionAccessibilityValue(ForcedAccessibilityValue::Off);
+    page->settings().setForcedPrefersContrastAccessibilityValue(ForcedAccessibilityValue::Off);
 #if ENABLE(VIDEO)
     page->settings().setMediaEnabled(false);
 #endif
@@ -1691,10 +1694,11 @@ OptionSet<PointerCharacteristics> RvChromeClient::pointerCharacteristicsOfAllAva
     }
 }
 
+// RV_MEDIA_DEFAULT is no preference on every platform. ForcedAccessibilityValue::System would read the OS setting on
+// Cocoa (ThemeMac::userPrefersReducedMotion and userPreferredContrast, platform/mac/ThemeMac.mm).
 static ForcedAccessibilityValue forcedAccessibilityValue(int32_t preference)
 {
-    return preference == RV_MEDIA_PREFERENCE ? ForcedAccessibilityValue::On
-        : preference == RV_MEDIA_NO_PREFERENCE ? ForcedAccessibilityValue::Off : ForcedAccessibilityValue::System;
+    return preference == RV_MEDIA_PREFERENCE ? ForcedAccessibilityValue::On : ForcedAccessibilityValue::Off;
 }
 
 int32_t rv_host_set_media_preferences(RvHost* host, const RvMediaPreferences* preferences)
