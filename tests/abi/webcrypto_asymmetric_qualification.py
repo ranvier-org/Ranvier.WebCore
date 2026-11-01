@@ -21,8 +21,8 @@ FORMATS={'raw':1,'jwk':2,'spki':3,'pkcs8':4}
 class Bytes(C.Structure):
     _fields_=[('data',P),('length',I)]
 class Request(C.Structure):
-    _fields_=[(n,I) for n in ['size','algorithm','operation','format','hash','curve','parameter','extractable']]
-    _fields_ += [('usages',C.c_uint32),('key',P),('peer',P)]
+    _fields_=[(n,I) for n in ['size','algorithm','operation','format','hash','curve']]
+    _fields_ += [('parameter',C.c_int64),('extractable',I),('usages',C.c_uint32),('key',P),('peer',P)]
     _fields_ += [(n,Bytes) for n in ['input','signature','label','exponent']]
     _fields_ += [('jwk',Bytes*14),('jwkExt',I)]
 class Result(C.Structure):
@@ -282,6 +282,19 @@ def verify(directory,jws_path,ecdh_path,bridge_library=None):
                     check(bytes.fromhex(result['output'])==bytes(truncated),result['label'],'first length bits; unused low bits zero (dated ED24.4.2)')
                 result=success(v['curve']+'/derive-import-AES','ECDH','derive-import',key=keys['initiator'][1],peer=keys['responder'][0],parameter=128)
                 check(bytes.fromhex(result['output'])==expected[:16],result['label'],'backend deriveBits/import/export composition')
+                error(v['curve']+'/uint32-max-length','ECDH','derive',key=keys['initiator'][1],peer=keys['responder'][0],parameter=0xffffffff,expected='OperationError')
+                if bits==521:
+                    canonical=b'\x04'+bytes.fromhex(v['initiator']['x']+v['initiator']['y'])
+                    spki=success(v['curve']+'/canonical-spki','ECDH','export',key=keys['initiator'][0],format='spki')
+                    spki=bytes.fromhex(spki['output'])
+                    assert spki.count(canonical)==1
+                    for coordinate in ['x','y']:
+                        point=dict(v['initiator'])
+                        point[coordinate]=(int(point[coordinate],16)+(2**521-1)).to_bytes(66,'big').hex()
+                        raw=b'\x04'+bytes.fromhex(point['x']+point['y'])
+                        jwk=dict(kty='EC',crv=v['curve'],x=b64(bytes.fromhex(point['x'])),y=b64(bytes.fromhex(point['y'])))
+                        for form,data,jwk_value in [('raw',raw,None),('jwk',b'',jwk),('spki',spki.replace(canonical,raw),None)]:
+                            error(v['curve']+'/'+coordinate+'-plus-prime/'+form,'ECDH','import',format=form,data=data,jwk=jwk_value,usages=0,curve=bits)
                 error(v['curve']+'/overlength','ECDH','derive',key=keys['initiator'][1],peer=keys['responder'][0],parameter=len(expected)*8+8,expected='OperationError')
                 other=peers[384 if bits==256 else 256]
                 error(v['curve']+'/wrong-curve','ECDH','derive',key=keys['initiator'][1],peer=other[0],parameter=-1,expected='InvalidAccessError')
