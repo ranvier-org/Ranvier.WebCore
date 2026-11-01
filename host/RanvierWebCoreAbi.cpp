@@ -257,7 +257,7 @@ private:
         wantUpdate();
         return true;
     }
-    void setCursor(const Cursor&) final;
+    void setCursor(const WebCore::Cursor&) final;
     void mouseDidMoveOverElement(const HitTestResult&, OptionSet<PlatformEventModifier>, const String& toolTip, TextDirection) final;
     RefPtr<PopupMenu> createPopupMenu(PopupMenuClient&) const final;
     // The pointing devices of rv_host_set_media_preferences.
@@ -278,9 +278,9 @@ private:
 };
 
 // The RV_CURSOR_* value of a WebCore cursor.
-static int32_t cursorValue(Cursor::Type type)
+static int32_t cursorValue(WebCore::Cursor::Type type)
 {
-    using enum Cursor::Type;
+    using enum WebCore::Cursor::Type;
     switch (type) {
     case Hand: return RV_CURSOR_POINTER;
     case IBeam: return RV_CURSOR_TEXT;
@@ -890,7 +890,7 @@ void RvChromeClient::requestPointerLock(CompletionHandler<void(PointerLockReques
 }
 #endif
 
-void RvChromeClient::setCursor(const Cursor& cursor)
+void RvChromeClient::setCursor(const WebCore::Cursor& cursor)
 {
     if (host)
         host->cursor = cursorValue(cursor.type());

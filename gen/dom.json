@@ -38,8 +38,10 @@
     "contextDocuments names the C++ document of an object whose operations take a checked context Document: another document returns RV_ERR_WRONG_HOST.",
     "resultValueOverloads adds C++ overloads that convert a result dictionary field to its IDL transport type.",
     "browserResultConversions maps Interface.member to the JavaScript function the Fable provider applies to the browser's result: getKeyframes gives ComputedKeyframe objects.",
-    "browserIndexedGetters lists named IDL getters that browsers expose only as an indexed property; the Fable binding reads $0[index], null when absent."
+    "browserIndexedGetters lists named IDL getters that browsers expose only as an indexed property; the Fable binding reads $0[index], null when absent.",
+    "webcoreNames lists the WebCore names that this file's C++ snippets use and no IDL definition declares; the glue writes them WebCore::<name>."
   ],
+  "webcoreNames": ["LiveNodeList", "RanvierCollectionLike", "WebAnimationTime"],
   "attributeBridges": {
     "Document.adoptedStyleSheets": {
       "sequenceElement": "CSSStyleSheet",

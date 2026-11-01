@@ -1,0 +1,10 @@
+C:\wk\native-batch-6\host\RanvierViewportGlue.cpp(71,46): warning: address of stack memory associated with local variable 'list' returned [-Wreturn-stack-address]
+   71 |     return reinterpret_cast<RvEventTarget*>(&target);
+      |                                              ^~~~~~
+C:\wk\native-batch-6\host\RanvierViewportGlue.cpp(69,18): note: binding reference variable 'target' here
+   69 |     EventTarget& target = *list;
+      |                  ^         ~~~~
+1 warning generated.
+
+ERRORS=0
+EXIT=0

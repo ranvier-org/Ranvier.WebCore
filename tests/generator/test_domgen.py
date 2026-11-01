@@ -98,6 +98,32 @@ interface SVGTransformList { SVGTransform createSVGTransformFromMatrix(''' + arg
         self.assertIn('return v.setMatrix(m);})($0,$1)', shared)
         self.assertEqual(shared.count('return v.createSVGTransformFromMatrix(m);})($0,$1)'), 2)
 
+    def test_qualify_webcore_qualifies_code_references_and_keeps_text_members_and_qualified_names(self):
+        names = {'Comment', 'Node', 'Document'}
+        source = ('// Comment.constructor: Node\n'
+                  '#include "Comment.h"\n'
+                  'RefPtr impl = dynamicDowncast<Document>(*nodeOf(target)); auto c = \'C\';\n'
+                  'return deliver([&]() -> decltype(auto) { return Comment::create(*impl, "Comment"_s); }, '
+                  '[&](auto&& value) { return storeHandle<Node>(value, result); });\n'
+                  'auto* p = ([&]() -> Comment* { return impl->Comment; }()); WebCore::Node* n = x.Node; ~Node();\n')
+        self.assertEqual(domgen.qualify_webcore(source, names),
+                         '// Comment.constructor: Node\n'
+                         '#include "Comment.h"\n'
+                         'RefPtr impl = dynamicDowncast<WebCore::Document>(*nodeOf(target)); auto c = \'C\';\n'
+                         'return deliver([&]() -> decltype(auto) { return WebCore::Comment::create(*impl, "Comment"_s); }, '
+                         '[&](auto&& value) { return storeHandle<WebCore::Node>(value, result); });\n'
+                         'auto* p = ([&]() -> WebCore::Comment* { return impl->Comment; }()); WebCore::Node* n = x.Node; ~Node();\n')
+
+    def test_glue_names_every_webcore_type_qualified_without_a_using_directive(self):
+        # A macOS SDK declares Comment, Rect and other Carbon names globally: `using namespace WebCore` makes them ambiguous.
+        glue = self.generator.glue()
+        self.assertNotIn('using namespace WebCore', glue)
+        self.assertIn('dynamicDowncast<WebCore::Document>(*nodeOf(target))', glue)
+        self.assertIn('WebCore::Node* nodeOf(RvNode* handle) { return reinterpret_cast<WebCore::Node*>(handle); }', glue)
+        self.assertIn('template<typename T> struct IsExceptionOr<WebCore::ExceptionOr<T>> : std::true_type { };', glue)
+        self.assertTrue({'Node', 'Document', 'Element', 'ElementCreationOptions', 'Mode', 'EventListener', 'Exception',
+                         'ExceptionOr'} <= self.generator.webcore_names())
+
     def test_svg_matrix_dictionary_bindings_reject_wrong_argument_shape(self):
         for argument in ['DOMString matrix', 'DOMMatrix2DInit other', 'DOMMatrix2DInit matrix, long extra', 'DOMMatrix2DInit? matrix']:
             with self.subTest(argument=argument), self.assertRaisesRegex(SystemExit, 'one nonnullable DOMMatrix2DInit matrix argument'):
@@ -127,11 +153,11 @@ interface Timeline {
         self.assertIn('RV_EXPORT void rv_dom_tick_callback_release(RvTickCallback*);', header)
         self.assertNotIn('typedef struct RvTickCallback RvTickCallback;', header)
         self.assertIn('RvTickCallback* callback', header)
-        self.assertIn('reinterpret_cast<TickCallback*>(handle)->deref();', glue)
+        self.assertIn('reinterpret_cast<WebCore::TickCallback*>(handle)->deref();', glue)
         self.assertIn('if (a0 && !Ranvier::tickMatches(*a0, *impl))', glue)
         self.assertIn('    return RV_ERR_WRONG_HOST;', glue)
         self.assertIn('#include "RanvierTicks.h"', glue)
-        self.assertIn('RefPtr<Document> settingsDocument = impl->document();', glue)
+        self.assertIn('RefPtr<WebCore::Document> settingsDocument = impl->document();', glue)
         self.assertIn('settings.ticksEnabled', glue)
         # A callback function outside callbackObjectRoots stays unsupported.
         self.assertNotIn('rv_dom_timeline_unlisted', header)
@@ -328,7 +354,7 @@ interface CSSTranslate { attribute CSSNumericValue x; };
         generator.lock_structs = {}
         generator.run()
         glue = generator.glue()
-        self.assertIn('storeConstGetter<CSSStyleValue, CSSNumericValue>(value, result)', glue)
+        self.assertIn('storeConstGetter<WebCore::CSSStyleValue, WebCore::CSSNumericValue>(value, result)', glue)
         self.assertIn('static_assert(std::is_lvalue_reference_v<V> && std::is_const_v<std::remove_reference_t<V>>);', glue)
         self.assertIn('static_assert(std::is_same_v<std::remove_cvref_t<V>, Declared>);', glue)
         self.assertIn('static_assert(std::is_polymorphic_v<Root>);', glue)
@@ -364,7 +390,7 @@ partial interface Node {
         self.assertNotIn('finiteInput', unrestricted)
         glue = generator.glue()
         self.assertEqual(glue.count('!std::isfinite(source->arm0)'), 1)
-        self.assertIn('status = Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });', glue)
+        self.assertIn('status = Ranvier::recordException(WebCore::Exception { WebCore::ExceptionCode::TypeError, "A finite numeric value is required."_s });', glue)
 
     def test_selected_perspective_typedef_flattens_nested_union_for_cpp_and_shared_contracts(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
@@ -391,7 +417,7 @@ interface CSSPerspective : CSSTransformComponent {
         factory = next(row for row in json.loads(generator.api_model())['functions'] if row['function'] == 'rv_dom_css_perspective_create')
         mapping = factory['arguments'][0]['mapping']
         self.assertEqual([child['kind'] for child in mapping['subtypes']], ['object', 'string', 'object'])
-        self.assertIn('Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>>', generator.glue())
+        self.assertIn('Variant<Ref<WebCore::CSSNumericValue>, String, Ref<WebCore::CSSOMKeywordValue>>', generator.glue())
         shared = generator.interfaces()
         self.assertIn('| CSSNumericValue of CSSNumericValue', shared)
         self.assertIn('| DOMString of string', shared)
@@ -422,7 +448,7 @@ interface CSSRotate : CSSTransformComponent {
         generator.run()
         factories = {function.name: function for function in generator.functions if function.kind == 'constructor'}
         self.assertEqual(set(factories), {'css_rotate_create_1', 'css_rotate_create_4'})
-        self.assertIn('CSSRotate::create(HandleArg<CSSNumericValue> { a0.get() })', generator.glue())
+        self.assertIn('WebCore::CSSRotate::create(HandleArg<WebCore::CSSNumericValue> { a0.get() })', generator.glue())
         locked = {'params': factories['css_rotate_create_1'].params, 'comment': factories['css_rotate_create_1'].comment}
         subsequent = domgen.Generator(domgen.World(self.source, config))
         subsequent.lock = {'css_rotate_create': locked}
@@ -577,14 +603,14 @@ partial interface Node {
         generator.lock_structs = {}
         generator.run()
         glue = generator.glue()
-        self.assertIn('storeTrackedHandle<DOMRectReadOnly, DOMRect>(value, result)', glue)
-        self.assertIn('storeTrackedHandle<DOMRectReadOnly, DOMRectReadOnly>(value, result)', glue)
-        self.assertIn('storeTrackedHandle<DOMRectReadOnly, DOMRect>(value[i], &result->items[i])', glue)
-        self.assertIn('castTrackedHandle<DOMRect>(*reinterpret_cast<DOMRectReadOnly*>(target))', glue)
-        self.assertIn('retainTrackedHandle(reinterpret_cast<DOMRectReadOnly*>(handle))', glue)
-        self.assertIn('releaseTrackedHandle(reinterpret_cast<DOMRectReadOnly*>(handle))', glue)
-        self.assertIn('releaseTrackedHandle(reinterpret_cast<DOMRectReadOnly*>(value->items[i]))', glue)
-        self.assertNotIn('dynamicDowncast<DOMRect>', glue)
+        self.assertIn('storeTrackedHandle<WebCore::DOMRectReadOnly, WebCore::DOMRect>(value, result)', glue)
+        self.assertIn('storeTrackedHandle<WebCore::DOMRectReadOnly, WebCore::DOMRectReadOnly>(value, result)', glue)
+        self.assertIn('storeTrackedHandle<WebCore::DOMRectReadOnly, WebCore::DOMRect>(value[i], &result->items[i])', glue)
+        self.assertIn('castTrackedHandle<WebCore::DOMRect>(*reinterpret_cast<WebCore::DOMRectReadOnly*>(target))', glue)
+        self.assertIn('retainTrackedHandle(reinterpret_cast<WebCore::DOMRectReadOnly*>(handle))', glue)
+        self.assertIn('releaseTrackedHandle(reinterpret_cast<WebCore::DOMRectReadOnly*>(handle))', glue)
+        self.assertIn('releaseTrackedHandle(reinterpret_cast<WebCore::DOMRectReadOnly*>(value->items[i]))', glue)
+        self.assertNotIn('dynamicDowncast<WebCore::DOMRect>', glue)
         self.assertIn('auto found = handles.find(&value);', glue)
         self.assertIn('found->second.mutableType', glue)
         self.assertIn('if (!--found->second.references)', glue)
@@ -825,14 +851,14 @@ interface Surface {
         fill = next(function for function in generator.functions if function.name == 'shape_fill_2')
         self.assertEqual(('int32_t', 'mode'), fill.params[-1])
         glue = generator.glue()
-        self.assertIn('auto a1 = enumerationFromIndex<Mode>(mode, enumerationMode);', glue)
+        self.assertIn('auto a1 = enumerationFromIndex<WebCore::Mode>(mode, enumerationMode);', glue)
         self.assertIn('RV_DOM_MODE_CLOSED = 1', generator.header())
         absent = self.path_generator('    undefined pick(optional Mode mode);')
         self.assertEqual('optional enumeration Mode argument without a default', dict(absent.excluded)['Shape.pick'])
 
     def test_union_argument_conversions_convert_the_held_arm_into_the_engine_typedef(self):
         glue = self.draw_generator(['PaintSource']).glue()
-        self.assertIn('impl->draw(WTF::switchOn(std::move(*a0), [](auto&& arm) -> PaintSource { return PaintSource { std::move(arm) }; }), x)', glue)
+        self.assertIn('impl->draw(WTF::switchOn(std::move(*a0), [](auto&& arm) -> WebCore::PaintSource { return WebCore::PaintSource { std::move(arm) }; }), x)', glue)
         plain = self.draw_generator().glue()
         self.assertIn('impl->draw(std::move(*a0), x)', plain)
 
@@ -927,7 +953,7 @@ partial interface DOMFormData { undefined take(FormDataEntryValue value); File f
         self.assertNotIn('trusted', generator.header().split('RvDomFormDataEventInit {')[1].split('}')[0])
         glue = generator.glue()
         self.assertIn('FormDataEvent::Init a1 { { }, a1form_data.releaseNonNull() };', glue)
-        self.assertIn('event.interfaceType() == EventInterfaceType::FormDataEvent', glue)
+        self.assertIn('event.interfaceType() == WebCore::EventInterfaceType::FormDataEvent', glue)
 
     def test_selected_nullable_sequence_elements_do_not_reuse_the_nonnullable_container(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
@@ -1219,7 +1245,7 @@ interface CSSOMKeywordValue : CSSStyleValue { constructor(USVString value); };
         self.assertEqual(constructor['receiver'], 'Document')
         glue = generator.glue()
         self.assertTrue('CSSOMKeywordValue::create(a0.string())' in glue)
-        self.assertTrue('dynamicDowncast<Document>(*nodeOf(target))' in glue)
+        self.assertTrue('dynamicDowncast<WebCore::Document>(*nodeOf(target))' in glue)
 
     def test_configured_bare_stringifier_exports_engine_serialization_only_for_selected_types(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
@@ -1280,7 +1306,7 @@ interface CSSStyleValue {
         glue = generator.glue()
         self.assertTrue('CSSStyleValue::parse(document.get(), a0.atom(), a1.string())' in glue)
         self.assertTrue('CSSStyleValue::parseAll(document.get(), a0.atom(), a1.string())' in glue)
-        self.assertIn('dynamicDowncast<Document>(*nodeOf(target))', glue)
+        self.assertIn('dynamicDowncast<WebCore::Document>(*nodeOf(target))', glue)
         self.assertIn('property_length >= 0', glue)
 
     def test_registration_dictionary_has_lossless_spans_and_independent_capability(self):
@@ -1429,7 +1455,7 @@ interface CSSStyleDeclaration { DOMString getPropertyValue(DOMString property); 
         self.assertIn({'ctype': 'int32_t', 'name': 'pseudo_element_length'}, operation['parameters'])
         self.assertEqual(operation['parameters'][-1], {'ctype': 'RvCSSStyleDeclaration**', 'name': 'result'})
         glue = generator.glue()
-        self.assertTrue('impl->window()->getComputedStyle(HandleArg<Element> { a0.get() }, a1.string())' in glue)
+        self.assertTrue('impl->window()->getComputedStyle(HandleArg<WebCore::Element> { a0.get() }, a1.string())' in glue)
         self.assertIn('if (!impl->window())', glue)
         self.assertIn('pseudo_element_length >= -1', glue)
         self.assertIn('pseudo_element_length >= 0 && a1.string().isNull()', glue)
@@ -1456,8 +1482,8 @@ partial interface Element {
                          {'ctype': 'const RvDomSequenceElementNullable*', 'name': 'value'})
         self.assertNotIn('rv_dom_element_get_aria_owns_elements', functions)
         glue = generator.glue()
-        self.assertIn('impl->getElementsArrayAttributeForBindings(HTMLNames::aria_labelledbyAttr)', glue)
-        self.assertIn('impl->setElementsArrayAttribute(HTMLNames::aria_labelledbyAttr, std::move(*a0))', glue)
+        self.assertIn('impl->getElementsArrayAttributeForBindings(WebCore::HTMLNames::aria_labelledbyAttr)', glue)
+        self.assertIn('impl->setElementsArrayAttribute(WebCore::HTMLNames::aria_labelledbyAttr, std::move(*a0))', glue)
 
     def test_event_target_objects_use_event_target_handles_and_report_detached(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
@@ -1485,9 +1511,9 @@ partial interface Element {
         self.assertEqual(functions['rv_dom_window_get_viewport']['parameters'][-1], {'ctype': 'RvEventTarget**', 'name': 'result'})
         self.assertNotIn('Viewport', generator.handles)
         glue = generator.glue()
-        self.assertIn('dynamicDowncast<Viewport>(*reinterpret_cast<EventTarget*>(target))', glue)
+        self.assertIn('dynamicDowncast<WebCore::Viewport>(*reinterpret_cast<WebCore::EventTarget*>(target))', glue)
         self.assertIn('if (!(impl->frame()))' + chr(10) + '        return RV_ERR_DETACHED;', glue)
-        self.assertIn('storeHandle<EventTarget>(value, result)', glue)
+        self.assertIn('storeHandle<WebCore::EventTarget>(value, result)', glue)
         self.assertNotIn('settings.viewportApi', glue.split('ranvier_dom_viewport_get_width', 1)[1].split(chr(10) + '}', 1)[0])
 
     def test_event_target_object_subtypes_cast_through_their_base_and_answer_a_type_query(self):
@@ -1515,10 +1541,10 @@ interface CssMotion : Motion { readonly attribute DOMString motionName; };
         self.assertNotIn('CssMotion', generator.handles)
         self.assertNotIn('Motion', generator.handles)
         glue = generator.glue()
-        self.assertIn('auto* base = dynamicDowncast<Motion>(*reinterpret_cast<EventTarget*>(target)); '
-                      'return base ? dynamicDowncast<CssMotion>(*base) : nullptr;', glue)
+        self.assertIn('auto* base = dynamicDowncast<WebCore::Motion>(*reinterpret_cast<WebCore::EventTarget*>(target)); '
+                      'return base ? dynamicDowncast<WebCore::CssMotion>(*base) : nullptr;', glue)
         query = glue.split('int32_t ranvier_dom_motion_get_interface_name', 1)[1].split(chr(10) + '}', 1)[0]
-        self.assertIn('RefPtr impl = dynamicDowncast<Motion>(*reinterpret_cast<EventTarget*>(target));', query)
+        self.assertIn('RefPtr impl = dynamicDowncast<WebCore::Motion>(*reinterpret_cast<WebCore::EventTarget*>(target));', query)
         self.assertIn('if (!impl)' + chr(10) + '        return RV_ERR_WRONG_INTERFACE;', query)
         self.assertIn('return copyString("CssMotion"_s, buffer, capacity, length);', query)
         self.assertIn('return copyString("Motion"_s, buffer, capacity, length);', query)
@@ -1740,7 +1766,7 @@ namespace DOMCSSNamespace {
         self.assertIn('ENABLE(PARTIAL)', functions['rv_dom_css_supports_1']['conditional'])
         self.assertNotIn('ENABLE(PARTIAL)', functions['rv_dom_css_supports_2']['conditional'])
         glue = generator.glue()
-        self.assertIn('dynamicDowncast<Document>(*nodeOf(target))', glue)
+        self.assertIn('dynamicDowncast<WebCore::Document>(*nodeOf(target))', glue)
         self.assertIn('DOMCSSNamespace::supports(document.get(), a0.string(), a1.string())', glue)
         self.assertIn('ProbeSupport::supports(document.get(), a0.string())', glue)
         self.assertIn('StringArg a0 { property, property_length }', glue)
@@ -1805,9 +1831,9 @@ interface UnboundSet { setlike<AbstractRange>; readonly attribute long other; };
         self.assertEqual('pair', functions['highlight_registry_entries'].returns.subtypes[0].kind)
         glue = generator.glue()
         self.assertIn('#include "RanvierCollectionLike.h"', glue)
-        self.assertIn('WebCore::RanvierCollectionLike::remove(*impl, HandleArg<AbstractRange> { a0.get() })', glue)
+        self.assertIn('WebCore::RanvierCollectionLike::remove(*impl, HandleArg<WebCore::AbstractRange> { a0.get() })', glue)
         self.assertIn('WebCore::RanvierCollectionLike::get(*impl, a0.atom())', glue)
-        self.assertIn('RanvierCollectionLike::createHighlight(DomSequenceArgument<Ref<AbstractRange>>', glue)
+        self.assertIn('RanvierCollectionLike::createHighlight(DomSequenceArgument<Ref<WebCore::AbstractRange>>', glue)
         self.assertIn('DOMCSSNamespace::highlights(document.get())', glue)
         self.assertIn('decltype(impl->type())', glue)
         self.assertNotIn('{call_with', glue)
@@ -2001,7 +2027,7 @@ dictionary CSSStyleSheetInit { DOMString baseURL = null; boolean disabled = fals
         self.assertEqual(factory['kind'], 'constructor')
         self.assertEqual(factory['feature'], 'dom-constructor:CSSStyleSheet')
         glue = generator.glue()
-        self.assertIn('dynamicDowncast<Document>(*nodeOf(target))', glue)
+        self.assertIn('dynamicDowncast<WebCore::Document>(*nodeOf(target))', glue)
         self.assertIn('CSSStyleSheet::Init a0', glue)
         self.assertIn('CSSStyleSheet::create(*impl, std::move(a0))', glue)
         self.assertIn('"dom-constructor:CSSStyleSheet"', glue)
@@ -2032,7 +2058,7 @@ interface CSSGroupingRule : CSSRule {};
         glue = generator.glue()
         self.assertIn('#if ENABLE(PROBE)', glue)
         self.assertIn('"dom-type-query:CSSRule"', glue)
-        self.assertLess(glue.index('dynamicDowncast<CSSStartingStyleRule>'), glue.index('dynamicDowncast<CSSGroupingRule>'))
+        self.assertLess(glue.index('dynamicDowncast<WebCore::CSSStartingStyleRule>'), glue.index('dynamicDowncast<WebCore::CSSGroupingRule>'))
         self.assertIn('return copyString("CSSRule"_s, buffer, capacity, length)', glue)
 
     def test_css_rule_and_descriptor_settings_use_retained_binding_document(self):
@@ -2055,7 +2081,7 @@ interface CSSFontFaceDescriptors : CSSStyleDeclaration {
         generator.run()
         self.assertEqual(len(generator.functions), 3)
         glue = generator.glue()
-        self.assertEqual(glue.count('RefPtr<Document> settingsDocument = impl->documentForBindings();'), 3)
+        self.assertEqual(glue.count('RefPtr<WebCore::Document> settingsDocument = impl->documentForBindings();'), 3)
         self.assertNotIn('settingsSheet->ownerDocument()', glue)
         self.assertIn('if (!settingsDocument)\n        return RV_ERR_UNSUPPORTED;', glue)
         self.assertIn('settings.cssAnchorPositioningEnabled', glue)
@@ -2132,7 +2158,7 @@ interface Bytes {
         self.assertIn('typedef struct RvDomByteSpan {', header)
         self.assertIn('    RvDomByteSpan arm0;', header)
         glue = generator.glue()
-        self.assertIn('Variant<Ref<JSC::ArrayBufferView>, Ref<JSC::ArrayBuffer>, Ref<Bytes>, String>', glue)
+        self.assertIn('Variant<Ref<JSC::ArrayBufferView>, Ref<JSC::ArrayBuffer>, Ref<WebCore::Bytes>, String>', glue)
         self.assertIn('WTF::InPlaceIndex<1>, arm0.releaseNonNull()', glue)
         self.assertIn('WTF::InPlaceIndex<2>', glue)
         self.assertIn('WTF::InPlaceIndex<3>', glue)
@@ -2173,7 +2199,7 @@ interface Faces {
         self.assertEqual('iterator_snapshot', snapshot.kind)
         self.assertEqual('dom-faces-values', snapshot.feature)
         glue = generator.glue()
-        self.assertIn('RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());', glue)
+        self.assertIn('RefPtr contextDocument = dynamicDowncast<WebCore::Document>(static_cast<WebCore::ActiveDOMObject&>(*impl).scriptExecutionContext());', glue)
         self.assertIn('impl->setWeight(document.get(), a0.string())', glue)
         self.assertIn('impl->check(document.get(), a0.string())', glue)
         self.assertIn('entries.append(entry.releaseNonNull())', glue)
@@ -2266,7 +2292,7 @@ interface Matcher {
         self.assertEqual({'MatchResult': 'RvDomMatchResult', 'PartResult': 'RvDomPartResult', 'PartInit': 'RvDomPartInit'},
                          generator.result_dicts)
         glue = generator.glue()
-        for line in ['RvDomMatchResult* encodeDictRvDomMatchResult(const MatchResult& value);',
+        for line in ['RvDomMatchResult* encodeDictRvDomMatchResult(const WebCore::MatchResult& value);',
                      'result->size = sizeof(RvDomMatchResult);',
                      'result->part = encodeDictRvDomPartResult(*field);',
                      'releaseDictRvDomPartResult(const_cast<RvDomPartResult*>(value->part));',
@@ -2633,7 +2659,7 @@ interface HiddenEvent : Event {
         glue = generator.glue()
         create = glue[glue.index('int32_t ranvier_dom_internal_shown_event_create('):]
         create = create[:create.index('\n}\n')]
-        self.assertIn('auto* global = impl->globalObject(); if (!global) return Exception { ExceptionCode::InvalidStateError', create)
+        self.assertIn('auto* global = impl->globalObject(); if (!global) return WebCore::Exception { WebCore::ExceptionCode::InvalidStateError', create)
         self.assertIn('InternalShownEvent::create(*global, a0.atom(), std::move(a1))', create)
         self.assertIn('impl->whenSeconds().value()', glue)
         query = glue[glue.index('int32_t ranvier_dom_event_get_interface_name('):]
@@ -2760,8 +2786,8 @@ partial interface Element {
         # Result: the dictionary arm owns a new reference, NULL for absent, dropped by its release.
         glue = generator.glue()
         self.assertIn('if (*field)', glue)
-        self.assertIn('storeHandle<DOMStringMap>(*field, &result->offset);', glue)
-        self.assertIn('if (value->offset) reinterpret_cast<DOMStringMap*>(value->offset)->deref();', glue)
+        self.assertIn('storeHandle<WebCore::DOMStringMap>(*field, &result->offset);', glue)
+        self.assertIn('if (value->offset) reinterpret_cast<WebCore::DOMStringMap*>(value->offset)->deref();', glue)
         # Fable: the dictionary arm of the result union is told apart from the string arm by a plain-object predicate.
         self.assertIn('let private isRangeOffset (_: obj) : bool =', generator.interfaces())
         config['exclude'] = [name for name in config['exclude'] if name != 'Element.placeNullable']
@@ -2787,8 +2813,8 @@ partial interface Element {
         generator.run()
         glue = generator.glue()
         # One C transport for both spellings, and one C++ alternative list: the decoder's.
-        self.assertIn('Vector<Variant<Ref<Node>, String, Mode>>', glue)
-        self.assertNotIn('Variant<Ref<Node>, Variant<String, Mode>>', glue)
+        self.assertIn('Vector<Variant<Ref<WebCore::Node>, String, WebCore::Mode>>', glue)
+        self.assertNotIn('Variant<Ref<WebCore::Node>, Variant<String, WebCore::Mode>>', glue)
 
     def test_union_field_default_applies_before_the_options_are_read(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
@@ -2992,8 +3018,8 @@ interface RangeProbe { constructor(RangeProbeInit init); };
 ''', ['RangeProbe'], {'constructors': {'RangeProbe': {'receiver': 'Document', 'factory': 'RangeProbe::create', 'passReceiver': False}},
                       'dictionaryCppTypes': {'RangeProbeInit': 'RangeProbe::Init'}, 'referenceDictionaries': ['RangeProbeInit']})
         glue = generator.glue()
-        self.assertIn('    RefPtr<Node> startContainer;', glue)
-        self.assertIn('std::remove_cvref_t<decltype(std::declval<RangeProbe::Init&>().startOffset)> startOffset { };', glue)
+        self.assertIn('    RefPtr<WebCore::Node> startContainer;', glue)
+        self.assertIn('std::remove_cvref_t<decltype(std::declval<WebCore::RangeProbe::Init&>().startOffset)> startOffset { };', glue)
         self.assertIn('if (!stage0.startContainer)' + chr(10) + '        return RV_ERR_NULL_ARGUMENT;', glue)
         self.assertIn('RangeProbe::Init a0 { .startContainer = stage0.startContainer.releaseNonNull(), .startOffset = std::move(stage0.startOffset) };', glue)
 
@@ -3016,7 +3042,7 @@ interface ProbeEvent : Event { constructor(DOMString type, optional ProbeEventIn
         self.assertNotIn('dom_probe_event_create', {function.name for function in unselected.functions})
         generator = self.factory_generator(extra, ['ProbeEvent'], {**update, 'dictionaryEventTargetMembers': ['ProbeEventInit.relatedTarget']})
         self.assertIn('    RvEventTarget* related_target; /* EventTarget?, default null */', generator.header())
-        self.assertIn('a1.relatedTarget = reinterpret_cast<EventTarget*>(init->related_target);', generator.glue())
+        self.assertIn('a1.relatedTarget = reinterpret_cast<WebCore::EventTarget*>(init->related_target);', generator.glue())
 
     def test_typed_array_inputs_copy_counted_elements_and_typed_array_results_stay_left_out(self):
         extra = '''
@@ -3089,8 +3115,8 @@ ContextProbe includes DrawProbe;
         generator.lock_structs = {}
         generator.run()
         glue = generator.glue()
-        self.assertIn('Variant<Ref<ImageAProbe>, Ref<ImageBProbe>, Ref<ImageCProbe>>', glue)
-        self.assertIn('Variant<Ref<ImageAProbe>, Ref<ImageCProbe>, Ref<ImageBProbe>>', glue)
+        self.assertIn('Variant<Ref<WebCore::ImageAProbe>, Ref<WebCore::ImageBProbe>, Ref<WebCore::ImageCProbe>>', glue)
+        self.assertIn('Variant<Ref<WebCore::ImageAProbe>, Ref<WebCore::ImageCProbe>, Ref<WebCore::ImageBProbe>>', glue)
 
     def test_typedef_defined_differently_fails_for_a_reference_from_a_file_without_a_definition(self):
         world = self.image_source_world('interface OtherProbe { undefined use(ImageSourceProbe image); };\n')

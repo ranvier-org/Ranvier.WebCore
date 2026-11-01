@@ -142,6 +142,24 @@ def snake(name: str) -> str:
     return name.lower()
 
 
+# The WebCore names the glue's hand-written runtime refers to that no IDL definition declares.
+RUNTIME_WEBCORE_NAMES = {"ActiveDOMObject", "EventInterfaceType", "Exception", "ExceptionCode", "ExceptionOr", "HTMLNames",
+                         "parseEnumerationFromString"}
+
+CPP_TOKEN = re.compile(r'//[^\n]*|/\*.*?\*/|"(?:\\.|[^"\\\n])*"|\'(?:\\.|[^\'\\\n])*\'|^[ \t]*#[^\n]*|'
+                       r'\)\s*->|(?:::|\.|->|~)\s*[A-Za-z_]\w*|[A-Za-z_]\w*', re.S | re.M)
+
+
+def qualify_webcore(text: str, names) -> str:
+    """text with each unqualified reference to one of names written WebCore::<name>. Comments, string and character
+    literals, preprocessor lines, member accesses and names after :: are kept as written; a trailing return type
+    after ") ->" is qualified."""
+    def replace(match):
+        token = match.group(0)
+        return f"WebCore::{token}" if token in names else token
+    return CPP_TOKEN.sub(replace, text)
+
+
 def wk_ucfirst(name: str) -> str:
     """CodeGenerator.pm's WK_ucfirst, for setter names."""
     result = name[:1].upper() + name[1:]
@@ -2705,7 +2723,7 @@ class Generator(ComplexGeneratorMixin):
             quoted = ", ".join(f'"{v}"_s' for v in values)
             lines.append(f"static constexpr ASCIILiteral {enum_table(enum)}[] = {{ {quoted} }};")
         lines += self.complex_runtime()
-        lines += ["", "using namespace WebCore;", "", 'extern "C" {', ""]
+        lines += ["", 'extern "C" {', ""]
         lines.append("int32_t ranvier_dom_has(const char* feature)")
         lines.append("{")
         lines.append("    if (!feature)")
@@ -2790,7 +2808,23 @@ class Generator(ComplexGeneratorMixin):
                     lines.append("#endif")
             lines += [f'    return copyString("{query["names"][-1]}"_s, buffer, capacity, length);', "}", ""]
         lines += ["} // extern \"C\"", ""]
-        return "\n".join(lines)
+        return qualify_webcore("\n".join(lines), self.webcore_names())
+
+    def webcore_names(self):
+        """The unqualified C++ names of WebCore's IDL interfaces, namespaces, callbacks, dictionaries, enumerations and
+        typedefs, of RUNTIME_WEBCORE_NAMES and of gen/dom.json's webcoreNames. The glue names each one as
+        WebCore::<name>: a macOS SDK declares some, such as Comment and Rect, in the global namespace."""
+        world = self.world
+        names = set(RUNTIME_WEBCORE_NAMES) | set(world.config.get("webcoreNames", []))
+        names |= set(world.enums) | set(world.typedefs) | set(world.callbacks)
+        names |= {world.cpp_class(name) for name in world.interfaces}
+        names |= {self.dictionary_cpp(name) for name in world.dictionaries}
+        for name, definition in world.namespaces.items():
+            names.add(definition.attrs.get("ImplementedAs", name))
+            for scope in [definition, *world.namespace_partials.get(name, [])]:
+                names |= {value for value in [scope.attrs.get("ImplementedBy")]
+                          + [member.attrs.get("ImplementedBy") for member in scope.members] if isinstance(value, str)}
+        return {name for name in names if re.fullmatch(r"[A-Za-z_]\w*", name)}
 
     def const_getter_runtime(self):
         if not self.const_getters_used:
@@ -3014,8 +3048,6 @@ String lastExceptionMessage() { return latestMessage; }
 } // namespace Ranvier
 
 namespace {
-
-using namespace WebCore;
 
 Node* nodeOf(RvNode* handle) { return reinterpret_cast<Node*>(handle); }
 Event* eventOf(RvEvent* handle) { return reinterpret_cast<Event*>(handle); }

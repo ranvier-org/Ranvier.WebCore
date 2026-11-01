@@ -1,0 +1,68 @@
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.cpp(226,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+  226 | #if RANVIER_COMPOSITING
+      |     ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.cpp(698,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+  698 | #if RANVIER_COMPOSITING
+      |     ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.cpp(797,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+  797 | #if RANVIER_COMPOSITING
+      |     ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.cpp(839,70): warning: missing field 'color_scheme' initializer [-Wmissing-field-initializers]
+  839 |     RvMediaPreferences mediaPreferences { sizeof(RvMediaPreferences) };
+      |                                                                      ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.cpp(1566,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+ 1566 | #if RANVIER_COMPOSITING
+      |     ^
+In file included from C:\wk\native-batch-6\host\RanvierWebCoreAbi.cpp:1595:
+C:\wk\native-batch-6\host\RanvierCapabilities.inc(115,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+  115 | #if RANVIER_COMPOSITING
+      |     ^
+C:\wk\native-batch-6\host\RanvierCapabilities.inc(204,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+  204 | #if RANVIER_COMPOSITING
+      |     ^
+C:\wk\native-batch-6\host\RanvierCapabilities.inc(211,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+  211 | #if RANVIER_COMPOSITING && defined(_WIN32)
+      |     ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.cpp(1599,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+ 1599 | #if RANVIER_COMPOSITING
+      |     ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.cpp(1961,107): warning: missing field 'dirty' initializer [-Wmissing-field-initializers]
+ 1961 |     auto* host = new RvHost { createPage({ width, height }, orientation), { width, height }, std::nullopt };
+      |                                                                                                           ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.cpp(1969,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+ 1969 | #if RANVIER_COMPOSITING
+      |     ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.cpp(1977,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+ 1977 | #if RANVIER_COMPOSITING
+      |     ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.cpp(1995,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+ 1995 | #if RANVIER_COMPOSITING
+      |     ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.cpp(2338,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+ 2338 | #if RANVIER_COMPOSITING
+      |     ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.cpp(2398,24): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+ 2398 | #if defined(_WIN32) && RANVIER_COMPOSITING
+      |                        ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.cpp(2412,24): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+ 2412 | #if defined(_WIN32) && RANVIER_COMPOSITING
+      |                        ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.cpp(2470,24): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+ 2470 | #if defined(_WIN32) && RANVIER_COMPOSITING
+      |                        ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.cpp(2487,24): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+ 2487 | #if defined(_WIN32) && RANVIER_COMPOSITING
+      |                        ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.cpp(2513,5): warning: 'RANVIER_COMPOSITING' is not defined, evaluates to 0 [-Wundef]
+ 2513 | #if RANVIER_COMPOSITING
+      |     ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.cpp(4874,62): warning: missing field 'customElementRegistry' initializer [-Wmissing-field-initializers]
+ 4874 |     auto root = element->attachShadow({ ShadowRootMode::Open });
+      |                                                              ^
+C:\wk\native-batch-6\host\RanvierWebCoreAbi.cpp(5320,52): warning: conditional expression between different enumeration types ('(unnamed enum at C:\wk\native-batch-6\host\RanvierWebCoreAbi.h:2149:1)' and '(unnamed enum at C:\wk\native-batch-6\host\RanvierWebCoreAbi.h:1069:1)') is deprecated [-Wdeprecated-anon-enum-enum-conversion]
+ 5320 |             return page && hostForPage(page.get()) ? RV_ERR_WRONG_HOST : RV_ERR_DETACHED;
+      |                                                    ^ ~~~~~~~~~~~~~~~~~   ~~~~~~~~~~~~~~~
+21 warnings generated.
+
+ERRORS=0
+EXIT=0

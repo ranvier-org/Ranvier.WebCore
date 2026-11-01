@@ -1,0 +1,22 @@
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.old.cpp(7128,53): error: reference to 'Comment' is ambiguous
+ 7128 |     return deliver([&]() -> decltype(auto) { return Comment::create(*impl, a0.string()); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+      |                                                     ^
+C:\wk\native-batch-6\docs\batch-6-evidence\mac3\carbon-globals.h(82,23): note: candidate found by name lookup is 'Comment'
+   82 | RANVIER_CARBON_GLOBAL(Comment)
+      |                       ^
+C:\wk\src\Source\WebCore\dom\Comment.h(29,7): note: candidate found by name lookup is 'WebCore::Comment'
+   29 | class Comment final : public CharacterData {
+      |       ^
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.old.cpp(484,16): error: no matching function for call to object of type '(lambda at C:\wk\native-batch-6\host\dom\RanvierDomGlue.old.cpp:7128:93)'
+  484 |         return sink(call());
+      |                ^~~~
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.old.cpp(7128,12): note: in instantiation of function template specialization '(anonymous namespace)::deliver<(lambda at C:\wk\native-batch-6\host\dom\RanvierDomGlue.old.cpp:7128:20), (lambda at C:\wk\native-batch-6\host\dom\RanvierDomGlue.old.cpp:7128:93)>' requested here
+ 7128 |     return deliver([&]() -> decltype(auto) { return Comment::create(*impl, a0.string()); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+      |            ^
+C:\wk\native-batch-6\host\dom\RanvierDomGlue.old.cpp(7128,93): note: candidate template ignored: substitution failure [with value:auto = void]: cannot form a reference to 'void'
+ 7128 |     return deliver([&]() -> decltype(auto) { return Comment::create(*impl, a0.string()); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+      |                                                                                             ^       ~~
+2 errors generated.
+
+ERRORS=2
+EXIT=1

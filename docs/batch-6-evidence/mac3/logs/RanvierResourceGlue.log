@@ -1,0 +1,7 @@
+C:\wk\native-batch-6\host\RanvierResourceGlue.cpp(1084,101): warning: conditional expression between different enumeration types ('(unnamed enum at C:\wk\native-batch-6\host\RanvierWebCoreAbi.h:2149:1)' and '(unnamed enum at C:\wk\native-batch-6\host\RanvierWebCoreAbi.h:1069:1)') is deprecated [-Wdeprecated-anon-enum-enum-conversion]
+ 1084 |         return faceDocument && faceDocument->frame() && !faceDocument->activeDOMObjectsAreStopped() ? RV_ERR_WRONG_HOST : RV_ERR_DETACHED;
+      |                                                                                                     ^ ~~~~~~~~~~~~~~~~~   ~~~~~~~~~~~~~~~
+1 warning generated.
+
+ERRORS=0
+EXIT=0
