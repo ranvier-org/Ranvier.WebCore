@@ -18,6 +18,10 @@ on:
         description: Runtime identifiers to build, comma-separated (empty for all)
         type: string
         default: ''
+      clean:
+        description: Build from scratch, without restoring the cached build tree
+        type: boolean
+        default: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -196,9 +200,22 @@ jobs:
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 360
+    permissions:
+      contents: read
+      # Deleting the build tree a run has superseded (docs/CI.md, "Build tree").
+      actions: write
     env:
       FLAVOR: ${{ inputs.flavor || 'slim' }}
       RANVIER_WORK: ${{ matrix.work }}
+      BUILD_DIR: ${{ matrix.work }}/build-${{ inputs.flavor || 'slim' }}
+      # The build tree is restored on every run but a clean one, and saved where later runs can restore it: a
+      # branch's runs see its own entries and the default branch's, a pull request's its own and its base's, a tag
+      # only the default branch's.
+      TREE_RESTORE: ${{ !(github.event_name == 'workflow_dispatch' && inputs.clean) }}
+      TREE_SAVE: >-
+        ${{ (github.event_name != 'pull_request' &&
+             (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/codex/batch-'))) ||
+            (github.event_name == 'pull_request' && startsWith(github.head_ref, 'codex/batch-')) }}
     steps:
       - uses: actions/checkout@v4
 
@@ -210,21 +227,6 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-
-      # Each downloaded dependency has its own cache, restored before it is needed and saved as soon as it is
-      # fetched, so a later failure does not discard it and a package host's outage only matters on a miss.
-      - name: Cache keys
-        id: keys
-        shell: python
-        run: |
-          import hashlib, json, os
-          pins = json.load(open('pins.json'))
-          rid = '${{ matrix.rid }}'
-          # Keyed on the pins each one uses, not the whole file, which also holds the package version.
-          llvm = pins['llvm'].get(rid, {}).get('sha256', 'none')
-          vcpkg = hashlib.sha256(json.dumps([pins['vcpkg'], pins['webkit'], pins['icu']]).encode()).hexdigest()[:16]
-          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
-              out.write(f"llvm=llvm-{rid}-{llvm}\nvcpkg=vcpkg-{rid}-{os.environ['FLAVOR']}-{vcpkg}\n")
 
       - name: Restore gperf
         id: gperf
@@ -305,17 +307,12 @@ jobs:
             df -h $env:RANVIER_WORK
           }
 
-      - name: Restore vcpkg archives and downloads
-        id: vcpkg
-        if: runner.os == 'Windows'
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            C:\rw\vcpkg-archives
-            C:\rw\vcpkg-downloads
-          # Archives are named by their ABI hash, so an older entry's archives are used where they still match.
-          key: ${{ steps.keys.outputs.vcpkg }}-${{ hashFiles('config/**') }}
-          restore-keys: vcpkg-${{ matrix.rid }}-${{ env.FLAVOR }}-
+      # Each downloaded dependency has its own cache, restored before it is needed and saved as soon as it is
+      # fetched, so a later failure does not discard it and a package host's outage only matters on a miss. The
+      # keys name the toolchain, so this step follows the tool installs (scripts/build_cache.py keys, docs/CI.md).
+      - name: Cache keys
+        id: keys
+        run: python -I scripts/build_cache.py keys --rid ${{ matrix.rid }} --flavor ${{ env.FLAVOR }}
 
       - name: Restore LLVM
         id: llvm
@@ -343,21 +340,87 @@ jobs:
       - name: Apply patches and install the host
         run: python scripts/build.py prepare --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
 
+      # The CMake and ninja tree of an earlier build: exact on the same toolchain and inputs, otherwise the newest
+      # with the same patches and config, then the newest with the same WebKit pin and toolchain (docs/CI.md).
+      - name: Restore the build tree
+        id: tree
+        if: env.TREE_RESTORE == 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.BUILD_DIR }}
+          key: ${{ steps.keys.outputs.tree }}
+          restore-keys: ${{ steps.keys.outputs.tree-restore }}
+
+      # A restored tree holds vcpkg_installed under the same vcpkg key, so vcpkg installs nothing and needs no archives.
+      - name: Restore vcpkg archives
+        id: vcpkg
+        if: runner.os == 'Windows' && steps.tree.outputs.cache-matched-key == ''
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\rw\vcpkg-archives
+          # Archives are named by their ABI hash, so an older entry's archives are used where they still match.
+          key: ${{ steps.keys.outputs.vcpkg }}
+          restore-keys: ${{ steps.keys.outputs.vcpkg-prefix }}
+
+      # Sources of the ports vcpkg builds, which it needs only when an archive is missing.
+      - name: Restore vcpkg downloads
+        id: downloads
+        if: runner.os == 'Windows' && steps.vcpkg.outcome == 'success' && steps.vcpkg.outputs.cache-hit != 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\rw\vcpkg-downloads
+          key: ${{ steps.keys.outputs.downloads }}
+          restore-keys: ${{ steps.keys.outputs.downloads-prefix }}
+
+      # Gives the unchanged sources the times recorded with the tree, so that ninja rebuilds only what changed, and
+      # deletes the tree's CMakeCache.txt, so that configure sets the options a clean configure would.
+      - name: Match source times to the build tree
+        run: python -I scripts/build_cache.py normalise --build "${{ env.BUILD_DIR }}" --source "${{ env.RANVIER_WORK }}/src" --clear-unknown
+
       - name: Configure (installs vcpkg packages on Windows)
         run: python scripts/build.py configure --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
 
-      - name: Save vcpkg archives and downloads
-        # Only after a successful install: an entry saved under a key is never replaced.
-        if: runner.os == 'Windows' && steps.vcpkg.outputs.cache-hit != 'true'
+      # Only after a successful install: an entry saved under a key is never replaced.
+      - name: Save vcpkg archives
+        if: steps.vcpkg.outcome == 'success' && steps.vcpkg.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
-          path: |
-            C:\rw\vcpkg-archives
-            C:\rw\vcpkg-downloads
-          key: ${{ steps.keys.outputs.vcpkg }}-${{ hashFiles('config/**') }}
+          path: C:\rw\vcpkg-archives
+          key: ${{ steps.keys.outputs.vcpkg }}
+
+      - name: Save vcpkg downloads
+        if: steps.downloads.outcome == 'success' && steps.downloads.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: C:\rw\vcpkg-downloads
+          key: ${{ steps.keys.outputs.downloads }}
 
       - name: Build
         run: python scripts/build.py build --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
+
+      # Right after the build, so that a later failure keeps it. An exact hit has nothing new to save.
+      - name: Save the build tree
+        id: save-tree
+        if: env.TREE_SAVE == 'true' && steps.tree.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.BUILD_DIR }}
+          key: ${{ steps.keys.outputs.tree }}
+
+      # The entry this run restored and has now replaced, when it is this ref's own: one tree per runtime and ref
+      # keeps the cache inside the repository's 10 GB. An entry of another ref (the base branch's) is not deleted.
+      - name: Delete the superseded build tree
+        if: >-
+          steps.save-tree.outcome == 'success' && steps.tree.outputs.cache-matched-key != '' &&
+          steps.tree.outputs.cache-matched-key != steps.keys.outputs.tree
+        continue-on-error: true
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STALE: ${{ steps.tree.outputs.cache-matched-key }}
+        run: |
+          gh api --method DELETE "repos/$GITHUB_REPOSITORY/actions/caches?key=$STALE&ref=$GITHUB_REF" \
+            || echo "no entry $STALE under $GITHUB_REF"
 
       - name: Package
         run: python scripts/build.py package --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
