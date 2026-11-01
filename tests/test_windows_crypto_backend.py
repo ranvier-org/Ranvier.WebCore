@@ -13,6 +13,22 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class WindowsCryptoBackendTests(unittest.TestCase):
+    def test_provider_notice_checkout_preserves_vendor_bytes_with_windows_git_defaults(self):
+        with tempfile.TemporaryDirectory() as directory:
+            checkout = Path(directory)
+            target = checkout / 'packaging/licenses/LibreSSL-4.2.1.txt'
+            target.parent.mkdir(parents=True)
+            target.write_bytes((ROOT / 'packaging/licenses/LibreSSL-4.2.1.txt').read_bytes())
+            (checkout / '.gitattributes').write_bytes((ROOT / '.gitattributes').read_bytes())
+            command = ['git', '-c', 'core.autocrlf=true', '-c', 'core.eol=crlf', '-C', str(checkout)]
+            for arguments in [['init', '-q'], ['add', '.gitattributes', 'packaging/licenses/LibreSSL-4.2.1.txt']]:
+                subprocess.run(command + arguments, capture_output=True, check=True)
+            target.unlink()
+            subprocess.run(command + ['checkout-index', '-f', '--', 'packaging/licenses/LibreSSL-4.2.1.txt'],
+                           capture_output=True, check=True)
+            self.assertEqual(hashlib.sha256(target.read_bytes()).hexdigest(),
+                             '9853507b8821c3f277aa60bf554eade41441ef06b2df538d247183ad28789b7f')
+
     def cmake(self):
         cmake = shutil.which('cmake')
         if not cmake:

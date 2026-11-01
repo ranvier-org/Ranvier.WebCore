@@ -79,3 +79,11 @@ or non-Windows commands. These fixtures compile no native product code and remov
 The final focused six tests and full105-test Python suite pass, with the same three environmental skips.
 `build_cache.py` includes both `config` and `scripts/build.py` in the build-tree identity, so these
 changes also change the exact CI cache key while the documented restore-prefix migration remains safe.
+
+The first actual Windows package exposed a notice-only byte-identity failure: a clean checkout with
+Windows Git defaults converted the LibreSSL notice to133CRLF lines. Its LF-normalized content was
+exactly the pinned vendor text, but its raw hash differed. The scoped attribute
+`packaging/licenses/*.txt text eol=lf` preserves the upstream notice bytes independently of the user's
+Git defaults. A real temporary Git checkout with `core.autocrlf=true` and `core.eol=crlf` reproduces the
+old hash before the fix and the vendor hash afterward. This does not change any native source or DLL;
+the original package and its failing receipt remain immutable evidence.

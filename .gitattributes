@@ -5,3 +5,4 @@
 *.yml text eol=lf
 *.json text eol=lf
 host/* text eol=lf
+packaging/licenses/*.txt text eol=lf
