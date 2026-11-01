@@ -174,6 +174,30 @@ class BuildCacheTests(unittest.TestCase):
         self.assertEqual(int(self.prefix.stat().st_mtime), OLD_TIME + 100)
         self.assertEqual(self.manifest()['format'], 2)
 
+    def test_build_output_scan_ignores_symlink_to_changed_source_header(self):
+        self.assertEqual(self.run_cache('record').returncode, 0)
+        source_link = self.build / 'JavaScriptCorePrefix.h'
+        try:
+            os.symlink(self.prefix, source_link)
+        except OSError as error:
+            self.skipTest(f'file symlink creation is unavailable: {error}')
+
+        self.prefix.write_bytes(self.canonical.replace(b'\n', b'\r\n'))
+        git(self.source, 'update-index', '--assume-unchanged', 'JavaScriptCorePrefix.h')
+        self.set_mtime(self.prefix, FRESH_TIME)
+        cached_output = self.build / 'cached-object.obj'
+        cached_output.write_bytes(b'cached object')
+        self.set_mtime(cached_output, OLD_TIME)
+
+        result = self.run_cache('normalise')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertTrue(cached_output.exists(), 'a real cached object should remain reusable')
+        self.assertEqual(int(self.prefix.stat().st_mtime), FRESH_TIME, result.stdout)
+        self.assertEqual(
+            self.manifest()['trees']['webkit']['JavaScriptCorePrefix.h'][2],
+            hashlib.sha256(self.canonical.replace(b'\n', b'\r\n')).hexdigest(),
+        )
+
     def test_ci_normalise_caller_explicitly_allows_legacy_cache_migration(self):
         workflow = (ROOT / '.github' / 'workflows' / 'build.yml').read_text(encoding='utf-8')
         command = next(line for line in workflow.splitlines() if 'scripts/build_cache.py normalise' in line)

@@ -40,13 +40,25 @@ def newest_cached_output_mtime_ns(build):
     newest = None
     if not build.exists():
         return newest
-    for directory, _, names in os.walk(build):
+    reparse_flag = getattr(stat, 'FILE_ATTRIBUTE_REPARSE_POINT', 0x400)
+    for directory, directories, names in os.walk(build):
+        for name in tuple(directories):
+            path = pathlib.Path(directory) / name
+            try:
+                info = os.lstat(long_path(path))
+            except FileNotFoundError:
+                directories.remove(name)
+                continue
+            if stat.S_ISLNK(info.st_mode) or getattr(info, 'st_file_attributes', 0) & reparse_flag:
+                directories.remove(name)
         for name in names:
             if name in metadata or name == 'CMakeConfigureLog.yaml':
                 continue
             try:
-                info = os.stat(long_path(pathlib.Path(directory) / name))
+                info = os.lstat(long_path(pathlib.Path(directory) / name))
             except FileNotFoundError:
+                continue
+            if stat.S_ISLNK(info.st_mode) or getattr(info, 'st_file_attributes', 0) & reparse_flag:
                 continue
             if stat.S_ISREG(info.st_mode) and (newest is None or info.st_mtime_ns > newest):
                 newest = info.st_mtime_ns
