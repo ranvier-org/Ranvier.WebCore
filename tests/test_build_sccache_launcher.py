@@ -50,8 +50,11 @@ class BuildSccacheLauncherTests(unittest.TestCase):
 
     def test_configure_uses_the_pinned_launcher_only_for_windows_x64(self):
         command = self.configure_command('win-x64', r'C:\rw\tools\sccache\sccache.exe')
-        self.assertIn('-DCMAKE_C_COMPILER_LAUNCHER=C:/rw/tools/sccache/sccache.exe', command)
-        self.assertIn('-DCMAKE_CXX_COMPILER_LAUNCHER=C:/rw/tools/sccache/sccache.exe', command)
+        expected = pathlib.PureWindowsPath(r'C:\rw\tools\sccache\sccache.exe')
+        for variable in ['CMAKE_C_COMPILER_LAUNCHER', 'CMAKE_CXX_COMPILER_LAUNCHER']:
+            argument = next(value for value in command if str(value).startswith(f'-D{variable}='))
+            configured = argument.split('=', 1)[1]
+            self.assertEqual(pathlib.PureWindowsPath(configured), expected)
 
     def test_configure_leaves_other_rids_and_unset_launcher_unchanged(self):
         command = self.configure_command('win-arm64', r'C:\rw\tools\sccache\sccache.exe')
