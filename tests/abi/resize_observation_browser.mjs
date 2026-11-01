@@ -3,7 +3,7 @@
 // 1, 1.5 and 2 (playwright's deviceScaleFactor leaves devicePixelContentBoxSize at scale 1).
 import {createRequire} from 'node:module';
 import {readFileSync, writeFileSync} from 'node:fs';
-const {chromium} = createRequire('C:/wk/ranvier-views/tests/NativeApi.Conformance/package.json')('playwright');
+const {chromium} = createRequire(process.env.RANVIER_BROWSER_PACKAGE || 'C:/wk/ranvier-views/tests/NativeApi.Conformance/package.json')('playwright');
 
 const cases = JSON.parse(readFileSync(new URL('../fixtures/resize-observation-cases.json', import.meta.url), 'utf8'));
 
@@ -59,7 +59,9 @@ for (const scale of [1, 1.5, 2]) {
   const browser = await chromium.launch({headless: true, args: scale === 1 ? [] : ['--force-device-scale-factor=' + scale]});
   try {
     result.browser = browser.version();
-    const tab = await browser.newPage({viewport: {width: 800, height: 600}});
+    const tab = await browser.newPage({viewport: {width: 800, height: 600}, deviceScaleFactor: scale});
+    const actualScale = await tab.evaluate(() => devicePixelRatio);
+    if (Math.abs(actualScale - scale) > 0.000001) throw new Error('device scale mismatch: ' + actualScale);
     const scenarios = {};
     for (const scenario of cases.scenarios) {
       await tab.setContent(cases.markup);
