@@ -167,6 +167,7 @@ class Arena:
 class Page:
     def __init__(self, native, markup):
         self.n = native
+        keep_options_writable(native.library)
         self.host = native.bind('rv_host_create', P, [I, I])(WIDTH, HEIGHT)
         native.expect(bool(self.host), 'host created')
         utf8 = markup.encode('utf-8')
@@ -200,10 +201,30 @@ class Page:
 
 # JSC's exported Options::setOption(const char*, bool), MSVC and Itanium manglings.
 SET_OPTION = ['?setOption@Options@JSC@@SA_NPEBD_N@Z', '_ZN3JSC7Options9setOptionEPKcb']
+# WTF::Config::disableFreezingForTesting(). On Linux and macOS, WTF write-protects JSC's options when the first VM is set
+# up, so a later Options::setOption faults; Windows leaves them writable.
+DISABLE_FREEZING = '_ZN3WTF6Config25disableFreezingForTestingEv'
+options_writable = sys.platform == 'win32'
+
+
+def keep_options_writable(library):
+    """Keeps JSC's options writable for arm_vm_entry_crash. Must run before the process creates its first host, after which
+    WTF aborts the call."""
+    global options_writable
+    if options_writable:
+        return
+    function = getattr(library, DISABLE_FREEZING, None)
+    if function is not None:
+        function.restype, function.argtypes = None, []
+        function()
+        options_writable = True
 
 
 def arm_vm_entry_crash(directory, crash=True):
-    """Makes a VM entry under DisallowVMEntry crash the process; returns False where JSC does not export the setter."""
+    """Makes a VM entry under DisallowVMEntry crash the process; returns False where JSC does not export the setter or
+    its options are write-protected."""
+    if not options_writable:
+        return False
     names = {'win32': ['JavaScriptCore.dll'], 'darwin': ['JavaScriptCore.framework/JavaScriptCore', 'libJavaScriptCore.dylib']}
     for name in names.get(sys.platform, ['libRanvierWebCoreHost.so', 'libJavaScriptCore.so']):
         path = Path(directory) / name
@@ -221,6 +242,7 @@ def arm_vm_entry_crash(directory, crash=True):
 def vm_entry_control(directory):
     """The positive control, in a child process: with the crash armed, a page load (which enters the VM) aborts."""
     native = Native(directory)
+    keep_options_writable(native.library)
     host = native.bind('rv_host_create', P, [I, I])(64, 64)
     native.call('rv_host_load_html', [P, ctypes.c_char_p, I], host, b'<p>first</p>', len(b'<p>first</p>'))  # utf8
     if not arm_vm_entry_crash(directory):
