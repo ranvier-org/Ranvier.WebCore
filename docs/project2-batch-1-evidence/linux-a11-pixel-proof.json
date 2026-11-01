@@ -1,0 +1,29 @@
+{
+  "status": "implementation proof; independent acceptance pending",
+  "base": "2c2d60be0c04769720366fae75cdd4475ec1969b",
+  "abi": 60,
+  "frozen_stage_native_sha256": "f86aff3abe5004702da8e7fc7010cc4a24fa578e3d933c66be89c94d341f5797",
+  "candidate_unstripped_native_sha256": "5b6477ac589ecb8fa3bcbc337d49abd61590e6dcd549e1c799987feea1740ad7",
+  "patch_sha256": "c6f28c65f0405d0ecd8f42d37b33bbc0ecfd1dd7484c9b4f274fd23aa61f89f3",
+  "test_sha256": "9d345cb98ea9b23f682a4f37d34585b9524f603873d6fbe70c41c89ec17d314b",
+  "logs": {
+    "linux-a11-pixels-red.log": "379fe90a3bee817fd4949c3d68fe2f24b63e25993a8ef381f718dfcbfd4e46fc",
+    "linux-a11-pixels-green.log": "792748b2e52e7c1ed74d880940fc64f80b96aae86e39be37d17ab9c564a632fc",
+    "linux-a11-context-switch-red.log": "4e0634904e60f561591a9c15059c5de8185556a9949792829ec7bfd7bdbf8328"
+  },
+  "transport": "strict EGLImage import then test-only glReadPixels; no rv_host_paint calls",
+  "controlled_native_animation_times_ms": [
+    0,
+    50000,
+    100000
+  ],
+  "proofs": [
+    "old red frame",
+    "live blue DOM with frozen red old snapshot at t0",
+    "purple in-flight sample",
+    "new blue snapshot at100percent and final blue DOM",
+    "finished transition and pseudo animation cleanup",
+    "reverse midpoint and skip cleanup to red",
+    "midpoint interrupted by document replacement to green"
+  ]
+}
