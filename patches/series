@@ -53,3 +53,4 @@
 0052-eventloop-checkpoint-microtasks.patch
 0053-view-transition-settle-without-script.patch
 0054-wpe-standalone-compositor.patch
+0055-wpe-static-pasteboard-file-drops.patch

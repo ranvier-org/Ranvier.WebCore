@@ -1667,8 +1667,7 @@ int32_t rv_abi_has(const char* feature)
         if (!std::strcmp(feature, name))
             return 1;
     }
-#if !PLATFORM(GTK) && !PLATFORM(WPE)
-    // GTK and WPE keep file access out of drops (DataTransfer::allowsFileAccess); a paste carries files everywhere.
+#if !PLATFORM(GTK)
     if (!std::strcmp(feature, "data-transfer-files"))
         return 1;
 #endif
