@@ -1663,7 +1663,7 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "accessibility-uia"))
         return 1;
 #endif
-    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop", "drag-out", "clipboard-files", "range-replacement", "accessibility", "accessibility-text", "svg-document", "resize-entries", "intersection-entries" }) {
+    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop", "drag-out", "clipboard-files", "range-replacement", "accessibility", "accessibility-text", "svg-document", "resize-entries", "resize-device-pixel-content-box", "intersection-entries" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -5442,6 +5442,11 @@ private:
                     copy.borderInlineSize = entry->borderBoxSize()[0]->inlineSize();
                     copy.borderBlockSize = entry->borderBoxSize()[0]->blockSize();
                 }
+                if (!entry->devicePixelContentBoxSize().isEmpty()) {
+                    copy.hasDevicePixel = 1;
+                    copy.devicePixelInlineSize = entry->devicePixelContentBoxSize()[0]->inlineSize();
+                    copy.devicePixelBlockSize = entry->devicePixelContentBoxSize()[0]->blockSize();
+                }
                 copies.append(copy);
             }
             // The entries keep their targets alive for the call; the callback may release the observer.
@@ -5668,12 +5673,12 @@ int32_t rv_observer_observe_box(RvObserver* observer, RvNode* target, int32_t bo
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
-    if (!observer->resize || (box != RV_RESIZE_BOX_CONTENT && box != RV_RESIZE_BOX_BORDER))
+    if (!observer->resize || (box != RV_RESIZE_BOX_CONTENT && box != RV_RESIZE_BOX_BORDER && box != RV_RESIZE_BOX_DEVICE_PIXEL_CONTENT))
         return RV_ERR_UNSUPPORTED;
     RefPtr element = elementOf(target);
     if (!element)
         return RV_ERR_NOT_ELEMENT;
-    ranvier_resize_observe_box(*observer->resize, *element, box == RV_RESIZE_BOX_BORDER);
+    ranvier_resize_observe_box(*observer->resize, *element, box);
     return RV_OK;
 }
 

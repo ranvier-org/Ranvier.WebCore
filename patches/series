@@ -54,3 +54,4 @@
 0053-view-transition-settle-without-script.patch
 0054-wpe-standalone-compositor.patch
 0055-wpe-static-pasteboard-file-drops.patch
+0056-device-pixel-content-box.patch

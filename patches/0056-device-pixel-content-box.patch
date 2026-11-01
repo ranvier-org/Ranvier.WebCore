@@ -1,0 +1,162 @@
+diff --git a/Source/WebCore/page/ResizeObserverBoxOptions.h b/Source/WebCore/page/ResizeObserverBoxOptions.h
+--- a/Source/WebCore/page/ResizeObserverBoxOptions.h
++++ b/Source/WebCore/page/ResizeObserverBoxOptions.h
+@@ -33,6 +33,7 @@
+ enum class ResizeObserverBoxOptions : uint8_t {
+     BorderBox,
+     ContentBox,
++    DevicePixelContentBox,
+ };
+ 
+ } // namespace WebCore
+diff --git a/Source/WebCore/page/ResizeObservation.h b/Source/WebCore/page/ResizeObservation.h
+--- a/Source/WebCore/page/ResizeObservation.h
++++ b/Source/WebCore/page/ResizeObservation.h
+@@ -53,6 +53,7 @@
+         LayoutSize contentBoxSize;
+         LayoutSize contentBoxLogicalSize;
+         LayoutSize borderBoxLogicalSize;
++        LayoutSize devicePixelContentBoxLogicalSize;
+     };
+ 
+     std::optional<BoxSizes> elementSizeChanged() const;
+diff --git a/Source/WebCore/page/ResizeObservation.cpp b/Source/WebCore/page/ResizeObservation.cpp
+--- a/Source/WebCore/page/ResizeObservation.cpp
++++ b/Source/WebCore/page/ResizeObservation.cpp
+@@ -31,6 +31,7 @@
+ #include "Logging.h"
+ #include "RenderBoxInlines.h"
+ #include "RenderElementStyleInlines.h"
++#include "RenderLayer.h"
+ #include "SVGElement.h"
+ #include "StyleZoomPrimitivesInlines.h"
+ #include <wtf/TZoneMallocInlines.h>
+@@ -46,7 +47,7 @@
+ 
+ ResizeObservation::ResizeObservation(Element& element, ResizeObserverBoxOptions observedBox)
+     : m_target { element }
+-    , m_lastObservationSizes { LayoutSize(-1, -1), LayoutSize(-1, -1), LayoutSize(-1, -1) }
++    , m_lastObservationSizes { LayoutSize(-1, -1), LayoutSize(-1, -1), LayoutSize(-1, -1), LayoutSize(-1, -1) }
+     , m_observedBox { observedBox }
+ {
+ }
+@@ -60,7 +61,7 @@
+ 
+ void ResizeObservation::resetObservationSize()
+ {
+-    m_lastObservationSizes = { LayoutSize(-1, -1), LayoutSize(-1, -1), LayoutSize(-1, -1) };
++    m_lastObservationSizes = { LayoutSize(-1, -1), LayoutSize(-1, -1), LayoutSize(-1, -1), LayoutSize(-1, -1) };
+ }
+ 
+ auto ResizeObservation::computeObservedSizes() const -> std::optional<BoxSizes>
+@@ -72,7 +73,10 @@
+                 size.setWidth(svgRect->width());
+                 size.setHeight(svgRect->height());
+             }
+-            return { { size, size, size } };
++            FloatSize deviceSize(size);
++            deviceSize.scale(svg->document().deviceScaleFactor());
++            LayoutSize logicalDeviceSize(roundedIntSize(deviceSize));
++            return { { size, size, size, logicalDeviceSize } };
+         }
+     }
+ 
+@@ -80,10 +84,25 @@
+         if (CheckedPtr box = target->renderBox()) {
+             if (box->isSkippedContent())
+                 return std::nullopt;
++            const RenderLayerModelObject* paintContainer = nullptr;
++            for (auto* layer = box->enclosingLayer(); layer; layer = layer->parent()) {
++                if (layer->transform() || layer->isComposited()) {
++                    paintContainer = &layer->renderer();
++                    break;
++                }
++            }
++            auto origin = box->localToContainerPoint({ }, paintContainer, { });
++            float scale = target->document().deviceScaleFactor();
++            auto deviceSize = snapSizeToDevicePixel(box->contentBoxSize(), LayoutPoint(origin), scale);
++            deviceSize.scale(scale);
++            LayoutSize logicalDeviceSize(roundedIntSize(deviceSize));
++            if (!box->isHorizontalWritingMode())
++                logicalDeviceSize = logicalDeviceSize.transposedSize();
+             return { {
+                 Style::adjustLayoutSizeForAbsoluteZoom(box->contentBoxSize(), *box),
+                 Style::adjustLayoutSizeForAbsoluteZoom(box->contentBoxLogicalSize(), *box),
+-                Style::adjustLayoutSizeForAbsoluteZoom(box->logicalSize(), *box)
++                Style::adjustLayoutSizeForAbsoluteZoom(box->logicalSize(), *box),
++                logicalDeviceSize
+             } };
+         }
+     }
+@@ -118,7 +137,7 @@
+ 
+ FloatSize ResizeObservation::snappedContentBoxSize() const
+ {
+-    return m_lastObservationSizes.contentBoxLogicalSize; // FIXME: Need to pixel snap.
++    return m_lastObservationSizes.devicePixelContentBoxLogicalSize;
+ }
+ 
+ std::optional<ResizeObservation::BoxSizes> ResizeObservation::elementSizeChanged() const
+@@ -128,6 +147,10 @@
+         return std::nullopt;
+ 
+     switch (m_observedBox) {
++    case ResizeObserverBoxOptions::DevicePixelContentBox:
++        if (m_lastObservationSizes.devicePixelContentBoxLogicalSize != currentSizes->devicePixelContentBoxLogicalSize)
++            return currentSizes;
++        break;
+     case ResizeObserverBoxOptions::BorderBox:
+         if (m_lastObservationSizes.borderBoxLogicalSize != currentSizes->borderBoxLogicalSize) {
+             LOG_WITH_STREAM(ResizeObserver, stream << "ResizeObservation " << *this << " elementSizeChanged - border box size changed from " << m_lastObservationSizes.borderBoxLogicalSize << " to " << currentSizes->borderBoxLogicalSize);
+diff --git a/Source/WebCore/page/ResizeObserverEntry.h b/Source/WebCore/page/ResizeObserverEntry.h
+--- a/Source/WebCore/page/ResizeObserverEntry.h
++++ b/Source/WebCore/page/ResizeObserverEntry.h
+@@ -40,9 +40,9 @@
+ class ResizeObserverEntry : public RefCounted<ResizeObserverEntry> {
+     WTF_MAKE_TZONE_ALLOCATED_INLINE(ResizeObserverEntry);
+ public:
+-    static Ref<ResizeObserverEntry> create(Ref<Element>&& target, const FloatRect& contentRect, FloatSize borderBoxSize, FloatSize contentBoxSize)
++    static Ref<ResizeObserverEntry> create(Ref<Element>&& target, const FloatRect& contentRect, FloatSize borderBoxSize, FloatSize contentBoxSize, FloatSize devicePixelContentBoxSize)
+     {
+-        return adoptRef(*new ResizeObserverEntry(WTF::move(target), contentRect, borderBoxSize, contentBoxSize));
++        return adoptRef(*new ResizeObserverEntry(WTF::move(target), contentRect, borderBoxSize, contentBoxSize, devicePixelContentBoxSize));
+     }
+ 
+     Element& target() const { return m_target; }
+@@ -50,13 +50,15 @@
+ 
+     const Vector<Ref<ResizeObserverSize>>& borderBoxSize() const LIFETIME_BOUND { return m_borderBoxSizes; }
+     const Vector<Ref<ResizeObserverSize>>& contentBoxSize() const LIFETIME_BOUND { return m_contentBoxSizes; }
++    const Vector<Ref<ResizeObserverSize>>& devicePixelContentBoxSize() const LIFETIME_BOUND { return m_devicePixelContentBoxSizes; }
+ 
+ private:
+-    ResizeObserverEntry(Ref<Element>&& target, const FloatRect& contentRect, FloatSize borderBoxSize, FloatSize contentBoxSize)
++    ResizeObserverEntry(Ref<Element>&& target, const FloatRect& contentRect, FloatSize borderBoxSize, FloatSize contentBoxSize, FloatSize devicePixelContentBoxSize)
+         : m_target(WTF::move(target))
+         , m_contentRect(DOMRectReadOnly::create(contentRect.x(), contentRect.y(), contentRect.width(), contentRect.height()))
+         , m_borderBoxSizes({ ResizeObserverSize::create(borderBoxSize.width(), borderBoxSize.height()) })
+         , m_contentBoxSizes({ ResizeObserverSize::create(contentBoxSize.width(), contentBoxSize.height()) })
++        , m_devicePixelContentBoxSizes({ ResizeObserverSize::create(devicePixelContentBoxSize.width(), devicePixelContentBoxSize.height()) })
+     {
+     }
+ 
+@@ -65,6 +67,7 @@
+     // The spec is designed to allow mulitple boxes for multicol scenarios, but for now these vectors only ever contain one entry.
+     Vector<Ref<ResizeObserverSize>> m_borderBoxSizes;
+     Vector<Ref<ResizeObserverSize>> m_contentBoxSizes;
++    Vector<Ref<ResizeObserverSize>> m_devicePixelContentBoxSizes;
+ };
+ 
+ } // namespace WebCore
+diff --git a/Source/WebCore/page/ResizeObserver.cpp b/Source/WebCore/page/ResizeObserver.cpp
+--- a/Source/WebCore/page/ResizeObserver.cpp
++++ b/Source/WebCore/page/ResizeObserver.cpp
+@@ -173,7 +173,7 @@
+         ASSERT(target); // The target is supposed to be kept alive via `m_activeObservationTargets` and JSResizeObserver::visitAdditionalChildrenInGCThread().
+         if (!target)
+             return nullptr;
+-        return ResizeObserverEntry::create(target.releaseNonNull(), observation->computeContentRect(), observation->borderBoxSize(), observation->contentBoxSize());
++        return ResizeObserverEntry::create(target.releaseNonNull(), observation->computeContentRect(), observation->borderBoxSize(), observation->contentBoxSize(), observation->snappedContentBoxSize());
+     });
+     m_activeObservations.clear();
+ 
