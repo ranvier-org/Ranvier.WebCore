@@ -1,0 +1,24 @@
+{
+  "status": "implementation proof; independent acceptance pending",
+  "base": "e856810bba65d6e14c4c44d86b13f9df853211aa",
+  "abi": 60,
+  "policy": "WPE InMemoryImage plus explicit host byte-backed pasteboard opt-in; isStatic unchanged",
+  "copy_chain": [
+    "rv_blob_read_bytes rejects BlobDataFileReference and copies only DataSegment bytes",
+    "blobBytes returns a new Vector<uint8_t>",
+    "TransferPasteboard copies RanvierTransferFile vectors",
+    "readBuffer creates a SharedBuffer from the owned byte span"
+  ],
+  "frozen_red_runtime_sha256": "b460e30ecd2bee4ba2ef5e420d3a2a81d376084a8b15d44e7701d6e0b90e028d",
+  "candidate_unstripped_native_sha256": "54f2f129db135073885db1b1e5150763a73c28fb3e86df85285fccdbc85a82e4",
+  "assertions": 960,
+  "patch_sha256": "5364a0af1cab2de2ccb7603908b630fcde81fd25315e945ff46c540225e8844f",
+  "test_sha256": "d52278ab679d47d44a814db873c6a1abda93c7677719d4e3ac2767c8578a8c60",
+  "logs": {
+    "linux156-red.log": "f0a64ed0bb6b0ca9e53e94e7b177f73503073376d51b7f2576f79dd47f093ce2",
+    "linux156-green.log": "41504bd65cc3c46954ba623364a33fe118b09f8b76c7a38a5eb4d56f70f88fd6",
+    "linux156-results.json": "d9c5e3de98b1991060aa3e8c0d396f15f41b202b0c422e649dd45fc94d8417e7"
+  },
+  "privacy": "actual disk path and file URI strings expose no File; protected phases and after-event store modes preserved",
+  "nonhost": "default false hook, GTK unchanged, MayContainFilePaths still refused"
+}
