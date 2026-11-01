@@ -24,10 +24,6 @@ class Strings(ctypes.Structure):
     _fields_ = [('present', I), ('count', I), ('items', ctypes.POINTER(Span))]
 
 
-class StringValues(ctypes.Structure):
-    _fields_ = [('count', I), ('items', ctypes.POINTER(Span))]
-
-
 class Options(ctypes.Structure):
     _fields_ = [('size', ctypes.c_uint32), ('update', P), ('types', ctypes.POINTER(Strings))]
 
@@ -84,11 +80,11 @@ def run(directory, slim):
         for name in [b'slide', b'fade', b'slide']:
             n.ok('rv_dom_view_transition_type_set_add', [P, P, I], type_set, name, len(name))
         n.expect(n.integer('rv_dom_view_transition_type_set_size', type_set, ctypes.c_uint32) == 2, 'types deduplicate')
-        snapshot = StringValues()
-        n.ok('rv_dom_view_transition_type_set_values', [P, ctypes.POINTER(StringValues)], type_set, ctypes.byref(snapshot))
+        snapshot = Strings()
+        n.ok('rv_dom_view_transition_type_set_values', [P, ctypes.POINTER(Strings)], type_set, ctypes.byref(snapshot))
         n.ok('rv_dom_view_transition_type_set_clear', [P], type_set)
         n.expect([ctypes.string_at(snapshot.items[i].data, snapshot.items[i].length).decode() for i in range(snapshot.count)] == ['slide', 'fade'], 'type snapshot retains insertion order after clear')
-        n.bind('rv_dom_sequence_dom_string_release', None, [ctypes.POINTER(StringValues)])(ctypes.byref(snapshot))
+        n.bind('rv_dom_sequence_dom_string_release', None, [ctypes.POINTER(Strings)])(ctypes.byref(snapshot))
         n.bind('rv_dom_view_transition_type_set_release', None, [P])(type_set)
         settled = SETTLED(lambda _, kind, error: log.append((kind, error.decode() if error else None)))
         observer = P()
