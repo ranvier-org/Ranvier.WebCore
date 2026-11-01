@@ -95,12 +95,14 @@ def normalise(args):
             sys.exit(f'build_cache: {build} has no {MANIFEST}; build_cache.py record writes one for a tree built from these sources')
         print('build_cache: the build tree has no source manifest, so it is cleared', flush=True)
         clear(build)
-    written = {'format': FORMAT, 'trees': {}}
+    # Hash and inspect the full input set before mutating any source times. A same-timestamp raw-byte change must
+    # refuse atomically; otherwise earlier unchanged files could already have been normalized before the refusal.
+    scanned = {}
+    unsafe_raw_changes = []
     for name, tree in trees.items():
         ids, hashed = blob_ids(tree)
         old = (cached or {}).get('trees', {}).get(name, {})
-        entries = {}
-        kept = changed = added = 0
+        files = {}
         for path, oid in ids.items():
             full = long_path(tree / path)
             try:
@@ -111,6 +113,36 @@ def normalise(args):
                 continue
             seconds = int(info.st_mtime)
             raw_hash = raw_sha256(full)
+            previous = old.get(path)
+            if (args.command == 'normalise' and previous is not None
+                    and isinstance(previous, list) and previous and previous[0] == oid
+                    and (len(previous) < 3 or previous[2] != raw_hash)):
+                try:
+                    previous_seconds = int(previous[1])
+                except (IndexError, TypeError, ValueError):
+                    unsafe_raw_changes.append((name, path, 'unknown cached timestamp', seconds))
+                else:
+                    if seconds <= previous_seconds:
+                        unsafe_raw_changes.append((name, path, previous_seconds, seconds))
+            files[path] = (oid, info, seconds, raw_hash)
+        scanned[name] = (tree, ids, hashed, old, files)
+    if unsafe_raw_changes:
+        name, path, cached_seconds, current_seconds = unsafe_raw_changes[0]
+        reason = (f'build_cache: raw bytes changed without a strictly newer source timestamp at '
+                  f'{name}/{path} (cached={cached_seconds}, current={current_seconds}); refusing cached PCH reuse')
+        if not args.clear_unknown:
+            sys.exit(reason + '; rerun with --clear-unknown to discard the build tree explicitly')
+        print(reason + '; --clear-unknown was given, so the build tree is cleared', flush=True)
+        if build.exists():
+            clear(build)
+        cached = None
+    written = {'format': FORMAT, 'trees': {}}
+    for name, (tree, ids, hashed, old, files) in scanned.items():
+        old = (cached or {}).get('trees', {}).get(name, {})
+        entries = {}
+        kept = changed = added = 0
+        for path, (oid, info, seconds, raw_hash) in files.items():
+            full = long_path(tree / path)
             previous = old.get(path)
             if previous is None:
                 added += 1
@@ -305,7 +337,7 @@ for command in ['normalise', 'record']:
     n.add_argument('--build', required=True, help='the build directory, which holds the manifest')
     n.add_argument('--source', required=True, help='the WebKit checkout')
     n.add_argument('--repository', default=str(root), help="this repository's checkout (default: the one holding this script)")
-    n.add_argument('--clear-unknown', action='store_true', help='empty a build directory that has no manifest instead of failing')
+    n.add_argument('--clear-unknown', action='store_true', help='empty a build tree when its cached source identity is unknown instead of failing')
 e = sub.add_parser('explain')
 e.add_argument('--build', required=True)
 e.add_argument('--target', default='RanvierWebCoreHost')

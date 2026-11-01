@@ -34,8 +34,10 @@ class BuildCacheTests(unittest.TestCase):
         self.repository.mkdir()
         self.build.mkdir()
         self.prefix = self.source / 'JavaScriptCorePrefix.h'
+        self.early = self.source / 'AaEarly.cpp'
         self.canonical = b'#pragma once\n#define CACHE_TEST 1\n'
         self.prefix.write_bytes(self.canonical)
+        self.early.write_bytes(b'int cache_fixture_early;\n')
         (self.source / '.gitattributes').write_text('* text eol=crlf\n', encoding='ascii')
         self.init_git(self.source)
         self.init_git(self.repository)
@@ -107,6 +109,36 @@ class BuildCacheTests(unittest.TestCase):
         result = self.run_cache('normalise')
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(int(self.prefix.stat().st_mtime), OLD_TIME, result.stdout)
+
+    def test_raw_change_with_cached_timestamp_requires_explicit_clear_before_any_mutation(self):
+        self.assertEqual(self.run_cache('record').returncode, 0)
+        manifest_before = (self.build / 'ranvier-sources.json').read_bytes()
+        sentinel = self.build / 'stale-object.obj'
+        sentinel.write_bytes(b'stale object')
+        self.set_mtime(self.early, FRESH_TIME)
+        self.prefix.write_bytes(self.canonical.replace(b'\n', b'\r\n'))
+        git(self.source, 'update-index', '--assume-unchanged', 'JavaScriptCorePrefix.h')
+        self.set_mtime(self.prefix, OLD_TIME)
+
+        refused = self.run_cache('normalise')
+        self.assertNotEqual(refused.returncode, 0)
+        self.assertIn('refusing cached PCH reuse', refused.stderr)
+        self.assertEqual((self.build / 'ranvier-sources.json').read_bytes(), manifest_before)
+        self.assertTrue(sentinel.exists())
+        self.assertEqual(int(self.early.stat().st_mtime), FRESH_TIME, 'preflight must not normalize healthy files before refusing')
+
+        cleared = self.run_cache('normalise', clear_unknown=True)
+        self.assertEqual(cleared.returncode, 0, cleared.stderr)
+        self.assertIn('build tree is cleared', cleared.stdout)
+        self.assertFalse(sentinel.exists())
+        self.assertFalse((self.build / 'build.ninja').exists())
+        self.assertEqual(int(self.prefix.stat().st_mtime), OLD_TIME)
+        self.assertEqual(self.manifest()['format'], 2)
+
+    def test_ci_normalise_caller_explicitly_allows_legacy_cache_migration(self):
+        workflow = (ROOT / '.github' / 'workflows' / 'build.yml').read_text(encoding='utf-8')
+        command = next(line for line in workflow.splitlines() if 'scripts/build_cache.py normalise' in line)
+        self.assertIn('--clear-unknown', command)
 
     def test_legacy_manifest_without_raw_identity_is_a_cache_miss(self):
         self.assertEqual(self.run_cache('record').returncode, 0)
