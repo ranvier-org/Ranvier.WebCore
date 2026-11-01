@@ -205,6 +205,10 @@
 #include <wtf/MainThread.h>
 #include <wtf/ProcessID.h>
 #include <wtf/RunLoop.h>
+#if PLATFORM(COCOA)
+#include <CoreFoundation/CoreFoundation.h>
+#include <WebCore/MainThreadSharedTimer.h>
+#endif
 #include <wtf/HexNumber.h>
 #include <wtf/text/MakeString.h>
 #include <wtf/text/TextBreakIterator.h>
@@ -3459,6 +3463,21 @@ static void deliverNotificationRequests()
     }
 }
 
+#if PLATFORM(COCOA)
+// RunLoop::cycle() waits up to 50 ms for a source on Cocoa. Zero-limit passes deliver the pending sources without
+// waiting; the kernel can deliver a due timer's port message after them, so a due WebCore shared timer fires directly.
+static void cycleCocoaRunLoop()
+{
+    constexpr int maximumSourcePasses = 64;
+    for (int pass = 0; pass < maximumSourcePasses; ++pass) {
+        if (CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, true) != kCFRunLoopRunHandledSource)
+            break;
+    }
+    if (CFRunLoopGetNextTimerFireDate(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode) <= CFAbsoluteTimeGetCurrent())
+        MainThreadSharedTimer::restartSharedTimer();
+}
+#endif
+
 int32_t rv_run_loop_cycle(int32_t milliseconds)
 {
     if (milliseconds < 0)
@@ -3468,7 +3487,11 @@ int32_t rv_run_loop_cycle(int32_t milliseconds)
     auto deadline = MonotonicTime::now() + Seconds::fromMilliseconds(milliseconds);
     int32_t cycles = 0;
     do {
+#if PLATFORM(COCOA)
+        cycleCocoaRunLoop();
+#else
         RunLoop::cycle();
+#endif
         ++cycles;
         deliverNotificationRequests();
         if (MonotonicTime::now() < deadline)

@@ -352,7 +352,8 @@ RV_EXPORT RvNode* rv_document_active_element(RvHost*);
 /* v10 */
 
 /* Cycles the calling thread's run loop, which fires due timers and dispatches pending messages, until the
- * given milliseconds have elapsed, at least once. Returns the cycles run, or a negative status. */
+ * given milliseconds have elapsed, at least once. A cycle returns without waiting for a source; 0 runs exactly one
+ * cycle. Returns the cycles run, or a negative status. */
 RV_EXPORT int32_t rv_run_loop_cycle(int32_t milliseconds);
 
 /* v11 */
