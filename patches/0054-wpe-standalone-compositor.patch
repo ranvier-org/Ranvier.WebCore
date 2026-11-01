@@ -17,6 +17,20 @@ index ee4bc92..d6d4fab 100644
  
 -#endif // USE(COORDINATED_GRAPHICS)
 +#endif // USE(COORDINATED_GRAPHICS) || (PLATFORM(WPE) && USE(GRAPHICS_LAYER_TEXTURE_MAPPER))
+diff --git a/Source/WebCore/platform/graphics/texmap/TextureMapperGCGLPlatformLayer.cpp b/Source/WebCore/platform/graphics/texmap/TextureMapperGCGLPlatformLayer.cpp
+index c3684ad..fa01133 100644
+--- a/Source/WebCore/platform/graphics/texmap/TextureMapperGCGLPlatformLayer.cpp
++++ b/Source/WebCore/platform/graphics/texmap/TextureMapperGCGLPlatformLayer.cpp
+@@ -23,7 +23,9 @@
+ 
+ #if ENABLE(WEBGL) && USE(TEXTURE_MAPPER) && !USE(COORDINATED_GRAPHICS)
+ 
++#if !USE(LIBEPOXY)
+ #include "ANGLEHeaders.h"
++#endif
+ #include "BitmapTexture.h"
+ #include "GLContext.h"
+ #include "TextureMapper.h"
 diff --git a/Source/cmake/OptionsWPE.cmake b/Source/cmake/OptionsWPE.cmake
 index ecf52b4..5777736 100644
 --- a/Source/cmake/OptionsWPE.cmake
