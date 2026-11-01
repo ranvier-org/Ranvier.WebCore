@@ -19,7 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from form_collections import Native, P, I, U, OK, NULL_ARGUMENT, WRONG_THREAD, DOM_EXCEPTION, WRONG_INTERFACE, ABI  # noqa: E402
 from web_animations import (AnimationOptions, Arena, EffectOptions, KeyframeAnimationOptions, KeyframeEffectOptions, Page, Time,  # noqa: E402
                             TimelineOptions, Span, StringInput, FILL, DIRECTION, exception_name,
-                            arm_vm_entry_crash, PLAY_STATES)
+                            arm_vm_entry_crash, NOT_ARMED_EXIT, PLAY_STATES)
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 CLOSE = 1e-6
@@ -720,8 +720,8 @@ def verify(directory, arm=True):
         if armed:
             control = subprocess.run([sys.executable, '-I', '-X', 'utf8', str(Path(__file__).with_name('web_animations.py')),
                                       '--native-directory', str(directory), '--vm-entry-control'], capture_output=True, text=True, timeout=120)
-            native.expect(control.returncode not in (0, 3) and 'VM_ENTRY_CONTROL_SURVIVED' not in control.stdout,
-                          'the armed VM-entry crash aborts a page load (control exit ' + str(control.returncode) + ')')
+            native.expect(control.returncode not in (0, NOT_ARMED_EXIT) and 'VM_ENTRY_CONTROL_SURVIVED' not in control.stdout,
+                          'the armed VM-entry crash aborts a page load (control exit ' + str(control.returncode) + ') ' + control.stderr[-2000:])
         native.expect(native.text('rv_dom_document_get_title', [P], page.document) == title, 'no script ran')
     finally:
         if armed:

@@ -207,8 +207,10 @@ def verify(directory, evidence_json=None):
             rgba = p.paint()
             return [p.pixel(rgba, x, y) for x, y in points]
 
-        def near(actual, expected, label, tolerance=GRADIENT_TOLERANCE):
-            expect(all(abs(a - b) <= tolerance for a, b in zip(actual, expected)), label + ': ' + str(actual) + ' expected ' + str(expected))
+        def misses(labels, actuals, expecteds):
+            # Every pixel beyond GRADIENT_TOLERANCE, so one failure reports them all.
+            return [label + ': ' + str(actual) + ' expected ' + str(expected) for label, actual, expected in zip(labels, actuals, expecteds)
+                    if not all(abs(a - b) <= GRADIENT_TOLERANCE for a, b in zip(actual, expected))]
 
         def over_white(rgba):
             # A Chromium getImageData value composited over the white page.
@@ -321,9 +323,14 @@ def verify(directory, evidence_json=None):
         ok(fill_rect(ctx, 20, 30, 20, 10), 'conic fill')
         report['gradients'] = pixels((0, 5), (30, 5), (59, 5), (30, 20), (35, 20), (45, 20), (38, 35), (22, 35))
         oracle = [[253, 0, 2, 255], [126, 0, 130, 255], [2, 0, 253, 255], [0, 237, 0, 255], [0, 115, 0, 255], BLACK, [250, 0, 5, 255], [6, 0, 250, 255]]
-        for label, actual, expected in zip(['linear left', 'linear middle', 'linear right', 'radial centre', 'radial half', 'radial outside',
-                                            'conic east', 'conic west'], report['gradients'], oracle):
-            near(actual, expected, label)
+        if sys.platform == 'darwin':
+            # CoreGraphics rasterises the gradient itself (CGContextDrawRadialGradient, called from
+            # GradientRendererCG::drawRadialGradient in Source/WebCore/platform/graphics/cg/GradientRendererCG.cpp). At the
+            # centre pixel it gives t = 9/255; Skia samples the pixel centre, 0.707px out, at t = 0.0707.
+            oracle[3] = [0, 246, 0, 255]
+        labels = ['linear left', 'linear middle', 'linear right', 'radial centre', 'radial half', 'radial outside', 'conic east', 'conic west']
+        missed = misses(labels, report['gradients'], oracle)
+        expect(not missed, 'gradients: ' + '; '.join(missed))
         exception(add_stop(lin, document, -0.1, 'red'), 'IndexSizeError', 'addColorStop below 0')
         exception(add_stop(lin, document, 1.1, 'red'), 'IndexSizeError', 'addColorStop above 1')
         exception(add_stop(lin, document, float('nan'), 'red'), 'TypeError', 'addColorStop NaN')
@@ -397,8 +404,11 @@ def verify(directory, evidence_json=None):
         ok(fill_rect(ctx, 40, 0, 10, 10), 'blurred shadow fill')
         report['shadow'] = pixels((10, 10), (30, 10), (45, 10), (45, 25), (45, 31), (45, 38))
         expect(report['shadow'][:3] == [RED, BLUE, WHITE], 'shadow: ' + str(report['shadow'][:3]))
-        for label, actual, alpha in zip(['blurred centre', 'blurred edge', 'blurred far'], report['shadow'][3:], [249, 63, 0]):
-            near(actual, over_white([0, 0, 255, alpha]), label)
+        # CoreGraphics draws a blurred shadow with its private CGStyleCreateShadow2 (GraphicsContextCG.cpp), whose kernel
+        # gives the edge alpha 55 where Chromium gives 63; the value is the one measured on macOS (run 41289077910).
+        shadow_alphas = [249, 55 if sys.platform == 'darwin' else 63, 0]
+        missed = misses(['blurred centre', 'blurred edge', 'blurred far'], report['shadow'][3:], [over_white([0, 0, 255, alpha]) for alpha in shadow_alphas])
+        expect(not missed, 'blurred shadow: ' + '; '.join(missed))
         ok(reset(ctx), 'reset')
         ok(numbers['shadow_offset_x'][1](ctx, 20), 'shadowOffsetX')
         set_style('fill', '#ff0000')
