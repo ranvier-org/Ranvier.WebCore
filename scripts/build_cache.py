@@ -8,10 +8,11 @@
 #
 # A restored build tree holds the objects of an earlier build, but checkout and the WebKit fetch give every
 # source file a fresh modification time, which ninja reads as a change to all of them. The tree carries a
-# manifest of the sources it was built from: for each file, its git blob id and its modification time.
-# normalise sets every file whose blob id matches the manifest back to the recorded time, leaves changed and
+# manifest of the sources it was built from: for each file, its git blob id, raw-byte SHA-256 and modification time.
+# normalise sets every file whose blob id and raw-byte hash match the manifest back to the recorded time, leaves changed and
 # new files at their checkout time, then writes the manifest of the current sources for the next save. Blob ids
-# come from git's index, which the checkout has just written, so only the files git reports as changed are read.
+# come from git's index, which the checkout has just written, so only files Git reports as changed need a Git hash;
+# raw-byte hashes are still computed for each regular tracked source before a timestamp is reused.
 # Restoring the recorded time rather than an arbitrary old one also keeps clang's precompiled headers valid:
 # a PCH records each input's modification time and is rejected when one differs.
 #
@@ -21,7 +22,16 @@ import argparse, hashlib, json, os, pathlib, re, stat, subprocess, sys, time
 
 root = pathlib.Path(__file__).resolve().parents[1]
 MANIFEST = 'ranvier-sources.json'
-FORMAT = 1
+FORMAT = 2
+
+
+def raw_sha256(path):
+    """Hash the bytes the compiler reads, without loading large source files into memory."""
+    digest = hashlib.sha256()
+    with open(path, 'rb') as source:
+        while block := source.read(1024 * 1024):
+            digest.update(block)
+    return digest.hexdigest()
 
 
 def long_path(path):
@@ -100,17 +110,18 @@ def normalise(args):
             if not stat.S_ISREG(info.st_mode):
                 continue
             seconds = int(info.st_mtime)
+            raw_hash = raw_sha256(full)
             previous = old.get(path)
             if previous is None:
                 added += 1
-            elif previous[0] != oid:
+            elif previous[0] != oid or len(previous) < 3 or previous[2] != raw_hash:
                 changed += 1
             else:
                 kept += 1
                 if previous[1] != seconds:
                     os.utime(full, ns=(previous[1] * 10**9, previous[1] * 10**9))
                     seconds = previous[1]
-            entries[path] = [oid, seconds]
+            entries[path] = [oid, seconds, raw_hash]
         # A directory is an input of some edges (WebKit's header links name source directories), and checkout gives
         # it a fresh time too. One whose listing of tracked entries is unchanged gets its recorded time back.
         listings = {}
