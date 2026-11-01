@@ -9,7 +9,7 @@ diff --git a/Source/WebCore/rendering/BackgroundPainter.cpp b/Source/WebCore/ren
  
  namespace WebCore {
  
-@@ -435,8 +436,21 @@
+@@ -435,8 +436,17 @@
                  scrolledPaintRect.y() + m_renderer.borderTop() + (includePadding ? m_renderer.paddingTop() : 0_lu),
                  scrolledPaintRect.width() - bLeft - bRight - (includePadding ? pLeft + pRight : 0_lu),
                  scrolledPaintRect.height() - m_renderer.borderTop() - m_renderer.borderBottom() - (includePadding ? m_renderer.paddingTop() + m_renderer.paddingBottom() : 0_lu));
@@ -20,15 +20,11 @@ diff --git a/Source/WebCore/rendering/BackgroundPainter.cpp b/Source/WebCore/ren
 +                + (includePadding ? pLeft.toDouble() * deviceScaleFactor : 0);
 +            double pixelY = scrolledPaintRect.y().toDouble() * deviceScaleFactor + borderPixels(m_renderer.borderTop())
 +                + (includePadding ? m_renderer.paddingTop().toDouble() * deviceScaleFactor : 0);
-+            double left = std::floor(pixelX + 0.5);
-+            double top = std::floor(pixelY + 0.5);
-+            double right = std::floor(pixelX + clipRect.width().toDouble() * deviceScaleFactor + 0.5);
-+            double bottom = std::floor(pixelY + clipRect.height().toDouble() * deviceScaleFactor + 0.5);
-+            FloatRect deviceAlignedClip(left / deviceScaleFactor, top / deviceScaleFactor,
-+                (right - left) / deviceScaleFactor, (bottom - top) / deviceScaleFactor);
++            FloatRect preciseClip(pixelX / deviceScaleFactor, pixelY / deviceScaleFactor,
++                clipRect.width().toFloat(), clipRect.height().toFloat());
              backgroundClipStateSaver.save();
 -            context.clip(clipRect);
-+            context.clip(deviceAlignedClip);
++            context.clip(preciseClip);
          }
          break;
      }
