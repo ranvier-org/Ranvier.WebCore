@@ -9,8 +9,8 @@
 
 include("${CMAKE_CURRENT_LIST_DIR}/common.cmake")
 
-# vcpkg: no LCMS. The "web" feature still installs curl, libpsl, OpenSSL and SQLite, which the stubs
-# leave unlinked; they are not packaged.
+# vcpkg: no LCMS. The "web" feature installs curl, libpsl, OpenSSL and SQLite; only the Windows
+# cryptography backend links OpenSSL. The dependency closure packages the libraries actually linked.
 set(VCPKG_MANIFEST_FEATURES "web;skia;woff2" CACHE STRING "")
 set(USE_LCMS OFF CACHE BOOL "")
 
@@ -24,7 +24,11 @@ set(ENABLE_WEBDRIVER OFF CACHE BOOL "")
 # The patch series (patches/). Each option defaults to OFF upstream of this file.
 set(USE_ANGLE_STUB ON CACHE BOOL "")          # 0001: ANGLE replaced by EGL/GLES entry points that fail
 set(USE_NETWORK_STUB ON CACHE BOOL "")        # 0002: no curl, libpsl; no network loads
-set(USE_CRYPTO_STUB ON CACHE BOOL "")         # 0003: no OpenSSL; Web Crypto keeps the SHA digests
+if (RANVIER_RID MATCHES "^win-")
+    set(USE_CRYPTO_STUB OFF CACHE BOOL "")
+else ()
+    set(USE_CRYPTO_STUB ON CACHE BOOL "")
+endif ()
 set(USE_GPU_STUB ON CACHE BOOL "")            # 0004: no GPU code in WebCore or Skia
 set(USE_WEB_API_STUB ON CACHE BOOL "")        # 0005: no IndexedDB, caches, service/shared workers, push, WebSocket
 set(USE_SQLITE_STUB ON CACHE BOOL "")         # 0006: no SQLite (requires USE_WEB_API_STUB)

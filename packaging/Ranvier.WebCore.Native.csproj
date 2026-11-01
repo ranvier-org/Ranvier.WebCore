@@ -19,6 +19,7 @@
     <None Include="$(StageDir)manifest.json" Pack="true" PackagePath="" />
     <None Include="$(StageDir)buildTransitive.targets" Pack="true" PackagePath="buildTransitive/$(PackageId).targets" />
     <None Include="../NOTICE.md" Pack="true" PackagePath="" />
+    <None Include="licenses/LibreSSL-4.2.1.txt" Pack="true" PackagePath="licenses/" Condition="'$(RuntimeId)' == 'win-x64' Or '$(RuntimeId)' == 'win-arm64'" />
     <None Include="README.md" Pack="true" PackagePath="" />
   </ItemGroup>
 </Project>

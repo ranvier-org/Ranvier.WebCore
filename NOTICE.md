@@ -2,7 +2,8 @@
 
 The package contains these components. Each is under its own license; the license texts are in the
 component's source at the pinned version. This list needs a licensing review before a public release, and
-the package does not yet carry the full license texts.
+the package does not yet carry the full license texts for every component. Windows packages include
+LibreSSL's retained copyright and license text at `licenses/LibreSSL-4.2.1.txt`.
 
 | DLL | Component | License |
 |---|---|---|
@@ -16,3 +17,4 @@ the package does not yet carry the full license texts.
 | `libwebp.dll`, `libwebpmux.dll`, `libwebpdemux.dll`, `libsharpyuv.dll` | libwebp | BSD-3-Clause |
 | `zlib1.dll` | zlib | zlib |
 | `brotlicommon.dll`, `brotlidec.dll` | Brotli | MIT |
+| `crypto-57.dll` (Windows) | LibreSSL 4.2.1 | ISC, public domain and retained OpenSSL/SSLeay licenses; see `licenses/LibreSSL-4.2.1.txt` |
