@@ -26,6 +26,10 @@ def probe(name, *commands, rid=None, flavor='slim', timeout=TIMEOUT):
 
 
 PROBES = [
+    probe('Verify Windows shared D3D11 frames and bounded lifetimes',
+          'python -I scripts/sdl_runtime.py --out {work}/tools/sdl3',
+          'python -I tests/gpu/run.py --native {native} --sdl {work}/tools/sdl3/SDL3.dll --teardown all',
+          rid='win-x64', flavor='gpu', timeout=1200),
     probe('Exercise typed DOM transport against the packaged native host',
           'python -I tests/generator/native_types.py --native-dir {native}', rid='win-x64'),
     probe('Verify document-scoped CSS support queries',

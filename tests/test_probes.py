@@ -69,6 +69,17 @@ class ProbeRunnerTests(unittest.TestCase):
 
 
 class WorkflowTests(unittest.TestCase):
+    def test_windows_gpu_runs_actual_shared_frame_and_lifetime_acceptance(self):
+        selected = [entry for entry in probes.PROBES if probes.applies(entry, 'win-x64', 'gpu')]
+        frames = [entry for entry in selected if any('tests/gpu/run.py' in command for command in entry['commands'])]
+        self.assertEqual(len(frames), 1)
+        commands = frames[0]['commands']
+        self.assertIn('scripts/sdl_runtime.py', commands[0])
+        self.assertIn('--native ' + probes.NATIVE, commands[1])
+        self.assertIn('--teardown all', commands[1])
+        self.assertFalse(probes.applies(frames[0], 'win-x64', 'slim'))
+        self.assertFalse(probes.applies(frames[0], 'linux-x64', 'gpu'))
+
     def test_the_native_job_runs_its_probes_through_the_runner(self):
         workflow = (ROOT / '.github/workflows/build.yml').read_text()
         native = workflow.split('\n  native:\n', 1)[1].split('\n  managed:\n', 1)[0]

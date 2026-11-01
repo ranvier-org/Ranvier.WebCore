@@ -212,25 +212,30 @@ records `"builder": "local"` in the `source` field of its `manifest.json`; CI's 
 
 `release.py --flavor gpu` builds and checks `Ranvier.WebCore.Native.Gpu.<rid>`; `slim`, `gpu` and `lean`
 retain the same clean-source, remote-commit and immutable-version-tag checks. Creating a release always
-starts the default **slim** tag run. That run validates/publishes the five slim runtimes, managed interop
-and native aggregate; it does not select GPU assets. A GPU release therefore needs a subsequent dispatch
-on the **same immutable tag**, after the slim tag run succeeds:
+starts the default **slim** tag run. After it publishes the five slim runtimes, managed interop and native
+aggregate, the `windows-gpu-cohort` job automatically dispatches Windows x64 GPU on the **same immutable tag**.
+This pairs each new native preview with its Windows GPU runtime. An owner's attached GPU asset is checked
+on a clean runner; otherwise that run builds it. Both paths run the native shared D3D11 frame and lifetime
+acceptance with the SHA-256-pinned SDL package in `scripts/sdl_runtime.py`.
+
+To retry only the GPU cohort of an existing tag, dispatch explicitly:
 
 ```
-gh workflow run build.yml --repo ranvier-org/Ranvier.WebCore --ref v0.1.0-preview.7 --field flavor=gpu --field rids=win-x64
+gh workflow run build.yml --repo ranvier-org/Ranvier.WebCore --ref v<VERSION> --field flavor=gpu --field rids=win-x64
 ```
 
 The dispatch builds or checks the GPU package against that tag's commit, flavor and version and publishes
 `Ranvier.WebCore.Native.Gpu.win-x64` through the existing NuGet OIDC job. The owner's attached-package
-check remains in effect; an asset that does not qualify is rebuilt in CI. Do not overlap the two runs:
-their concurrency group is keyed by the tag, so the later dispatch would cancel a running slim release.
-The managed interop version must remain `0.1.0-preview.7`; choosing the GPU runtime does not change its ABI.
+check remains in effect; an asset that does not qualify is rebuilt in CI. Concurrency is keyed by tag and
+flavor, so a GPU dispatch cannot cancel its slim cohort. Check the GPU run's publication separately:
+a successful slim run establishes only slim availability. The managed interop and GPU runtime must use
+the same version and ABI.
 
 After the GPU version is available from the public v3 feed, run the Views workflow at a ref containing its
 strict GPU lane and the matching backend. This example uses the coordinated preview version:
 
 ```
-gh workflow run ci.yml --repo ranvier-org/Ranvier.View --ref <validated-view-ref> --field gpu_runtime_version=0.1.0-preview.7 --field gpu_runtime_source=https://api.nuget.org/v3/index.json --field gpu_runtime_package=Ranvier.WebCore.Native.Gpu.win-x64
+gh workflow run ci.yml --repo ranvier-org/Ranvier.View --ref <validated-view-ref> --field gpu_runtime_version=<VERSION> --field gpu_runtime_source=https://api.nuget.org/v3/index.json --field gpu_runtime_package=Ranvier.WebCore.Native.Gpu.win-x64
 ```
 
 The `webcore-gpu` lane verifies the exact package identity, version, flavor and staged hashes, then runs
