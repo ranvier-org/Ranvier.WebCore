@@ -36,6 +36,7 @@ class BuildCacheTests(unittest.TestCase):
         self.prefix = self.source / 'JavaScriptCorePrefix.h'
         self.canonical = b'#pragma once\n#define CACHE_TEST 1\n'
         self.prefix.write_bytes(self.canonical)
+        (self.source / '.gitattributes').write_text('* text eol=crlf\n', encoding='ascii')
         self.init_git(self.source)
         self.init_git(self.repository)
         (self.build / 'build.ninja').write_text('# fixture\n', encoding='utf-8')
@@ -80,13 +81,12 @@ class BuildCacheTests(unittest.TestCase):
         self.assertEqual(self.manifest()['trees']['webkit']['JavaScriptCorePrefix.h'][0], old_blob)
 
         self.prefix.write_bytes(self.canonical.replace(b'\n', b'\r\n'))
-        # Simulate a checkout that Git considers clean because its canonical blob is unchanged.
-        # Assume-unchanged makes the index identity authoritative, as it is for clean files in build_cache.
+        # Verify Git's eol filter maps CRLF to the LF index blob, then exercise the clean-index path.
         git(self.source, 'update-index', '--assume-unchanged', 'JavaScriptCorePrefix.h')
         self.assertEqual(git(self.source, 'status', '--porcelain'), '')
         canonical_hash = subprocess.run(
-            ['git', '-C', str(self.source), 'hash-object', '--stdin'],
-            input=self.canonical,
+            ['git', '-C', str(self.source), 'hash-object', '--path=JavaScriptCorePrefix.h', '--stdin'],
+            input=self.canonical.replace(b'\n', b'\r\n'),
             capture_output=True,
             check=True,
         ).stdout.decode().strip()
