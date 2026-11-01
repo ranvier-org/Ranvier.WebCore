@@ -5,6 +5,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 
 
@@ -197,6 +198,95 @@ class BuildCacheTests(unittest.TestCase):
             self.manifest()['trees']['webkit']['JavaScriptCorePrefix.h'][2],
             hashlib.sha256(self.canonical.replace(b'\n', b'\r\n')).hexdigest(),
         )
+
+    def test_build_output_scan_prunes_directory_alias_to_source_tree(self):
+        self.assertEqual(self.run_cache('record').returncode, 0)
+        source_directory_link = self.build / 'source-alias'
+        try:
+            os.symlink(self.source, source_directory_link, target_is_directory=True)
+        except OSError as error:
+            self.skipTest(f'directory symlink creation is unavailable: {error}')
+
+        self.prefix.write_bytes(self.canonical.replace(b'\n', b'\r\n'))
+        git(self.source, 'update-index', '--assume-unchanged', 'JavaScriptCorePrefix.h')
+        self.set_mtime(self.prefix, FRESH_TIME)
+        cached_output = self.build / 'cached-object.obj'
+        cached_output.write_bytes(b'cached object')
+        self.set_mtime(cached_output, OLD_TIME)
+
+        result = self.run_cache('normalise')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertTrue(cached_output.exists())
+        self.assertEqual(int(self.prefix.stat().st_mtime), FRESH_TIME, result.stdout)
+
+    def test_build_output_scan_counts_symlink_to_cached_artifact_target_time(self):
+        self.assertEqual(self.run_cache('record').returncode, 0)
+        artifact = self.root / 'shared-cached-object.obj'
+        artifact.write_bytes(b'old cached object')
+        now_ns = time.time_ns()
+        source_ns = now_ns + 10 * 1_000_000_000
+        artifact_ns = now_ns + 20 * 1_000_000_000
+        os.utime(artifact, ns=(artifact_ns, artifact_ns))
+        artifact_link = self.build / 'object.obj'
+        try:
+            os.symlink(artifact, artifact_link)
+        except OSError as error:
+            self.skipTest(f'file symlink creation is unavailable: {error}')
+
+        manifest_before = (self.build / 'ranvier-sources.json').read_bytes()
+        changed = self.canonical.replace(b'CACHE_TEST 1', b'CACHE_TEST 2')
+        self.prefix.write_bytes(changed)
+        os.utime(self.prefix, ns=(source_ns, source_ns))
+        self.assertLess(artifact_link.lstat().st_mtime_ns, self.prefix.stat().st_mtime_ns)
+        self.assertLess(self.prefix.stat().st_mtime_ns, artifact.stat().st_mtime_ns)
+
+        refused = self.run_cache('normalise')
+        self.assertNotEqual(refused.returncode, 0)
+        self.assertIn('refusing cached PCH reuse', refused.stderr)
+        self.assertEqual((self.build / 'ranvier-sources.json').read_bytes(), manifest_before)
+        self.assertEqual(artifact.read_bytes(), b'old cached object')
+        self.assertTrue(artifact_link.is_symlink())
+
+    def test_build_output_scan_counts_symlink_artifact_own_time(self):
+        self.assertEqual(self.run_cache('record').returncode, 0)
+        artifact = self.root / 'shared-cached-object.obj'
+        artifact.write_bytes(b'old cached object')
+        self.set_mtime(artifact, OLD_TIME)
+        artifact_link = self.build / 'object.obj'
+        try:
+            os.symlink(artifact, artifact_link)
+        except OSError as error:
+            self.skipTest(f'file symlink creation is unavailable: {error}')
+
+        self.prefix.write_bytes(self.canonical.replace(b'CACHE_TEST 1', b'CACHE_TEST 2'))
+        self.set_mtime(self.prefix, FRESH_TIME)
+        self.assertGreater(artifact_link.lstat().st_mtime_ns, self.prefix.stat().st_mtime_ns)
+
+        refused = self.run_cache('normalise')
+        self.assertNotEqual(refused.returncode, 0)
+        self.assertIn('refusing cached PCH reuse', refused.stderr)
+        self.assertEqual(artifact.read_bytes(), b'old cached object')
+
+    def test_build_output_scan_fails_closed_on_external_artifact_directory_link(self):
+        self.assertEqual(self.run_cache('record').returncode, 0)
+        artifact_directory = self.root / 'external-artifacts'
+        artifact_directory.mkdir()
+        (artifact_directory / 'object.obj').write_bytes(b'cached object')
+        artifact_link = self.build / 'external-artifacts'
+        try:
+            os.symlink(artifact_directory, artifact_link, target_is_directory=True)
+        except OSError as error:
+            self.skipTest(f'directory symlink creation is unavailable: {error}')
+
+        manifest_before = (self.build / 'ranvier-sources.json').read_bytes()
+        self.prefix.write_bytes(self.canonical.replace(b'CACHE_TEST 1', b'CACHE_TEST 2'))
+        self.set_mtime(self.prefix, FRESH_TIME)
+
+        refused = self.run_cache('normalise')
+        self.assertNotEqual(refused.returncode, 0)
+        self.assertIn('directory reparse path', refused.stderr)
+        self.assertEqual((self.build / 'ranvier-sources.json').read_bytes(), manifest_before)
+        self.assertTrue((artifact_directory / 'object.obj').exists())
 
     def test_ci_normalise_caller_explicitly_allows_legacy_cache_migration(self):
         workflow = (ROOT / '.github' / 'workflows' / 'build.yml').read_text(encoding='utf-8')

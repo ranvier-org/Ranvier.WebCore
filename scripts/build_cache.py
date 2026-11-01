@@ -34,34 +34,103 @@ def raw_sha256(path):
     return digest.hexdigest()
 
 
-def newest_cached_output_mtime_ns(build):
-    """Newest reusable file timestamp in a build tree, excluding cache/build metadata."""
+class UnsafeBuildTreeReparsePath(RuntimeError):
+    pass
+
+
+def resolved_path_key(path):
+    return os.path.normcase(os.path.normpath(os.path.realpath(os.path.abspath(str(path)))))
+
+
+def path_is_within(path, root):
+    try:
+        return os.path.commonpath((path, root)) == root
+    except ValueError:
+        return False
+
+
+def source_directory_keys(source_files, source_roots):
+    directories = set(source_roots)
+    for source in source_files:
+        for root in source_roots:
+            if not path_is_within(source, root):
+                continue
+            parent = os.path.dirname(source)
+            while path_is_within(parent, root):
+                directories.add(parent)
+                if parent == root:
+                    break
+                parent = os.path.dirname(parent)
+            break
+    return directories
+
+
+def is_reparse_path(info, reparse_flag):
+    return stat.S_ISLNK(info.st_mode) or bool(getattr(info, 'st_file_attributes', 0) & reparse_flag)
+
+
+def newest_cached_output_mtime_ns(build, source_files, source_roots):
+    """Newest reusable file timestamp, excluding metadata and known source aliases."""
     metadata = {MANIFEST, 'build.ninja', '.ninja_log', '.ninja_deps', 'CMakeCache.txt', 'compile_commands.json'}
     newest = None
     if not build.exists():
         return newest
     reparse_flag = getattr(stat, 'FILE_ATTRIBUTE_REPARSE_POINT', 0x400)
+    source_directories = source_directory_keys(source_files, source_roots)
+    build_key = resolved_path_key(build)
+    internal_directory_links = set()
+    scanned_directories = set()
     for directory, directories, names in os.walk(build):
+        scanned_directories.add(resolved_path_key(directory))
         for name in tuple(directories):
             path = pathlib.Path(directory) / name
             try:
                 info = os.lstat(long_path(path))
-            except FileNotFoundError:
-                directories.remove(name)
+            except OSError as error:
+                raise UnsafeBuildTreeReparsePath(f'cannot inspect directory path {path}: {error}') from error
+            if not is_reparse_path(info, reparse_flag):
                 continue
-            if stat.S_ISLNK(info.st_mode) or getattr(info, 'st_file_attributes', 0) & reparse_flag:
-                directories.remove(name)
+            directories.remove(name)
+            try:
+                target_key = resolved_path_key(path)
+                target_info = os.stat(long_path(path))
+            except (OSError, RuntimeError) as error:
+                raise UnsafeBuildTreeReparsePath(f'cannot resolve directory reparse path {path}: {error}') from error
+            if target_key in source_directories:
+                continue
+            if not stat.S_ISDIR(target_info.st_mode):
+                raise UnsafeBuildTreeReparsePath(f'directory reparse path does not resolve to a directory: {path}')
+            if path_is_within(target_key, build_key):
+                internal_directory_links.add(target_key)
+                continue
+            raise UnsafeBuildTreeReparsePath(f'unclassified external directory reparse path {path}')
         for name in names:
             if name in metadata or name == 'CMakeConfigureLog.yaml':
                 continue
+            path = pathlib.Path(directory) / name
             try:
-                info = os.lstat(long_path(pathlib.Path(directory) / name))
-            except FileNotFoundError:
-                continue
-            if stat.S_ISLNK(info.st_mode) or getattr(info, 'st_file_attributes', 0) & reparse_flag:
+                info = os.lstat(long_path(path))
+            except OSError as error:
+                raise UnsafeBuildTreeReparsePath(f'cannot inspect build output path {path}: {error}') from error
+            if is_reparse_path(info, reparse_flag):
+                try:
+                    target_key = resolved_path_key(path)
+                    target_info = os.stat(long_path(path))
+                except (OSError, RuntimeError) as error:
+                    raise UnsafeBuildTreeReparsePath(f'cannot resolve file reparse path {path}: {error}') from error
+                if target_key in source_files:
+                    continue
+                if not stat.S_ISREG(target_info.st_mode):
+                    raise UnsafeBuildTreeReparsePath(f'file reparse path does not resolve to a regular file: {path}')
+                newest = max(newest or 0, info.st_mtime_ns, target_info.st_mtime_ns)
                 continue
             if stat.S_ISREG(info.st_mode) and (newest is None or info.st_mtime_ns > newest):
                 newest = info.st_mtime_ns
+    unscanned_internal_links = internal_directory_links - scanned_directories
+    if unscanned_internal_links:
+        raise UnsafeBuildTreeReparsePath(
+            f'internal artifact directory reparse path was not covered by regular build traversal: '
+            f'{sorted(unscanned_internal_links)[0]}')
     return newest
 
 
@@ -130,8 +199,6 @@ def normalise(args):
     # refuse atomically; otherwise earlier unchanged files could already have been normalized before the refusal.
     scanned = {}
     unsafe_raw_changes = []
-    newest_output_ns = None
-    output_mtime_scanned = False
     for name, tree in trees.items():
         ids, hashed = blob_ids(tree)
         old = (cached or {}).get('trees', {}).get(name, {})
@@ -154,24 +221,41 @@ def normalise(args):
                     previous_seconds = int(previous[1])
                 except (IndexError, TypeError, ValueError):
                     previous_seconds = 'unknown'
-                if not output_mtime_scanned:
-                    newest_output_ns = newest_cached_output_mtime_ns(build)
-                    output_mtime_scanned = True
-                if newest_output_ns is not None and info.st_mtime_ns <= newest_output_ns:
-                    unsafe_raw_changes.append((name, path, previous_seconds, seconds, newest_output_ns))
+                unsafe_raw_changes.append((name, path, previous_seconds, seconds, info.st_mtime_ns))
             files[path] = (oid, info, seconds, raw_hash)
         scanned[name] = (tree, ids, hashed, old, files)
     if unsafe_raw_changes:
-        name, path, cached_seconds, current_seconds, newest_output_ns = unsafe_raw_changes[0]
-        reason = (f'build_cache: raw bytes changed but the source timestamp is not newer than cached output '
-                  f'{name}/{path} (cached-source={cached_seconds}, current={current_seconds}, '
-                  f'newest-output-ns={newest_output_ns}); refusing cached PCH reuse')
-        if not args.clear_unknown:
-            sys.exit(reason + '; rerun with --clear-unknown to discard the build tree explicitly')
-        print(reason + '; --clear-unknown was given, so the build tree is cleared', flush=True)
-        if build.exists():
-            clear(build)
-        cached = None
+        source_files = set()
+        source_roots = set()
+        for tree, _, _, _, files in scanned.values():
+            root_key = resolved_path_key(tree)
+            source_roots.add(root_key)
+            source_files.update(os.path.normcase(os.path.normpath(os.path.join(root_key, *path.split('/'))))
+                                for path in files)
+        try:
+            newest_output_ns = newest_cached_output_mtime_ns(build, source_files, source_roots)
+            unsafe_path_reason = None
+        except UnsafeBuildTreeReparsePath as error:
+            newest_output_ns = None
+            unsafe_path_reason = f'build_cache: unsafe build-tree link: {error}; refusing cached PCH reuse'
+        unsafe_change = next((change for change in unsafe_raw_changes
+                              if newest_output_ns is not None and change[4] <= newest_output_ns), None)
+        if unsafe_path_reason:
+            reason = unsafe_path_reason
+        elif unsafe_change is not None:
+            name, path, cached_seconds, current_seconds, _ = unsafe_change
+            reason = (f'build_cache: raw bytes changed but the source timestamp is not newer than cached output '
+                      f'{name}/{path} (cached-source={cached_seconds}, current={current_seconds}, '
+                      f'newest-output-ns={newest_output_ns}); refusing cached PCH reuse')
+        else:
+            reason = None
+        if reason is not None:
+            if not args.clear_unknown:
+                sys.exit(reason + '; rerun with --clear-unknown to discard the build tree explicitly')
+            print(reason + '; --clear-unknown was given, so the build tree is cleared', flush=True)
+            if build.exists():
+                clear(build)
+            cached = None
     written = {'format': FORMAT, 'trees': {}}
     for name, (tree, ids, hashed, old, files) in scanned.items():
         old = (cached or {}).get('trees', {}).get(name, {})
