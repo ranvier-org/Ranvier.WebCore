@@ -3,6 +3,7 @@
 import argparse
 import ctypes
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -21,10 +22,6 @@ class Span(ctypes.Structure):
 
 class Strings(ctypes.Structure):
     _fields_ = [('present', I), ('count', I), ('items', ctypes.POINTER(Span))]
-
-
-class StringValues(ctypes.Structure):
-    _fields_ = [('count', I), ('items', ctypes.POINTER(Span))]
 
 
 class Options(ctypes.Structure):
@@ -61,6 +58,18 @@ def run(directory, slim):
         callback = n.bind('rv_view_transition_update_callback_create', P, [P, UPDATE, P, RELEASE])(page.host, update, None, release)
         n.expect(bool(callback), 'update callback created')
         options = Options(ctypes.sizeof(Options), callback, None)
+        n.expect(start(None, None, ctypes.byref(result)) == -1, 'start rejects a null document')
+        wrong_thread = []
+        worker = threading.Thread(target=lambda: wrong_thread.append(start(page.document, None, ctypes.byref(P()))))
+        worker.start()
+        worker.join()
+        n.expect(wrong_thread == [-2], 'start requires the owning thread')
+        foreign = Case(n, '<div>foreign host</div>')
+        foreign_tick = UPDATE(lambda _: 0)
+        foreign_callback = n.bind('rv_view_transition_update_callback_create', P, [P, UPDATE, P, P])(foreign.host, foreign_tick, None, None)
+        foreign_options = Options(ctypes.sizeof(Options), foreign_callback, None)
+        n.expect(start(page.document, ctypes.byref(foreign_options), ctypes.byref(result)) == -12, 'update callback belongs to its creating document')
+        n.bind('rv_dom_view_transition_update_callback_release', None, [P])(foreign_callback)
         n.expect(start(page.document, ctypes.byref(options), ctypes.byref(result)) == OK and result.value, 'transition started')
         n.expect(not log, 'update is deferred from start')
         active = n.handle('rv_dom_document_get_active_view_transition', [P], page.document)
@@ -71,14 +80,16 @@ def run(directory, slim):
         for name in [b'slide', b'fade', b'slide']:
             n.ok('rv_dom_view_transition_type_set_add', [P, P, I], type_set, name, len(name))
         n.expect(n.integer('rv_dom_view_transition_type_set_size', type_set, ctypes.c_uint32) == 2, 'types deduplicate')
-        snapshot = StringValues()
-        n.ok('rv_dom_view_transition_type_set_values', [P, ctypes.POINTER(StringValues)], type_set, ctypes.byref(snapshot))
+        snapshot = Strings()
+        n.ok('rv_dom_view_transition_type_set_values', [P, ctypes.POINTER(Strings)], type_set, ctypes.byref(snapshot))
         n.ok('rv_dom_view_transition_type_set_clear', [P], type_set)
         n.expect([ctypes.string_at(snapshot.items[i].data, snapshot.items[i].length).decode() for i in range(snapshot.count)] == ['slide', 'fade'], 'type snapshot retains insertion order after clear')
-        n.bind('rv_dom_sequence_dom_string_release', None, [ctypes.POINTER(StringValues)])(ctypes.byref(snapshot))
+        n.bind('rv_dom_sequence_dom_string_release', None, [ctypes.POINTER(Strings)])(ctypes.byref(snapshot))
         n.bind('rv_dom_view_transition_type_set_release', None, [P])(type_set)
         settled = SETTLED(lambda _, kind, error: log.append((kind, error.decode() if error else None)))
         observer = P()
+        n.expect(n.call('rv_view_transition_observe', [P, P, SETTLED, P, ctypes.POINTER(P)], foreign.host, result, settled, None, ctypes.byref(observer)) == -12, 'observation requires the transition document')
+        foreign.close()
         n.ok('rv_view_transition_observe', [P, P, SETTLED, P, ctypes.POINTER(P)], page.host, result, settled, None, ctypes.byref(observer))
         deadline = time.monotonic() + 5
         while len(log) < 4 and time.monotonic() < deadline:
