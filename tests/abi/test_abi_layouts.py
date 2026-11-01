@@ -1,6 +1,8 @@
 import importlib.util
 from pathlib import Path
+import subprocess
 import unittest
+from unittest.mock import patch
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -30,6 +32,30 @@ class AbiLayoutTests(unittest.TestCase):
         actual['RvImageDataLayout'][1][-1] += 8
         with self.assertRaisesRegex(AssertionError, 'RvImageDataLayout compiler offsets'):
             abi_layouts.check_native_layouts(actual)
+
+    def test_msvc_probe_intermediates_are_confined_to_temporary_directory(self):
+        expected_output = '\n'.join(
+            f'{name}|{size}|{",".join(str(offset) for offset in offsets)}'
+            for name, (_, size, offsets, _) in abi_layouts.LAYOUTS.items()
+        ) + '\n'
+        caller = Path.cwd()
+
+        def run(command, **kwargs):
+            working = Path(kwargs['cwd'])
+            self.assertNotEqual(working, caller)
+            if command[0].endswith('cl.exe'):
+                (working / 'abi_layout_probe.obj').write_bytes(b'probe object')
+                return subprocess.CompletedProcess(command, 0, '', '')
+            return subprocess.CompletedProcess(command, 0, expected_output, '')
+
+        with (
+            patch.object(abi_layouts.shutil, 'which', side_effect=lambda name: 'C:/tools/cl.exe' if name == 'cl' else None),
+            patch.object(abi_layouts.subprocess, 'run', side_effect=run),
+        ):
+            actual = abi_layouts.run_native_probe()
+
+        self.assertEqual(actual['RvImageDataLayout'], (40, [0, 4, 8, 12, 16, 20, 24, 32]))
+        self.assertFalse((caller / 'abi_layout_probe.obj').exists())
 
 
 if __name__ == '__main__':

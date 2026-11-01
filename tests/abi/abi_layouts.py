@@ -115,10 +115,10 @@ def run_native_probe():
         else:
             command = [compiler, '-std=c11', '-I', str(ROOT / 'host'), str(source), '-o', str(executable)]
         compile_result = subprocess.run(
-            command, capture_output=True, text=True, check=False, env=environment,
+            command, capture_output=True, text=True, check=False, env=environment, cwd=directory,
         )
         assert compile_result.returncode == 0, 'native ABI probe compile failed:\n' + compile_result.stderr
-        run_result = subprocess.run([str(executable)], capture_output=True, text=True, check=False)
+        run_result = subprocess.run([str(executable)], capture_output=True, text=True, check=False, cwd=directory)
         assert run_result.returncode == 0, 'native ABI probe failed:\n' + run_result.stderr
         return parse_native_layouts(run_result.stdout)
 
