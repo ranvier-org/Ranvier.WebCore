@@ -144,6 +144,11 @@ PROBES = [
           'python -I -X utf8 tests/abi/web_animation_effects.py --native-directory {native}'),
     probe('Verify Web Animations creation against the Chromium oracle',
           'python -I -X utf8 tests/abi/web_animations.py --native-directory {native}'),
+    *[probe('Verify default compositor root reattachment',
+            'python -I -X utf8 tests/gpu/compositor_reattach.py --native-directory {native}',
+            rid=rid, flavor='gpu',
+            env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'} if rid.startswith('linux-') else {})
+      for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],
     probe('Verify the Web Animations lifecycle and promises against the Chromium oracle',
           'python -I -X utf8 tests/abi/animation_lifecycle.py --native-directory {native}'),
     probe('Verify typed animation and transition events against the Chromium oracle',

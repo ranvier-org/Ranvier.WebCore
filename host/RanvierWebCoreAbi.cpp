@@ -739,8 +739,7 @@ struct RvCompositor final : GraphicsLayerClient {
     GLContext* context { nullptr };
     std::unique_ptr<TextureMapper> textureMapper;
     RefPtr<GraphicsLayer> root;
-    // The compositor's root layer, a child of root; and the view root paints, during composite.
-    GraphicsLayer* attached { nullptr };
+    // The view root paints during composite.
     LocalFrameView* view { nullptr };
     IntSize size;
     GLuint texture { 0 };
@@ -2491,10 +2490,9 @@ static int32_t composite(RvCompositor& compositor, LocalFrameView& view, uint8_t
         return RV_ERR_PAINT_FAILED;
     while (frameRoot->parent() && frameRoot->parent() != compositor.root.get())
         frameRoot = frameRoot->parent();
-    if (compositor.attached != frameRoot.get()) {
+    if (frameRoot->parent() != compositor.root.get()) {
         compositor.root->removeAllChildren();
         compositor.root->addChild(*frameRoot);
-        compositor.attached = frameRoot.get();
     }
     // The content under the layers is repainted whole each frame.
     compositor.view = &view;
