@@ -6,6 +6,7 @@ import threading
 
 parser = argparse.ArgumentParser()
 parser.add_argument("runtime")
+parser.add_argument("--context-lifecycle", action="store_true")
 args = parser.parse_args()
 runtime = C.CDLL(args.runtime)
 assert hasattr(runtime, "rv_configure_egl_display"), "Linux EGL display configuration is missing"
@@ -58,9 +59,43 @@ host = create(80, 60)
 assert host
 assert configure(display) == -9, "display selection is frozen once a host exists"
 assert mode(host, 1) == 0, "strict compositor must be supported"
-html = b"<style>html,body{margin:0;background:rgb(17,34,51)}div{width:30px;height:20px;background:rgb(221,17,34);transform:translate3d(7px,9px,0)}</style><div></div>"
+if args.context_lifecycle:
+    assert make_current(display, None, None, context)
+    sentinels = (uint * 64)()
+    gen_texture(64, sentinels)
+    for name in sentinels:
+        bind_texture(0x0DE1, name)
+    is_texture = bind(gl, "glIsTexture", C.c_ubyte, uint)
+    assert all(is_texture(name) for name in sentinels)
+    assert mode(host, 0) == 0
+    assert make_current(display, None, None, context)
+    alive = sum(bool(is_texture(name)) for name in sentinels)
+    assert alive == len(sentinels), f"native compositor disable deleted {len(sentinels)-alive} consumer texture(s)"
+    assert mode(host, 1) == 0
+    assert make_current(display, None, None, context)
+    replacement = b"<p>replacement document</p>"
+    assert load(host, replacement, len(replacement)) == 0
+    assert make_current(display, None, None, context)
+    assert all(is_texture(name) for name in sentinels), "HTML replacement deleted consumer textures"
+    assert mode(host, 1) == 0
+    assert make_current(display, None, None, context)
+    destroy(host)
+    assert make_current(display, None, None, context)
+    assert all(is_texture(name) for name in sentinels), "host destruction deleted consumer textures"
+    print(json.dumps({"result": "PASS", "consumer_textures_preserved": alive, "html_replacement": True, "host_destroy": True}))
+    raise SystemExit(0)
+html = b"<style>html,body{margin:0;background:rgb(17,34,51)}div{width:30px;height:20px;background:rgb(221,17,34);transform:translate3d(7px,9px,0)}</style><div id=box></div>"
 assert load(host, html, len(html)) == 0
 assert update(host) == 0
+element = bind(runtime, "rv_document_get_element_by_id", ptr, ptr, C.c_char_p, integer)(host, b"box", 3)
+style_buffer, style_length = C.create_string_buffer(128), integer()
+assert bind(runtime, "rv_element_computed_style", integer, ptr, C.c_char_p, ptr, integer, C.POINTER(integer))(
+    element, b"transform", style_buffer, 128, C.byref(style_length)) == 0
+rect = [C.c_double() for _ in range(4)]
+assert bind(runtime, "rv_element_rect", integer, ptr, *([C.POINTER(C.c_double)] * 4))(
+    element, *[C.byref(value) for value in rect]) == 0
+print(json.dumps({"transform": style_buffer.value.decode(), "rect": [value.value for value in rect]}), flush=True)
+bind(runtime, "rv_node_release", None, ptr)(element)
 assert make_current(display, None, None, context)
 frame = ptr()
 assert acquire(None, C.byref(frame)) == -1 and not frame
@@ -103,6 +138,15 @@ bind_fbo(0x8D40, framebuffer)
 attach(0x8D40, 0x8CE0, 0x0DE1, texture, 0)
 assert bind(gl, "glCheckFramebufferStatus", uint, uint)(0x8D40) == 0x8CD5
 pixel = (C.c_ubyte * 4)()
+pixels = (C.c_ubyte * (width.value * height.value * 4))()
+read(0, 0, width.value, height.value, 0x1908, 0x1401, pixels)
+red_points = [(index % width.value, index // width.value) for index in range(width.value * height.value)
+              if list(pixels[index * 4:index * 4 + 4]) == [221, 17, 34, 255]]
+print(json.dumps({"red_bounds": [min(x for x, y in red_points), min(y for x, y in red_points),
+                                 max(x for x, y in red_points), max(y for x, y in red_points)] if red_points else [],
+                  "top_left": list(pixels[:4])}), flush=True)
+assert [min(x for x, y in red_points), min(y for x, y in red_points),
+        max(x for x, y in red_points), max(y for x, y in red_points)] == [7, 9, 36, 28]
 read(0, 0, 1, 1, 0x1908, 0x1401, pixel)
 assert list(pixel) == [17, 34, 51, 255], list(pixel)
 read(10, 12, 1, 1, 0x1908, 0x1401, pixel)

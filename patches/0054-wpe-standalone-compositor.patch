@@ -17,6 +17,23 @@ index ee4bc92..d6d4fab 100644
  
 -#endif // USE(COORDINATED_GRAPHICS)
 +#endif // USE(COORDINATED_GRAPHICS) || (PLATFORM(WPE) && USE(GRAPHICS_LAYER_TEXTURE_MAPPER))
+diff --git a/Source/WebCore/platform/graphics/egl/GLContext.cpp b/Source/WebCore/platform/graphics/egl/GLContext.cpp
+index 8ca8424..d1f4f9a 100644
+--- a/Source/WebCore/platform/graphics/egl/GLContext.cpp
++++ b/Source/WebCore/platform/graphics/egl/GLContext.cpp
+@@ -523,7 +523,11 @@ unsigned GLContext::glVersion() const
+ 
+ bool GLContext::makeContextCurrent()
+ {
+-    if (isCurrent())
++    if (isCurrent()
++#if PLATFORM(WPE) && USE(GRAPHICS_LAYER_TEXTURE_MAPPER)
++        && eglGetCurrentContext() == m_context
++#endif
++    )
+         return true;
+ 
+     // ANGLE doesn't know anything about non-ANGLE contexts, and does
 diff --git a/Source/WebCore/platform/graphics/texmap/TextureMapperGCGLPlatformLayer.cpp b/Source/WebCore/platform/graphics/texmap/TextureMapperGCGLPlatformLayer.cpp
 index c3684ad..fa01133 100644
 --- a/Source/WebCore/platform/graphics/texmap/TextureMapperGCGLPlatformLayer.cpp
