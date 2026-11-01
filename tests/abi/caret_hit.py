@@ -3,13 +3,15 @@ tests/fixtures/caret-hit-oracle.json through Document.caretPositionFromPoint (wi
 CaretPositionFromPointOptions.shadowRoots) and Document.caretRangeFromPoint at device scales 1, 1.5 and 2, unscrolled
 and scrolled, then checks errors, a CaretPosition held past text changes, removal and rv_host_destroy, and a document
 without a render tree. Each scroll is checked against the oracle case whose actual offset equals the runtime's.
-Differences from Chromium must equal tests/fixtures/caret-hit-qualified.json exactly."""
+Differences from Chromium must equal the platform's qualified file exactly: tests/fixtures/caret-hit-qualified.json on
+Windows, caret-hit-qualified.<system>-<arch>.json or caret-hit-qualified.<system>.json elsewhere (see qualified_file)."""
 
 import argparse
 import ctypes
 import json
 import math
 from pathlib import Path
+import platform
 import sys
 import threading
 
@@ -212,9 +214,22 @@ def rounded(value):
     return value
 
 
+def qualified_file():
+    """The qualified differences for the running platform: the most specific of <system>-<arch> and <system>, where
+    system is darwin or linux and arch is x64 or arm64. Every Windows architecture shares caret-hit-qualified.json."""
+    if sys.platform == 'win32':
+        return FIXTURES / 'caret-hit-qualified.json'
+    system = 'darwin' if sys.platform == 'darwin' else 'linux'
+    arch = {'x86_64': 'x64', 'amd64': 'x64', 'aarch64': 'arm64', 'arm64': 'arm64'}.get(platform.machine().lower(), platform.machine().lower())
+    for name in [f'caret-hit-qualified.{system}-{arch}.json', f'caret-hit-qualified.{system}.json']:
+        if (FIXTURES / name).exists():
+            return FIXTURES / name
+    raise AssertionError(f'no qualified caret differences for {system}-{arch}')
+
+
 def run(native_directory, webkit_source, measure=None):
     oracle = json.loads((FIXTURES / 'caret-hit-oracle.json').read_text())
-    qualified = json.loads((FIXTURES / 'caret-hit-qualified.json').read_text()) if measure is None else {'differences': []}
+    qualified = json.loads(qualified_file().read_text()) if measure is None else {'differences': []}
     differences, checked, assertions = [], 0, 0
     for scale in oracle['scales']:
         with SvgProbe(native_directory, 320, 240) as p:

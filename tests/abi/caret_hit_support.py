@@ -52,10 +52,12 @@ class CaretPage:
             root = p.object('rv_dom_element_attach_shadow', [P, ctypes.POINTER(ShadowRootInit)], [p.node(host), ctypes.byref(init)], 'node')
             p.call('rv_dom_shadow_root_set_inner_html', [P, Utf8], root, markup)
             self.roots['open' if mode == 2 else 'closed'] = root
+        # #bidi holds eight upright Ahem glyphs: 160px once the font applies. #inline's <b> run is wider on
+        # CoreText, whose synthetic bold adds size / 36 to each advance.
         deadline = time.monotonic() + 10
-        while self.width('inline') != 160:
+        while self.width('bidi') != 160:
             if time.monotonic() > deadline:
-                raise AssertionError('pinned Ahem was not applied: inline width ' + str(self.width('inline')))
+                raise AssertionError('pinned Ahem was not applied: bidi width ' + str(self.width('bidi')))
             self.cycle(10)
             p.update()
         p.update()

@@ -75,7 +75,7 @@ class Native:
     def __init__(self, directory):
         directory = Path(directory).resolve()
         self.search = os.add_dll_directory(str(directory)) if sys.platform == 'win32' else None
-        self.library = ctypes.CDLL(str(directory / 'RanvierWebCoreHost.dll'))
+        self.library = ctypes.CDLL(str(directory / {'win32': 'RanvierWebCoreHost.dll', 'darwin': 'libRanvierWebCoreHost.dylib'}.get(sys.platform, 'libRanvierWebCoreHost.so')))
         self.assertions = 0
 
     def bind(self, name, result, arguments):

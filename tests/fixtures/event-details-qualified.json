@@ -174,7 +174,133 @@
           "button": 0
         }
       ],
-      "reason": "WebKit does not focus a <button> on a mouse press (HTMLFormControlElement::isMouseFocusable is false off GTK/WPE), so no focus/focusin; WebKit's click PointerEvent reads isPrimary true where Chromium reads false"
+      "reason": "WebKit does not focus a <button> on a mouse press (HTMLFormControlElement::isMouseFocusable is false off GTK/WPE), so no focus/focusin; WebKit's click PointerEvent reads isPrimary true where Chromium reads false",
+      "platforms": [
+        "windows",
+        "darwin"
+      ]
+    },
+    {
+      "scope": "click events",
+      "field": "sequence",
+      "chromium": [
+        {
+          "type": "pointerdown",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "button",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "mousedown",
+          "interface": "MouseEvent",
+          "trusted": true,
+          "target": "button",
+          "button": 0,
+          "detail": 1
+        },
+        {
+          "type": "focus",
+          "interface": "FocusEvent",
+          "trusted": true,
+          "target": "button"
+        },
+        {
+          "type": "focusin",
+          "interface": "FocusEvent",
+          "trusted": true,
+          "target": "button"
+        },
+        {
+          "type": "pointerup",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "button",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "mouseup",
+          "interface": "MouseEvent",
+          "trusted": true,
+          "target": "button",
+          "button": 0,
+          "detail": 1
+        },
+        {
+          "type": "click",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "button",
+          "pointerType": "mouse",
+          "isPrimary": false,
+          "button": 0
+        }
+      ],
+      "native": [
+        {
+          "type": "pointerdown",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "button",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "mousedown",
+          "interface": "MouseEvent",
+          "trusted": true,
+          "target": "button",
+          "button": 0,
+          "detail": 1
+        },
+        {
+          "type": "focus",
+          "interface": "FocusEvent",
+          "trusted": true,
+          "target": "button"
+        },
+        {
+          "type": "focusin",
+          "interface": "FocusEvent",
+          "trusted": true,
+          "target": "button"
+        },
+        {
+          "type": "pointerup",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "button",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        },
+        {
+          "type": "mouseup",
+          "interface": "MouseEvent",
+          "trusted": true,
+          "target": "button",
+          "button": 0,
+          "detail": 1
+        },
+        {
+          "type": "click",
+          "interface": "PointerEvent",
+          "trusted": true,
+          "target": "button",
+          "pointerType": "mouse",
+          "isPrimary": true,
+          "button": 0
+        }
+      ],
+      "reason": "WPE (the Linux port) focuses a <button> on a mouse press as Chromium does (HTMLFormControlElement::isMouseFocusable defers to HTMLElement under GTK/WPE); WebKit's click PointerEvent reads isPrimary true where Chromium reads false",
+      "platforms": [
+        "linux"
+      ]
     },
     {
       "scope": "type events",

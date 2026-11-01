@@ -1,6 +1,7 @@
 """Native39/ABI51 I08 event detail probe against an actual runtime directory: the constructors and getters of the event
 detail interfaces, rv_dom_event_get_interface_name, engine-dispatched payloads and teardown, compared with the Chromium
-oracle tests/fixtures/event-details-oracle.json. Every difference must be listed in tests/fixtures/event-details-qualified.json."""
+oracle tests/fixtures/event-details-oracle.json. Every difference must be listed in tests/fixtures/event-details-qualified.json;
+a qualification with "platforms" applies only on those systems (windows, darwin, linux)."""
 import argparse
 import ctypes
 import hashlib
@@ -475,7 +476,9 @@ def verify(directory, oracle_path, qualified_path, evidence):
     # Every difference is qualified, and every qualification is still measured.
     canonical = lambda item: json.dumps(item, sort_keys=True)
     measured = sorted(map(canonical, differences))
-    listed = sorted(canonical({k: v for k, v in item.items() if k != 'reason'}) for item in qualified['differences'])
+    system = {'win32': 'windows', 'darwin': 'darwin'}.get(sys.platform, 'linux')
+    applicable = [item for item in qualified['differences'] if system in item.get('platforms', [system])]
+    listed = sorted(canonical({k: v for k, v in item.items() if k not in ('reason', 'platforms')}) for item in applicable)
     unexpected = sorted(set(measured) - set(listed))
     stale = sorted(set(listed) - set(measured))
     expect(all(item.get('reason') for item in qualified['differences']), 'each qualification has a reason')
