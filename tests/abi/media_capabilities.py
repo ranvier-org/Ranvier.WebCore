@@ -161,7 +161,13 @@ def verify(native_directory):
                     expect(info(token, *map(ctypes.byref, values)) == OK, case['name'] + ': info')
                     answer = [v.value for v in values]
                     expect(all(v in (0, 1) for v in answer), case['name'] + ': boolean answer')
-                    if not provider:
+                    if not provider and case['type'] == 'webrtc' and sys.platform == 'darwin':
+                        # macOS builds WebRTC in (config/mac.cmake), so MediaCapabilities answers webrtc queries
+                        # from the engine's WebRTCProvider and libwebrtc's codec list, not from the host provider.
+                        # VP8 is in that list; no capability override is registered, so smooth and powerEfficient
+                        # stay false.
+                        expect(answer == [1, 0, 0], case['name'] + ': answered by the engine WebRTC provider ' + str(answer))
+                    elif not provider:
                         expect(answer == [0, 0, 0], case['name'] + ': unsupported without a provider ' + str(answer))
                     row.update(supported=answer[0], smooth=answer[1], powerEfficient=answer[2])
                     expect(release(token) == OK, case['name'] + ': release')
