@@ -513,7 +513,11 @@ int32_t ranvier_crypto_hmac_key_info(RanvierCryptoKeyHandle handle, RanvierCrypt
     auto* hmac = dynamicDowncast<CryptoKeyHMAC>(*key);
     if (!hmac)
         return RV_ERR_WRONG_INTERFACE;
-    *info = { sizeof(*info), key->extractable(), hmac->key().size() * 8,
+    auto metadata = key->algorithm();
+    auto* algorithm = std::get_if<CryptoHmacKeyAlgorithm>(&metadata);
+    if (!algorithm)
+        return RV_ERR_WRONG_INTERFACE;
+    *info = { sizeof(*info), key->extractable(), algorithm->length,
         key->allows(CryptoKeyUsageSign), key->allows(CryptoKeyUsageVerify) };
     return RV_OK;
 }
