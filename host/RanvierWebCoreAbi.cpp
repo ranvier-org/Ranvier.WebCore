@@ -205,6 +205,9 @@
 #include <wtf/MainThread.h>
 #include <wtf/ProcessID.h>
 #include <wtf/RunLoop.h>
+#if USE(GLIB)
+#include <glib.h>
+#endif
 #if PLATFORM(COCOA)
 #include <CoreFoundation/CoreFoundation.h>
 #include <WebCore/MainThreadSharedTimer.h>
@@ -3476,6 +3479,21 @@ static void cycleCocoaRunLoop()
     if (CFRunLoopGetNextTimerFireDate(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode) <= CFAbsoluteTimeGetCurrent())
         MainThreadSharedTimer::restartSharedTimer();
 }
+#elif USE(GLIB)
+// The GLib analogue of cycleCocoaRunLoop: a GLib iteration dispatches only the highest-priority band of ready sources
+// (RunLoop work at 0, the WebCore shared timer at 10 on WPE). Non-blocking passes continue while a source is due.
+static void cycleGLibRunLoop()
+{
+    constexpr int maximumSourcePasses = 64;
+    GMainContext* context = g_main_context_get_thread_default();
+    if (!context)
+        context = g_main_context_default();
+    for (int pass = 0; pass < maximumSourcePasses; ++pass) {
+        RunLoop::cycle();
+        if (!g_main_context_pending(context))
+            break;
+    }
+}
 #endif
 
 int32_t rv_run_loop_cycle(int32_t milliseconds)
@@ -3489,6 +3507,8 @@ int32_t rv_run_loop_cycle(int32_t milliseconds)
     do {
 #if PLATFORM(COCOA)
         cycleCocoaRunLoop();
+#elif USE(GLIB)
+        cycleGLibRunLoop();
 #else
         RunLoop::cycle();
 #endif
