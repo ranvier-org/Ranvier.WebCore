@@ -1,0 +1,56 @@
+diff --git a/Source/WebCore/crypto/algorithms/CryptoAlgorithmECDH.cpp b/Source/WebCore/crypto/algorithms/CryptoAlgorithmECDH.cpp
+--- a/Source/WebCore/crypto/algorithms/CryptoAlgorithmECDH.cpp
++++ b/Source/WebCore/crypto/algorithms/CryptoAlgorithmECDH.cpp
+@@ -111,6 +111,8 @@
+             return;
+         }
+         (*derivedKey).shrink(lengthInBytes);
++        if (*length % 8)
++            derivedKey->last() &= static_cast<uint8_t>(0xff << (8 - *length % 8));
+         callback(WTF::move(*derivedKey));
+     };
+     // This is a special case that can't use dispatchOperation() because it bundles
+diff --git a/Source/WebCore/crypto/algorithms/CryptoAlgorithmX25519.cpp b/Source/WebCore/crypto/algorithms/CryptoAlgorithmX25519.cpp
+--- a/Source/WebCore/crypto/algorithms/CryptoAlgorithmX25519.cpp
++++ b/Source/WebCore/crypto/algorithms/CryptoAlgorithmX25519.cpp
+@@ -88,21 +88,9 @@
+         return;
+     }
+ 
+-    // Return an empty string doesn't make much sense, but truncating either at all.
+-    // https://github.com/WICG/webcrypto-secure-curves/pull/29
+-    if (length && !(*length)) {
+-        // Avoid executing the key-derivation, since we are going to return an empty string.
+-        callback({ });
+-        return;
+-    }
+-
+     auto unifiedCallback = [callback = WTF::move(callback), exceptionCallback = WTF::move(exceptionCallback)](std::optional<Vector<uint8_t>>&& derivedKey, std::optional<size_t> length) mutable {
+         if (!derivedKey) {
+             exceptionCallback(ExceptionCode::OperationError);
+-            return;
+-        }
+-        if (!length) {
+-            callback(WTF::move(*derivedKey));
+             return;
+         }
+ #if !HAVE(X25519_ZERO_CHECKS)
+@@ -114,12 +102,18 @@
+             return;
+         }
+ #endif
++        if (!length) {
++            callback(WTF::move(*derivedKey));
++            return;
++        }
+         auto lengthInBytes = std::ceil(*length / 8.);
+         if (lengthInBytes > (*derivedKey).size()) {
+             exceptionCallback(ExceptionCode::OperationError);
+             return;
+         }
+         (*derivedKey).shrink(lengthInBytes);
++        if (*length % 8)
++            derivedKey->last() &= static_cast<uint8_t>(0xff << (8 - *length % 8));
+         callback(WTF::move(*derivedKey));
+     };
+     // This is a special case that can't use dispatchOperation() because it bundles
