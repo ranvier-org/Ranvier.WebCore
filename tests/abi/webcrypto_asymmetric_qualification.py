@@ -11,6 +11,7 @@ import traceback
 
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from form_collections import Native, Case, P, I
+from utf8_inputs import bind as bind_utf8
 
 FIELDS=['kty','crv','x','y','d','n','e','p','q','dp','dq','qi','alg','use']
 ALGORITHMS={'RS256':1,'PSS':2,'OAEP':3,'ECDSA':4,'ECDH':5}
@@ -37,15 +38,16 @@ def copied(value):
     return C.string_at(value.data,value.length)
 
 class Backend:
-    def __init__(self,directory):
+    def __init__(self,directory,bridge_library=None):
         self.n=Native(directory)
-        self.start=self.n.bind('ranvier_test_asymmetric_start',P,[P,P,CALLBACK,P])
-        self.barrier=self.n.bind('ranvier_test_asymmetric_barrier',I,[P])
-        self.release=self.n.bind('ranvier_test_asymmetric_release',I,[P])
-        self.release_key=self.n.bind('ranvier_test_asymmetric_key_release',I,[P])
-        self.echo=self.n.bind('ranvier_test_asymmetric_input',I,[P,I,C.POINTER(Bytes)])
-        assert self.n.bind('ranvier_test_asymmetric_request_size',I,[])()==C.sizeof(Request)
-        assert self.n.bind('ranvier_test_asymmetric_result_size',I,[])()==C.sizeof(Result)
+        self.library=C.CDLL(bridge_library) if bridge_library else self.n.library
+        self.start=bind_utf8(self.library,'ranvier_test_asymmetric_start',P,[P,P,CALLBACK,P])
+        self.barrier=bind_utf8(self.library,'ranvier_test_asymmetric_barrier',I,[P])
+        self.release=bind_utf8(self.library,'ranvier_test_asymmetric_release',I,[P])
+        self.release_key=bind_utf8(self.library,'ranvier_test_asymmetric_key_release',I,[P])
+        self.echo=bind_utf8(self.library,'ranvier_test_asymmetric_input',I,[P,I,C.POINTER(Bytes)])
+        assert bind_utf8(self.library,'ranvier_test_asymmetric_request_size',I,[])()==C.sizeof(Request)
+        assert bind_utf8(self.library,'ranvier_test_asymmetric_result_size',I,[])()==C.sizeof(Result)
         self.page=Case(self.n,'<p>script-free asymmetric backend qualification</p>')
         self.records,self.keys,self.callbacks=[],[],[]
         self.check_script_guard()
@@ -134,8 +136,8 @@ def validate_fixture(path):
     assert fixture['vectors'][2]['initiator']['d'].startswith('00')
     return fixture
 
-def verify(directory,jws_path,ecdh_path):
-    backend=Backend(directory)
+def verify(directory,jws_path,ecdh_path,bridge_library=None):
+    backend=Backend(directory,bridge_library)
     failures=[]
     def check(condition,label,detail):
         if not condition: failures.append(dict(label=label,detail=detail))
@@ -295,6 +297,7 @@ if __name__=='__main__':
     if sys.platform=='linux': C.CDLL(None).prctl(4,0)
     parser=argparse.ArgumentParser()
     parser.add_argument('--native-directory')
+    parser.add_argument('--bridge-library')
     parser.add_argument('--jws-fixture',type=Path,default=Path(__file__).resolve().parents[1]/'fixtures/crypto-jws-rfc7515-signatures.json')
     parser.add_argument('--ecdh-fixture',type=Path,default=Path(__file__).resolve().parents[1]/'fixtures/crypto-ecdh-rfc5903.json')
     parser.add_argument('--report',type=Path)
@@ -305,7 +308,7 @@ if __name__=='__main__':
         print('RFC5903 structural validation PASS:3curves/8published fields/leading zeros')
     else:
         assert args.native_directory and args.report
-        try: report=verify(args.native_directory,args.jws_fixture,args.ecdh_fixture)
+        try: report=verify(args.native_directory,args.jws_fixture,args.ecdh_fixture,args.bridge_library)
         except Exception as error:
             traceback.print_exc()
             report=dict(result='FAIL',infrastructureFailure=repr(error))
