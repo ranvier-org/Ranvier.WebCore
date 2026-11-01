@@ -1,0 +1,44 @@
+RV_BITMAP before=0x7a9d870a1180
+RV_BITMAP after=0x7a9d870a1180 expected=0x7a9d870a1180
+{"label": "old red DOM", "box": [255, 0, 0, 255], "background": [17, 34, 51, 255], "sha256": "a6df836da4618a67457ba18dd38ecd8938b2133033cbf05bb3a4a122791493a3"}
+{"events": [[0, null], [1, null]], "controlled_pseudos": ["::view-transition-new(root)"]}
+RV_BITMAP before=0x7a9d870a1180
+RV_BITMAP after=0x7a9d870a1180 expected=0x7a9d870a1180
+RV_BITMAP before=0x7a9d870a1180
+RV_BITMAP after=0x7a9d870a13c0 expected=0x7a9d870a1180
+Mesa: error: GL_INVALID_OPERATION in glTexSubImage2D(invalid texture level 0)
+RV_BITMAP before=0x7a9d870a13c0
+RV_BITMAP after=0x7a9d870a13c0 expected=0x7a9d870a13c0
+Mesa: error: GL_INVALID_OPERATION in glUseProgram
+Mesa: error: GL_INVALID_OPERATION in glUniform(location=4)
+Mesa: error: 2 similar GL_INVALID_OPERATION errors
+Mesa: error: GL_INVALID_OPERATION in glUniformMatrix(non-matrix uniform)
+Mesa: error: GL_INVALID_OPERATION in glUniformMatrix(location=1)
+Mesa: error: GL_INVALID_VALUE in glUseProgram
+Mesa: error: GL_INVALID_OPERATION in glUniform(location=2)
+Mesa: error: GL_INVALID_OPERATION in glUniformMatrix(non-matrix uniform)
+Mesa: error: GL_INVALID_OPERATION in glUniformMatrix(location=1)
+Mesa: error: GL_INVALID_OPERATION in glUseProgram
+Mesa: error: GL_INVALID_OPERATION in glUniform(location=4)
+Mesa: error: 2 similar GL_INVALID_OPERATION errors
+Mesa: error: GL_INVALID_OPERATION in glUniformMatrix(non-matrix uniform)
+Mesa: error: GL_INVALID_OPERATION in glUniformMatrix(location=1)
+Mesa: error: GL_INVALID_OPERATION in glUseProgram
+Mesa: error: GL_INVALID_OPERATION in glUniform(location=4)
+Mesa: error: 2 similar GL_INVALID_OPERATION errors
+Mesa: error: GL_INVALID_OPERATION in glUniformMatrix(non-matrix uniform)
+Mesa: error: GL_INVALID_OPERATION in glUniformMatrix(location=1)
+Mesa: error: GL_INVALID_VALUE in glDetachShader
+Traceback (most recent call last):
+  File "/mnt/c/wk/project2-linux-gpu/tests/gpu/linux_view_transition_pixels.py", line 173, in <module>
+    run(parser.parse_args().native_directory)
+  File "/mnt/c/wk/project2-linux-gpu/tests/gpu/linux_view_transition_pixels.py", line 142, in run
+    middle = consumer.pixels(page.host, 'in flight at 50000ms of 100000ms')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/wk/project2-linux-gpu/tests/gpu/linux_view_transition_pixels.py", line 52, in pixels
+    self.n.ok('rv_host_acquire_egl_frame', [P, C.POINTER(P)], host, C.byref(frame))
+  File "/mnt/c/wk/project2-linux-gpu/tests/abi/form_collections.py", line 94, in ok
+    self.expect(status == OK, f'{name}: status {status}')
+  File "/mnt/c/wk/project2-linux-gpu/tests/abi/form_collections.py", line 87, in expect
+    raise AssertionError(label)
+AssertionError: rv_host_acquire_egl_frame: status -5

@@ -1,0 +1,11 @@
+{"label": "old red DOM", "box": [255, 0, 0, 255], "background": [17, 34, 51, 255], "sha256": "a6df836da4618a67457ba18dd38ecd8938b2133033cbf05bb3a4a122791493a3"}
+{"events": [[0, null], [1, null]], "controlled_pseudos": ["::view-transition-new(root)"]}
+{"label": "in flight at 0ms; live DOM is blue", "box": [255, 0, 0, 255], "background": [17, 34, 51, 255], "sha256": "a6df836da4618a67457ba18dd38ecd8938b2133033cbf05bb3a4a122791493a3"}
+{"label": "in flight at 50000ms; live DOM is blue", "box": [127, 0, 128, 255], "background": [16, 34, 50, 255], "sha256": "b25763f35fa46abc0c427136fb7e95a0526e866571335426a4c3f450f62a1e8b"}
+{"label": "in flight at 100000ms; live DOM is blue", "box": [0, 0, 255, 255], "background": [17, 34, 51, 255], "sha256": "b5940f8c1173371d5f1b89e2f0eb8c50f18a528f7ff32979703026d2efb2e76c"}
+{"label": "finished blue DOM", "box": [0, 0, 255, 255], "background": [17, 34, 51, 255], "sha256": "b5940f8c1173371d5f1b89e2f0eb8c50f18a528f7ff32979703026d2efb2e76c"}
+{"label": "reverse transition before skip at 50%", "box": [128, 0, 127, 255], "background": [16, 34, 50, 255], "sha256": "ab892f4a5c4de4af035bc2ea80eeb7b8a14fc720797e369b5e2f5c26b1c65bd1"}
+{"label": "skip cleans pseudo tree; live DOM red", "box": [255, 0, 0, 255], "background": [17, 34, 51, 255], "sha256": "a6df836da4618a67457ba18dd38ecd8938b2133033cbf05bb3a4a122791493a3"}
+{"label": "transition before document replacement at 50%", "box": [127, 0, 128, 255], "background": [16, 34, 50, 255], "sha256": "b25763f35fa46abc0c427136fb7e95a0526e866571335426a4c3f450f62a1e8b"}
+{"label": "replacement document green; old transition interrupted", "box": [0, 255, 0, 255], "background": [17, 34, 51, 255], "sha256": "a9d63fbbd91343bdd19f9b2613e8eec3e2acba17955f3492a44b84bb32182f2a"}
+{"result": "PASS", "transport": "EGLImage", "gpu_frames": 9, "cpu_paint_api_calls": 0, "events": [[0, null], [1, null]], "pseudo_animations_after": 0, "controlled_times_ms": [0, 50000, 100000], "skip_cleanup": true, "replacement_cleanup": true}
