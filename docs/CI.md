@@ -30,21 +30,98 @@ at a package host matters only on a miss. A step that downloads retries a failur
 downloads, git fetches and vcpkg bootstrap four times with a growing pause, Chocolatey four times, each
 Homebrew install four times, and apt's `Acquire::Retries=5`.
 
-| Entry | Key | Saved after |
-|---|---|---|
-| gperf (Windows, from Chocolatey) | its version and the RID: a cache entry holds paths relative to the workspace, whose drive differs between the x64 and ARM64 images | its install |
-| LLVM (Windows) | the RID's archive hash in `pins.json` | fetch |
-| vcpkg binary archives and downloads (Windows) | the RID, the flavor, the vcpkg, WebKit and ICU pins, and `config/` | a successful configure |
+`scripts/build_cache.py keys` computes every key in one step after the tool installs, because the build
+tree's key names the toolchain.
 
-- A vcpkg miss restores the newest entry of the RID and flavor: archives are named by their ABI hash, so
-  the packages that did not change are not rebuilt. ICU's source archive comes from vcpkg's downloads;
-  after a binary cache hit skipped vcpkg's download, `build.py` downloads it there itself for the ICU
-  filter, checking `pins.json`'s hash.
+| Entry | Key | Restored | Saved after |
+|---|---|---|---|
+| gperf (Windows, from Chocolatey) | its version and the RID: a cache entry holds paths relative to the workspace, whose drive differs between the x64 and ARM64 images | always | its install |
+| LLVM (Windows) | the RID's archive hash in `pins.json` | always | fetch |
+| build tree | see [Build tree](#build-tree) | unless a manual run sets `clean` | the build |
+| vcpkg binary archives (Windows) | the RID, the flavor and vcpkg's ABI inputs: the vcpkg and WebKit pins, any patch that writes WebKit's `vcpkg.json`, `vcpkg-configuration.json` or `WebKitLibraries/triplets/`, the flavor's `VCPKG_MANIFEST_FEATURES`, and the MSVC toolset | when no build tree was restored | a successful configure |
+| vcpkg downloads (Windows) | the RID and the vcpkg, WebKit and ICU pins | when the archives missed | a successful configure |
+
+- A miss restores the newest entry with the same prefix (`vcpkg-<rid>-<flavor>-`, `vcpkg-downloads-<rid>-`):
+  archives are named by their ABI hash, so the packages that did not change are not rebuilt. An entry is
+  saved only on a miss, because a saved key is never replaced.
+- A config edit changes neither vcpkg key unless it changes the manifest features. Until 2026-11-01 the key
+  ended in a hash of all of `config/`: each config edit saved a new 272 to 412 MB entry, the repository
+  reached its 10 GB limit, and GitHub evicted the entries a run then missed (19 minutes of vcpkg builds on
+  `win-x64`).
+- A restored build tree holds `vcpkg_installed` under the same vcpkg key, so vcpkg installs nothing and the
+  archives are not restored.
+- The downloads hold the ports' sources, which vcpkg reads only to build a package whose archive is missing,
+  so they have their own entry, the same for every flavor and toolset. ICU's source archive comes from
+  vcpkg's downloads; when they were not restored, `build.py` downloads it there itself for the ICU filter,
+  checking `pins.json`'s hash.
 - Not cached: the WebKit checkout (about 2 GB from GitHub, with retries), vcpkg's own checkout, and the
-  Linux and macOS packages. The repository's Actions cache holds 10 GB, and on 2026-10-27 it held
-  9.4 GB, most of it LLVM entries under the old keys that GitHub evicts as they go unused.
-- The WebKit build itself is not cached. A compiler cache (sccache with clang-cl) is the next step if
-  build time matters.
+  Linux and macOS packages.
+
+### Build tree
+
+The CMake and ninja directory, `<work>/build-<flavor>`, is cached for each RID and flavor, so a run compiles
+what its commit changed.
+
+```
+tree-<rid>-<flavor>-<WebKit pin>-<toolchain>-<core>-<host>
+```
+
+| Part | Hash of |
+|---|---|
+| toolchain | Windows: the MSVC toolset, the Windows SDK, the LLVM pin and the vcpkg key (the tree holds `vcpkg_installed`). Linux: `clang --version` and the image. macOS: `xcodebuild -version` and the SDK version. |
+| core | the blob ids of `patches/`, `config/`, `scripts/build.py` and `scripts/patches.py` |
+| host | the blob ids of `host/` |
+
+- An exact hit restores a tree built from the same inputs: ninja has nothing to do, and nothing is saved.
+- Otherwise the run restores the newest tree with the same core (only `host/` differs), else the newest with
+  the same WebKit pin and toolchain, builds incrementally and saves under its exact key. A fallback stays
+  within one WebKit pin and toolchain and, on Windows, one vcpkg key: ninja does not track the compiler, and
+  reinstalled vcpkg headers invalidate the precompiled headers.
+- After saving, the run deletes the entry it restored if that entry is its own ref's, which keeps one tree per
+  RID, flavor and ref. A default-branch entry restored by a pull request stays.
+- Saved on pushes and manual runs of `main` and `codex/batch-*`, and on pull requests from `codex/batch-*`;
+  restored on every run. A branch sees its own entries and the default branch's, a pull request its own and
+  its base branch's, and a tag only the default branch's, so a release tag on `main`'s head restores the tree
+  that `main`'s push saved. Pushes to `codex/batch-*` do not start this workflow; their pull request's runs
+  save under the pull request's ref.
+- A manual run with `clean` builds from an empty tree.
+
+Checkout and the WebKit fetch give every source a new modification time, which ninja reads as a change to every
+file. The tree therefore carries `ranvier-sources.json`: the git blob id and modification time, in seconds, of
+each file of the WebKit checkout and of this repository, and of each directory, with a hash of the names it
+lists. After prepare, `build_cache.py normalise` gives each file whose blob id is unchanged, and each directory
+whose listing is unchanged, its recorded time; changed and new files keep the time checkout gave them. The
+blob ids come from git's index, which checkout has just written, and only the files git reports as changed
+(the patched and installed ones) are read: about 2 s in WSL for the 77,000 files of the sparse checkout, and
+about 10 s on a Windows workstation. normalise then writes the manifest of the current sources, which the save
+stores with the tree.
+
+clang-cl's precompiled headers need the recorded time rather than an arbitrary old one: on Windows CMake
+builds them without `-fno-pch-timestamp`, and clang rejects a PCH whose inputs' times differ from the ones it
+recorded.
+
+normalise also deletes the tree's `CMakeCache.txt` and `CMakeFiles/CMakeConfigureLog.yaml`, so every configure
+starts without a cache. The config files set options with `set(... CACHE)`, which leaves a value already in a
+cache in place: a reused cache kept `ENABLE_POINTER_LOCK=OFF` after `config/common.cmake` changed it to `ON`.
+Without a cache, configure sets the options a clean configure sets, and the files it writes rebuild their
+dependents. Measured on 2026-11-01 in WSL (linux-x64, slim, `-j 10`), from a tree built at `codex/batch-6`
+and a fresh WebKit fetch:
+
+| Change | ninja edges | Build |
+|---|---|---|
+| none | 0 | 0.3 s |
+| one file of `host/` | 2: its compile and the host library's link | 17 s |
+| `ENABLE_POINTER_LOCK` from `ON` to `OFF` | 1,159 of 8,019: 1,093 compiles (1,091 objects depend on `cmakeconfig.h`) and their links and generators | not run |
+| the same edit with the old cache kept | 2: the option stays `ON` | |
+
+A configure without a cache took 60 s in WSL; the hosted Linux runners configure from scratch in about 20 s.
+
+Compressed as `actions/cache` compresses (zstd level 3, 1 GB window), a tree is about 1.0 GB on Windows
+(5.3 GB on disk, of which the linked libraries' PDBs, which `package` copies, are 0.17 GB compressed),
+0.57 GB on Linux (2.1 GB on disk, 0.47 GB of it precompiled headers) and, estimated from its 2.1 GB on disk,
+about 0.6 GB on macOS: about 3.7 GB for the five RIDs. The repository's 10 GB also holds LLVM (about 2.6 GB)
+and the vcpkg entries (about 1 GB), so the default branch's trees and one pull request's fit only narrowly;
+GitHub evicts the least recently used entries beyond the limit.
 
 ## Local runs
 
@@ -128,7 +205,7 @@ must succeed without CPU fallback before the accelerated release is complete.
 
 An incremental rebuild after vcpkg reinstalls packages can fail with clang rejecting a precompiled header:
 the reinstalled headers keep older modification times. Delete `cmake_pch.cxx.obj` under
-`<build>/Source` and build again. A fresh build, as in CI, does not hit this.
+`<build>/Source` and build again. CI does not hit this: it reuses a build tree only under the same vcpkg key.
 
 ## win-arm64
 
