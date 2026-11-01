@@ -31,6 +31,16 @@ def run(entries, *options):
 
 
 class ProbeRunnerTests(unittest.TestCase):
+    def test_content_clipping_gate_uses_only_proven_gpu_baseline_profiles(self):
+        gates = [entry for entry in probes.PROBES if any(
+            'background_content_clip_regression.py' in command for command in entry['commands'])]
+        self.assertEqual({entry['rid'] for entry in gates}, {'linux-x64', 'win-x64'})
+        for entry in gates:
+            self.assertTrue(probes.applies(entry, entry['rid'], 'gpu'))
+            self.assertFalse(probes.applies(entry, entry['rid'], 'slim'))
+            for unproven in ['linux-arm64', 'win-arm64', 'osx-arm64']:
+                self.assertFalse(probes.applies(entry, unproven, 'gpu'))
+
     def test_probe_environment_reaches_the_child_without_changing_the_parent(self):
         entry = probes.probe('environment', 'python -c "import os; print(os.environ.get(\'RANVIER_PROBE_ENV_TEST\'))"')
         entry['env'] = {'RANVIER_PROBE_ENV_TEST': 'isolated-child'}
