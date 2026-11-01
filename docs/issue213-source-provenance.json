@@ -1,0 +1,41 @@
+{
+  "captured_utc": "2026-11-01T17:29:51.062192+00:00",
+  "description": "Hashes of read-only diagnostic source copies and their callers; paths are relative artifact labels.",
+  "sources": [
+    {
+      "artifact": "flake1-artifacts/burn.sh",
+      "sha256": "da6081a81c9b2a9fa18f5cde19534b00c77332b019778e991a2a988558d554b3",
+      "bytes": 948
+    },
+    {
+      "artifact": "flake3-artifacts/burn.sh",
+      "sha256": "f29eeb786a0d8be29d2b5e68cf8f6bd576e2d8f64d8ae0ee2d20cf8814539117",
+      "bytes": 1078
+    },
+    {
+      "artifact": "flake1-artifacts/run.sh",
+      "sha256": "1cf3a436ba2e84f07b66b2b2f342735b016699a6a948a126934143936041fa47",
+      "bytes": 2855
+    },
+    {
+      "artifact": "flake1-artifacts/loop.sh",
+      "sha256": "5ed07d3218364f219a98275ab20c5c8de91eb9c21a3c28ad109825a6607b1941",
+      "bytes": 643
+    },
+    {
+      "artifact": "flake3-artifacts/run.sh",
+      "sha256": "1639101d3e44372d3ece85c86a721e42707d850747cba146643f88f4e87a1877",
+      "bytes": 3606
+    },
+    {
+      "artifact": "flake1-artifacts/burner.js",
+      "sha256": "1d6eb78ea683d0c0ce7546efc3be4328e221799ae7cf20cfcc16cf5fbbc6e050",
+      "bytes": 49
+    },
+    {
+      "artifact": "flake3-artifacts/burner.js",
+      "sha256": "1d6eb78ea683d0c0ce7546efc3be4328e221799ae7cf20cfcc16cf5fbbc6e050",
+      "bytes": 49
+    }
+  ]
+}

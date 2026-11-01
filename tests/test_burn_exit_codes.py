@@ -49,6 +49,13 @@ class BurnExitCodeTests(unittest.TestCase):
                 self.assertEqual(status, int(value), stderr)
                 self.assertIn(f"BURN_CHILD_EXIT_CODE={value}", stdout)
 
+    def test_pinned_mode_normalizes_nonzero_codes_with_zero_low_byte(self):
+        for value in ("256", "512"):
+            with self.subTest(child_exit=value):
+                status, stdout, stderr = self.run_child("exit", value)
+                self.assertEqual(status, 1, stderr)
+                self.assertIn(f"BURN_CHILD_EXIT_CODE={value}", stdout)
+
     def test_pinned_mode_preserves_unhandled_exception_exit(self):
         status, stdout, stderr = self.run_child("unhandled")
         self.assertEqual(status, 1, stderr)

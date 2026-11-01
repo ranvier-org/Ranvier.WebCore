@@ -17,11 +17,13 @@ if mode == "crash":
     kernel32.TerminateProcess(kernel32.GetCurrentProcess(), 0xC0000005)
     raise SystemExit(1)
 if mode == "affinity":
-    process_mask = wintypes.DWORD()
-    system_mask = wintypes.DWORD()
+    process_mask = ctypes.c_size_t()
+    system_mask = ctypes.c_size_t()
     kernel32 = ctypes.windll.kernel32
+    kernel32.GetCurrentProcess.argtypes = ()
+    kernel32.GetCurrentProcess.restype = wintypes.HANDLE
     get_mask = kernel32.GetProcessAffinityMask
-    get_mask.argtypes = (wintypes.HANDLE, ctypes.POINTER(wintypes.DWORD), ctypes.POINTER(wintypes.DWORD))
+    get_mask.argtypes = (wintypes.HANDLE, ctypes.POINTER(ctypes.c_size_t), ctypes.POINTER(ctypes.c_size_t))
     get_mask.restype = wintypes.BOOL
     if not get_mask(kernel32.GetCurrentProcess(), ctypes.byref(process_mask), ctypes.byref(system_mask)):
         raise ctypes.WinError()

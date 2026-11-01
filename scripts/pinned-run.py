@@ -160,7 +160,8 @@ def main(argv):
         print(f"pinned-run: {error}", file=sys.stderr)
         return 127
     print(f"BURN_CHILD_EXIT_CODE={code}", flush=True)
-    return code
+    # Bash keeps only the low byte; preserve failure when a failing DWORD has a zero low byte.
+    return (code & 0xFF) or (1 if code else 0)
 
 
 if __name__ == "__main__":
