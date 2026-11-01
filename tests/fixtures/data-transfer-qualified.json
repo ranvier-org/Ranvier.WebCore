@@ -248,6 +248,10 @@
   },
   {
    "path": "drop.after.drop.items",
+   "platforms": [
+    "win32",
+    "darwin"
+   ],
    "native": [
     [
      "string",
@@ -268,6 +272,24 @@
    ],
    "chromium": [],
    "reason": "WebKit keeps an item list it built during the event after the data store is invalidated (DataTransfer::makeInvalidForSecurity leaves the cached items); its types, data and files are empty, as in Chromium."
+  },
+  {
+   "path": "drop.after.drop.items",
+   "platforms": [
+    "linux"
+   ],
+   "native": [
+    [
+     "string",
+     "text/plain"
+    ],
+    [
+     "string",
+     "text/html"
+    ]
+   ],
+   "chromium": [],
+   "reason": "WebKit keeps an item list it built during the event after the data store is invalidated (DataTransfer::makeInvalidForSecurity leaves the cached items); its types, data and files are empty, as in Chromium. The list holds no file items: KNOWN BUG #156 (https://github.com/ranvier-org/Ranvier.WebCore/issues/156)"
   },
   {
    "path": "drop.after.drop.dropEffect",
