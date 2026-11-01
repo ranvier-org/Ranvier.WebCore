@@ -26,6 +26,11 @@ def probe(name, *commands, rid=None, flavor=('slim', 'gpu'), timeout=TIMEOUT, en
 
 
 PROBES = [
+    *[probe('Verify failed SVG images stay empty while HTML fallback icons remain visible',
+            'python -I tests/abi/svg_image_error_paint.py --native-directory {native}',
+            rid=rid, flavor=None,
+            env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
+      for rid in ['linux-x64', 'linux-arm64', 'win-x64', 'win-arm64']],
     probe('Verify Windows same-document transition snapshot pixels',
           'python -I tests/gpu/windows_view_transition_pixels.py --native-directory {native} --output {work}/gpu-transition-readback',
           rid='win-x64', flavor='gpu'),

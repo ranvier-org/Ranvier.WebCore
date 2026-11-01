@@ -352,26 +352,6 @@
     }
   },
   "nativeQualifications": {
-    "image.networkErrorPaint": {
-      "windows": [
-        161,
-        201,
-        229,
-        255
-      ],
-      "macos": "browser",
-      "linux": "browser"
-    },
-    "image.brokenBytesPaint": {
-      "windows": [
-        161,
-        201,
-        229,
-        255
-      ],
-      "macos": "browser",
-      "linux": "browser"
-    },
     "switch.attribute": ""
   },
   "qualificationNotes": {
