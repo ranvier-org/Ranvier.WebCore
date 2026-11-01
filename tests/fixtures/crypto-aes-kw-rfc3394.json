@@ -1,0 +1,66 @@
+{
+  "source": {
+    "title": "RFC 3394: AES Key Wrap Algorithm",
+    "url": "https://www.rfc-editor.org/rfc/rfc3394.html",
+    "default_iv_section": "Section 2.2.3.1",
+    "vectors_section": "Section 4, test cases 4.1-4.6"
+  },
+  "algorithm": "AES-KW",
+  "default_iv_hex": "a6a6a6a6a6a6a6a6",
+  "vectors": [
+    {
+      "case": "4.1",
+      "kek_bits": 128,
+      "kek_hex": "000102030405060708090a0b0c0d0e0f",
+      "key_data_bits": 128,
+      "key_data_hex": "00112233445566778899aabbccddeeff",
+      "ciphertext_hex": "1fa68b0a8112b447aef34bd8fb5a7b829d3e862371d2cfe5",
+      "ciphertext_octets": 24
+    },
+    {
+      "case": "4.2",
+      "kek_bits": 192,
+      "kek_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
+      "key_data_bits": 128,
+      "key_data_hex": "00112233445566778899aabbccddeeff",
+      "ciphertext_hex": "96778b25ae6ca435f92b5b97c050aed2468ab8a17ad84e5d",
+      "ciphertext_octets": 24
+    },
+    {
+      "case": "4.3",
+      "kek_bits": 256,
+      "kek_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "key_data_bits": 128,
+      "key_data_hex": "00112233445566778899aabbccddeeff",
+      "ciphertext_hex": "64e8c3f9ce0f5ba263e9777905818a2a93c8191e7d6e8ae7",
+      "ciphertext_octets": 24
+    },
+    {
+      "case": "4.4",
+      "kek_bits": 192,
+      "kek_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
+      "key_data_bits": 192,
+      "key_data_hex": "00112233445566778899aabbccddeeff0001020304050607",
+      "ciphertext_hex": "031d33264e15d33268f24ec260743edce1c6c7ddee725a936ba814915c6762d2",
+      "ciphertext_octets": 32
+    },
+    {
+      "case": "4.5",
+      "kek_bits": 256,
+      "kek_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "key_data_bits": 192,
+      "key_data_hex": "00112233445566778899aabbccddeeff0001020304050607",
+      "ciphertext_hex": "a8f9bc1612c68b3ff6e6f4fbe30e71e4769c8b80a32cb8958cd5d17d6b254da1",
+      "ciphertext_octets": 32
+    },
+    {
+      "case": "4.6",
+      "kek_bits": 256,
+      "kek_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "key_data_bits": 256,
+      "key_data_hex": "00112233445566778899aabbccddeeff000102030405060708090a0b0c0d0e0f",
+      "ciphertext_hex": "28c9f404c4b810f4cbccb35cfb87f8263f5786e2d80ed326cbc7f0e71a99f43bfb988b9b7a02dd21",
+      "ciphertext_octets": 40
+    }
+  ]
+}
