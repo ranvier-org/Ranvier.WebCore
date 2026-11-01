@@ -46,6 +46,20 @@ def run(directory, slim):
         options = Options(ctypes.sizeof(Options), callback, None)
         n.expect(start(page.document, ctypes.byref(options), ctypes.byref(result)) == OK and result.value, 'transition started')
         n.expect(not log, 'update is deferred from start')
+        active = n.handle('rv_dom_document_get_active_view_transition', [P], page.document)
+        n.expect(active == result.value, 'document exposes the active transition')
+        n.bind('rv_dom_view_transition_release', None, [P])(active)
+        type_set = n.handle('rv_dom_view_transition_get_types', [P], result)
+        n.expect(n.integer('rv_dom_view_transition_type_set_size', type_set, ctypes.c_uint32) == 0, 'initial empty types')
+        for name in [b'slide', b'fade', b'slide']:
+            n.ok('rv_dom_view_transition_type_set_add', [P, P, I], type_set, name, len(name))
+        n.expect(n.integer('rv_dom_view_transition_type_set_size', type_set, ctypes.c_uint32) == 2, 'types deduplicate')
+        snapshot = Strings()
+        n.ok('rv_dom_view_transition_type_set_values', [P, ctypes.POINTER(Strings)], type_set, ctypes.byref(snapshot))
+        n.ok('rv_dom_view_transition_type_set_clear', [P], type_set)
+        n.expect([ctypes.string_at(snapshot.items[i].data, snapshot.items[i].length).decode() for i in range(snapshot.count)] == ['slide', 'fade'], 'type snapshot retains insertion order after clear')
+        n.bind('rv_dom_sequence_dom_string_release', None, [ctypes.POINTER(Strings)])(ctypes.byref(snapshot))
+        n.bind('rv_dom_view_transition_type_set_release', None, [P])(type_set)
         settled = SETTLED(lambda _, kind, error: log.append((kind, error.decode() if error else None)))
         observer = P()
         n.ok('rv_view_transition_observe', [P, P, SETTLED, P, ctypes.POINTER(P)], page.host, result, settled, None, ctypes.byref(observer))
@@ -59,6 +73,45 @@ def run(directory, slim):
         n.bind('rv_dom_view_transition_release', None, [P])(result)
         n.bind('rv_dom_view_transition_update_callback_release', None, [P])(callback)
         n.expect(releases == ['callback'], 'callback context released once')
+        for mode in ['skip', 'reject', 'observer-release', 'replacement']:
+            events = []
+            tick = UPDATE(lambda _, mode=mode: events.append(('update', None)) or (1 if mode == 'reject' else 0))
+            released = []
+            finalizer = RELEASE(lambda _: released.append(True))
+            cb = n.bind('rv_view_transition_update_callback_create', P, [P, UPDATE, P, RELEASE])(page.host, tick, None, finalizer)
+            transition = P()
+            args = Options(ctypes.sizeof(Options), cb, None)
+            n.expect(start(page.document, ctypes.byref(args), ctypes.byref(transition)) == OK, mode + ': start')
+            observer = P()
+            sink = SETTLED(lambda _, kind, error: events.append((kind, error.decode() if error else None)))
+            n.ok('rv_view_transition_observe', [P, P, SETTLED, P, ctypes.POINTER(P)], page.host, transition, sink, None, ctypes.byref(observer))
+            if mode == 'skip':
+                n.ok('rv_dom_view_transition_skip_transition', [P], transition)
+            if mode == 'observer-release':
+                n.bind('rv_view_transition_observer_release', None, [P])(observer)
+                observer = P()
+            if mode == 'replacement':
+                n.ok('rv_host_load_html', [P, P, I], page.host, b'<div>replacement</div>', 22)
+            deadline = time.monotonic() + 5
+            while time.monotonic() < deadline:
+                n.call('rv_host_update', [P], page.host)
+                n.call('rv_run_loop_cycle', [I], 5)
+                if len(events) >= 4 or (mode in ['observer-release', 'replacement'] and time.monotonic() > deadline - 4.8):
+                    break
+            if mode == 'skip':
+                n.expect(events == [(1, 'AbortError'), ('update', None), (0, None), (2, None)], f'skip before update settlement: {events}')
+            elif mode == 'reject':
+                n.expect(events == [('update', None), (0, 'TypeError'), (1, 'TypeError'), (2, 'TypeError')], f'failed update rejects every promise: {events}')
+            elif mode == 'observer-release':
+                n.expect(events == [('update', None)], f'released observer stops promise delivery: {events}')
+            else:
+                n.expect(events == [], f'replaced document stops application callbacks and observations: {events}')
+            if observer:
+                n.bind('rv_view_transition_observer_release', None, [P])(observer)
+            n.bind('rv_dom_view_transition_release', None, [P])(transition)
+            n.bind('rv_dom_view_transition_update_callback_release', None, [P])(cb)
+            if mode != 'replacement':
+                n.expect(released == [True], mode + ': callback context released once')
         return n.assertions
     finally:
         page.close()
