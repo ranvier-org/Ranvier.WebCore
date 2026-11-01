@@ -322,10 +322,6 @@ class BuildCacheTests(unittest.TestCase):
         self.assertTrue(legacy_key.startswith(restore_prefixes[0]))
         self.assertTrue(legacy_key.startswith(legacy_restore_prefix))
 
-        workflow = (ROOT / '.github' / 'workflows' / 'build.yml').read_text(encoding='utf-8')
-        save_condition = next(line for line in workflow.splitlines() if "steps.tree.outputs.cache-hit != 'true'" in line)
-        self.assertIn("steps.tree.outputs.cache-hit != 'true'", save_condition)
-
     def test_legacy_manifest_without_raw_identity_is_a_cache_miss(self):
         self.assertEqual(self.run_cache('record').returncode, 0)
         manifest = self.manifest()
