@@ -520,6 +520,10 @@ jobs:
         if: env.FLAVOR == 'slim'
         run: python -I -X utf8 tests/abi/screen_metrics.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
+      - name: Verify that a zero-millisecond run-loop cycle returns without waiting
+        if: env.FLAVOR == 'slim'
+        run: python -I -X utf8 tests/abi/run_loop_cycle.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
       - name: Verify URL, URLSearchParams and URLPattern against the Chromium oracle
         if: env.FLAVOR == 'slim'
         run: python -I -X utf8 tests/abi/url_values.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
