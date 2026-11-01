@@ -16,7 +16,12 @@ Existing patched `OptionsWin.cmake` then finds `OpenSSL::Crypto`, exposes `USE_O
 `HAVE_RSA_PSS` through `wtf/Platform.h`. `PlatformWin.cmake` selects `platform/OpenSSL.cmake` instead of
 `crypto/stub/CryptoStub.cmake`; PAL replaces its CryptoAPI digest implementation with the existing
 OpenSSL digest unit. No extra CMake command-line override, public header or configure-script change is
-needed. The reviewed patch0060 supplies three backend units, two registry registrations and source-list
+needed to choose the backend. For a direct `build.py configure` on an existing Windows slim/GPU tree,
+the command removes only the cached `USE_CRYPTO_STUB` entry with `-UUSE_CRYPTO_STUB` before loading the
+selected preset. Otherwise an old `ON` cache value would survive the new `OFF` default. Other cached
+settings remain intact; lean and non-Windows configure commands are unchanged. Direct CMake callers
+can still supply `-DUSE_CRYPTO_STUB=ON` after the preset for an explicit control build. The reviewed
+patch0060 supplies three backend units, two registry registrations and source-list
 entries, with only the matching unsupported-platform fallbacks excluded for `USE(OPENSSL)`.
 
 The existing package dependency walk follows WebCore's DLL imports into the installed triplet. It
@@ -37,6 +42,11 @@ than a three-unit link. The platform source list replaces one stub unit with the
 backend group plus the three new OKP units, and PAL changes its digest unit. This is a prediction;
 the actual freshly configured Ninja dependency graph supplies the edge count. Do not reuse a
 CryptoStub PCH to claim the registry or conditional backend paths compile.
+
+The existing CI restore flow already runs `build_cache.py normalise` before configure; that helper
+intentionally removes `CMakeCache.txt` so all preset defaults are refreshed. The root-controlled warm
+handoff follows the same policy. Those flows already migrate correctly. The targeted `-U` fixes the
+separate direct-configure flow without adding cache removal or changing normalise/CI behavior.
 
 Use the protected warm site only after an explicit root handoff, unchanged toolchain/interpreter and
 `--work C:/wk/project2/windows-gpu` paths, process-local AMD64 environment, and jobs4. Stage a new
@@ -60,3 +70,12 @@ and reviewed; no such changes are bundled into0060. The full issue143 profile st
 eleven operations: generateKey, importKey, exportKey, sign, verify, encrypt, decrypt, deriveBits,
 deriveKey, wrapKey and unwrapKey, with ownership/extractability/usages and deferred error delivery.
 Native JIT, NativeAOT and Chromium acceptance across the selected platforms remains pending.
+
+The follow-up migration regression first reproduced `USE_CRYPTO_STUB:BOOL=ON` after reconfiguring the
+same build directory with the new preset, for both Windows architectures and both slim/GPU flavors.
+With the targeted reset, each actual CMake reconfigure writes `OFF`, retains an unrelated cache value,
+and still accepts an explicit subsequent `-D...=ON`. Focused coverage also confirms no reset for lean
+or non-Windows commands. These fixtures compile no native product code and remove their temporary trees.
+The final focused six tests and full105-test Python suite pass, with the same three environmental skips.
+`build_cache.py` includes both `config` and `scripts/build.py` in the build-tree identity, so these
+changes also change the exact CI cache key while the documented restore-prefix migration remains safe.

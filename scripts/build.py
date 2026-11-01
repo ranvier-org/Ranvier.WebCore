@@ -257,8 +257,10 @@ def stable_interpreters(env):
 def configure(env):
     build.mkdir(parents=True, exist_ok=True)
     # RANVIER_RID comes before -C: config/common.cmake picks the port from it.
-    command = ['cmake', '-S', source, '-B', build, '-G', 'Ninja', f'-DRANVIER_RID={args.rid}',
-               '-C', root / 'config' / f'{args.flavor}.cmake', *stable_interpreters(env)]
+    command = ['cmake', '-S', source, '-B', build, '-G', 'Ninja', f'-DRANVIER_RID={args.rid}']
+    if windows and args.flavor in ('slim', 'gpu'):
+        command += ['-UUSE_CRYPTO_STUB']
+    command += ['-C', root / 'config' / f'{args.flavor}.cmake', *stable_interpreters(env)]
     if windows:
         clang = (llvm / 'clang-cl.exe').as_posix()
         command += [f'-DCMAKE_C_COMPILER={clang}', f'-DCMAKE_CXX_COMPILER={clang}',
