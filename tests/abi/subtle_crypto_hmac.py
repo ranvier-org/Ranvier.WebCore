@@ -194,6 +194,9 @@ def run(directory, bridge_library=None):
                                            page.document, ctypes.byref(params())), page)
         probe.ok('hmac_key_info', [Key, ctypes.POINTER(Info)], generated, ctypes.byref(info))
         n.expect(info.length_bits == 512, 'SHA-256 default HMAC key block length')
+        zero = probe.start('hmac_generate', [P, ctypes.POINTER(Params)], page.document, ctypes.byref(params(bits=0)))
+        probe.wait(zero, page)
+        n.expect(probe.error(zero) == 'OperationError', 'explicit generated length zero rejects rather than taking default')
         in_flight = probe.start('hmac_sign', [P, Key, Bytes], page.document, generated, span(b'retained input key'))
         probe.ok('key_release', [Key], generated)
         del probe.keys[generated.value]
@@ -225,10 +228,17 @@ def run(directory, bridge_library=None):
         partial = probe.import_key(page, params(bits=159))
         probe.ok('hmac_key_info', [Key, ctypes.POINTER(Info)], partial, ctypes.byref(info))
         n.expect(info.length_bits == 159, 'WebCrypto raw-import bit length is preserved')
+        raw = probe.start('hmac_export_raw', [P, Key], page.document, partial)
+        n.expect(probe.bytes(raw, page) == bytes([0x0b]) * 19 + bytes([0x0a]), 'unused imported low bits are cleared')
+        signed = probe.start('hmac_sign', [P, Key, Bytes], page.document, partial, span(b'Hi There'))
+        n.expect(probe.bytes(signed, page).hex() == '944edeba2ad096630491b7710d2697544996bc4442720577f59a1c8be13f9712',
+                 '159-bit HMAC uses canonical key bytes, matching Chromium control')
         partial = probe.take(probe.start('hmac_generate', [P, ctypes.POINTER(Params)],
                                          page.document, ctypes.byref(params(bits=159))), page)
         probe.ok('hmac_key_info', [Key, ctypes.POINTER(Info)], partial, ctypes.byref(info))
         n.expect(info.length_bits == 159, 'WebCrypto generated bit length is preserved')
+        raw = probe.bytes(probe.start('hmac_export_raw', [P, Key], page.document, partial), page)
+        n.expect(len(raw) == 20 and not raw[-1] & 1, 'generated storage rounds up and clears unused low bits')
         return n.assertions
     except BaseException:
         print(f'SUBTLE_CRYPTO_HMAC FAIL assertions={n.assertions}', flush=True)
