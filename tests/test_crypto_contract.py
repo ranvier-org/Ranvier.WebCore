@@ -9,6 +9,39 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class CryptoContractTests(unittest.TestCase):
+    def test_kdf_c_and_cpp_layout(self):
+        compiler = os.environ.get('CC', 'clang')
+        source = '''
+#include "RanvierCryptoKdfContract.h"
+#include <stddef.h>
+#ifdef __cplusplus
+#define CHECK static_assert
+#else
+#define CHECK _Static_assert
+#endif
+CHECK(sizeof(((RanvierCryptoPbkdf2Params*)0)->iterations) == 8, "range checked unsigned long transport");
+CHECK(sizeof(((RanvierCryptoOptionalLength*)0)->bits) == 8, "nullable range checked length");
+#if UINTPTR_MAX == UINT64_MAX
+CHECK(sizeof(RanvierCryptoHkdfParams) == 72, "HKDF dictionary");
+CHECK(sizeof(RanvierCryptoPbkdf2Params) == 64, "PBKDF2 dictionary");
+CHECK(sizeof(RanvierCryptoKdfParams) == 40, "KDF selection");
+CHECK(sizeof(RanvierCryptoOptionalLength) == 16, "nullable deriveBits length");
+CHECK(sizeof(RanvierCryptoDerivedAesParams) == 12, "derived AES length");
+CHECK(sizeof(RanvierCryptoDerivedKeyParams) == 40, "derived key algorithm");
+CHECK(sizeof(RanvierCryptoKdfKeyInfo) == 16, "KDF metadata");
+CHECK(offsetof(RanvierCryptoHkdfParams, info) == 56, "required info presence");
+CHECK(offsetof(RanvierCryptoPbkdf2Params, iterations) == 32, "iterations range");
+#endif
+'''
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / 'kdf-contract.c'
+            path.write_text(source)
+            for language, standard in [('c', 'c11'), ('c++', 'c++20')]:
+                result = subprocess.run([compiler, '-x', language, '-std=' + standard,
+                                         '-fsyntax-only', '-I', str(ROOT / 'host'), str(path)],
+                                        capture_output=True, text=True)
+                self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_aes_c_and_cpp_layout(self):
         compiler = os.environ.get('CC', 'clang')
         source = '''

@@ -1,6 +1,7 @@
 #include "config.h"
 #include "RanvierCryptoGlue.h"
 #include "RanvierCryptoAesGlue.h"
+#include "RanvierCryptoKdfGlue.h"
 #include "dom/RanvierDomGlue.h"
 #include "CryptoAlgorithm.h"
 #include "CryptoAlgorithmHmacKeyParams.h"
@@ -8,6 +9,8 @@
 #include "CryptoAlgorithmAesCtrParams.h"
 #include "CryptoAlgorithmAesGcmParams.h"
 #include "CryptoAlgorithmAesKeyParams.h"
+#include "CryptoAlgorithmHkdfParams.h"
+#include "CryptoAlgorithmPbkdf2Params.h"
 #include "CryptoAlgorithmParameters.h"
 #include "CryptoAlgorithmRegistry.h"
 #include "CryptoKeyHMAC.h"
@@ -15,6 +18,7 @@
 #include "DOMException.h"
 #include "Document.h"
 #include "Exception.h"
+#include "ExceptionOr.h"
 #include "Node.h"
 #include "ScriptExecutionContext.h"
 #include <wtf/MainThread.h>
@@ -650,6 +654,11 @@ bool isAes(CryptoAlgorithmIdentifier identifier)
         || identifier == CryptoAlgorithmIdentifier::AES_GCM || identifier == CryptoAlgorithmIdentifier::AES_KW;
 }
 
+bool isKdf(CryptoAlgorithmIdentifier identifier)
+{
+    return identifier == CryptoAlgorithmIdentifier::HKDF || identifier == CryptoAlgorithmIdentifier::PBKDF2;
+}
+
 std::optional<CryptoAlgorithmIdentifier> aesIdentifier(RanvierCryptoBytes name)
 {
     auto identifier = CryptoAlgorithmRegistry::singleton().identifier(text(name));
@@ -658,6 +667,8 @@ std::optional<CryptoAlgorithmIdentifier> aesIdentifier(RanvierCryptoBytes name)
 
 CryptoKeyUsageBitmap allowedUsages(CryptoAlgorithmIdentifier identifier)
 {
+    if (isKdf(identifier))
+        return CryptoKeyUsageDeriveBits | CryptoKeyUsageDeriveKey;
     if (identifier == CryptoAlgorithmIdentifier::HMAC)
         return CryptoKeyUsageSign | CryptoKeyUsageVerify;
     if (identifier == CryptoAlgorithmIdentifier::AES_KW)
@@ -680,7 +691,7 @@ bool valid(const RanvierCryptoSecretImportParams* input)
 std::optional<ExceptionCode> importParameters(const RanvierCryptoSecretImportParams& input, std::unique_ptr<CryptoAlgorithmParameters>& params)
 {
     auto identifier = CryptoAlgorithmRegistry::singleton().identifier(text(input.name));
-    if (!identifier || (!isAes(*identifier) && *identifier != CryptoAlgorithmIdentifier::HMAC))
+    if (!identifier || (!isAes(*identifier) && !isKdf(*identifier) && *identifier != CryptoAlgorithmIdentifier::HMAC))
         return ExceptionCode::NotSupportedError;
     if (*identifier != CryptoAlgorithmIdentifier::HMAC) {
         params = makeUnique<CryptoAlgorithmParameters>(*identifier);
@@ -868,6 +879,11 @@ void importSecret(uint64_t id, CryptoKeyFormat format, KeyData&& data, const Cry
         if (auto* bytes = std::get_if<Vector<uint8_t>>(&data))
             secureZeroSpan(bytes->mutableSpan());
     };
+    if (isKdf(params.identifier) && format != CryptoKeyFormat::Raw) {
+        wipe();
+        deliver(id, errorResult(ExceptionCode::NotSupportedError));
+        return;
+    }
     if (params.identifier == CryptoAlgorithmIdentifier::HMAC
         && downcast<CryptoAlgorithmHmacKeyParams>(params).length == 0) {
         wipe();
@@ -1059,12 +1075,12 @@ int32_t ranvier_crypto_key_export(RvNode* handle, RanvierCryptoBytes formatName,
         deliver(id, errorResult(ExceptionCode::TypeError));
         return RV_OK;
     }
-    if (!key->extractable()) {
-        deliver(id, errorResult(ExceptionCode::InvalidAccessError));
-        return RV_OK;
-    }
     if (!isAes(key->algorithmIdentifier()) && key->algorithmIdentifier() != CryptoAlgorithmIdentifier::HMAC) {
         deliver(id, errorResult(ExceptionCode::NotSupportedError));
+        return RV_OK;
+    }
+    if (!key->extractable()) {
+        deliver(id, errorResult(ExceptionCode::InvalidAccessError));
         return RV_OK;
     }
     auto algorithm = CryptoAlgorithmRegistry::singleton().create(key->algorithmIdentifier());
@@ -1369,5 +1385,234 @@ int32_t ranvier_crypto_aes_unwrap(RvNode* handle, RanvierCryptoBytes formatName,
                 data = bytes;
             importSecret(id, format, WTF::move(data), *params, extractable, usages, duplicateJwkUsages);
         });
+    return RV_OK;
+}
+
+namespace {
+
+bool valid(const RanvierCryptoKdfParams* input)
+{
+    if (!input || input->size != sizeof(*input) || !valid(input->name))
+        return false;
+    if (auto* hkdf = input->hkdf) {
+        if (hkdf->size != sizeof(*hkdf) || !flag(hkdf->hash_present) || !flag(hkdf->salt_present) || !flag(hkdf->info_present)
+            || (hkdf->hash_present && !valid(hkdf->hash)) || (hkdf->salt_present && !valid(hkdf->salt))
+            || (hkdf->info_present && !valid(hkdf->info)))
+            return false;
+    }
+    if (auto* pbkdf2 = input->pbkdf2) {
+        if (pbkdf2->size != sizeof(*pbkdf2) || !flag(pbkdf2->hash_present) || !flag(pbkdf2->salt_present) || !flag(pbkdf2->iterations_present)
+            || (pbkdf2->hash_present && !valid(pbkdf2->hash)) || (pbkdf2->salt_present && !valid(pbkdf2->salt)))
+            return false;
+    }
+    return true;
+}
+
+bool valid(const RanvierCryptoDerivedKeyParams* input)
+{
+    if (!input || input->size != sizeof(*input) || !valid(input->name))
+        return false;
+    if (auto* aes = input->aes) {
+        if (aes->size != sizeof(*aes) || !flag(aes->length_present))
+            return false;
+    }
+    RanvierCryptoSecretImportParams importInput { sizeof(importInput), input->name, input->hmac };
+    return valid(&importInput);
+}
+
+std::optional<CryptoAlgorithmIdentifier> hashIdentifier(RanvierCryptoBytes name)
+{
+    auto identifier = CryptoAlgorithmRegistry::singleton().identifier(text(name));
+    if (!identifier || (*identifier != CryptoAlgorithmIdentifier::SHA_1 && *identifier != CryptoAlgorithmIdentifier::SHA_256
+        && *identifier != CryptoAlgorithmIdentifier::SHA_384 && *identifier != CryptoAlgorithmIdentifier::SHA_512))
+        return std::nullopt;
+    return identifier;
+}
+
+std::optional<ExceptionCode> kdfParameters(const RanvierCryptoKdfParams& input, std::unique_ptr<CryptoAlgorithmParameters>& params)
+{
+    auto identifier = CryptoAlgorithmRegistry::singleton().identifier(text(input.name));
+    if (!identifier || !isKdf(*identifier))
+        return ExceptionCode::NotSupportedError;
+    if (*identifier == CryptoAlgorithmIdentifier::HKDF) {
+        auto* inputParams = input.hkdf;
+        if (!inputParams || !inputParams->hash_present || !inputParams->salt_present || !inputParams->info_present)
+            return ExceptionCode::TypeError;
+        auto hash = hashIdentifier(inputParams->hash);
+        if (!hash)
+            return ExceptionCode::NotSupportedError;
+        auto value = makeUnique<CryptoAlgorithmHkdfParams>(*identifier);
+        value->hashIdentifier = *hash;
+        value->hash = CryptoAlgorithmRegistry::singleton().name(*hash);
+        value->salt = BufferSource(bytesOf(inputParams->salt));
+        value->info = BufferSource(bytesOf(inputParams->info));
+        params = WTF::move(value);
+    } else {
+        auto* inputParams = input.pbkdf2;
+        if (!inputParams || !inputParams->hash_present || !inputParams->salt_present || !inputParams->iterations_present
+            || inputParams->iterations > UINT32_MAX)
+            return ExceptionCode::TypeError;
+        auto hash = hashIdentifier(inputParams->hash);
+        if (!hash)
+            return ExceptionCode::NotSupportedError;
+        auto value = makeUnique<CryptoAlgorithmPbkdf2Params>(*identifier);
+        value->hashIdentifier = *hash;
+        value->hash = CryptoAlgorithmRegistry::singleton().name(*hash);
+        value->salt = BufferSource(bytesOf(inputParams->salt));
+        value->iterations = static_cast<unsigned long>(inputParams->iterations);
+        params = WTF::move(value);
+    }
+    return std::nullopt;
+}
+
+std::optional<ExceptionCode> derivedParameters(const RanvierCryptoDerivedKeyParams& input,
+    std::unique_ptr<CryptoAlgorithmParameters>& importParams, std::unique_ptr<CryptoAlgorithmParameters>& lengthParams)
+{
+    RanvierCryptoSecretImportParams importInput { sizeof(importInput), input.name, input.hmac };
+    if (auto error = importParameters(importInput, importParams))
+        return error;
+    if (isAes(importParams->identifier)) {
+        if (!input.aes || !input.aes->length_present || input.aes->length_bits > UINT16_MAX)
+            return ExceptionCode::TypeError;
+        CryptoAlgorithmAesKeyParamsInit init;
+        init.length = static_cast<uint16_t>(input.aes->length_bits);
+        lengthParams = makeUnique<CryptoAlgorithmAesKeyParams>(importParams->identifier, WTF::move(init));
+        return std::nullopt;
+    }
+    return importParameters(importInput, lengthParams);
+}
+
+void runDerivation(uint64_t id, const CryptoAlgorithmParameters& params, Ref<CryptoKey>&& key,
+    std::optional<size_t> length, CryptoAlgorithm::VectorCallback&& callback)
+{
+    auto* value = operation(id);
+    if (!value || value->result)
+        return;
+    if (!length || *length % 8
+        || (params.identifier == CryptoAlgorithmIdentifier::PBKDF2 && !downcast<CryptoAlgorithmPbkdf2Params>(params).iterations)) {
+        deliver(id, errorResult(ExceptionCode::OperationError));
+        return;
+    }
+    auto algorithm = CryptoAlgorithmRegistry::singleton().create(params.identifier);
+    if (!algorithm) {
+        deliver(id, errorResult(ExceptionCode::NotSupportedError));
+        return;
+    }
+    algorithm->deriveBits(params, WTF::move(key), length, WTF::move(callback), onError(id), *value->document, queue());
+}
+
+}
+
+int32_t ranvier_crypto_kdf_supported(RvNode* handle, RanvierCryptoBytes name, int32_t* supported)
+{
+    Document* document;
+    if (auto status = documentOf(handle, document))
+        return status;
+    if (!valid(name) || !supported)
+        return RV_ERR_NULL_ARGUMENT;
+    auto identifier = CryptoAlgorithmRegistry::singleton().identifier(text(name));
+    *supported = identifier && isKdf(*identifier) && !!CryptoAlgorithmRegistry::singleton().create(*identifier);
+    return RV_OK;
+}
+
+int32_t ranvier_crypto_kdf_derive_bits(RvNode* handle, const RanvierCryptoKdfParams* input, RanvierCryptoKeyHandle keyHandle,
+    RanvierCryptoOptionalLength requestedLength, RanvierCryptoOperationHandle* output)
+{
+    Document* document;
+    if (auto status = documentOf(handle, document))
+        return status;
+    if (!output)
+        return RV_ERR_NULL_ARGUMENT;
+    output->value = 0;
+    if (!valid(input) || !flag(requestedLength.present))
+        return RV_ERR_NULL_ARGUMENT;
+    RefPtr<CryptoKey> key;
+    if (auto status = lookupKey(keyHandle, key))
+        return status;
+    auto id = admit(*document, output);
+    if (requestedLength.present && requestedLength.bits > UINT32_MAX) {
+        deliver(id, errorResult(ExceptionCode::TypeError));
+        return RV_OK;
+    }
+    std::unique_ptr<CryptoAlgorithmParameters> params;
+    if (auto error = kdfParameters(*input, params)) {
+        deliver(id, errorResult(*error));
+        return RV_OK;
+    }
+    if (key->algorithmIdentifier() != params->identifier || !key->allows(CryptoKeyUsageDeriveBits)) {
+        deliver(id, errorResult(ExceptionCode::InvalidAccessError));
+        return RV_OK;
+    }
+    std::optional<size_t> length;
+    if (requestedLength.present)
+        length = static_cast<size_t>(requestedLength.bits);
+    runDerivation(id, *params, key.releaseNonNull(), length, [id](const Vector<uint8_t>& bytes) { deliverBytes(id, bytes); });
+    return RV_OK;
+}
+
+int32_t ranvier_crypto_kdf_derive_key(RvNode* handle, const RanvierCryptoKdfParams* input, RanvierCryptoKeyHandle keyHandle,
+    const RanvierCryptoDerivedKeyParams* derived, int32_t extractable, RanvierCryptoStrings requestedUsages, RanvierCryptoOperationHandle* output)
+{
+    Document* document;
+    if (auto status = documentOf(handle, document))
+        return status;
+    if (!output)
+        return RV_ERR_NULL_ARGUMENT;
+    output->value = 0;
+    if (!valid(input) || !valid(derived) || !flag(extractable) || !valid(requestedUsages))
+        return RV_ERR_NULL_ARGUMENT;
+    RefPtr<CryptoKey> key;
+    if (auto status = lookupKey(keyHandle, key))
+        return status;
+    auto id = admit(*document, output);
+    CryptoKeyUsageBitmap usages;
+    if (auto error = usagesOf(requestedUsages, usages)) {
+        deliver(id, errorResult(*error));
+        return RV_OK;
+    }
+    std::unique_ptr<CryptoAlgorithmParameters> params, importParams, lengthParams;
+    if (auto error = kdfParameters(*input, params)) {
+        deliver(id, errorResult(*error));
+        return RV_OK;
+    }
+    if (auto error = derivedParameters(*derived, importParams, lengthParams)) {
+        deliver(id, errorResult(*error));
+        return RV_OK;
+    }
+    if (key->algorithmIdentifier() != params->identifier || !key->allows(CryptoKeyUsageDeriveKey)) {
+        deliver(id, errorResult(ExceptionCode::InvalidAccessError));
+        return RV_OK;
+    }
+    auto lengthAlgorithm = CryptoAlgorithmRegistry::singleton().create(lengthParams->identifier);
+    auto importAlgorithm = CryptoAlgorithmRegistry::singleton().create(importParams->identifier);
+    if (!lengthAlgorithm || !importAlgorithm) {
+        deliver(id, errorResult(ExceptionCode::NotSupportedError));
+        return RV_OK;
+    }
+    auto length = lengthAlgorithm->getKeyLength(*lengthParams);
+    if (length.hasException()) {
+        deliver(id, errorResult(length.releaseException().code()));
+        return RV_OK;
+    }
+    runDerivation(id, *params, key.releaseNonNull(), length.releaseReturnValue(),
+        [id, params = WTF::move(importParams), extractable, usages](const Vector<uint8_t>& bytes) {
+            auto* value = operation(id);
+            if (!value || value->result)
+                return;
+            importSecret(id, CryptoKeyFormat::Raw, KeyData { bytes }, *params, extractable, usages);
+        });
+    return RV_OK;
+}
+
+int32_t ranvier_crypto_kdf_key_info(RanvierCryptoKeyHandle handle, RanvierCryptoKdfKeyInfo* info)
+{
+    RefPtr<CryptoKey> key;
+    if (auto status = lookupKey(handle, key))
+        return status;
+    if (!info || info->size != sizeof(*info))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isKdf(key->algorithmIdentifier()))
+        return RV_ERR_WRONG_INTERFACE;
+    *info = { sizeof(*info), key->extractable(), key->allows(CryptoKeyUsageDeriveBits), key->allows(CryptoKeyUsageDeriveKey) };
     return RV_OK;
 }
