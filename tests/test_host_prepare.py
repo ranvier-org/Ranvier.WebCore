@@ -22,6 +22,7 @@ class HostPrepare(unittest.TestCase):
             program.write_text('#include <cstdint>\n#include <cstring>\n#include <initializer_list>\n'
                 '#define USE(feature) USE_##feature\n#define ENABLE(feature) 0\n#define PLATFORM(feature) 0\n'
                 'int ranvier_dom_has(const char*) { return 0; }\n'
+                'extern "C" int32_t ranvier_print_pdf_supported() { return 0; }\n'
                 'int32_t rv_abi_has(const char* feature)'+capability+'\n}\n'
                 'int main() { return rv_abi_has("view-transitions") != EXPECT_SUPPORTED; }\n')
             for name,stub,compositor,expected in [('windows-slim',1,0,0),('wpe-slim',0,0,0),('gpu',0,1,1)]:
