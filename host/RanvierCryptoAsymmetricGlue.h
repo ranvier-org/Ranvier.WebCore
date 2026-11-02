@@ -14,6 +14,10 @@ WEBCORE_EXPORT int32_t ranvier_crypto_asymmetric_encrypt(RvNode*, const RanvierC
 WEBCORE_EXPORT int32_t ranvier_crypto_asymmetric_decrypt(RvNode*, const RanvierCryptoAsymmetricOaepParams*, RanvierCryptoKeyHandle, RanvierCryptoBytes data, RanvierCryptoOperationHandle*);
 WEBCORE_EXPORT int32_t ranvier_crypto_asymmetric_derive_bits(RvNode*, const RanvierCryptoAsymmetricDeriveParams*, RanvierCryptoKeyHandle, RanvierCryptoOptionalLength, RanvierCryptoOperationHandle*);
 WEBCORE_EXPORT int32_t ranvier_crypto_asymmetric_derive_key(RvNode*, const RanvierCryptoAsymmetricDeriveParams*, RanvierCryptoKeyHandle, const RanvierCryptoDerivedKeyParams*, int32_t extractable, RanvierCryptoStrings usages, RanvierCryptoOperationHandle*);
+WEBCORE_EXPORT int32_t ranvier_crypto_asymmetric_key_info(RanvierCryptoKeyHandle, RanvierCryptoAsymmetricKeyInfo*);
+WEBCORE_EXPORT int32_t ranvier_crypto_asymmetric_key_hash(RanvierCryptoKeyHandle, char*, int32_t capacity, int32_t* length);
+WEBCORE_EXPORT int32_t ranvier_crypto_asymmetric_key_named_curve(RanvierCryptoKeyHandle, char*, int32_t capacity, int32_t* length);
+WEBCORE_EXPORT int32_t ranvier_crypto_asymmetric_key_public_exponent(RanvierCryptoKeyHandle, uint8_t*, int32_t capacity, int32_t* length);
 
 WEBCORE_EXPORT int32_t ranvier_crypto_operation_take_key_pair(RanvierCryptoOperationHandle, RanvierCryptoKeyPairResult*);
 WEBCORE_EXPORT int32_t ranvier_crypto_operation_jwk(RanvierCryptoOperationHandle, RanvierCryptoJsonWebKey*);
