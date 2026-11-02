@@ -1,0 +1,102 @@
+import importlib.util
+import json
+from pathlib import Path
+import tempfile
+import unittest
+from unittest.mock import patch
+import zipfile
+
+spec = importlib.util.spec_from_file_location('recovery', Path(__file__).resolve().parents[1] / 'scripts/recover_preview4_gpu.py')
+recovery = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(recovery)
+
+
+class RecoveryTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        files = [{'name': f'{i}.dll', 'bytes': 1, 'sha256': recovery.sha(bytes([i]))} for i in range(26)]
+        self.manifest = {'source': {'commit': recovery.PRODUCT, 'dirty': False, 'builder': 'ci'}, 'files': files}
+        self.manifest_path = self.root / 'manifest.json'
+        self.manifest_path.write_text(json.dumps(self.manifest))
+        self.package = self.root / 'package.nupkg'
+        with zipfile.ZipFile(self.package, 'w') as archive:
+            archive.writestr('manifest.json', self.manifest_path.read_bytes())
+            for i in range(26):
+                archive.writestr(f'runtimes/win-x64/native/{i}.dll', bytes([i]))
+        payloads = {x['name']: x['sha256'] for x in files}
+        self.receipt = {'packageSha256': recovery.sha(self.package.read_bytes()),
+                        'manifestSha256': recovery.sha(self.manifest_path.read_bytes()), 'source': recovery.PRODUCT,
+                        'before': payloads, 'after': payloads.copy(), 'unchanged': True,
+                        'capture': {'exit': 0, 'timedOut': False}}
+        self.report = {'result': 'PASS', 'rid': 'win-x64', 'completeKeys': 54, 'strictContentMaskKeys': 12,
+                       'results': [{} for _ in range(54)], 'failures': []}
+        self.write_evidence()
+        self.jobs = {'jobs': [{'name': 'diagnose-p4-clipping', 'conclusion': 'success', 'steps': [
+            {'name': 'Verify diagnostic guards and bounded cleanup', 'conclusion': 'success'},
+            {'name': 'Replay exact failed package and retain full pixels and adapter identity', 'conclusion': 'success'}]},
+            {'name': 'publish', 'conclusion': 'skipped'}]}
+        self.producer = {'head_sha': recovery.PRODUCT, 'status': 'completed', 'conclusion': 'failure'}
+        self.qualification = {'head_sha': recovery.POLICY, 'event': 'workflow_dispatch',
+                              'status': 'completed', 'conclusion': 'success'}
+
+    def write_evidence(self):
+        (self.root / 'receipt.json').write_text(json.dumps(self.receipt))
+        (self.root / 'background-content-clipping-regression.json').write_text(json.dumps(self.report))
+
+    def run_verify(self):
+        def api(path):
+            if path.endswith('/jobs'):
+                return self.jobs
+            return self.producer if path.endswith(str(recovery.PRODUCER)) else self.qualification
+        with patch.object(recovery, 'api', side_effect=api), \
+             patch.object(recovery, 'PACKAGE_SHA', recovery.sha(self.package.read_bytes())), \
+             patch.object(recovery, 'MANIFEST_SHA', recovery.sha(self.manifest_path.read_bytes())), \
+             patch.object(recovery, 'REPORT_SHA', recovery.sha((self.root / 'background-content-clipping-regression.json').read_bytes())), \
+             patch.object(recovery, 'RECEIPT_SHA', recovery.sha((self.root / 'receipt.json').read_bytes())):
+            return recovery.verify(self.package, self.manifest_path, self.root)
+
+    def test_complete_fixed_evidence(self):
+        self.assertEqual(self.run_verify()['nativeFiles'], 26)
+
+    def test_failed_or_wrong_source_qualification_refused(self):
+        for key, value in [('conclusion', 'failure'), ('head_sha', 'wrong'), ('event', 'push')]:
+            with self.subTest(key=key):
+                original = self.qualification[key]
+                self.qualification[key] = value
+                with self.assertRaises(ValueError):
+                    self.run_verify()
+                self.qualification[key] = original
+
+    def test_unexpected_job_or_missing_guard_refused(self):
+        self.jobs['jobs'][1]['conclusion'] = 'success'
+        with self.assertRaises(ValueError):
+            self.run_verify()
+        self.jobs['jobs'][1]['conclusion'] = 'skipped'
+        self.jobs['jobs'][0]['steps'][0]['conclusion'] = 'failure'
+        with self.assertRaises(ValueError):
+            self.run_verify()
+
+    def test_changed_payload_receipt_or_failed_report_refused(self):
+        self.receipt['after'] = {}
+        self.write_evidence()
+        with self.assertRaises(ValueError):
+            self.run_verify()
+        self.receipt['after'] = self.receipt['before'].copy()
+        self.report['failures'] = ['unexpected']
+        self.write_evidence()
+        with self.assertRaises(ValueError):
+            self.run_verify()
+
+    def test_corrupt_package_refused_even_if_outer_hash_is_updated(self):
+        with zipfile.ZipFile(self.package, 'a') as archive:
+            archive.writestr('runtimes/win-x64/native/0.dll', b'changed')
+        self.receipt['packageSha256'] = recovery.sha(self.package.read_bytes())
+        self.write_evidence()
+        with self.assertRaises(ValueError):
+            self.run_verify()
+
+
+if __name__ == '__main__':
+    unittest.main()
