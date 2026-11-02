@@ -98,6 +98,7 @@ class Probe:
             self.functions[suffix] = fn
         self.callbacks = []
         self.live_observers = set()
+        self.observer_handles = {}
         self.live_batches = set()
         self.callback_errors = []
 
@@ -130,7 +131,7 @@ class Probe:
             })
         return result
 
-    def create(self, document, action=None):
+    def create(self, document, action=None, on_closed=None):
         events, releases = [], []
 
         def delivered(_, observer, batch):
@@ -141,18 +142,28 @@ class Probe:
             except BaseException as error:
                 self.callback_errors.append(repr(error))
 
-        callback = CALLBACK(delivered)
-        release = RELEASE(lambda _: releases.append('release'))
-        self.callbacks.extend([callback, release])
         handle = P()
+        def finalized(_):
+            try:
+                releases.append('release')
+                if on_closed and handle.value:
+                    on_closed(handle.value)
+            except BaseException as error:
+                self.callback_errors.append(repr(error))
+
+        callback = CALLBACK(delivered)
+        release = RELEASE(finalized)
+        self.callbacks.extend([callback, release])
         self.ok('create', document, callback, None, release, C.byref(handle))
         self.n.expect(bool(handle.value), 'created observer is non-null')
         self.live_observers.add(handle.value)
+        self.observer_handles[handle.value] = handle
         return handle.value, events, releases
 
     def release(self, handle):
-        self.ok('release', handle)
+        self.observer_handles.pop(handle).value = None
         self.live_observers.remove(handle)
+        self.ok('release', handle)
 
     def observe(self, observer, target, options):
         self.ok('observe', observer, target, C.byref(options))
@@ -182,6 +193,8 @@ class Probe:
 
     def close(self):
         for handle in list(self.live_observers):
+            self.observer_handles.pop(handle).value = None
+            self.live_observers.remove(handle)
             self.call('release', handle)
         for handle in list(self.live_batches):
             self.call('batch_release', handle)
@@ -325,7 +338,10 @@ def run(directory, bridge, report_path=None):
         n.expect(len(events) == 2 and [e[1][0]['old'] for e in events] == [None, 'first'], 'reentrant mutation queues a separate delivery')
         p.release(reentrant)
 
-        stale, _, releases = p.create(foreign.document)
+        def provider_closed(handle):
+            p.release(handle)
+
+        stale, _, releases = p.create(foreign.document, on_closed=provider_closed)
         p.observe(stale, foreign.document, Options(child_list=True, subtree=True))
         detached_child = n.handle('rv_dom_document_create_element', [P, Utf8, P], foreign.document, 'div', None, nullable=False)
         foreign.owned.append(detached_child)
@@ -339,7 +355,7 @@ def run(directory, bridge, report_path=None):
         foreign = None
         p.pump()
         after_destroy = p.counts()
-        automatic_teardown = releases == ['release'] and after_destroy[1:3] == initial[1:3]
+        automatic_teardown = releases == ['release'] and after_destroy == [*initial[:3], initial[3] + 1]
         teardown = {'before': before_destroy, 'after': after_destroy,
                     'context_releases_before_observer_access': list(releases),
                     'automatic': automatic_teardown}
@@ -351,11 +367,72 @@ def run(directory, bridge, report_path=None):
         n.expect(releases == ['release'], 'stopped-context access drops the callback lease')
         n.expect(len(p.records(retained)) == 1, 'retained record batch remains readable after host destruction')
         p.release_batch(retained)
-        p.release(stale)
+        n.expect(stale not in p.live_observers, 'provider closed notification released its native observer without caller disposal')
         p.pump()
+        n.expect(automatic_teardown, f'automatic destroy counts before explicit access: {teardown}')
+
+        replacements = {}
+        for mode in ['html', 'svg']:
+            changed = Case(n, '<div id="old">old document</div>')
+            try:
+                target = changed.node('old')
+                old_observer, old_events, old_releases = p.create(changed.document, on_closed=provider_closed)
+                p.observe(old_observer, target, Options(attribute_old_value=True))
+                p.set_attribute(target, 'data-before-replacement', mode)
+                batch = p.take(old_observer)
+                function = 'rv_host_load_html' if mode == 'html' else 'rv_host_load_svg'
+                markup = '<div>replacement</div>' if mode == 'html' else '<svg xmlns="http://www.w3.org/2000/svg"><text>replacement</text></svg>'
+                n.ok(function, [P, Utf8], changed.host, markup)
+                p.pump()
+                raw = p.counts()
+                replacements[mode] = {'counts_before_observer_access': raw,
+                                      'context_releases': list(old_releases)}
+                n.expect(raw == [*initial[:3], initial[3] + 1] and old_releases == ['release'],
+                         f'{mode} replacement automatically closes observer roots: {replacements[mode]}')
+                n.expect(old_events == [], mode + ' replacement suppresses queued callback delivery')
+                n.expect(p.records(batch)[0]['target'] == target, mode + ' replacement retains independent record snapshot')
+                p.release_batch(batch)
+                n.expect(old_observer not in p.live_observers, mode + ' replacement releases native provider token')
+            finally:
+                changed.close()
+
+        doomed = Case(n, '<div id="doomed"></div>')
+        doomed_closed = False
+        destroy_order = []
+        kept = []
+        def destroy_while_delivering(_, borrowed):
+            nonlocal doomed_closed
+            p.ok('batch_retain', borrowed)
+            p.live_batches.add(borrowed)
+            kept.append(borrowed)
+            doomed_closed = True
+            doomed.close()
+            destroy_order.append(list(doomed_releases))
+
+        try:
+            doomed_target = doomed.node('doomed')
+            doomed_observer, doomed_events, doomed_releases = p.create(
+                doomed.document, destroy_while_delivering, provider_closed)
+            p.observe(doomed_observer, doomed_target, Options(attributes=True))
+            p.set_attribute(doomed_target, 'data-destroy', 'now')
+            p.pump(lambda: bool(doomed_events), timeout=2)
+            n.expect(destroy_order == [[]] and doomed_releases == ['release'],
+                     'host destruction during delivery preserves the in-flight context lease through callback return')
+            raw = p.counts()
+            n.expect(raw == [*initial[:3], initial[3] + 1] and doomed_observer not in p.live_observers,
+                     f'self-destroy callback leaves only its retained batch: {raw}')
+            n.expect(p.records(kept[0])[0]['target'] == doomed_target,
+                     'callback snapshot survives destruction of its creating host')
+            p.release_batch(kept.pop())
+            p.pump()
+            n.expect(len(doomed_events) == 1, 'destroyed observer never delivers again')
+        finally:
+            if not doomed_closed:
+                doomed.close()
         n.expect(p.counts() == initial, 'observer, callback, context and batch counts return to baseline')
         return {'assertions': n.assertions, 'transcript': transcript, 'counts': initial,
-                'host_teardown': teardown}
+                'host_teardown': teardown, 'replacement_teardown': replacements,
+                'self_destroy_context_release_order': destroy_order}
     finally:
         p.close()
         if foreign is not None:

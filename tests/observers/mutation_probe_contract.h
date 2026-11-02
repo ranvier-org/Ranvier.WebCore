@@ -61,6 +61,7 @@ MUTATION_TEST_EXPORT int32_t ranvier_test_mutation_batch_release(TestMutationBat
 MUTATION_TEST_EXPORT int32_t ranvier_test_mutation_batch_count(TestMutationBatch*, int32_t*);
 MUTATION_TEST_EXPORT int32_t ranvier_test_mutation_batch_record(TestMutationBatch*, int32_t, TestMutationRecordView*);
 MUTATION_TEST_EXPORT int32_t ranvier_test_mutation_counts(TestMutationCounts*);
+MUTATION_TEST_EXPORT void ranvier_test_mutation_invalidate_document(RvNode*);
 #ifdef __cplusplus
 }
 #endif

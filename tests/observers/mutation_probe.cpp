@@ -338,3 +338,19 @@ int32_t ranvier_test_mutation_counts(TestMutationCounts* result)
     result->batches = batches().size();
     return RV_OK;
 }
+
+void ranvier_test_mutation_invalidate_document(RvNode* handle)
+{
+    if (!handle || !isMainThread())
+        return;
+    auto* document = dynamicDowncast<Document>(reinterpret_cast<Node*>(handle));
+    if (!document)
+        return;
+    std::vector<std::shared_ptr<State>> protectedStates;
+    for (auto& [observer, state] : observers()) {
+        if (!state->closed && state->document.get() == document)
+            protectedStates.push_back(state);
+    }
+    for (auto& state : protectedStates)
+        state->close();
+}
