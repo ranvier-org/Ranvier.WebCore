@@ -31,7 +31,7 @@ void deliverKeyPair(uint64_t, WebCore::CryptoKey& publicKey, WebCore::CryptoKey&
 void deliverJwk(uint64_t, WebCore::JsonWebKey&&);
 
 bool validJwk(const RanvierCryptoJsonWebKey*);
-std::optional<WebCore::ExceptionCode> copyJwk(const RanvierCryptoJsonWebKey&, WebCore::JsonWebKey&);
+std::optional<WebCore::ExceptionCode> copyJwk(const RanvierCryptoJsonWebKey&, WebCore::JsonWebKey&, bool& duplicateKeyOps);
 std::optional<WebCore::ExceptionCode> normalizeUsages(RanvierCryptoStrings, WebCore::CryptoKeyUsageBitmap&);
 
 class DerivedKeyTarget;
