@@ -1,6 +1,7 @@
 """Shared F# DOM interfaces and Fable adapters from the scoped Web IDL model."""
 
 import itertools
+import json
 import re
 from pathlib import Path
 
@@ -637,7 +638,9 @@ class InterfaceEmitter:
                  'type internal DomStringEnumAttribute() =', '    inherit Attribute()', '',
                  '[<AttributeUsage(AttributeTargets.Class)>]', 'type internal DomDictionaryAttribute() =',
                  '    inherit Attribute()', '#endif', '']
-        if 'NodeOrDOMString' in self.unions:
+        retained_unions = json.loads(Path(__file__).with_name('native_retained_union_displays.json').read_text(encoding='utf-8'))
+        display_unions = ('NodeOrDOMString', 'DOMStringOrCanvasGradientOrCanvasPattern', 'UnrestrictedDoubleOrDOMPointInit')
+        if any(name in self.unions for name in (*display_unions, *retained_unions)):
             helper = Path(__file__).with_name('native_display.fs.inc').read_text(encoding='utf-8')
             lines[5:5] = helper.splitlines() + ['']
         declarations = []
@@ -726,12 +729,39 @@ class InterfaceEmitter:
                 if omitted:
                     lines += [f'/// <remarks>Fields omitted from the shared contract: {", ".join(omitted)}.</remarks>']
             prefix = "type" if index == 0 else "and"
-            if name == 'NodeOrDOMString':
+            if name in retained_unions:
+                native_declaration = f'{prefix} [<System.Diagnostics.DebuggerDisplay("{{ToString(),nq}}"); RequireQualifiedAccess>] {name}'
+                native_declaration += '\n    =' if name == 'TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString' else ' ='
+                lines += ['#if !FABLE_COMPILER',
+                          native_declaration,
+                          '#else', f'{prefix} [<RequireQualifiedAccess>] {name} =', '#endif']
+                lines += body + [''] + retained_unions[name] + ['']
+                continue
+            if name in ('NodeOrDOMString', 'DOMStringOrCanvasGradientOrCanvasPattern', 'UnrestrictedDoubleOrDOMPointInit'):
                 lines += ['#if !FABLE_COMPILER',
                           f'{prefix} [<System.Diagnostics.DebuggerDisplay("{{ToString(),nq}}"); RequireQualifiedAccess>] {name} =',
                           '#else', f'{prefix} [<RequireQualifiedAccess>] {name} =', '#endif']
                 lines += body + ['']
-                lines += Path(__file__).with_name('native_node_display.fs.inc').read_text(encoding='utf-8').splitlines() + ['']
+                template = {'NodeOrDOMString': 'native_node_display.fs.inc',
+                            'DOMStringOrCanvasGradientOrCanvasPattern': 'native_canvas_style_display.fs.inc',
+                            'UnrestrictedDoubleOrDOMPointInit': 'native_canvas_radius_display.fs.inc'}[name]
+                lines += Path(__file__).with_name(template).read_text(encoding='utf-8').splitlines() + ['']
+                continue
+            if name in ('CanvasLineCap', 'CanvasLineJoin', 'ImageSmoothingQuality', 'CanvasFillRule',
+                        'CanvasTextAlign', 'CanvasTextBaseline', 'CanvasDirection', 'AnimationPlayState',
+                        'AnimationReplaceState', 'CompositeOperation', 'FillMode', 'FontFaceLoadStatus',
+                        'IterationCompositeOperation', 'PlaybackDirection', 'ScrollAxis', 'ScrollBehavior',
+                        'ShadowRootMode', 'SlotAssignmentMode'):
+                lines += ['#if !FABLE_COMPILER',
+                          f'{prefix} [<System.Diagnostics.DebuggerDisplay("{{ToString(),nq}}"); DomStringEnum; RequireQualifiedAccess>] {name} =',
+                          '#else', f'{prefix} [<DomStringEnum; RequireQualifiedAccess>] {name} =', '#endif']
+                lines += body + ['', '#if !FABLE_COMPILER', '    override this.ToString() =',
+                          '        if System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeSupported then',
+                          '            sprintf "%+A" this', '        else', '            match this with']
+                for value in self.world.enums[name][0]:
+                    case = case_name(value)
+                    lines.append(f'            | {name}.{case} -> "{case}"')
+                lines += ['#endif', '']
                 continue
             if name in self.world.enums:
                 lines += [f'{prefix} [<DomStringEnum; RequireQualifiedAccess>] {name} =']

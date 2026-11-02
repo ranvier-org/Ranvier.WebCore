@@ -634,6 +634,16 @@ jobs:
           path: ${{ env.RANVIER_WORK }}/probe-logs
           if-no-files-found: ignore
 
+      - name: Retain native PDF output and ownership results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: printing-report-${{ matrix.rid }}-${{ env.FLAVOR }}
+          path: |
+            ${{ env.RANVIER_WORK }}/printing-pdf.json
+            ${{ env.RANVIER_WORK }}/host-output.pdf
+          if-no-files-found: ignore
+
       - name: Retain clipping pixel results
         if: always()
         uses: actions/upload-artifact@v4

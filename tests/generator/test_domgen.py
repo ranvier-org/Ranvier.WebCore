@@ -60,6 +60,49 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_retained_union_alone_includes_native_display_helper(self):
+        (self.source / 'Source/WebCore/dom/Fixture.idl').write_text('''
+interface Probe { attribute (unrestricted double or DOMString) value; };
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = ['Probe']
+        config['contract'] = {}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.run()
+        source = generator.interfaces()
+        self.assertIn('UnrestrictedDoubleOrDOMString', source)
+        self.assertIn('member internal this.NativeDisplay(', source)
+        self.assertIn('module internal NativeDisplay =', source)
+
+    def test_canvas_style_union_has_a_typed_native_display(self):
+        (self.source / 'Source/WebCore/dom/Fixture.idl').write_text(IDL + '''
+interface CanvasGradient {};
+interface CanvasPattern {};
+interface PaintProbe { attribute (DOMString or CanvasGradient or CanvasPattern) value; };
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CanvasGradient', 'CanvasPattern', 'PaintProbe']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.run()
+        source = generator.interfaces()
+        self.assertIn('DOMStringOrCanvasGradientOrCanvasPattern.DOMString (v0_0)', source)
+        self.assertIn('NativeDisplay.opaque context n0 "<Ranvier.Dom.CanvasGradient>"', source)
+        self.assertIn('NativeDisplay.opaque context n0 "<Ranvier.Dom.CanvasPattern>"', source)
+
+    def test_canvas_enum_has_typed_native_display(self):
+        (self.source / 'Source/WebCore/dom/Fixture.idl').write_text(IDL + '''
+enum CanvasLineCap { "butt", "round", "square" };
+enum CanvasTextAlign { "start", "center" };
+interface RadiusProbe { attribute CanvasLineCap cap; attribute CanvasTextAlign align; };
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['RadiusProbe']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.run()
+        source = generator.interfaces()
+        self.assertIn('CanvasLineCap.Butt -> "Butt"', source)
+        self.assertIn('CanvasTextAlign.Center -> "Center"', source)
+
     def test_node_string_display_preserves_the_fable_union_and_native_fields(self):
         generator = domgen.Generator(self.world)
         generator.run()
