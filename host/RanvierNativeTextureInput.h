@@ -9,6 +9,7 @@
 #include <EGL/eglext_angle.h>
 #include "RenderBox.h"
 #include "RenderBoxInlines.h"
+#include "ContainerNodeInlines.h"
 #include "RenderLayer.h"
 #include "RenderLayerBacking.h"
 #include "TextureMapperPlatformLayer.h"
@@ -19,7 +20,7 @@ extern "C" __declspec(dllimport) void rv_native_texture_draw(WebCore::TextureMap
 struct RvNativeTextureInput final : WebCore::TextureMapperPlatformLayer {
     template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
     RefPtr<WebCore::Element> element;
-    RefPtr<WebCore::GraphicsLayer> layer;
+    WeakPtr<WebCore::GraphicsLayer> layer;
     ComPtr<ID3D11Device> producerDevice;
     ComPtr<ID3D11Device> compositorDevice;
     ComPtr<ID3D11Texture2D> producerTexture;
