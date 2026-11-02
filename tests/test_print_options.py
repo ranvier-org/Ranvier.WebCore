@@ -10,6 +10,29 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class PrintOptionsTests(unittest.TestCase):
+    def test_actual_backend_branch_uses_preprocessor_only_feature_macros(self):
+        compiler = os.environ.get('CXX') or os.environ.get('CC') or shutil.which('clang++') or shutil.which('c++')
+        if not compiler:
+            self.skipTest('C++ compiler unavailable')
+        source = (ROOT / 'host/RanvierPrintGlue.cpp').read_text(encoding='utf-8')
+        fragment = 'auto options = input ?' + source.split('auto options = input ?', 1)[1].split('    auto* candidate', 1)[0]
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            cpp = directory / 'backend.cpp'
+            cpp.write_text('#include "RanvierPrintOptions.h"\n#include <cassert>\n'
+                '#define USE(x) (defined USE_##x && USE_##x)\n'
+                'int32_t actual(const RvPrintOptions* input) {\n' + fragment +
+                'return static_cast<int32_t>(options.raster_dpi); }\n'
+                'int main() { assert(actual(nullptr) == EXPECT_DPI); auto options = ranvierPrintDefaultOptions(); '
+                'assert(actual(&options) == EXPECT_DPI); options.raster_dpi = 144; '
+                'assert(actual(&options) == EXPECT_EXPLICIT); }\n', encoding='utf-8')
+            for skia, cg, dpi, explicit in [(1, 0, 144, 144), (0, 1, 72, -9)]:
+                exe = directory / f'profile-{skia}.exe'
+                subprocess.run([compiler, '-std=c++20', f'-DUSE_SKIA={skia}', f'-DUSE_CG={cg}',
+                                f'-DEXPECT_DPI={dpi}', f'-DEXPECT_EXPLICIT={explicit}', '-I', str(ROOT / 'host'),
+                                str(cpp), '-o', str(exe)], check=True)
+                subprocess.run([str(exe)], check=True)
+
     def test_pdf_off_keeps_a_truthful_unavailable_backend(self):
         compiler = os.environ.get('CXX') or os.environ.get('CC') or shutil.which('clang++') or shutil.which('c++')
         if not compiler:
