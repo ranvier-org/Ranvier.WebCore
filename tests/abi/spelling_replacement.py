@@ -11,7 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
 from utf8_inputs import Utf8
 
-CASES = ['exact-undo', 'cancel', 'stale-document', 'composition', 'callback-replace', 'callback-destroy']
+CASES = ['exact-undo', 'cancel', 'stale-document', 'composition', 'callback-replace', 'callback-replace-newedit', 'callback-destroy']
 
 
 def exercise(directory, scenario, replacement):
@@ -90,7 +90,9 @@ def exercise(directory, scenario, replacement):
                 before = text()
                 p.expect(before == '🙂 spel suffix' and not ended, 'real composition text is present')
                 target = make_range(3, 7)
-                p.expect(replace(p.host, target, chosen) == -9, 'active composition declines spelling correction')
+                status = replace(p.host, target, chosen)
+                print(json.dumps({'diagnostic': scenario, 'status': status, 'before': before, 'after': text(), 'compositionEnds': len(ended)}), flush=True)
+                p.expect(status == -9, 'active composition declines spelling correction')
                 p.expect(text() == before and not ended, 'declined spelling does not commit or cancel IME')
                 commit = p.bind('rv_host_ime_commit', I, [P, Utf8])
                 p.expect(commit(p.host, b'speling') == 0 and len(ended) == 1, 'original composition remains committable')
@@ -101,18 +103,36 @@ def exercise(directory, scenario, replacement):
                     if entered:
                         return
                     entered.append(True)
-                    if scenario == 'callback-replace':
+                    if scenario.startswith('callback-replace'):
                         p.load('<div id="fresh" contenteditable="true">fresh</div>', standalone=False)
+                        if scenario == 'callback-replace-newedit':
+                            fresh = p.node('fresh')
+                            p.call('rv_element_focus', [P], fresh)
+                            p.expect(history(p.host, 4) == 1, 'select new document text')
+                            p.call('rv_host_ime_commit', [P, Utf8], p.host, b'new typed text')
                     else:
+                        print(json.dumps({'diagnostic': scenario, 'point': 'before host destruction'}), flush=True)
                         original_host, p.host = p.host, None
                         p.bind('rv_host_destroy', None, [P])(original_host)
                 on('beforeinput', action)
                 status = replace(p.host, target, chosen)
                 p.expect(status >= 0 and entered == [True], 'range callback returns safely')
-                if scenario == 'callback-replace':
+                if scenario.startswith('callback-replace'):
                     fresh = p.node('fresh')
-                    p.expect(p.text('rv_dom_node_get_text_content', [P], fresh) == 'fresh', 'replacement callback keeps new document intact')
-                    p.expect(history(p.host, 6) == 0 and history(p.host, 7) == 0, 'no old-document history after replacement')
+                    expected = 'new typed text' if scenario.endswith('newedit') else 'fresh'
+                    p.expect(p.text('rv_dom_node_get_text_content', [P], fresh) == expected, 'replacement callback keeps new document intact')
+                    undo = history(p.host, 6)
+                    after_undo = p.text('rv_dom_node_get_text_content', [P], fresh)
+                    print(json.dumps({'diagnostic': scenario, 'outerStatus': status, 'undo': undo, 'afterUndo': after_undo}), flush=True)
+                    if scenario.endswith('newedit'):
+                        p.expect(undo == 1 and after_undo == 'fresh', 'new-document edit remains undoable')
+                        p.expect(history(p.host, 6) == 0, 'old-document step not inserted before new-document history')
+                        p.expect(history(p.host, 7) == 1 and p.text('rv_dom_node_get_text_content', [P], fresh) == expected,
+                                 'new-document edit remains redoable')
+                    else:
+                        redo = history(p.host, 7)
+                        print(json.dumps({'diagnostic': scenario, 'redo': redo}), flush=True)
+                        p.expect(undo == 0 and redo == 0, 'no old-document history after replacement')
                 else:
                     p.expect(p.host is None, 'host destruction returned after range callback')
             p.expect(not callback_errors, 'native callbacks completed without hidden Python failures: ' + str(callback_errors))
