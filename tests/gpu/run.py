@@ -46,7 +46,7 @@ if not args.run_only:
     compiler = shutil.which('cl', path=env.get('PATH'))
     if not compiler:
         parser.error('Selected compiler environment did not provide cl.exe.')
-    subprocess.run([compiler, '/nologo', '/std:c++20', '/EHsc', '/W4', str(root / 'tests/gpu/NativeFrameAcceptance.cpp'), f'/Fe:{exe}', f'/Fo:{out}/', '/link', 'd3d11.lib', 'dxgi.lib', 'user32.lib'], cwd=out, env=env, check=True)
+    subprocess.run([compiler, '/nologo', '/std:c++20', '/EHsc', '/W4', str(root / 'tests/gpu/NativeFrameAcceptance.cpp'), f'/Fe:{exe}', f'/Fo:{out}/', '/link', 'd3d11.lib', 'dxgi.lib', 'user32.lib', 'd3d12.lib'], cwd=out, env=env, check=True)
 if not args.build_only:
     for mode in ['explicit', 'host', 'renderer', 'window'] if args.teardown == 'all' else [args.teardown]:
         subprocess.run([str(exe), mode], cwd=out, env=env, check=True, timeout=45)
