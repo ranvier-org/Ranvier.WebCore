@@ -22,6 +22,7 @@ def main():
     consumer = Path(tempfile.mkdtemp(prefix='sdk-',dir=output)).resolve()
     sha = lambda p: hashlib.file_digest(p.open('rb'),'sha256').hexdigest()
     inputs = [*sorted((root/'examples/NativeMedia').glob('*.h')),*sorted((root/'tests/media').glob('*.cpp')),
+              root/'examples/NativeMedia/WindowsPlaybackBridge.cpp', root/'tests/media/bridge_lifetime.py',
               root/'tests/media/windows_composition.py',root/'tests/fixtures/native-media-colors-tone.mp4',root/'tests/fixtures/native-media-colors-tone.json']
     before = {str(p.relative_to(root)):sha(p) for p in inputs}
     native_before = {p.relative_to(args.native_directory).as_posix():sha(p) for p in args.native_directory.rglob('*') if p.is_file()}
@@ -52,15 +53,17 @@ def main():
             raise RuntimeError('Selected compiler environment did not provide cl.exe')
         libraries = ['ole32.lib','oleaut32.lib','uuid.lib','mfplat.lib','mf.lib','mfreadwrite.lib','mfuuid.lib','d3d11.lib','dxgi.lib']
         provider_absent = False
-        for stem in ['windows_provider','windows_video','windows_audio','windows_controls','WindowsPlaybackProbe']:
+        for stem in ['windows_provider','windows_video','windows_audio','windows_controls','WindowsPlaybackProbe','WindowsPlaybackBridge']:
             if provider_absent:
                 report['groups'].append({'name':stem,'availability':'not run: optional OS playback provider unavailable'})
                 continue
-            module = stem == 'WindowsPlaybackProbe'
+            bridge = stem == 'WindowsPlaybackBridge'
+            module = stem == 'WindowsPlaybackProbe' or bridge
+            source = root/('examples/NativeMedia' if bridge else 'tests/media')/(stem+'.cpp')
             executable = consumer/(stem+('.dll' if module else '.exe'))
             command = [compiler,'/nologo','/std:c++20','/EHsc','/W4','/WX','/MT','/utf-8','/DWIN32_LEAN_AND_MEAN','/DNOMINMAX','/D_WIN32_WINNT=0x0A00',
-                       *(['/LD'] if module else []),str(root/'tests/media'/(stem+'.cpp')),f'/Fe:{executable}',f'/Fo:{consumer}/',
-                       '/link',*libraries,*(['runtimeobject.lib','windowsapp.lib','shell32.lib','user32.lib'] if stem=='windows_controls' else [])]
+                       *(['/LD'] if module else []),str(source),f'/Fe:{executable}',f'/Fo:{consumer}/',
+                       '/link',*libraries,*(['runtimeobject.lib','windowsapp.lib','shell32.lib','user32.lib'] if stem=='windows_controls' or bridge else [])]
             group = {'name':stem,'compileCommand':command}
             with (output/(stem+'-compile.log')).open('wb') as log:
                 result = subprocess.run(command,cwd=consumer,env=environment,stdout=log,stderr=subprocess.STDOUT,timeout=90)
@@ -69,7 +72,10 @@ def main():
                 failures.append(stem+' compile')
             else:
                 group['executableSha256'] = sha(executable)
-                if module:
+                if bridge:
+                    command = [sys.executable,'-I','-B','-X','utf8',str(root/'tests/media/bridge_lifetime.py'),
+                               '--bridge',str(executable),'--fixture',str(fixture),'--report',str(output/'bridge.json')]
+                elif module:
                     command = [sys.executable,'-I','-B','-X','utf8',str(root/'tests/media/windows_composition.py'),
                                '--native-directory',str(args.native_directory.resolve()),'--helper',str(executable),'--fixture',str(fixture),
                                '--report',str(output/'composition.json')]

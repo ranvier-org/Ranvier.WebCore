@@ -106,3 +106,20 @@ audio recording is saved. Reports distinguish unavailable optional services from
 actual failures, and the runner exits nonzero when an executed group fails.
 Generated executables/objects are cleaned after execution. Renderer payload
 hashes and consumer source hashes must remain unchanged.
+
+The managed consumer also runs actual JIT and strict NativeAOT, each followed
+by a copied application with the optional DLL physically absent:
+
+```powershell
+python -I -X utf8 tests/media/managed.py --native-stage PATH_TO_STAGE --view-root PATH_TO_VIEW --nuget-config PATH_TO_NUGET_CONFIG --output managed-media-proof
+```
+
+The stage is the parent of `runtimes/win-x64/native`. The explicit View source
+graph supports qualification before the matching View package is published;
+use a clean owned checkout and configuration retaining its feed mappings.
+`--dotnet-sdk-driver` can select the exact installed SDK's `dotnet.dll`.
+The runner builds only the optional SDK DLL and application, checks all source
+and renderer hashes, retains command/log receipts, and removes disposable build
+outputs. Its inspection-only SDK helper reads the composed GPU frame and the
+process's own audio/OS session; the application adapter itself uses only public
+View APIs. Run under the normal native-process and memory limits.

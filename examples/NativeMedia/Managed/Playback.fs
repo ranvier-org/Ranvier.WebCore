@@ -73,11 +73,14 @@ type VideoFrameLease internal (owner: int, info: NativeFrameInfo, release: unit 
         member _.Dispose() =
             if not disposed then
                 Ownership.thread owner
-                try release ()
-                finally disposed <- true
+                release ()
+                disposed <- true
 
 /// <summary>An optional Windows Media Foundation player with explicit owner-thread and video-publication lifetime.</summary>
-/// <remarks>Dispose every frame lease before destroying its View host. Disposing the player pauses/revokes actions immediately; live frames defer provider teardown.</remarks>
+/// <remarks>
+/// Dispose frame leases before destroying their View host. Player disposal pauses/revokes actions immediately;
+/// live frames defer provider teardown.
+/// </remarks>
 [<Sealed>]
 type WindowsPlayback private (initial: nativeint) =
     let owner = Environment.CurrentManagedThreadId
@@ -114,13 +117,10 @@ type WindowsPlayback private (initial: nativeint) =
                 host.NativeTextureChanged target
                 let mutable held = frame
                 let release () =
-                    let mutable failure: exn = null
                     try host.BindD3D11Texture(target, 0n)
                     with
                     | :? ObjectDisposedException -> ()
-                    | error -> failure <- error
                     let status = Native.ranvier_media_frame_release(&held)
-                    if not (isNull failure) then raise failure
                     Ownership.check "media frame release" status
                 ValueSome (new VideoFrameLease(owner, info, release))
             with error ->
