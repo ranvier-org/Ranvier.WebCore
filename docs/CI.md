@@ -1,5 +1,15 @@
 # CI
 
+The fixed preview2 Windows GPU artifact has an explicit recovery dispatch in this same `build.yml` workflow:
+`recover_preview2_gpu=true`, dispatched from `main`. Its product source remains
+`05ba023551aaf58946cbc0ca7099ca65d9860e14`; its reviewed test source is separately pinned in
+`docs/preview2-gpu-recovery.json`. The original tag and package are unchanged. Recovery downloads the
+original CI package and manifest, fetches only five pinned font assets, verifies all seven published
+cohort packages, runs the packed GPU gates and all 101 Windows common/GPU probes, then rehashes the
+payload and retained proof before OIDC authentication. It never configures or builds the native engine.
+Ordinary build/publication jobs are skipped for this dispatch. A successful manual recovery does not
+prove the automatic next-tag GPU cohort path. NuGet policy rejection fails closed; no policy is changed.
+
 `.github/workflows/build.yml` runs `scripts/build.py` step by step for each runtime in its matrix, then
 uploads the `.nupkg` with `manifest.json`, and the PDBs as a separate artifact. On a `v*` tag it sets the
 package version from the tag and, when the repository variable `NUGET_USER` is set, pushes the packages
