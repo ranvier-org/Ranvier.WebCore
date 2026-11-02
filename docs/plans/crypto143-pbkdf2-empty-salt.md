@@ -1,6 +1,6 @@
 # PBKDF2 empty-salt fallback proposal
 
-Codex. Review checkpoint only: no0066 implementation or engine application yet. This addresses [WebCore237](https://github.com/ranvier-org/Ranvier.WebCore/issues/237) within143 without changing the selected profile.
+Codex. Source review checkpoint: 0066 is implemented, uncompiled and unapplied. This addresses [WebCore #237](https://github.com/ranvier-org/Ranvier.WebCore/issues/237) within #143 without changing the selected profile.
 
 ## Evidence and provenance
 
@@ -18,7 +18,9 @@ For each big-endian32-bit block index, calculate the first PRF over that four-by
 
 Reject zero iterations. Generic deriveBits already handles null/non-byte lengths and the typed bridge preserves its explicit zero-iteration/zero-output rejection. Zero output remains an owning empty result for positive iterations. Before allocation, validate digest length and compute block count as `(outputBytes - 1) / hashBytes + 1`, avoiding addition/multiplication overflow; reject counts above UINT32_MAX. Use a64-bit loop index to prevent the last legal block increment from wrapping. The selected WebIDL output range remains unchanged.
 
-The HMAC handle closes on every path. Explicitly initialized scratch arrays hold U and the XOR accumulator; all relevant bytes are overwritten before use, then wiped on success/error. A guarded output vector is wiped on failure and transferred normally on success. Allocation or provider failures return OperationError through the existing callback. This promises cleanup of introduced buffers, not forensic erasure of pre-existing engine key storage. Preserve provider FIPS restrictions: the empty-salt fallback must not bypass a mode that forbids empty salt.
+The HMAC handle closes on every path. Explicitly initialized scratch arrays hold U and the XOR accumulator; all relevant bytes are overwritten before use, then wiped on success/error. A guarded output vector is wiped on failure and transferred normally on success. Allocation or provider failures return OperationError through the existing callback. This promises cleanup of introduced buffers, not forensic erasure of pre-existing engine key storage.
+
+The selection rule is exactly `salt.empty && !gcry_fips_mode_active()`. Every nonempty-salt or FIPS request keeps the original public provider call and its policy decisions. Public libgcrypt 1.10.3 source shows that HMAC open checks operational state and public setkey enforces its own FIPS key rule. The read-only mode query changes no configuration. A private C primitive probe proves all four hashes and key lengths 0/8/16 against an independent reference in default mode. A separate child with forced process-local FIPS reports mode 1, rejects short HMAC keys through the public API, and retains the original empty-salt PBKDF2 rejection. This is branch/policy evidence, not a FIPS cohort qualification.
 
 ## Required private proof
 

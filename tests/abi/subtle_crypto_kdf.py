@@ -201,6 +201,21 @@ def check_empty_inputs(probe, page):
                         probe.n.expect(output == expected, 'present empty password/salt is valid and distinct from missing')
 
 
+def check_empty_salt_expansion(probe, page):
+    for password in [b'', b'pass\0word', bytes(range(200))]:
+        key = probe.base(page, 'PBKDF2', password)
+        for hash_name in ['SHA-1', 'SHA-256', 'SHA-384', 'SHA-512']:
+            digest = hash_name.lower().replace('-', '')
+            size = hashlib.new(digest).digest_size
+            for iterations in [1, 2, 4096]:
+                for length in [0, 1, size - 1, size, size + 1, 2 * size + 3]:
+                    with probe.check(f'empty salt {hash_name} passwordLength={len(password)} iterations={iterations} bytes={length}'):
+                        options = parameters('PBKDF2', hash_name, b'', iterations=iterations)
+                        output = probe.bytes(probe.bits(page, key, options, length * 8), page)
+                        expected = hashlib.pbkdf2_hmac(digest, password, b'', iterations, length) if length else b''
+                        probe.n.expect(output == expected, 'empty-salt block prefixes and multiple blocks match independent reference')
+
+
 def check_validation(probe, page):
     for name in ['HKDF', 'PBKDF2']:
         key = probe.base(page, name)
@@ -313,7 +328,7 @@ def run(directory, bridge_library=None):
             supported = I()
             probe.ok('kdf_supported', [P, Bytes, ctypes.POINTER(I)], page.document, span(name.encode()), ctypes.byref(supported))
             n.expect(supported.value == 1, name + ' registered')
-        for group in [check_vectors, check_hashes_and_derived_keys, check_empty_inputs, check_validation]:
+        for group in [check_vectors, check_hashes_and_derived_keys, check_empty_inputs, check_validation, check_empty_salt_expansion]:
             with probe.check(group.__name__):
                 group(probe, page)
         with probe.check('check_lifetime'):

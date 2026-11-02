@@ -1,0 +1,100 @@
+diff --git a/Source/WebCore/crypto/gcrypt/CryptoAlgorithmPBKDF2GCrypt.cpp b/Source/WebCore/crypto/gcrypt/CryptoAlgorithmPBKDF2GCrypt.cpp
+--- a/Source/WebCore/crypto/gcrypt/CryptoAlgorithmPBKDF2GCrypt.cpp
++++ b/Source/WebCore/crypto/gcrypt/CryptoAlgorithmPBKDF2GCrypt.cpp
+@@ -32,8 +32,85 @@
+ #include "CryptoKeyRaw.h"
+ #include "ExceptionOr.h"
+ #include "GCryptUtilities.h"
++#include <wtf/Scope.h>
++#include <wtf/StdLibExtras.h>
+ 
+ namespace WebCore {
++
++// RFC 8018 section 5.2, specialized to the provider's unsupported empty-salt case.
++static std::optional<Vector<uint8_t>> deriveWithEmptySalt(const Vector<uint8_t>& password, int hashAlgorithm, size_t iterations, size_t lengthInBytes)
++{
++    if (!iterations)
++        return std::nullopt;
++    if (!lengthInBytes)
++        return Vector<uint8_t> { };
++
++    size_t hashBytes = gcry_md_get_algo_dlen(hashAlgorithm);
++    std::array<uint8_t, 64> previous { };
++    std::array<uint8_t, 64> accumulator { };
++    if (!hashBytes || hashBytes > previous.size())
++        return std::nullopt;
++    uint64_t blocks = (lengthInBytes - 1) / hashBytes + 1;
++    if (blocks > UINT32_MAX)
++        return std::nullopt;
++
++    Vector<uint8_t> output;
++    bool transferred = false;
++    auto clearBuffers = makeScopeExit([&] {
++        secureZeroSpan(std::span { previous });
++        secureZeroSpan(std::span { accumulator });
++        if (!transferred)
++            secureZeroSpan(output.mutableSpan());
++    });
++    gcry_md_hd_t handle = nullptr;
++    auto closeHandle = makeScopeExit([&] {
++        if (handle)
++            gcry_md_close(handle);
++    });
++    if (auto error = gcry_md_open(&handle, hashAlgorithm, GCRY_MD_FLAG_HMAC)) {
++        PAL::GCrypt::logError(error);
++        return std::nullopt;
++    }
++    const void* key = password.isEmpty() ? static_cast<const void*>("") : password.span().data();
++    if (auto error = gcry_md_setkey(handle, key, password.size())) {
++        PAL::GCrypt::logError(error);
++        return std::nullopt;
++    }
++    if (!output.tryGrow(lengthInBytes))
++        return std::nullopt;
++
++    auto previousBytes = std::span { previous }.first(hashBytes);
++    auto accumulatorBytes = std::span { accumulator }.first(hashBytes);
++    size_t offset = 0;
++    for (uint64_t block = 1; block <= blocks; ++block) {
++        std::array<uint8_t, 4> counter {
++            static_cast<uint8_t>(block >> 24), static_cast<uint8_t>(block >> 16),
++            static_cast<uint8_t>(block >> 8), static_cast<uint8_t>(block)
++        };
++        gcry_md_reset(handle);
++        gcry_md_write(handle, counter.data(), counter.size());
++        const uint8_t* digest = gcry_md_read(handle, hashAlgorithm);
++        if (!digest)
++            return std::nullopt;
++        memcpySpan(previousBytes, unsafeMakeSpan(digest, hashBytes));
++        memcpySpan(accumulatorBytes, previousBytes);
++        for (size_t iteration = 1; iteration < iterations; ++iteration) {
++            gcry_md_reset(handle);
++            gcry_md_write(handle, previousBytes.data(), previousBytes.size());
++            digest = gcry_md_read(handle, hashAlgorithm);
++            if (!digest)
++                return std::nullopt;
++            memcpySpan(previousBytes, unsafeMakeSpan(digest, hashBytes));
++            for (size_t index = 0; index < hashBytes; ++index)
++                accumulator[index] ^= previous[index];
++        }
++        size_t count = std::min(hashBytes, lengthInBytes - offset);
++        memcpySpan(output.mutableSpan().subspan(offset, count), accumulatorBytes.first(count));
++        offset += count;
++    }
++    transferred = true;
++    return WTF::move(output);
++}
+ 
+ static std::optional<Vector<uint8_t>> gcryptDeriveBits(const Vector<uint8_t>& keyData, const Vector<uint8_t>& saltData, CryptoAlgorithmIdentifier hashIdentifier, size_t iterations, size_t length)
+ {
+@@ -44,6 +121,10 @@
+ 
+     // Length, in bits, is a multiple of 8, as guaranteed by CryptoAlgorithmPBKDF2::deriveBits().
+     ASSERT(!(length % 8));
++
++    // Keep FIPS derivations on the provider's existing policy path.
++    if (saltData.isEmpty() && !gcry_fips_mode_active())
++        return deriveWithEmptySalt(keyData, *hashAlgorithm, iterations, length / 8);
+ 
+     const void* key = keyData.span().data() ? keyData.span().data() : reinterpret_cast<const uint8_t*>("");
+ 
