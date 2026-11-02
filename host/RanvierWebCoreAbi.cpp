@@ -2519,9 +2519,9 @@ static int32_t composite(RvHost& host, RvCompositor& compositor, LocalFrameView&
         compositor.root->removeAllChildren();
         compositor.root->addChild(*frameRoot);
     }
-    // The content under the layers is repainted whole each frame.
     compositor.view = &view;
-    compositor.root->setNeedsDisplay();
+    if (!host.dirty.isEmpty())
+        compositor.root->setNeedsDisplay();
     compositor.root->flushCompositingStateForThisLayerOnly();
     view.flushCompositingStateIncludingSubframes();
 #if defined(_WIN32)
