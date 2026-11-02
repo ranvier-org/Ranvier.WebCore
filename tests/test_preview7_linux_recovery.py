@@ -53,9 +53,10 @@ class ProfileContract(unittest.TestCase):
         with patch.object(recovery, 'api', side_effect=[producer, {'total_count': 2, 'jobs': [repeated, repeated]}]):
             with self.assertRaisesRegex(ValueError, 'Duplicate'): recovery.check_remote()
 
-    def test_workflow_is_unarmed_and_revalidates_before_authentication(self):
+    def test_workflow_is_main_only_and_revalidates_before_authentication(self):
         workflow = (source.parents[1] / '.github/workflows/preview7-linux-gpu-recovery.yml').read_text()
-        self.assertEqual(workflow.count('if: ${{ false &&'), 2)
+        self.assertEqual(workflow.count("github.ref == 'refs/heads/main'"), 2)
+        self.assertNotIn('if: ${{ false &&', workflow)
         self.assertEqual(workflow.count('python -I scripts/prepare_preview7_linux_gpu.py'), 2)
         self.assertLess(workflow.index('Independently re-download and verify before authentication'),
                         workflow.index('Authenticate after verification'))
