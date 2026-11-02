@@ -66,6 +66,8 @@ int wmain(int argc, wchar_t** argv)
     auto result = checkWindowsSpelling(L"en-US", L"\U0001F642 speling suffix");
     if (!require(result.state == State::Available && !result.truncated, "actual OS misspelling check"))
         return 1;
+    if (!require(!result.providerId.empty(), "actual preferred OS provider identity"))
+        return 1;
     auto issue = std::find_if(result.issues.begin(), result.issues.end(), [](const auto& value) { return value.start == 3 && value.length == 7; });
     if (!require(issue != result.issues.end(), "OS offsets count UTF-16 units after surrogate prefix"))
         return 1;
@@ -82,7 +84,8 @@ int wmain(int argc, wchar_t** argv)
             return 1;
     }
     std::ofstream output { std::filesystem::path(argv[1]) };
-    output << "{\"available\":true,\"language\":\"en-US\",\"word\":\"speling\",\"start\":" << issue->start
+    output << "{\"available\":true,\"providerId\":" << jsonString(result.providerId)
+           << ",\"language\":\"en-US\",\"word\":\"speling\",\"start\":" << issue->start
            << ",\"length\":" << issue->length << ",\"suggestions\":[";
     bool first = true;
     for (auto& suggestion : issue->suggestions) {

@@ -27,6 +27,7 @@ struct Result {
     HRESULT error { E_UNEXPECTED };
     bool truncated { false };
     std::vector<Issue> issues;
+    std::wstring providerId { };
 };
 
 namespace Detail {
@@ -74,6 +75,8 @@ inline Result checkWindowsSpelling(std::wstring_view language, std::wstring_view
         return Detail::failed(apartment.status);
     Microsoft::WRL::ComPtr<ISpellCheckerFactory> factory;
     auto status = CoCreateInstance(__uuidof(SpellCheckerFactory), nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&factory));
+    if (cancelled())
+        return Detail::cancelled();
     if (FAILED(status)) {
         if (status == REGDB_E_CLASSNOTREG)
             return { State::Unavailable, status, false, { } };
@@ -82,6 +85,8 @@ inline Result checkWindowsSpelling(std::wstring_view language, std::wstring_view
     std::wstring tag(language);
     BOOL supported = FALSE;
     status = factory->IsSupported(tag.c_str(), &supported);
+    if (cancelled())
+        return Detail::cancelled();
     if (FAILED(status))
         return Detail::failed(status);
     if (!supported)
@@ -90,9 +95,14 @@ inline Result checkWindowsSpelling(std::wstring_view language, std::wstring_view
         return Detail::cancelled();
     Microsoft::WRL::ComPtr<ISpellChecker> checker;
     status = factory->CreateSpellChecker(tag.c_str(), &checker);
+    if (cancelled())
+        return Detail::cancelled();
     if (FAILED(status))
         return Detail::failed(status);
     Result result { State::Available, S_OK, false, { } };
+    Detail::TaskString providerId;
+    if (SUCCEEDED(checker->get_Id(&providerId.value)) && !Detail::copyString(providerId.value, result.providerId))
+        return Detail::failed(HRESULT_FROM_WIN32(ERROR_BUFFER_OVERFLOW));
     if (text.empty())
         return result;
     std::wstring input(text);
