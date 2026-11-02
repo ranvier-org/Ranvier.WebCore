@@ -47,5 +47,7 @@ std::optional<WebCore::ExceptionCode> normalizeAsymmetricImport(const RanvierCry
     std::unique_ptr<WebCore::CryptoAlgorithmParameters>&);
 std::optional<WebCore::ExceptionCode> normalizeAsymmetricOaep(const RanvierCryptoAsymmetricOaepParams&,
     std::unique_ptr<WebCore::CryptoAlgorithmParameters>&);
+void importAsymmetricKey(uint64_t, WebCore::CryptoKeyFormat, WebCore::KeyData&&,
+    const WebCore::CryptoAlgorithmParameters&, bool extractable, WebCore::CryptoKeyUsageBitmap, bool duplicateKeyOps);
 
 }
