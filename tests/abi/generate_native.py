@@ -155,6 +155,14 @@ def fsharp_name(name: str) -> str:
     return f"``{name}``" if name in KEYWORDS else name
 
 
+def trace_types() -> list[str]:
+    fields = [("phase", "int"), ("source", "int"), ("start_ns", "uint64"),
+              ("duration_ns", "uint64"), ("sequence", "uint64")]
+    return ["", "/// <summary>Host rendering trace event; times are monotonic nanoseconds.</summary>",
+            "[<Struct; StructLayout(LayoutKind.Sequential)>]", "type HostTraceEvent ="] + [
+                f"    val mutable {name}: {kind}" for name, kind in fields]
+
+
 def print_types() -> list[str]:
     fields = [("size", "uint32"), ("max_pages", "uint32"),
               ("paper_width_points", "float"), ("paper_height_points", "float"),
@@ -406,6 +414,7 @@ def generated(header: str) -> str:
 
     lines += mutation_types()
     lines += print_types()
+    lines += trace_types()
     found = declarations(header)
     lines += [
         "",

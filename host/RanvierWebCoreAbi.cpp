@@ -17,7 +17,9 @@
 #include "RanvierInspectGlue.h"
 #include "RanvierWakeLockGlue.h"
 #include "RanvierNotificationGlue.h"
+#include <array>
 #include <atomic>
+#include <chrono>
 #include <memory>
 #include <string>
 #include <vector>
@@ -903,6 +905,35 @@ struct RvCompositor final : GraphicsLayerClient {
 };
 #endif
 
+static uint64_t traceNow()
+{
+    using namespace std::chrono;
+    return static_cast<uint64_t>(duration_cast<nanoseconds>(steady_clock::now().time_since_epoch()).count());
+}
+
+struct RvHostTraceBuffer {
+    std::array<RvHostTraceEvent, 256> events { };
+    size_t head { 0 };
+    size_t count { 0 };
+    uint64_t dropped { 0 };
+    uint64_t sequence { 0 };
+    bool enabled { true };
+
+    void record(int32_t phase, uint64_t start, uint64_t duration)
+    {
+        if (!enabled)
+            return;
+        if (count == events.size()) {
+            if (dropped != UINT64_MAX)
+                ++dropped;
+            return;
+        }
+        auto index = (head + count) % events.size();
+        events[index] = { phase, RV_HOST_TRACE_SOURCE_HOST, start, duration, ++sequence };
+        ++count;
+    }
+};
+
 struct RvHost {
     Ref<Page> page;
     IntSize size;
@@ -947,6 +978,7 @@ struct RvHost {
     unsigned editingDepth { 0 };
     bool destroyAfterEditing { false };
     bool updateWanted { false };
+    std::shared_ptr<RvHostTraceBuffer> traceBuffer;
     int32_t cursor { RV_CURSOR_DEFAULT };
     String tooltip;
     RvPopupCallback popupCallback { nullptr };
@@ -1003,6 +1035,23 @@ struct RvHost {
     }
 };
 
+class RvTraceSpan {
+public:
+    RvTraceSpan(RvHost& host, int32_t phase)
+        : m_buffer(host.traceBuffer), m_phase(phase), m_start(m_buffer ? traceNow() : 0) { }
+    ~RvTraceSpan()
+    {
+        if (m_buffer && m_buffer->enabled) {
+            auto end = traceNow();
+            m_buffer->record(m_phase, m_start, end - m_start);
+        }
+    }
+private:
+    std::shared_ptr<RvHostTraceBuffer> m_buffer;
+    int32_t m_phase;
+    uint64_t m_start;
+};
+
 class RvEditingScope {
 public:
     explicit RvEditingScope(RvHost& host)
@@ -1026,6 +1075,8 @@ void RvChromeClient::invalidate(const IntRect& rect)
 {
     if (!host)
         return;
+    if (host->traceBuffer)
+        host->traceBuffer->record(RV_HOST_TRACE_UPDATE_REQUESTED, traceNow(), 0);
     host->dirty.unite(intersection(rect, IntRect { { }, host->size }));
     host->requestFrame();
 }
@@ -1114,6 +1165,8 @@ void RvChromeClient::wantUpdate()
 {
     if (!host)
         return;
+    if (host->traceBuffer)
+        host->traceBuffer->record(RV_HOST_TRACE_UPDATE_REQUESTED, traceNow(), 0);
     host->updateWanted = true;
     host->requestFrame();
 }
@@ -1678,6 +1731,8 @@ static int32_t fail(const Exception& exception) { return Ranvier::recordExceptio
 template<typename T> static int32_t status(const ExceptionOr<T>& result) { return result.hasException() ? fail(result.exception()) : RV_OK; }
 
 // The layouts tests/abi/abi_layouts.py checks from ctypes and the F# interop declares.
+static_assert(sizeof(RvHostTraceEvent) == 32 && offsetof(RvHostTraceEvent, start_ns) == 8
+    && offsetof(RvHostTraceEvent, duration_ns) == 16 && offsetof(RvHostTraceEvent, sequence) == 24);
 static_assert(sizeof(void*) != 8 || (sizeof(RvFormSubmission) == 72 && offsetof(RvFormSubmission, method) == 8 && offsetof(RvFormSubmission, content_type) == 32
     && offsetof(RvFormSubmission, body_length) == 48 && offsetof(RvFormSubmission, form) == 56 && offsetof(RvFormSubmission, submitter) == 64));
 static_assert(sizeof(void*) != 8 || (sizeof(RvTextSegments) == 32 && offsetof(RvTextSegments, starts) == 8 && offsetof(RvTextSegments, locale) == 24));
@@ -1710,6 +1765,8 @@ int32_t rv_abi_has(const char* feature)
 {
     if (!feature)
         return 0;
+    if (!std::strcmp(feature, "host-tracing"))
+        return 1;
     if (!std::strcmp(feature, "editing-undo"))
         return 1;
     if (!std::strcmp(feature, "screen"))
@@ -2326,6 +2383,10 @@ void rv_host_destroy(RvHost* host)
         return;
     }
     host->documentTransaction = RvHost::DocumentTransaction::Destroying;
+    if (host->traceBuffer) {
+        host->traceBuffer->enabled = false;
+        host->traceBuffer.reset();
+    }
     static_cast<RvEditorClient&>(host->page->editorClient()).documentWillChange();
 #if (defined(_WIN32) || defined(__linux__)) && RANVIER_COMPOSITING
     host->nativeTextures.clear();
@@ -2923,11 +2984,15 @@ int32_t rv_host_acquire_egl_frame(RvHost* host, RvGpuFrame** frame)
     auto result = [&]() -> int32_t {
         SetForScope inFrame(host->inFrame, true);
         host->frameRequested = false;
-        host->document().updateLayoutIgnorePendingStylesheets();
-        RefPtr view = host->frame().view();
-        if (!view)
-            return RV_ERR_PAINT_FAILED;
-        view->updateLayoutAndStyleIfNeededRecursive();
+        RefPtr<LocalFrameView> view;
+        {
+            RvTraceSpan span(*host, RV_HOST_TRACE_STYLE_LAYOUT);
+            host->document().updateLayoutIgnorePendingStylesheets();
+            view = host->frame().view();
+            if (!view)
+                return RV_ERR_PAINT_FAILED;
+            view->updateLayoutAndStyleIfNeededRecursive();
+        }
         if (!view->clipLayer())
             return RV_ERR_UNSUPPORTED;
         if (host->compositor && (host->compositor->size != host->size || host->compositor->scale != host->deviceScale))
@@ -2945,7 +3010,11 @@ int32_t rv_host_acquire_egl_frame(RvHost* host, RvGpuFrame** frame)
         auto surface = host->presentationSurface;
         if (!surface || !surface->beginProducer())
             return RV_ERR_UNSUPPORTED;
-        auto paintResult = composite(*host, *host->compositor, *view, nullptr, surface->framebuffer());
+        int32_t paintResult;
+        {
+            RvTraceSpan span(*host, RV_HOST_TRACE_PAINT);
+            paintResult = composite(*host, *host->compositor, *view, nullptr, surface->framebuffer());
+        }
         if (paintResult != RV_OK || !surface->finishProducer(consumerContext)) {
             surface->cancelProducer();
             host->presentationSurface = nullptr;
@@ -2982,11 +3051,15 @@ int32_t rv_host_acquire_d3d11_frame(RvHost* host, void* consumerDevice, RvGpuFra
     auto result = [&]() -> int32_t {
         SetForScope inFrame(host->inFrame, true);
         host->frameRequested = false;
-        host->document().updateLayoutIgnorePendingStylesheets();
-        RefPtr view = host->frame().view();
-        if (!view)
-            return RV_ERR_PAINT_FAILED;
-        view->updateLayoutAndStyleIfNeededRecursive();
+        RefPtr<LocalFrameView> view;
+        {
+            RvTraceSpan span(*host, RV_HOST_TRACE_STYLE_LAYOUT);
+            host->document().updateLayoutIgnorePendingStylesheets();
+            view = host->frame().view();
+            if (!view)
+                return RV_ERR_PAINT_FAILED;
+            view->updateLayoutAndStyleIfNeededRecursive();
+        }
         if (!view->clipLayer())
             return RV_ERR_UNSUPPORTED;
         if (host->compositor && (host->compositor->size != host->size || host->compositor->scale != host->deviceScale))
@@ -3006,7 +3079,11 @@ int32_t rv_host_acquire_d3d11_frame(RvHost* host, void* consumerDevice, RvGpuFra
             host->presentationSurface = nullptr;
             return RV_ERR_UNSUPPORTED;
         }
-        auto paintResult = composite(*host, *host->compositor, *view, nullptr, surface->framebuffer());
+        int32_t paintResult;
+        {
+            RvTraceSpan span(*host, RV_HOST_TRACE_PAINT);
+            paintResult = composite(*host, *host->compositor, *view, nullptr, surface->framebuffer());
+        }
         bool transferred = paintResult == RV_OK && surface->finishProducer();
         if (!transferred) {
             surface->cancelProducer();
@@ -3080,13 +3157,17 @@ static int32_t paintArea(RvHost& host, uint8_t* rgba, int32_t length, IntRect ar
     area.intersect({ { }, host.size });
     host.inFrame = true;
     host.frameRequested = false;
-    host.document().updateLayoutIgnorePendingStylesheets();
-    RefPtr view = host.frame().view();
-    if (!view) {
-        host.inFrame = false;
-        return RV_ERR_PAINT_FAILED;
+    RefPtr<LocalFrameView> view;
+    {
+        RvTraceSpan span(host, RV_HOST_TRACE_STYLE_LAYOUT);
+        host.document().updateLayoutIgnorePendingStylesheets();
+        view = host.frame().view();
+        if (!view) {
+            host.inFrame = false;
+            return RV_ERR_PAINT_FAILED;
+        }
+        view->updateLayoutAndStyleIfNeededRecursive();
     }
-    view->updateLayoutAndStyleIfNeededRecursive();
 #if RANVIER_COMPOSITING
     // A paint of the whole viewport composites when the host is in compositing mode. In
     // RV_COMPOSITING_WHEN_NEEDED a frame without a clip layer is not in compositing mode and takes the CPU path.
@@ -3098,7 +3179,11 @@ static int32_t paintArea(RvHost& host, uint8_t* rgba, int32_t length, IntRect ar
         if (!host.compositor)
             host.compositor = RvCompositor::create(host.size, host.deviceScale);
         if (host.compositor) {
-            auto result = composite(host, *host.compositor, *view, rgba);
+            int32_t result;
+            {
+                RvTraceSpan span(host, RV_HOST_TRACE_PAINT);
+                result = composite(host, *host.compositor, *view, rgba);
+            }
             host.dirty = { };
             host.inFrame = false;
             if (host.updateWanted)
@@ -3117,7 +3202,10 @@ static int32_t paintArea(RvHost& host, uint8_t* rgba, int32_t length, IntRect ar
             buffer->context().translate(-area.x(), -area.y());
             auto behavior = view->paintBehavior();
             view->setPaintBehavior(behavior | PaintBehavior::FlattenCompositingLayers);
-            view->paint(buffer->context(), area);
+            {
+                RvTraceSpan span(host, RV_HOST_TRACE_PAINT);
+                view->paint(buffer->context(), area);
+            }
             view->setPaintBehavior(behavior);
         }
     }
@@ -4841,6 +4929,51 @@ int32_t rv_host_set_frame_callback(RvHost* host, RvFrameCallback callback, void*
     return RV_OK;
 }
 
+int32_t rv_host_trace_enable(RvHost* host, int32_t enabled)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_DETACHED;
+    if (enabled != 0 && enabled != 1)
+        return RV_ERR_UNSUPPORTED;
+    if (enabled && !host->traceBuffer)
+        host->traceBuffer = std::make_shared<RvHostTraceBuffer>();
+    else if (!enabled && host->traceBuffer) {
+        host->traceBuffer->enabled = false;
+        host->traceBuffer.reset();
+    }
+    return RV_OK;
+}
+
+int32_t rv_host_trace_drain(RvHost* host, RvHostTraceEvent* events, int32_t capacity, int32_t* written, uint64_t* dropped)
+{
+    if (!host || !written || !dropped || (capacity > 0 && !events))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_DETACHED;
+    if (capacity < 0 || capacity > 256)
+        return RV_ERR_UNSUPPORTED;
+    auto buffer = host->traceBuffer;
+    if (!buffer) {
+        *written = 0;
+        *dropped = 0;
+        return RV_OK;
+    }
+    auto count = std::min(static_cast<size_t>(capacity), buffer->count);
+    for (size_t i = 0; i < count; ++i)
+        events[i] = buffer->events[(buffer->head + i) % buffer->events.size()];
+    buffer->head = (buffer->head + count) % buffer->events.size();
+    buffer->count -= count;
+    *written = static_cast<int32_t>(count);
+    *dropped = std::exchange(buffer->dropped, 0);
+    return RV_OK;
+}
+
 int32_t rv_host_update(RvHost* host)
 {
     if (!host)
@@ -4853,8 +4986,11 @@ int32_t rv_host_update(RvHost* host)
     host->inFrame = true;
     host->frameRequested = false;
     host->updateWanted = false;
-    page->updateRendering();
-    page->finalizeRenderingUpdate({ });
+    {
+        RvTraceSpan span(*host, RV_HOST_TRACE_RENDERING_UPDATE);
+        page->updateRendering();
+        page->finalizeRenderingUpdate({ });
+    }
     host->inFrame = false;
     // A running animation asked for the next frame during this one.
     if (host->updateWanted)
