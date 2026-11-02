@@ -4,5 +4,7 @@ src/**/bin/
 src/**/obj/
 tests/generator/**/bin/
 tests/generator/**/obj/
+tests/printing/bin/
+tests/printing/obj/
 artifacts/
 __pycache__/
