@@ -54,6 +54,7 @@ set(USE_SYSTEM_MALLOC OFF CACHE BOOL "")
 get_filename_component(_ranvier_root "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
 set(WebCore_EMBEDDER_SOURCES "${_ranvier_root}/host/dom/RanvierDomGlue.cpp;${_ranvier_root}/host/RanvierSvgViewGlue.cpp;${_ranvier_root}/host/RanvierResourceGlue.cpp;${_ranvier_root}/host/RanvierEventGlue.cpp;${_ranvier_root}/host/RanvierViewportGlue.cpp;${_ranvier_root}/host/RanvierInspectGlue.cpp;${_ranvier_root}/host/RanvierCanvasGlue.cpp;${_ranvier_root}/host/RanvierWakeLockGlue.cpp;${_ranvier_root}/host/RanvierNotificationGlue.cpp;${_ranvier_root}/host/RanvierTransferGlue.cpp;${_ranvier_root}/host/RanvierPointerGlue.cpp;${_ranvier_root}/host/RanvierCanvasPixelsGlue.cpp;${_ranvier_root}/host/RanvierCanvasExportGlue.cpp" CACHE STRING "" FORCE)
 set(WebCore_EMBEDDER_SOURCES "${WebCore_EMBEDDER_SOURCES};${_ranvier_root}/host/RanvierCryptoGlue.cpp" CACHE STRING "" FORCE)
+set(WebCore_EMBEDDER_SOURCES "${WebCore_EMBEDDER_SOURCES};${_ranvier_root}/host/RanvierCryptoAsymmetricGlue.cpp" CACHE STRING "" FORCE)
 # WebKit compiles the touch PointerEvent constructors (dom/glib/PointerEventGLib.cpp, port-neutral) only for GTK and
 # WPE. The path is relative to Source/WebCore, where WebCore's CMakeLists adds the embedder sources.
 if (RANVIER_RID MATCHES "^win-")
