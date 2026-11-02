@@ -2,6 +2,7 @@
 #include <winrt/Windows.Media.Control.h>
 #include <winrt/Windows.Foundation.Collections.h>
 #include <shellapi.h>
+#include <shobjidl.h>
 #include <chrono>
 #include <cstdio>
 #include <thread>
@@ -28,6 +29,15 @@ static bool waitFor(WindowsMediaControls& controls, Playback& player, auto predi
         }
         if (FAILED(controls.drain(player)))
             return false;
+        Frame frame;
+        auto video = player.nextFrame(frame);
+        if (FAILED(video))
+            return false;
+        if (video == S_OK) {
+            Microsoft::WRL::ComPtr<IDXGIKeyedMutex> mutex;
+            if (FAILED(frame.texture.As(&mutex)) || mutex->AcquireSync(1,100) != S_OK || mutex->ReleaseSync(0) != S_OK)
+                return false;
+        }
         if (predicate())
             return true;
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -78,7 +88,13 @@ int wmain(int argc, wchar_t** argv)
             return 1;
         if (!require(session.TryPauseAsync().get() && waitFor(controls,player,[&] { return player.snapshot().state == State::Paused; }), "OS pause action reaches the same native provider"))
             return 1;
-        if (!require(session.TryChangePlaybackPositionAsync(10000000).get() && waitFor(controls,player,[&] { auto s=player.snapshot(); return !s.seeking && std::abs(s.position-1)<.05; }), "OS seek action reaches actual provider clock"))
+        auto capabilities = session.GetPlaybackInfo().Controls();
+        bool seekAccepted = session.TryChangePlaybackPositionAsync(10000000).get();
+        bool seekCompleted = seekAccepted && waitFor(controls,player,[&] { auto s=player.snapshot(); return !s.seeking && std::abs(s.position-1)<.05; });
+        auto seekResult = player.snapshot();
+        std::printf("SMTC_SEEK_CAPABILITY=%d ACCEPTED=%d COMPLETED=%d POSITION=%.6f SEEKING=%d STATE=%d\n",
+            capabilities.IsPlaybackPositionEnabled(),seekAccepted,seekCompleted,seekResult.position,seekResult.seeking,static_cast<int>(seekResult.state));
+        if (!require(seekCompleted, "OS seek action reaches actual provider clock"))
             return 1;
         if (!require(session.TryPlayAsync().get() && waitFor(controls,player,[&] { return player.snapshot().state == State::Playing; }), "OS play action resumes same provider"))
             return 1;

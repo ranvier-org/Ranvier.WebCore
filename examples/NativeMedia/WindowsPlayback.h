@@ -17,7 +17,7 @@
 
 namespace RanvierNativeMedia {
 
-enum class State { Closed, Ready, Loading, Playing, Paused, Ended, Cancelled, Failed, Unavailable };
+enum class State { Closed, Ready, Loading, Playing, Paused, Ended, Cancelled, Failed, Unavailable, Stopped };
 
 struct Frame {
     Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
@@ -159,8 +159,18 @@ public:
         return FAILED(status = m_engine->Load()) ? fail(status) : status;
     }
 
-    HRESULT play() { auto status = admitted(); return FAILED(status) ? status : m_engine->Play(); }
-    HRESULT pause() { auto status = admitted(); return FAILED(status) ? status : m_engine->Pause(); }
+    HRESULT play() { auto status = admitted(); if (FAILED(status)) return status; status = m_engine->Play(); if (SUCCEEDED(status)) m_stopped = false; return status; }
+    HRESULT pause() { auto status = admitted(); if (FAILED(status)) return status; status = m_engine->Pause(); if (SUCCEEDED(status)) m_stopped = false; return status; }
+    HRESULT stop()
+    {
+        auto status = pause();
+        if (FAILED(status))
+            return status;
+        status = seek(0);
+        if (SUCCEEDED(status))
+            m_stopped = true;
+        return status;
+    }
     HRESULT seek(double seconds)
     {
         auto status = admitted();
@@ -168,7 +178,10 @@ public:
             return status;
         if (!std::isfinite(seconds) || seconds < 0)
             return E_INVALIDARG;
-        return m_engine->SetCurrentTime(seconds);
+        status = m_engine->SetCurrentTime(seconds);
+        if (SUCCEEDED(status))
+            m_stopped = false;
+        return status;
     }
 
     ID3D11Device* device() const { return m_device.Get(); }
@@ -254,7 +267,7 @@ public:
         value.seeking = !!m_engine->IsSeeking();
         value.hasAudio = !!m_engine->HasAudio();
         value.hasVideo = !!m_engine->HasVideo();
-        value.state = !m_opened ? State::Ready : !value.ready ? State::Loading :
+        value.state = !m_opened ? State::Ready : !value.ready ? State::Loading : m_stopped ? State::Stopped :
             m_engine->IsEnded() ? State::Ended : m_engine->IsPaused() ? State::Paused : State::Playing;
         return value;
     }
@@ -284,6 +297,7 @@ public:
         m_ownsMf = false;
         m_ownsCom = false;
         m_opened = false;
+        m_stopped = false;
         m_closedState = State::Closed;
         m_failure = S_OK;
         return status;
@@ -303,6 +317,7 @@ private:
     bool m_ownsCom { false };
     bool m_ownsMf { false };
     bool m_opened { false };
+    bool m_stopped { false };
     State m_closedState { State::Closed };
     HRESULT m_failure { S_OK };
     std::shared_ptr<Detail::Events> m_events;
