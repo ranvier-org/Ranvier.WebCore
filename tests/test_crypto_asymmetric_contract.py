@@ -36,6 +36,9 @@ CHECK(sizeof(RanvierCryptoAsymmetricSignParams) == 64, "signature parameters");
 CHECK(sizeof(RanvierCryptoAsymmetricOaepParams) == 48, "OAEP parameters");
 CHECK(sizeof(RanvierCryptoAsymmetricDeriveParams) == 40, "peer key presence and handle");
 CHECK(sizeof(RanvierCryptoAsymmetricKeyData) == 32, "raw or JWK key data");
+CHECK(sizeof(RanvierCryptoAsymmetricKeyInfo) == 24, "typed asymmetric algorithm metadata");
+CHECK(offsetof(RanvierCryptoAsymmetricKeyInfo, modulus_length_bits) == 8, "RSA bit length");
+CHECK(offsetof(RanvierCryptoAsymmetricKeyInfo, hash_present) == 16, "optional bound hash");
 #endif
 '''
         with tempfile.TemporaryDirectory() as temporary:

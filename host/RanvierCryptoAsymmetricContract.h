@@ -83,3 +83,11 @@ typedef struct RanvierCryptoAsymmetricKeyData {
     RanvierCryptoBytes raw;
     const RanvierCryptoJsonWebKey* jwk;
 } RanvierCryptoAsymmetricKeyData;
+
+typedef struct RanvierCryptoAsymmetricKeyInfo {
+    uint32_t size;
+    int32_t modulus_length_present;
+    uint64_t modulus_length_bits;
+    int32_t hash_present;
+    int32_t named_curve_present;
+} RanvierCryptoAsymmetricKeyInfo;
