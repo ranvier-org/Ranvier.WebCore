@@ -83,6 +83,7 @@ def verify(directory):
             expect(number(host, category, name.encode(), ctypes.byref(value)) == 0, 'Capability assertion failed')
             return value.value
         expect('dom:Document' in catalogues[0] and 'svg-document' in catalogues[0], 'Capability assertion failed')
+        expect('host-tracing' in catalogues[0] and get_fact(0, 'host-tracing', 0) == 1, 'host tracing capability')
         expect(get_fact(0, 'dom:Document', 0) == 1 and get_fact(0, 'dom:Document', 1) == -1, 'Capability assertion failed')
         expect(get_number(1, 'scripts', 1) == 0 and get_number(1, 'vm-entry-guard', 1) == 1, 'Capability assertion failed')
         expect(get_number(1, 'automatic-images', 1) == 1, 'Capability assertion failed')

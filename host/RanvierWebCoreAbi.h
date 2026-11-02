@@ -2780,6 +2780,29 @@ RV_EXPORT int32_t rv_host_print_pdf(RvHost*, const RvPrintOptions* options, RvPr
 /* Copies a completed PDF through the existing resource byte/capacity contract; release with rv_resource_release. */
 RV_EXPORT int32_t rv_print_pdf_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length);
 
+/* Host-observed rendering events. Times are monotonic nanoseconds with an unspecified epoch. UPDATE_REQUESTED
+ * includes invalidations; STYLE_LAYOUT measures combined host-invoked preparation, not separate engine style or
+ * layout phases. PAINT measures CPU paint or GPU compositing. RENDERING_UPDATE measures WebCore's page update. */
+enum {
+    RV_HOST_TRACE_UPDATE_REQUESTED = 1,
+    RV_HOST_TRACE_STYLE_LAYOUT = 2,
+    RV_HOST_TRACE_PAINT = 3,
+    RV_HOST_TRACE_RENDERING_UPDATE = 4,
+    RV_HOST_TRACE_SOURCE_HOST = 1,
+};
+typedef struct RvHostTraceEvent {
+    int32_t phase;
+    int32_t source;
+    uint64_t start_ns;
+    uint64_t duration_ns;
+    uint64_t sequence;
+} RvHostTraceEvent;
+/* Disabled by default. Each transition clears queued events and the dropped count. */
+RV_EXPORT int32_t rv_host_trace_enable(RvHost*, int32_t enabled);
+/* Copies and removes up to capacity oldest events. Capacity is 0..256; events may be NULL only for zero
+ * capacity. Writes the number copied and events dropped since the preceding drain, then clears that count. */
+RV_EXPORT int32_t rv_host_trace_drain(RvHost*, RvHostTraceEvent* events, int32_t capacity, int32_t* written, uint64_t* dropped);
+
 #ifdef __cplusplus
 }
 #endif

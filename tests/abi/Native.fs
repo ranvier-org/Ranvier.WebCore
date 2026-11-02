@@ -287,6 +287,15 @@ type PrintOptions =
 [<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]
 type PrintCancelPoll = delegate of context: nativeint -> int
 
+/// <summary>Host rendering trace event; times are monotonic nanoseconds.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type HostTraceEvent =
+    val mutable phase: int
+    val mutable source: int
+    val mutable start_ns: uint64
+    val mutable duration_ns: uint64
+    val mutable sequence: uint64
+
 /// <summary>
 /// Per-function counts and Stopwatch ticks of the calls made while <c>On</c>, indexed as <c>Names</c>. The ticks of a
 /// call span its P/Invoke transition, marshalling and native work.
@@ -629,6 +638,8 @@ module Calls =
             "rv_mutation_record_batch_get_record"
             "rv_host_print_pdf"
             "rv_print_pdf_result"
+            "rv_host_trace_enable"
+            "rv_host_trace_drain"
         |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
@@ -2026,6 +2037,12 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_print_pdf_result(uint64 operation, [<In; Out>] byte[] buffer, int64 capacity, int64& length)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_trace_enable(nativeint host, int enabled)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_trace_drain(nativeint host, nativeint events, int capacity, int& written, uint64& dropped)
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -6373,6 +6390,32 @@ let rv_print_pdf_result (operation: uint64, buffer: byte[], capacity: int64, len
         result
     else
         Raw.rv_print_pdf_result (operation, buffer, capacity, &length)
+
+let rv_host_trace_enable (host: nativeint, enabled: int) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_trace_enable (host, enabled)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[335] <- Calls.Counts[335] + 1L
+        Calls.Ticks[335] <- Calls.Ticks[335] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_trace_enable (host, enabled)
+
+let rv_host_trace_drain
+    (host: nativeint, events: nativeint, capacity: int, written: byref<int>, dropped: byref<uint64>)
+    : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_trace_drain (host, events, capacity, &written, &dropped)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[336] <- Calls.Counts[336] + 1L
+        Calls.Ticks[336] <- Calls.Ticks[336] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_trace_drain (host, events, capacity, &written, &dropped)
 
 // END GENERATED
 
