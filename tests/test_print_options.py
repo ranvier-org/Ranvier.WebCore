@@ -10,8 +10,29 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class PrintOptionsTests(unittest.TestCase):
+    def test_pdf_off_keeps_a_truthful_unavailable_backend(self):
+        compiler = os.environ.get('CXX') or os.environ.get('CC') or shutil.which('clang++') or shutil.which('c++')
+        if not compiler:
+            self.skipTest('C++ compiler unavailable')
+        with tempfile.TemporaryDirectory() as temporary:
+            folder = Path(temporary)
+            (folder / 'wtf').mkdir()
+            (folder / 'WebCore').mkdir()
+            (folder / 'config.h').write_text('#define USE(x) 0\n#define UNUSED_PARAM(x) (void)(x)\n', encoding='utf-8')
+            (folder / 'wtf/MainThread.h').write_text('namespace WTF { inline bool isMainThread() { return true; } }\n', encoding='utf-8')
+            (folder / 'WebCore/PlatformExportMacros.h').write_text('#define WEBCORE_EXPORT\n', encoding='utf-8')
+            (folder / 'off.cpp').write_text('#include "RanvierPrintGlue.h"\n#include <cassert>\n'
+                'int main() { assert(!ranvier_print_pdf_supported()); RvPrintPdfData* out = nullptr; '
+                'assert(ranvier_print_pdf(reinterpret_cast<RvNode*>(1), nullptr, nullptr, nullptr, &out) == RV_ERR_UNSUPPORTED); '
+                'assert(!out); }\n', encoding='utf-8')
+            exe = folder / 'off.exe'
+            subprocess.run([compiler, '-std=c++20', '-Wall', '-Wextra', '-Werror', '-DRANVIER_ENABLE_PDF=0',
+                            '-I', str(folder), '-I', str(ROOT / 'host'), str(ROOT / 'host/RanvierPrintGlue.cpp'),
+                            str(folder / 'off.cpp'), '-o', str(exe)], check=True)
+            subprocess.run([str(exe)], check=True)
+
     def test_backend_defaults_and_rejected_profiles(self):
-        compiler = os.environ.get('CC') or shutil.which('clang') or shutil.which('c++')
+        compiler = os.environ.get('CXX') or os.environ.get('CC') or shutil.which('clang++') or shutil.which('c++')
         if not compiler:
             self.skipTest('C++ compiler unavailable')
         source = r'''

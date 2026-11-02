@@ -247,6 +247,8 @@ extern "C" int32_t ranvier_print_pdf(RvNode* handle, const RvPrintOptions* input
     if (!WTF::isMainThread())
         return RV_ERR_WRONG_THREAD;
 #if (USE(SKIA) || USE(CG)) && RANVIER_ENABLE_PDF
+    if (input && input->size != sizeof(RvPrintOptions))
+        return RV_ERR_UNSUPPORTED;
     auto options = input ? *input : ranvierPrintDefaultOptions();
     if (!ranvierPrintNormalizeOptions(options, USE(CG)))
         return RV_ERR_UNSUPPORTED;
@@ -262,6 +264,7 @@ extern "C" int32_t ranvier_print_pdf(RvNode* handle, const RvPrintOptions* input
     *output = result.release();
     return RV_OK;
 #else
+    UNUSED_PARAM(input);
     UNUSED_PARAM(cancel);
     UNUSED_PARAM(cancelContext);
     return RV_ERR_UNSUPPORTED;
