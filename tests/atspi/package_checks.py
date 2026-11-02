@@ -42,6 +42,9 @@ def main():
             assert names.count('runtimes/linux-x64/native/libRanvierWebCoreAtspi.so') == 1
             assert not any('libRanvierWebCoreHost.so' in name or name.endswith('.dll') for name in names)
             assert json.loads(archive.read('provider-manifest.json')) == manifest
+            assert manifest['callerClaimedProviderSourceRevision'] == args.source_revision
+            assert manifest['sourceProvenance'] == 'unverified-caller-claim'
+            assert 'providerSourceRevision' not in manifest
         rows.append(dict(name='only provider native asset and exact manifest bundled', passed=True))
         before = module.sha(destination)
         rejected('existing artifact is not overwritten', lambda: module.pack(args.provider, args.native, 'linux-x64', 'Ranvier.Private.Atspi.Control', '0.0.0-privatecontrol', output, args.source_revision), FileExistsError)

@@ -43,9 +43,12 @@ usable and reports accessibility attachment as unavailable.
 
 The reserved public package ID is `Ranvier.WebCore.Accessibility.Atspi`. A public version is not allocated.
 Its version must follow the final matching Native ABI63 cohort; immutable ABI62 releases cannot supply this module.
-Current artifacts use explicitly private identities and versions. `provider-manifest.json` records the reviewed provider
-source commit, selected host hash, provider hash, payload hashes and private style-only qualification scope.
-`--source-revision` names the commit that produced the binary; repackaging an archived binary must retain that commit.
+Current artifacts use explicitly private identities and versions. `provider-manifest.json` records the caller-claimed
+provider commit, selected host hash, provider hash, payload hashes and private style-only qualification scope.
+`--source-revision` checks commit syntax only. The manifest labels that field `callerClaimedProviderSourceRevision`
+and its provenance `unverified-caller-claim`: the packager cannot establish which source produced an arbitrary ELF.
+Reviewers must compare the module and host hashes against independent producer receipts. CI's same-run source checkout,
+build and retained logs provide separate source-build evidence; repackaging alone supplies no such proof.
 The packager rejects public package IDs and versions while the final cohort, version and source licenses await review.
 
 Only `linux-x64` is currently eligible for packaging and the opt-in workflow. ARM64 source/compilation is preparatory:

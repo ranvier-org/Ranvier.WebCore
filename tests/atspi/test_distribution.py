@@ -26,7 +26,7 @@ class DistributionPolicyTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'qualified'):
             package.validate_distribution('linux-arm64', '5b34cc0dd3932d434fd3f0c35c6bfc6497c3bd6c')
 
-    def test_invalid_source_cannot_be_recorded_as_provenance(self):
+    def test_malformed_caller_source_claim_is_rejected(self):
         for revision in ['', 'HEAD', '../source', '5b34cc0d']:
             with self.subTest(revision=revision), self.assertRaisesRegex(ValueError, 'revision'):
                 package.validate_distribution('linux-x64', revision)
