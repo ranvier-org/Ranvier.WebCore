@@ -46,6 +46,19 @@ class ProbeRunnerTests(unittest.TestCase):
         self.assertIn('printing-pdf.json', block)
         self.assertIn('host-output.pdf', block)
 
+    def test_ime_surrounding_cancellation_history_and_observation_are_routed(self):
+        for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']:
+            for flavor in ['slim', 'gpu']:
+                commands = [command for entry in probes.PROBES if probes.applies(entry, rid, flavor)
+                            for command in entry['commands']]
+                for name in ['ime_surrounding.py', 'ime_surrounding_delete.py',
+                             'ime_surrounding_history.py', 'ime_surrounding_observation.py']:
+                    self.assertEqual(sum(name in command for command in commands), 1, (rid, flavor, name))
+        workflow = (ROOT / '.github/workflows/build.yml').read_text()
+        block = workflow.split('      - name: Retain IME mutation and reentry results\n', 1)[1].split('\n      - name:', 1)[0]
+        self.assertIn('if: always()', block)
+        self.assertIn('ime-surrounding-observation*.json', block)
+
     def test_picker_tracing_and_teardown_are_routed_to_qualified_platforms(self):
         for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']:
             for flavor in ['slim', 'gpu']:

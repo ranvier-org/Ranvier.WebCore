@@ -460,6 +460,7 @@ static constexpr const char* capabilityAbiNames[] = {
     "cursor",
     "scroll",
     "ime",
+    "ime-surrounding",
     "style",
     "geometry",
     "animation",

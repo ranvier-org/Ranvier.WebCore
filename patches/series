@@ -60,3 +60,4 @@
 0061-svg-failed-image-paint.patch
 0062-skia-pdf-path-dump.patch
 0063-file-picker-embedder-hook.patch
+0064-ime-cancellation-target.patch

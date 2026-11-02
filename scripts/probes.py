@@ -26,6 +26,16 @@ def probe(name, *commands, rid=None, flavor=('slim', 'gpu'), timeout=TIMEOUT, en
 
 
 PROBES = [
+    *[probe('Verify committed IME surrounding text and cancellation',
+            'python -I tests/abi/ime_surrounding.py --native-directory {native}',
+            'python -I tests/abi/ime_surrounding_delete.py --native-directory {native}', rid=rid, flavor=None)
+      for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],
+    *[probe('Verify surrounding deletion undo and redo preserve selected composition',
+            'python -I tests/abi/ime_surrounding_history.py --native-directory {native}', rid=rid, flavor=None)
+      for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],
+    *[probe('Verify IME mutation observation and callback reentry',
+            'python -I tests/abi/ime_surrounding_observation.py --native-directory {native} --report {work}/ime-surrounding-observation.json', rid=rid, flavor=None)
+      for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],
     *[probe('Verify host file picker ownership and invalidation',
             'python -I tests/abi/file_picker.py --native-directory {native}', rid=rid, flavor=None)
       for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],

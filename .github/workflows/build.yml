@@ -652,6 +652,14 @@ jobs:
           path: ${{ env.RANVIER_WORK }}/background-content-clipping-regression.json
           if-no-files-found: ignore
 
+      - name: Retain IME mutation and reentry results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ime-surrounding-report-${{ matrix.rid }}-${{ env.FLAVOR }}
+          path: ${{ env.RANVIER_WORK }}/ime-surrounding-observation*.json
+          if-no-files-found: ignore
+
       - name: Upload the CMake logs on failure
         if: failure()
         uses: actions/upload-artifact@v4

@@ -116,7 +116,7 @@ def verify(directory, rid):
     assert (manifest['rid'],manifest['flavor'],manifest['abi']) == (rid,'gpu',62), 'Unproven package profile'
     font = font_identity(rid)
     native = Native(directory)
-    assert native.bind('rv_abi_version', I, [])() == 62
+    assert native.bind('rv_abi_version', I, [])() == 63
     assert native.call('rv_abi_has', [ctypes.c_char_p], b'compositing') == 1, 'Only the GPU profile is qualified'
     profile,cases,expected,before,targets = load_inputs(rid)
     results, seen = [], set()

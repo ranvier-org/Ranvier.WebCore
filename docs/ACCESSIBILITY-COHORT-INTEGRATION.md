@@ -3,12 +3,14 @@
 This branch prepares optional #182 source on Native main `c70c0c1220ea6f0a45a3572be504e0ad82ef4621`.
 That main already contains accepted printing/generator and P7 qualification/recovery commits. The integration delta
 imports only the focused #182 commits and PR255/256 delivery changes, without their older branch merge ancestry.
-It is currently a private style-only ABI63 source with 345 declarations, not the final 347-function union.
-No final native producer, public package version or ARM64 qualification is implied.
+Guarded #171 source `8bfce001cd5ab63b7b230c55acb80a35cf627aea` is accepted for this bounded source integration.
+The combined source has ABI63 and 347 declarations with regenerated canonical interop. This is source integration;
+the matching native producer/runtime, real Windows IME, public package version and ARM64 qualification remain separate.
 
 ## Source merge and ABI order
 
-- Keep final #171 Host/0064 ownership with `windows_gpu`. Do not import prototype `85e` or a diagnostic fault build.
+- Keep final #171 Host/0064 qualification ownership with `windows_gpu`. The integrated net source is from accepted
+  `8bfce001`, without prototype `85e` commit ancestry or a diagnostic fault build.
 - Obtain the reviewed guarded #171 commit, exact vendor patch and frozen source archive/receipt from that lane.
   Record its identity alongside the main base and each focused #182 cherry-pick. Have acceptance review the delta.
 - Integrate only that reviewed source. The #171 history/busy and IME helpers are separate from the #182 AX text-style
