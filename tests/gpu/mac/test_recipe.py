@@ -1,4 +1,5 @@
 import importlib.util
+import os
 import platform
 import shutil
 from pathlib import Path
@@ -9,6 +10,39 @@ import unittest
 
 
 class RecipeTests(unittest.TestCase):
+    @unittest.skipUnless(shutil.which('cmake') and os.environ.get('RANVIER_WEBKIT_SOURCE'),
+                         'requires CMake and the pinned WebKit source')
+    def test_sdk_frameworks_use_sdk_libraries_with_webkit_framework_macro(self):
+        root = Path(__file__).resolve().parents[3]
+        macros = Path(os.environ['RANVIER_WEBKIT_SOURCE']) / 'Source/cmake/WebKitMacros.cmake'
+        with tempfile.TemporaryDirectory() as temporary:
+            fixture = Path(temporary)
+            libraries = fixture / 'sdk/lib'
+            libraries.mkdir(parents=True)
+            for framework in ['Foundation', 'IOSurface', 'Metal']:
+                (libraries / ('lib' + framework + '.a')).write_bytes(b'!<arch>\n')
+            (fixture / 'CMakeLists.txt').write_text(
+                'cmake_minimum_required(VERSION 3.20)\nproject(SDKContract LANGUAGES CXX)\n'
+                f'include("{macros.as_posix()}")\n'
+                'macro(_WEBKIT_TARGET target)\n'
+                'target_link_libraries(${target} PRIVATE ${${target}_LIBRARIES} ${${target}_PRIVATE_LIBRARIES})\n'
+                'set_target_properties(${target} PROPERTIES LINKER_LANGUAGE CXX)\nendmacro()\n'
+                'set(ENABLE_WEBCORE ON)\nset(RANVIER_MAC_GPU_SPIKE ON)\nset(USE_GPU_STUB ON)\n'
+                'add_library(ANGLE::GLES INTERFACE IMPORTED)\nadd_library(ANGLE::EGL INTERFACE IMPORTED)\n'
+                'file(WRITE "${CMAKE_BINARY_DIR}/cmakeconfig.h" "")\n'
+                f'set(CMAKE_PREFIX_PATH "{(fixture / "sdk").as_posix()}")\n'
+                f'include("{(root / "host/RanvierWebCoreHost.cmake").as_posix()}")\n'
+                'get_target_property(libraries RanvierWebCoreHost LINK_LIBRARIES)\n'
+                'file(WRITE "${CMAKE_BINARY_DIR}/libraries.txt" "${libraries}")\n')
+            build = fixture / 'build'
+            result = subprocess.run(['cmake', '-S', str(fixture), '-B', str(build)],
+                                    capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            linked = (build / 'libraries.txt').read_text()
+            for framework in ['Foundation', 'IOSurface', 'Metal']:
+                self.assertIn((libraries / ('lib' + framework + '.a')).as_posix(), linked)
+                self.assertNotIn('WebKit::' + framework, linked)
+
     def load(self):
         path = Path(__file__).with_name('run.py')
         self.assertTrue(path.exists(), 'one-RID spike recipe is missing')

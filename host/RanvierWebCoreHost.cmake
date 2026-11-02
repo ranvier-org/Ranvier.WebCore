@@ -61,7 +61,14 @@ if (ENABLE_WEBCORE)
     if (RANVIER_MAC_GPU_SPIKE)
         list(APPEND RanvierWebCoreHost_SOURCES RanvierAbi/RanvierMacGpuSpike.mm)
         list(APPEND RanvierWebCoreHost_LIBRARIES ANGLE::GLES ANGLE::EGL)
-        list(APPEND RanvierWebCoreHost_FRAMEWORKS Foundation IOSurface Metal)
+        find_library(RANVIER_MAC_FOUNDATION_LIBRARY Foundation REQUIRED)
+        find_library(RANVIER_MAC_IOSURFACE_LIBRARY IOSurface REQUIRED)
+        find_library(RANVIER_MAC_METAL_LIBRARY Metal REQUIRED)
+        list(APPEND RanvierWebCoreHost_LIBRARIES
+            ${RANVIER_MAC_FOUNDATION_LIBRARY}
+            ${RANVIER_MAC_IOSURFACE_LIBRARY}
+            ${RANVIER_MAC_METAL_LIBRARY}
+        )
         set_source_files_properties(RanvierAbi/RanvierMacGpuSpike.mm PROPERTIES COMPILE_FLAGS "-fobjc-arc")
     endif ()
     # Accelerated compositing (rv_host_set_accelerated_compositing) needs GraphicsLayerTextureMapper, which
