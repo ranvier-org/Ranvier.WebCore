@@ -414,6 +414,7 @@ static constexpr const char* capabilityAbiNames[] = {
     "dom-type-query:AnimationTimeline",
     "dom-type-query:WebAnimation",
     "host-tracing",
+    "host-errors",
     "editing-undo",
     "screen",
     "printing-pdf",

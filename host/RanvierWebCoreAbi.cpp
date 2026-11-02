@@ -239,6 +239,9 @@
 #include "RanvierWebCoreEGL.h"
 #else
 #include <GLES2/gl2.h>
+#if defined(_WIN32)
+#include <d3d11.h>
+#endif
 #endif
 #include <WebCore/GLContext.h>
 #include <WebCore/GraphicsLayerTextureMapper.h>
@@ -962,6 +965,8 @@ struct RvHost {
     bool destroyAfterEditing { false };
     bool updateWanted { false };
     std::shared_ptr<RvHostTraceBuffer> traceBuffer;
+    bool errorRecordsEnabled { false };
+    std::optional<RvHostErrorRecord> lastHostError;
     int32_t cursor { RV_CURSOR_DEFAULT };
     String tooltip;
     RvPopupCallback popupCallback { nullptr };
@@ -1709,6 +1714,7 @@ template<typename T> static int32_t status(const ExceptionOr<T>& result) { retur
 // The layouts tests/abi/abi_layouts.py checks from ctypes and the F# interop declares.
 static_assert(sizeof(RvHostTraceEvent) == 32 && offsetof(RvHostTraceEvent, start_ns) == 8
     && offsetof(RvHostTraceEvent, duration_ns) == 16 && offsetof(RvHostTraceEvent, sequence) == 24);
+static_assert(sizeof(RvHostErrorRecord) == 16 && offsetof(RvHostErrorRecord, native_code) == 12);
 static_assert(sizeof(void*) != 8 || (sizeof(RvFormSubmission) == 72 && offsetof(RvFormSubmission, method) == 8 && offsetof(RvFormSubmission, content_type) == 32
     && offsetof(RvFormSubmission, body_length) == 48 && offsetof(RvFormSubmission, form) == 56 && offsetof(RvFormSubmission, submitter) == 64));
 static_assert(sizeof(void*) != 8 || (sizeof(RvTextSegments) == 32 && offsetof(RvTextSegments, starts) == 8 && offsetof(RvTextSegments, locale) == 24));
@@ -1742,6 +1748,8 @@ int32_t rv_abi_has(const char* feature)
     if (!feature)
         return 0;
     if (!std::strcmp(feature, "host-tracing"))
+        return 1;
+    if (!std::strcmp(feature, "host-errors"))
         return 1;
     if (!std::strcmp(feature, "editing-undo"))
         return 1;
@@ -3000,6 +3008,8 @@ int32_t rv_host_acquire_egl_frame(RvHost* host, RvGpuFrame** frame)
         *frame = new RvGpuFrame { WTF::move(surface) };
         return RV_OK;
     }();
+    if (result != RV_OK && host->errorRecordsEnabled)
+        host->lastHostError = RvHostErrorRecord { RV_HOST_ERROR_ACQUIRE_FRAME, RV_HOST_ERROR_SOURCE_EGL, result, 0 };
     if (host->updateWanted)
         host->requestFrame();
     return result;
@@ -3071,6 +3081,10 @@ int32_t rv_host_acquire_d3d11_frame(RvHost* host, void* consumerDevice, RvGpuFra
         }
         return transferred ? RV_OK : RV_ERR_PAINT_FAILED;
     }();
+    if (result != RV_OK && host->errorRecordsEnabled) {
+        auto reason = static_cast<ID3D11Device*>(consumerDevice)->GetDeviceRemovedReason();
+        host->lastHostError = RvHostErrorRecord { RV_HOST_ERROR_ACQUIRE_FRAME, RV_HOST_ERROR_SOURCE_D3D11, result, static_cast<int32_t>(reason) };
+    }
     if (host->updateWanted)
         host->requestFrame();
     return result;
@@ -4920,6 +4934,39 @@ int32_t rv_host_trace_enable(RvHost* host, int32_t enabled)
     else if (!enabled && host->traceBuffer) {
         host->traceBuffer->enabled = false;
         host->traceBuffer.reset();
+    }
+    return RV_OK;
+}
+
+int32_t rv_host_error_enable(RvHost* host, int32_t enabled)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_DETACHED;
+    if (enabled != 0 && enabled != 1)
+        return RV_ERR_UNSUPPORTED;
+    if (host->errorRecordsEnabled != static_cast<bool>(enabled)) {
+        host->lastHostError.reset();
+        host->errorRecordsEnabled = enabled;
+    }
+    return RV_OK;
+}
+
+int32_t rv_host_error_take(RvHost* host, RvHostErrorRecord* record, int32_t* present)
+{
+    if (!host || !record || !present)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_DETACHED;
+    *present = host->lastHostError.has_value();
+    if (host->lastHostError) {
+        *record = *host->lastHostError;
+        host->lastHostError.reset();
     }
     return RV_OK;
 }
