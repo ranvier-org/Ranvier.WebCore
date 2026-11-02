@@ -1,6 +1,8 @@
 #include "config.h"
 #include "print177_probe.h"
 #include "Document.h"
+#include "DocumentView.h"
+#include "FrameDestructionObserverInlines.h"
 #include "GraphicsContextSkia.h"
 #include "LocalFrame.h"
 #include "LocalFrameView.h"

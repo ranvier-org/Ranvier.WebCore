@@ -93,7 +93,9 @@ def main(args):
              source / 'tests/printing/print177_probe.py', source / 'host/RanvierMutationGlue.cpp',
              build / 'CMakeCache.txt', build / 'build.ninja',
              Path('C:/wk/src/Source/WebCore/page/PrintContext.h'),
-             Path('C:/wk/src/Source/WebCore/page/PrintContext.cpp')]
+             Path('C:/wk/src/Source/WebCore/page/PrintContext.cpp'),
+             Path('C:/wk/src/Source/WebCore/dom/DocumentView.h'),
+             Path('C:/wk/src/Source/WebCore/page/FrameDestructionObserverInlines.h')]
     for directory in ['C:/wk/src/Source/ThirdParty/skia/include', 'C:/wk/src/Source/WebCore/platform/graphics/skia']:
         extra += list(Path(directory).rglob('*.h'))
     if args.dependency_receipt:
