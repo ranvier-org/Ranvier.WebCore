@@ -4,6 +4,7 @@
 #include "RanvierCryptoKdfGlue.h"
 #include "RanvierCryptoAsymmetricGlue.h"
 #include "RanvierCryptoInternal.h"
+#include "RanvierCryptoGeneralGlue.h"
 #include "dom/RanvierDomGlue.h"
 #include "CryptoAlgorithm.h"
 #include "CryptoAlgorithmHmacKeyParams.h"
@@ -1341,7 +1342,7 @@ ExceptionOr<String> jsonString(JSON::Value& value)
 {
     switch (value.type()) {
     case JSON::Value::Type::String:
-        return value.asString();
+        return String { value.asString() };
     case JSON::Value::Type::Null:
         return String { "null"_s };
     case JSON::Value::Type::Object:
@@ -1362,12 +1363,13 @@ ExceptionOr<String> jsonString(JSON::Value& value)
                 builder.append(converted.releaseReturnValue());
             }
         }
-        return builder.toString();
+        return String { builder.toString() };
     }
     case JSON::Value::Type::Boolean:
+        return String { *value.asBoolean() ? "true"_s : "false"_s };
     case JSON::Value::Type::Integer:
     case JSON::Value::Type::Double:
-        return value.toJSONString();
+        return String::number(*value.asDouble());
     }
     RELEASE_ASSERT_NOT_REACHED();
 }
@@ -1398,8 +1400,8 @@ std::optional<ExceptionCode> decodeJwk(const Vector<uint8_t>& bytes, JsonWebKey&
             return ExceptionCode::DataError;
         return ExceptionCode::TypeError;
     }
-    auto field = [&](ASCIILiteral name, String& output) -> std::optional<ExceptionCode> {
-        auto value = object->getValue(name);
+    auto field = [&](JSON::Object* source, ASCIILiteral name, String& output) -> std::optional<ExceptionCode> {
+        auto value = source ? source->getValue(name) : nullptr;
         if (!value) {
             output = { };
             return std::nullopt;
@@ -1410,14 +1412,8 @@ std::optional<ExceptionCode> decodeJwk(const Vector<uint8_t>& bytes, JsonWebKey&
         output = converted.releaseReturnValue();
         return std::nullopt;
     };
-    for (size_t index = 0; index < jwkStringFields.size(); ++index) {
-        if (auto error = field(jwkFieldNames[index], jwk.*jwkStringFields[index]))
-            return error;
-    }
-    if (auto ext = object->getValue("ext"_s))
-        jwk.ext = jsonBoolean(*ext);
-    if (auto value = object->getValue("key_ops"_s)) {
-        auto array = value->asArray();
+    auto convertUsages = [&](JSON::Value& value) -> std::optional<ExceptionCode> {
+        auto array = value.asArray();
         if (!array)
             return ExceptionCode::TypeError;
         jwk.key_ops = Vector<CryptoKeyUsage>();
@@ -1434,9 +1430,10 @@ std::optional<ExceptionCode> decodeJwk(const Vector<uint8_t>& bytes, JsonWebKey&
                 jwk.usages |= usageBit(*usage);
             }
         }
-    }
-    if (auto value = object->getValue("oth"_s)) {
-        auto array = value->asArray();
+        return std::nullopt;
+    };
+    auto convertOtherPrimes = [&](JSON::Value& value) -> std::optional<ExceptionCode> {
+        auto array = value.asArray();
         if (!array)
             return ExceptionCode::TypeError;
         jwk.oth = Vector<RsaOtherPrimesInfo>();
@@ -1444,19 +1441,43 @@ std::optional<ExceptionCode> decodeJwk(const Vector<uint8_t>& bytes, JsonWebKey&
             auto prime = item->asObject();
             if (!prime && !item->isNull() && item->type() != JSON::Value::Type::Array)
                 return ExceptionCode::TypeError;
-            auto r = prime ? prime->getValue("r"_s) : nullptr;
-            auto d = prime ? prime->getValue("d"_s) : nullptr;
-            auto t = prime ? prime->getValue("t"_s) : nullptr;
-            auto convertedR = r ? jsonString(*r) : ExceptionOr<String> { String { } };
-            auto convertedD = d ? jsonString(*d) : ExceptionOr<String> { String { } };
-            auto convertedT = t ? jsonString(*t) : ExceptionOr<String> { String { } };
-            if (convertedR.hasException())
-                return convertedR.releaseException().code();
-            if (convertedD.hasException())
-                return convertedD.releaseException().code();
-            if (convertedT.hasException())
-                return convertedT.releaseException().code();
-            jwk.oth->append({ convertedR.releaseReturnValue(), convertedD.releaseReturnValue(), convertedT.releaseReturnValue() });
+            RsaOtherPrimesInfo converted;
+            if (auto error = field(prime.get(), "d"_s, converted.d))
+                return error;
+            if (auto error = field(prime.get(), "r"_s, converted.r))
+                return error;
+            if (auto error = field(prime.get(), "t"_s, converted.t))
+                return error;
+            jwk.oth->append(WTF::move(converted));
+        }
+        return std::nullopt;
+    };
+    constexpr std::array<ASCIILiteral, 18> members {
+        "alg"_s, "crv"_s, "d"_s, "dp"_s, "dq"_s, "e"_s, "ext"_s, "k"_s, "key_ops"_s,
+        "kty"_s, "n"_s, "oth"_s, "p"_s, "q"_s, "qi"_s, "use"_s, "x"_s, "y"_s
+    };
+    for (auto member : members) {
+        if (member == "ext"_s) {
+            if (auto value = object->getValue(member))
+                jwk.ext = jsonBoolean(*value);
+        } else if (member == "key_ops"_s) {
+            if (auto value = object->getValue(member)) {
+                if (auto error = convertUsages(*value))
+                    return error;
+            }
+        } else if (member == "oth"_s) {
+            if (auto value = object->getValue(member)) {
+                if (auto error = convertOtherPrimes(*value))
+                    return error;
+            }
+        } else {
+            for (size_t index = 0; index < jwkFieldNames.size(); ++index) {
+                if (jwkFieldNames[index] == member) {
+                    if (auto error = field(object.get(), member, jwk.*jwkStringFields[index]))
+                        return error;
+                    break;
+                }
+            }
         }
     }
     return jwk.kty.isNull() ? std::optional { ExceptionCode::DataError } : std::nullopt;
@@ -1972,4 +1993,241 @@ void importDerivedKey(uint64_t id, const std::shared_ptr<DerivedKeyTarget>& targ
         *target->importParameters, target->extractable, target->usages);
 }
 
+}
+
+namespace {
+
+bool valid(const RanvierCryptoImportParams* input)
+{
+    if (!input || input->size != sizeof(*input) || !valid(input->name))
+        return false;
+    RanvierCryptoSecretImportParams secret { sizeof(secret), input->name, input->hmac };
+    return valid(&secret) && (!input->asymmetric || Ranvier::Crypto::validAsymmetricKeyParams(input->asymmetric));
+}
+
+bool valid(const RanvierCryptoWrappingParams* input)
+{
+    return input && input->size == sizeof(*input) && valid(input->name)
+        && (!input->aes || valid(input->aes))
+        && (!input->oaep || Ranvier::Crypto::validAsymmetricOaepParams(input->oaep));
+}
+
+bool isAsymmetric(CryptoAlgorithmIdentifier identifier)
+{
+    return identifier == CryptoAlgorithmIdentifier::RSASSA_PKCS1_v1_5 || identifier == CryptoAlgorithmIdentifier::RSA_PSS
+        || identifier == CryptoAlgorithmIdentifier::RSA_OAEP || identifier == CryptoAlgorithmIdentifier::ECDSA
+        || identifier == CryptoAlgorithmIdentifier::ECDH || identifier == CryptoAlgorithmIdentifier::Ed25519
+        || identifier == CryptoAlgorithmIdentifier::X25519;
+}
+
+std::optional<ExceptionCode> generalImportParameters(const RanvierCryptoImportParams& input, std::unique_ptr<CryptoAlgorithmParameters>& params)
+{
+    auto identifier = CryptoAlgorithmRegistry::singleton().identifier(text(input.name));
+    if (!identifier)
+        return ExceptionCode::NotSupportedError;
+    if (isAsymmetric(*identifier)) {
+        RanvierCryptoAsymmetricKeyParams value { };
+        if (input.asymmetric)
+            value = *input.asymmetric;
+        value.size = sizeof(value);
+        value.name = input.name;
+        return Ranvier::Crypto::normalizeAsymmetricImport(value, params);
+    }
+    RanvierCryptoSecretImportParams value { sizeof(value), input.name, input.hmac };
+    return importParameters(value, params);
+}
+
+std::optional<ExceptionCode> wrappingParameters(const RanvierCryptoWrappingParams& input, std::unique_ptr<CryptoAlgorithmParameters>& params)
+{
+    auto identifier = CryptoAlgorithmRegistry::singleton().identifier(text(input.name));
+    if (!identifier)
+        return ExceptionCode::NotSupportedError;
+    if (*identifier == CryptoAlgorithmIdentifier::RSA_OAEP) {
+        RanvierCryptoAsymmetricOaepParams value { };
+        if (input.oaep)
+            value = *input.oaep;
+        value.size = sizeof(value);
+        value.name = input.name;
+        return Ranvier::Crypto::normalizeAsymmetricOaep(value, params);
+    }
+    RanvierCryptoAesCipherParams value { };
+    if (input.aes)
+        value = *input.aes;
+    value.size = sizeof(value);
+    value.name = input.name;
+    return cipherParameters(value, true, params);
+}
+
+void importAnyKey(uint64_t id, CryptoKeyFormat format, KeyData&& data, const CryptoAlgorithmParameters& params,
+    bool extractable, CryptoKeyUsageBitmap usages, bool duplicateKeyOps)
+{
+    if (!Ranvier::Crypto::pendingDocument(id)) {
+        if (auto* raw = std::get_if<Vector<uint8_t>>(&data))
+            secureZeroSpan(raw->mutableSpan());
+        return;
+    }
+    if (isAsymmetric(params.identifier))
+        Ranvier::Crypto::importAsymmetricKey(id, format, WTF::move(data), params, extractable, usages, duplicateKeyOps);
+    else
+        importSecret(id, format, WTF::move(data), params, extractable, usages, duplicateKeyOps);
+}
+
+}
+
+int32_t ranvier_crypto_key_import(RvNode* handle, RanvierCryptoBytes formatName, const RanvierCryptoAsymmetricKeyData* input,
+    const RanvierCryptoImportParams* options, int32_t extractable, RanvierCryptoStrings requestedUsages, RanvierCryptoOperationHandle* output)
+{
+    Document* document;
+    if (auto status = documentOf(handle, document))
+        return status;
+    if (!output)
+        return RV_ERR_NULL_ARGUMENT;
+    output->value = 0;
+    if (!valid(formatName) || !input || input->size != sizeof(*input) || !flag(input->raw_present)
+        || (input->raw_present && !valid(input->raw)) || (input->jwk && !Ranvier::Crypto::validJwk(input->jwk))
+        || !valid(options) || !flag(extractable) || !valid(requestedUsages))
+        return RV_ERR_NULL_ARGUMENT;
+    auto id = admit(*document, output);
+    auto format = formatOf(formatName);
+    CryptoKeyUsageBitmap usages;
+    if (!format || usagesOf(requestedUsages, usages)) {
+        deliver(id, errorResult(ExceptionCode::TypeError));
+        return RV_OK;
+    }
+    std::unique_ptr<CryptoAlgorithmParameters> params;
+    if (auto error = generalImportParameters(*options, params)) {
+        deliver(id, errorResult(*error));
+        return RV_OK;
+    }
+    if ((*format == CryptoKeyFormat::Jwk && (!input->jwk || input->raw_present))
+        || (*format != CryptoKeyFormat::Jwk && (!input->raw_present || input->jwk))) {
+        deliver(id, errorResult(ExceptionCode::TypeError));
+        return RV_OK;
+    }
+    bool duplicate = false;
+    KeyData data;
+    if (*format == CryptoKeyFormat::Jwk) {
+        JsonWebKey jwk;
+        if (auto error = Ranvier::Crypto::copyJwk(*input->jwk, jwk, duplicate)) {
+            deliver(id, errorResult(*error));
+            return RV_OK;
+        }
+        data = WTF::move(jwk);
+    } else
+        data = copy(input->raw);
+    importAnyKey(id, *format, WTF::move(data), *params, extractable, usages, duplicate);
+    return RV_OK;
+}
+
+int32_t ranvier_crypto_key_wrap(RvNode* handle, RanvierCryptoBytes formatName, RanvierCryptoKeyHandle keyHandle,
+    RanvierCryptoKeyHandle wrappingHandle, const RanvierCryptoWrappingParams* input, RanvierCryptoOperationHandle* output)
+{
+    Document* document;
+    if (auto status = documentOf(handle, document))
+        return status;
+    if (!output)
+        return RV_ERR_NULL_ARGUMENT;
+    output->value = 0;
+    if (!valid(formatName) || !valid(input))
+        return RV_ERR_NULL_ARGUMENT;
+    RefPtr<CryptoKey> key, wrapping;
+    if (auto status = lookupKey(keyHandle, key))
+        return status;
+    if (auto status = lookupKey(wrappingHandle, wrapping))
+        return status;
+    auto id = admit(*document, output);
+    auto format = formatOf(formatName);
+    if (!format) {
+        deliver(id, errorResult(ExceptionCode::TypeError));
+        return RV_OK;
+    }
+    std::unique_ptr<CryptoAlgorithmParameters> params;
+    if (auto error = wrappingParameters(*input, params)) {
+        deliver(id, errorResult(*error));
+        return RV_OK;
+    }
+    if (wrapping->algorithmIdentifier() != params->identifier || !wrapping->allows(CryptoKeyUsageWrapKey)) {
+        deliver(id, errorResult(ExceptionCode::InvalidAccessError));
+        return RV_OK;
+    }
+    auto identifier = key->algorithmIdentifier();
+    auto algorithm = CryptoAlgorithmRegistry::singleton().create(identifier);
+    if (!algorithm || identifier == CryptoAlgorithmIdentifier::HKDF || identifier == CryptoAlgorithmIdentifier::PBKDF2) {
+        deliver(id, errorResult(ExceptionCode::NotSupportedError));
+        return RV_OK;
+    }
+    if (!key->extractable()) {
+        deliver(id, errorResult(ExceptionCode::InvalidAccessError));
+        return RV_OK;
+    }
+    algorithm->exportKey(*format, key.releaseNonNull(), [id, wrapping = wrapping.releaseNonNull(), params = WTF::move(params)](CryptoKeyFormat, KeyData&& data) mutable {
+        if (!Ranvier::Crypto::pendingDocument(id)) {
+            if (auto* raw = std::get_if<Vector<uint8_t>>(&data))
+                secureZeroSpan(raw->mutableSpan());
+            return;
+        }
+        Vector<uint8_t> bytes;
+        if (auto* raw = std::get_if<Vector<uint8_t>>(&data))
+            bytes = WTF::move(*raw);
+        else
+            bytes = encodeJwk(std::get<JsonWebKey>(data));
+        runCipher(id, *params, WTF::move(wrapping), WTF::move(bytes), false, true,
+            [id](const Vector<uint8_t>& result) { deliverBytes(id, result); });
+    }, onError(id));
+    return RV_OK;
+}
+
+int32_t ranvier_crypto_key_unwrap(RvNode* handle, RanvierCryptoBytes formatName, RanvierCryptoBytes wrapped,
+    RanvierCryptoKeyHandle unwrappingHandle, const RanvierCryptoWrappingParams* input, const RanvierCryptoImportParams* options,
+    int32_t extractable, RanvierCryptoStrings requestedUsages, RanvierCryptoOperationHandle* output)
+{
+    Document* document;
+    if (auto status = documentOf(handle, document))
+        return status;
+    if (!output)
+        return RV_ERR_NULL_ARGUMENT;
+    output->value = 0;
+    if (!valid(formatName) || !valid(wrapped) || !valid(input) || !valid(options) || !flag(extractable) || !valid(requestedUsages))
+        return RV_ERR_NULL_ARGUMENT;
+    RefPtr<CryptoKey> key;
+    if (auto status = lookupKey(unwrappingHandle, key))
+        return status;
+    auto id = admit(*document, output);
+    auto format = formatOf(formatName);
+    CryptoKeyUsageBitmap usages;
+    if (!format || usagesOf(requestedUsages, usages)) {
+        deliver(id, errorResult(ExceptionCode::TypeError));
+        return RV_OK;
+    }
+    std::unique_ptr<CryptoAlgorithmParameters> params, importParams;
+    if (auto error = wrappingParameters(*input, params)) {
+        deliver(id, errorResult(*error));
+        return RV_OK;
+    }
+    if (auto error = generalImportParameters(*options, importParams)) {
+        deliver(id, errorResult(*error));
+        return RV_OK;
+    }
+    if (key->algorithmIdentifier() != params->identifier || !key->allows(CryptoKeyUsageUnwrapKey)) {
+        deliver(id, errorResult(ExceptionCode::InvalidAccessError));
+        return RV_OK;
+    }
+    runCipher(id, *params, key.releaseNonNull(), copy(wrapped), true, true,
+        [id, format = *format, params = WTF::move(importParams), extractable, usages](const Vector<uint8_t>& bytes) {
+            if (!Ranvier::Crypto::pendingDocument(id))
+                return;
+            KeyData data;
+            bool duplicate = false;
+            if (format == CryptoKeyFormat::Jwk) {
+                JsonWebKey jwk;
+                if (auto error = decodeJwk(bytes, jwk, duplicate)) {
+                    deliver(id, errorResult(*error));
+                    return;
+                }
+                data = WTF::move(jwk);
+            } else
+                data = bytes;
+            importAnyKey(id, format, WTF::move(data), *params, extractable, usages, duplicate);
+        });
+    return RV_OK;
 }

@@ -8,7 +8,7 @@ from pathlib import Path
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from subtle_crypto_aes import AesProbe, cipher
+from subtle_crypto_aes import AesProbe, algorithm, cipher
 from subtle_crypto_hmac import Native, Case
 
 
@@ -54,8 +54,19 @@ def run(directory, report=None):
         ('nested dictionary conversion error', encoded({'oth': [{'r': {'toString': None}}]}), 'TypeError', ('encrypt',)),
         ('optional other prime null DOMString', encoded({'oth': [{'r': None}]}), '', ('encrypt',)),
         ('duplicate unknown key_ops', encoded({'key_ops': ['encrypt', 'future', 'future']}), 'DataError', ('encrypt',)),
+        ('distinct unknown UTF16 surrogates', encoded({'key_ops': ['encrypt', '\ud800', '\ud801']}), '', ('encrypt',)),
+        ('duplicate unknown UTF16 surrogate', encoded({'key_ops': ['encrypt', '\ud800', '\ud800']}), 'DataError', ('encrypt',)),
         ('replacement UTF8 in ignored public field', encoded({'x': 'replace'}).replace(b'replace', b'\xff'), '', ('encrypt',)),
     ]
+    for literal, converted in [('-0', '0'), ('1e400', 'Infinity'), ('-1e400', '-Infinity'),
+                               ('1e-400', '0'), ('9007199254740993', '9007199254740992'),
+                               ('1e21', '1e+21'), ('1e20', '100000000000000000000'),
+                               ('1e-6', '0.000001'), ('1e-7', '1e-7'),
+                               ('1000000000000000100', '1000000000000000100'),
+                               ('1.0000000000000002', '1.0000000000000002')]:
+        for suffix, comparison, expected in [('duplicate', converted, 'DataError'), ('distinct', 'different-number', '')]:
+            value = encoded({'key_ops': ['encrypt', 'RAW_NUMBER', comparison]}).replace(b'"RAW_NUMBER"', literal.encode())
+            cases.append(('numeric DOMString ' + literal + ' ' + suffix, value, expected, ('encrypt',)))
     measured = []
     try:
         wrapping = probe.import_key(page, 'AES-CBC', raw, usages=('encrypt', 'unwrapKey'))
@@ -71,6 +82,22 @@ def run(directory, report=None):
                 if not actual:
                     key = probe.take(operation, page)
                     n.expect(probe.bytes(probe.export(page, key), page) == raw, name + ' preserves imported key bytes')
+        for label, literal, expected in [('numeric Infinity', b'1e400', bytes.fromhex('2277e29e2b72')),
+                                         ('nested numeric Infinity', b'[1e400]', bytes.fromhex('2277e29e2b72')),
+                                         ('literal null string', b'"null"', bytes.fromhex('9ee965'))]:
+            with probe.check(label):
+                data = b'{"kty":"oct","key_ops":["sign"],"ext":true,"k":' + literal + b'}'
+                encrypted = probe.bytes(probe.transform(page, 'encrypt', wrapping, params, data), page)
+                operation = probe.unwrap(page, encrypted, wrapping, params, name='HMAC', format='jwk', usages=('sign',),
+                                         options=algorithm('HMAC', 'SHA-256'))
+                probe.wait(operation, page)
+                actual = probe.error(operation)
+                measured.append({'case': label, 'inputHex': data.hex(), 'expected': '', 'actual': actual,
+                                 'expectedRawHex': expected.hex()})
+                n.expect(actual == '', label + ' imports successfully')
+                output = probe.bytes(probe.export(page, probe.take(operation, page)), page)
+                measured[-1]['actualRawHex'] = output.hex()
+                n.expect(output == expected, label + ' uses DOMString number conversion, not JSON serialization')
         if probe.failures:
             raise AssertionError(f'{len(probe.failures)} independent dated JWK codec cases failed')
         return n.assertions

@@ -371,7 +371,7 @@ def check_wrapping(probe, page):
             probe.error_is(page, probe.wrap(page, key, encrypting, parameters), 'InvalidAccessError')
             valid_wrapped = probe.bytes(probe.wrap(page, key, wrapping, parameters), page)
             probe.error_is(page, probe.unwrap(page, valid_wrapped, encrypting, parameters), 'InvalidAccessError')
-            invalid_json = [(b'{', 'DataError'), (b'1', 'DataError'), (b'null', 'DataError'), (b'[]', 'DataError'), (json.dumps({**basic, 'key_ops': ['encrypt', 'encrypt']}).encode(), 'DataError'), (json.dumps({**basic, 'key_ops': ['bogus']}).encode(), 'DataError'), (json.dumps({**basic, 'key_ops': None}).encode(), 'DataError'), (json.dumps({**basic, 'alg': ''}).encode(), 'DataError')]
+            invalid_json = [(b'{', 'SyntaxError'), (b'1', 'TypeError'), (b'null', 'DataError'), (b'[]', 'DataError'), (json.dumps({**basic, 'key_ops': ['encrypt', 'encrypt']}).encode(), 'DataError'), (json.dumps({**basic, 'key_ops': ['bogus']}).encode(), 'DataError'), (json.dumps({**basic, 'key_ops': None}).encode(), 'TypeError'), (json.dumps({**basic, 'alg': ''}).encode(), 'DataError')]
             for data, error in invalid_json:
                 with probe.check(f'wrapping line373: {(data, error)!r}'):
                     wrapped = probe.bytes(probe.transform(page, 'encrypt', encrypting, parameters, data), page)
