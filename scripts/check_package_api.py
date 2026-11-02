@@ -41,6 +41,9 @@ def verify(package, gpu=False):
                                 str(destination / 'libRanvierWebCoreHost.so'), *arguments], check=True, env=environment)
             subprocess.run([sys.executable, '-I', str(root / 'tests/gpu/linux_view_transition_pixels.py'),
                             '--native-directory', str(destination)], check=True, env=environment)
+            subprocess.run([sys.executable, '-I', str(root / 'tests/gpu/compositor_input_linux.py'),
+                            '--native-directory', str(destination), '--report', str(destination.parent / 'compositor-input-linux.json')],
+                           check=True, env=environment)
         elif gpu:
             sdl = destination.parent / 'sdl'
             subprocess.run([sys.executable, '-I', str(root / 'scripts/sdl_runtime.py'), '--out', str(sdl)], check=True)
@@ -49,10 +52,16 @@ def verify(package, gpu=False):
             subprocess.run([sys.executable, '-I', str(root / 'tests/gpu/windows_view_transition_pixels.py'),
                             '--native-directory', str(destination), '--output', str(destination.parent / 'transition-readback')],
                            check=True)
+            subprocess.run([sys.executable, '-I', str(root / 'tests/gpu/compositor_windows.py'),
+                            '--native-directory', str(destination), '--output', str(destination.parent / 'compositor-input')],
+                           check=True)
         else:
             for name in ['css_supports', 'computed_style', 'fragment_rectangles', 'keyframe_rules', 'counter_style_rules', 'custom_properties', 'typed_style_values', 'style_property_maps', 'declared_style_maps', 'style_map_entries', 'geometry_values', 'matrix_values', 'css_transforms', 'detached_cssom_context']:
                 subprocess.run([sys.executable, '-I', str(root / 'tests/abi' / (name + '.py')),
                                 '--native-directory', str(destination)], check=True)
+        subprocess.run([sys.executable, '-I', '-X', 'utf8', str(root / 'tests/abi/mutation_observation.py'),
+                        '--native-directory', str(destination)], check=True,
+                       env=environment if gpu and rid.startswith('linux-') else None)
         print(f'PASS packaged API probes: {rid}, {files} native/resource files')
 
 

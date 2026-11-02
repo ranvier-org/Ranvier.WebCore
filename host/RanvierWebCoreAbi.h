@@ -178,7 +178,7 @@ RV_EXPORT int32_t rv_host_set_accelerated_compositing(RvHost*, int32_t mode);
 enum { RV_GPU_RGBA8_PREMULTIPLIED = 1 };
 /* Acquires a Windows D3D11 frame without CPU pixel readback. Call rv_host_update before acquire, as before
  * CPU paint, to advance animations and update compositing layers. consumerDevice is a live ID3D11Device*
- * (for SDL, SDL_PROP_RENDERER_D3D11_DEVICE_POINTER). Requires compositing enabled, scale 1 and a GPU build;
+ * (for SDL, SDL_PROP_RENDERER_D3D11_DEVICE_POINTER). Requires compositing enabled and a GPU build;
  * otherwise returns RV_ERR_UNSUPPORTED so the caller can paint with rv_host_paint_rgba. An outstanding
  * frame on the same surface also returns RV_ERR_UNSUPPORTED immediately. Other GPU waits are bounded.
  * Writes NULL to *frame on failure. The frame owns its resources independently of host/renderer/window;
@@ -208,6 +208,23 @@ RV_EXPORT int32_t rv_gpu_frame_info(RvGpuFrame*, void** texture, int32_t* width,
  * the consumer immediate context, returns the keyed mutex to the producer and frees this frame handle.
  * The SDL wrapper and all frame handles must be disposed before unloading their native DLLs. */
 RV_EXPORT int32_t rv_gpu_frame_release(RvGpuFrame*);
+
+/* Binds a native D3D11 RGBA8 UNORM texture with premultiplied sRGB bytes to this host's current-document element.
+ * The target needs a composited RenderBox (for example will-change:transform). DOM layout, clipping, scrolling,
+ * transforms, opacity and stacking apply. Single mip/sample/array and NTshared+keyedmutex flags are required.
+ * Producer acquires key0, renders/flushes and releases key1 before each host frame; composition returns key0.
+ * The host retains the COM texture until replacement, unbind (NULL), element removal or document/host teardown.
+ * compositor_input_windows.py verifies native GPU pixels, DPR, loss, bounded waits and lifetime. Owner thread only. */
+RV_EXPORT int32_t rv_host_bind_d3d11_texture(RvHost*, RvNode* target, void* texture);
+/* Linux GPU input: imports an RGBA8 premultiplied sRGB EGLImage from the configured display on the owner thread.
+ * Keep its producer context current for binding. The host retains an image sibling; the caller may destroy the
+ * EGLImage handle after success. Complete producer writes with glFinish before each host acquisition, and do not
+ * modify the image during that synchronous call. flipY is 0 for top-row-first content, 1 for GL bottom-row-first.
+ * NULL unbinds. Geometry and teardown follow the D3D11 binding; the producer context is restored before return. */
+RV_EXPORT int32_t rv_host_bind_egl_image(RvHost*, RvNode* target, void* image, int32_t flipY);
+/* Queues a frame after the app publishes a bound native texture. Does not invalidate the base DOM backing.
+ * Call on the host owner thread after the producer synchronization above; returns UNSUPPORTED without a binding. */
+RV_EXPORT int32_t rv_host_native_texture_changed(RvHost*, RvNode* target);
 
 /* Bits of the capture parameter of rv_node_add_event_listener. Values 0 and 1 retain their original
  * bubbling/capturing behavior. PASSIVE has an effect only together with PASSIVE_SPECIFIED; omitting
@@ -917,7 +934,10 @@ enum {
     RV_CLIPBOARD_DOM = 2,
 };
 
-/* Editing commands of rv_host_edit. */
+/* Editing commands of rv_host_edit. Undo/redo require rv_abi_has("editing-undo").
+ * History belongs to the engine editor, resets on document replacement and is separate from application history.
+ * Nested editing input during undo/redo returns RV_ERR_UNSUPPORTED; cancel beforeinput and retry after the outer call.
+ * Destruction requested by an editing callback is deferred until the outer editing call returns. */
 enum {
     RV_EDIT_COPY = 0,
     RV_EDIT_CUT = 1,
@@ -926,6 +946,8 @@ enum {
     RV_EDIT_PASTE_PLAIN = 3,
     RV_EDIT_SELECT_ALL = 4,
     RV_EDIT_DELETE = 5,
+    RV_EDIT_UNDO = 6,
+    RV_EDIT_REDO = 7,
 };
 
 typedef struct RvClipboardRequest RvClipboardRequest;
@@ -2679,6 +2701,84 @@ RV_EXPORT int32_t rv_image_bitmap_result(uint64_t operation, RvImageBitmap** bit
 /* The DOMException name of a DECODE_FAILED rv_image_bitmap_create, until rv_resource_release; capacity follows
  * rv_last_exception. RV_ERR_UNSUPPORTED for another operation or outcome. */
 RV_EXPORT int32_t rv_image_bitmap_error(uint64_t operation, char* buffer, int32_t capacity, int32_t* length);
+
+/* Mutation records borrow UTF-16 strings and node arrays from their record batch. Length -1 is null, 0 is empty.
+ * Retain nodes before releasing the batch when they must outlive its snapshot. */
+typedef struct RvMutationObserver RvMutationObserver;
+typedef struct RvMutationRecordBatch RvMutationRecordBatch;
+
+typedef struct { int32_t present; int32_t value; } RvMutationOptionalBool;
+typedef struct { const uint16_t* data; int32_t length; } RvMutationString;
+typedef struct { int32_t present; const RvMutationString* items; int32_t count; } RvMutationOptionalStrings;
+typedef struct { RvNode* const* items; int32_t count; } RvMutationNodes;
+
+typedef struct RvMutationObserverOptions {
+    uint32_t size;
+    int32_t child_list;
+    int32_t subtree;
+    RvMutationOptionalBool attributes;
+    RvMutationOptionalBool character_data;
+    RvMutationOptionalBool attribute_old_value;
+    RvMutationOptionalBool character_data_old_value;
+    RvMutationOptionalStrings attribute_filter;
+} RvMutationObserverOptions;
+
+typedef struct RvMutationRecordView {
+    uint32_t size;
+    RvMutationString type;
+    RvNode* target;
+    RvMutationNodes added_nodes;
+    RvMutationNodes removed_nodes;
+    RvNode* previous_sibling;
+    RvNode* next_sibling;
+    RvMutationString attribute_name;
+    RvMutationString attribute_namespace;
+    RvMutationString old_value;
+} RvMutationRecordView;
+
+typedef void (*RvMutationCallback)(void* context, RvMutationObserver* observer, RvMutationRecordBatch* records);
+typedef void (*RvMutationContextRelease)(void* context);
+
+/* Creates a disconnected observer. callback and context release are required; success transfers the context lease.
+ * Host replacement/destruction closes it. An in-flight callback keeps the lease until callback return. */
+RV_EXPORT int32_t rv_host_create_mutation_observer(RvHost*, RvMutationCallback callback, void* context, RvMutationContextRelease release, RvMutationObserver** result);
+RV_EXPORT int32_t rv_mutation_observer_observe(RvMutationObserver*, RvNode* target, const RvMutationObserverOptions* options);
+RV_EXPORT int32_t rv_mutation_observer_disconnect(RvMutationObserver*);
+RV_EXPORT int32_t rv_mutation_observer_take_records(RvMutationObserver*, RvMutationRecordBatch** result);
+RV_EXPORT int32_t rv_mutation_observer_release(RvMutationObserver*);
+RV_EXPORT int32_t rv_mutation_record_batch_retain(RvMutationRecordBatch*);
+RV_EXPORT int32_t rv_mutation_record_batch_release(RvMutationRecordBatch*);
+RV_EXPORT int32_t rv_mutation_record_batch_get_count(RvMutationRecordBatch*, int32_t* result);
+RV_EXPORT int32_t rv_mutation_record_batch_get_record(RvMutationRecordBatch*, int32_t index, RvMutationRecordView* result);
+
+typedef struct RvPrintOptions {
+    uint32_t size;
+    uint32_t max_pages;
+    double paper_width_points;
+    double paper_height_points;
+    double margin_top_points;
+    double margin_right_points;
+    double margin_bottom_points;
+    double margin_left_points;
+    uint64_t output_budget_bytes;
+    float raster_dpi;
+    uint32_t reserved;
+} RvPrintOptions;
+
+/* Polled synchronously before layout and between pages: zero continues, nonzero cancels. The callback may only read
+ * its cancellation state; it must not pump events or call the host. Its context is borrowed until print_pdf returns. */
+typedef int32_t (*RvPrintCancelPoll)(void* context);
+
+/* "printing-pdf": synchronously renders the current DOM, then delivers the existing resource completion on a later
+ * turn with zero width/height. Geometry is in points (72/inch); raster_dpi affects raster-only PDF effects.
+ * Options are copied. Positive finite paper/printable sizes, nonnegative margins, max_pages 1..4096, output budget
+ * 1..67108864 bytes, raster_dpi 72..600 and reserved=0 are required. Invalid options return UNSUPPORTED; output failure
+ * returns PAINT_FAILED. No failed call transfers an operation/context. Cancellation delivers RESOURCE_CANCELLED
+ * without PDF bytes. Printing restores screen layout/scroll before returning; no OS dialog or spooler is invoked.
+ * The app settles required fonts/images first. tests/abi/printing_pdf.py pins the output/teardown contract. */
+RV_EXPORT int32_t rv_host_print_pdf(RvHost*, const RvPrintOptions* options, RvPrintCancelPoll cancel_poll, void* cancel_context, RvResourceCompletion callback, void* context, int32_t* page_count, uint64_t* operation);
+/* Copies a completed PDF through the existing resource byte/capacity contract; release with rv_resource_release. */
+RV_EXPORT int32_t rv_print_pdf_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length);
 
 #ifdef __cplusplus
 }

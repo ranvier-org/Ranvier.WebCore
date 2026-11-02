@@ -26,6 +26,14 @@ def probe(name, *commands, rid=None, flavor=('slim', 'gpu'), timeout=TIMEOUT, en
 
 
 PROBES = [
+    *[probe('Verify native EGL texture input and fractional-DPI DOM composition',
+            'python -I tests/gpu/compositor_input_linux.py --native-directory {native} --report {work}/gpu-compositor-input-linux.json',
+            rid=rid, flavor='gpu',
+            env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
+      for rid in ['linux-x64', 'linux-arm64']],
+    probe('Verify native texture input and fractional-DPI GPU composition',
+          'python -I tests/gpu/compositor_windows.py --native-directory {native} --output {work}/gpu-compositor-input',
+          rid='win-x64', flavor='gpu'),
     *[probe('Verify fixed content clipping masks and complete pointwise paint stability',
             f'python -I tests/abi/background_content_clip_regression.py --native-directory {{native}} --rid {rid} --report {{work}}/background-content-clipping-regression.json',
             rid=rid, flavor='gpu',
@@ -41,6 +49,14 @@ PROBES = [
             rid=rid, flavor=None,
             env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
       for rid in ['linux-x64', 'linux-arm64', 'win-x64', 'win-arm64']],
+    *[probe('Verify native PDF layout, resource ownership and teardown',
+            'python -I -X utf8 tests/abi/printing_pdf.py --native-directory {native} --webkit-source {work}/src --report {work}/printing-pdf.json',
+            rid=rid, flavor=None,
+            env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'} if rid.startswith('linux') else None)
+      for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],
+    *[probe('Verify controlled unavailable native PDF backend',
+            'python -I -X utf8 tests/abi/printing_pdf.py --native-directory {native} --webkit-source {work}/src --report {work}/printing-pdf.json --expect-unsupported',
+            rid=rid, flavor=None) for rid in ['osx-x64', 'osx-arm64']],
     probe('Verify Windows same-document transition snapshot pixels',
           'python -I tests/gpu/windows_view_transition_pixels.py --native-directory {native} --output {work}/gpu-transition-readback',
           rid='win-x64', flavor='gpu'),
@@ -136,6 +152,8 @@ PROBES = [
           'python -I tests/abi/focus_input.py --native-directory {native}'),
     probe('Verify touch frames, touch lists and touch pointer events',
           'python -I tests/abi/touch_input.py --native-directory {native}'),
+    probe('Verify native editor undo, redo and callback lifetime',
+          'python -I tests/abi/editing_undo.py --native-directory {native}'),
     probe('Verify pen and mouse pointer fidelity and pen capture',
           'python -I tests/abi/pen_input.py --native-directory {native}'),
     probe('Verify pointer lock requests, relative movement and loss',
@@ -205,6 +223,8 @@ PROBES = [
           'python -I -X utf8 tests/abi/resize_observation.py --native-directory {native}'),
     probe('Verify intersection observation roots, margins, entries and takeRecords against the Chromium oracle',
           'python -I -X utf8 tests/abi/intersection_observation.py --native-directory {native}'),
+    probe('Verify mutation records, deferred delivery and context ownership',
+          'python -I -X utf8 tests/abi/mutation_observation.py --native-directory {native}', flavor=None),
     probe('Verify media capability queries, their delivery and teardown against the Chromium oracle',
           'python -I -X utf8 tests/abi/media_capabilities.py --native-directory {native}'),
     probe('Verify snapshot scale, crop, color space, encodings and delivery',

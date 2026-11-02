@@ -54,10 +54,12 @@ class PackagedGpuTests(unittest.TestCase):
 
             with patch('subprocess.run', side_effect=execute):
                 probe.verify(self.package(Path(directory)), gpu=True)
-        self.assertEqual(len(calls), 3)
+        self.assertEqual(len(calls), 5)
         self.assertTrue(calls[0][2].endswith('sdl_runtime.py'))
         self.assertTrue(Path(calls[1][2]).as_posix().endswith('tests/gpu/run.py'))
         self.assertEqual(calls[1][-2:], ['--teardown', 'all'])
+        self.assertTrue(calls[3][2].endswith('compositor_windows.py'))
+        self.assertTrue(calls[4][4].endswith('mutation_observation.py'))
 
     def test_gpu_package_gate_rejects_the_wrong_flavor_or_rid_without_running_it(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -74,8 +76,9 @@ class PackagedGpuTests(unittest.TestCase):
 
                 def execute(command, **kwargs):
                     calls.append((command, kwargs))
-                    if command[3] == '--native-directory':
-                        self.assertEqual((Path(command[4]) / 'libRanvierWebCoreHost.so').read_bytes(), b'packaged host')
+                    if '--native-directory' in command:
+                        native = Path(command[command.index('--native-directory') + 1])
+                        self.assertEqual((native / 'libRanvierWebCoreHost.so').read_bytes(), b'packaged host')
                     else:
                         self.assertEqual(Path(command[3]).read_bytes(), b'packaged host')
 
@@ -107,6 +110,22 @@ class PackagedGpuTests(unittest.TestCase):
                 self.assertTrue(calls[0][1]['check'])
                 self.assertEqual(calls[0][1]['env']['EGL_PLATFORM'], 'surfaceless')
                 self.assertEqual(calls[0][1]['env']['LIBGL_ALWAYS_SOFTWARE'], '1')
+
+    def test_linux_gpu_package_checks_native_input_on_the_extracted_payload(self):
+        with tempfile.TemporaryDirectory() as directory:
+            for rid in ['linux-x64', 'linux-arm64']:
+                calls = []
+                def execute(command, **kwargs):
+                    if Path(command[2]).name == 'compositor_input_linux.py':
+                        calls.append((command, kwargs))
+                        native = Path(command[command.index('--native-directory') + 1])
+                        self.assertEqual((native / 'libRanvierWebCoreHost.so').read_bytes(), b'packaged host')
+                with self.subTest(rid=rid), patch('subprocess.run', side_effect=execute):
+                    probe.verify(self.package(Path(directory), rid=rid), gpu=True)
+                self.assertEqual(len(calls), 1)
+                self.assertTrue(calls[0][1]['check'])
+                self.assertIn('--report', calls[0][0])
+                self.assertEqual(calls[0][1]['env']['EGL_PLATFORM'], 'surfaceless')
 
 
 if __name__ == '__main__':

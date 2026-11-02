@@ -102,9 +102,9 @@ def verify(directory, rid):
     assert rid in PROFILES and sys.platform == PROFILES[rid], 'Unproven native platform/RID'
     assert platform.machine().lower() in ['amd64', 'x86_64'], 'No ARM baseline has been qualified'
     manifest = json.loads((Path(directory).resolve().parents[2] / 'manifest.json').read_text())
-    assert (manifest['rid'],manifest['flavor'],manifest['abi']) == (rid,'gpu',60), 'Unproven package profile'
+    assert (manifest['rid'],manifest['flavor'],manifest['abi']) == (rid,'gpu',61), 'Unproven package profile'
     native = Native(directory)
-    assert native.bind('rv_abi_version', I, [])() == 60
+    assert native.bind('rv_abi_version', I, [])() == 61
     assert native.call('rv_abi_has', [ctypes.c_char_p], b'compositing') == 1, 'Only the GPU profile is qualified'
     profile,cases,expected,before,targets = load_inputs(rid)
     results, seen = [], set()

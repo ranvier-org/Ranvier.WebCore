@@ -1,0 +1,11 @@
+diff --git a/Source/ThirdParty/skia/CMakeLists.txt b/Source/ThirdParty/skia/CMakeLists.txt
+--- a/Source/ThirdParty/skia/CMakeLists.txt
++++ b/Source/ThirdParty/skia/CMakeLists.txt
+@@ -176,6 +176,7 @@
+     src/core/SkPaintPriv.cpp
+     src/core/SkPath.cpp
+     src/core/SkPathBuilder.cpp
++    src/core/SkPathDump.cpp
+     src/core/SkPathData.cpp
+     src/core/SkPathEffect.cpp
+     src/core/SkPathIter.cpp

@@ -1,6 +1,8 @@
 #pragma once
 #include <memory>
 
+namespace WebCore { class GLContext; }
+
 class RvEGLContextScope {
 public:
     RvEGLContextScope();
@@ -10,6 +12,7 @@ private:
     void* context;
     void* draw;
     void* read;
+    WebCore::GLContext* nativeContext { nullptr };
 };
 
 class RvEGLSurface {

@@ -12,12 +12,19 @@ RvEGLContextScope::RvEGLContextScope()
     , draw(eglGetCurrentSurface(EGL_DRAW)), read(eglGetCurrentSurface(EGL_READ))
 {
     // SDL switches contexts outside GLContextWrapper's current-context cache.
-    if (auto* current = WebCore::GLContext::current())
+    if (auto* current = WebCore::GLContext::current()) {
+        if (current->platformContext() == context)
+            nativeContext = current;
         current->unmakeContextCurrent();
+    }
 }
 
 RvEGLContextScope::~RvEGLContextScope()
 {
+    if (nativeContext) {
+        nativeContext->makeContextCurrent();
+        return;
+    }
     if (auto* current = WebCore::GLContext::current())
         current->unmakeContextCurrent();
     if (display != EGL_NO_DISPLAY)

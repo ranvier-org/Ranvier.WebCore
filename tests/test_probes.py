@@ -31,6 +31,13 @@ def run(entries, *options):
 
 
 class ProbeRunnerTests(unittest.TestCase):
+    def test_clipping_report_is_retained_even_when_a_probe_fails(self):
+        workflow = (ROOT / '.github/workflows/build.yml').read_text()
+        block = workflow.split('      - name: Retain clipping pixel results\n', 1)[1].split('\n      - name:', 1)[0]
+        self.assertIn('if: always()', block)
+        self.assertIn('background-content-clipping-regression.json', block)
+        self.assertIn('clipping-report-${{ matrix.rid }}-${{ env.FLAVOR }}', block)
+
     def test_content_clipping_gate_uses_only_proven_gpu_baseline_profiles(self):
         gates = [entry for entry in probes.PROBES if any(
             'background_content_clip_regression.py' in command for command in entry['commands'])]
@@ -89,6 +96,25 @@ class ProbeRunnerTests(unittest.TestCase):
 
 
 class WorkflowTests(unittest.TestCase):
+    def test_linux_gpu_runs_native_texture_input_on_both_gpu_rids(self):
+        entries = [entry for entry in probes.PROBES if any(
+            'compositor_input_linux.py' in command for command in entry['commands'])]
+        self.assertEqual({entry['rid'] for entry in entries}, {'linux-x64', 'linux-arm64'})
+        for entry in entries:
+            self.assertTrue(probes.applies(entry, entry['rid'], 'gpu'))
+            self.assertFalse(probes.applies(entry, entry['rid'], 'slim'))
+            self.assertFalse(probes.applies(entry, 'win-x64', 'gpu'))
+            self.assertEqual(entry['env'], {'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
+
+    def test_windows_gpu_runs_native_texture_and_fractional_compositor_frames(self):
+        entries = [entry for entry in probes.PROBES if any(
+            'compositor_windows.py' in command for command in entry['commands'])]
+        self.assertEqual(len(entries), 1)
+        self.assertTrue(probes.applies(entries[0], 'win-x64', 'gpu'))
+        self.assertFalse(probes.applies(entries[0], 'win-x64', 'slim'))
+        self.assertFalse(probes.applies(entries[0], 'linux-x64', 'gpu'))
+        self.assertIn('--native-directory ' + probes.NATIVE, entries[0]['commands'][0])
+
     def test_c_abi_layout_probe_runs_for_every_native_flavor(self):
         layouts = [entry for entry in probes.PROBES if 'tests/abi/abi_layouts.py' in ' '.join(entry['commands'])]
         self.assertEqual(len(layouts), 1)
@@ -179,6 +205,8 @@ class WorkflowTests(unittest.TestCase):
         workflow = (ROOT / '.github/workflows/build.yml').read_text()
         native = workflow.split('\n  native:\n', 1)[1].split('\n  managed:\n', 1)[0]
         self.assertIn('python -I scripts/probes.py run', native)
+        self.assertEqual(native.count('tests/abi/mutation_observation.py'), 1)
+        native = native.replace('tests/abi/mutation_observation.py', 'explicit-mutation-observation')
         for script in ['tests/abi/', 'tests/uia/', 'tests/generator/native_types.py']:
             self.assertNotIn(script, native)
 

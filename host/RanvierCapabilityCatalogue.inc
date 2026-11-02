@@ -413,7 +413,9 @@ static constexpr const char* capabilityAbiNames[] = {
     "dom-type-query:AnimationEffect",
     "dom-type-query:AnimationTimeline",
     "dom-type-query:WebAnimation",
+    "editing-undo",
     "screen",
+    "printing-pdf",
     "capabilities",
     "svg-view-selection",
     "image-decode",
@@ -479,9 +481,13 @@ static constexpr const char* capabilityAbiNames[] = {
     "intersection-entries",
     "data-transfer-files",
     "compositing",
+    "compositor-device-scale",
     "presentation-d3d11",
+    "texture-input-d3d11",
     "presentation-egl",
+    "texture-input-egl",
     "accessibility-events",
+    "mutation-observation",
 };
 static constexpr CapabilityBuildFlag capabilityBuildFlags[] = {
 #if defined(RV_CAP_ENABLE_ACCESSIBILITY)
