@@ -330,6 +330,8 @@ def main():
         child.add_argument('--contract', required=True, type=Path)
         child.add_argument('--receipt', required=True, type=Path)
     args = parser.parse_args()
+    if args.command in ('qualify', 'publication'):
+        parser.error('preview.2 recovery is retired after the confirmed removed-device cache defect; use the qualified successor cohort')
     contract = json.loads(args.contract.read_text()) if args.command != 'command' else None
     if args.command == 'qualify':
         receipt = qualify(args.package.resolve(), args.manifest.resolve(), args.test_root.resolve(),
