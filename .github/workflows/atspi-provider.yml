@@ -71,6 +71,8 @@ jobs:
         run: |
           python3 -I tests/abi/accessibility_text_styles.py --native-directory "$ATSPI_WORK/native" --report "$ATSPI_WORK/direct-style-report.json"
           python3 -I tests/atspi/run.py run --native "$ATSPI_WORK/native/libRanvierWebCoreHost.so" --provider "$ATSPI_WORK/install/lib/libRanvierWebCoreAtspi.so" --output "$ATSPI_WORK/protocol" --registry --extended-text
+          python3 -I tests/atspi/run.py run --native "$ATSPI_WORK/native/libRanvierWebCoreHost.so" --provider "$ATSPI_WORK/install/lib/libRanvierWebCoreAtspi.so" --output "$ATSPI_WORK/protocol-queued" --registry --extended-text --queued-set
+          python3 -I tests/atspi/run.py run --native "$ATSPI_WORK/native/libRanvierWebCoreHost.so" --provider "$ATSPI_WORK/install/lib/libRanvierWebCoreAtspi.so" --output "$ATSPI_WORK/protocol-session" --registry --extended-text --discovery session
       - name: Pack a private qualification asset without a renderer dependency
         env:
           NATIVE_RID: ${{ inputs.rid }}
@@ -85,6 +87,8 @@ jobs:
             ${{ env.ATSPI_WORK }}/native/producer-receipt.json
             ${{ env.ATSPI_WORK }}/direct-style-report.json
             ${{ env.ATSPI_WORK }}/protocol/
+            ${{ env.ATSPI_WORK }}/protocol-queued/
+            ${{ env.ATSPI_WORK }}/protocol-session/
             ${{ env.ATSPI_WORK }}/package/
             ${{ env.ATSPI_WORK }}/build/CMakeFiles/CMakeConfigureLog.yaml
           if-no-files-found: warn
