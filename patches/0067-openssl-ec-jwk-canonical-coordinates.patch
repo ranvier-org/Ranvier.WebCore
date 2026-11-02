@@ -1,0 +1,46 @@
+diff --git a/Source/WebCore/crypto/openssl/CryptoKeyECOpenSSL.cpp b/Source/WebCore/crypto/openssl/CryptoKeyECOpenSSL.cpp
+--- a/Source/WebCore/crypto/openssl/CryptoKeyECOpenSSL.cpp
++++ b/Source/WebCore/crypto/openssl/CryptoKeyECOpenSSL.cpp
+@@ -85,6 +85,22 @@
+     return !EC_GROUP_cmp(group, EC_KEY_get0_group(key.get()), nullptr);
+ }
+ 
++static bool setJWKPointCoordinates(const EC_GROUP* group, EC_POINT* point, const Vector<uint8_t>& xBytes, const Vector<uint8_t>& yBytes)
++{
++    if (!group || !point)
++        return false;
++    auto x = convertToBigNumber(xBytes);
++    auto y = convertToBigNumber(yBytes);
++    auto prime = BIGNUMPtr(BN_new());
++    if (!x || !y || !prime)
++        return false;
++    if (EC_GROUP_get_curve_GFp(group, prime.get(), nullptr, nullptr, nullptr) <= 0)
++        return false;
++    if (BN_cmp(x.get(), prime.get()) >= 0 || BN_cmp(y.get(), prime.get()) >= 0)
++        return false;
++    return EC_POINT_set_affine_coordinates_GFp(group, point, x.get(), y.get(), nullptr) > 0;
++}
++
+ size_t CryptoKeyEC::keySizeInBits() const
+ {
+     // EVP_PKEY_size() returns the size of DER-encoded key and cannot be used for this function's purpose.
+@@ -166,8 +182,7 @@
+     auto group = EC_KEY_get0_group(key.get());
+     auto point = ECPointPtr(EC_POINT_new(group));
+ 
+-    // Currently we only support elliptic curves over GF(p).   
+-    if (EC_POINT_set_affine_coordinates_GFp(group, point.get(), convertToBigNumber(x).get(), convertToBigNumber(y).get(), nullptr) <= 0)
++    if (!setJWKPointCoordinates(group, point.get(), x, y))
+         return nullptr;
+ 
+     if (EC_KEY_set_public_key(key.get(), point.get()) <= 0)
+@@ -192,8 +207,7 @@
+     auto group = EC_KEY_get0_group(key.get());
+     auto point = ECPointPtr(EC_POINT_new(group));
+ 
+-    // Currently we only support elliptic curves over GF(p).   
+-    if (EC_POINT_set_affine_coordinates_GFp(group, point.get(), convertToBigNumber(x).get(), convertToBigNumber(y).get(), nullptr) <= 0)
++    if (!setJWKPointCoordinates(group, point.get(), x, y))
+         return nullptr;
+ 
+     if (EC_KEY_set_public_key(key.get(), point.get()) <= 0)
