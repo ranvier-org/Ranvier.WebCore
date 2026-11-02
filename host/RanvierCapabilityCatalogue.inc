@@ -477,6 +477,7 @@ static constexpr const char* capabilityAbiNames[] = {
     "range-replacement",
     "accessibility",
     "accessibility-text",
+    "accessibility-text-style",
     "svg-document",
     "resize-entries",
     "resize-device-pixel-content-box",
