@@ -68,6 +68,7 @@ def run(args):
         report['assertions'] += 1
         if not value:
             report['failures'].append(label)
+        (args.output / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
 
     with SvgProbe(args.native_directory, 500, 300) as p:
         retained_results = []
@@ -98,9 +99,16 @@ def run(args):
         p.update()
 
         def screen():
+            p.update()
             x, y = I(), I()
             p.call('rv_host_scroll_position', [P, C.POINTER(I), C.POINTER(I)], p.host, C.byref(x), C.byref(y))
-            return {'scroll': [x.value, y.value], 'paint': hashlib.sha256(bytes(p.paint())).hexdigest()}
+            width, height = I(), I()
+            p.call('rv_host_paint_size', [P, C.POINTER(I), C.POINTER(I)], p.host, C.byref(width), C.byref(height))
+            rgba = (C.c_uint8 * (width.value * height.value * 4))()
+            p.call('rv_host_paint_rgba', [P, P, I], p.host, rgba, len(rgba))
+            data = bytes(rgba)
+            return {'scroll': [x.value, y.value], 'paint': hashlib.sha256(data).hexdigest(),
+                    'size': [width.value, height.value]}
 
         def job(label, options, expected, keep=False):
             before = screen()
@@ -164,7 +172,7 @@ def run(args):
                 red = [(x, y) for y in range(image.height) for x in range(image.width) if (lambda c: c[0] > 240 and c[1] < 20 and c[2] < 20)(image.getpixel((x, y)))]
                 span = max(x for x, _ in red) - min(x for x, _ in red) + 1 if red else 0
                 check(abs(span - 72) <= 1, 'CSS one-inch ruler is 72 PDF points: ' + str(span))
-                check(any(c[2] > 240 and c[0] < 20 and c[1] < 20 for c in image.getdata()), 'decoded image survives PDF ' + path.name)
+                check(any(c[2] > 240 and c[0] < 20 and c[1] < 20 for c in image.get_flattened_data()), 'decoded image survives PDF ' + path.name)
         job('cancel-before', Options(cancel_after_pages=0), 1)
         job('cancel-after-first-page', Options(cancel_after_pages=1), 1)
         job('bounded-output-failure', Options(output_budget_bytes=128), 2)
