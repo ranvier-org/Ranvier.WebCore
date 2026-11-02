@@ -89,6 +89,16 @@ class ProbeRunnerTests(unittest.TestCase):
 
 
 class WorkflowTests(unittest.TestCase):
+    def test_linux_gpu_runs_native_texture_input_on_both_gpu_rids(self):
+        entries = [entry for entry in probes.PROBES if any(
+            'compositor_input_linux.py' in command for command in entry['commands'])]
+        self.assertEqual({entry['rid'] for entry in entries}, {'linux-x64', 'linux-arm64'})
+        for entry in entries:
+            self.assertTrue(probes.applies(entry, entry['rid'], 'gpu'))
+            self.assertFalse(probes.applies(entry, entry['rid'], 'slim'))
+            self.assertFalse(probes.applies(entry, 'win-x64', 'gpu'))
+            self.assertEqual(entry['env'], {'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
+
     def test_windows_gpu_runs_native_texture_and_fractional_compositor_frames(self):
         entries = [entry for entry in probes.PROBES if any(
             'compositor_windows.py' in command for command in entry['commands'])]

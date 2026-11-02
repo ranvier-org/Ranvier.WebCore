@@ -41,6 +41,9 @@ def verify(package, gpu=False):
                                 str(destination / 'libRanvierWebCoreHost.so'), *arguments], check=True, env=environment)
             subprocess.run([sys.executable, '-I', str(root / 'tests/gpu/linux_view_transition_pixels.py'),
                             '--native-directory', str(destination)], check=True, env=environment)
+            subprocess.run([sys.executable, '-I', str(root / 'tests/gpu/compositor_input_linux.py'),
+                            '--native-directory', str(destination), '--report', str(destination.parent / 'compositor-input-linux.json')],
+                           check=True, env=environment)
         elif gpu:
             sdl = destination.parent / 'sdl'
             subprocess.run([sys.executable, '-I', str(root / 'scripts/sdl_runtime.py'), '--out', str(sdl)], check=True)
