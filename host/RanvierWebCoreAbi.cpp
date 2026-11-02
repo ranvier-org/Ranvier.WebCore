@@ -2972,7 +2972,6 @@ int32_t rv_host_acquire_egl_frame(RvHost* host, RvGpuFrame** frame)
     RvEGLContextScope returnContext;
     host->documentTransaction = RvHost::DocumentTransaction::Rendering;
     auto result = [&]() -> int32_t {
-        RvEGLContextScope contextScope;
         SetForScope inFrame(host->inFrame, true);
         host->frameRequested = false;
         RefPtr<LocalFrameView> view;
@@ -3017,6 +3016,7 @@ int32_t rv_host_acquire_egl_frame(RvHost* host, RvGpuFrame** frame)
         *frame = new RvGpuFrame { WTF::move(surface) };
         return RV_OK;
     }();
+    returnContext.restore();
     if (result != RV_OK && host->errorRecordsEnabled)
         host->lastHostError = RvHostErrorRecord { RV_HOST_ERROR_ACQUIRE_FRAME, RV_HOST_ERROR_SOURCE_EGL, result, 0 };
     if (host->updateWanted && !host->destroyAfterDocumentTransaction)
