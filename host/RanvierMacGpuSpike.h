@@ -18,6 +18,12 @@ RV_EXPORT int32_t rv_mac_spike_frame_release(RvMacSpikeFrame*);
 /* Borrowed process-lifetime EGL/GL renderer identity; NULL indicates an uninitialized producer. */
 RV_EXPORT const char* rv_mac_spike_identity(void);
 RV_EXPORT int32_t rv_mac_spike_counters(RvHost*, uint64_t* gpu_frames, uint64_t* readback_frames, uint64_t* base_paints);
+/* Opt-in input prototype: iosurface is a valid nonplanar premultiplied BGRA8 IOSurfaceRef, retained until
+ * replacement, unbind (NULL), target removal, document replacement or host destruction. Complete producer
+ * GPU work before binding/notifying; do not write during an acquire call. Acquisition finishes the input
+ * GPU read before returning. flipY is 0 or 1. A failed replacement keeps the earlier binding.
+ * Contract fixture: tests/gpu/mac/texture_input.mm. */
+RV_EXPORT int32_t rv_mac_spike_bind_iosurface(RvHost*, RvNode* target, void* iosurface, int32_t flipY);
 
 #ifdef __cplusplus
 }
@@ -40,6 +46,19 @@ public:
 private:
     struct State;
     explicit RvMacSpikeSurface(std::unique_ptr<State>);
+    std::unique_ptr<State> state;
+};
+
+class RvMacSpikeInputSurface {
+public:
+    static std::unique_ptr<RvMacSpikeInputSurface> create(void* iosurface, bool (*makeCurrent)());
+    ~RvMacSpikeInputSurface();
+    bool begin();
+    bool end();
+    unsigned texture() const;
+private:
+    struct State;
+    explicit RvMacSpikeInputSurface(std::unique_ptr<State>);
     std::unique_ptr<State> state;
 };
 #endif

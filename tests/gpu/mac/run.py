@@ -53,6 +53,7 @@ def main():
     parser.add_argument('--work', type=Path, required=True)
     parser.add_argument('--jobs', type=int, default=4)
     parser.add_argument('--execute', action='store_true', help='run locally on macOS arm64; default prints commands')
+    parser.add_argument('--texture-input', action='store_true', help='also compile/run the private native Metal IOSurface input fixture')
     args = parser.parse_args()
     work = args.work.expanduser().resolve()
     plan = commands(args.rid, args.mac_gpu_spike, work, args.jobs)
@@ -93,7 +94,8 @@ def main():
         stage = work / 'out/gpu/runtimes/osx-arm64/native'
         run('stage-manifest', [sys.executable, str(ROOT / 'scripts/smoke.py'), '--stage', str(work / 'out/gpu'),
                                '--build-dir', str(work / 'build-mac-gpu-spike'), '--expect-flavor', 'gpu', '--no-load'])
-        run('exports', [sys.executable, str(Path(__file__).with_name('check_exports.py')), str(stage)])
+        run('exports', [sys.executable, str(Path(__file__).with_name('check_exports.py')), str(stage),
+                        *(['--texture-input'] if args.texture_input else [])])
         sdl = shlex.split(run('sdl-flags', ['pkg-config', '--cflags', '--libs', 'sdl3']).strip())
         receipt['sdlVersion'] = run('sdl-version', ['pkg-config', '--modversion', 'sdl3']).strip()
         executable = evidence / 'mac-gpu-spike'
@@ -104,6 +106,14 @@ def main():
                               '-framework', 'Metal', '-framework', 'IOSurface', '-framework', 'Foundation', *sdl])
         run('proof', [str(executable), '--output', str(evidence)])
         run('unsupported-renderer', [str(executable), '--reject-software'])
+        if args.texture_input:
+            input_executable = evidence / 'mac-texture-input'
+            run('input-compile', ['xcrun', 'clang++', '-std=c++20', '-fobjc-arc', '-Wall', '-Wextra', '-Werror',
+                                  '-mmacosx-version-min=26.0', '-I' + str(ROOT / 'host'),
+                                  str(Path(__file__).with_name('texture_input.mm')), '-o', str(input_executable),
+                                  '-L' + str(stage), '-lRanvierWebCoreHost', '-Wl,-rpath,' + str(stage),
+                                  '-framework', 'Metal', '-framework', 'IOSurface', '-framework', 'Foundation', *sdl])
+            run_step('input-proof', [str(input_executable), '--output', str(evidence)], ROOT, evidence, receipt, timeout=180)
         receipt['files'] = {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
                             for p in stage.iterdir() if p.is_file()}
         receipt['passed'] = True

@@ -858,6 +858,9 @@ public:
 // layer (RenderLayerBacking::paintsIntoWindow).
 #include "RanvierNativeTextureInput.h"
 #include "RanvierNativeTextureEGLInput.h"
+#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+#include "RanvierNativeTextureMacInput.h"
+#endif
 
 struct RvCompositor final : GraphicsLayerClient {
     GLContext* context { nullptr };
@@ -1011,6 +1014,8 @@ struct RvHost {
     Vector<std::unique_ptr<RvNativeTextureInput>> nativeTextures;
 #elif defined(__linux__) && RANVIER_COMPOSITING
     Vector<std::unique_ptr<RvNativeEGLTextureInput>> nativeTextures;
+#elif defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE && RANVIER_COMPOSITING
+    Vector<std::unique_ptr<RvNativeMacTextureInput>> nativeTextures;
 #endif
     // The viewport area invalidated since the last paint.
     IntRect dirty;
@@ -2489,7 +2494,7 @@ void rv_host_destroy(RvHost* host)
         host->traceBuffer.reset();
     }
     static_cast<RvEditorClient&>(host->page->editorClient()).documentWillChange();
-#if (defined(_WIN32) || defined(__linux__)) && RANVIER_COMPOSITING
+#if (defined(_WIN32) || defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE)) && RANVIER_COMPOSITING
     host->nativeTextures.clear();
 #endif
     invalidateFilePicker(*host);
@@ -2531,7 +2536,7 @@ int32_t rv_host_load_html(RvHost* host, const uint8_t* html, int32_t html_length
         return RV_ERR_DETACHED;
     host->documentTransaction = RvHost::DocumentTransaction::Replacing;
     static_cast<RvEditorClient&>(host->page->editorClient()).documentWillChange();
-#if (defined(_WIN32) || defined(__linux__)) && RANVIER_COMPOSITING
+#if (defined(_WIN32) || defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE)) && RANVIER_COMPOSITING
     host->nativeTextures.clear();
 #endif
     invalidateFilePicker(*host);
@@ -2562,7 +2567,7 @@ int32_t rv_host_load_svg(RvHost* host, const uint8_t* svg, int32_t svg_length)
         return RV_ERR_DETACHED;
     host->documentTransaction = RvHost::DocumentTransaction::Replacing;
     static_cast<RvEditorClient&>(host->page->editorClient()).documentWillChange();
-#if (defined(_WIN32) || defined(__linux__)) && RANVIER_COMPOSITING
+#if (defined(_WIN32) || defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE)) && RANVIER_COMPOSITING
     host->nativeTextures.clear();
 #endif
     invalidateFilePicker(*host);
@@ -2914,7 +2919,7 @@ static int32_t composite(RvHost& host, RvCompositor& compositor, LocalFrameView&
         compositor.root->setNeedsDisplay();
     compositor.root->flushCompositingStateForThisLayerOnly();
     view.flushCompositingStateIncludingSubframes();
-#if defined(_WIN32) || defined(__linux__)
+#if defined(_WIN32) || defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE)
     host.nativeTextures.removeAllMatching([&](auto& input) {
         return !input->element->isConnected() || &input->element->document() != &host.document();
     });
@@ -2944,6 +2949,13 @@ static int32_t composite(RvHost& host, RvCompositor& compositor, LocalFrameView&
 #endif
     rootLayer.layer().paint(*compositor.textureMapper);
     compositor.textureMapper->endPainting();
+#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+    for (auto& input : host.nativeTextures) {
+        input->end();
+        if (input->failed)
+            return RV_ERR_PAINT_FAILED;
+    }
+#endif
     if (!rgba) {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         return glGetError() == GL_NO_ERROR ? RV_OK : RV_ERR_PAINT_FAILED;
@@ -3056,7 +3068,7 @@ int32_t rv_host_native_texture_changed(RvHost* host, RvNode* target)
         return RV_ERR_WRONG_THREAD;
     if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
         return RV_ERR_DETACHED;
-#if (defined(_WIN32) || defined(__linux__)) && RANVIER_COMPOSITING
+#if (defined(_WIN32) || defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE)) && RANVIER_COMPOSITING
     if (host->inFrame)
         return RV_ERR_UNSUPPORTED;
     auto* element = dynamicDowncast<Element>(*node(target));

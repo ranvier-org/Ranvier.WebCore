@@ -3,6 +3,35 @@ struct RvMacSpikeFrame {
     std::unique_ptr<RvMacSpikeSurface> surface;
 };
 
+int32_t rv_mac_spike_bind_iosurface(RvHost* host, RvNode* target, void* surface, int32_t flipY)
+{
+    if (!host || !target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
+        return RV_ERR_DETACHED;
+    if (host->inFrame || (flipY != 0 && flipY != 1))
+        return RV_ERR_UNSUPPORTED;
+    auto* element = dynamicDowncast<Element>(*node(target));
+    if (!element || &element->document() != &host->document() || !element->isConnected())
+        return RV_ERR_WRONG_HOST;
+    std::unique_ptr<RvNativeMacTextureInput> input;
+    if (surface) {
+        input = RvNativeMacTextureInput::create(*element, surface, flipY, [] {
+            auto* context = compositingContext();
+            return context && context->makeContextCurrent();
+        });
+        if (!input)
+            return RV_ERR_UNSUPPORTED;
+    }
+    host->nativeTextures.removeAllMatching([&](auto& prior) { return prior->element.get() == element; });
+    if (input)
+        host->nativeTextures.append(WTF::move(input));
+    host->requestFrame();
+    return RV_OK;
+}
+
 const char* rv_mac_spike_identity()
 {
     return onOwningThread() ? rvMacSpikeIdentity() : nullptr;
