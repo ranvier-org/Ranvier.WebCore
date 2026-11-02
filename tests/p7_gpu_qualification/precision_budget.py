@@ -94,6 +94,12 @@ def complete_budget(inputs, record, quad_origin, quad_size, texture_size):
     viewport = [int(record['viewportCss'][0] * record['scale']), int(record['viewportCss'][1] * record['scale'])]
     raster = [projection_bound(position, viewport[axis], bits)
               for axis in range(2) for position in [quad_origin[axis], quad_origin[axis] + quad_size[axis]]]
+    for index, row in enumerate(raster):
+        mirror_error = Fraction(viewport[index // 2], 2 ** (bits + 1))
+        bound = Fraction(row['exactTotalScreenErrorFraction']) + mirror_error
+        row['mirrorAdditionalViewportAddError'] = float(mirror_error)
+        row['mirrorSafeTotalScreenError'] = float(bound)
+        row['exactTotalScreenErrorFraction'] = str(bound)
     exclusion_limit = Fraction(2, 5) / 256
     assert all(Fraction(row['exactTotalScreenErrorFraction']) < exclusion_limit for row in raster)
     axes = [address_budget(extent, bits) for extent in texture_size]
