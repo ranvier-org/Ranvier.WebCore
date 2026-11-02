@@ -736,7 +736,8 @@ class InterfaceEmitter:
                             'UnrestrictedDoubleOrDOMPointInit': 'native_canvas_radius_display.fs.inc'}[name]
                 lines += Path(__file__).with_name(template).read_text(encoding='utf-8').splitlines() + ['']
                 continue
-            if name in ('CanvasLineCap', 'CanvasLineJoin', 'ImageSmoothingQuality', 'CanvasFillRule'):
+            if name in ('CanvasLineCap', 'CanvasLineJoin', 'ImageSmoothingQuality', 'CanvasFillRule',
+                        'CanvasTextAlign', 'CanvasTextBaseline', 'CanvasDirection'):
                 lines += ['#if !FABLE_COMPILER',
                           f'{prefix} [<System.Diagnostics.DebuggerDisplay("{{ToString(),nq}}"); DomStringEnum; RequireQualifiedAccess>] {name} =',
                           '#else', f'{prefix} [<DomStringEnum; RequireQualifiedAccess>] {name} =', '#endif']

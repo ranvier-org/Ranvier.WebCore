@@ -367,6 +367,33 @@ module internal NativeDisplay =
     let int32 context depth (value: int) =
         atom context depth (value.ToString (CultureInfo.InvariantCulture))
 
+    /// <summary>Formats a double as an F# structured numeric literal.</summary>
+    let float64 context depth (value: float) =
+        let text =
+            if Double.IsNaN value then
+                "nan"
+            elif Double.IsPositiveInfinity value then
+                "infinity"
+            elif Double.IsNegativeInfinity value then
+                "-infinity"
+            else
+                let number = value.ToString("G10", CultureInfo.InvariantCulture).ToLowerInvariant()
+
+                if number.Contains "." || number.Contains "e" then
+                    number
+                else
+                    number + ".0"
+
+        atom context depth text
+
+    /// <summary>Formats a byte as an F# structured numeric literal.</summary>
+    let uint8 context depth (value: byte) =
+        atom
+            context
+            depth
+            (value.ToString (CultureInfo.InvariantCulture)
+             + "uy")
+
     let int64 context depth (value: int64) =
         atom
             context

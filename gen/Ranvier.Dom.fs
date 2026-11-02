@@ -372,6 +372,33 @@ module internal NativeDisplay =
     let int32 context depth (value: int) =
         atom context depth (value.ToString (CultureInfo.InvariantCulture))
 
+    /// <summary>Formats a double as an F# structured numeric literal.</summary>
+    let float64 context depth (value: float) =
+        let text =
+            if Double.IsNaN value then
+                "nan"
+            elif Double.IsPositiveInfinity value then
+                "infinity"
+            elif Double.IsNegativeInfinity value then
+                "-infinity"
+            else
+                let number = value.ToString("G10", CultureInfo.InvariantCulture).ToLowerInvariant()
+
+                if number.Contains "." || number.Contains "e" then
+                    number
+                else
+                    number + ".0"
+
+        atom context depth text
+
+    /// <summary>Formats a byte as an F# structured numeric literal.</summary>
+    let uint8 context depth (value: byte) =
+        atom
+            context
+            depth
+            (value.ToString (CultureInfo.InvariantCulture)
+             + "uy")
+
     let int64 context depth (value: int64) =
         atom
             context
@@ -6833,25 +6860,7 @@ and [<RequireQualifiedAccess>] UnrestrictedDoubleOrDOMPointInit =
         NativeDisplay.union context depth precedence (box this) (fun nested ->
             match this with
             | UnrestrictedDoubleOrDOMPointInit.UnrestrictedDouble value ->
-                "UnrestrictedDouble",
-                [
-                    Some (fun _ ->
-                        NativeDisplay.manual context nested (box value) (fun () ->
-                            if Double.IsNaN value then
-                                "nan"
-                            elif Double.IsPositiveInfinity value then
-                                "infinity"
-                            elif Double.IsNegativeInfinity value then
-                                "-infinity"
-                            else
-                                let text =
-                                    value.ToString("G10", Globalization.CultureInfo.InvariantCulture).ToLowerInvariant()
-
-                                if text.Contains "." || text.Contains "e" then
-                                    text
-                                else
-                                    text + ".0"))
-                ]
+                "UnrestrictedDouble", [ Some (fun _ -> NativeDisplay.float64 context nested value) ]
             | UnrestrictedDoubleOrDOMPointInit.DOMPointInit value ->
                 "DOMPointInit",
                 [
@@ -7285,10 +7294,25 @@ and [<DomStringEnum; RequireQualifiedAccess>] VisibilityState =
     | [<CompiledName("visible")>] Visible
 
 /// <summary>CanvasDirection in the scoped DOM interface model.</summary>
+#if !FABLE_COMPILER
+and [<System.Diagnostics.DebuggerDisplay("{ToString(),nq}"); DomStringEnum; RequireQualifiedAccess>] CanvasDirection =
+#else
 and [<DomStringEnum; RequireQualifiedAccess>] CanvasDirection =
+#endif
     | [<CompiledName("ltr")>] Ltr
     | [<CompiledName("rtl")>] Rtl
     | [<CompiledName("inherit")>] Inherit
+
+#if !FABLE_COMPILER
+    override this.ToString() =
+        if System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeSupported then
+            sprintf "%+A" this
+        else
+            match this with
+            | CanvasDirection.Ltr -> "Ltr"
+            | CanvasDirection.Rtl -> "Rtl"
+            | CanvasDirection.Inherit -> "Inherit"
+#endif
 
 /// <summary>CanvasFillRule in the scoped DOM interface model.</summary>
 #if !FABLE_COMPILER
@@ -7352,21 +7376,56 @@ and [<DomStringEnum; RequireQualifiedAccess>] CanvasLineJoin =
 #endif
 
 /// <summary>CanvasTextAlign in the scoped DOM interface model.</summary>
+#if !FABLE_COMPILER
+and [<System.Diagnostics.DebuggerDisplay("{ToString(),nq}"); DomStringEnum; RequireQualifiedAccess>] CanvasTextAlign =
+#else
 and [<DomStringEnum; RequireQualifiedAccess>] CanvasTextAlign =
+#endif
     | [<CompiledName("start")>] Start
     | [<CompiledName("end")>] End
     | [<CompiledName("left")>] Left
     | [<CompiledName("right")>] Right
     | [<CompiledName("center")>] Center
 
+#if !FABLE_COMPILER
+    override this.ToString() =
+        if System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeSupported then
+            sprintf "%+A" this
+        else
+            match this with
+            | CanvasTextAlign.Start -> "Start"
+            | CanvasTextAlign.End -> "End"
+            | CanvasTextAlign.Left -> "Left"
+            | CanvasTextAlign.Right -> "Right"
+            | CanvasTextAlign.Center -> "Center"
+#endif
+
 /// <summary>CanvasTextBaseline in the scoped DOM interface model.</summary>
+#if !FABLE_COMPILER
+and [<System.Diagnostics.DebuggerDisplay("{ToString(),nq}"); DomStringEnum; RequireQualifiedAccess>] CanvasTextBaseline =
+#else
 and [<DomStringEnum; RequireQualifiedAccess>] CanvasTextBaseline =
+#endif
     | [<CompiledName("top")>] Top
     | [<CompiledName("hanging")>] Hanging
     | [<CompiledName("middle")>] Middle
     | [<CompiledName("alphabetic")>] Alphabetic
     | [<CompiledName("ideographic")>] Ideographic
     | [<CompiledName("bottom")>] Bottom
+
+#if !FABLE_COMPILER
+    override this.ToString() =
+        if System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeSupported then
+            sprintf "%+A" this
+        else
+            match this with
+            | CanvasTextBaseline.Top -> "Top"
+            | CanvasTextBaseline.Hanging -> "Hanging"
+            | CanvasTextBaseline.Middle -> "Middle"
+            | CanvasTextBaseline.Alphabetic -> "Alphabetic"
+            | CanvasTextBaseline.Ideographic -> "Ideographic"
+            | CanvasTextBaseline.Bottom -> "Bottom"
+#endif
 
 /// <summary>ImageSmoothingQuality in the scoped DOM interface model.</summary>
 #if !FABLE_COMPILER

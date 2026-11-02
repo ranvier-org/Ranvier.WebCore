@@ -3,25 +3,7 @@
         NativeDisplay.union context depth precedence (box this) (fun nested ->
             match this with
             | UnrestrictedDoubleOrDOMPointInit.UnrestrictedDouble value ->
-                "UnrestrictedDouble",
-                [
-                    Some (fun _ ->
-                        NativeDisplay.manual context nested (box value) (fun () ->
-                            if Double.IsNaN value then
-                                "nan"
-                            elif Double.IsPositiveInfinity value then
-                                "infinity"
-                            elif Double.IsNegativeInfinity value then
-                                "-infinity"
-                            else
-                                let text =
-                                    value.ToString("G10", Globalization.CultureInfo.InvariantCulture).ToLowerInvariant()
-
-                                if text.Contains "." || text.Contains "e" then
-                                    text
-                                else
-                                    text + ".0"))
-                ]
+                "UnrestrictedDouble", [ Some (fun _ -> NativeDisplay.float64 context nested value) ]
             | UnrestrictedDoubleOrDOMPointInit.DOMPointInit value ->
                 "DOMPointInit",
                 [

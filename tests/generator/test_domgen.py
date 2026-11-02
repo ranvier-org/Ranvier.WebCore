@@ -78,7 +78,8 @@ interface PaintProbe { attribute (DOMString or CanvasGradient or CanvasPattern) 
     def test_canvas_enum_has_typed_native_display(self):
         (self.source / 'Source/WebCore/dom/Fixture.idl').write_text(IDL + '''
 enum CanvasLineCap { "butt", "round", "square" };
-interface RadiusProbe { attribute CanvasLineCap cap; };
+enum CanvasTextAlign { "start", "center" };
+interface RadiusProbe { attribute CanvasLineCap cap; attribute CanvasTextAlign align; };
 ''')
         config = dict(self.world.config)
         config['interfaces'] = list(config['interfaces']) + ['RadiusProbe']
@@ -86,6 +87,7 @@ interface RadiusProbe { attribute CanvasLineCap cap; };
         generator.run()
         source = generator.interfaces()
         self.assertIn('CanvasLineCap.Butt -> "Butt"', source)
+        self.assertIn('CanvasTextAlign.Center -> "Center"', source)
 
     def test_node_string_display_preserves_the_fable_union_and_native_fields(self):
         generator = domgen.Generator(self.world)
