@@ -390,6 +390,19 @@ public:
     RvEditorClient() = default;
     ~RvEditorClient() final { clearUndoRedoOperations(); }
     bool isReplayingHistory() const { return m_replaying != Replay::None; }
+    std::optional<uint64_t> beginEditingDocument()
+    {
+        return std::exchange(m_editDocumentGeneration, m_documentGeneration);
+    }
+    void endEditingDocument(std::optional<uint64_t> previous)
+    {
+        m_editDocumentGeneration = previous;
+    }
+    void documentWillChange()
+    {
+        ++m_documentGeneration;
+        clearUndoRedoOperations();
+    }
 private:
     // Key down runs the key's editing command; key press inserts the characters it produced.
     void handleKeyboardEvent(KeyboardEvent& event) final
@@ -464,20 +477,6 @@ private:
     uint64_t m_replayGeneration { 0 };
     uint64_t m_documentGeneration { 0 };
     std::optional<uint64_t> m_editDocumentGeneration;
-
-    std::optional<uint64_t> beginEditingDocument()
-    {
-        return std::exchange(m_editDocumentGeneration, m_documentGeneration);
-    }
-    void endEditingDocument(std::optional<uint64_t> previous)
-    {
-        m_editDocumentGeneration = previous;
-    }
-    void documentWillChange()
-    {
-        ++m_documentGeneration;
-        clearUndoRedoOperations();
-    }
 
     static void discard(Vector<Ref<UndoStep>>& history)
     {
