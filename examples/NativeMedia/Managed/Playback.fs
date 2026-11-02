@@ -51,6 +51,23 @@ module private Ownership =
         if status < 0 then
             raise (ExternalException(operation + " failed", status))
 
+module private TargetBindings =
+    let reservations = Runtime.CompilerServices.ConditionalWeakTable<WebCoreHost, ResizeArray<Element>>()
+
+    let reserve (host: WebCoreHost) (target: Element) =
+        let entries = reservations.GetValue(host, fun _ -> ResizeArray<Element>())
+        lock entries (fun () ->
+            if entries |> Seq.exists (fun previous -> target.isSameNode previous) then
+                invalidOp "The native media target already has a live publication"
+            entries.Add target)
+        let mutable released = false
+        fun () ->
+            lock entries (fun () ->
+                if not released then
+                    let index = entries.FindIndex(fun previous -> obj.ReferenceEquals(previous, target))
+                    if index >= 0 then entries.RemoveAt index
+                    released <- true)
+
 type internal PendingFrameCleanup(owner: int) =
     let mutable pending: ((unit -> unit) * (unit -> bool)) option = None
 
@@ -123,38 +140,36 @@ type WindowsPlayback private (initial: nativeint) =
         if isNull (box target) then nullArg (nameof target)
         if not (WebCoreHost.Has "texture-input-d3d11") then
             raise (NotSupportedException "This native renderer has no D3D11 texture input")
+        let releaseTarget = TargetBindings.reserve host target
         let mutable frame = 0n
-        let status =
-            if repeat then Native.ranvier_media_republish(handle, &frame)
-            else Native.ranvier_media_next_frame(handle, &frame)
-        Ownership.check "media frame publication" status
-        if status = 1 then ValueNone
-        else
-            let mutable bound = false
-            try
+        let mutable bound = false
+        let cleanup () =
+            if bound then
+                try host.BindD3D11Texture(target, 0n)
+                with :? ObjectDisposedException -> ()
+                bound <- false
+            try Native.ranvier_media_frame_release(&frame) |> Ownership.check "media frame release"
+            finally
+                if frame = 0n then releaseTarget ()
+        try
+            let status =
+                if repeat then Native.ranvier_media_republish(handle, &frame)
+                else Native.ranvier_media_next_frame(handle, &frame)
+            Ownership.check "media frame publication" status
+            if status = 1 then
+                releaseTarget ()
+                ValueNone
+            else
                 let mutable info = Unchecked.defaultof<NativeFrameInfo>
                 info.Size <- uint32 (Marshal.SizeOf<NativeFrameInfo>())
                 Native.ranvier_media_frame_info(frame, &info) |> Ownership.check "media frame metadata"
                 host.BindD3D11Texture(target, info.Texture)
                 bound <- true
                 host.NativeTextureChanged target
-                let mutable held = frame
-                let release () =
-                    try host.BindD3D11Texture(target, 0n)
-                    with
-                    | :? ObjectDisposedException -> ()
-                    let status = Native.ranvier_media_frame_release(&held)
-                    Ownership.check "media frame release" status
-                ValueSome (new VideoFrameLease(owner, info, release, fun () -> held = 0n))
-            with _ ->
-                pending.Rollback(
-                    (fun () ->
-                        if bound then
-                            try host.BindD3D11Texture(target, 0n)
-                            with :? ObjectDisposedException -> ()
-                        Native.ranvier_media_frame_release(&frame) |> Ownership.check "media publication rollback"),
-                    fun () -> frame = 0n)
-                reraise ()
+                ValueSome (new VideoFrameLease(owner, info, cleanup, fun () -> frame = 0n))
+        with _ ->
+            pending.Rollback(cleanup, fun () -> frame = 0n)
+            reraise ()
 
     /// <summary>Creates an OS player on the calling thread; no file or media session controls are opened.</summary>
     /// <exception cref="T:System.PlatformNotSupportedException">The application is not running on Windows.</exception>
@@ -192,7 +207,10 @@ type WindowsPlayback private (initial: nativeint) =
         Native.ranvier_media_snapshot(handle, &value) |> Ownership.check "media snapshot"
         PlaybackSnapshot value
     /// <summary>Publishes a decoded frame into a composited element, or returns ValueNone when no frame is ready.</summary>
-    /// <remarks>Release the previous frame and composition leases before requesting another publication.</remarks>
+    /// <remarks>
+    /// One adapter publication may own a host/element at a time. Release its frame/composition leases first;
+    /// do not externally rebind or unbind that element while its media lease is live.
+    /// </remarks>
     member _.TryPublishFrame(host: WebCoreHost, target: Element) = publish false host target
     /// <summary>Republishes the retained paused frame for a new View presentation.</summary>
     /// <remarks>Release the previous frame and composition leases first; ValueNone means no frame was decoded yet.</remarks>

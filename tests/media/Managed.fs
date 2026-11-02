@@ -270,6 +270,41 @@ let main arguments =
             let lateFrame = try frame.Texture |> ignore; false with :? ObjectDisposedException -> true
             check lateFrame "released frame rejects late texture access"
         (player :> IDisposable).Dispose()
+        do
+            use firstPlayer = WindowsPlayback.Create()
+            use secondPlayer = WindowsPlayback.Create()
+            for supplied in [firstPlayer; secondPlayer] do
+                supplied.OpenFile(Path.GetFullPath arguments[1])
+                supplied.Play()
+            let publication (supplied: WindowsPlayback) =
+                let watch = Stopwatch.StartNew()
+                let mutable result: VideoFrameLease option = None
+                while Option.isNone result && watch.Elapsed.TotalSeconds < 5 do
+                    host.Cycle(milliseconds = 1)
+                    match supplied.TryPublishFrame(host, target) with
+                    | ValueSome frame -> result <- Some frame
+                    | ValueNone -> Thread.Sleep 5
+                check (Option.isSome result) "exclusive target obtains an actual frame"
+                result.Value
+            use firstFrame = publication firstPlayer
+            let mutable accidental: VideoFrameLease option = None
+            let mutable blocked = false
+            let secondWatch = Stopwatch.StartNew()
+            while not blocked && Option.isNone accidental && secondWatch.Elapsed.TotalSeconds < 5 do
+                try
+                    match secondPlayer.TryPublishFrame(host, host.Document.getElementById "video") with
+                    | ValueSome frame -> accidental <- Some frame
+                    | ValueNone -> host.Cycle(milliseconds = 1); Thread.Sleep 5
+                with :? InvalidOperationException -> blocked <- true
+            Console.WriteLine("MEDIA_TARGET_SECOND_PUBLICATION=" + (Option.isSome accidental).ToString())
+            accidental |> Option.iter (fun frame -> (frame :> IDisposable).Dispose())
+            check blocked "one live adapter publication per host target"
+            render false firstFrame
+            (firstFrame :> IDisposable).Dispose()
+            use secondFrame = publication secondPlayer
+            (firstFrame :> IDisposable).Dispose()
+            render false secondFrame
+            check (secondFrame.Texture <> 0n) "repeated old disposal preserves the newer target binding"
         use missing = WindowsPlayback.Create()
         let mutable fileError = 0
         try missing.OpenFile(Path.Combine(Path.GetDirectoryName arguments[1], "absent-managed-media.mp4"))

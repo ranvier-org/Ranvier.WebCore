@@ -17,8 +17,10 @@ python examples/NativeMedia/build_windows.py --output media-provider
 
 Reference `Managed/NativeMedia.fsproj` from the application and set
 `NativeMediaDllPath` to the resulting absolute `RanvierNativeMedia.dll` path.
-The project uses the existing `Ranvier.View.WebCore` package; `RanvierViewRoot`
-can instead name an owned View source checkout for an unpublished cohort.
+The project targets the matching `Ranvier.View.WebCore` alpha.45 cohort.
+Until that planned cohort is published, `RanvierViewRoot` must name its exact
+owned View source checkout; private source qualification does not prove a public
+package consumer. The matching package-only consumer remains a release gate.
 This example is not a new renderer package or automatically loaded dependency.
 
 Create `Ranvier.Examples.NativeMedia.WindowsPlayback` on the View host thread,
@@ -43,6 +45,11 @@ The frame lease binds/notifies the existing View texture input and retains the
 player/COM texture. Finish and release any native composition lease before
 disposing the frame lease, which unbinds and releases the publication. Only one
 publication may be outstanding. `TryRepublishFrame` handles paused redraws.
+The adapter also reserves each host/DOM-element across players: another player
+cannot publish there until the current lease is consumed. Do not rebind or
+unbind that leased element through other View/native APIs. Different elements
+can carry independent players. Native DOM identity, rather than wrapper object
+identity, determines whether targets are the same.
 Dispose frame leases before destroying their View host. Player disposal revokes
 controls and pauses immediately; an outstanding frame defers final provider
 destruction. Wrong-thread calls and releases preserve ownership and fail with
