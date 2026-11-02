@@ -1,11 +1,52 @@
 # Optional native Windows playback
 
-These application-side headers use the Windows SDK Media Foundation/Media
+This application-side adapter uses the Windows SDK Media Foundation/Media
 Engine and OS transport controls. They are not loaded by the renderer and add
 no WebCore feature flag, codec, network stack or package dependency. Windows
 x64 is the qualified example; other platform provider adapters are not supplied.
 No HTMLMediaElement, Web Audio, remote playback or browser activation behavior
 is exposed.
+
+## F# application use
+
+Build the optional DLL with the installed Visual Studio C++ tools and Windows SDK:
+
+```powershell
+python examples/NativeMedia/build_windows.py --output media-provider
+```
+
+Reference `Managed/NativeMedia.fsproj` from the application and set
+`NativeMediaDllPath` to the resulting absolute `RanvierNativeMedia.dll` path.
+The project uses the existing `Ranvier.View.WebCore` package; `RanvierViewRoot`
+can instead name an owned View source checkout for an unpublished cohort.
+This example is not a new renderer package or automatically loaded dependency.
+
+Create `Ranvier.Examples.NativeMedia.WindowsPlayback` on the View host thread,
+open a local file and call `Play`. `AttachControls(window.NativeHandle, title)`
+adds OS controls for that application's HWND; `DrainControls` applies queued
+commands on the same thread. Snapshots preserve the provider's clock and HRESULT.
+Known provider absence raises `MediaProviderUnavailableException`; unsupported
+platforms fail before attempting to load the Windows DLL.
+
+For a composited `Element` in the current host document:
+
+```fsharp
+match player.TryPublishFrame(window.Host, target) with
+| ValueSome frame ->
+    use frame = frame
+    // Select ordinary DOM caption text from frame.PresentationTime.
+    window.Present()
+| ValueNone -> ()
+```
+
+The frame lease binds/notifies the existing View texture input and retains the
+player/COM texture. Finish and release any native composition lease before
+disposing the frame lease, which unbinds and releases the publication. Only one
+publication may be outstanding. `TryRepublishFrame` handles paused redraws.
+Dispose frame leases before destroying their View host. Player disposal revokes
+controls and pauses immediately; an outstanding frame defers final provider
+destruction. Wrong-thread calls and releases preserve ownership and fail with
+the native wrong-thread HRESULT. Disposal is mandatory and idempotent.
 
 `WindowsPlayback.h` owns one local source per initialized session. Call
 `initialize()`, then `openFile(path)` on the owning application thread. A second
