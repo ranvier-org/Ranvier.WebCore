@@ -51,3 +51,9 @@ the exact candidate stage and source commit, writing a **new** capture file. Run
 the full paint capture and native catalogue, retain the old/new pointwise report
 and residuals, and obtain independent review before replacing profile bytes or
 provenance. Baselines are never regenerated as part of a test.
+
+## Linux font precondition
+
+The inline `fragment-clone` control names Arial. The reviewed Linux baseline resolves it to DejaVu Sans, SHA256 `ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280`. The Linux clipping probe uses the process-local `linux-fonts.conf` alias and verifies the selected font bytes before creating the host. This does not change the application's fonts or any pixel policy.
+
+The exact preview.4 Linux package from producer `41449896415` reproduced its CI failure under Liberation Sans. Consumer-only CI `41472188111` ran the unchanged gate twice against identical package bytes: the default font failed only `fragment-clone` at all three scales; the reviewed DejaVu Sans font matched all 54 stored RGBA captures byte for byte. Preserve both reports when assessing this environment correction.
