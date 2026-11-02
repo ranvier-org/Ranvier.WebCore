@@ -1,5 +1,5 @@
 #include "config.h"
-#if USE(TEXTURE_MAPPER) && !USE(COORDINATED_GRAPHICS)
+#if RANVIER_COMPOSITING
 #include "TextureMapper.h"
 #include "TextureMapperFlags.h"
 #include "Element.h"
