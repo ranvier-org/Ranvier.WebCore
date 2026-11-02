@@ -26,9 +26,35 @@ def probe(name, *commands, rid=None, flavor=('slim', 'gpu'), timeout=TIMEOUT, en
 
 
 PROBES = [
+    *[probe('Verify fixed content clipping masks and complete pointwise paint stability',
+            f'python -I tests/abi/background_content_clip_regression.py --native-directory {{native}} --rid {rid} --report {{work}}/background-content-clipping-regression.json',
+            rid=rid, flavor='gpu',
+            env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'} if rid.startswith('linux') else None)
+      for rid in ['linux-x64', 'win-x64']],
+    *[probe('Verify SVG image failures through real EGLImage frames',
+            'python -I tests/abi/svg_image_error_paint.py --native-directory {native} --gpu',
+            rid=rid, flavor='gpu',
+            env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
+      for rid in ['linux-x64', 'linux-arm64']],
+    *[probe('Verify failed SVG images stay empty while HTML fallback icons remain visible',
+            'python -I tests/abi/svg_image_error_paint.py --native-directory {native}',
+            rid=rid, flavor=None,
+            env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
+      for rid in ['linux-x64', 'linux-arm64', 'win-x64', 'win-arm64']],
     probe('Verify Windows same-document transition snapshot pixels',
           'python -I tests/gpu/windows_view_transition_pixels.py --native-directory {native} --output {work}/gpu-transition-readback',
           rid='win-x64', flavor='gpu'),
+
+    *[probe('Verify embedded WPE built-in images and icon lifetimes',
+            'python -I tests/abi/wpe_builtin_images.py --native-directory {native}',
+            rid=rid, flavor=None,
+            env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
+      for rid in ['linux-x64', 'linux-arm64']],
+    *[probe('Verify embedded WPE icons through retained EGLImage frames',
+            'python -I tests/abi/wpe_builtin_images.py --native-directory {native} --gpu',
+            rid=rid, flavor='gpu',
+            env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
+      for rid in ['linux-x64', 'linux-arm64']],
     *[probe('Verify Linux same-document transition snapshot pixels',
             'python -I tests/gpu/linux_view_transition_pixels.py --native-directory {native}',
             rid=rid, flavor='gpu',

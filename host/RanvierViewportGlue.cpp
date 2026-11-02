@@ -279,9 +279,14 @@ int32_t ranvier_box_quad(RvNode* node, int32_t box, RvNode* to, int32_t toSpace,
     return RV_OK;
 }
 
-void ranvier_resize_observe_box(ResizeObserver& observer, Element& element, bool border)
+void ranvier_resize_observe_box(ResizeObserver& observer, Element& element, int32_t box)
 {
-    observer.observe(element, ResizeObserverOptions { border ? ResizeObserverBoxOptions::BorderBox : ResizeObserverBoxOptions::ContentBox });
+    auto option = ResizeObserverBoxOptions::ContentBox;
+    if (box == RV_RESIZE_BOX_BORDER)
+        option = ResizeObserverBoxOptions::BorderBox;
+    else if (box == RV_RESIZE_BOX_DEVICE_PIXEL_CONTENT)
+        option = ResizeObserverBoxOptions::DevicePixelContentBox;
+    observer.observe(element, ResizeObserverOptions { option });
 }
 
 int32_t ranvier_document_now(RvNode* documentHandle, double* milliseconds)

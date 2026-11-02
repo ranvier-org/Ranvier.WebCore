@@ -736,8 +736,7 @@ RV_EXPORT void rv_observer_release(RvObserver*);
 typedef struct RvResizeEntry {
     /* sizeof(RvResizeEntry). */
     int32_t size;
-    /* 1 when devicePixelInlineSize and devicePixelBlockSize hold the device-pixel content box. Always 0: the engine
-     * has no device-pixel-content-box (webkit.org/b/219005, Ranvier.WebCore#146). */
+    /* 1 when devicePixelInlineSize and devicePixelBlockSize hold the device-pixel content box. */
     int32_t hasDevicePixel;
     /* The observed element, valid for the callback; rv_node_retain keeps it. */
     RvNode* target;
@@ -776,9 +775,8 @@ typedef void (*RvResizeEntriesCallback)(void* context, RvObserver* observer, con
  * stopped with rv_observer_unobserve and freed with rv_observer_release. NULL for a NULL host or callback. */
 RV_EXPORT RvObserver* rv_host_observe_resize_entries(RvHost*, RvResizeEntriesCallback callback, void* context);
 /* ResizeObserver.observe(element, { box }). Observing an observed element with another box replaces its observation
- * and reports it again; with the same box it changes nothing. RV_ERR_UNSUPPORTED for
- * RV_RESIZE_BOX_DEVICE_PIXEL_CONTENT, which the engine lacks (Ranvier.WebCore#146), for another box value, and for an
- * intersection observer. */
+ * and reports it again; with the same box it changes nothing. RV_ERR_UNSUPPORTED for an unknown box value or an
+ * intersection observer. "resize-device-pixel-content-box" advertises device-pixel observation and entry sizes. */
 RV_EXPORT int32_t rv_observer_observe_box(RvObserver*, RvNode* element, int32_t box);
 /* ResizeObserver.disconnect() or IntersectionObserver.disconnect(): unobserves every target and drops pending
  * notifications. The observer stays valid, observes again, and is freed with rv_observer_release. */

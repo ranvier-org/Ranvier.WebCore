@@ -46,6 +46,7 @@ jobs:
       - run: python -I tests/test_preview2_recovery.py
       - run: python -I tests/test_preview2_recovery_workflow.py
       - run: python -I tests/test_probes.py
+      - run: python -I tests/test_background_clip_policy.py
       - run: python -I tests/test_sdl_runtime.py
       - run: python -I tests/test_package_gpu.py
       - run: python -I tests/test_sccache_cache_policy.py

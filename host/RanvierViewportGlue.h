@@ -12,8 +12,7 @@
 //   RV_ERR_DETACHED when the document has no window.
 // - ranvier_intersection_take_records returns the observer's queued entries and empties its queue, as
 //   IntersectionObserver.takeRecords() does.
-// - ranvier_resize_observe_box observes the element's content box, or its border box when border is true, as
-//   ResizeObserver.observe(element, { box }) does.
+// - ranvier_resize_observe_box observes the element with an RV_RESIZE_BOX_* option.
 // - ranvier_media_query_matches and ranvier_media_query_media read a MediaQueryList, and return
 //   RV_ERR_WRONG_INTERFACE for any other target. Both remain valid after the document is destroyed.
 extern "C" {
@@ -36,5 +35,5 @@ class IntersectionObserverEntry;
 class ResizeObserver;
 }
 
-WEBCORE_EXPORT void ranvier_resize_observe_box(WebCore::ResizeObserver&, WebCore::Element&, bool border);
+WEBCORE_EXPORT void ranvier_resize_observe_box(WebCore::ResizeObserver&, WebCore::Element&, int32_t box);
 WEBCORE_EXPORT Vector<Ref<WebCore::IntersectionObserverEntry>> ranvier_intersection_take_records(WebCore::IntersectionObserver&);
