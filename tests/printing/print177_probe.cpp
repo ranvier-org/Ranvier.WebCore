@@ -105,8 +105,8 @@ void paint(Document& document, LocalFrame& frame, const Print177Options& options
 {
     PrintGuard guard(frame);
     auto& context = guard.context();
-    FloatBoxExtent margins(options.margin_top_points, options.margin_right_points,
-        options.margin_bottom_points, options.margin_left_points);
+    FloatBoxExtent margins(static_cast<float>(options.margin_top_points), static_cast<float>(options.margin_right_points),
+        static_cast<float>(options.margin_bottom_points), static_cast<float>(options.margin_left_points));
     auto effectiveMargins = context.computedPageMargin(margins);
     FloatSize available(options.paper_width_points - margins.left() - margins.right(),
         options.paper_height_points - margins.top() - margins.bottom());

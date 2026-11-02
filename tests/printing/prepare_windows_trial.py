@@ -96,6 +96,10 @@ def main(args):
              Path('C:/wk/src/Source/WebCore/page/PrintContext.cpp')]
     for directory in ['C:/wk/src/Source/ThirdParty/skia/include', 'C:/wk/src/Source/WebCore/platform/graphics/skia']:
         extra += list(Path(directory).rglob('*.h'))
+    if args.dependency_receipt:
+        prior = json.loads(args.dependency_receipt.read_text())
+        for step in prior['compileSteps']:
+            extra += [Path(path) for path in step['dependencies']]
     for path in extra:
         assert path.is_file(), path
         protected.setdefault(str(path), {'historicalPath': None, 'historicalSha256': None})
@@ -131,4 +135,5 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     for name in ['source-root', 'build-root', 'producer-receipt', 'host-receipt', 'host-transaction-receipt', 'output']:
         parser.add_argument('--' + name, type=Path, required=True)
+    parser.add_argument('--dependency-receipt', type=Path)
     main(parser.parse_args())
