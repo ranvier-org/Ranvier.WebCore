@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 
 ROOT = Path(__file__).resolve().parents[2]
 P, I, D, U = ctypes.c_void_p, ctypes.c_int32, ctypes.c_double, ctypes.c_uint32
@@ -100,10 +101,34 @@ def check_native_layouts(actual):
         assert native_offsets == offsets, f'{name} compiler offsets {native_offsets}, expected {offsets}'
 
 
+def cleanup_probe_directory(directory):
+    directory = Path(directory)
+    temporary_root = Path(tempfile.gettempdir()).resolve()
+    if directory.is_symlink():
+        raise ValueError(f'refusing to remove a linked ABI probe directory: {directory}')
+    resolved = directory.resolve(strict=True)
+    if resolved.parent != temporary_root or not resolved.name.startswith('ranvier-abi-layout-'):
+        raise ValueError(f'refusing to remove non-owned ABI probe directory: {directory}')
+
+    attempts = 4
+    for attempt in range(attempts):
+        try:
+            shutil.rmtree(resolved)
+            return
+        except PermissionError as error:
+            if attempt + 1 == attempts:
+                raise PermissionError(
+                    f'could not remove owned ABI probe directory after {attempts} attempts; '
+                    f'diagnostics retained at {resolved}'
+                ) from error
+            time.sleep(0.05 * (attempt + 1))
+
+
 def run_native_probe():
     compiler = next((shutil.which(name) for name in ('cc', 'gcc', 'clang', 'clang-cl', 'cl') if shutil.which(name)), None)
     assert compiler, 'a C compiler (cc, gcc, or clang) is required for native ABI layout checks'
-    with tempfile.TemporaryDirectory(prefix='ranvier-abi-layout-') as directory:
+    directory = Path(tempfile.mkdtemp(prefix='ranvier-abi-layout-'))
+    try:
         source = Path(directory) / 'abi_layout_probe.c'
         executable = Path(directory) / ('abi_layout_probe.exe' if sys.platform == 'win32' else 'abi_layout_probe')
         source.write_text(native_probe_source(), encoding='utf-8')
@@ -114,13 +139,33 @@ def run_native_probe():
             command = [compiler, '/nologo', '/std:c11', '/I' + str(ROOT / 'host'), str(source), '/Fe:' + str(executable)]
         else:
             command = [compiler, '-std=c11', '-I', str(ROOT / 'host'), str(source), '-o', str(executable)]
+        print(f'ABI probe compile command: {command!r}', flush=True)
         compile_result = subprocess.run(
             command, capture_output=True, text=True, check=False, env=environment, cwd=directory,
         )
-        assert compile_result.returncode == 0, 'native ABI probe compile failed:\n' + compile_result.stderr
-        run_result = subprocess.run([str(executable)], capture_output=True, text=True, check=False, cwd=directory)
-        assert run_result.returncode == 0, 'native ABI probe failed:\n' + run_result.stderr
-        return parse_native_layouts(run_result.stdout)
+        print(f'ABI probe compile exit={compile_result.returncode}', flush=True)
+        if compile_result.stdout:
+            print('ABI probe compile stdout:\n' + compile_result.stdout, flush=True)
+        if compile_result.stderr:
+            print('ABI probe compile stderr:\n' + compile_result.stderr, flush=True)
+        assert compile_result.returncode == 0, 'native ABI probe compile failed'
+
+        run_command = [str(executable)]
+        print(f'ABI probe run command: {run_command!r}', flush=True)
+        run_result = subprocess.run(run_command, capture_output=True, text=True, check=False, cwd=directory)
+        print(f'ABI probe run exit={run_result.returncode}', flush=True)
+        if run_result.stdout:
+            print('ABI probe stdout:\n' + run_result.stdout, flush=True)
+        if run_result.stderr:
+            print('ABI probe stderr:\n' + run_result.stderr, flush=True)
+        assert run_result.returncode == 0, 'native ABI probe failed'
+
+        actual = parse_native_layouts(run_result.stdout)
+        check_native_layouts(actual)
+        print(f'PASS native ABI layout probe: {len(actual)} structs validated', flush=True)
+        return actual
+    finally:
+        cleanup_probe_directory(directory)
 
 
 def main():
@@ -146,7 +191,7 @@ def main():
             assert block, fsharp + ' in Native.fs'
             assert len(re.findall(r'val mutable', block.group(1))) == len(fields), fsharp + ' field count'
             checks += 1
-    check_native_layouts(run_native_probe())
+    run_native_probe()
     checks += 2 * sum(len(layout[0]) + 1 for layout in LAYOUTS.values())
     print(f'PASS abi_layouts: {checks} assertions', flush=True)
 

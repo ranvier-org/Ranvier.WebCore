@@ -3,6 +3,9 @@
 #define NOMINMAX
 #include <windows.h>
 #include <d3d11_1.h>
+#include <d3d11on12.h>
+#include <d3d12.h>
+#include <dxgi1_4.h>
 #include <dxgi1_2.h>
 #include <wrl/client.h>
 #include <cstdio>
@@ -58,18 +61,64 @@ int main(int argc, char** argv) try {
     require(rv_host_acquire_d3d11_frame(host, nullptr, &frame) == RV_ERR_NULL_ARGUMENT && !frame, "failed acquire output clearing");
     require(rv_host_set_accelerated_compositing(host, RV_COMPOSITING_ALWAYS) == RV_OK, "enable compositor");
     require(rv_host_update(host) == RV_OK, "initial rendering update");
-    ComPtr<ID3D11Device> warp;
-    hr(D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_WARP, nullptr, 0, nullptr, 0, D3D11_SDK_VERSION, &warp, nullptr, nullptr), "WARP incompatible consumer device");
-    DWORD failureHandles = 0, afterFailureHandles = 0;
+    auto ordinaryFrame = [&](const char* label) {
+        RvGpuFrame* regular = nullptr;
+        auto status = rv_host_acquire_d3d11_frame(host, device, &regular);
+        std::printf("failed-consumer control: regular SDL %s status=%d frame=%p\n", label, status, regular);
+        require(status == RV_OK && regular, "regular SDL consumer remains valid");
+        void* texture = nullptr; int width = 0, height = 0, format = 0;
+        auto info = rv_gpu_frame_info(regular, &texture, &width, &height, &format);
+        auto released = rv_gpu_frame_release(regular);
+        std::printf("failed-consumer control: regular SDL %s info=%d size=%dx%d format=%d release=%d\n", label, info, width, height, format, released);
+        require(info == RV_OK && texture && width == 64 && height == 64 && format == RV_GPU_RGBA8_PREMULTIPLIED && released == RV_OK, "regular SDL frame metadata and release");
+    };
+    ordinaryFrame("before removed-device control");
+    ComPtr<IDXGIFactory4> factory;
+    ComPtr<IDXGIAdapter> warpAdapter;
+    ComPtr<ID3D12Device5> removed12;
+    ComPtr<ID3D12CommandQueue> removedQueue;
+    ComPtr<ID3D11Device> removed11;
+    ComPtr<ID3D11DeviceContext> removedContext;
+    hr(CreateDXGIFactory1(IID_PPV_ARGS(&factory)), "owned D3D12 factory");
+    hr(factory->EnumWarpAdapter(IID_PPV_ARGS(&warpAdapter)), "owned WARP adapter");
+    hr(D3D12CreateDevice(warpAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&removed12)), "owned WARP D3D12 device");
+    D3D12_COMMAND_QUEUE_DESC queueDescription {};
+    queueDescription.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+    hr(removed12->CreateCommandQueue(&queueDescription, IID_PPV_ARGS(&removedQueue)), "owned D3D12 queue");
+    IUnknown* queues[] { removedQueue.Get() };
+    hr(D3D11On12CreateDevice(removed12.Get(), D3D11_CREATE_DEVICE_BGRA_SUPPORT, nullptr, 0, queues, 1, 0,
+        &removed11, &removedContext, nullptr), "owned D3D11On12 consumer");
+    auto before12 = removed12->GetDeviceRemovedReason();
+    auto before11 = removed11->GetDeviceRemovedReason();
+    require(before12 == S_OK && before11 == S_OK, "owned consumer starts healthy");
+    RvGpuFrame* beforeFrame = nullptr;
+    auto beforeAcquire = rv_host_acquire_d3d11_frame(host, removed11.Get(), &beforeFrame);
+    std::printf("failed-consumer control: before removal D3D12=0x%08lx D3D11=0x%08lx acquire=%d frame=%p\n", static_cast<unsigned long>(before12), static_cast<unsigned long>(before11), beforeAcquire, beforeFrame);
+    if (beforeAcquire == RV_OK) {
+        require(beforeFrame, "healthy owned consumer successful acquire returns a frame");
+        require(rv_gpu_frame_release(beforeFrame) == RV_OK, "release healthy owned consumer frame");
+    } else
+        require(beforeAcquire == RV_ERR_UNSUPPORTED && !beforeFrame, "healthy owned consumer is explicitly unsupported with cleared output");
+    removed12->RemoveDevice();
+    auto after12 = removed12->GetDeviceRemovedReason();
+    auto after11 = removed11->GetDeviceRemovedReason();
+    std::printf("failed-consumer control: after removal D3D12=0x%08lx D3D11=0x%08lx\n", static_cast<unsigned long>(after12), static_cast<unsigned long>(after11));
+    require(FAILED(after12) && FAILED(after11), "owned consumer reports actual removal");
+    DWORD firstFailureHandles = 0, lastFailureHandles = 0;
     for (int attempt = 0; attempt < 25; ++attempt) {
-        frame = reinterpret_cast<RvGpuFrame*>(1);
-        require(rv_host_acquire_d3d11_frame(host, warp.Get(), &frame) == RV_ERR_UNSUPPORTED && !frame, "cross-adapter acquire failure leaves no frame");
-        if (!attempt) require(GetProcessHandleCount(GetCurrentProcess(), &failureHandles), "initial process handle count");
+        RvGpuFrame* rejected = reinterpret_cast<RvGpuFrame*>(1);
+        auto status = rv_host_acquire_d3d11_frame(host, removed11.Get(), &rejected);
+        std::printf("failed-consumer control: removed acquire attempt=%d status=%d frame=%p\n", attempt, status, rejected);
+        if (status == RV_OK && rejected)
+            require(rv_gpu_frame_release(rejected) == RV_OK, "release unexpected removed-consumer frame");
+        require(status == RV_ERR_UNSUPPORTED && !rejected, "actual removed-consumer acquisition fails with cleared output");
+        if (!attempt) require(GetProcessHandleCount(GetCurrentProcess(), &firstFailureHandles), "first removed-consumer handle count");
     }
-    require(GetProcessHandleCount(GetCurrentProcess(), &afterFailureHandles), "final process handle count");
-    std::printf("failed-device handles: %lu -> %lu\n", failureHandles, afterFailureHandles);
-    require(afterFailureHandles <= failureHandles + 4, "failed cross-device acquisition leaked NT handles");
-    warp.Reset();
+    require(GetProcessHandleCount(GetCurrentProcess(), &lastFailureHandles), "last removed-consumer handle count");
+    std::printf("failed-consumer control: removed-consumer handles %lu -> %lu\n", firstFailureHandles, lastFailureHandles);
+    require(lastFailureHandles <= firstFailureHandles + 4, "removed-consumer attempts retain bounded NT handles");
+    removedContext.Reset(); removed11.Reset(); removedQueue.Reset(); removed12.Reset(); warpAdapter.Reset(); factory.Reset();
+    ordinaryFrame("after removed-device control");
     int wrongThread = RV_OK;
     std::thread thread([&] { RvGpuFrame* invalid = nullptr; wrongThread = rv_host_acquire_d3d11_frame(host, device, &invalid); }); thread.join();
     require(wrongThread == RV_ERR_WRONG_THREAD, "acquire owner thread");
