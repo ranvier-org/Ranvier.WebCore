@@ -55,7 +55,7 @@ jobs:
           echo "PKG_CONFIG_PATH=$MAC220_SDL/lib/pkgconfig" >> "$GITHUB_ENV"
           echo "DYLD_LIBRARY_PATH=$MAC220_SDL/lib" >> "$GITHUB_ENV"
       - name: Run the isolated native experiment
-        run: python3 -I tests/gpu/mac/run.py --rid osx-arm64 --mac-gpu-spike --work "$MAC220_WORK" --jobs 4 --execute
+        run: python3 -I tests/gpu/mac/run.py --rid osx-arm64 --mac-gpu-spike --work "$MAC220_WORK" --jobs 4 --texture-input --execute
       - name: Retain source identity, first failure and runtime evidence
         if: always()
         uses: actions/upload-artifact@v4
