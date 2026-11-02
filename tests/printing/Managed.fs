@@ -58,13 +58,13 @@ let main arguments =
     let poll =
         PrintCancelPoll(fun _ -> if cancellation.IsCancellationRequested then 1 else 0)
 
-    let pollPointer = Marshal.GetFunctionPointerForDelegate(poll)
+    let pollPointer = Marshal.GetFunctionPointerForDelegate<PrintCancelPoll>(poll)
     let events = ResizeArray<struct (int * int * int)>()
 
     let completed =
         ResourceCompletion(fun _ outcome width height -> events.Add(struct (outcome, width, height)))
 
-    let completedPointer = Marshal.GetFunctionPointerForDelegate(completed)
+    let completedPointer = Marshal.GetFunctionPointerForDelegate<ResourceCompletion>(completed)
 
     let read token =
         let mutable length = -1L
