@@ -1,4 +1,5 @@
 import importlib.util
+import base64
 import json
 from pathlib import Path
 import tempfile
@@ -29,12 +30,18 @@ class RecoveryTests(unittest.TestCase):
         payloads = {x['name']: x['sha256'] for x in files}
         self.receipt = {'packageSha256': recovery.sha(self.package.read_bytes()),
                         'manifestSha256': recovery.sha(self.manifest_path.read_bytes()), 'source': recovery.PRODUCT,
-                        'before': payloads, 'after': payloads.copy(), 'unchanged': True,
-                        'capture': {'exit': 0, 'timedOut': False}}
-        self.report = {'result': 'PASS', 'rid': 'win-x64', 'completeKeys': 54, 'strictContentMaskKeys': 12,
+                        'nativeUnchanged': True, 'samplerFormatsDiagnostic': True, 'profile': recovery.PROFILE}
+        self.report = {'result': 'FAIL', 'rid': 'win-x64', 'completeKeys': 54, 'strictContentMaskKeys': 12,
                        'results': [{'name': n, 'scale': s, 'strictFixedCase': n in recovery.FIXED,
                                     'contentMaskDifference': 0, 'unexplainedWorsePixels': []}
-                                   for n in recovery.CASES for s in (1, 1.5, 2)], 'failures': []}
+                                   for n in recovery.CASES for s in (1, 1.5, 2)],
+                       'failures': [{'name': 'composited-translate', 'scale': s} for s in (1.5, 2)]}
+        self.model = {'result': 'PASS', 'cases': [{'scale': 1.5, 'pixels': 1080000}, {'scale': 2, 'pixels': 1920000}],
+                      'expectedGeneratedBeforeCaptureLoad': True, 'pixelGoldenInputs': False}
+        self.sampler = {'renderer': recovery.PROFILE, 'runtimeUnchanged': True, 'controlsPass': True,
+                        'negativeControlsPass': True, 'policy': {'result': 'PASS', 'samplesPerDestination': 1048576,
+                                                                'historicalCrossDrawResult': 'FAIL'}}
+        self.precision = {'renderer': recovery.PROFILE, 'nativeUnchanged': True}
         self.original = {'result': 'FAIL', 'completeKeys': 54, 'strictContentMaskKeys': 12,
                          'failures': [{'name': 'composited-translate', 'scale': s} for s in (1.5, 2)]}
         self.summary = self.root / 'summary.txt'
@@ -45,33 +52,37 @@ class RecoveryTests(unittest.TestCase):
                          'path': '.github/workflows/build.yml', 'run_attempt': 1}
         self.qualification = {'head_sha': 'policy', 'event': 'workflow_dispatch', 'path': 'qualified.yml',
                               'run_attempt': 1, 'status': 'completed', 'conclusion': 'success'}
-        self.jobs = {'total_count': 2, 'jobs': [{'name': 'qualify-p7-gpu', 'conclusion': 'success',
+        self.jobs = {'total_count': 2, 'jobs': [{'name': 'qualify', 'conclusion': 'success',
                      'steps': [{'name': name, 'conclusion': 'success'} for name in recovery.QUALIFICATION_STEPS]},
                      {'name': 'publish', 'conclusion': 'skipped'}]}
         self.write_evidence()
 
     def write_evidence(self):
-        for name, value in [('receipt.json', self.receipt), ('report.json', self.report), ('original.json', self.original)]:
-            (self.root / name).write_text(json.dumps(value))
+        for name, value in [('qualification.json', self.receipt), ('original-report.json', self.report),
+                            ('original.json', self.original), ('model.json', self.model),
+                            ('policy/sampler-format-probe.json', self.sampler),
+                            ('policy/vertex-fragment-precision.json', self.precision)]:
+            path = self.root / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps(value))
 
-    def run_verify(self, qualification=42):
+    def run_verify(self, qualification=42, evidence_pins=None, source_digest=None):
         def api(path):
+            if path.startswith('contents/'):
+                return {'encoding': 'base64', 'content': base64.b64encode(b'qualified-source').decode()}
             if '/jobs?' in path:
                 return self.jobs
             return self.producer if path.endswith(str(recovery.PRODUCER)) else self.qualification
         values = {'api': api, 'TRUSTED_QUALIFICATION': 42, 'TRUSTED_POLICY': 'policy', 'TRUSTED_WORKFLOW': 'qualified.yml',
                   'PACKAGE_SHA': recovery.sha(self.package.read_bytes()), 'MANIFEST_SHA': recovery.sha(self.manifest_path.read_bytes()),
-                  'TRUSTED_REPORT_SHA': recovery.sha((self.root / 'report.json').read_bytes()),
-                  'TRUSTED_RECEIPT_SHA': recovery.sha((self.root / 'receipt.json').read_bytes()),
+                  'SOURCE_SHA': {'test-source': source_digest or recovery.sha(b'qualified-source')},
+                  'EVIDENCE_SHA': evidence_pins or {n: recovery.sha((self.root / n).read_bytes()) for n in
+                                                   ['qualification.json', 'original-report.json', 'model.json',
+                                                    'policy/sampler-format-probe.json', 'policy/vertex-fragment-precision.json']},
                   'ORIGINAL_REPORT_SHA': recovery.sha((self.root / 'original.json').read_bytes()),
                   'SUMMARY_SHA': recovery.sha(self.summary.read_bytes())}
         with patch.multiple(recovery, **values):
             return recovery.verify(self.package, self.manifest_path, self.root, self.summary, self.root / 'original.json', qualification)
-
-    def test_unarmed_rejects_before_any_io(self):
-        with patch.object(recovery, 'api', side_effect=AssertionError('unexpected API')):
-            with self.assertRaisesRegex(ValueError, 'unarmed'):
-                recovery.verify(None, None, None, None, None, 42)
 
     def test_complete_pinned_evidence(self):
         self.assertEqual(self.run_verify()['nativeFiles'], 26)
@@ -80,6 +91,10 @@ class RecoveryTests(unittest.TestCase):
         with self.assertRaises(ValueError): self.run_verify(43)
         self.qualification['path'] = 'other.yml'
         with self.assertRaises(ValueError): self.run_verify()
+
+    def test_wrong_qualified_source_hash_rejected(self):
+        with self.assertRaisesRegex(ValueError, 'Qualification source SHA mismatch'):
+            self.run_verify(source_digest=recovery.sha(b'other-source'))
 
     def test_incomplete_jobs_or_unexpected_job_rejected(self):
         self.jobs['total_count'] = 3
@@ -91,6 +106,26 @@ class RecoveryTests(unittest.TestCase):
     def test_missing_qualification_step_rejected(self):
         self.jobs['jobs'][0]['steps'][0]['conclusion'] = 'failure'
         with self.assertRaises(ValueError): self.run_verify()
+
+    def test_evidence_tampering_and_failed_model_are_rejected(self):
+        pins = {n: recovery.sha((self.root / n).read_bytes()) for n in
+                ['qualification.json', 'original-report.json', 'model.json',
+                 'policy/sampler-format-probe.json', 'policy/vertex-fragment-precision.json']}
+        self.model['result'] = 'FAIL'
+        self.write_evidence()
+        with self.assertRaisesRegex(ValueError, 'evidence SHA mismatch'):
+            self.run_verify(evidence_pins=pins)
+        with self.assertRaisesRegex(ValueError, 'Model mismatch'):
+            self.run_verify()
+
+    def test_wrong_profile_or_sampler_policy_rejected(self):
+        self.sampler['renderer'] = 'different hardware'
+        self.write_evidence()
+        with self.assertRaisesRegex(ValueError, 'Sampler qualification mismatch'): self.run_verify()
+        self.sampler['renderer'] = recovery.PROFILE
+        self.sampler['policy']['historicalCrossDrawResult'] = 'PASS'
+        self.write_evidence()
+        with self.assertRaisesRegex(ValueError, 'Sampler qualification mismatch'): self.run_verify()
 
     def test_original_red_and_all_case_identities_are_required(self):
         self.original['failures'].pop()
@@ -112,10 +147,10 @@ class RecoveryTests(unittest.TestCase):
         with self.assertRaises(ValueError): self.run_verify()
 
     def test_changed_payload_or_receipt_rejected(self):
-        self.receipt['after'] = {}
+        self.receipt['nativeUnchanged'] = False
         self.write_evidence()
         with self.assertRaises(ValueError): self.run_verify()
-        self.receipt['after'] = self.receipt['before'].copy()
+        self.receipt['nativeUnchanged'] = True
         with zipfile.ZipFile(self.package, 'a') as archive:
             archive.writestr('runtimes/win-x64/native/0.dll', b'changed')
         self.receipt['packageSha256'] = recovery.sha(self.package.read_bytes())

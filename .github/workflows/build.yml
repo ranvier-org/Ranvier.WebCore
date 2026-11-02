@@ -30,18 +30,22 @@ on:
         description: Publish the fixed, independently qualified P4 Windows GPU artifact
         type: boolean
         default: false
+      recover_preview7_windows:
+        description: Publish the independently qualified P7 Windows GPU artifact
+        type: boolean
+        default: false
       recover_preview7_linux:
         description: Publish the verified P7 Linux GPU producer artifacts
         type: boolean
         default: false
 
 concurrency:
-  group: ${{ inputs.recover_preview7_linux && format('preview7-linux-recovery-{0}', github.run_id) || inputs.recover_preview4_gpu && format('preview4-artifact-recovery-{0}', github.run_id) || inputs.recover_preview2_gpu && format('preview2-artifact-recovery-{0}', github.run_id) || format('{0}-{1}-{2}', github.workflow, github.ref, inputs.flavor || 'slim') }}
-  cancel-in-progress: ${{ !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux }}
+  group: ${{ inputs.recover_preview7_windows && format('preview7-windows-recovery-{0}', github.run_id) || inputs.recover_preview7_linux && format('preview7-linux-recovery-{0}', github.run_id) || inputs.recover_preview4_gpu && format('preview4-artifact-recovery-{0}', github.run_id) || inputs.recover_preview2_gpu && format('preview2-artifact-recovery-{0}', github.run_id) || format('{0}-{1}-{2}', github.workflow, github.ref, inputs.flavor || 'slim') }}
+  cancel-in-progress: ${{ !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows }}
 
 jobs:
   package-contract:
-    if: ${{ !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux }}
+    if: ${{ !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -108,7 +112,7 @@ jobs:
           if-no-files-found: ignore
 
   plan:
-    if: ${{ !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux }}
+    if: ${{ !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows }}
     # The matrix, filtered by the manual run's rids input. On a version tag whose release holds a runtime's
     # package, attached by scripts/release.py as the repository owner, that runtime goes to prebuilt instead.
     runs-on: ubuntu-latest
@@ -182,7 +186,7 @@ jobs:
     # A runtime whose package was built and checked on the owner's machine by scripts/release.py: checked
     # again here, on a clean runner of its platform, against the tag's commit, then passed to publish.
     needs: plan
-    if: ${{ !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && needs.plan.outputs.prebuilt != '' }}
+    if: ${{ !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && needs.plan.outputs.prebuilt != '' }}
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.plan.outputs.prebuilt) }}
@@ -226,7 +230,7 @@ jobs:
 
   native:
     needs: plan
-    if: ${{ !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && needs.plan.outputs.matrix != '' }}
+    if: ${{ !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && needs.plan.outputs.matrix != '' }}
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
@@ -671,7 +675,7 @@ jobs:
   managed:
     needs: [native, prebuilt, package-contract]
     if: >-
-      ${{ !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !cancelled() && inputs.rids == '' && (inputs.flavor == '' || inputs.flavor == 'slim') &&
+      ${{ !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && !cancelled() && inputs.rids == '' && (inputs.flavor == '' || inputs.flavor == 'slim') &&
           !(github.event_name == 'pull_request' && !startsWith(github.head_ref, 'codex/batch-') &&
             !contains(github.event.pull_request.labels.*.name, 'full-matrix')) &&
           (needs.native.result == 'success' || needs.native.result == 'skipped') &&
@@ -712,7 +716,7 @@ jobs:
     # as workflow artifacts. Every selected runtime and the contract gate must pass before any push;
     # a full slim release also requires the paired managed cohort.
     if: >-
-      ${{ !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !cancelled() && startsWith(github.ref, 'refs/tags/v') && vars.NUGET_USER != '' &&
+      ${{ !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && !cancelled() && startsWith(github.ref, 'refs/tags/v') && vars.NUGET_USER != '' &&
           needs.package-contract.result == 'success' &&
           (needs.native.result == 'success' || needs.native.result == 'skipped') &&
           (needs.prebuilt.result == 'success' || needs.prebuilt.result == 'skipped') &&
@@ -742,7 +746,7 @@ jobs:
   windows-gpu-cohort:
     needs: publish
     if: >-
-      ${{ !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !cancelled() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') &&
+      ${{ !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && !cancelled() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') &&
           needs.publish.result == 'success' }}
     runs-on: ubuntu-latest
     permissions:
@@ -757,7 +761,7 @@ jobs:
           --field flavor=gpu --field rids=win-x64
 
   recover-preview2-gpu:
-    if: ${{ inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
+    if: ${{ inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
     runs-on: windows-2025
     timeout-minutes: 45
     permissions:
@@ -815,7 +819,7 @@ jobs:
   publish-preview2-recovery:
     needs: [recover-preview2-gpu]
     if: >-
-      ${{ !cancelled() && inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && github.event_name == 'workflow_dispatch' &&
+      ${{ !cancelled() && inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && github.event_name == 'workflow_dispatch' &&
           github.ref == 'refs/heads/main' && needs.recover-preview2-gpu.result == 'success' && vars.NUGET_USER != '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -854,7 +858,7 @@ jobs:
         run: dotnet nuget push recovery/export/Ranvier.WebCore.Native.Gpu.win-x64.0.1.1-preview.2.nupkg --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY"
 
   verify-preview4-gpu-recovery:
-    if: ${{ inputs.recover_preview4_gpu && !inputs.recover_preview2_gpu && !inputs.recover_preview7_linux && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
+    if: ${{ inputs.recover_preview4_gpu && !inputs.recover_preview2_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -907,7 +911,7 @@ jobs:
   publish-preview4-gpu-recovery:
     needs: [verify-preview4-gpu-recovery]
     if: >-
-      ${{ !cancelled() && inputs.recover_preview4_gpu && !inputs.recover_preview2_gpu && !inputs.recover_preview7_linux &&
+      ${{ !cancelled() && inputs.recover_preview4_gpu && !inputs.recover_preview2_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows &&
           github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' &&
           needs.verify-preview4-gpu-recovery.result == 'success' && vars.NUGET_USER != '' }}
     runs-on: ubuntu-latest
@@ -973,7 +977,7 @@ jobs:
         run: dotnet nuget push recovery/export/Ranvier.WebCore.Native.Gpu.win-x64.0.1.1-preview.4.nupkg --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY"
 
   verify-preview7-linux-recovery:
-    if: ${{ inputs.recover_preview7_linux && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
+    if: ${{ inputs.recover_preview7_linux && !inputs.recover_preview7_windows && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -998,7 +1002,7 @@ jobs:
 
   publish-preview7-linux-recovery:
     needs: [verify-preview7-linux-recovery]
-    if: ${{ !cancelled() && inputs.recover_preview7_linux && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.verify-preview7-linux-recovery.result == 'success' && vars.NUGET_USER != '' }}
+    if: ${{ !cancelled() && inputs.recover_preview7_linux && !inputs.recover_preview7_windows && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.verify-preview7-linux-recovery.result == 'success' && vars.NUGET_USER != '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -1031,3 +1035,65 @@ jobs:
         env:
           NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
         run: dotnet nuget push "$RUNNER_TEMP/p7-linux-publish/export/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY"
+
+  verify-preview7-windows-recovery:
+    if: ${{ inputs.recover_preview7_windows && !inputs.recover_preview7_linux && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - name: Check Windows recovery contract
+        run: |
+          python -I tests/test_preview7_windows_evidence.py
+          python -I tests/test_preview7_recovery.py
+      - name: Download and verify immutable producer and qualification
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python -I scripts/prepare_preview7_windows_gpu.py --work "$RUNNER_TEMP/p7-windows-verify"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p7-windows-recovery-verification
+          path: ${{ runner.temp }}/p7-windows-verify/verification.json
+          if-no-files-found: error
+
+  publish-preview7-windows-recovery:
+    needs: [verify-preview7-windows-recovery]
+    if: ${{ !cancelled() && inputs.recover_preview7_windows && !inputs.recover_preview7_linux && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.verify-preview7-windows-recovery.result == 'success' && vars.NUGET_USER != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Independently re-download and verify before authentication
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python -I scripts/prepare_preview7_windows_gpu.py --work "$RUNNER_TEMP/p7-windows-publish"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p7-windows-recovery-pre-push
+          path: ${{ runner.temp }}/p7-windows-publish/verification.json
+          if-no-files-found: error
+      - name: Authenticate after verification
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ vars.NUGET_USER }}
+      - name: Publish unchanged producer package
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: dotnet nuget push "$RUNNER_TEMP/p7-windows-publish/export/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY"

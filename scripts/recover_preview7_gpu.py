@@ -1,6 +1,7 @@
-"""Fail closed until an independently reviewed P7 GPU qualification is pinned."""
+"""Verify the immutable P7 Windows GPU producer and its pinned qualification."""
 
 import argparse
+import base64
 import hashlib
 import json
 from pathlib import Path
@@ -23,14 +24,23 @@ CASES = {'bordered-half-phase', 'zero-origin', 'borderless-half-phase', 'negativ
          'fragment-clone', 'rounded-border-control'}
 FIXED = {'bordered-half-phase', 'negative-origin', 'nested-offset', 'always-composited'}
 
-# Deliberately unarmed. A later reviewed change must pin all four values to the
-# independently qualified run and its immutable evidence before publication.
-TRUSTED_QUALIFICATION = None
-TRUSTED_POLICY = None
-TRUSTED_WORKFLOW = None
-TRUSTED_REPORT_SHA = None
-TRUSTED_RECEIPT_SHA = None
-QUALIFICATION_STEPS = ('Verify exact producer inputs', 'Qualify complete GPU clipping contract')
+TRUSTED_QUALIFICATION = 41541720378
+TRUSTED_POLICY = '4d99783d1a90863bfdeaffccb8e032edded846de'
+TRUSTED_WORKFLOW = '.github/workflows/p7-windows-qualification.yml'
+EVIDENCE_SHA = json.loads(Path(__file__).with_name('preview7_windows_evidence.json').read_text())
+QUALIFICATION_STEPS = ('Check qualification contract', 'Check numeric evidence persistence',
+                       'Check per-format primitive policy controls', 'Qualify exact P7 Windows artifact')
+PROFILE = 'ANGLE (Microsoft, Microsoft Basic Render Driver (0x0000008C) Direct3D11 vs_5_0 ps_5_0, D3D11-10.0.26100.33648)'
+SOURCE_SHA = {
+    '.github/workflows/p7-windows-qualification.yml': '84f15f30dc5cbbde5da4f50a741a9f8bfe3ab793dffa0ce0ac5475c76956956c',
+    'scripts/qualify_p7_clipping.py': '662558478dcb1267da7fdb10984692bcbd8ded4ddd3ec721a08d8d49bf90ee43',
+    'scripts/capture_p7_clipping.py': '5e44c3e1a2602635042bd1cfcabb24b27f6ff11cbe844242b5910d5b9ef9362c',
+    'tests/p7_gpu_qualification/cases.json': '77d7472d0cd458e439adf6b3b38e379437bc0f632390394a1666e05e314c71b1',
+    'tests/p7_gpu_qualification/baseline-a9.json': '787743d5a92863d0d576592ab9c5e5aedf03ca8feaafba444dedd93c43d70d1d',
+    'tests/p7_gpu_qualification/gpu_pixel_gate_v3.py': 'e13e7889839688b4a0e87c809489fcf7ba0d6bd91749173741ede93d863634c3',
+    'tests/p7_gpu_qualification/sampler_format_policy.py': 'ff9b73d9b5d1deed82b098724596aae8078ea79a4aed445c6c12996b3fce1dc9',
+    'tests/p7_gpu_qualification/sampler_format_probe.py': 'b70ec77b5e50a7f0c77a1e2e95cb4d3978f296ed11d423b6ee07c36aed2a4054',
+}
 
 
 def require(condition, reason):
@@ -47,8 +57,6 @@ def api(path):
 
 
 def verify(package, manifest_path, evidence, summary_path, original_report_path, qualification):
-    require(all((TRUSTED_QUALIFICATION, TRUSTED_POLICY, TRUSTED_WORKFLOW, TRUSTED_REPORT_SHA, TRUSTED_RECEIPT_SHA)),
-            'Recovery is unarmed: reviewed qualification pins are missing')
     require(qualification == TRUSTED_QUALIFICATION, 'Qualification run does not match the trusted pin')
     producer = api(f'actions/runs/{PRODUCER}')
     qualified = api(f'actions/runs/{qualification}')
@@ -61,14 +69,18 @@ def verify(package, manifest_path, evidence, summary_path, original_report_path,
             and qualified['path'] == TRUSTED_WORKFLOW and qualified['run_attempt'] == 1
             and qualified['status'] == 'completed' and qualified['conclusion'] == 'success',
             'Qualification identity or status changed')
+    for name, digest in SOURCE_SHA.items():
+        content = api(f'contents/{name}?ref={TRUSTED_POLICY}')
+        require(content['encoding'] == 'base64' and sha(base64.b64decode(content['content'])) == digest,
+                f'Qualification source SHA mismatch: {name}')
     response = api(f'actions/runs/{qualification}/jobs?per_page=100')
     jobs = response['jobs']
     require(response['total_count'] == len(jobs), 'Qualification job list is incomplete')
-    selected = [job for job in jobs if job['name'] == 'qualify-p7-gpu']
+    selected = [job for job in jobs if job['name'] == 'qualify']
     require(len(selected) == 1 and selected[0]['conclusion'] == 'success', 'Qualification job missing')
     steps = {step['name']: step['conclusion'] for step in selected[0]['steps']}
     require(all(steps.get(name) == 'success' for name in QUALIFICATION_STEPS), 'Qualification step missing')
-    require(all(job['conclusion'] == 'skipped' for job in jobs if job['name'] != 'qualify-p7-gpu'),
+    require(all(job['conclusion'] == 'skipped' for job in jobs if job['name'] != 'qualify'),
             'Qualification unexpectedly ran another job')
     summary = summary_path.read_bytes()
     require(sha(summary) == SUMMARY_SHA, 'Producer summary SHA mismatch')
@@ -87,11 +99,14 @@ def verify(package, manifest_path, evidence, summary_path, original_report_path,
             'Original failure evidence mismatch')
     package_bytes, manifest_bytes = package.read_bytes(), manifest_path.read_bytes()
     require(sha(package_bytes) == PACKAGE_SHA and sha(manifest_bytes) == MANIFEST_SHA, 'Artifact SHA mismatch')
-    report_bytes = (evidence / 'report.json').read_bytes()
-    receipt_bytes = (evidence / 'receipt.json').read_bytes()
-    require(sha(report_bytes) == TRUSTED_REPORT_SHA and sha(receipt_bytes) == TRUSTED_RECEIPT_SHA,
-            'Qualification evidence SHA mismatch')
-    manifest, report, receipt = map(json.loads, (manifest_bytes, report_bytes, receipt_bytes))
+    for name, digest in EVIDENCE_SHA.items():
+        require(sha((evidence / name).read_bytes()) == digest, f'Qualification evidence SHA mismatch: {name}')
+    manifest = json.loads(manifest_bytes)
+    report = json.loads((evidence / 'original-report.json').read_bytes())
+    receipt = json.loads((evidence / 'qualification.json').read_bytes())
+    model = json.loads((evidence / 'model.json').read_bytes())
+    sampler = json.loads((evidence / 'policy/sampler-format-probe.json').read_bytes())
+    precision = json.loads((evidence / 'policy/vertex-fragment-precision.json').read_bytes())
     require(manifest['source'] == {'commit': PRODUCT, 'dirty': False, 'builder': 'ci'}
             and manifest['abi'] == 62 and manifest['rid'] == 'win-x64' and manifest['flavor'] == 'gpu',
             'Manifest source or ABI mismatch')
@@ -99,20 +114,29 @@ def verify(package, manifest_path, evidence, summary_path, original_report_path,
             'Expected 26 unique native files')
     expected = {x['name']: x['sha256'] for x in manifest['files']}
     require(receipt['packageSha256'] == PACKAGE_SHA and receipt['manifestSha256'] == MANIFEST_SHA
-            and receipt['source'] == PRODUCT and receipt['unchanged'] is True
-            and receipt['capture']['exit'] == 0 and not receipt['capture']['timedOut']
-            and receipt['before'] == receipt['after'] == expected, 'Qualification receipt mismatch')
-    require(report['result'] == 'PASS' and report['rid'] == 'win-x64'
+            and receipt['source'] == PRODUCT and receipt['nativeUnchanged'] is True
+            and receipt['samplerFormatsDiagnostic'] is True and receipt['profile'] == PROFILE,
+            'Qualification receipt mismatch')
+    require(report['result'] == 'FAIL' and report['rid'] == 'win-x64'
             and report['completeKeys'] == 54 and report['strictContentMaskKeys'] == 12
-            and len(report['results']) == 54 and not report['failures'], 'Qualification report mismatch')
+            and len(report['results']) == 54 and {(x['name'], x['scale']) for x in report['failures']}
+            == {('composited-translate', 1.5), ('composited-translate', 2)}, 'Qualification report mismatch')
     keys = {(row['name'], row['scale']) for row in report['results']}
     require(keys == {(name, scale) for name in CASES for scale in (1, 1.5, 2)},
             'Qualification case identity mismatch')
     require(all(row['strictFixedCase'] == (row['name'] in FIXED) for row in report['results']),
             'Qualification strict-mask identity mismatch')
-    require(all(not row['unexplainedWorsePixels']
-                and (not row['strictFixedCase'] or row['contentMaskDifference'] == 0)
-                for row in report['results']), 'Qualification contains a failed pixel or strict mask')
+    require(all((row['name'] == 'composited-translate' and row['scale'] in (1.5, 2))
+                or (not row['unexplainedWorsePixels'] and
+                    (not row['strictFixedCase'] or row['contentMaskDifference'] == 0))
+                for row in report['results']), 'Unexpected failed pixel or strict mask')
+    require(model['result'] == 'PASS' and len(model['cases']) == 2
+            and {(x['scale'], x['pixels']) for x in model['cases']} == {(1.5, 1080000), (2, 1920000)}
+            and model['expectedGeneratedBeforeCaptureLoad'] and not model['pixelGoldenInputs'], 'Model mismatch')
+    require(sampler['renderer'] == precision['renderer'] == PROFILE and sampler['runtimeUnchanged']
+            and precision['nativeUnchanged'] and sampler['controlsPass'] and sampler['negativeControlsPass']
+            and sampler['policy']['result'] == 'PASS' and sampler['policy']['samplesPerDestination'] == 1048576
+            and sampler['policy']['historicalCrossDrawResult'] == 'FAIL', 'Sampler qualification mismatch')
     with zipfile.ZipFile(package) as archive:
         names = archive.namelist()
         require(len(names) == len(set(names)), 'Duplicate package member')
@@ -125,7 +149,7 @@ def verify(package, manifest_path, evidence, summary_path, original_report_path,
             require(len(payload) == item['bytes'] and sha(payload) == item['sha256'], 'Native payload mismatch')
     return {'packageSha256': PACKAGE_SHA, 'manifestSha256': MANIFEST_SHA, 'producer': PRODUCER,
             'qualification': qualification, 'product': PRODUCT, 'policy': TRUSTED_POLICY,
-            'reportSha256': TRUSTED_REPORT_SHA, 'receiptSha256': TRUSTED_RECEIPT_SHA,
+            'evidenceSha256': EVIDENCE_SHA, 'qualificationSourceSha256': SOURCE_SHA, 'profile': PROFILE,
             'producerSummarySha256': SUMMARY_SHA, 'originalReportSha256': ORIGINAL_REPORT_SHA,
             'producerGroupsPassed': 110, 'nativeFiles': 26}
 
