@@ -2726,7 +2726,8 @@ int32_t rv_host_acquire_d3d11_frame(RvHost* host, void* consumerDevice, RvGpuFra
         bool transferred = paintResult == RV_OK && surface->finishProducer();
         if (!transferred) {
             surface->cancelProducer();
-            host->presentationSurface = nullptr;
+            if (paintResult != RV_ERR_UNSUPPORTED || !surface->available())
+                host->presentationSurface = nullptr;
         } else {
             host->dirty = { };
             *frame = new RvGpuFrame { WTF::move(surface) };

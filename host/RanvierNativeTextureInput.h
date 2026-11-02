@@ -7,7 +7,7 @@
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 #include <EGL/eglext_angle.h>
-#include "TextureMapperPlatformLayer.h"
+#include <WebCore/TextureMapperPlatformLayer.h>
 
 extern "C" __declspec(dllimport) void rv_native_texture_draw(WebCore::TextureMapper*, unsigned,
     const WebCore::FloatRect*, const WebCore::TransformationMatrix*, float);
