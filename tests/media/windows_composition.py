@@ -76,6 +76,9 @@ def run(args):
                             return list(output[offset:offset+4])
                         center, clipped = pixel(40,35), pixel(115,35)
                         edge = pixel(100,35)
+                        caption_ink = sum(1 for y in range(int(90*scale),int(118*scale)) for x in range(int(20*scale),int(190*scale))
+                                          if max(output[(y*width.value+x)*4:(y*width.value+x)*4+3]) < 100)
+                        p.expect(caption_ink > 20*scale*scale, 'timed caption glyphs are actually painted in the native GPU frame')
                         if phase is None:
                             p.expect(center == [255,255,255,255], 'removed video no longer paints into native DOM: ' + str(center))
                         else:
@@ -84,7 +87,7 @@ def run(args):
                         p.expect(clipped == [255,255,255,255], 'decoded video obeys DOM clipping: ' + str(clipped))
                         p.expect(edge == [255,255,255,255] if 'narrower' in label or phase is None else edge[phase] > 200 and any(edge[index] < 100 for index in range(3) if index != phase),
                                  'dynamic DOM clip edge follows current width: ' + str(edge))
-                        frames.append({'label':label,'phase':phase,'size':[width.value,height.value],'center':center,'clipped':clipped,'sha256':hashlib.sha256(output).hexdigest()})
+                        frames.append({'label':label,'phase':phase,'size':[width.value,height.value],'center':center,'clipped':clipped,'captionInkPixels':caption_ink,'sha256':hashlib.sha256(output).hexdigest()})
                         return hashlib.sha256(output).hexdigest()
                     finally:
                         p.call('rv_gpu_frame_release', [P], frame)
@@ -136,6 +139,8 @@ def run(args):
                 capture('removed-video-source',None)
                 p.load(PAGE, standalone=False)
                 target = p.node('surface')
+                caption = p.node('caption')
+                p.call('rv_dom_node_set_text_content', [P,Utf8], caption, b'blue cue')
                 p.update()
                 p.expect(republish(session) == 0, 'application republishes retained resource for the new document')
                 p.call('rv_host_bind_d3d11_texture', [P,P,P], p.host, target, texture)
