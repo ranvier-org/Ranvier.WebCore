@@ -185,6 +185,47 @@ def verify_gcrypt_startup(directory,external=False,bridge_library=None):
         for page in reversed(pages):
             if page is not None:page.close()
 
+def validate_private_jwk_fixture(path):
+    fixture=json.loads(path.read_bytes())
+    assert fixture['sourceSha256']=='939fab548a6e6bb49a5b3c4dd24a3c5df54a46645447b2d6f4df4fd88ff2d69f'
+    assert len(fixture['cases'])==68
+    domains={d['curve']:d for d in fixture['domains']}
+    assert set(domains)=={'P-256','P-384','P-521'}
+    labels=set()
+    for case in fixture['cases']:
+        assert case['label'] not in labels
+        labels.add(case['label'])
+        assert case['algorithm'] in ['ECDSA','ECDH'] and case['curve'] in [256,384,521]
+        jwk=case['jwk'];width=(case['curve']+7)//8
+        assert jwk['kty']=='EC' and jwk['crv']=='P-'+str(case['curve'])
+        decode=lambda text:base64.urlsafe_b64decode(text+'='*(-len(text)%4))
+        assert len(decode(jwk['x']))==width and len(decode(jwk['y']))==width
+        assert len(bytes.fromhex(domains[jwk['crv']]['orderHex']))==width
+        assert case['expectedError'] in [None,'DataError']
+        mutation=case['label'].rsplit('/',1)[1]
+        expected_width=width+1 if mutation=='scalar-extra-leading-zero' else 0 if mutation=='scalar-empty' else width
+        assert len(decode(jwk['d']))==expected_width
+    return fixture
+
+def verify_private_jwk(directory,path,bridge_library=None):
+    fixture=validate_private_jwk_fixture(path)
+    backend=Backend(directory,bridge_library)
+    failures=[]
+    try:
+        for case in fixture['cases']:
+            result=backend.run(case['label'],case['algorithm'],'import',format='jwk',jwk=case['jwk'],curve=case['curve'],usages=case['usages'])
+            if result['exception']!=case['expectedError']:
+                failures.append(dict(label=case['label'],expectedError=case['expectedError'],actual=result))
+            if case['expectedError'] is None and result['firstKey']:
+                exported=backend.run(case['label']+'/export',case['algorithm'],'export',key=result['firstKey'],format='jwk',curve=case['curve'])
+                if exported['exception'] or any(exported['jwk'].get(k)!=case['jwk'][k] for k in ['x','y','d']):
+                    failures.append(dict(label=exported['label'],actual=exported))
+        backend.check_script_guard()
+        return dict(result='FAIL' if failures else 'PASS',imports=len(fixture['cases']),records=backend.records,failures=failures,
+                    fixtureSha256=hashlib.sha256(path.read_bytes()).hexdigest(),validationBasis=fixture['validationBasis'],
+                    scope='Private EC JWK mathematical validity; typed dictionary normalization/error precedence not claimed')
+    finally:backend.close()
+
 def verify(directory,jws_path,ecdh_path,bridge_library=None):
     backend=Backend(directory,bridge_library)
     failures=[]
@@ -366,14 +407,25 @@ if __name__=='__main__':
     parser.add_argument('--validate-fixture',action='store_true')
     parser.add_argument('--gcrypt-startup-only',action='store_true')
     parser.add_argument('--external-gcrypt-init',action='store_true')
+    parser.add_argument('--private-jwk-only',action='store_true')
+    parser.add_argument('--private-jwk-fixture',type=Path,default=Path(__file__).resolve().parents[1]/'fixtures/crypto-ec-private-jwk-validation.json')
+    parser.add_argument('--validate-private-jwk-fixture',action='store_true')
     args=parser.parse_args()
-    if args.validate_fixture:
+    if args.validate_private_jwk_fixture:
+        validate_private_jwk_fixture(args.private_jwk_fixture)
+        print('Private EC JWK fixture structural validation PASS:68imports/3curves')
+    elif args.validate_fixture:
         validate_fixture(args.ecdh_fixture)
         print('RFC5903 structural validation PASS:3curves/8published fields/leading zeros')
     else:
         assert args.native_directory and args.report
         try:
-            report=verify_gcrypt_startup(args.native_directory,args.external_gcrypt_init,args.bridge_library) if args.gcrypt_startup_only else verify(args.native_directory,args.jws_fixture,args.ecdh_fixture,args.bridge_library)
+            if args.private_jwk_only:
+                report=verify_private_jwk(args.native_directory,args.private_jwk_fixture,args.bridge_library)
+            elif args.gcrypt_startup_only:
+                report=verify_gcrypt_startup(args.native_directory,args.external_gcrypt_init,args.bridge_library)
+            else:
+                report=verify(args.native_directory,args.jws_fixture,args.ecdh_fixture,args.bridge_library)
         except Exception as error:
             traceback.print_exc()
             report=dict(result='FAIL',infrastructureFailure=repr(error))

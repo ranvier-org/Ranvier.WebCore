@@ -1,0 +1,998 @@
+{
+  "source": "RFC5903 domain orders/generators and section8 published key pairs",
+  "sourceSha256": "939fab548a6e6bb49a5b3c4dd24a3c5df54a46645447b2d6f4df4fd88ff2d69f",
+  "scope": "Private EC JWK scalar bounds and Q=dG; all point/scalar bytes derive from published RFC5903 values or explicitly labeled integer/width mutations. No expected point or shared secret is generated.",
+  "domains": [
+    {
+      "curve": "P-256",
+      "orderHex": "ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551",
+      "generatorXHex": "6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296",
+      "generatorYHex": "4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5",
+      "section": "3.1"
+    },
+    {
+      "curve": "P-384",
+      "orderHex": "ffffffffffffffffffffffffffffffffffffffffffffffffc7634d81f4372ddf581a0db248b0a77aecec196accc52973",
+      "generatorXHex": "aa87ca22be8b05378eb1c71ef320ad746e1d3b628ba79b9859f741e082542a385502f25dbf55296c3a545e3872760ab7",
+      "generatorYHex": "3617de4a96262c6f5d9e98bf9292dc29f8f41dbd289a147ce9da3113b5f0b8c00a60b1ce1d7e819d7a431d7c90ea0e5f",
+      "section": "3.2"
+    },
+    {
+      "curve": "P-521",
+      "orderHex": "01fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffa51868783bf2f966b7fcc0148f709a5d03bb5c9b8899c47aebb6fb71e91386409",
+      "generatorXHex": "00c6858e06b70404e9cd9e3ecb662395b4429c648139053fb521f828af606b4d3dbaa14b5e77efe75928fe1dc127a2ffa8de3348b3c1856a429bf97e7e31c2e5bd66",
+      "generatorYHex": "011839296a789a3bc0045c8a5fb42c7d1bd998f54449579b446817afbd17273e662c97ee72995ef42640c550b9013fad0761353c7086a272c24088be94769fd16650",
+      "section": "3.3"
+    }
+  ],
+  "cases": [
+    {
+      "label": "ECDSA/P-256/published",
+      "algorithm": "ECDSA",
+      "curve": 256,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "d": "yI8B9RDZrD9wopLaojFt5UTpqriv6EBJxiqcV4YtFDM",
+        "x": "2tC2U5QiHPmwUeH-yleH0Jjf5jf8kLnvlF0MN3JYEYA",
+        "y": "UnGgRhzbglLWHxxFb6PlmrH0WzOsz19YOJ4Fd7iZC7M"
+      },
+      "usages": 4,
+      "expectedError": null
+    },
+    {
+      "label": "ECDSA/P-256/scalar-zero",
+      "algorithm": "ECDSA",
+      "curve": 256,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "d": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "x": "2tC2U5QiHPmwUeH-yleH0Jjf5jf8kLnvlF0MN3JYEYA",
+        "y": "UnGgRhzbglLWHxxFb6PlmrH0WzOsz19YOJ4Fd7iZC7M"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-256/scalar-one-with-published-point",
+      "algorithm": "ECDSA",
+      "curve": 256,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "d": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE",
+        "x": "2tC2U5QiHPmwUeH-yleH0Jjf5jf8kLnvlF0MN3JYEYA",
+        "y": "UnGgRhzbglLWHxxFb6PlmrH0WzOsz19YOJ4Fd7iZC7M"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-256/scalar-order-minus-one-with-published-point",
+      "algorithm": "ECDSA",
+      "curve": 256,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "d": "_____wAAAAD__________7zm-q2nF56E87nKwvxjJVA",
+        "x": "2tC2U5QiHPmwUeH-yleH0Jjf5jf8kLnvlF0MN3JYEYA",
+        "y": "UnGgRhzbglLWHxxFb6PlmrH0WzOsz19YOJ4Fd7iZC7M"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-256/scalar-order",
+      "algorithm": "ECDSA",
+      "curve": 256,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "d": "_____wAAAAD__________7zm-q2nF56E87nKwvxjJVE",
+        "x": "2tC2U5QiHPmwUeH-yleH0Jjf5jf8kLnvlF0MN3JYEYA",
+        "y": "UnGgRhzbglLWHxxFb6PlmrH0WzOsz19YOJ4Fd7iZC7M"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-256/scalar-order-plus-one",
+      "algorithm": "ECDSA",
+      "curve": 256,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "d": "_____wAAAAD__________7zm-q2nF56E87nKwvxjJVI",
+        "x": "2tC2U5QiHPmwUeH-yleH0Jjf5jf8kLnvlF0MN3JYEYA",
+        "y": "UnGgRhzbglLWHxxFb6PlmrH0WzOsz19YOJ4Fd7iZC7M"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-256/scalar-all-ff",
+      "algorithm": "ECDSA",
+      "curve": 256,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "d": "__________________________________________8",
+        "x": "2tC2U5QiHPmwUeH-yleH0Jjf5jf8kLnvlF0MN3JYEYA",
+        "y": "UnGgRhzbglLWHxxFb6PlmrH0WzOsz19YOJ4Fd7iZC7M"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-256/scalar-one-with-published-generator",
+      "algorithm": "ECDSA",
+      "curve": 256,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "d": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE",
+        "x": "axfR8uEsQkf4vOblY6RA8ncDfYEt6zOg9KE5RdiYwpY",
+        "y": "T-NC4v4af5uO5-tKfA-eFivOM1drMV7Oy7ZAaDe_UfU"
+      },
+      "usages": 4,
+      "expectedError": null
+    },
+    {
+      "label": "ECDSA/P-256/different-published-public-pair",
+      "algorithm": "ECDSA",
+      "curve": 256,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "d": "yI8B9RDZrD9wopLaojFt5UTpqriv6EBJxiqcV4YtFDM",
+        "x": "0S37UonI1PgSCLcCcDmMNCKWlwoLzLdMc2_HVUSUv2M",
+        "y": "VvvzyjZswj6BV4VME8WNaqwj8Eatow-DU-dPMwOYcqs"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-256/scalar-extra-leading-zero",
+      "algorithm": "ECDSA",
+      "curve": 256,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "d": "AMiPAfUQ2aw_cKKS2qIxbeVE6aq4r-hAScYqnFeGLRQz",
+        "x": "2tC2U5QiHPmwUeH-yleH0Jjf5jf8kLnvlF0MN3JYEYA",
+        "y": "UnGgRhzbglLWHxxFb6PlmrH0WzOsz19YOJ4Fd7iZC7M"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-256/scalar-empty",
+      "algorithm": "ECDSA",
+      "curve": 256,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "d": "",
+        "x": "2tC2U5QiHPmwUeH-yleH0Jjf5jf8kLnvlF0MN3JYEYA",
+        "y": "UnGgRhzbglLWHxxFb6PlmrH0WzOsz19YOJ4Fd7iZC7M"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-256/published",
+      "algorithm": "ECDH",
+      "curve": 256,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "d": "yI8B9RDZrD9wopLaojFt5UTpqriv6EBJxiqcV4YtFDM",
+        "x": "2tC2U5QiHPmwUeH-yleH0Jjf5jf8kLnvlF0MN3JYEYA",
+        "y": "UnGgRhzbglLWHxxFb6PlmrH0WzOsz19YOJ4Fd7iZC7M"
+      },
+      "usages": 48,
+      "expectedError": null
+    },
+    {
+      "label": "ECDH/P-256/scalar-zero",
+      "algorithm": "ECDH",
+      "curve": 256,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "d": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "x": "2tC2U5QiHPmwUeH-yleH0Jjf5jf8kLnvlF0MN3JYEYA",
+        "y": "UnGgRhzbglLWHxxFb6PlmrH0WzOsz19YOJ4Fd7iZC7M"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-256/scalar-one-with-published-point",
+      "algorithm": "ECDH",
+      "curve": 256,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "d": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE",
+        "x": "2tC2U5QiHPmwUeH-yleH0Jjf5jf8kLnvlF0MN3JYEYA",
+        "y": "UnGgRhzbglLWHxxFb6PlmrH0WzOsz19YOJ4Fd7iZC7M"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-256/scalar-order-minus-one-with-published-point",
+      "algorithm": "ECDH",
+      "curve": 256,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "d": "_____wAAAAD__________7zm-q2nF56E87nKwvxjJVA",
+        "x": "2tC2U5QiHPmwUeH-yleH0Jjf5jf8kLnvlF0MN3JYEYA",
+        "y": "UnGgRhzbglLWHxxFb6PlmrH0WzOsz19YOJ4Fd7iZC7M"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-256/scalar-order",
+      "algorithm": "ECDH",
+      "curve": 256,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "d": "_____wAAAAD__________7zm-q2nF56E87nKwvxjJVE",
+        "x": "2tC2U5QiHPmwUeH-yleH0Jjf5jf8kLnvlF0MN3JYEYA",
+        "y": "UnGgRhzbglLWHxxFb6PlmrH0WzOsz19YOJ4Fd7iZC7M"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-256/scalar-order-plus-one",
+      "algorithm": "ECDH",
+      "curve": 256,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "d": "_____wAAAAD__________7zm-q2nF56E87nKwvxjJVI",
+        "x": "2tC2U5QiHPmwUeH-yleH0Jjf5jf8kLnvlF0MN3JYEYA",
+        "y": "UnGgRhzbglLWHxxFb6PlmrH0WzOsz19YOJ4Fd7iZC7M"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-256/scalar-all-ff",
+      "algorithm": "ECDH",
+      "curve": 256,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "d": "__________________________________________8",
+        "x": "2tC2U5QiHPmwUeH-yleH0Jjf5jf8kLnvlF0MN3JYEYA",
+        "y": "UnGgRhzbglLWHxxFb6PlmrH0WzOsz19YOJ4Fd7iZC7M"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-256/scalar-one-with-published-generator",
+      "algorithm": "ECDH",
+      "curve": 256,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "d": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE",
+        "x": "axfR8uEsQkf4vOblY6RA8ncDfYEt6zOg9KE5RdiYwpY",
+        "y": "T-NC4v4af5uO5-tKfA-eFivOM1drMV7Oy7ZAaDe_UfU"
+      },
+      "usages": 48,
+      "expectedError": null
+    },
+    {
+      "label": "ECDH/P-256/different-published-public-pair",
+      "algorithm": "ECDH",
+      "curve": 256,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "d": "yI8B9RDZrD9wopLaojFt5UTpqriv6EBJxiqcV4YtFDM",
+        "x": "0S37UonI1PgSCLcCcDmMNCKWlwoLzLdMc2_HVUSUv2M",
+        "y": "VvvzyjZswj6BV4VME8WNaqwj8Eatow-DU-dPMwOYcqs"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-256/scalar-extra-leading-zero",
+      "algorithm": "ECDH",
+      "curve": 256,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "d": "AMiPAfUQ2aw_cKKS2qIxbeVE6aq4r-hAScYqnFeGLRQz",
+        "x": "2tC2U5QiHPmwUeH-yleH0Jjf5jf8kLnvlF0MN3JYEYA",
+        "y": "UnGgRhzbglLWHxxFb6PlmrH0WzOsz19YOJ4Fd7iZC7M"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-256/scalar-empty",
+      "algorithm": "ECDH",
+      "curve": 256,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "d": "",
+        "x": "2tC2U5QiHPmwUeH-yleH0Jjf5jf8kLnvlF0MN3JYEYA",
+        "y": "UnGgRhzbglLWHxxFb6PlmrH0WzOsz19YOJ4Fd7iZC7M"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-384/published",
+      "algorithm": "ECDSA",
+      "curve": 384,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-384",
+        "d": "CZ88cDTUosaZiE1zo3Wmf3Yk73xrPA8WBke2dBTc5lXjW1OAQeZJ7j-u-JZ4OrGU",
+        "x": "ZnhC19GArCzeb3TzdVH1V1XHZFwg73PjFjT-crTFXubeOsgIrLS9tMiHMq7pX0Gq",
+        "y": "lILtH8Duucr8SYRiXM_CP2UDIUng4UStoCQYFTWg847rn8_zwslH2uabTGNFc6gc"
+      },
+      "usages": 4,
+      "expectedError": null
+    },
+    {
+      "label": "ECDSA/P-384/scalar-zero",
+      "algorithm": "ECDSA",
+      "curve": 384,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-384",
+        "d": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "x": "ZnhC19GArCzeb3TzdVH1V1XHZFwg73PjFjT-crTFXubeOsgIrLS9tMiHMq7pX0Gq",
+        "y": "lILtH8Duucr8SYRiXM_CP2UDIUng4UStoCQYFTWg847rn8_zwslH2uabTGNFc6gc"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-384/scalar-one-with-published-point",
+      "algorithm": "ECDSA",
+      "curve": 384,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-384",
+        "d": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB",
+        "x": "ZnhC19GArCzeb3TzdVH1V1XHZFwg73PjFjT-crTFXubeOsgIrLS9tMiHMq7pX0Gq",
+        "y": "lILtH8Duucr8SYRiXM_CP2UDIUng4UStoCQYFTWg847rn8_zwslH2uabTGNFc6gc"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-384/scalar-order-minus-one-with-published-point",
+      "algorithm": "ECDSA",
+      "curve": 384,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-384",
+        "d": "________________________________x2NNgfQ3Ld9YGg2ySLCneuzsGWrMxSly",
+        "x": "ZnhC19GArCzeb3TzdVH1V1XHZFwg73PjFjT-crTFXubeOsgIrLS9tMiHMq7pX0Gq",
+        "y": "lILtH8Duucr8SYRiXM_CP2UDIUng4UStoCQYFTWg847rn8_zwslH2uabTGNFc6gc"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-384/scalar-order",
+      "algorithm": "ECDSA",
+      "curve": 384,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-384",
+        "d": "________________________________x2NNgfQ3Ld9YGg2ySLCneuzsGWrMxSlz",
+        "x": "ZnhC19GArCzeb3TzdVH1V1XHZFwg73PjFjT-crTFXubeOsgIrLS9tMiHMq7pX0Gq",
+        "y": "lILtH8Duucr8SYRiXM_CP2UDIUng4UStoCQYFTWg847rn8_zwslH2uabTGNFc6gc"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-384/scalar-order-plus-one",
+      "algorithm": "ECDSA",
+      "curve": 384,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-384",
+        "d": "________________________________x2NNgfQ3Ld9YGg2ySLCneuzsGWrMxSl0",
+        "x": "ZnhC19GArCzeb3TzdVH1V1XHZFwg73PjFjT-crTFXubeOsgIrLS9tMiHMq7pX0Gq",
+        "y": "lILtH8Duucr8SYRiXM_CP2UDIUng4UStoCQYFTWg847rn8_zwslH2uabTGNFc6gc"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-384/scalar-all-ff",
+      "algorithm": "ECDSA",
+      "curve": 384,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-384",
+        "d": "________________________________________________________________",
+        "x": "ZnhC19GArCzeb3TzdVH1V1XHZFwg73PjFjT-crTFXubeOsgIrLS9tMiHMq7pX0Gq",
+        "y": "lILtH8Duucr8SYRiXM_CP2UDIUng4UStoCQYFTWg847rn8_zwslH2uabTGNFc6gc"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-384/scalar-one-with-published-generator",
+      "algorithm": "ECDSA",
+      "curve": 384,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-384",
+        "d": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB",
+        "x": "qofKIr6LBTeOscce8yCtdG4dO2KLp5uYWfdB4IJUKjhVAvJdv1UpbDpUXjhydgq3",
+        "y": "NhfeSpYmLG9dnpi_kpLcKfj0Hb0omhR86doxE7XwuMAKYLHOHX6BnXpDHXyQ6g5f"
+      },
+      "usages": 4,
+      "expectedError": null
+    },
+    {
+      "label": "ECDSA/P-384/different-published-public-pair",
+      "algorithm": "ECDSA",
+      "curve": 384,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-384",
+        "d": "CZ88cDTUosaZiE1zo3Wmf3Yk73xrPA8WBke2dBTc5lXjW1OAQeZJ7j-u-JZ4OrGU",
+        "x": "5Vjb71PuzePT_M_BrqCKiamHR10S_ZUNg8-kFzK8UJ0NGsQ6Azbe-W_aQdB3SjVx",
+        "y": "3PvseqzzGWRyFp6DhDA2f2buvjxucMQW3V8MaHWd0f_4P6QBQiCd_16q2W255jhs"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-384/scalar-extra-leading-zero",
+      "algorithm": "ECDSA",
+      "curve": 384,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-384",
+        "d": "AAmfPHA01KLGmYhNc6N1pn92JO98azwPFgZHtnQU3OZV41tTgEHmSe4_rviWeDqxlA",
+        "x": "ZnhC19GArCzeb3TzdVH1V1XHZFwg73PjFjT-crTFXubeOsgIrLS9tMiHMq7pX0Gq",
+        "y": "lILtH8Duucr8SYRiXM_CP2UDIUng4UStoCQYFTWg847rn8_zwslH2uabTGNFc6gc"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-384/scalar-empty",
+      "algorithm": "ECDSA",
+      "curve": 384,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-384",
+        "d": "",
+        "x": "ZnhC19GArCzeb3TzdVH1V1XHZFwg73PjFjT-crTFXubeOsgIrLS9tMiHMq7pX0Gq",
+        "y": "lILtH8Duucr8SYRiXM_CP2UDIUng4UStoCQYFTWg847rn8_zwslH2uabTGNFc6gc"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-384/published",
+      "algorithm": "ECDH",
+      "curve": 384,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-384",
+        "d": "CZ88cDTUosaZiE1zo3Wmf3Yk73xrPA8WBke2dBTc5lXjW1OAQeZJ7j-u-JZ4OrGU",
+        "x": "ZnhC19GArCzeb3TzdVH1V1XHZFwg73PjFjT-crTFXubeOsgIrLS9tMiHMq7pX0Gq",
+        "y": "lILtH8Duucr8SYRiXM_CP2UDIUng4UStoCQYFTWg847rn8_zwslH2uabTGNFc6gc"
+      },
+      "usages": 48,
+      "expectedError": null
+    },
+    {
+      "label": "ECDH/P-384/scalar-zero",
+      "algorithm": "ECDH",
+      "curve": 384,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-384",
+        "d": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "x": "ZnhC19GArCzeb3TzdVH1V1XHZFwg73PjFjT-crTFXubeOsgIrLS9tMiHMq7pX0Gq",
+        "y": "lILtH8Duucr8SYRiXM_CP2UDIUng4UStoCQYFTWg847rn8_zwslH2uabTGNFc6gc"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-384/scalar-one-with-published-point",
+      "algorithm": "ECDH",
+      "curve": 384,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-384",
+        "d": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB",
+        "x": "ZnhC19GArCzeb3TzdVH1V1XHZFwg73PjFjT-crTFXubeOsgIrLS9tMiHMq7pX0Gq",
+        "y": "lILtH8Duucr8SYRiXM_CP2UDIUng4UStoCQYFTWg847rn8_zwslH2uabTGNFc6gc"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-384/scalar-order-minus-one-with-published-point",
+      "algorithm": "ECDH",
+      "curve": 384,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-384",
+        "d": "________________________________x2NNgfQ3Ld9YGg2ySLCneuzsGWrMxSly",
+        "x": "ZnhC19GArCzeb3TzdVH1V1XHZFwg73PjFjT-crTFXubeOsgIrLS9tMiHMq7pX0Gq",
+        "y": "lILtH8Duucr8SYRiXM_CP2UDIUng4UStoCQYFTWg847rn8_zwslH2uabTGNFc6gc"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-384/scalar-order",
+      "algorithm": "ECDH",
+      "curve": 384,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-384",
+        "d": "________________________________x2NNgfQ3Ld9YGg2ySLCneuzsGWrMxSlz",
+        "x": "ZnhC19GArCzeb3TzdVH1V1XHZFwg73PjFjT-crTFXubeOsgIrLS9tMiHMq7pX0Gq",
+        "y": "lILtH8Duucr8SYRiXM_CP2UDIUng4UStoCQYFTWg847rn8_zwslH2uabTGNFc6gc"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-384/scalar-order-plus-one",
+      "algorithm": "ECDH",
+      "curve": 384,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-384",
+        "d": "________________________________x2NNgfQ3Ld9YGg2ySLCneuzsGWrMxSl0",
+        "x": "ZnhC19GArCzeb3TzdVH1V1XHZFwg73PjFjT-crTFXubeOsgIrLS9tMiHMq7pX0Gq",
+        "y": "lILtH8Duucr8SYRiXM_CP2UDIUng4UStoCQYFTWg847rn8_zwslH2uabTGNFc6gc"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-384/scalar-all-ff",
+      "algorithm": "ECDH",
+      "curve": 384,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-384",
+        "d": "________________________________________________________________",
+        "x": "ZnhC19GArCzeb3TzdVH1V1XHZFwg73PjFjT-crTFXubeOsgIrLS9tMiHMq7pX0Gq",
+        "y": "lILtH8Duucr8SYRiXM_CP2UDIUng4UStoCQYFTWg847rn8_zwslH2uabTGNFc6gc"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-384/scalar-one-with-published-generator",
+      "algorithm": "ECDH",
+      "curve": 384,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-384",
+        "d": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB",
+        "x": "qofKIr6LBTeOscce8yCtdG4dO2KLp5uYWfdB4IJUKjhVAvJdv1UpbDpUXjhydgq3",
+        "y": "NhfeSpYmLG9dnpi_kpLcKfj0Hb0omhR86doxE7XwuMAKYLHOHX6BnXpDHXyQ6g5f"
+      },
+      "usages": 48,
+      "expectedError": null
+    },
+    {
+      "label": "ECDH/P-384/different-published-public-pair",
+      "algorithm": "ECDH",
+      "curve": 384,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-384",
+        "d": "CZ88cDTUosaZiE1zo3Wmf3Yk73xrPA8WBke2dBTc5lXjW1OAQeZJ7j-u-JZ4OrGU",
+        "x": "5Vjb71PuzePT_M_BrqCKiamHR10S_ZUNg8-kFzK8UJ0NGsQ6Azbe-W_aQdB3SjVx",
+        "y": "3PvseqzzGWRyFp6DhDA2f2buvjxucMQW3V8MaHWd0f_4P6QBQiCd_16q2W255jhs"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-384/scalar-extra-leading-zero",
+      "algorithm": "ECDH",
+      "curve": 384,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-384",
+        "d": "AAmfPHA01KLGmYhNc6N1pn92JO98azwPFgZHtnQU3OZV41tTgEHmSe4_rviWeDqxlA",
+        "x": "ZnhC19GArCzeb3TzdVH1V1XHZFwg73PjFjT-crTFXubeOsgIrLS9tMiHMq7pX0Gq",
+        "y": "lILtH8Duucr8SYRiXM_CP2UDIUng4UStoCQYFTWg847rn8_zwslH2uabTGNFc6gc"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-384/scalar-empty",
+      "algorithm": "ECDH",
+      "curve": 384,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-384",
+        "d": "",
+        "x": "ZnhC19GArCzeb3TzdVH1V1XHZFwg73PjFjT-crTFXubeOsgIrLS9tMiHMq7pX0Gq",
+        "y": "lILtH8Duucr8SYRiXM_CP2UDIUng4UStoCQYFTWg847rn8_zwslH2uabTGNFc6gc"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-521/published",
+      "algorithm": "ECDSA",
+      "curve": 521,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-521",
+        "d": "ADet6TGaifTavbPvQRqszKUSPGGsq1e1OT3OR2CBcqCVqoWjD-HClSxncdk3upd39ZV7Jjm6sHJGL2jCelc4LUpS",
+        "x": "ABVBfoTb8owK08J4cTNJ3H3xU8iXoYkb2YurQ1fJ7L7h479C4AuOOArq5XwtEHVklBiFlCr1p_RgFyPEGV0XbO0-",
+        "y": "AXyuILZkHS7raVeG2MlGFGI50Jnhjh1aUUxznXy0oQrYp4gBWsQF13mdx157fVts8iYaan8VB0OL8BvrbKOSb5WC"
+      },
+      "usages": 4,
+      "expectedError": null
+    },
+    {
+      "label": "ECDSA/P-521/scalar-zero",
+      "algorithm": "ECDSA",
+      "curve": 521,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-521",
+        "d": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "x": "ABVBfoTb8owK08J4cTNJ3H3xU8iXoYkb2YurQ1fJ7L7h479C4AuOOArq5XwtEHVklBiFlCr1p_RgFyPEGV0XbO0-",
+        "y": "AXyuILZkHS7raVeG2MlGFGI50Jnhjh1aUUxznXy0oQrYp4gBWsQF13mdx157fVts8iYaan8VB0OL8BvrbKOSb5WC"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-521/scalar-one-with-published-point",
+      "algorithm": "ECDSA",
+      "curve": 521,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-521",
+        "d": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB",
+        "x": "ABVBfoTb8owK08J4cTNJ3H3xU8iXoYkb2YurQ1fJ7L7h479C4AuOOArq5XwtEHVklBiFlCr1p_RgFyPEGV0XbO0-",
+        "y": "AXyuILZkHS7raVeG2MlGFGI50Jnhjh1aUUxznXy0oQrYp4gBWsQF13mdx157fVts8iYaan8VB0OL8BvrbKOSb5WC"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-521/scalar-order-minus-one-with-published-point",
+      "algorithm": "ECDSA",
+      "curve": 521,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-521",
+        "d": "Af__________________________________________-lGGh4O_L5Zrf8wBSPcJpdA7tcm4iZxHrrtvtx6ROGQI",
+        "x": "ABVBfoTb8owK08J4cTNJ3H3xU8iXoYkb2YurQ1fJ7L7h479C4AuOOArq5XwtEHVklBiFlCr1p_RgFyPEGV0XbO0-",
+        "y": "AXyuILZkHS7raVeG2MlGFGI50Jnhjh1aUUxznXy0oQrYp4gBWsQF13mdx157fVts8iYaan8VB0OL8BvrbKOSb5WC"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-521/scalar-order",
+      "algorithm": "ECDSA",
+      "curve": 521,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-521",
+        "d": "Af__________________________________________-lGGh4O_L5Zrf8wBSPcJpdA7tcm4iZxHrrtvtx6ROGQJ",
+        "x": "ABVBfoTb8owK08J4cTNJ3H3xU8iXoYkb2YurQ1fJ7L7h479C4AuOOArq5XwtEHVklBiFlCr1p_RgFyPEGV0XbO0-",
+        "y": "AXyuILZkHS7raVeG2MlGFGI50Jnhjh1aUUxznXy0oQrYp4gBWsQF13mdx157fVts8iYaan8VB0OL8BvrbKOSb5WC"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-521/scalar-order-plus-one",
+      "algorithm": "ECDSA",
+      "curve": 521,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-521",
+        "d": "Af__________________________________________-lGGh4O_L5Zrf8wBSPcJpdA7tcm4iZxHrrtvtx6ROGQK",
+        "x": "ABVBfoTb8owK08J4cTNJ3H3xU8iXoYkb2YurQ1fJ7L7h479C4AuOOArq5XwtEHVklBiFlCr1p_RgFyPEGV0XbO0-",
+        "y": "AXyuILZkHS7raVeG2MlGFGI50Jnhjh1aUUxznXy0oQrYp4gBWsQF13mdx157fVts8iYaan8VB0OL8BvrbKOSb5WC"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-521/scalar-all-ff",
+      "algorithm": "ECDSA",
+      "curve": 521,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-521",
+        "d": "________________________________________________________________________________________",
+        "x": "ABVBfoTb8owK08J4cTNJ3H3xU8iXoYkb2YurQ1fJ7L7h479C4AuOOArq5XwtEHVklBiFlCr1p_RgFyPEGV0XbO0-",
+        "y": "AXyuILZkHS7raVeG2MlGFGI50Jnhjh1aUUxznXy0oQrYp4gBWsQF13mdx157fVts8iYaan8VB0OL8BvrbKOSb5WC"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-521/scalar-one-with-published-generator",
+      "algorithm": "ECDSA",
+      "curve": 521,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-521",
+        "d": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB",
+        "x": "AMaFjga3BATpzZ4-y2YjlbRCnGSBOQU_tSH4KK9ga009uqFLXnfv51ko_h3BJ6L_qN4zSLPBhWpCm_l-fjHC5b1m",
+        "y": "ARg5KWp4mjvABFyKX7QsfRvZmPVESVebRGgXr70XJz5mLJfucple9CZAxVC5AT-tB2E1PHCGonLCQIi-lHaf0WZQ"
+      },
+      "usages": 4,
+      "expectedError": null
+    },
+    {
+      "label": "ECDSA/P-521/different-published-public-pair",
+      "algorithm": "ECDSA",
+      "curve": 521,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-521",
+        "d": "ADet6TGaifTavbPvQRqszKUSPGGsq1e1OT3OR2CBcqCVqoWjD-HClSxncdk3upd39ZV7Jjm6sHJGL2jCelc4LUpS",
+        "x": "ANCzl1rEt5n1vqFtXhPpr5cdXpuYTJ85coteVzlzWiGbl8NWQ2rcbpW7A1L2vmSmwpEtTvLQQzztK2FxZAAS2UYP",
+        "y": "AVxoImODlW470Gbnl7Yjwnzg6sL1UaEMLHJNmFIHe4ciC2U2xcQIodKuu46G1niuSctXCR9HMilleatE_NF_D8Vq"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-521/scalar-extra-leading-zero",
+      "algorithm": "ECDSA",
+      "curve": 521,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-521",
+        "d": "AAA3rekxmon02r2z70EarMylEjxhrKtXtTk9zkdggXKglaqFow_hwpUsZ3HZN7qXd_WVeyY5urByRi9ownpXOC1KUg",
+        "x": "ABVBfoTb8owK08J4cTNJ3H3xU8iXoYkb2YurQ1fJ7L7h479C4AuOOArq5XwtEHVklBiFlCr1p_RgFyPEGV0XbO0-",
+        "y": "AXyuILZkHS7raVeG2MlGFGI50Jnhjh1aUUxznXy0oQrYp4gBWsQF13mdx157fVts8iYaan8VB0OL8BvrbKOSb5WC"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-521/scalar-empty",
+      "algorithm": "ECDSA",
+      "curve": 521,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-521",
+        "d": "",
+        "x": "ABVBfoTb8owK08J4cTNJ3H3xU8iXoYkb2YurQ1fJ7L7h479C4AuOOArq5XwtEHVklBiFlCr1p_RgFyPEGV0XbO0-",
+        "y": "AXyuILZkHS7raVeG2MlGFGI50Jnhjh1aUUxznXy0oQrYp4gBWsQF13mdx157fVts8iYaan8VB0OL8BvrbKOSb5WC"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDSA/P-521/scalar-plus-order-same-point",
+      "algorithm": "ECDSA",
+      "curve": 521,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-521",
+        "d": "Ajet6TGaifTavbPvQRqszKUSPGGsq1e1OT3OR2CBcqCVpNcpl2WBxMLS8aU5A46Bm2W23ANzOg6N3iQyMXXJZa5b",
+        "x": "ABVBfoTb8owK08J4cTNJ3H3xU8iXoYkb2YurQ1fJ7L7h479C4AuOOArq5XwtEHVklBiFlCr1p_RgFyPEGV0XbO0-",
+        "y": "AXyuILZkHS7raVeG2MlGFGI50Jnhjh1aUUxznXy0oQrYp4gBWsQF13mdx157fVts8iYaan8VB0OL8BvrbKOSb5WC"
+      },
+      "usages": 4,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-521/published",
+      "algorithm": "ECDH",
+      "curve": 521,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-521",
+        "d": "ADet6TGaifTavbPvQRqszKUSPGGsq1e1OT3OR2CBcqCVqoWjD-HClSxncdk3upd39ZV7Jjm6sHJGL2jCelc4LUpS",
+        "x": "ABVBfoTb8owK08J4cTNJ3H3xU8iXoYkb2YurQ1fJ7L7h479C4AuOOArq5XwtEHVklBiFlCr1p_RgFyPEGV0XbO0-",
+        "y": "AXyuILZkHS7raVeG2MlGFGI50Jnhjh1aUUxznXy0oQrYp4gBWsQF13mdx157fVts8iYaan8VB0OL8BvrbKOSb5WC"
+      },
+      "usages": 48,
+      "expectedError": null
+    },
+    {
+      "label": "ECDH/P-521/scalar-zero",
+      "algorithm": "ECDH",
+      "curve": 521,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-521",
+        "d": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "x": "ABVBfoTb8owK08J4cTNJ3H3xU8iXoYkb2YurQ1fJ7L7h479C4AuOOArq5XwtEHVklBiFlCr1p_RgFyPEGV0XbO0-",
+        "y": "AXyuILZkHS7raVeG2MlGFGI50Jnhjh1aUUxznXy0oQrYp4gBWsQF13mdx157fVts8iYaan8VB0OL8BvrbKOSb5WC"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-521/scalar-one-with-published-point",
+      "algorithm": "ECDH",
+      "curve": 521,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-521",
+        "d": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB",
+        "x": "ABVBfoTb8owK08J4cTNJ3H3xU8iXoYkb2YurQ1fJ7L7h479C4AuOOArq5XwtEHVklBiFlCr1p_RgFyPEGV0XbO0-",
+        "y": "AXyuILZkHS7raVeG2MlGFGI50Jnhjh1aUUxznXy0oQrYp4gBWsQF13mdx157fVts8iYaan8VB0OL8BvrbKOSb5WC"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-521/scalar-order-minus-one-with-published-point",
+      "algorithm": "ECDH",
+      "curve": 521,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-521",
+        "d": "Af__________________________________________-lGGh4O_L5Zrf8wBSPcJpdA7tcm4iZxHrrtvtx6ROGQI",
+        "x": "ABVBfoTb8owK08J4cTNJ3H3xU8iXoYkb2YurQ1fJ7L7h479C4AuOOArq5XwtEHVklBiFlCr1p_RgFyPEGV0XbO0-",
+        "y": "AXyuILZkHS7raVeG2MlGFGI50Jnhjh1aUUxznXy0oQrYp4gBWsQF13mdx157fVts8iYaan8VB0OL8BvrbKOSb5WC"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-521/scalar-order",
+      "algorithm": "ECDH",
+      "curve": 521,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-521",
+        "d": "Af__________________________________________-lGGh4O_L5Zrf8wBSPcJpdA7tcm4iZxHrrtvtx6ROGQJ",
+        "x": "ABVBfoTb8owK08J4cTNJ3H3xU8iXoYkb2YurQ1fJ7L7h479C4AuOOArq5XwtEHVklBiFlCr1p_RgFyPEGV0XbO0-",
+        "y": "AXyuILZkHS7raVeG2MlGFGI50Jnhjh1aUUxznXy0oQrYp4gBWsQF13mdx157fVts8iYaan8VB0OL8BvrbKOSb5WC"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-521/scalar-order-plus-one",
+      "algorithm": "ECDH",
+      "curve": 521,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-521",
+        "d": "Af__________________________________________-lGGh4O_L5Zrf8wBSPcJpdA7tcm4iZxHrrtvtx6ROGQK",
+        "x": "ABVBfoTb8owK08J4cTNJ3H3xU8iXoYkb2YurQ1fJ7L7h479C4AuOOArq5XwtEHVklBiFlCr1p_RgFyPEGV0XbO0-",
+        "y": "AXyuILZkHS7raVeG2MlGFGI50Jnhjh1aUUxznXy0oQrYp4gBWsQF13mdx157fVts8iYaan8VB0OL8BvrbKOSb5WC"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-521/scalar-all-ff",
+      "algorithm": "ECDH",
+      "curve": 521,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-521",
+        "d": "________________________________________________________________________________________",
+        "x": "ABVBfoTb8owK08J4cTNJ3H3xU8iXoYkb2YurQ1fJ7L7h479C4AuOOArq5XwtEHVklBiFlCr1p_RgFyPEGV0XbO0-",
+        "y": "AXyuILZkHS7raVeG2MlGFGI50Jnhjh1aUUxznXy0oQrYp4gBWsQF13mdx157fVts8iYaan8VB0OL8BvrbKOSb5WC"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-521/scalar-one-with-published-generator",
+      "algorithm": "ECDH",
+      "curve": 521,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-521",
+        "d": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB",
+        "x": "AMaFjga3BATpzZ4-y2YjlbRCnGSBOQU_tSH4KK9ga009uqFLXnfv51ko_h3BJ6L_qN4zSLPBhWpCm_l-fjHC5b1m",
+        "y": "ARg5KWp4mjvABFyKX7QsfRvZmPVESVebRGgXr70XJz5mLJfucple9CZAxVC5AT-tB2E1PHCGonLCQIi-lHaf0WZQ"
+      },
+      "usages": 48,
+      "expectedError": null
+    },
+    {
+      "label": "ECDH/P-521/different-published-public-pair",
+      "algorithm": "ECDH",
+      "curve": 521,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-521",
+        "d": "ADet6TGaifTavbPvQRqszKUSPGGsq1e1OT3OR2CBcqCVqoWjD-HClSxncdk3upd39ZV7Jjm6sHJGL2jCelc4LUpS",
+        "x": "ANCzl1rEt5n1vqFtXhPpr5cdXpuYTJ85coteVzlzWiGbl8NWQ2rcbpW7A1L2vmSmwpEtTvLQQzztK2FxZAAS2UYP",
+        "y": "AVxoImODlW470Gbnl7Yjwnzg6sL1UaEMLHJNmFIHe4ciC2U2xcQIodKuu46G1niuSctXCR9HMilleatE_NF_D8Vq"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-521/scalar-extra-leading-zero",
+      "algorithm": "ECDH",
+      "curve": 521,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-521",
+        "d": "AAA3rekxmon02r2z70EarMylEjxhrKtXtTk9zkdggXKglaqFow_hwpUsZ3HZN7qXd_WVeyY5urByRi9ownpXOC1KUg",
+        "x": "ABVBfoTb8owK08J4cTNJ3H3xU8iXoYkb2YurQ1fJ7L7h479C4AuOOArq5XwtEHVklBiFlCr1p_RgFyPEGV0XbO0-",
+        "y": "AXyuILZkHS7raVeG2MlGFGI50Jnhjh1aUUxznXy0oQrYp4gBWsQF13mdx157fVts8iYaan8VB0OL8BvrbKOSb5WC"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-521/scalar-empty",
+      "algorithm": "ECDH",
+      "curve": 521,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-521",
+        "d": "",
+        "x": "ABVBfoTb8owK08J4cTNJ3H3xU8iXoYkb2YurQ1fJ7L7h479C4AuOOArq5XwtEHVklBiFlCr1p_RgFyPEGV0XbO0-",
+        "y": "AXyuILZkHS7raVeG2MlGFGI50Jnhjh1aUUxznXy0oQrYp4gBWsQF13mdx157fVts8iYaan8VB0OL8BvrbKOSb5WC"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    },
+    {
+      "label": "ECDH/P-521/scalar-plus-order-same-point",
+      "algorithm": "ECDH",
+      "curve": 521,
+      "jwk": {
+        "kty": "EC",
+        "crv": "P-521",
+        "d": "Ajet6TGaifTavbPvQRqszKUSPGGsq1e1OT3OR2CBcqCVpNcpl2WBxMLS8aU5A46Bm2W23ANzOg6N3iQyMXXJZa5b",
+        "x": "ABVBfoTb8owK08J4cTNJ3H3xU8iXoYkb2YurQ1fJ7L7h479C4AuOOArq5XwtEHVklBiFlCr1p_RgFyPEGV0XbO0-",
+        "y": "AXyuILZkHS7raVeG2MlGFGI50Jnhjh1aUUxznXy0oQrYp4gBWsQF13mdx157fVts8iYaan8VB0OL8BvrbKOSb5WC"
+      },
+      "usages": 48,
+      "expectedError": "DataError"
+    }
+  ],
+  "sourceUrl": "https://www.rfc-editor.org/rfc/rfc5903.txt",
+  "validationBasis": {
+    "sec1": "https://www.secg.org/sec1-v2.pdf#page=29",
+    "sec1Sections": [
+      "3.2",
+      "3.2.1"
+    ],
+    "webcrypto": "https://w3c.github.io/webcrypto/",
+    "webcryptoDate": "2026-10-22",
+    "webcryptoSections": [
+      "25.3.4",
+      "26.3.3"
+    ],
+    "rejection": "DataError for invalid JWK under RFC7518 section6.2.2",
+    "chromeObservation": "Chrome156 returns OperationError for scalar range, DataError for mismatched pairs. The dated specification expectation is retained."
+  }
+}

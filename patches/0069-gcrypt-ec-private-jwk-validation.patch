@@ -1,0 +1,99 @@
+diff --git a/Source/WebCore/crypto/gcrypt/CryptoKeyECGCrypt.cpp b/Source/WebCore/crypto/gcrypt/CryptoKeyECGCrypt.cpp
+--- a/Source/WebCore/crypto/gcrypt/CryptoKeyECGCrypt.cpp
++++ b/Source/WebCore/crypto/gcrypt/CryptoKeyECGCrypt.cpp
+@@ -138,14 +138,14 @@
+     return CryptoKeyPair { WTF::move(publicKey), WTF::move(privateKey) };
+ }
+ 
+-RefPtr<CryptoKeyEC> CryptoKeyEC::platformImportRaw(CryptoAlgorithmIdentifier identifier, NamedCurve curve, Vector<uint8_t>&& keyData, bool extractable, CryptoKeyUsageBitmap usages)
++static bool validateECPoint(CryptoKeyEC::NamedCurve curve, const Vector<uint8_t>& keyData, PAL::GCrypt::Handle<gcry_ctx_t>& context)
+ {
+     // Bail if the raw public key data size doesn't match the size of an uncompressed point
+     // for this curve, or if the first byte in the raw public key data isn't 0x04, as required
+     // for an uncompressed EC point encoded in an octet string.
+     if (keyData.size() != curveUncompressedPointSize(curve)
+         || !CryptoConstants::matches(keyData.span().data(), 1, CryptoConstants::s_ecUncompressedFormatLeadingByte))
+-        return nullptr;
++        return false;
+ 
+     // Convert X and Y coordinate data into MPIs.
+     unsigned coordinateSize = curveUncompressedFieldElementSize(curve);
+@@ -154,13 +154,13 @@
+         gcry_error_t error = gcry_mpi_scan(&xMPI, GCRYMPI_FMT_USG, &keyData.at(1), coordinateSize, nullptr);
+         if (error != GPG_ERR_NO_ERROR) {
+             PAL::GCrypt::logError(error);
+-            return nullptr;
++            return false;
+         }
+ 
+         error = gcry_mpi_scan(&yMPI, GCRYMPI_FMT_USG, &keyData.at(1 + coordinateSize), coordinateSize, nullptr);
+         if (error != GPG_ERR_NO_ERROR) {
+             PAL::GCrypt::logError(error);
+-            return nullptr;
++            return false;
+         }
+     }
+ 
+@@ -169,19 +169,27 @@
+     PAL::GCrypt::Handle<gcry_mpi_point_t> point(gcry_mpi_point_set(nullptr, xMPI, yMPI, GCRYMPI_CONST_ONE));
+ 
+     // Create an EC context for the specified curve.
+-    PAL::GCrypt::Handle<gcry_ctx_t> context;
+     gcry_error_t error = gcry_mpi_ec_new(&context, nullptr, curveName(curve).characters());
+     if (error != GPG_ERR_NO_ERROR) {
+         PAL::GCrypt::logError(error);
+-        return nullptr;
++        return false;
+     }
+ 
+     // Bail if the constructed MPI point is not on the specified EC curve.
+     if (!gcry_mpi_ec_curve_point(point, context))
++        return false;
++
++    return true;
++}
++
++RefPtr<CryptoKeyEC> CryptoKeyEC::platformImportRaw(CryptoAlgorithmIdentifier identifier, NamedCurve curve, Vector<uint8_t>&& keyData, bool extractable, CryptoKeyUsageBitmap usages)
++{
++    PAL::GCrypt::Handle<gcry_ctx_t> context;
++    if (!validateECPoint(curve, keyData, context))
+         return nullptr;
+ 
+     PAL::GCrypt::Handle<gcry_sexp_t> platformKey;
+-    error = gcry_sexp_build(&platformKey, nullptr, "(public-key(ecc(curve %s)(q %b)))",
++    gcry_error_t error = gcry_sexp_build(&platformKey, nullptr, "(public-key(ecc(curve %s)(q %b)))",
+         curveName(curve).characters(), keyData.size(), keyData.span().data());
+     if (error != GPG_ERR_NO_ERROR) {
+         PAL::GCrypt::logError(error);
+@@ -220,9 +228,30 @@
+     q.appendVector(x);
+     q.appendVector(y);
+ 
++    PAL::GCrypt::Handle<gcry_ctx_t> context;
++    if (!validateECPoint(curve, q, context))
++        return nullptr;
++
++    PAL::GCrypt::Handle<gcry_mpi_t> privateScalar;
++    gcry_error_t error = gcry_mpi_scan(&privateScalar, GCRYMPI_FMT_USG, d.span().data(), d.size(), nullptr);
++    if (error != GPG_ERR_NO_ERROR) {
++        PAL::GCrypt::logError(error);
++        return nullptr;
++    }
++
++    PAL::GCrypt::Handle<gcry_mpi_t> order(gcry_mpi_ec_get_mpi("n", context, 1));
++    if (!order || gcry_mpi_cmp_ui(privateScalar, 1) < 0 || gcry_mpi_cmp(privateScalar, order) >= 0)
++        return nullptr;
++
+     PAL::GCrypt::Handle<gcry_sexp_t> platformKey;
+-    gcry_error_t error = gcry_sexp_build(&platformKey, nullptr, "(private-key(ecc(curve %s)(q %b)(d %b)))",
++    error = gcry_sexp_build(&platformKey, nullptr, "(private-key(ecc(curve %s)(q %b)(d %b)))",
+         curveName(curve).characters(), q.size(), q.span().data(), d.size(), d.span().data());
++    if (error != GPG_ERR_NO_ERROR) {
++        PAL::GCrypt::logError(error);
++        return nullptr;
++    }
++
++    error = gcry_pk_testkey(platformKey);
+     if (error != GPG_ERR_NO_ERROR) {
+         PAL::GCrypt::logError(error);
+         return nullptr;

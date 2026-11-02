@@ -61,3 +61,4 @@
 0063-gcrypt-aes-cbc-padding.patch
 0064-gcrypt-ec-public-point-validation.patch
 0065-derived-bits-validation-and-zero-fill.patch
+0069-gcrypt-ec-private-jwk-validation.patch
