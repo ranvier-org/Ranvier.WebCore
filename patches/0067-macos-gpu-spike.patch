@@ -99,7 +99,7 @@ diff --git a/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp b/Source/
 +    auto height = CGImageGetHeight(image.get());
 +    CheckedSize byteCount = width;
 +    byteCount *= height;
-+    byteCount *= 4;
++    byteCount *= size_t { 4 };
 +    RELEASE_ASSERT(!byteCount.hasOverflowed() && width <= std::numeric_limits<int>::max() / 4);
 +    Vector<uint8_t> pixels(byteCount.value());
 +    auto colorSpace = adoptCF(CGColorSpaceCreateWithName(kCGColorSpaceSRGB));
