@@ -145,6 +145,7 @@ with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
     probe([sys.executable, '-I', tests / 'focus_input.py', '--native-directory', out])
     probe([sys.executable, '-I', tests / 'touch_input.py', '--native-directory', out])
     probe([sys.executable, '-I', tests / 'editing_undo.py', '--native-directory', out])
+    probe([sys.executable, '-I', '-X', 'utf8', tests / 'spelling_replacement.py', '--native-directory', out])
     probe([sys.executable, '-I', tests / 'pen_input.py', '--native-directory', out])
     probe([sys.executable, '-I', tests / 'pointer_lock.py', '--native-directory', out])
     probe([sys.executable, '-I', tests / 'event_loop_latency.py', '--native-directory', out])

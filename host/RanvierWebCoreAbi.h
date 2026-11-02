@@ -1084,6 +1084,8 @@ typedef struct RvAbstractRange RvAbstractRange;
  * content, a dataTransfer of text/plain and text/html; then the edit and input. The dataTransfer stays readable while
  * a handle holds it. Returns 1 when the edit applied, 0 when a listener cancelled beforeinput or the range is not
  * editable, RV_ERR_WRONG_HOST for a range of another document. */
+/* Active IME composition or nested history replay returns RV_ERR_UNSUPPORTED without applying the correction.
+ * Destruction requested by an editing callback is deferred until the outer editing call returns. */
 RV_EXPORT int32_t rv_host_replace_range(RvHost*, RvAbstractRange* range, const uint8_t* text, int32_t text_length);
 
 /* "accessibility" for rv_abi_has: the page's accessibility tree, which the app exposes through the platform's
