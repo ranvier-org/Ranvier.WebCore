@@ -14,13 +14,13 @@ def job(name):
     return re.split(r'(?m)^  [a-z][\w-]*:\s*$', text.split(marker, 1)[1], maxsplit=1)[0]
 
 
-def evaluate(expression, recovery=False, result='success', event='workflow_dispatch', ref='refs/heads/main', user='owner', cancelled=False):
-    values = {'inputs.recover_preview2_gpu': recovery, 'github.event_name': event, 'github.ref': ref,
+def evaluate(expression, recovery=False, recovery4=False, result='success', event='workflow_dispatch', ref='refs/heads/main', user='owner', cancelled=False):
+    values = {'inputs.recover_preview2_gpu': recovery, 'inputs.recover_preview4_gpu': recovery4, 'github.event_name': event, 'github.ref': ref,
               'github.workflow': 'build', 'github.run_id': 123, 'inputs.flavor': 'gpu', 'vars.NUGET_USER': user,
               'inputs.rids': '', 'github.head_ref': 'codex/batch-fixture',
               'github.event.pull_request.labels.*.name': [],
               'needs.plan.outputs.matrix': 'selected', 'needs.plan.outputs.prebuilt': 'attached',
-              'needs.recover-preview2-gpu.result': result, 'needs.native.result': 'success',
+              'needs.recover-preview2-gpu.result': result, 'needs.verify-preview4-gpu-recovery.result': result, 'needs.native.result': 'success',
               'needs.prebuilt.result': 'skipped', 'needs.managed.result': 'skipped',
               'needs.package-contract.result': 'success', 'needs.publish.result': 'success'}
     for key in sorted(values, key=len, reverse=True):
@@ -49,6 +49,34 @@ def permitted(name, **options):
 
 
 class RecoveryWorkflowControls(unittest.TestCase):
+    def test_preview4_skips_all_other_jobs_and_requires_main(self):
+        for name in ['plan', 'package-contract', 'native', 'prebuilt', 'managed', 'publish',
+                     'windows-gpu-cohort', 'recover-preview2-gpu', 'publish-preview2-recovery']:
+            with self.subTest(job=name):
+                self.assertFalse(permitted(name, recovery4=True))
+        self.assertTrue(permitted('verify-preview4-gpu-recovery', recovery4=True))
+        self.assertFalse(permitted('verify-preview4-gpu-recovery', recovery4=True, recovery=True))
+        self.assertFalse(permitted('verify-preview4-gpu-recovery', recovery4=True, ref='refs/heads/unreviewed'))
+        self.assertFalse(permitted('verify-preview4-gpu-recovery', recovery4=True, event='push'))
+
+    def test_preview4_publish_requires_verified_main_and_owner(self):
+        self.assertTrue(permitted('publish-preview4-gpu-recovery', recovery4=True))
+        for state in ['failure', 'cancelled', 'skipped']:
+            self.assertFalse(permitted('publish-preview4-gpu-recovery', recovery4=True, result=state))
+        self.assertFalse(permitted('publish-preview4-gpu-recovery', recovery4=True, user=''))
+        self.assertFalse(permitted('publish-preview4-gpu-recovery', recovery4=True, cancelled=True))
+        self.assertFalse(permitted('publish-preview4-gpu-recovery', recovery4=True, ref='refs/tags/v0.1.1-preview.4'))
+
+    def test_preview4_uses_separate_concurrency_and_rechecks_before_login(self):
+        text = WORKFLOW.read_text()
+        group = re.search(r'(?m)^  group: (.+)$', text)[1].split('${{')[1].split('}}')[0]
+        cancel = re.search(r'(?m)^  cancel-in-progress: (.+)$', text)[1].split('${{')[1].split('}}')[0]
+        self.assertEqual(evaluate(group, recovery4=True), 'preview4-artifact-recovery-123')
+        self.assertFalse(evaluate(cancel, recovery4=True))
+        publication = job('publish-preview4-gpu-recovery')
+        self.assertLess(publication.index('scripts/recover_preview4_gpu.py'), publication.index('NuGet/login@v1'))
+        self.assertIn('needs: [verify-preview4-gpu-recovery]', publication)
+
     def test_recovery_skips_every_ordinary_job(self):
         for name in ['plan', 'package-contract', 'native', 'prebuilt', 'managed', 'publish', 'windows-gpu-cohort']:
             with self.subTest(job=name):

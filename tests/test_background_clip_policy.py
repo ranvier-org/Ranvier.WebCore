@@ -4,12 +4,64 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / 'abi'))
-from background_content_clip_regression import BASELINES, load_inputs, pixel_policy, solid_red, unique_entries
+from background_content_clip_regression import BASELINES, half_coverage_allowed, load_inputs, pixel_policy, solid_red, unique_entries
 
 
 class PaintPolicyTests(unittest.TestCase):
+    def test_half_coverage_also_handles_the_reverse_rounding_direction(self):
+        before, after = bytes([127,127,127,255]), bytes([128,128,128,255])
+        result = pixel_policy(before,after,before,half_coverage=True)
+        self.assertEqual(result['worsePixels'],[0])
+        self.assertEqual(result['qualifiedHalfCoveragePixels'],[0])
+        self.assertEqual(result['unexplainedWorsePixels'],[])
+
+    def test_a_strict_case_never_uses_half_coverage_qualification(self):
+        import background_content_clip_regression as policy
+        with patch.object(policy,'FIXED',policy.FIXED | {'composited-translate'}):
+            self.assertFalse(half_coverage_allowed('win-x64','composited-translate',1))
+
+    def test_half_coverage_keeps_raw_loss_metrics_and_labels_qualified_pixels(self):
+        before = bytes([128,128,128,255,255,128,128,255])
+        after = bytes([127,127,127,255,255,127,127,255])
+        result = pixel_policy(before, after, before, half_coverage=True)
+        self.assertEqual(result['worsePixels'], [0,1])
+        self.assertEqual(result['previouslyExactPixelsLost'], 2)
+        self.assertEqual(result['totalL1ErrorDelta'], 5)
+        self.assertEqual(result['qualifiedHalfCoveragePixels'], [0,1])
+        self.assertEqual(result['unexplainedWorsePixels'], [])
+
+    def test_half_coverage_does_not_allow_other_byte_or_alpha_changes(self):
+        for old, new in [(126,128),(128,129),(0,1),(254,255)]:
+            with self.subTest(before=old, after=new):
+                before, after = bytes([old,old,old,255]), bytes([new,new,new,255])
+                result = pixel_policy(before, after, before, half_coverage=True)
+                self.assertEqual(result['qualifiedHalfCoveragePixels'], [])
+                self.assertEqual(result['unexplainedWorsePixels'], [0])
+        before, after = bytes([128,128,128,255]), bytes([127,127,127,254])
+        result = pixel_policy(before, after, before, half_coverage=True)
+        self.assertEqual(result['unexplainedWorsePixels'], [0])
+
+    def test_half_coverage_does_not_hide_shape_or_coordinate_changes(self):
+        red, half, white = bytes([255,0,0,255]), bytes([255,128,128,255]), bytes([255,255,255,255])
+        for before, after in [(half,red),(red,half),(half+white,white+half)]:
+            result = pixel_policy(before, after, before, half_coverage=True)
+            self.assertTrue(result['unexplainedWorsePixels'])
+            self.assertEqual(result['qualifiedHalfCoveragePixels'], [])
+
+    def test_half_coverage_is_scoped_to_windows_gpu_composited_control(self):
+        self.assertTrue(half_coverage_allowed('win-x64','composited-translate',1))
+        for rid,name,scale in [('linux-x64','composited-translate',1),('win-x64','composited-translate',1.5),
+                               ('win-x64','scale-fractional',1),('win-x64','always-composited',1),
+                               ('win-x64','bordered-half-phase',1),('win-arm64','composited-translate',1)]:
+            with self.subTest(rid=rid,name=name,scale=scale):
+                self.assertFalse(half_coverage_allowed(rid,name,scale))
+                before, after = bytes([128,128,128,255]), bytes([127,127,127,255])
+                result = pixel_policy(before,after,before,half_coverage=half_coverage_allowed(rid,name,scale))
+                self.assertEqual(result['unexplainedWorsePixels'],[0])
+
     def test_improvement_toward_chromium_is_allowed(self):
         result = pixel_policy(bytes([200,10,10,255]), bytes([230,0,0,255]), bytes([255,0,0,255]))
         self.assertEqual(result['worsePixels'], [])
