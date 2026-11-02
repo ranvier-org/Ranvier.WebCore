@@ -17,6 +17,11 @@ class Snapshot(C.Structure):
     _fields_ = [('state', C.c_int32), ('error', C.c_int32), ('position', C.c_double), ('duration', C.c_double),
                 ('ready', C.c_int32), ('seeking', C.c_int32), ('audio', C.c_int32), ('video', C.c_int32)]
 
+PAGE = '''<style>body{margin:0;background:white}#clip{position:absolute;left:20px;top:20px;width:90px;height:50px;overflow:hidden;will-change:transform}
+#surface{width:96px;height:64px;will-change:transform;transform:translateX(5px);opacity:.75}
+#caption{position:absolute;left:20px;top:90px;font:20px sans-serif}</style>
+<div id="clip"><div id="surface"></div></div><div id="caption"></div>'''
+
 
 def run(args):
     helper = C.CDLL(str(args.helper.resolve()))
@@ -43,10 +48,7 @@ def run(args):
         try:
             with SvgProbe(args.native_directory, 320, 200) as p:
                 p.call('rv_host_set_device_scale', [P, C.c_float], p.host, scale)
-                p.load('''<style>body{margin:0;background:white}#clip{position:absolute;left:20px;top:20px;width:90px;height:50px;overflow:hidden}
-                #surface{width:96px;height:64px;will-change:transform;transform:translateX(5px);opacity:.75}
-                #caption{position:absolute;left:20px;top:90px;font:20px sans-serif}</style>
-                <div id="clip"><div id="surface"></div></div><div id="caption"></div>''', standalone=False)
+                p.load(PAGE, standalone=False)
                 target, caption = p.node('surface'), p.node('caption')
                 p.update()
                 frames, bound = [], None
@@ -74,10 +76,13 @@ def run(args):
                             return list(output[offset:offset+4])
                         center, clipped = pixel(40,35), pixel(115,35)
                         edge = pixel(100,35)
-                        p.expect(center[phase] > 200 and all(45 < center[index] < 100 for index in range(3) if index != phase),
-                                 'decoded video follows DOM translation/opacity: ' + str(center))
+                        if phase is None:
+                            p.expect(center == [255,255,255,255], 'removed video no longer paints into native DOM: ' + str(center))
+                        else:
+                            p.expect(center[phase] > 200 and all(45 < center[index] < 100 for index in range(3) if index != phase),
+                                     'decoded video follows DOM translation/opacity: ' + str(center))
                         p.expect(clipped == [255,255,255,255], 'decoded video obeys DOM clipping: ' + str(clipped))
-                        p.expect(edge == [255,255,255,255] if 'narrower' in label else edge[phase] > 200 and any(edge[index] < 100 for index in range(3) if index != phase),
+                        p.expect(edge == [255,255,255,255] if 'narrower' in label or phase is None else edge[phase] > 200 and any(edge[index] < 100 for index in range(3) if index != phase),
                                  'dynamic DOM clip edge follows current width: ' + str(edge))
                         frames.append({'label':label,'phase':phase,'size':[width.value,height.value],'center':center,'clipped':clipped,'sha256':hashlib.sha256(output).hexdigest()})
                         return hashlib.sha256(output).hexdigest()
@@ -126,11 +131,19 @@ def run(args):
                         p.expect(seek(session,1.5) == 0, 'actual seek to blue cue')
                         p.expect(play(session) == 0, 'resume after seek')
                 p.expect(phases == {0,1,2}, 'all provider frame/caption phases reach native composition')
-                p.call('rv_host_bind_d3d11_texture', [P,P,P], p.host, target, None)
-                p.expect(close(session) == 0, 'audio/video session closes after texture unbind')
-                p.expect(play(session) < 0, 'closed session rejects playback')
-                p.load('<p>replaced after playback</p>', standalone=False)
+                clip = p.node('clip')
+                p.call('rv_node_remove_child', [P,P], clip, target)
+                capture('removed-video-source',None)
+                p.load(PAGE, standalone=False)
+                target = p.node('surface')
                 p.update()
+                p.expect(republish(session) == 0, 'application republishes retained resource for the new document')
+                p.call('rv_host_bind_d3d11_texture', [P,P,P], p.host, target, texture)
+                p.call('rv_host_native_texture_changed', [P,P], p.host, target)
+                capture('rebound-after-document-replacement',2)
+                p.dispose_host()
+                p.expect(close(session) == 0, 'application closes audio/video after destroying a host with a bound texture')
+                p.expect(play(session) < 0, 'closed session rejects playback')
                 report['scales'].append({'scale':scale,'frames':frames})
                 report['assertions'] += p.assertions
         finally:
