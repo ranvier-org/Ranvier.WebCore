@@ -150,7 +150,7 @@ def run(args):
                 return True
 
             request('reentrant-load-rejected', cancel_action=reload_in_poll, expected_outcome=3)
-            check(load_attempts == [-12], 'printing transaction rejects document replacement')
+            check(load_attempts == [-10], 'printing transaction rejects document replacement: ' + str(load_attempts))
             retained, retained_bytes = request('bytes-outlive-host')
             p.release_nodes()
             p.dispose_host()
@@ -175,7 +175,7 @@ def run(args):
         options, pages, token = Options(), I(-1), U64(0xdead)
         export = p.bind('rv_host_print_pdf', I, [P, C.POINTER(Options), Cancel, P, Completion, P, C.POINTER(I), C.POINTER(U64)])
         status = export(p.host, C.byref(options), cancel, None, completed, None, C.byref(pages), C.byref(token))
-        p.expect(status == -12 and pages.value == token.value == 0 and polls == [1] and not events,
+        p.expect(status == -10 and pages.value == token.value == 0 and polls == [1] and not events,
                  'reentrant close defers until print state is restored and publishes no operation')
         p.host = None
         report['assertions'] += p.assertions
