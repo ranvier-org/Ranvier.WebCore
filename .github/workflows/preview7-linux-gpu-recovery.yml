@@ -1,4 +1,4 @@
-name: Preview 7 Linux GPU artifact recovery
+name: Preview 7 Linux GPU artifact recovery (retired)
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ concurrency:
 
 jobs:
   verify:
-    if: ${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
+    if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -34,7 +34,7 @@ jobs:
 
   publish:
     needs: [verify]
-    if: ${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.verify.result == 'success' && vars.NUGET_USER != '' }}
+    if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:

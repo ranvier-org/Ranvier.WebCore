@@ -1,7 +1,8 @@
 # Next optional accessibility cohort integration
 
-This branch prepares optional #182 source on Native main `c70c0c1220ea6f0a45a3572be504e0ad82ef4621`.
-That main already contains accepted printing/generator and P7 qualification/recovery commits. The integration delta
+This branch started optional #182 source on Native main `c70c0c1220ea6f0a45a3572be504e0ad82ef4621` and merges accepted
+current main `57d4386e31045cb652cec948c3ec12ef8c80345e`, including its trusted Linux recovery route.
+That main contains accepted printing/generator and P7 qualification/recovery commits. The integration delta
 imports only the focused #182 commits and PR255/256 delivery changes, without their older branch merge ancestry.
 Guarded #171 source `8bfce001cd5ab63b7b230c55acb80a35cf627aea` is accepted for this bounded source integration.
 The combined source has ABI63 and 347 declarations with regenerated canonical interop. This is source integration;
@@ -23,7 +24,7 @@ the matching native producer/runtime, real Windows IME, public package version a
 ## Generate and validate once the union is frozen
 
 - Check the final source declaration count, ABI version, preserved 344-signature prefix and exact three-function tail.
-  `python tests/atspi/cohort_source.py --baseline-ref c70c0c1220ea6f0a45a3572be504e0ad82ef4621 --ime-source-ref <reviewed-full-commit>`
+  `python tests/atspi/cohort_source.py --baseline-ref 57d4386e31045cb652cec948c3ec12ef8c80345e --ime-source-ref <reviewed-full-commit>`
   enforces this shape and complete tail return/parameter signatures from the explicit IME source and frozen reviewed
   style source `7ebcec106b2b5088d2ec2fc18d891e17cfce728e` (override with `--style-source-ref` only after review).
   Its `--manifest <new-file>` option requires a clean committed tree and records source evidence only.
