@@ -241,6 +241,7 @@
 #include <GLES2/gl2.h>
 #if defined(_WIN32)
 #include <d3d11.h>
+#include <wrl/client.h>
 #endif
 #endif
 #include <WebCore/GLContext.h>
@@ -958,7 +959,7 @@ struct RvHost {
     bool frameRequested { false };
     // Inside rv_host_update or rv_host_paint_rgba, which call no callback.
     bool inFrame { false };
-    enum class DocumentTransaction { Idle, Replacing, Printing, Destroying };
+    enum class DocumentTransaction { Idle, Replacing, Printing, Rendering, Destroying };
     DocumentTransaction documentTransaction { DocumentTransaction::Idle };
     bool destroyAfterDocumentTransaction { false };
     unsigned editingDepth { 0 };
@@ -2362,7 +2363,8 @@ void rv_host_destroy(RvHost* host)
     if (host->documentTransaction == RvHost::DocumentTransaction::Destroying)
         return;
     if (host->documentTransaction == RvHost::DocumentTransaction::Replacing
-        || host->documentTransaction == RvHost::DocumentTransaction::Printing) {
+        || host->documentTransaction == RvHost::DocumentTransaction::Printing
+        || host->documentTransaction == RvHost::DocumentTransaction::Rendering) {
         host->destroyAfterDocumentTransaction = true;
         return;
     }
@@ -2956,15 +2958,19 @@ int32_t rv_host_acquire_egl_frame(RvHost* host, RvGpuFrame** frame)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_DETACHED;
 #if defined(__linux__) && RANVIER_COMPOSITING
     auto pixelSize = paintSize(*host);
     if (!configuredEGLDisplay || eglGetCurrentDisplay() != configuredEGLDisplay || eglGetCurrentContext() == EGL_NO_CONTEXT
-        || host->compositingMode == RV_COMPOSITING_OFF || host->inFrame)
+        || host->compositingMode == RV_COMPOSITING_OFF || host->inFrame
+        || host->documentTransaction != RvHost::DocumentTransaction::Idle)
         return RV_ERR_UNSUPPORTED;
     if (host->presentationSurface && !host->presentationSurface->available())
         return RV_ERR_UNSUPPORTED;
     auto consumerContext = eglGetCurrentContext();
     RvEGLContextScope contextScope;
+    host->documentTransaction = RvHost::DocumentTransaction::Rendering;
     auto result = [&]() -> int32_t {
         SetForScope inFrame(host->inFrame, true);
         host->frameRequested = false;
@@ -2977,6 +2983,8 @@ int32_t rv_host_acquire_egl_frame(RvHost* host, RvGpuFrame** frame)
                 return RV_ERR_PAINT_FAILED;
             view->updateLayoutAndStyleIfNeededRecursive();
         }
+        if (host->destroyAfterDocumentTransaction)
+            return RV_ERR_DETACHED;
         if (!view->clipLayer())
             return RV_ERR_UNSUPPORTED;
         if (host->compositor && (host->compositor->size != host->size || host->compositor->scale != host->deviceScale))
@@ -3010,8 +3018,14 @@ int32_t rv_host_acquire_egl_frame(RvHost* host, RvGpuFrame** frame)
     }();
     if (result != RV_OK && host->errorRecordsEnabled)
         host->lastHostError = RvHostErrorRecord { RV_HOST_ERROR_ACQUIRE_FRAME, RV_HOST_ERROR_SOURCE_EGL, result, 0 };
-    if (host->updateWanted)
+    if (host->updateWanted && !host->destroyAfterDocumentTransaction)
         host->requestFrame();
+    if (host->destroyAfterDocumentTransaction && *frame) {
+        rv_gpu_frame_release(*frame);
+        *frame = nullptr;
+    }
+    if (finishDocumentTransaction(host) != RV_OK)
+        return RV_ERR_DETACHED;
     return result;
 #else
     return RV_ERR_UNSUPPORTED;
@@ -3027,13 +3041,18 @@ int32_t rv_host_acquire_d3d11_frame(RvHost* host, void* consumerDevice, RvGpuFra
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_DETACHED;
 #if defined(_WIN32) && RANVIER_COMPOSITING
     auto pixelSize = paintSize(*host);
-    if (host->compositingMode == RV_COMPOSITING_OFF || host->inFrame)
+    if (host->compositingMode == RV_COMPOSITING_OFF || host->inFrame
+        || host->documentTransaction != RvHost::DocumentTransaction::Idle)
         return RV_ERR_UNSUPPORTED;
     if (host->presentationSurface && host->presentationSurface->matches(consumerDevice, pixelSize.width(), pixelSize.height())
         && !host->presentationSurface->available())
         return RV_ERR_UNSUPPORTED;
+    Microsoft::WRL::ComPtr<ID3D11Device> retainedDevice = static_cast<ID3D11Device*>(consumerDevice);
+    host->documentTransaction = RvHost::DocumentTransaction::Rendering;
     auto result = [&]() -> int32_t {
         SetForScope inFrame(host->inFrame, true);
         host->frameRequested = false;
@@ -3046,6 +3065,8 @@ int32_t rv_host_acquire_d3d11_frame(RvHost* host, void* consumerDevice, RvGpuFra
                 return RV_ERR_PAINT_FAILED;
             view->updateLayoutAndStyleIfNeededRecursive();
         }
+        if (host->destroyAfterDocumentTransaction)
+            return RV_ERR_DETACHED;
         if (!view->clipLayer())
             return RV_ERR_UNSUPPORTED;
         if (host->compositor && (host->compositor->size != host->size || host->compositor->scale != host->deviceScale))
@@ -3082,11 +3103,17 @@ int32_t rv_host_acquire_d3d11_frame(RvHost* host, void* consumerDevice, RvGpuFra
         return transferred ? RV_OK : RV_ERR_PAINT_FAILED;
     }();
     if (result != RV_OK && host->errorRecordsEnabled) {
-        auto reason = static_cast<ID3D11Device*>(consumerDevice)->GetDeviceRemovedReason();
+        auto reason = retainedDevice->GetDeviceRemovedReason();
         host->lastHostError = RvHostErrorRecord { RV_HOST_ERROR_ACQUIRE_FRAME, RV_HOST_ERROR_SOURCE_D3D11, result, static_cast<int32_t>(reason) };
     }
-    if (host->updateWanted)
+    if (host->updateWanted && !host->destroyAfterDocumentTransaction)
         host->requestFrame();
+    if (host->destroyAfterDocumentTransaction && *frame) {
+        rv_gpu_frame_release(*frame);
+        *frame = nullptr;
+    }
+    if (finishDocumentTransaction(host) != RV_OK)
+        return RV_ERR_DETACHED;
     return result;
 #else
     return RV_ERR_UNSUPPORTED;
@@ -5003,8 +5030,11 @@ int32_t rv_host_update(RvHost* host)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
-    if (host->documentTransaction == RvHost::DocumentTransaction::Printing)
+    if (!liveHosts.contains(host))
+        return RV_ERR_DETACHED;
+    if (host->documentTransaction != RvHost::DocumentTransaction::Idle || host->inFrame)
         return RV_ERR_UNSUPPORTED;
+    host->documentTransaction = RvHost::DocumentTransaction::Rendering;
     Ref page = host->page;
     host->inFrame = true;
     host->frameRequested = false;
@@ -5016,9 +5046,9 @@ int32_t rv_host_update(RvHost* host)
     }
     host->inFrame = false;
     // A running animation asked for the next frame during this one.
-    if (host->updateWanted)
+    if (host->updateWanted && !host->destroyAfterDocumentTransaction)
         host->requestFrame();
-    return RV_OK;
+    return finishDocumentTransaction(host);
 }
 
 int32_t rv_host_dirty_rect(RvHost* host, int32_t* x, int32_t* y, int32_t* width, int32_t* height)
