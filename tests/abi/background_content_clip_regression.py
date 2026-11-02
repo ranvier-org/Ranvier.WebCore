@@ -10,6 +10,7 @@ import hashlib
 import json
 from pathlib import Path
 import platform
+import subprocess
 import sys
 import zlib
 
@@ -19,6 +20,16 @@ from background_content_clip_capture import capture_samples, FIXTURES, Native, I
 BASELINES = FIXTURES / 'background-content-clip-baselines'
 FIXED = {'bordered-half-phase', 'negative-origin', 'nested-offset', 'always-composited'}
 PROFILES = {'linux-x64': 'linux', 'win-x64': 'win32'}
+LINUX_FONT_SHA256 = 'ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280'
+
+
+def font_identity(rid):
+    if rid != 'linux-x64':
+        return None
+    font = Path(subprocess.check_output(['fc-match', '--format', '%{file}', 'Arial'], text=True).strip())
+    digest = hashlib.sha256(font.read_bytes()).hexdigest()
+    assert digest == LINUX_FONT_SHA256, 'Linux clipping font differs from the reviewed DejaVu Sans baseline; use linux-fonts.conf'
+    return dict(family='DejaVu Sans', file=str(font), sha256=digest)
 
 
 def half_coverage_allowed(rid, name, scale):
@@ -103,6 +114,7 @@ def verify(directory, rid):
     assert platform.machine().lower() in ['amd64', 'x86_64'], 'No ARM baseline has been qualified'
     manifest = json.loads((Path(directory).resolve().parents[2] / 'manifest.json').read_text())
     assert (manifest['rid'],manifest['flavor'],manifest['abi']) == (rid,'gpu',61), 'Unproven package profile'
+    font = font_identity(rid)
     native = Native(directory)
     assert native.bind('rv_abi_version', I, [])() == 61
     assert native.call('rv_abi_has', [ctypes.c_char_p], b'compositing') == 1, 'Only the GPU profile is qualified'
@@ -132,7 +144,7 @@ def verify(directory, rid):
                 strictContentMaskKeys=12,results=results,failures=failures,
                 qualifiedHalfCoverageDifferences=[entry for entry in results if entry['qualifiedHalfCoveragePixels']],
                 residualContentMaskDifferences=[entry for entry in results if entry['contentMaskDifference']],
-                baselineSource=profile['source'],baselineRuntime=profile['runtime'],
+                baselineSource=profile['source'],baselineRuntime=profile['runtime'],font=font,
                 scopes='Strict complete content-red masks for 12 fixed keys; full raw RGBA pointwise metrics for 54 controls; Windows DPR1 composited half-coverage RGB127/128 rounding separately qualified; no other byte/alpha/shape qualification')
 
 

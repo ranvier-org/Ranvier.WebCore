@@ -11,6 +11,32 @@ from background_content_clip_regression import BASELINES, half_coverage_allowed,
 
 
 class PaintPolicyTests(unittest.TestCase):
+    def test_linux_baseline_font_is_verified_and_other_platforms_do_not_query_fontconfig(self):
+        import background_content_clip_regression as policy
+        with patch.object(policy.subprocess, 'check_output') as query:
+            self.assertIsNone(policy.font_identity('win-x64'))
+            query.assert_not_called()
+        with tempfile.TemporaryDirectory() as temporary:
+            font = Path(temporary) / 'font.ttf'
+            font.write_bytes(b'fixture font')
+            import hashlib
+            digest = hashlib.sha256(font.read_bytes()).hexdigest()
+            with patch.object(policy.subprocess, 'check_output', return_value=str(font)), \
+                 patch.object(policy, 'LINUX_FONT_SHA256', digest):
+                self.assertEqual(policy.font_identity('linux-x64')['sha256'], digest)
+                font.write_bytes(b'different font')
+                with self.assertRaisesRegex(AssertionError, 'font differs'):
+                    policy.font_identity('linux-x64')
+
+    def test_font_precondition_is_only_on_linux_clipping_probe(self):
+        import runpy
+        probes = runpy.run_path(str(Path(__file__).resolve().parents[1] / 'scripts/probes.py'))['PROBES']
+        selected = [entry for entry in probes if 'FONTCONFIG_FILE' in entry['env']]
+        self.assertEqual(len(selected), 1)
+        self.assertEqual(selected[0]['rid'], 'linux-x64')
+        self.assertEqual(selected[0]['flavor'], 'gpu')
+        self.assertIn('background_content_clip_regression.py', selected[0]['commands'][0])
+
     def test_half_coverage_also_handles_the_reverse_rounding_direction(self):
         before, after = bytes([127,127,127,255]), bytes([128,128,128,255])
         result = pixel_policy(before,after,before,half_coverage=True)
