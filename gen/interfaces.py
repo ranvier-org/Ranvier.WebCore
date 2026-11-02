@@ -2,6 +2,7 @@
 
 import itertools
 import re
+from pathlib import Path
 
 import idl
 
@@ -636,6 +637,9 @@ class InterfaceEmitter:
                  'type internal DomStringEnumAttribute() =', '    inherit Attribute()', '',
                  '[<AttributeUsage(AttributeTargets.Class)>]', 'type internal DomDictionaryAttribute() =',
                  '    inherit Attribute()', '#endif', '']
+        if 'NodeOrDOMString' in self.unions:
+            helper = Path(__file__).with_name('native_display.fs.inc').read_text(encoding='utf-8')
+            lines[5:5] = helper.splitlines() + ['']
         declarations = []
         for name, members in bodies:
             source = self.sources[name]
@@ -722,6 +726,13 @@ class InterfaceEmitter:
                 if omitted:
                     lines += [f'/// <remarks>Fields omitted from the shared contract: {", ".join(omitted)}.</remarks>']
             prefix = "type" if index == 0 else "and"
+            if name == 'NodeOrDOMString':
+                lines += ['#if !FABLE_COMPILER',
+                          f'{prefix} [<System.Diagnostics.DebuggerDisplay("{{ToString(),nq}}"); RequireQualifiedAccess>] {name} =',
+                          '#else', f'{prefix} [<RequireQualifiedAccess>] {name} =', '#endif']
+                lines += body + ['']
+                lines += Path(__file__).with_name('native_node_display.fs.inc').read_text(encoding='utf-8').splitlines() + ['']
+                continue
             if name in self.world.enums:
                 lines += [f'{prefix} [<DomStringEnum; RequireQualifiedAccess>] {name} =']
             else:

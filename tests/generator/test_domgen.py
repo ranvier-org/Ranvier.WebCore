@@ -60,6 +60,18 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_node_string_display_preserves_the_fable_union_and_native_fields(self):
+        generator = domgen.Generator(self.world)
+        generator.run()
+        source = generator.interfaces()
+        self.assertIn('#else\nand [<RequireQualifiedAccess>] NodeOrDOMString =\n#endif\n    | Node of Node\n    | DOMString of string', source)
+        self.assertIn('NodeOrDOMString.Node (v0_0)', source)
+        self.assertIn('NativeDisplay.opaque context n0 "<Ranvier.Dom.Node>"', source)
+        self.assertIn('NodeOrDOMString.DOMString (v0_0)', source)
+        self.assertIn('NativeDisplay.text context n0 (v0_0)', source)
+        self.assertEqual(source.count('member internal this.NativeDisplay('), 1)
+        self.assertIn('RuntimeFeature.IsDynamicCodeSupported', source)
+
     def test_nullable_callback_dictionary_member_preserves_null_default(self):
         (self.source / 'Source/WebCore/dom/Fixture.idl').write_text(IDL + '''
 callback ViewTransitionUpdateCallback = undefined();
