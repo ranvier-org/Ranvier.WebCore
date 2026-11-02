@@ -8,6 +8,7 @@
 #include <cwchar>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 namespace RanvierNativeSpelling {
@@ -103,6 +104,8 @@ inline Result checkWindowsSpelling(std::wstring_view language, std::wstring_view
     Detail::TaskString providerId;
     if (SUCCEEDED(checker->get_Id(&providerId.value)) && !Detail::copyString(providerId.value, result.providerId))
         return Detail::failed(HRESULT_FROM_WIN32(ERROR_BUFFER_OVERFLOW));
+    if (cancelled())
+        return Detail::cancelled();
     if (text.empty())
         return result;
     std::wstring input(text);
