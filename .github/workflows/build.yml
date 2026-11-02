@@ -50,6 +50,7 @@ jobs:
       - run: python -I tests/test_preview2_recovery.py
       - run: python -I tests/test_preview2_recovery_workflow.py
       - run: python -I tests/test_preview4_recovery.py
+      - run: python -I tests/test_preview7_recovery.py
       - run: python -I tests/test_probes.py
       - run: python -I tests/test_background_clip_policy.py
       - run: python -I tests/test_sdl_runtime.py
