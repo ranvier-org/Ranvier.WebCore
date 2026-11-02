@@ -21,6 +21,8 @@ No final native producer, public package version or ARM64 qualification is impli
 ## Generate and validate once the union is frozen
 
 - Check the final source declaration count, ABI version, preserved 344-signature prefix and exact three-function tail.
+  `python tests/atspi/cohort_source.py --baseline-ref c70c0c1220ea6f0a45a3572be504e0ad82ef4621` enforces this shape.
+  Its `--manifest <new-file>` option requires a clean committed tree and records source evidence only.
   Record a normalized declaration manifest with source commit, header hash and generator hash. This is source evidence,
   separate from a producer runtime manifest; never authenticate an arbitrary binary from its supplied source label.
 - Run `python tests/abi/generate_native.py write` only after that order is settled. Format with the repository's
