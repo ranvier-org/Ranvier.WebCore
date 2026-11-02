@@ -436,4 +436,23 @@ static constexpr const char interfaceXml[] = R"ATSPI(<node>
 
 </interface>
 
+<interface name="org.a11y.atspi.Cache">
+
+  <method name="GetItems">
+    <arg direction="out" name="nodes" type="a((so)(so)(so)iiassusau)" />
+    <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QSpiAccessibleCacheArray" />
+  </method>
+
+  <signal name="AddAccessible">
+    <arg direction="out" name="nodeAdded" type="((so)(so)(so)iiassusau)" />
+    <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="QSpiAccessibleCacheItem" />
+  </signal>
+
+  <signal name="RemoveAccessible">
+    <arg direction="out" name="nodeRemoved" type="(so)" />
+    <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="QSpiObjectReference" />
+  </signal>
+
+</interface>
+
 </node>)ATSPI";
