@@ -21,6 +21,10 @@ class InputConsumer(Consumer):
         self.create_image = C.CFUNCTYPE(P, P, P, U, P, P)(get_proc(b'eglCreateImageKHR'))
         self.destroy_image = C.CFUNCTYPE(U, P, P)(get_proc(b'eglDestroyImageKHR'))
 
+    def check_current(self):
+        current=self.bind(self.egl,'eglGetCurrentContext',P,[])()
+        self.n.expect(current==self.context,'native operation restored the exact external consumer context')
+
     def source(self, page, target, width=32, height=24, flip=False):
         self.activate()
         texture, framebuffer = U(), U()
@@ -41,6 +45,7 @@ class InputConsumer(Consumer):
         assert image, 'producer EGLImage creation'
         try:
             self.n.ok('rv_host_bind_egl_image',[P,P,P,I],page.host,target,image,int(flip))
+            self.check_current()
         finally:
             assert self.destroy_image(self.display,image), 'caller releases EGLImage handle after binding'
 
@@ -77,6 +82,7 @@ class InputConsumer(Consumer):
         frame = P()
         self.n.ok('rv_host_acquire_egl_frame',[P,P],host,C.byref(frame))
         assert frame.value
+        self.check_current()
         texture,framebuffer = U(),U()
         try:
             image,width,height,format_ = P(),I(),I(),I()
@@ -98,6 +104,7 @@ class InputConsumer(Consumer):
             self.delete_source(texture,framebuffer)
             self.bind(self.gl,'glFinish',None,[])()
             self.n.ok('rv_gpu_frame_release',[P],frame)
+            self.check_current()
 
     def close(self):
         self.current(self.display,None,None,None)
@@ -192,15 +199,33 @@ def run(directory, report, scales=(1,1.5,2)):
                     native.ok('rv_dom_web_animation_cancel',[P],animation)
                     native.bind('rv_event_target_release',None,[P])(animation)
                 page.close()
+                post_destroy_current=consumer.bind(consumer.egl,'eglGetCurrentContext',P,[])()
+                consumer.activate()
+                consumer.check_current()
                 consumer.delete_source(texture,framebuffer)
                 if held.value:
                     consumer.activate()
+                    retained_texture,retained_fbo=U(),U()
                     try:
                         image,width,height,format_=P(),I(),I(),I()
                         native.ok('rv_gpu_frame_info',[P,P,P,P,P],held,C.byref(image),C.byref(width),C.byref(height),C.byref(format_))
                         assert image.value and (width.value,height.value,format_.value)==(int(101*scale),int(67*scale),1)
-                        lifetimes.append(dict(scale=scale,heldOutputSurvivedHostAndBoundInput=True))
+                        consumer.bind(consumer.gl,'glGenTextures',None,[I,P])(1,C.byref(retained_texture))
+                        consumer.bind(consumer.gl,'glBindTexture',None,[U,U])(0x0DE1,retained_texture)
+                        consumer.target(0x0DE1,image)
+                        consumer.bind(consumer.gl,'glGenFramebuffers',None,[I,P])(1,C.byref(retained_fbo))
+                        consumer.bind(consumer.gl,'glBindFramebuffer',None,[U,U])(0x8D40,retained_fbo)
+                        consumer.bind(consumer.gl,'glFramebufferTexture2D',None,[U,U,U,U,I])(0x8D40,0x8CE0,0x0DE1,retained_texture,0)
+                        assert consumer.bind(consumer.gl,'glCheckFramebufferStatus',U,[U])(0x8D40)==0x8CD5
+                        pixel=(C.c_ubyte*4)()
+                        consumer.bind(consumer.gl,'glReadPixels',None,[I,I,I,I,U,U,P])(int(16*scale),int(16*scale),1,1,0x1908,0x1401,pixel)
+                        assert list(pixel)==[255,0,0,255],list(pixel)
+                        lifetimes.append(dict(scale=scale,heldOutputSurvivedHostAndBoundInput=True,pixel=list(pixel),
+                                              consumerContextStillCurrentAfterDestroy=post_destroy_current==consumer.context,
+                                              callerReactivatedConsumerAfterDestroy=True))
                     finally:
+                        consumer.bind(consumer.gl,'glFinish',None,[])()
+                        consumer.delete_source(retained_texture,retained_fbo)
                         native.ok('rv_gpu_frame_release',[P],held)
     finally:
         consumer.close()
