@@ -55,11 +55,15 @@ class CaretPage:
         # #bidi holds eight upright Ahem glyphs: 160px once the font applies. #inline's <b> run is wider on
         # CoreText, whose synthetic bold adds size / 36 to each advance.
         deadline = time.monotonic() + 10
-        while self.width('bidi') != 160:
-            if time.monotonic() > deadline:
-                raise AssertionError('pinned Ahem was not applied: bidi width ' + str(self.width('bidi')))
-            self.cycle(10)
-            p.update()
+        with p.suppress_assertion_count():
+            width = self.width('bidi')
+            while width != 160:
+                if time.monotonic() > deadline:
+                    raise AssertionError('pinned Ahem was not applied: bidi width ' + str(width))
+                self.cycle(10)
+                p.update()
+                width = self.width('bidi')
+        p.expect(width == 160, 'pinned Ahem was not applied: bidi width ' + str(width))
         p.update()
 
     def width(self, identifier):

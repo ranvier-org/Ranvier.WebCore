@@ -1,9 +1,9 @@
 // Chromium oracle for tests/abi/resize_observation.py: replays tests/fixtures/resize-observation-cases.json and writes
-// tests/fixtures/resize-observation-oracle.json. Each scenario runs in a fresh document, once at device scale 1 and once
-// with a forced device scale of 2 (playwright's deviceScaleFactor leaves devicePixelContentBoxSize at scale 1).
+// tests/fixtures/resize-observation-oracle.json. Each scenario runs in a fresh document at forced device scales
+// 1, 1.5 and 2 (playwright's deviceScaleFactor leaves devicePixelContentBoxSize at scale 1).
 import {createRequire} from 'node:module';
 import {readFileSync, writeFileSync} from 'node:fs';
-const {chromium} = createRequire('C:/wk/ranvier-views/tests/NativeApi.Conformance/package.json')('playwright');
+const {chromium} = createRequire(process.env.RANVIER_BROWSER_PACKAGE || 'C:/wk/ranvier-views/tests/NativeApi.Conformance/package.json')('playwright');
 
 const cases = JSON.parse(readFileSync(new URL('../fixtures/resize-observation-cases.json', import.meta.url), 'utf8'));
 
@@ -36,6 +36,7 @@ const run = async scenario => {
     } else if (kind === 'unobserve') observers[args[0]].unobserve($(args[1]));
     else if (kind === 'disconnect') observers[args[0]].disconnect();
     else if (kind === 'style') $(args[0]).style.setProperty(args[1], args[2]);
+    else if (kind === 'attribute') $(args[0]).setAttribute(args[1], args[2]);
     else if (kind === 'update') { await frame(); log.push('|'); }
     else if (kind === 'settle') { await frame(); await frame(); }
     else if (kind === 'arm') armed.push({o: args[0], t: args[1], step: args[2]});
@@ -44,7 +45,7 @@ const run = async scenario => {
       const io = new IntersectionObserver(es => log.push(args[0] + ':' + es.map(e => e.target.id).join(',')));
       io.observe($(args[1]));
     } else if (kind === 'element') { const el = document.createElement('div'); el.id = args[0]; el.style.cssText = args[1]; elements[args[0]] = el; }
-    else if (kind === 'append') document.body.append($(args[0]));
+    else if (kind === 'append') (args[1] ? $(args[1]) : document.body).append($(args[0]));
     else if (kind === 'remove') $(args[0]).remove();
     else throw new Error('unknown step ' + kind);
   };
@@ -54,11 +55,13 @@ const run = async scenario => {
 };
 
 const result = {browser: null, scales: {}};
-for (const scale of [1, 2]) {
+for (const scale of [1, 1.5, 2]) {
   const browser = await chromium.launch({headless: true, args: scale === 1 ? [] : ['--force-device-scale-factor=' + scale]});
   try {
     result.browser = browser.version();
-    const tab = await browser.newPage({viewport: {width: 800, height: 600}});
+    const tab = await browser.newPage({viewport: {width: 800, height: 600}, deviceScaleFactor: scale});
+    const actualScale = await tab.evaluate(() => devicePixelRatio);
+    if (Math.abs(actualScale - scale) > 0.000001) throw new Error('device scale mismatch: ' + actualScale);
     const scenarios = {};
     for (const scenario of cases.scenarios) {
       await tab.setContent(cases.markup);
@@ -70,4 +73,4 @@ for (const scale of [1, 2]) {
   }
 }
 writeFileSync(new URL('../fixtures/resize-observation-oracle.json', import.meta.url), JSON.stringify(result, null, 2) + '\n');
-console.log('ORACLE resize-observation: ' + cases.scenarios.length + ' scenarios x 2 scales, Chromium ' + result.browser);
+console.log('ORACLE resize-observation: ' + cases.scenarios.length + ' scenarios x ' + Object.keys(result.scales).length + ' scales, Chromium ' + result.browser);

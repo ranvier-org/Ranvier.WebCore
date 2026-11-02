@@ -9,6 +9,26 @@ if (ENABLE_WEBCORE)
         RanvierAbi/RanvierWebCoreEGL.cpp
         RanvierAbi/RanvierImageEncoding.cpp
     )
+    if (PORT STREQUAL "WPE")
+        set(_ranvier_image_bundle "${CMAKE_CURRENT_BINARY_DIR}/RanvierWPEImagesGResourceBundle")
+        set(_ranvier_image_xml "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<gresources>\n<gresource prefix=\"/org/webkitwpe/resources\">\n")
+        set(_ranvier_image_inputs "")
+        foreach (_image IN ITEMS missingImage missingImage@2x missingImage@3x panIcon textAreaResizeCorner textAreaResizeCorner@2x)
+            string(APPEND _ranvier_image_xml "<file alias=\"images/${_image}\">${_image}.png</file>\n")
+            list(APPEND _ranvier_image_inputs "${WEBCORE_DIR}/Resources/${_image}.png")
+        endforeach ()
+        string(APPEND _ranvier_image_xml "</gresource>\n</gresources>\n")
+        file(CONFIGURE OUTPUT "${_ranvier_image_bundle}.xml" CONTENT "${_ranvier_image_xml}" @ONLY)
+        add_custom_command(
+            OUTPUT "${_ranvier_image_bundle}.c"
+            DEPENDS "${_ranvier_image_bundle}.xml" ${_ranvier_image_inputs}
+            COMMAND "${GLIB_COMPILE_RESOURCES_EXECUTABLE}" --generate-source --internal
+                "--target=${_ranvier_image_bundle}.c" "--sourcedir=${WEBCORE_DIR}/Resources"
+                "${_ranvier_image_bundle}.xml"
+            VERBATIM
+        )
+        list(APPEND RanvierWebCoreHost_SOURCES "${_ranvier_image_bundle}.c")
+    endif ()
     set(RanvierWebCoreHost_LIBRARIES ${TestWebCore_LIBRARIES})
     if (WIN32)
         list(APPEND RanvierWebCoreHost_LIBRARIES Uiautomationcore Ole32 OleAut32 Comctl32)

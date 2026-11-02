@@ -1,0 +1,9 @@
+{
+  "issue": "https://github.com/ranvier-org/Ranvier.WebCore/issues/232",
+  "patch_sha256": "f1b72546065d5d5e4bedb52f10aa9c6bc8b855c90a22f9d3cb03cb78ce291800",
+  "engine": "UNAPPLIED before cleancommit/source-seriescheck",
+  "regression_red": "fef actual73-check mixedSVG/HTMLcontrol:networkerror,badbytes,pendingoldfallbackpaint; validreplacement/stale/errorcallbacks pass; finaltestfails allpaintingfailures",
+  "oracle": "RawChromiumstateunchanged; onlyobsoleteWindowsblueerrorqualification removed for patchedprofile; switchqualification retained",
+  "public_resource_control_sha256": "c17b3e1c65acedc98b0bfeb0f9fd26dd8377ab8ce8256163d996ce30de3dc239",
+  "focused_red_sha256": "88cb7e249e21fcafae2720e40215b35b2a274ca436b1f03d8f80560c15fed829"
+}
