@@ -4,7 +4,7 @@
 # the vcpkg toolchain file and VCPKG_INSTALLED_DIR.
 
 set(CMAKE_BUILD_TYPE "Release" CACHE STRING "")
-set(RANVIER_ENABLE_PDF ON CACHE BOOL "Enable the native Skia PDF renderer")
+set(RANVIER_ENABLE_PDF ON CACHE BOOL "Enable the native PDF renderer (Skia or CoreGraphics)")
 
 if (RANVIER_RID MATCHES "^win-(.+)$")
     set(PORT "Win" CACHE STRING "")

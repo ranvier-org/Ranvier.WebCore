@@ -31,6 +31,21 @@ def run(entries, *options):
 
 
 class ProbeRunnerTests(unittest.TestCase):
+    def test_mac_pdf_runs_the_actual_core_graphics_profile(self):
+        for rid in ['osx-arm64', 'osx-x64']:
+            commands = [command for entry in probes.PROBES if probes.applies(entry, rid, 'slim')
+                        for command in entry['commands'] if 'printing_pdf.py' in command]
+            self.assertEqual(len(commands), 1)
+            self.assertIn('--core-graphics', commands[0])
+            self.assertNotIn('--expect-unsupported', commands[0])
+
+    def test_pdf_artifacts_survive_a_later_probe_failure(self):
+        workflow = (ROOT / '.github/workflows/build.yml').read_text()
+        block = workflow.split('      - name: Retain native PDF output and ownership results\n', 1)[1].split('\n      - name:', 1)[0]
+        self.assertIn('if: always()', block)
+        self.assertIn('printing-pdf.json', block)
+        self.assertIn('host-output.pdf', block)
+
     def test_picker_tracing_and_teardown_are_routed_to_qualified_platforms(self):
         for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']:
             for flavor in ['slim', 'gpu']:
