@@ -2729,6 +2729,34 @@ RV_EXPORT int32_t rv_mutation_record_batch_release(RvMutationRecordBatch*);
 RV_EXPORT int32_t rv_mutation_record_batch_get_count(RvMutationRecordBatch*, int32_t* result);
 RV_EXPORT int32_t rv_mutation_record_batch_get_record(RvMutationRecordBatch*, int32_t index, RvMutationRecordView* result);
 
+typedef struct RvPrintOptions {
+    uint32_t size;
+    uint32_t max_pages;
+    double paper_width_points;
+    double paper_height_points;
+    double margin_top_points;
+    double margin_right_points;
+    double margin_bottom_points;
+    double margin_left_points;
+    uint64_t output_budget_bytes;
+    float raster_dpi;
+    uint32_t reserved;
+} RvPrintOptions;
+
+/* Polled synchronously before layout and between pages: zero continues, nonzero cancels. The callback may only read
+ * its cancellation state; it must not pump events or call the host. Its context is borrowed until print_pdf returns. */
+typedef int32_t (*RvPrintCancelPoll)(void* context);
+
+/* "printing-pdf": synchronously renders the current DOM, then delivers the existing resource completion on a later
+ * turn with zero width/height. Geometry is in points (72/inch); raster_dpi affects raster-only PDF effects.
+ * Options are copied. Positive finite paper/printable sizes, nonnegative margins, max_pages 1..4096, output budget
+ * 1..67108864 bytes, raster_dpi 72..600 and reserved=0 are required. Invalid options return UNSUPPORTED; output failure
+ * returns PAINT_FAILED. No failed call transfers an operation/context. Cancellation delivers RESOURCE_CANCELLED
+ * without PDF bytes. Printing restores screen layout/scroll before returning; no OS dialog or spooler is invoked. */
+RV_EXPORT int32_t rv_host_print_pdf(RvHost*, const RvPrintOptions* options, RvPrintCancelPoll cancel_poll, void* cancel_context, RvResourceCompletion callback, void* context, int32_t* page_count, uint64_t* operation);
+/* Copies a completed PDF through the existing resource byte/capacity contract; release with rv_resource_release. */
+RV_EXPORT int32_t rv_print_pdf_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length);
+
 #ifdef __cplusplus
 }
 #endif
