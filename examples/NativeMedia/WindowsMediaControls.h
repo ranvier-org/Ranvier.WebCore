@@ -64,6 +64,7 @@ public:
             auto factory = winrt::get_activation_factory<SystemMediaTransportControls, ISystemMediaTransportControlsInterop>();
             winrt::check_hresult(factory->GetForWindow(window, winrt::guid_of<SystemMediaTransportControls>(), winrt::put_abi(m_controls)));
             m_actions = std::make_shared<Detail::Actions>();
+            m_actions->values.reserve(32);
             auto actions = m_actions;
             m_button = m_controls.ButtonPressed([actions](auto const&, auto const& argument) {
                 switch (argument.Button()) {

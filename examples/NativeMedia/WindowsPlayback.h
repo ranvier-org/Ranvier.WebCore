@@ -138,6 +138,8 @@ public:
         auto status = admitted();
         if (FAILED(status))
             return status;
+        if (m_opened)
+            return MF_E_INVALIDREQUEST;
         if (!path || !*path)
             return E_INVALIDARG;
         Microsoft::WRL::ComPtr<IMFByteStream> stream;
@@ -312,7 +314,14 @@ private:
         return m_engine ? S_OK : MF_E_SHUTDOWN;
     }
     HRESULT fail(HRESULT value) { m_failure = value; return value; }
-    HRESULT failedInitialization(HRESULT value) { close(); m_closedState = State::Unavailable; m_failure = value; return value; }
+    HRESULT failedInitialization(HRESULT value)
+    {
+        close();
+        m_closedState = value == REGDB_E_CLASSNOTREG || value == HRESULT_FROM_WIN32(ERROR_MOD_NOT_FOUND)
+            || value == DXGI_ERROR_UNSUPPORTED ? State::Unavailable : State::Failed;
+        m_failure = value;
+        return value;
+    }
     DWORD m_owner { 0 };
     bool m_ownsCom { false };
     bool m_ownsMf { false };

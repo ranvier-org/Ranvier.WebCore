@@ -3,6 +3,8 @@
 #include <cmath>
 #include <cstdio>
 #include <thread>
+#include <filesystem>
+#include <fstream>
 
 using RanvierNativeMedia::Playback;
 using RanvierNativeMedia::State;
@@ -19,6 +21,15 @@ static bool waitFor(Playback& player, auto predicate)
 {
     auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(5);
     do {
+        RanvierNativeMedia::Frame frame;
+        auto video = player.nextFrame(frame);
+        if (FAILED(video))
+            return false;
+        if (video == S_OK) {
+            Microsoft::WRL::ComPtr<IDXGIKeyedMutex> mutex;
+            if (FAILED(frame.texture.As(&mutex)) || mutex->AcquireSync(1,100) != S_OK || mutex->ReleaseSync(0) != S_OK)
+                return false;
+        }
         auto value = player.snapshot();
         if (predicate(value))
             return true;
@@ -39,7 +50,7 @@ int wmain(int argc, wchar_t** argv)
     auto status = player.initialize();
     std::printf("MEDIA_INITIALIZE_HRESULT=%08lx\n", static_cast<unsigned long>(status));
     if (FAILED(status))
-        return 77;
+        return player.snapshot().state == State::Unavailable ? 77 : 1;
     if (!require(SUCCEEDED(player.openFile(argv[1])), "open local owned audio/video fixture"))
         return 1;
     if (!require(waitFor(player, [](auto value) { return value.ready && value.duration > 1; }), "actual provider resolves local media"))
@@ -47,6 +58,8 @@ int wmain(int argc, wchar_t** argv)
     auto initial = player.snapshot();
     std::printf("MEDIA_DURATION=%.6f HAS_AUDIO=%d HAS_VIDEO=%d\n", initial.duration, initial.hasAudio, initial.hasVideo);
     if (!require(initial.hasAudio, "provider reports an actual audio stream"))
+        return 1;
+    if (!require(FAILED(player.openFile(argv[1])), "one source is owned until the session is explicitly reinitialized"))
         return 1;
     if (!require(SUCCEEDED(player.play()), "play admitted"))
         return 1;
@@ -81,6 +94,20 @@ int wmain(int argc, wchar_t** argv)
     if (!require(SUCCEEDED(missing.initialize()) && FAILED(missing.openFile(L"Z:\\ranvier-no-such-media-file.wav")), "missing local source retains an explicit failure"))
         return 1;
     missing.close();
+    auto invalid = std::filesystem::path(argv[0]).parent_path() / L"invalid-media.bin";
+    std::ofstream(invalid, std::ios::binary) << "This is original invalid test media, not an encoded stream.";
+    Playback broken;
+    if (!require(SUCCEEDED(broken.initialize()), "asynchronous-error session initializes"))
+        return 1;
+    auto opened = broken.openFile(invalid.c_str());
+    bool failed = FAILED(opened) || waitFor(broken, [](auto value) { return value.state == State::Failed && FAILED(value.error); });
+    if (!require(failed, "invalid source produces an actual provider error instead of endless loading"))
+        return 1;
+    auto failure = broken.snapshot();
+    std::printf("MEDIA_INVALID_SOURCE_STATE=%d HRESULT=%08lx\n", static_cast<int>(failure.state), static_cast<unsigned long>(failure.error));
+    if (!require(SUCCEEDED(broken.initialize()) && SUCCEEDED(broken.openFile(argv[1]))
+        && waitFor(broken, [](auto value) { return value.ready; }), "fresh explicit session recovers without stale source-error callbacks"))
+        return 1;
     std::printf("MEDIA_PROVIDER_ASSERTIONS=%u\n", assertions);
     return 0;
 }

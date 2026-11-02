@@ -58,12 +58,14 @@ def run(args):
                 def capture(label, phase, *, publish=False):
                     if publish:
                         p.expect(republish(session) == 0, 'application republishes retained paused frame under existing key protocol')
+                    p.update()
                     frame = P()
                     status = p.bind('rv_host_acquire_d3d11_frame', I, [P,P,C.POINTER(P)])(p.host, device(session), C.byref(frame))
                     p.expect(status == 0 and frame.value, 'strict GPU output acquired: ' + str(status))
                     try:
                         texture, width, height, format_ = P(), I(), I(), I()
                         p.call('rv_gpu_frame_info', [P,P,P,P,P], frame, C.byref(texture), C.byref(width), C.byref(height), C.byref(format_))
+                        p.expect([width.value,height.value] == [math.ceil(p.width*scale),math.ceil(p.height*scale)], 'native frame follows logical resize and device scale')
                         pixels = (C.c_ubyte * (width.value * height.value * 4))()
                         p.expect(readback(session, texture, pixels, len(pixels), width.value, height.value) == 0, 'actual GPU output readback')
                         output = bytes(pixels)
@@ -71,9 +73,12 @@ def run(args):
                             offset = (int(y*scale)*width.value+int(x*scale))*4
                             return list(output[offset:offset+4])
                         center, clipped = pixel(40,35), pixel(115,35)
+                        edge = pixel(100,35)
                         p.expect(center[phase] > 200 and all(45 < center[index] < 100 for index in range(3) if index != phase),
                                  'decoded video follows DOM translation/opacity: ' + str(center))
                         p.expect(clipped == [255,255,255,255], 'decoded video obeys DOM clipping: ' + str(clipped))
+                        p.expect(edge == [255,255,255,255] if 'narrower' in label else edge[phase] > 200 and any(edge[index] < 100 for index in range(3) if index != phase),
+                                 'dynamic DOM clip edge follows current width: ' + str(edge))
                         frames.append({'label':label,'phase':phase,'size':[width.value,height.value],'center':center,'clipped':clipped,'sha256':hashlib.sha256(output).hexdigest()})
                         return hashlib.sha256(output).hexdigest()
                     finally:
@@ -93,6 +98,9 @@ def run(args):
                         p.call('rv_host_bind_d3d11_texture', [P,P,P], p.host, target, texture)
                         bound = texture.value
                     phase = 0 if timestamp.value < 6666666 else 1 if timestamp.value < 13333333 else 2
+                    clock = state()
+                    p.expect(clock.seeking or abs(clock.position - timestamp.value / 10000000) < .25,
+                             'decoded video presentation time follows the provider audio clock')
                     cue = ['red cue','green cue','blue cue'][phase]
                     p.call('rv_dom_node_set_text_content', [P,Utf8], caption, cue.encode())
                     p.call('rv_host_native_texture_changed', [P,P], p.host, target)
@@ -106,6 +114,15 @@ def run(args):
                         time.sleep(.12)
                         second = capture('paused-second',phase,publish=True)
                         p.expect(abs(state().position - before) < .03 and first == second, 'paused audio/video clock and native caption frame remain stable')
+                        p.call('rv_host_resize', [P,I,I], p.host, 360, 240)
+                        p.width,p.height = 360,240
+                        capture('paused-resized',phase,publish=True)
+                        clip = p.node('clip')
+                        value = b'70px'
+                        p.call('rv_element_set_style', [P,C.c_char_p,P,I,I], clip, b'width', value, len(value), 0)
+                        capture('paused-narrower-clip',phase,publish=True)
+                        value = b'90px'
+                        p.call('rv_element_set_style', [P,C.c_char_p,P,I,I], clip, b'width', value, len(value), 0)
                         p.expect(seek(session,1.5) == 0, 'actual seek to blue cue')
                         p.expect(play(session) == 0, 'resume after seek')
                 p.expect(phases == {0,1,2}, 'all provider frame/caption phases reach native composition')
