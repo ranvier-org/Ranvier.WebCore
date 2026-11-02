@@ -9,7 +9,6 @@
 #include <EGL/eglext_angle.h>
 #include "RenderBox.h"
 #include "RenderBoxInlines.h"
-#include "ContainerNodeInlines.h"
 #include "RenderLayer.h"
 #include "RenderLayerBacking.h"
 #include "TextureMapperPlatformLayer.h"
@@ -106,7 +105,7 @@ struct RvNativeTextureInput final : WebCore::TextureMapperPlatformLayer {
 
     bool attach()
     {
-        auto* box = dynamicDowncast<WebCore::RenderBox>(element->renderer());
+        auto* box = dynamicDowncast<WebCore::RenderBox>(static_cast<WebCore::Node&>(*element).renderer());
         auto* backing = box && box->layer() ? box->layer()->backing() : nullptr;
         auto* current = backing ? backing->graphicsLayer() : nullptr;
         if (current != layer.get()) {
