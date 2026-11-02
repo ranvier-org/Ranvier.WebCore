@@ -69,7 +69,8 @@ def pack(provider, native, rid, package_id, version, output, source_revision):
         'NOTICE.md': (root / 'NOTICE.md').read_bytes(),
     }
     manifest = dict(id=package_id, version=version, rid=rid, abi=abi,
-        providerSourceRevision=source_revision, qualificationScope='private-style-only-ABI63',
+        callerClaimedProviderSourceRevision=source_revision, sourceProvenance='unverified-caller-claim',
+        qualificationScope='private-style-only-ABI63',
         hostSha256=sha(native), providerSha256=sha(provider),
         requiredCapability='accessibility-text-style', hostBundled=False,
         dependencies='System GIO/GObject/GLib; no renderer package is selected by this optional provider.',
@@ -94,7 +95,7 @@ if __name__ == '__main__':
     parser.add_argument('--id', required=True)
     parser.add_argument('--version', required=True)
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--source-revision', required=True, help='Reviewed source commit used to build the provider.')
+    parser.add_argument('--source-revision', required=True, help='Caller-claimed provider commit; syntax checked, provenance unverified.')
     args = parser.parse_args()
     destination, manifest = pack(args.provider, args.native, args.rid, args.id, args.version, args.output, args.source_revision)
     print(json.dumps(dict(path=str(destination), sha256=sha(destination), manifest=manifest)))

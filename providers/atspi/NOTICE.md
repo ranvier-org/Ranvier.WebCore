@@ -11,4 +11,5 @@ metadata and applicable source notices must be finalized with the coordinated de
 
 The reserved public identity is Ranvier.WebCore.Accessibility.Atspi; no public version is allocated. The current
 artifact is private style-only ABI63 qualification, with linux-x64 distribution only. ARM64 and macOS are not
-qualified runtime assets. The producer manifest records the exact source identity and selected host binary hash.
+qualified runtime assets. The package manifest records an explicitly unverified caller source claim and selected
+host binary hash; source provenance requires separate producer evidence.
