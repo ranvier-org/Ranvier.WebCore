@@ -1,6 +1,7 @@
 #include "../../examples/NativeSpelling/WindowsSpellingProvider.h"
 #include <algorithm>
 #include <cstdio>
+#include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <string>
@@ -16,9 +17,13 @@ static bool require(bool condition, const char* message)
     return condition;
 }
 
-static std::string quoted(std::wstring_view text)
+static std::string jsonString(std::wstring_view text)
 {
     auto count = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, text.data(), static_cast<int>(text.size()), nullptr, 0, nullptr, nullptr);
+    if (!count && !text.empty()) {
+        std::fputs("FAIL: invalid UTF-16 provider result\n", stderr);
+        std::exit(1);
+    }
     std::string utf8(static_cast<size_t>(count), '\0');
     if (count)
         WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, text.data(), static_cast<int>(text.size()), utf8.data(), count, nullptr, nullptr);
@@ -83,7 +88,7 @@ int wmain(int argc, wchar_t** argv)
     for (auto& suggestion : issue->suggestions) {
         if (!first)
             output << ',';
-        output << quoted(suggestion);
+        output << jsonString(suggestion);
         first = false;
     }
     output << "],\"assertions\":" << assertions << "}\n";
