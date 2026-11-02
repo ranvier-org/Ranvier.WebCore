@@ -14,13 +14,13 @@ def job(name):
     return re.split(r'(?m)^  [a-z][\w-]*:\s*$', text.split(marker, 1)[1], maxsplit=1)[0]
 
 
-def evaluate(expression, recovery=False, recovery4=False, result='success', event='workflow_dispatch', ref='refs/heads/main', user='owner', cancelled=False):
-    values = {'inputs.recover_preview2_gpu': recovery, 'inputs.recover_preview4_gpu': recovery4, 'github.event_name': event, 'github.ref': ref,
+def evaluate(expression, recovery=False, recovery4=False, recovery7=False, result='success', event='workflow_dispatch', ref='refs/heads/main', user='owner', cancelled=False):
+    values = {'inputs.recover_preview2_gpu': recovery, 'inputs.recover_preview4_gpu': recovery4, 'inputs.recover_preview7_linux': recovery7, 'github.event_name': event, 'github.ref': ref,
               'github.workflow': 'build', 'github.run_id': 123, 'inputs.flavor': 'gpu', 'vars.NUGET_USER': user,
               'inputs.rids': '', 'github.head_ref': 'codex/batch-fixture',
               'github.event.pull_request.labels.*.name': [],
               'needs.plan.outputs.matrix': 'selected', 'needs.plan.outputs.prebuilt': 'attached',
-              'needs.recover-preview2-gpu.result': result, 'needs.verify-preview4-gpu-recovery.result': result, 'needs.native.result': 'success',
+              'needs.recover-preview2-gpu.result': result, 'needs.verify-preview4-gpu-recovery.result': result, 'needs.verify-preview7-linux-recovery.result': result, 'needs.native.result': 'success',
               'needs.prebuilt.result': 'skipped', 'needs.managed.result': 'skipped',
               'needs.package-contract.result': 'success', 'needs.publish.result': 'success'}
     for key in sorted(values, key=len, reverse=True):
@@ -49,6 +49,30 @@ def permitted(name, **options):
 
 
 class RecoveryWorkflowControls(unittest.TestCase):
+    def test_preview7_isolated_and_main_only(self):
+        for name in ['plan', 'package-contract', 'native', 'prebuilt', 'managed', 'publish', 'windows-gpu-cohort',
+                     'recover-preview2-gpu', 'publish-preview2-recovery', 'verify-preview4-gpu-recovery', 'publish-preview4-gpu-recovery']:
+            with self.subTest(job=name): self.assertFalse(permitted(name, recovery7=True))
+        self.assertTrue(permitted('verify-preview7-linux-recovery', recovery7=True))
+        self.assertFalse(permitted('verify-preview7-linux-recovery', recovery7=True, recovery=True))
+        self.assertFalse(permitted('verify-preview7-linux-recovery', recovery7=True, recovery4=True))
+        self.assertFalse(permitted('verify-preview7-linux-recovery', recovery7=True, ref='refs/heads/other'))
+        self.assertFalse(permitted('verify-preview7-linux-recovery', recovery7=True, event='push'))
+        self.assertTrue(permitted('publish-preview7-linux-recovery', recovery7=True))
+        self.assertFalse(permitted('publish-preview7-linux-recovery', recovery7=True, result='failure'))
+        self.assertFalse(permitted('publish-preview7-linux-recovery', recovery7=True, user=''))
+        self.assertFalse(permitted('publish-preview7-linux-recovery', recovery7=True, cancelled=True))
+
+    def test_preview7_concurrency_and_verification_before_authentication(self):
+        text = WORKFLOW.read_text()
+        group = re.search(r'(?m)^  group: (.+)$', text)[1].split('${{')[1].split('}}')[0]
+        cancel = re.search(r'(?m)^  cancel-in-progress: (.+)$', text)[1].split('${{')[1].split('}}')[0]
+        self.assertEqual(evaluate(group, recovery7=True), 'preview7-linux-recovery-123')
+        self.assertFalse(evaluate(cancel, recovery7=True))
+        publication = job('publish-preview7-linux-recovery')
+        self.assertLess(publication.index('scripts/prepare_preview7_linux_gpu.py'), publication.index('NuGet/login@v1'))
+        self.assertIn('needs: [verify-preview7-linux-recovery]', publication)
+
     def test_preview4_skips_all_other_jobs_and_requires_main(self):
         for name in ['plan', 'package-contract', 'native', 'prebuilt', 'managed', 'publish',
                      'windows-gpu-cohort', 'recover-preview2-gpu', 'publish-preview2-recovery']:
