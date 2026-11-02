@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import tempfile
 import zipfile
+import xml.etree.ElementTree as ET
 
 
 def main():
@@ -45,9 +46,11 @@ def main():
             assert manifest['callerClaimedProviderSourceRevision'] == args.source_revision
             assert manifest['sourceProvenance'] == 'unverified-caller-claim'
             assert 'providerSourceRevision' not in manifest
-            assert 'pending' in manifest['licenseReviewStatus']
+            assert 'original-project-license-unspecified' in manifest['licenseMetadataStatus']
             assert 'Embedded protocol declarations' in archive.read('THIRD-PARTY.md').decode()
             assert 'GNU LESSER GENERAL PUBLIC LICENSE' in archive.read('licenses/LGPL-2.1.txt').decode()
+            license_metadata = ET.fromstring(archive.read('Ranvier.Private.Atspi.Control.nuspec')).find('metadata/license')
+            assert license_metadata.attrib == {'type': 'file'} and license_metadata.text == 'NOTICE.md'
         rows.append(dict(name='only provider native asset and exact manifest bundled', passed=True))
         before = module.sha(destination)
         rejected('existing artifact is not overwritten', lambda: module.pack(args.provider, args.native, 'linux-x64', 'Ranvier.Private.Atspi.Control', '0.0.0-privatecontrol', output, args.source_revision), FileExistsError)

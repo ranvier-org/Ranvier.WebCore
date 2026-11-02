@@ -49,7 +49,7 @@ provider commit, selected host hash, provider hash, payload hashes and private s
 and its provenance `unverified-caller-claim`: the packager cannot establish which source produced an arbitrary ELF.
 Reviewers must compare the module and host hashes against independent producer receipts. CI's same-run source checkout,
 build and retained logs provide separate source-build evidence; repackaging alone supplies no such proof.
-The packager rejects public package IDs and versions while the final cohort, version and source licenses await review.
+The packager rejects public package IDs and versions while the final matching cohort and public version remain unallocated.
 
 Only `linux-x64` is currently eligible for packaging and the opt-in workflow. ARM64 source/compilation is preparatory:
 enable distribution only after a matching actual ARM64 Native ABI63 host, provider, protocol and ordinary Window/AOT
@@ -67,10 +67,11 @@ the separate protocol and managed Window normal/traced NativeAOT receipts supply
 The opt-in CI workflow retains this consumer receipt with native/protocol reports and the private package. It does not
 publish to NuGet. Final integration must repeat all gates against the frozen #171/#182 union and public managed cohort.
 
-Public release review must supply applicable project/source license texts and finalize notices. The current qualification
-notice records packaged and system components without assigning an unreviewed license to the provider.
+The qualification notice records packaged and system components without assigning an unspecified project license.
 `THIRD-PARTY.md` inventories the embedded WebKit protocol XML and identified LGPL dependency/header sources; its
-unresolved XML and project license questions keep public package/license metadata unallocated.
+XML origin and project license metadata limitations do not introduce an additional approval gate. NuGet license
+metadata names the truthful `NOTICE.md`, following existing native/managed/aggregate package convention, without
+inventing grants or an SPDX expression. The final matching cohort and public version still require allocation.
 
 ## ARM64 test preparation
 
@@ -88,4 +89,4 @@ SDK publish/load must then run on ARM64. `--test-only-arm64` allows only private
 `ARM64-test-only-unqualified`; ordinary ARM64 distribution remains rejected. This override does not qualify a runtime.
 
 Even a green ARM64 distribution job leaves real managed Window normal/traced NativeAOT lifecycle and optional-module/
-missing-bus checks, complete matching final cohort acceptance and public license/version review outstanding.
+missing-bus checks, complete matching final cohort acceptance and public version allocation outstanding.
