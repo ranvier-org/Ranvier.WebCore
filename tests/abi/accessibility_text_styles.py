@@ -53,7 +53,8 @@ def run(directory):
         start, end, length = integer(91), integer(92), integer(93)
         buffer = C.create_string_buffer(b'!' * 128, 129)
         status = style(handle, offset, property, C.byref(start), C.byref(end), buffer, capacity, C.byref(length))
-        return status, start.value, end.value, length.value, buffer.value.decode()
+        value = buffer.raw[:length.value].decode() if status == 0 else buffer.value.decode()
+        return status, start.value, end.value, length.value, value
     try:
         assert load(host, html, len(html)) == 0
         assert enable(host, 1, None, None) == 0
@@ -76,7 +77,7 @@ def run(directory):
         for prop in [b'width', b'future-property']:
             actual = query(rich, 0, prop)
             check('unsupported property clears outputs ' + prop.decode(), actual[:4] == (-9, 0, 0, 0), actual[:4])
-        actual = query(rich, 1, capacity=3)
+        actual = query(rich, 1, capacity=2)
         check('short buffer untouched with complete run/count', actual[:4] == (-6, 1, 4, 3) and actual[4] == '!' * 128, actual[:4])
         actual = query(rich, 1, capacity=-1)
         check('negative capacity clears outputs', actual[:4] == (-9, 0, 0, 0), actual[:4])
