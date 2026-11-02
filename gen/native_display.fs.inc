@@ -312,6 +312,22 @@ module internal NativeDisplay =
                     Some (fun childPrecedence -> renderItem context nestedDepth childPrecedence item)
                 ])
 
+    /// <summary>Formats a result using statically typed payload renderers.</summary>
+    let result (context: Context) depth precedence renderOk renderError value =
+        match value with
+        | Ok item ->
+            union context depth precedence (box value) (fun nestedDepth ->
+                "Ok",
+                [
+                    Some (fun childPrecedence -> renderOk context nestedDepth childPrecedence item)
+                ])
+        | Error item ->
+            union context depth precedence (box value) (fun nestedDepth ->
+                "Error",
+                [
+                    Some (fun childPrecedence -> renderError context nestedDepth childPrecedence item)
+                ])
+
     /// <summary>Formats a nonnull opaque value with its declared marker and no user code.</summary>
     let opaque (context: Context) depth marker (value: obj) =
         context.Guard (
