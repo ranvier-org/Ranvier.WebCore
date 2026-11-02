@@ -5,6 +5,7 @@
 #include <thread>
 #include <filesystem>
 #include <fstream>
+#include <mmdeviceapi.h>
 
 using RanvierNativeMedia::Playback;
 using RanvierNativeMedia::State;
@@ -51,6 +52,21 @@ int wmain(int argc, wchar_t** argv)
     std::printf("MEDIA_INITIALIZE_HRESULT=%08lx\n", static_cast<unsigned long>(status));
     if (FAILED(status))
         return player.snapshot().state == State::Unavailable ? 77 : 1;
+    Microsoft::WRL::ComPtr<IMMDeviceEnumerator> endpoints;
+    status = CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&endpoints));
+    if (FAILED(status))
+        return 1;
+    Microsoft::WRL::ComPtr<IMMDevice> endpoint;
+    status = endpoints->GetDefaultAudioEndpoint(eRender, eMultimedia, &endpoint);
+    if (status == HRESULT_FROM_WIN32(ERROR_NOT_FOUND)) {
+        std::puts("MEDIA_AUDIO_ENDPOINT_UNAVAILABLE: requested audio/video fixture has no OS output endpoint");
+        return 77;
+    }
+    if (FAILED(status)) {
+        std::fprintf(stderr, "MEDIA_AUDIO_ENDPOINT_HRESULT=%08lx\n", static_cast<unsigned long>(status));
+        return 1;
+    }
+    std::puts("MEDIA_AUDIO_ENDPOINT_PRESENT=1");
     if (!require(SUCCEEDED(player.openFile(argv[1])), "open local owned audio/video fixture"))
         return 1;
     if (!require(waitFor(player, [](auto value) { return value.ready && value.duration > 1; }), "actual provider resolves local media"))
