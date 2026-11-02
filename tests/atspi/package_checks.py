@@ -14,6 +14,7 @@ def main():
     parser.add_argument('--native', required=True, type=Path)
     parser.add_argument('--previous-native', required=True, type=Path)
     parser.add_argument('--report', required=True, type=Path)
+    parser.add_argument('--source-revision', required=True)
     args = parser.parse_args()
     source = Path(__file__).resolve().parents[2] / 'providers/atspi/package.py'
     spec = importlib.util.spec_from_file_location('atspi_package', source)
@@ -34,8 +35,8 @@ def main():
     rejected('uninstalled absolute build rpath', lambda: module.validate_runtime(args.uninstalled_provider, args.native, 'linux-x64'))
     with tempfile.TemporaryDirectory(prefix='ranvier-atspi-package-') as temporary:
         output = Path(temporary)
-        rejected('package path injection', lambda: module.pack(args.provider, args.native, 'linux-x64', '../escape', '0.0.0-test', output))
-        destination, manifest = module.pack(args.provider, args.native, 'linux-x64', 'Ranvier.Private.Atspi.Control', '0.0.0-test', output)
+        rejected('package path injection', lambda: module.pack(args.provider, args.native, 'linux-x64', '../escape', '0.0.0-privatecontrol', output, args.source_revision))
+        destination, manifest = module.pack(args.provider, args.native, 'linux-x64', 'Ranvier.Private.Atspi.Control', '0.0.0-privatecontrol', output, args.source_revision)
         with zipfile.ZipFile(destination) as archive:
             names = archive.namelist()
             assert names.count('runtimes/linux-x64/native/libRanvierWebCoreAtspi.so') == 1
@@ -43,7 +44,7 @@ def main():
             assert json.loads(archive.read('provider-manifest.json')) == manifest
         rows.append(dict(name='only provider native asset and exact manifest bundled', passed=True))
         before = module.sha(destination)
-        rejected('existing artifact is not overwritten', lambda: module.pack(args.provider, args.native, 'linux-x64', 'Ranvier.Private.Atspi.Control', '0.0.0-test', output), FileExistsError)
+        rejected('existing artifact is not overwritten', lambda: module.pack(args.provider, args.native, 'linux-x64', 'Ranvier.Private.Atspi.Control', '0.0.0-privatecontrol', output, args.source_revision), FileExistsError)
         assert before == module.sha(destination)
     args.report.write_text(json.dumps(rows, indent=2))
     print(json.dumps(dict(checks=len(rows), failures=[row for row in rows if not row['passed']])))
