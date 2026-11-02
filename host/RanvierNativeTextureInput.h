@@ -7,14 +7,11 @@
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 #include <EGL/eglext_angle.h>
-#include "RenderBox.h"
-#include "RenderBoxInlines.h"
-#include "RenderLayer.h"
-#include "RenderLayerBacking.h"
 #include "TextureMapperPlatformLayer.h"
 
 extern "C" __declspec(dllimport) void rv_native_texture_draw(WebCore::TextureMapper*, unsigned,
     const WebCore::FloatRect*, const WebCore::TransformationMatrix*, float);
+extern "C" __declspec(dllimport) WebCore::GraphicsLayer* rv_native_texture_layer(WebCore::Element*, WebCore::FloatRect*);
 
 struct RvNativeTextureInput final : WebCore::TextureMapperPlatformLayer {
     template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
@@ -105,17 +102,14 @@ struct RvNativeTextureInput final : WebCore::TextureMapperPlatformLayer {
 
     bool attach()
     {
-        auto* box = dynamicDowncast<WebCore::RenderBox>(static_cast<WebCore::Node&>(*element).renderer());
-        auto* backing = box && box->layer() ? box->layer()->backing() : nullptr;
-        auto* current = backing ? backing->graphicsLayer() : nullptr;
+        WebCore::FloatRect rect;
+        auto* current = rv_native_texture_layer(element.get(), &rect);
         if (current != layer.get()) {
             detach();
             layer = current;
         }
         if (!layer)
             return false;
-        auto rect = WebCore::FloatRect { box->contentBoxRect() };
-        rect.move(-layer->offsetFromRenderer());
         layer->setContentsToPlatformLayer(this, WebCore::GraphicsLayer::ContentsLayerPurpose::Canvas);
         layer->setContentsRect(rect);
         layer->setContentsClippingRect(WebCore::FloatRoundedRect { rect });
