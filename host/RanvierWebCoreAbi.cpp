@@ -462,6 +462,22 @@ private:
     Replay m_replaying { Replay::None };
     uint64_t m_historyGeneration { 0 };
     uint64_t m_replayGeneration { 0 };
+    uint64_t m_documentGeneration { 0 };
+    std::optional<uint64_t> m_editDocumentGeneration;
+
+    std::optional<uint64_t> beginEditingDocument()
+    {
+        return std::exchange(m_editDocumentGeneration, m_documentGeneration);
+    }
+    void endEditingDocument(std::optional<uint64_t> previous)
+    {
+        m_editDocumentGeneration = previous;
+    }
+    void documentWillChange()
+    {
+        ++m_documentGeneration;
+        clearUndoRedoOperations();
+    }
 
     static void discard(Vector<Ref<UndoStep>>& history)
     {
@@ -472,7 +488,8 @@ private:
 
     void registerUndoStep(UndoStep& step) final
     {
-        if (m_replaying == Replay::Redo && m_replayGeneration != m_historyGeneration) {
+        if ((m_editDocumentGeneration && *m_editDocumentGeneration != m_documentGeneration)
+            || (m_replaying == Replay::Redo && m_replayGeneration != m_historyGeneration)) {
             step.didRemoveFromUndoManager();
             return;
         }
@@ -484,7 +501,8 @@ private:
     }
     void registerRedoStep(UndoStep& step) final
     {
-        if (m_replaying == Replay::Undo && m_replayGeneration != m_historyGeneration) {
+        if ((m_editDocumentGeneration && *m_editDocumentGeneration != m_documentGeneration)
+            || (m_replaying == Replay::Undo && m_replayGeneration != m_historyGeneration)) {
             step.didRemoveFromUndoManager();
             return;
         }
@@ -988,14 +1006,21 @@ struct RvHost {
 
 class RvEditingScope {
 public:
-    explicit RvEditingScope(RvHost& host) : m_host(host) { ++m_host.editingDepth; }
+    explicit RvEditingScope(RvHost& host)
+        : m_host(host)
+        , m_previousDocumentGeneration(static_cast<RvEditorClient&>(host.page->editorClient()).beginEditingDocument())
+    {
+        ++m_host.editingDepth;
+    }
     ~RvEditingScope()
     {
+        static_cast<RvEditorClient&>(m_host.page->editorClient()).endEditingDocument(m_previousDocumentGeneration);
         if (!--m_host.editingDepth && std::exchange(m_host.destroyAfterEditing, false))
             rv_host_destroy(&m_host);
     }
 private:
     RvHost& m_host;
+    std::optional<uint64_t> m_previousDocumentGeneration;
 };
 
 void RvChromeClient::invalidate(const IntRect& rect)
@@ -2302,7 +2327,7 @@ void rv_host_destroy(RvHost* host)
         return;
     }
     host->documentTransaction = RvHost::DocumentTransaction::Destroying;
-    host->page->editorClient().clearUndoRedoOperations();
+    static_cast<RvEditorClient&>(host->page->editorClient()).documentWillChange();
 #if (defined(_WIN32) || defined(__linux__)) && RANVIER_COMPOSITING
     host->nativeTextures.clear();
 #endif
@@ -2343,7 +2368,7 @@ int32_t rv_host_load_html(RvHost* host, const uint8_t* html, int32_t html_length
     if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
         return RV_ERR_DETACHED;
     host->documentTransaction = RvHost::DocumentTransaction::Replacing;
-    host->page->editorClient().clearUndoRedoOperations();
+    static_cast<RvEditorClient&>(host->page->editorClient()).documentWillChange();
 #if (defined(_WIN32) || defined(__linux__)) && RANVIER_COMPOSITING
     host->nativeTextures.clear();
 #endif
@@ -2373,7 +2398,7 @@ int32_t rv_host_load_svg(RvHost* host, const uint8_t* svg, int32_t svg_length)
     if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
         return RV_ERR_DETACHED;
     host->documentTransaction = RvHost::DocumentTransaction::Replacing;
-    host->page->editorClient().clearUndoRedoOperations();
+    static_cast<RvEditorClient&>(host->page->editorClient()).documentWillChange();
 #if (defined(_WIN32) || defined(__linux__)) && RANVIER_COMPOSITING
     host->nativeTextures.clear();
 #endif
@@ -6891,16 +6916,19 @@ int32_t rv_host_replace_range(RvHost* host, RvAbstractRange* range, const uint8_
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle || host->destroyAfterEditing)
+        return RV_ERR_DETACHED;
     auto& abstract = *reinterpret_cast<AbstractRange*>(range);
     if (&abstract.startContainer().document() != &host->document() || &abstract.endContainer().document() != &host->document())
         return RV_ERR_WRONG_HOST;
+    if (host->frame().editor().hasComposition())
+        return RV_ERR_UNSUPPORTED;
+    Ref protectedRange = abstract;
     auto bytes = input->utf8();
-    int32_t result = 0;
-    auto status = dispatchCountingFailures([&] {
-        result = ranvier_replace_range(range, reinterpret_cast<const uint8_t*>(bytes.data()), static_cast<int32_t>(bytes.length()));
+    return handleInput(*host, [&] {
+        return ranvier_replace_range(reinterpret_cast<RvAbstractRange*>(protectedRange.ptr()),
+            reinterpret_cast<const uint8_t*>(bytes.data()), static_cast<int32_t>(bytes.length())) == 1;
     });
-    host->document().updateStyleIfNeeded();
-    return status == RV_OK ? result : status;
 }
 
 // Accessibility: the tree of WebCore's accessibility objects, as docs/ACCESSIBILITY.md describes.
