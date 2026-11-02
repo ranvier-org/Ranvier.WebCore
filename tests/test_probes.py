@@ -89,6 +89,16 @@ class ProbeRunnerTests(unittest.TestCase):
 
 
 class WorkflowTests(unittest.TestCase):
+    def test_spelling_range_and_optional_os_provider_have_automatic_routes(self):
+        ranges = [entry for entry in probes.PROBES if 'spelling_replacement.py' in ' '.join(entry['commands'])]
+        self.assertEqual(len(ranges), 1)
+        self.assertIsNone(ranges[0]['rid'])
+        self.assertIsNone(ranges[0]['flavor'])
+        providers = [entry for entry in probes.PROBES if 'tests/spelling/windows.py' in ' '.join(entry['commands'])]
+        self.assertEqual(len(providers), 1)
+        self.assertEqual(providers[0]['rid'], 'win-x64')
+        self.assertIsNone(providers[0]['flavor'])
+
     def test_linux_gpu_runs_native_texture_input_on_both_gpu_rids(self):
         entries = [entry for entry in probes.PROBES if any(
             'compositor_input_linux.py' in command for command in entry['commands'])]
