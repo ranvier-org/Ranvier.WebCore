@@ -1,0 +1,52 @@
+name: P7 Windows GPU consumer qualification
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: p7-windows-consumer-${{ github.run_id }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  qualify:
+    runs-on: windows-2025
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install bounded model dependency
+        run: python -m pip install numpy==2.4.3
+      - name: Check qualification contract
+        run: python -I tests/test_p7_qualification_contract.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: package-win-x64-gpu
+          path: ${{ runner.temp }}/p7-package
+          run-id: 41498246594
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: manifest-win-x64-gpu
+          path: ${{ runner.temp }}/p7-manifest
+          run-id: 41498246594
+          github-token: ${{ github.token }}
+      - name: Qualify exact P7 Windows artifact
+        shell: pwsh
+        run: >-
+          python -I scripts/qualify_p7_clipping.py
+          --package "$env:RUNNER_TEMP/p7-package/Ranvier.WebCore.Native.Gpu.win-x64.0.1.1-preview.7.nupkg"
+          --manifest "$env:RUNNER_TEMP/p7-manifest/manifest.json"
+          --work "$env:RUNNER_TEMP/p7-windows-qualification"
+      - name: Retain complete qualification and original report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p7-windows-qualification
+          path: ${{ runner.temp }}/p7-windows-qualification
+          if-no-files-found: warn

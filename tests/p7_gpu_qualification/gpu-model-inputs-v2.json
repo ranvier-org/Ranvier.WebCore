@@ -1,0 +1,616 @@
+{
+  "format": 1,
+  "scope": "Geometry/CTM/texture metadata ONLY; no captured pixel, palette or tolerance input",
+  "casesSha256": "77d7472d0cd458e439adf6b3b38e379437bc0f632390394a1666e05e314c71b1",
+  "gpu": {
+    "version": "OpenGL ES 3.0 (ANGLE 2.1.29096 git hash: e9f64dda0c5b)",
+    "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5080 (0x00002C02) Direct3D11 vs_5_0 ps_5_0, D3D11-32.0.16.1088)",
+    "vendor": "Google Inc. (NVIDIA)",
+    "fragmentLowFloat": {
+      "range": [
+        127,
+        127
+      ],
+      "precision": 23
+    },
+    "fragmentMediumFloat": {
+      "range": [
+        127,
+        127
+      ],
+      "precision": 23
+    },
+    "fragmentHighFloat": {
+      "range": [
+        127,
+        127
+      ],
+      "precision": 23
+    }
+  },
+  "sourceFacts": [
+    {
+      "fact": "GraphicsContextSkia::clip non-AA",
+      "path": "C:/wk/src/Source/WebCore/platform/graphics/skia/GraphicsContextSkia.cpp",
+      "lines": [
+        647,
+        658
+      ],
+      "sha256": "f603c3f08bae487cd6de14d557681637e16b8f8c3ca319d28bb9978eb12ea7ee"
+    },
+    {
+      "fact": "SkRasterClip axis-aligned BW round",
+      "path": "C:/wk/src/Source/ThirdParty/skia/src/core/SkRasterClip.cpp",
+      "lines": [
+        152,
+        176
+      ],
+      "sha256": "bd6c18720d3882d836570d3536ad50527ee67b8a30b7aea3555a9bcc28015bee"
+    },
+    {
+      "fact": "SkRect::round",
+      "path": "C:/wk/src/Source/ThirdParty/skia/include/core/SkRect.h",
+      "lines": [
+        1272,
+        1278
+      ],
+      "sha256": "03e5fb31037aa3a40191c92189da435c92062f3f3ad90be044a0df9b4692ac86"
+    },
+    {
+      "fact": "TextureMapper rectilinear edge-AA selection",
+      "path": "C:/wk/src/Source/WebCore/platform/graphics/texmap/TextureMapper.cpp",
+      "lines": [
+        575,
+        601
+      ],
+      "sha256": "34e64df086d1a65fe8dfac51f93b4e0137beb1f29c1401a45e7ec591928e8ecd"
+    },
+    {
+      "fact": "GraphicsLayerTextureMapper contentsScale",
+      "path": "C:/wk/src/Source/WebCore/platform/graphics/texmap/GraphicsLayerTextureMapper.cpp",
+      "lines": [
+        572,
+        589
+      ],
+      "sha256": "cfaa244a004f65161eb4554a619bffdf04fc456a79bf8f90089f375a0e321d99"
+    }
+  ],
+  "providerPrecisionPrimary": {
+    "url": "https://microsoft.github.io/DirectX-Specs/d3d/archive/D3D11_3_FunctionalSpec.htm",
+    "sections": [
+      "3.2.4.1 FLOAT to fixed:0.6LSB conversion",
+      "7.18.16.1 minimum8fractionalbits texture addresses",
+      "3.2.3.6 FLOAT to UNORM:0.6LSB conversion",
+      "7.18.16.3 constant-color sampling invariant"
+    ]
+  },
+  "cases": [
+    {
+      "name": "composited-translate",
+      "scale": 1.5,
+      "viewportCss": [
+        800,
+        600
+      ],
+      "styles": {
+        "width": "100.5px",
+        "height": "33.25px",
+        "border-left-width": "4.666667px",
+        "border-top-width": "4.666667px",
+        "padding-left": "2px",
+        "padding-top": "10px",
+        "transform": "matrix(1, 0, 0, 1, 7.25, 11.5)"
+      },
+      "resize": {
+        "o": "o",
+        "t": "f",
+        "rect": [
+          2,
+          10,
+          100.5,
+          33.25
+        ],
+        "content": [
+          100.5,
+          33.25
+        ],
+        "border": [
+          115.8125,
+          58.5625
+        ],
+        "device": [
+          151,
+          50
+        ]
+      },
+      "paint": {
+        "case": "composited-translate scale=1.5",
+        "dpr": [
+          1.5
+        ],
+        "paint": [
+          0.34375,
+          0.34375,
+          115.8125,
+          58.5625
+        ],
+        "logical": [
+          7.0,
+          15.0,
+          100.5,
+          33.25
+        ],
+        "precise": [
+          7.010416507720947,
+          15.010416984558105,
+          100.5,
+          33.25
+        ],
+        "ctm": [
+          1.5,
+          0.0,
+          0.0,
+          1.5,
+          0.0,
+          0.0
+        ]
+      },
+      "rootTexture": {
+        "texture": [
+          2.0
+        ],
+        "size": [
+          1200.0,
+          900.0
+        ],
+        "allocated": [
+          1200.0,
+          900.0
+        ],
+        "opaque": [
+          0.0
+        ],
+        "rect": [
+          0.0,
+          0.0,
+          1200.0,
+          900.0
+        ],
+        "opacity": [
+          1.0
+        ],
+        "rectilinear": [
+          1.0
+        ],
+        "exposed": [
+          1.0
+        ],
+        "matrix": [
+          1.0000000298023224,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0000000298023224,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "pattern": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "clamp": [
+          -1.0,
+          -1.0
+        ]
+      },
+      "promotedTexture": {
+        "texture": [
+          3.0
+        ],
+        "size": [
+          175.0,
+          89.0
+        ],
+        "allocated": [
+          175.0,
+          89.0
+        ],
+        "opaque": [
+          0.0
+        ],
+        "rect": [
+          0.0,
+          0.0,
+          174.984375,
+          88.9921875
+        ],
+        "opacity": [
+          1.0
+        ],
+        "rectilinear": [
+          1.0
+        ],
+        "exposed": [
+          1.0
+        ],
+        "matrix": [
+          1.0000000298023224,
+          0.0,
+          0.0,
+          14.859375,
+          0.0,
+          1.0000000298023224,
+          0.0,
+          21.234375,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "pattern": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "clamp": [
+          -1.0,
+          -1.0
+        ]
+      }
+    },
+    {
+      "name": "composited-translate",
+      "scale": 2,
+      "viewportCss": [
+        800,
+        600
+      ],
+      "styles": {
+        "width": "100.5px",
+        "height": "33.25px",
+        "border-left-width": "5px",
+        "border-top-width": "5px",
+        "padding-left": "2px",
+        "padding-top": "10px",
+        "transform": "matrix(1, 0, 0, 1, 7.25, 11.5)"
+      },
+      "resize": {
+        "o": "o",
+        "t": "f",
+        "rect": [
+          2,
+          10,
+          100.5,
+          33.25
+        ],
+        "content": [
+          100.5,
+          33.25
+        ],
+        "border": [
+          116.5,
+          59.25
+        ],
+        "device": [
+          201,
+          67
+        ]
+      },
+      "paint": {
+        "case": "composited-translate scale=2",
+        "dpr": [
+          2.0
+        ],
+        "paint": [
+          0.0,
+          0.0,
+          116.5,
+          59.25
+        ],
+        "logical": [
+          7.0,
+          15.0,
+          100.5,
+          33.25
+        ],
+        "precise": [
+          7.0,
+          15.0,
+          100.5,
+          33.25
+        ],
+        "ctm": [
+          2.0,
+          0.0,
+          0.0,
+          2.0,
+          0.0,
+          0.0
+        ]
+      },
+      "rootTexture": {
+        "texture": [
+          2.0
+        ],
+        "size": [
+          1600.0,
+          1200.0
+        ],
+        "allocated": [
+          1600.0,
+          1200.0
+        ],
+        "opaque": [
+          0.0
+        ],
+        "rect": [
+          0.0,
+          0.0,
+          1600.0,
+          1200.0
+        ],
+        "opacity": [
+          1.0
+        ],
+        "rectilinear": [
+          1.0
+        ],
+        "exposed": [
+          1.0
+        ],
+        "matrix": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "pattern": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "clamp": [
+          -1.0,
+          -1.0
+        ]
+      },
+      "promotedTexture": {
+        "texture": [
+          3.0
+        ],
+        "size": [
+          233.0,
+          119.0
+        ],
+        "allocated": [
+          233.0,
+          119.0
+        ],
+        "opaque": [
+          0.0
+        ],
+        "rect": [
+          0.0,
+          0.0,
+          233.0,
+          119.0
+        ],
+        "opacity": [
+          1.0
+        ],
+        "rectilinear": [
+          1.0
+        ],
+        "exposed": [
+          1.0
+        ],
+        "matrix": [
+          1.0,
+          0.0,
+          0.0,
+          20.5,
+          0.0,
+          1.0,
+          0.0,
+          29.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "pattern": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "clamp": [
+          -1.0,
+          -1.0
+        ]
+      }
+    }
+  ],
+  "shaderPrecision": {
+    "shaderPrecision": {
+      "vertex": {
+        "low": {
+          "range": [
+            127,
+            127
+          ],
+          "fractionBits": 23
+        },
+        "medium": {
+          "range": [
+            127,
+            127
+          ],
+          "fractionBits": 23
+        },
+        "high": {
+          "range": [
+            127,
+            127
+          ],
+          "fractionBits": 23
+        }
+      },
+      "fragment": {
+        "low": {
+          "range": [
+            127,
+            127
+          ],
+          "fractionBits": 23
+        },
+        "medium": {
+          "range": [
+            127,
+            127
+          ],
+          "fractionBits": 23
+        },
+        "high": {
+          "range": [
+            127,
+            127
+          ],
+          "fractionBits": 23
+        }
+      }
+    },
+    "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5080 (0x00002C02) Direct3D11 vs_5_0 ps_5_0, D3D11-32.0.16.1088)",
+    "runtime": {
+      "brotlicommon.dll": "51ceb027fb1ac0c7f69520b09fa06234e447e64e617ba610208ccf9ccf2831c5",
+      "brotlidec.dll": "7591018fa9170e6907259fb62734a4ca30c0304e759b9fb2907228861cd007ea",
+      "harfbuzz-icu.dll": "a45432d511eb93b05dcddb379c37493fd50653d984f8f99a80b8d6a3c9f34888",
+      "harfbuzz.dll": "1a8a3056ce49e98599c9f773363ea6c7a3c776bb452c6e2d81be9768a25aa5e1",
+      "icudt77.dll": "44e4cff48966f407f14d7d57d370265b7a67d349ee2c8fc04183602f98e7bc2b",
+      "icuin77.dll": "40f418ab7b3b220c13307b637704d5c3c6ef5de9e6d5f9f1ad2ed4c7cbc89d76",
+      "icuuc77.dll": "08023f88e42b0b44cfd173c9a3c14f32424b7ff4123fc248e418f37e7e01f97e",
+      "JavaScriptCore.dll": "70bd9af08605020bb79a5d887a434ead0d28b4c9fb5e57db6b3c7c8aeef7d459",
+      "jpeg62.dll": "f25567bb956f5bb3a85f5d68698532b8aec8147d29a5f1cc4e62c4b194084eef",
+      "libEGL.dll": "83c72a0f3e6786b88dda551beeb3dcf6cdb21f220ec22337e8ff483d4e56813d",
+      "libGLESv2.dll": "f69808d2ad01faca3fcb804060dd4da984e68cc503e17dfdd39af17131a02ea0",
+      "libpng16.dll": "7168dfbdd06556c9e0ef0fd24d90917d23462d40556fd3addd5243028e360203",
+      "libsharpyuv.dll": "4cd3003f77ad24f86694e29e07b992bce22bd65766ababacc8decaa5e030fb63",
+      "libwebp.dll": "a512b83b0b2e608a6d1fbe90963330b4e3c88830e3847406ab6d80ec129894c0",
+      "libwebpdemux.dll": "bd53a42f30b7c7b719bc804c85d51b35c1b386298c6474105c5583ee9d078cdd",
+      "libwebpmux.dll": "0b93a02a948eb68dca4cb29ad8751bd7919b7577497661a656affb32f7c476b1",
+      "libxml2.dll": "74d68362419332ec5c579728251c15e551de38b7642d16303a96320cb1e9ebc9",
+      "RanvierWebCoreHost.dll": "f1ff0a7575264730dbcf1e7a0421964cf2ea74dcebd99e36fc41d8dbd30c2ad1",
+      "WebCore.dll": "81e85df6c14cc04511058fb2e4f4ffb09eec0ccd09f73d71797a0170f2d288b4",
+      "zlib1.dll": "1da50b2ab41a5d4c0719e1d9be37508fc8bf284577130e1f183e56592dd29d51",
+      "WebKit.resources/icons/missingImage.png": "c13b9dcf2f6a41033e540d85de3d1e30054bd3b54c0b35229b5a77bd403a7229",
+      "WebKit.resources/icons/missingImage@2x.png": "40b23dc2728d8499608654a4b89cfd5ad4bd04a09b5b27e4927004e167d41bf7",
+      "WebKit.resources/icons/missingImage@3x.png": "99e0c1a9d026c61ea3ed12a7ad14087b0ceeac04b08caba7ab648c0ae8be5ed4",
+      "WebKit.resources/icons/panIcon.png": "1f0018318f073a57aa89ae175bec415a2aef08404c72e535b8fefeb428590329",
+      "WebKit.resources/icons/textAreaResizeCorner.png": "16d9c626d3faf3907a10819493d53d43ab4a09a0eeafec92e1492afbb03c4c8b",
+      "WebKit.resources/icons/textAreaResizeCorner@2x.png": "4557192b829da5e271abf02024cc0a7e1ae2153b79b98682a330bfa48c1e57bf"
+    },
+    "nativeUnchanged": true,
+    "assertions": 6,
+    "purpose": "Actual vertex+fragment precision only; no new renderer build or repeated54-case gate"
+  },
+  "matrixGetterOrder": [
+    "m11",
+    "m21",
+    "m31",
+    "m41",
+    "m12",
+    "m22",
+    "m32",
+    "m42",
+    "m13",
+    "m23",
+    "m33",
+    "m43",
+    "m14",
+    "m24",
+    "m34",
+    "m44"
+  ],
+  "matrixOrderCorrection": "Explicitgetterorder, nottoColumnMajorFloatArray order. Indices3/7=m41/m42; GPUuniformcolumn-majortranslationindices12/13 aredifferent."
+}
