@@ -47,7 +47,8 @@ jobs:
       - name: Install optional provider and independent client prerequisites
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build pkg-config libglib2.0-dev libatspi2.0-dev python3-gi gir1.2-atspi-2.0 dbus-x11 libegl1 fonts-dejavu-core
+          sudo apt-get install -y cmake ninja-build pkg-config libglib2.0-dev libatspi2.0-dev python3-gi gir1.2-atspi-2.0 dbus-x11 fonts-dejavu-core
+          sudo apt-get install -y libharfbuzz-icu0 libicu74 libjpeg-turbo8 libepoxy0 libgcrypt20 libsoup-3.0-0 libtasn1-6 libxkbcommon0 libxml2 libpng16-16t64 libsqlite3-0 libwebp7 libwebpdemux2 libwebpmux3 zlib1g libfreetype6 libfontconfig1 libwoff1 libdrm2 libegl1 libgles2 liblcms2-2 libatomic1
       - name: Fetch only the reviewed producer artifact
         env:
           GH_TOKEN: ${{ github.token }}
@@ -58,6 +59,8 @@ jobs:
         run: |
           gh run download "$NATIVE_RUN" --repo "$GITHUB_REPOSITORY" --name "$NATIVE_ARTIFACT" --dir "$ATSPI_WORK/artifact"
           python3 -I tests/atspi/stage_native.py --artifacts "$ATSPI_WORK/artifact" --rid "$NATIVE_RID" --expected-sha256 "$NATIVE_SHA256" --output "$ATSPI_WORK/native"
+          ldd "$ATSPI_WORK/native/libRanvierWebCoreHost.so" | tee "$ATSPI_WORK/native/runtime-dependencies.txt"
+          if grep -q 'not found' "$ATSPI_WORK/native/runtime-dependencies.txt"; then exit 1; fi
       - name: Build and install only the optional module
         run: |
           cmake -S providers/atspi -B "$ATSPI_WORK/build" -G Ninja -DRANVIER_WEBCORE_LIBRARY:FILEPATH="$ATSPI_WORK/native/libRanvierWebCoreHost.so"
