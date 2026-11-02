@@ -17,8 +17,6 @@ jobs:
     timeout-minutes: 330
     env:
       HOMEBREW_NO_AUTO_UPDATE: '1'
-      MAC220_WORK: ${{ runner.temp }}/ranvier-mac220
-      MAC220_SDL: ${{ runner.temp }}/ranvier-mac220-sdl
     steps:
       - uses: actions/checkout@v4
         with:
@@ -32,6 +30,8 @@ jobs:
       - name: Select the actual Mac SDK and build tools
         shell: bash
         run: |
+          echo "MAC220_WORK=$RUNNER_TEMP/ranvier-mac220" >> "$GITHUB_ENV"
+          echo "MAC220_SDL=$RUNNER_TEMP/ranvier-mac220-sdl" >> "$GITHUB_ENV"
           xcode=$(find /Applications -maxdepth 1 -name 'Xcode_26*.app' ! -iname '*beta*' | sort -V | tail -1)
           test -n "$xcode"
           export DEVELOPER_DIR="$xcode/Contents/Developer"
