@@ -33,6 +33,12 @@ struct RvD3D11Surface::State {
     int height { 0 };
     enum class Owner { None, Producer, Consumer, Failed } owner { Owner::None };
 
+    bool healthy() const
+    {
+        return producerDevice && consumerDevice
+            && producerDevice->GetDeviceRemovedReason() == S_OK && consumerDevice->GetDeviceRemovedReason() == S_OK;
+    }
+
     ~State()
     {
         if (owner == Owner::Producer)
@@ -87,6 +93,8 @@ std::shared_ptr<RvD3D11Surface> RvD3D11Surface::create(void* consumer, int width
     state->producerDevice = reinterpret_cast<ID3D11Device*>(producer);
     // The ABI accepts an actual ID3D11Device COM interface, not an arbitrary address.
     state->consumerDevice = static_cast<ID3D11Device*>(consumer);
+    if (!state->healthy())
+        return nullptr;
     ComPtr<ID3D11Device1> consumer1;
     if (FAILED(state->consumerDevice.As(&consumer1)))
         return nullptr;
@@ -140,7 +148,7 @@ bool RvD3D11Surface::matches(void* device, int width, int height) const
 bool RvD3D11Surface::available() const { return state->owner == State::Owner::None; }
 bool RvD3D11Surface::beginProducer()
 {
-    if (!available() || !state->makeCurrent())
+    if (!available() || !state->healthy() || !state->makeCurrent())
         return false;
     // No outstanding frame may stall the UI thread: a failed/stale GPU handoff is recoverable.
     if (state->producerMutex->AcquireSync(0, 16) != S_OK) {
@@ -164,6 +172,11 @@ bool RvD3D11Surface::finishProducer()
     if (FAILED(released) || state->consumerMutex->AcquireSync(1, 16) != S_OK)
         return false;
     state->owner = State::Owner::Consumer;
+    if (!state->healthy()) {
+        releaseConsumer();
+        state->owner = State::Owner::Failed;
+        return false;
+    }
     return true;
 }
 void RvD3D11Surface::cancelProducer()

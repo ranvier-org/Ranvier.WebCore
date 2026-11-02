@@ -16,6 +16,7 @@ def permits_publish(native='success', prebuilt='skipped', managed='success', con
     expression = re.sub(r'needs\.([a-z-]+)\.result', lambda match: repr(results[match[1]]), expression)
     for name, value in [('github.ref', ref), ('vars.NUGET_USER', owner), ('inputs.flavor', flavor)]:
         expression = expression.replace(name, repr(value))
+    expression = expression.replace('!inputs.recover_preview2_gpu', 'True')
     expression = expression.replace('!cancelled()', repr(not cancelled)).replace('&&', ' and ').replace('||', ' or ')
     return eval(' '.join(expression.split()), {'__builtins__': {}}, {'startsWith': lambda value, prefix: value.startswith(prefix)})
 
@@ -31,6 +32,7 @@ def permits_windows_gpu_cohort(native='success', prebuilt='skipped', publish='su
         expression = 'success() && (' + expression + ')'
     for name, value in [('github.event_name', event), ('github.ref', ref), ('needs.publish.result', publish)]:
         expression = expression.replace(name, repr(value))
+    expression = expression.replace('!inputs.recover_preview2_gpu', 'True')
     expression = expression.replace('!cancelled()', repr(not cancelled)).replace('success()', repr(success))
     expression = expression.replace('&&', ' and ').replace('||', ' or ')
     return eval(' '.join(expression.split()), {'__builtins__': {}},

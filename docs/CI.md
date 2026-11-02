@@ -1,5 +1,16 @@
 # CI
 
+Preview2 artifact recovery is retired. Its actual CI proof exposed a product defect: a cached D3D11
+surface could return a frame after the consumer device was removed. The `qualify` and `publication`
+commands now refuse before reading their inputs or creating output. The historical
+`recover_preview2_gpu` dispatch cannot reach publication. The original tag, package and identity
+contract in `docs/preview2-gpu-recovery.json` remain unchanged as evidence.
+
+The minimal successor uses Native `0.1.1-preview.3`, ABI60 and the device-health fix. It requires a fresh
+noncrypto source/configuration build and the full cohort proof; private DB/CD9 trial bytes cannot be
+published as that cohort. The next tag must also prove automatic Windows GPU dispatch. The separate
+product batch uses preview4 and is excluded from this successor.
+
 `.github/workflows/build.yml` runs `scripts/build.py` step by step for each runtime in its matrix, then
 uploads the `.nupkg` with `manifest.json`, and the PDBs as a separate artifact. On a `v*` tag it sets the
 package version from the tag and, when the repository variable `NUGET_USER` is set, pushes the packages
