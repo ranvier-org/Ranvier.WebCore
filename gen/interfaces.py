@@ -638,10 +638,11 @@ class InterfaceEmitter:
                  'type internal DomStringEnumAttribute() =', '    inherit Attribute()', '',
                  '[<AttributeUsage(AttributeTargets.Class)>]', 'type internal DomDictionaryAttribute() =',
                  '    inherit Attribute()', '#endif', '']
-        if any(name in self.unions for name in ('NodeOrDOMString', 'DOMStringOrCanvasGradientOrCanvasPattern', 'UnrestrictedDoubleOrDOMPointInit')):
+        retained_unions = json.loads(Path(__file__).with_name('native_retained_union_displays.json').read_text(encoding='utf-8'))
+        display_unions = ('NodeOrDOMString', 'DOMStringOrCanvasGradientOrCanvasPattern', 'UnrestrictedDoubleOrDOMPointInit')
+        if any(name in self.unions for name in (*display_unions, *retained_unions)):
             helper = Path(__file__).with_name('native_display.fs.inc').read_text(encoding='utf-8')
             lines[5:5] = helper.splitlines() + ['']
-        retained_unions = json.loads(Path(__file__).with_name('native_retained_union_displays.json').read_text(encoding='utf-8'))
         declarations = []
         for name, members in bodies:
             source = self.sources[name]

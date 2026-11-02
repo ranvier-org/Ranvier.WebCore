@@ -60,6 +60,20 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_retained_union_alone_includes_native_display_helper(self):
+        (self.source / 'Source/WebCore/dom/Fixture.idl').write_text('''
+interface Probe { attribute (unrestricted double or DOMString) value; };
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = ['Probe']
+        config['contract'] = {}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.run()
+        source = generator.interfaces()
+        self.assertIn('UnrestrictedDoubleOrDOMString', source)
+        self.assertIn('member internal this.NativeDisplay(', source)
+        self.assertIn('module internal NativeDisplay =', source)
+
     def test_canvas_style_union_has_a_typed_native_display(self):
         (self.source / 'Source/WebCore/dom/Fixture.idl').write_text(IDL + '''
 interface CanvasGradient {};
