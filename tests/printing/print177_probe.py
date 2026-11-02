@@ -108,10 +108,12 @@ def run(args):
             p.call('rv_host_paint_rgba', [P, P, I], p.host, rgba, len(rgba))
             data = bytes(rgba)
             return {'scroll': [x.value, y.value], 'paint': hashlib.sha256(data).hexdigest(),
-                    'size': [width.value, height.value]}
+                    'size': [width.value, height.value],
+                    'nonwhite': sum(any(data[i + channel] < 245 for channel in (0, 1, 2)) for i in range(0, len(data), 4))}
 
         def job(label, options, expected, keep=False):
             before = screen()
+            check(before['nonwhite'] > 100, label + ': source screen has real painted content')
             result = P()
             status = export(document, C.byref(options), C.byref(result))
             check(status == 0 and bool(result), label + ': admission')
@@ -188,7 +190,8 @@ def run(args):
         job('result-outlives-host', Options(), 0, keep=True)
         p.load('<p>HOST RELOADED AFTER PRINT</p>', standalone=False)
         p.update()
-        check(bool(bytes(p.paint())), 'host reload remains renderable')
+        after_reload = screen()
+        check(after_reload['size'] == [1000, 600] and after_reload['nonwhite'] > 100, 'host reload remains renderable at retained device scale')
         p.release_nodes()
         p.dispose_host()
         check(p.host is None, 'close after restored print has completed')
