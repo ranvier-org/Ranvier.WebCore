@@ -250,7 +250,12 @@ extern "C" int32_t ranvier_print_pdf(RvNode* handle, const RvPrintOptions* input
     if (input && input->size != sizeof(RvPrintOptions))
         return RV_ERR_UNSUPPORTED;
     auto options = input ? *input : ranvierPrintDefaultOptions();
-    if (!ranvierPrintNormalizeOptions(options, USE(CG)))
+#if USE(SKIA)
+    constexpr bool coreGraphics = false;
+#else
+    constexpr bool coreGraphics = true;
+#endif
+    if (!ranvierPrintNormalizeOptions(options, coreGraphics))
         return RV_ERR_UNSUPPORTED;
     auto* candidate = WTF::dynamicDowncast<WebCore::Document>(reinterpret_cast<WebCore::Node*>(handle));
     if (!candidate || !candidate->frame() || !candidate->frame()->view() || candidate->printing())
