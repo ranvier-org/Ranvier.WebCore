@@ -209,6 +209,65 @@ type NodeFilterCallback = delegate of context: nativeint * node: nativeint -> in
 [<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]
 type NodeFilterRelease = delegate of context: nativeint -> unit
 
+/// <summary>Presence 0 omits the option; value is 0 or 1.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type MutationOptionalBool =
+    val mutable present: int
+    val mutable value: int
+
+/// <summary>Borrowed UTF-16 code units; length -1 is null and 0 is empty.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type MutationString =
+    val mutable data: nativeint
+    val mutable length: int
+
+/// <summary>Presence-preserving filter strings; items points to count MutationString values.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type MutationOptionalStrings =
+    val mutable present: int
+    val mutable items: nativeint
+    val mutable count: int
+
+/// <summary>Borrowed nodes; retain each node before releasing its record batch to keep it.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type MutationNodes =
+    val mutable items: nativeint
+    val mutable count: int
+
+/// <summary>Observation options and copied filter inputs; size is the native structure byte count.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type MutationObserverOptions =
+    val mutable size: uint32
+    val mutable child_list: int
+    val mutable subtree: int
+    val mutable attributes: MutationOptionalBool
+    val mutable character_data: MutationOptionalBool
+    val mutable attribute_old_value: MutationOptionalBool
+    val mutable character_data_old_value: MutationOptionalBool
+    val mutable attribute_filter: MutationOptionalStrings
+
+/// <summary>Borrowed strings and nodes remain valid until their owning record batch is released.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type MutationRecordView =
+    val mutable size: uint32
+    val mutable ``type``: MutationString
+    val mutable target: nativeint
+    val mutable added_nodes: MutationNodes
+    val mutable removed_nodes: MutationNodes
+    val mutable previous_sibling: nativeint
+    val mutable next_sibling: nativeint
+    val mutable attribute_name: MutationString
+    val mutable attribute_namespace: MutationString
+    val mutable old_value: MutationString
+
+/// <summary>A borrowed record batch callback; retain its batch to keep records after return.</summary>
+[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]
+type MutationCallback = delegate of context: nativeint * observer: nativeint * records: nativeint -> unit
+
+/// <summary>Releases callback context after closure and the final in-flight callback return.</summary>
+[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]
+type MutationContextRelease = delegate of context: nativeint -> unit
+
 /// <summary>
 /// Per-function counts and Stopwatch ticks of the calls made while <c>On</c>, indexed as <c>Names</c>. The ticks of a
 /// call span its P/Invoke transition, marshalling and native work.
@@ -537,6 +596,15 @@ module Calls =
             "rv_image_bitmap_create"
             "rv_image_bitmap_result"
             "rv_image_bitmap_error"
+            "rv_host_create_mutation_observer"
+            "rv_mutation_observer_observe"
+            "rv_mutation_observer_disconnect"
+            "rv_mutation_observer_take_records"
+            "rv_mutation_observer_release"
+            "rv_mutation_record_batch_retain"
+            "rv_mutation_record_batch_release"
+            "rv_mutation_record_batch_get_count"
+            "rv_mutation_record_batch_get_record"
         |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
@@ -1877,6 +1945,39 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_image_bitmap_error(uint64 operation, byte[] buffer, int capacity, int[] length)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_create_mutation_observer(
+        nativeint host,
+        nativeint callback,
+        nativeint context,
+        nativeint release,
+        nativeint& result
+    )
+
+    [<DllImport(Lib)>]
+    extern int rv_mutation_observer_observe(nativeint observer, nativeint target, MutationObserverOptions& options)
+
+    [<DllImport(Lib)>]
+    extern int rv_mutation_observer_disconnect(nativeint observer)
+
+    [<DllImport(Lib)>]
+    extern int rv_mutation_observer_take_records(nativeint observer, nativeint& result)
+
+    [<DllImport(Lib)>]
+    extern int rv_mutation_observer_release(nativeint observer)
+
+    [<DllImport(Lib)>]
+    extern int rv_mutation_record_batch_retain(nativeint records)
+
+    [<DllImport(Lib)>]
+    extern int rv_mutation_record_batch_release(nativeint records)
+
+    [<DllImport(Lib)>]
+    extern int rv_mutation_record_batch_get_count(nativeint records, int& result)
+
+    [<DllImport(Lib)>]
+    extern int rv_mutation_record_batch_get_record(nativeint records, int index, MutationRecordView& result)
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -6027,6 +6128,121 @@ let rv_image_bitmap_error (operation: uint64, buffer: byte[], capacity: int, len
         result
     else
         Raw.rv_image_bitmap_error (operation, buffer, capacity, length)
+
+let rv_host_create_mutation_observer
+    (host: nativeint, callback: nativeint, context: nativeint, release: nativeint, result: byref<nativeint>)
+    : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+
+        let result =
+            Raw.rv_host_create_mutation_observer (host, callback, context, release, &result)
+
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[321] <- Calls.Counts[321] + 1L
+        Calls.Ticks[321] <- Calls.Ticks[321] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_create_mutation_observer (host, callback, context, release, &result)
+
+let rv_mutation_observer_observe
+    (observer: nativeint, target: nativeint, options: byref<MutationObserverOptions>)
+    : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_mutation_observer_observe (observer, target, &options)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[322] <- Calls.Counts[322] + 1L
+        Calls.Ticks[322] <- Calls.Ticks[322] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_mutation_observer_observe (observer, target, &options)
+
+let rv_mutation_observer_disconnect (observer: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_mutation_observer_disconnect (observer)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[323] <- Calls.Counts[323] + 1L
+        Calls.Ticks[323] <- Calls.Ticks[323] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_mutation_observer_disconnect (observer)
+
+let rv_mutation_observer_take_records (observer: nativeint, result: byref<nativeint>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_mutation_observer_take_records (observer, &result)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[324] <- Calls.Counts[324] + 1L
+        Calls.Ticks[324] <- Calls.Ticks[324] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_mutation_observer_take_records (observer, &result)
+
+let rv_mutation_observer_release (observer: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_mutation_observer_release (observer)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[325] <- Calls.Counts[325] + 1L
+        Calls.Ticks[325] <- Calls.Ticks[325] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_mutation_observer_release (observer)
+
+let rv_mutation_record_batch_retain (records: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_mutation_record_batch_retain (records)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[326] <- Calls.Counts[326] + 1L
+        Calls.Ticks[326] <- Calls.Ticks[326] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_mutation_record_batch_retain (records)
+
+let rv_mutation_record_batch_release (records: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_mutation_record_batch_release (records)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[327] <- Calls.Counts[327] + 1L
+        Calls.Ticks[327] <- Calls.Ticks[327] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_mutation_record_batch_release (records)
+
+let rv_mutation_record_batch_get_count (records: nativeint, result: byref<int>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_mutation_record_batch_get_count (records, &result)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[328] <- Calls.Counts[328] + 1L
+        Calls.Ticks[328] <- Calls.Ticks[328] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_mutation_record_batch_get_count (records, &result)
+
+let rv_mutation_record_batch_get_record (records: nativeint, index: int, result: byref<MutationRecordView>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_mutation_record_batch_get_record (records, index, &result)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[329] <- Calls.Counts[329] + 1L
+        Calls.Ticks[329] <- Calls.Ticks[329] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_mutation_record_batch_get_record (records, index, &result)
 
 // END GENERATED
 
