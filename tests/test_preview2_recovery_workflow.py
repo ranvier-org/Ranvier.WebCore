@@ -14,13 +14,13 @@ def job(name):
     return re.split(r'(?m)^  [a-z][\w-]*:\s*$', text.split(marker, 1)[1], maxsplit=1)[0]
 
 
-def evaluate(expression, recovery=False, recovery4=False, recovery7=False, result='success', event='workflow_dispatch', ref='refs/heads/main', user='owner', cancelled=False):
-    values = {'inputs.recover_preview2_gpu': recovery, 'inputs.recover_preview4_gpu': recovery4, 'inputs.recover_preview7_linux': recovery7, 'github.event_name': event, 'github.ref': ref,
+def evaluate(expression, recovery=False, recovery4=False, recovery7=False, recovery7windows=False, result='success', event='workflow_dispatch', ref='refs/heads/main', user='owner', cancelled=False):
+    values = {'inputs.recover_preview2_gpu': recovery, 'inputs.recover_preview4_gpu': recovery4, 'inputs.recover_preview7_linux': recovery7, 'inputs.recover_preview7_windows': recovery7windows, 'github.event_name': event, 'github.ref': ref,
               'github.workflow': 'build', 'github.run_id': 123, 'inputs.flavor': 'gpu', 'vars.NUGET_USER': user,
               'inputs.rids': '', 'github.head_ref': 'codex/batch-fixture',
               'github.event.pull_request.labels.*.name': [],
               'needs.plan.outputs.matrix': 'selected', 'needs.plan.outputs.prebuilt': 'attached',
-              'needs.recover-preview2-gpu.result': result, 'needs.verify-preview4-gpu-recovery.result': result, 'needs.verify-preview7-linux-recovery.result': result, 'needs.native.result': 'success',
+              'needs.recover-preview2-gpu.result': result, 'needs.verify-preview4-gpu-recovery.result': result, 'needs.verify-preview7-linux-recovery.result': result, 'needs.verify-preview7-windows-recovery.result': result, 'needs.native.result': 'success',
               'needs.prebuilt.result': 'skipped', 'needs.managed.result': 'skipped',
               'needs.package-contract.result': 'success', 'needs.publish.result': 'success'}
     for key in sorted(values, key=len, reverse=True):
