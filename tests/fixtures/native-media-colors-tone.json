@@ -24,5 +24,5 @@
     "toneHz": 440,
     "peakInt16": 1200
   },
-  "generationReceipt": "C:/wk/project2/media190191195/fixture-2/receipt.json"
+  "generatorEnvironment": "Windows SDK10.0.26100.0; clang-cl23.1.4; OS Media Foundation sink writer"
 }

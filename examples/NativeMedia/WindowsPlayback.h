@@ -19,6 +19,13 @@ namespace RanvierNativeMedia {
 
 enum class State { Closed, Ready, Loading, Playing, Paused, Ended, Cancelled, Failed, Unavailable };
 
+struct Frame {
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
+    LONGLONG presentationTime { 0 };
+    UINT width { 0 };
+    UINT height { 0 };
+};
+
 struct Snapshot {
     State state { State::Closed };
     HRESULT error { S_OK };
@@ -164,6 +171,64 @@ public:
         return m_engine->SetCurrentTime(seconds);
     }
 
+    ID3D11Device* device() const { return m_device.Get(); }
+
+    // A successful frame is published under key1. The consumer releases key0 before the next publication.
+    // The texture reference owns the resource, not an immutable copy of its pixels.
+    HRESULT nextFrame(Frame& output)
+    {
+        output = { };
+        auto status = admitted();
+        if (FAILED(status))
+            return status;
+        if (!m_engine->HasVideo() || m_engine->GetReadyState() < MF_MEDIA_ENGINE_READY_HAVE_CURRENT_DATA)
+            return S_FALSE;
+        DWORD width = 0, height = 0;
+        if (FAILED(status = m_engine->GetNativeVideoSize(&width, &height)))
+            return fail(status);
+        if (!width || !height || width > D3D11_REQ_TEXTURE2D_U_OR_V_DIMENSION || height > D3D11_REQ_TEXTURE2D_U_OR_V_DIMENSION)
+            return fail(E_INVALIDARG);
+        if (!m_texture || width != m_width || height != m_height) {
+            D3D11_TEXTURE2D_DESC description { };
+            description.Width = width;
+            description.Height = height;
+            description.MipLevels = 1;
+            description.ArraySize = 1;
+            description.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            description.SampleDesc.Count = 1;
+            description.Usage = D3D11_USAGE_DEFAULT;
+            description.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+            description.MiscFlags = D3D11_RESOURCE_MISC_SHARED_NTHANDLE | D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX;
+            Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
+            Microsoft::WRL::ComPtr<IDXGIKeyedMutex> mutex;
+            if (FAILED(status = m_device->CreateTexture2D(&description, nullptr, &texture))
+                || FAILED(status = texture.As(&mutex)))
+                return fail(status);
+            m_texture = std::move(texture);
+            m_mutex = std::move(mutex);
+            m_width = width;
+            m_height = height;
+        }
+        status = m_mutex->AcquireSync(0, 0);
+        if (status != S_OK)
+            return status == WAIT_TIMEOUT ? HRESULT_FROM_WIN32(WAIT_TIMEOUT) : status;
+        LONGLONG time = 0;
+        status = m_engine->OnVideoStreamTick(&time);
+        if (status != S_OK) {
+            auto release = m_mutex->ReleaseSync(0);
+            return FAILED(release) ? fail(release) : status;
+        }
+        RECT rectangle { 0, 0, static_cast<LONG>(width), static_cast<LONG>(height) };
+        MFARGB border { 0, 0, 0, 255 };
+        status = m_engine->TransferVideoFrame(m_texture.Get(), nullptr, &rectangle, &border);
+        m_context->Flush();
+        auto release = m_mutex->ReleaseSync(FAILED(status) ? 0 : 1);
+        if (FAILED(status) || FAILED(release))
+            return fail(FAILED(status) ? status : release);
+        output = { m_texture, time, width, height };
+        return S_OK;
+    }
+
     Snapshot snapshot() const
     {
         Snapshot value;
@@ -205,6 +270,10 @@ public:
         m_stream.Reset();
         m_notify.Reset();
         m_events.reset();
+        m_mutex.Reset();
+        m_texture.Reset();
+        m_width = 0;
+        m_height = 0;
         m_manager.Reset();
         m_context.Reset();
         m_device.Reset();
@@ -243,5 +312,9 @@ private:
     Microsoft::WRL::ComPtr<IMFDXGIDeviceManager> m_manager;
     Microsoft::WRL::ComPtr<ID3D11Device> m_device;
     Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_context;
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> m_texture;
+    Microsoft::WRL::ComPtr<IDXGIKeyedMutex> m_mutex;
+    UINT m_width { 0 };
+    UINT m_height { 0 };
 };
 }
