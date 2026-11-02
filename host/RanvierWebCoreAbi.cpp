@@ -2969,9 +2969,9 @@ int32_t rv_host_acquire_egl_frame(RvHost* host, RvGpuFrame** frame)
     if (host->presentationSurface && !host->presentationSurface->available())
         return RV_ERR_UNSUPPORTED;
     auto consumerContext = eglGetCurrentContext();
-    RvEGLContextScope contextScope;
     host->documentTransaction = RvHost::DocumentTransaction::Rendering;
     auto result = [&]() -> int32_t {
+        RvEGLContextScope contextScope;
         SetForScope inFrame(host->inFrame, true);
         host->frameRequested = false;
         RefPtr<LocalFrameView> view;
@@ -3021,8 +3021,9 @@ int32_t rv_host_acquire_egl_frame(RvHost* host, RvGpuFrame** frame)
     if (host->updateWanted && !host->destroyAfterDocumentTransaction)
         host->requestFrame();
     if (host->destroyAfterDocumentTransaction && *frame) {
-        rv_gpu_frame_release(*frame);
-        *frame = nullptr;
+        auto* abandoned = std::exchange(*frame, nullptr);
+        if (rv_gpu_frame_release(abandoned) != RV_OK)
+            delete abandoned;
     }
     if (finishDocumentTransaction(host) != RV_OK)
         return RV_ERR_DETACHED;
