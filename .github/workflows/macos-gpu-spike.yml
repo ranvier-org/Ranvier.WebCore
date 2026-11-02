@@ -1,0 +1,72 @@
+name: Private macOS GPU experiment
+
+on:
+  push:
+    branches: [codex/project2-macos220-ci]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: private-macos220-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  experiment:
+    runs-on: macos-26
+    timeout-minutes: 330
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: '1'
+      MAC220_WORK: ${{ runner.temp }}/ranvier-mac220
+      MAC220_SDL: ${{ runner.temp }}/ranvier-mac220-sdl
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.403'
+      - name: Select the actual Mac SDK and build tools
+        shell: bash
+        run: |
+          xcode=$(find /Applications -maxdepth 1 -name 'Xcode_26*.app' ! -iname '*beta*' | sort -V | tail -1)
+          test -n "$xcode"
+          export DEVELOPER_DIR="$xcode/Contents/Developer"
+          echo "DEVELOPER_DIR=$DEVELOPER_DIR" >> "$GITHUB_ENV"
+          for tool in cmake ninja gperf pkg-config; do
+            command -v "$tool" >/dev/null || brew install "$tool"
+          done
+          xcodebuild -version
+          xcrun --show-sdk-version
+          xcrun clang++ --version
+          cmake --version
+          ninja --version
+          python3 --version
+          perl -v
+          ruby --version
+          dotnet --version
+          df -h
+      - name: Stage the exact pinned SDL presenter SDK
+        run: |
+          python3 -I tests/gpu/mac/prepare_sdk.py --directory "$MAC220_SDL"
+          echo "PKG_CONFIG_PATH=$MAC220_SDL/lib/pkgconfig" >> "$GITHUB_ENV"
+          echo "DYLD_LIBRARY_PATH=$MAC220_SDL/lib" >> "$GITHUB_ENV"
+      - name: Run the isolated native experiment
+        run: python3 -I tests/gpu/mac/run.py --rid osx-arm64 --mac-gpu-spike --work "$MAC220_WORK" --jobs 4 --execute
+      - name: Retain source identity, first failure and runtime evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: private-macos220-${{ github.sha }}
+          path: |
+            ${{ env.MAC220_WORK }}/spike-evidence/
+            ${{ env.MAC220_WORK }}/build-mac-gpu-spike/cmakeconfig.h
+            ${{ env.MAC220_WORK }}/build-mac-gpu-spike/compile_commands.json
+            ${{ env.MAC220_WORK }}/build-mac-gpu-spike/CMakeFiles/CMakeConfigureLog.yaml
+            ${{ env.MAC220_WORK }}/out/gpu/*.nupkg
+            ${{ env.MAC220_SDL }}/sdk-receipt.json
+          if-no-files-found: warn
+          retention-days: 3
