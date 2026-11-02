@@ -468,39 +468,74 @@ def run(directory, report_path=None):
         finally:
             if not doomed_closed:
                 doomed.close()
-        invalidating = Case(n, '<div id="invalidating"></div>')
-        invalidating_closed = False
-        recreate_attempts = []
-        recreate_releases = []
-        recreate_callback = CALLBACK(lambda *_: None)
-        recreate_release = RELEASE(lambda _: recreate_releases.append(True))
-        def closed_during_invalidation(handle):
-            p.release(handle)
-            result = P(1)
-            status = p.call('create', invalidating.host, recreate_callback, None,
-                            recreate_release, C.byref(result))
-            recreate_attempts.append((status, result.value))
-            if status == OK:
-                p.ok('release', result)
+        raw_owner = Case(n, '<div id="raw-owner"></div>')
+        raw_closed = False
         try:
-            target = invalidating.node('invalidating')
-            token, _, _ = p.create(invalidating.host, on_closed=closed_during_invalidation)
+            target = raw_owner.node('raw-owner')
+            token, raw_events, raw_releases = p.create(raw_owner.host)
             p.observe(token, target, Options(attributes=True))
-            p.set_attribute(target, 'data-before-destroy', 'retained')
+            p.set_attribute(target, 'data-retained', 'raw')
             retained = p.take(token)
-            invalidating_closed = True
-            invalidating.close()
+            raw_closed = True
+            raw_owner.close()
             p.pump()
+            n.expect(raw_releases == ['release'] and token in p.live_observers and not raw_events,
+                     'automatic close releases context while a raw caller still owns its closed external token')
+            output = P(1)
+            n.expect(p.call('take_records', token, C.byref(output)) == -10 and not output.value,
+                     'closed external token is inactive, independently of its retained registry entry')
+            p.release(token)
+            n.expect(raw_releases == ['release'], 'explicit closed-token release does not release its context twice')
             p.release_batch(retained)
-            n.expect(recreate_attempts == [(-10, None)] and recreate_releases == [],
-                     f'factory rejects reentrant admission into an invalidating host: {recreate_attempts}')
         finally:
-            if not invalidating_closed:
-                invalidating.close()
+            if not raw_closed:
+                raw_owner.close()
+        reentry = {}
+        for mode in ['destroy', 'html', 'svg']:
+            invalidating = Case(n, '<div id="invalidating"></div>')
+            invalidating_closed = False
+            attempts, reloads, rejected_releases = [], [], []
+            sink = CALLBACK(lambda *_: None)
+            release = RELEASE(lambda _: rejected_releases.append(True))
+            def attempt_admission():
+                result = P(1)
+                status = p.call('create', invalidating.host, sink, None, release, C.byref(result))
+                attempts.append((status, result.value))
+                if status == OK:
+                    p.ok('release', result)
+            def close_and_reenter(handle):
+                p.release(handle)
+                attempt_admission()
+                reloads.append(n.call('rv_host_load_html', [P, Utf8], invalidating.host, '<div>nested reload</div>'))
+                attempt_admission()
+            try:
+                target = invalidating.node('invalidating')
+                token, _, _ = p.create(invalidating.host, on_closed=close_and_reenter)
+                p.observe(token, target, Options(attributes=True))
+                p.set_attribute(target, 'data-before-invalidation', mode)
+                retained = p.take(token)
+                if mode == 'destroy':
+                    invalidating_closed = True
+                    invalidating.close()
+                else:
+                    markup = '<div>outer reload</div>' if mode == 'html' else '<svg xmlns="http://www.w3.org/2000/svg"/>'
+                    n.ok('rv_host_load_' + mode, [P, Utf8], invalidating.host, markup)
+                p.pump()
+                p.release_batch(retained)
+                reentry[mode] = {'admissions': attempts, 'reloads': reloads,
+                                 'unexpected_transferred_context_releases': list(rejected_releases)}
+            finally:
+                if not invalidating_closed:
+                    invalidating.close()
+        if report_path:
+            report_path.write_text(json.dumps({'partial': True, 'invalidation_reentry': reentry}, indent=2), encoding='utf-8')
+        n.expect(all(row['admissions'] == [(-10, None), (-10, None)] and row['reloads'] == [OK]
+                     and not row['unexpected_transferred_context_releases'] for row in reentry.values()),
+                 f'invalidating contexts reject admission before and after nested reload: {reentry}')
         n.expect(not p.live_observers and not p.live_batches and p.accepted_contexts == p.released_contexts, 'all provider tokens, context leases and batches are released')
         return {'assertions': n.assertions, 'transcript': transcript, 'accepted_contexts': p.accepted_contexts, 'released_contexts': p.released_contexts,
                 'host_teardown': teardown, 'replacement_teardown': replacements,
-                'self_destroy_context_release_order': destroy_order}
+                'self_destroy_context_release_order': destroy_order, 'invalidation_reentry': reentry}
     finally:
         p.close()
         if foreign is not None:

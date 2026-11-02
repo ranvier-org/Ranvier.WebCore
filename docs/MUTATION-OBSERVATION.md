@@ -16,7 +16,8 @@ receives its observer identity and a borrowed record batch. Retain that batch in
 to keep it. `TakeRecords` drains immediately into an owned batch, including an empty batch;
 Disconnect discards queued records and permits later observation. Observer Release closes and
 consumes its token. A provider must clear its stored token before calling Release, because the
-context-release callback may reenter disposal.
+context-release callback may reenter disposal. Raw C callers still release their
+closed external observer token; automatic close ends the engine/context lifetime, not caller ownership.
 
 Record views, strings, node arrays and node pointers borrow storage from their batch. Strings carry
 UTF-16 code units: length -1 is null and 0 is empty. Retain nodes before wrapping them or releasing
