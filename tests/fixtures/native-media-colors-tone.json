@@ -1,0 +1,28 @@
+{
+  "source": "Original generated test content; no third-party media",
+  "generator": "tests/media/create_fixture.cpp",
+  "generatorSha256": "fbbef43e703f4a1d7af9e190599308c1e434676ad89ac5b777b3404f7a512e52",
+  "sha256": "d3ddf447d8d6c610f484426a89c223059b599693460fbbb60d8e64f251e00f10",
+  "bytes": 27709,
+  "durationSeconds": 2,
+  "video": {
+    "codec": "OS SinkWriter H264",
+    "width": 96,
+    "height": 64,
+    "frameRate": 30,
+    "frames": 60,
+    "phases": [
+      "red:0..20",
+      "green:20..40",
+      "blue:40..60"
+    ]
+  },
+  "audio": {
+    "codec": "OS SinkWriter AAC",
+    "sourceSampleRate": 48000,
+    "channels": 1,
+    "toneHz": 440,
+    "peakInt16": 1200
+  },
+  "generationReceipt": "C:/wk/project2/media190191195/fixture-2/receipt.json"
+}
