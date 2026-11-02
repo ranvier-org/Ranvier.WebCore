@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 TAIL = ['rv_host_ime_surrounding', 'rv_host_ime_delete_surrounding', 'rv_ax_text_style_run']
 
 
-def verify_abi(baseline, current, abi):
+def verify_abi(baseline, current, abi, expected_tail):
     if abi != 63:
         raise ValueError('The final union requires ABI63.')
     if len(current) != 347:
@@ -20,15 +20,19 @@ def verify_abi(baseline, current, abi):
         raise ValueError('The original 344 signatures and order must remain unchanged.')
     if [row[0] for row in current[344:]] != TAIL:
         raise ValueError('The final tail order must be surrounding 344, delete 345, style 346.')
+    if [row[0] for row in expected_tail] != TAIL or current[344:] != expected_tail:
+        raise ValueError('The final tail signatures differ from the explicitly pinned source headers.')
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--baseline-ref', required=True)
+    parser.add_argument('--ime-source-ref', required=True)
+    parser.add_argument('--style-source-ref', default='7ebcec106b2b5088d2ec2fc18d891e17cfce728e')
     parser.add_argument('--manifest', type=Path)
     args = parser.parse_args()
-    if not re.fullmatch('[0-9a-f]{40}', args.baseline_ref):
-        raise ValueError('Use an exact baseline commit, not a moving branch name.')
+    if not all(re.fullmatch('[0-9a-f]{40}', ref) for ref in [args.baseline_ref,args.ime_source_ref,args.style_source_ref]):
+        raise ValueError('Use exact baseline and tail source commits, not moving branch names.')
     header_path = 'host/RanvierWebCoreAbi.h'
     generator_path = 'tests/abi/generate_native.py'
     spec = importlib.util.spec_from_file_location('generate_native', ROOT / generator_path)
@@ -39,9 +43,15 @@ def main():
     declarations = generator.declarations(header)
     source = (ROOT / 'host/RanvierWebCoreAbi.cpp').read_text(encoding='utf-8')
     abi = int(re.search(r'rv_abi_version\(void\)\s*\{\s*return\s+(\d+);', source).group(1))
-    verify_abi(generator.declarations(baseline), declarations, abi)
+    expected_tail = []
+    for ref, names in [(args.ime_source_ref, TAIL[:2]), (args.style_source_ref, TAIL[2:])]:
+        pinned = generator.declarations(subprocess.check_output(['git', 'show', ref + ':' + header_path], cwd=ROOT, text=True))
+        by_name = {row[0]:row for row in pinned}
+        expected_tail.extend(by_name[name] for name in names)
+    verify_abi(generator.declarations(baseline), declarations, abi, expected_tail)
     result = dict(scope='source declaration contract only; no runtime qualification', abi=abi, functions=len(declarations),
-        baseline=args.baseline_ref, tail=[[index, row[0]] for index, row in enumerate(declarations[344:], 344)])
+        baseline=args.baseline_ref, pinnedImeSource=args.ime_source_ref, pinnedStyleSource=args.style_source_ref,
+        tail=[[index, row[0]] for index, row in enumerate(declarations[344:], 344)])
     if args.manifest:
         if subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT, text=True).strip():
             raise ValueError('Commit the exact final generated/source tree before recording its manifest.')
