@@ -1,0 +1,48 @@
+diff --git a/Source/WebCore/loader/EmptyClients.h b/Source/WebCore/loader/EmptyClients.h
+--- a/Source/WebCore/loader/EmptyClients.h
++++ b/Source/WebCore/loader/EmptyClients.h
+@@ -151,6 +151,6 @@ class EmptyChromeClient : public ChromeClient {
+     DisplayRefreshMonitorFactory* NODELETE displayRefreshMonitorFactory() const final;
+ 
+-    void NODELETE runOpenPanel(LocalFrame&, FileChooser&) final;
++    void NODELETE runOpenPanel(LocalFrame&, FileChooser&) override;
+     void NODELETE showShareSheet(ShareDataWithParsedURL&&, CompletionHandler<void(bool)>&&) final;
+     void loadIconForFiles(const Vector<String>&, FileIconLoader&) final { }
+ 
+diff --git a/Source/WebCore/platform/FileChooser.h b/Source/WebCore/platform/FileChooser.h
+--- a/Source/WebCore/platform/FileChooser.h
++++ b/Source/WebCore/platform/FileChooser.h
+@@ -78,6 +78,8 @@ public:
+     WEBCORE_EXPORT ~FileChooser();
+ 
+     void NODELETE invalidate();
++    bool isValid() const { return !!m_client; }
++    FileChooserClient* client() const { return m_client; }
+ 
+     WEBCORE_EXPORT void chooseFile(const String& path);
+     WEBCORE_EXPORT void chooseFiles(const Vector<String>& paths, const Vector<String>& replacementPaths = { });
+diff --git a/Source/WebCore/html/FileInputType.h b/Source/WebCore/html/FileInputType.h
+--- a/Source/WebCore/html/FileInputType.h
++++ b/Source/WebCore/html/FileInputType.h
+@@ -49,5 +49,9 @@ class FileInputType final : public BaseClickableWithKeyInputType, private FileCh
+     WTF_MAKE_TZONE_ALLOCATED(FileInputType);
+ public:
++    static HTMLInputElement* elementForFileChooserClient(FileChooserClient* client)
++    {
++        return client ? static_cast<FileInputType*>(client)->element() : nullptr;
++    }
+     static Ref<FileInputType> create(HTMLInputElement& element)
+     {
+         return adoptRef(*new FileInputType(element));
+diff --git a/Source/WebCore/Headers.cmake b/Source/WebCore/Headers.cmake
+--- a/Source/WebCore/Headers.cmake
++++ b/Source/WebCore/Headers.cmake
+@@ -1665,6 +1665,8 @@
+     html/ImageDataPixelFormat.h
+     html/ImageDataSettings.h
+     html/ImageDocument.h
++    html/BaseClickableWithKeyInputType.h
++    html/FileInputType.h
+     html/InputMode.h
+     html/InputType.h
+     html/LinkIconCollector.h
