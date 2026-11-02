@@ -268,6 +268,25 @@ type MutationCallback = delegate of context: nativeint * observer: nativeint * r
 [<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]
 type MutationContextRelease = delegate of context: nativeint -> unit
 
+/// <summary>PDF page geometry in points (72/inch), explicit page/output limits and raster-only DPI.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type PrintOptions =
+    val mutable size: uint32
+    val mutable max_pages: uint32
+    val mutable paper_width_points: float
+    val mutable paper_height_points: float
+    val mutable margin_top_points: float
+    val mutable margin_right_points: float
+    val mutable margin_bottom_points: float
+    val mutable margin_left_points: float
+    val mutable output_budget_bytes: uint64
+    val mutable raster_dpi: float32
+    val mutable reserved: uint32
+
+/// <summary>Reads cancellation only; must not pump events or call the host while rendering.</summary>
+[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]
+type PrintCancelPoll = delegate of context: nativeint -> int
+
 /// <summary>
 /// Per-function counts and Stopwatch ticks of the calls made while <c>On</c>, indexed as <c>Names</c>. The ticks of a
 /// call span its P/Invoke transition, marshalling and native work.
@@ -605,6 +624,8 @@ module Calls =
             "rv_mutation_record_batch_release"
             "rv_mutation_record_batch_get_count"
             "rv_mutation_record_batch_get_record"
+            "rv_host_print_pdf"
+            "rv_print_pdf_result"
         |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
@@ -1978,6 +1999,21 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_mutation_record_batch_get_record(nativeint records, int index, MutationRecordView& result)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_print_pdf(
+        nativeint host,
+        PrintOptions& options,
+        nativeint cancel_poll,
+        nativeint cancel_context,
+        nativeint callback,
+        nativeint context,
+        int& page_count,
+        uint64& operation
+    )
+
+    [<DllImport(Lib)>]
+    extern int rv_print_pdf_result(uint64 operation, [<In; Out>] byte[] buffer, int64 capacity, int64& length)
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -6243,6 +6279,52 @@ let rv_mutation_record_batch_get_record (records: nativeint, index: int, result:
         result
     else
         Raw.rv_mutation_record_batch_get_record (records, index, &result)
+
+let rv_host_print_pdf
+    (
+        host: nativeint,
+        options: byref<PrintOptions>,
+        cancel_poll: nativeint,
+        cancel_context: nativeint,
+        callback: nativeint,
+        context: nativeint,
+        page_count: byref<int>,
+        operation: byref<uint64>
+    ) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+
+        let result =
+            Raw.rv_host_print_pdf (
+                host,
+                &options,
+                cancel_poll,
+                cancel_context,
+                callback,
+                context,
+                &page_count,
+                &operation
+            )
+
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[330] <- Calls.Counts[330] + 1L
+        Calls.Ticks[330] <- Calls.Ticks[330] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_print_pdf (host, &options, cancel_poll, cancel_context, callback, context, &page_count, &operation)
+
+let rv_print_pdf_result (operation: uint64, buffer: byte[], capacity: int64, length: byref<int64>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_print_pdf_result (operation, buffer, capacity, &length)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[331] <- Calls.Counts[331] + 1L
+        Calls.Ticks[331] <- Calls.Ticks[331] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_print_pdf_result (operation, buffer, capacity, &length)
 
 // END GENERATED
 

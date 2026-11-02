@@ -1,6 +1,14 @@
 
 # Ranvier native WebCore C ABI experiment: a shared library over the TestWebCore host and frameworks.
 if (ENABLE_WEBCORE)
+    foreach (_ranvier_embedder_source IN LISTS WebCore_EMBEDDER_SOURCES)
+        if (_ranvier_embedder_source MATCHES "RanvierPrintGlue\\.cpp$")
+            set_source_files_properties("${_ranvier_embedder_source}" TARGET_DIRECTORY WebCore PROPERTIES
+                SKIP_PRECOMPILE_HEADERS ON
+                COMPILE_DEFINITIONS "RANVIER_ENABLE_PDF=$<BOOL:${RANVIER_ENABLE_PDF}>"
+            )
+        endif ()
+    endforeach ()
     set(RanvierWebCoreHost_SOURCES
         RanvierAbi/RanvierWebCoreAbi.cpp
         RanvierAbi/RanvierWebCoreDom.cpp

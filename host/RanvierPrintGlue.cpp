@@ -4,7 +4,11 @@
 #include <vector>
 #include <wtf/MainThread.h>
 
-#if USE(SKIA)
+#ifndef RANVIER_ENABLE_PDF
+#define RANVIER_ENABLE_PDF 0
+#endif
+
+#if USE(SKIA) && RANVIER_ENABLE_PDF
 #include "CSSUnits.h"
 #include "Document.h"
 #include "DocumentView.h"
@@ -30,7 +34,7 @@ struct RvPrintPdfData {
     bool cancelled { false };
 };
 
-#if USE(SKIA)
+#if USE(SKIA) && RANVIER_ENABLE_PDF
 namespace {
 using namespace WebCore;
 
@@ -179,7 +183,7 @@ int32_t paint(Document& document, LocalFrame& frame, const RvPrintOptions& optio
 
 extern "C" int32_t ranvier_print_pdf_supported()
 {
-#if USE(SKIA)
+#if USE(SKIA) && RANVIER_ENABLE_PDF
     return 1;
 #else
     return 0;
@@ -195,10 +199,10 @@ extern "C" int32_t ranvier_print_pdf(RvNode* handle, const RvPrintOptions* input
         return RV_ERR_NULL_ARGUMENT;
     if (!WTF::isMainThread())
         return RV_ERR_WRONG_THREAD;
-#if USE(SKIA)
+#if USE(SKIA) && RANVIER_ENABLE_PDF
     if (input->size != sizeof(RvPrintOptions) || !valid(*input))
         return RV_ERR_UNSUPPORTED;
-    auto* candidate = WebCore::dynamicDowncast<WebCore::Document>(reinterpret_cast<WebCore::Node*>(handle));
+    auto* candidate = WTF::dynamicDowncast<WebCore::Document>(reinterpret_cast<WebCore::Node*>(handle));
     if (!candidate || !candidate->frame() || !candidate->frame()->view() || candidate->printing())
         return RV_ERR_DETACHED;
     Ref document = *candidate;
@@ -210,6 +214,8 @@ extern "C" int32_t ranvier_print_pdf(RvNode* handle, const RvPrintOptions* input
     *output = result.release();
     return RV_OK;
 #else
+    UNUSED_PARAM(cancel);
+    UNUSED_PARAM(cancelContext);
     return RV_ERR_UNSUPPORTED;
 #endif
 }

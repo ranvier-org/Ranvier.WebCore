@@ -127,6 +127,8 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
         return "nativeint", ""
     if ctype == "const RvMutationObserverOptions*":
         return "MutationObserverOptions&", ""
+    if ctype == "const RvPrintOptions*":
+        return "PrintOptions&", ""
     if ctype == "RvMutationRecordView*":
         return "MutationRecordView&", ""
     if ctype == "const RvEventInit*":
@@ -151,6 +153,20 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
 
 def fsharp_name(name: str) -> str:
     return f"``{name}``" if name in KEYWORDS else name
+
+
+def print_types() -> list[str]:
+    fields = [("size", "uint32"), ("max_pages", "uint32"),
+              ("paper_width_points", "float"), ("paper_height_points", "float"),
+              ("margin_top_points", "float"), ("margin_right_points", "float"),
+              ("margin_bottom_points", "float"), ("margin_left_points", "float"),
+              ("output_budget_bytes", "uint64"), ("raster_dpi", "float32"), ("reserved", "uint32")]
+    return ["", "/// <summary>PDF page geometry in points (72/inch), explicit page/output limits and raster-only DPI.</summary>",
+            "[<Struct; StructLayout(LayoutKind.Sequential)>]", "type PrintOptions ="] + [
+                f"    val mutable {name}: {kind}" for name, kind in fields] + [
+                    "", "/// <summary>Reads cancellation only; must not pump events or call the host while rendering.</summary>",
+                    "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+                    "type PrintCancelPoll = delegate of context: nativeint -> int"]
 
 
 def mutation_types() -> list[str]:
@@ -389,6 +405,7 @@ def generated(header: str) -> str:
     ]
 
     lines += mutation_types()
+    lines += print_types()
     found = declarations(header)
     lines += [
         "",

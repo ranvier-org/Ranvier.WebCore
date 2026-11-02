@@ -2757,7 +2757,8 @@ typedef int32_t (*RvPrintCancelPoll)(void* context);
  * Options are copied. Positive finite paper/printable sizes, nonnegative margins, max_pages 1..4096, output budget
  * 1..67108864 bytes, raster_dpi 72..600 and reserved=0 are required. Invalid options return UNSUPPORTED; output failure
  * returns PAINT_FAILED. No failed call transfers an operation/context. Cancellation delivers RESOURCE_CANCELLED
- * without PDF bytes. Printing restores screen layout/scroll before returning; no OS dialog or spooler is invoked. */
+ * without PDF bytes. Printing restores screen layout/scroll before returning; no OS dialog or spooler is invoked.
+ * The app settles required fonts/images first. tests/abi/printing_pdf.py pins the output/teardown contract. */
 RV_EXPORT int32_t rv_host_print_pdf(RvHost*, const RvPrintOptions* options, RvPrintCancelPoll cancel_poll, void* cancel_context, RvResourceCompletion callback, void* context, int32_t* page_count, uint64_t* operation);
 /* Copies a completed PDF through the existing resource byte/capacity contract; release with rv_resource_release. */
 RV_EXPORT int32_t rv_print_pdf_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length);

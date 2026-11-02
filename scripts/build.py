@@ -38,6 +38,10 @@ parser.add_argument('--tool-path', action='append',
                     help='a directory put first on PATH (perl, ruby, gperf, python); repeatable (default RANVIER_TOOL_PATH, '
                          'separated as PATH is)')
 parser.add_argument('--jobs', type=int, default=os.cpu_count())
+pdf_options = parser.add_mutually_exclusive_group()
+pdf_options.add_argument('--enable-pdf', dest='enable_pdf', action='store_true', help='enable PDF writing on supported Skia backends (default)')
+pdf_options.add_argument('--disable-pdf', dest='enable_pdf', action='store_false', help='omit PDF writing for a size-focused custom build')
+parser.set_defaults(enable_pdf=True)
 parser.add_argument('--strict', action='store_true',
                     help='prepare fails when the WebKit checkout has edits the series does not make (release.py)')
 parser.add_argument('--rid', default='win-x64', choices=['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64', 'osx-arm64'])
@@ -209,7 +213,7 @@ def prepare():
     (api / 'RanvierAbi' / 'dom').mkdir(exist_ok=True)
     for name in ['RanvierWebCoreAbi.h', 'RanvierWebCoreAbi.cpp', 'RanvierWebCoreDom.h', 'RanvierWebCoreDom.cpp',
                  'RanvierWebCoreUia.cpp', 'RanvierWebCoreD3D11.h', 'RanvierWebCoreD3D11.cpp', 'RanvierWebCoreEGL.h', 'RanvierWebCoreEGL.cpp', 'RanvierImageEncoding.h', 'RanvierImageEncoding.cpp', 'dom/RanvierDomGlue.h',
-                 'RanvierCapabilities.inc', 'RanvierCapabilityCatalogue.inc', 'RanvierSvgViewGlue.h', 'RanvierResourceGlue.h', 'RanvierEventGlue.h', 'RanvierMutationGlue.h', 'RanvierViewportGlue.h', 'RanvierInspectGlue.h', 'RanvierCanvasGlue.h', 'RanvierWakeLockGlue.h', 'RanvierNotificationGlue.h', 'RanvierTransferGlue.h', 'RanvierPointerGlue.h', 'RanvierCanvasPixelsGlue.h', 'RanvierCanvasExportGlue.h']:
+                 'RanvierCapabilities.inc', 'RanvierCapabilityCatalogue.inc', 'RanvierSvgViewGlue.h', 'RanvierResourceGlue.h', 'RanvierEventGlue.h', 'RanvierMutationGlue.h', 'RanvierPrintGlue.h', 'RanvierViewportGlue.h', 'RanvierInspectGlue.h', 'RanvierCanvasGlue.h', 'RanvierWakeLockGlue.h', 'RanvierNotificationGlue.h', 'RanvierTransferGlue.h', 'RanvierPointerGlue.h', 'RanvierCanvasPixelsGlue.h', 'RanvierCanvasExportGlue.h']:
         shutil.copy2(root / 'host' / name, api / 'RanvierAbi' / name)
     git('checkout', commit, '--', 'Tools/TestWebKitAPI/CMakeLists.txt', cwd=source)
     cmake = api / 'CMakeLists.txt'
@@ -259,6 +263,7 @@ def configure(env):
     # RANVIER_RID comes before -C: config/common.cmake picks the port from it.
     command = ['cmake', '-S', source, '-B', build, '-G', 'Ninja', f'-DRANVIER_RID={args.rid}',
                '-C', root / 'config' / f'{args.flavor}.cmake', *stable_interpreters(env)]
+    command.append('-DRANVIER_ENABLE_PDF=' + ('ON' if getattr(args, 'enable_pdf', True) else 'OFF'))
     if windows:
         clang = (llvm / 'clang-cl.exe').as_posix()
         command += [f'-DCMAKE_C_COMPILER={clang}', f'-DCMAKE_CXX_COMPILER={clang}',

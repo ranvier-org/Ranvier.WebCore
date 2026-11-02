@@ -41,6 +41,14 @@ PROBES = [
             rid=rid, flavor=None,
             env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
       for rid in ['linux-x64', 'linux-arm64', 'win-x64', 'win-arm64']],
+    *[probe('Verify native PDF layout, resource ownership and teardown',
+            'python -I -X utf8 tests/abi/printing_pdf.py --native-directory {native} --webkit-source {work}/src --report {work}/printing-pdf.json',
+            rid=rid, flavor=None,
+            env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'} if rid.startswith('linux') else None)
+      for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],
+    *[probe('Verify controlled unavailable native PDF backend',
+            'python -I -X utf8 tests/abi/printing_pdf.py --native-directory {native} --webkit-source {work}/src --report {work}/printing-pdf.json --expect-unsupported',
+            rid=rid, flavor=None) for rid in ['osx-x64', 'osx-arm64']],
     probe('Verify Windows same-document transition snapshot pixels',
           'python -I tests/gpu/windows_view_transition_pixels.py --native-directory {native} --output {work}/gpu-transition-readback',
           rid='win-x64', flavor='gpu'),

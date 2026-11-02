@@ -47,6 +47,7 @@ WEBCORE_EXPORT int32_t ranvier_media_capabilities_info(uint64_t operation, int32
 // 1 when a media engine configuration provider answers decoding (encoding 0) or encoding (1) queries, else 0.
 WEBCORE_EXPORT int32_t ranvier_media_capabilities_provider(int32_t encoding);
 WEBCORE_EXPORT int32_t ranvier_resource_settled_bytes(RvNode* document, const uint8_t* bytes, int64_t length, int32_t width, int32_t height, RvResourceCompletion, void* context, uint64_t* operation);
+WEBCORE_EXPORT int32_t ranvier_resource_settled_bytes_outcome(RvNode* document, const uint8_t* bytes, int64_t length, int32_t width, int32_t height, int32_t outcome, RvResourceCompletion, void* context, uint64_t* operation);
 WEBCORE_EXPORT int32_t ranvier_resource_bytes(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length);
 // createImageBitmap: an operation with the contract above that holds its ImageBitmap or DOMException name from its
 // terminal outcome until release.

@@ -1593,13 +1593,15 @@ int32_t ranvier_media_capabilities_provider(int32_t encoding)
     return PlatformMediaEngineConfigurationFactory::hasDecodingConfigurationFactory() ? 1 : 0;
 }
 
-int32_t ranvier_resource_settled_bytes(RvNode* documentHandle, const uint8_t* bytes, int64_t length, int32_t width, int32_t height,
-    RvResourceCompletion callback, void* context, uint64_t* operation)
+int32_t ranvier_resource_settled_bytes_outcome(RvNode* documentHandle, const uint8_t* bytes, int64_t length, int32_t width, int32_t height,
+    int32_t outcome, RvResourceCompletion callback, void* context, uint64_t* operation)
 {
     if (!documentHandle || (!bytes && length) || length < 0 || !callback || !operation)
         return RV_ERR_NULL_ARGUMENT;
     if (!WTF::isMainThread())
         return RV_ERR_WRONG_THREAD;
+    if (outcome != RV_RESOURCE_SUCCEEDED && outcome != RV_RESOURCE_CANCELLED)
+        return RV_ERR_UNSUPPORTED;
     auto* document = documentFromHandle(documentHandle);
     if (!document || !document->window() || !nextOperation)
         return RV_ERR_UNSUPPORTED;
@@ -1608,11 +1610,18 @@ int32_t ranvier_resource_settled_bytes(RvNode* documentHandle, const uint8_t* by
     value->width = width;
     value->height = height;
     value->starting = true;
-    value->finish(RV_RESOURCE_SUCCEEDED);
+    value->finish(outcome);
     value->starting = false;
     *operation = nextOperation++;
     operations().emplace(*operation, WTF::move(value));
     return RV_OK;
+}
+
+int32_t ranvier_resource_settled_bytes(RvNode* documentHandle, const uint8_t* bytes, int64_t length, int32_t width, int32_t height,
+    RvResourceCompletion callback, void* context, uint64_t* operation)
+{
+    return ranvier_resource_settled_bytes_outcome(documentHandle, bytes, length, width, height,
+        RV_RESOURCE_SUCCEEDED, callback, context, operation);
 }
 
 int32_t ranvier_resource_bytes(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length)

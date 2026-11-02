@@ -7,6 +7,7 @@
 #include "RanvierResourceGlue.h"
 #include "RanvierEventGlue.h"
 #include "RanvierMutationGlue.h"
+#include "RanvierPrintGlue.h"
 #include "RanvierTransferGlue.h"
 #include "RanvierPointerGlue.h"
 #include "RanvierViewportGlue.h"
@@ -17,6 +18,7 @@
 #include "RanvierWakeLockGlue.h"
 #include "RanvierNotificationGlue.h"
 #include <atomic>
+#include <memory>
 #include <string>
 #include <vector>
 #include <JavaScriptCore/DisallowVMEntry.h>
@@ -903,9 +905,9 @@ struct RvHost {
     bool frameRequested { false };
     // Inside rv_host_update or rv_host_paint_rgba, which call no callback.
     bool inFrame { false };
-    enum class DocumentTransaction { Idle, Replacing, Destroying };
+    enum class DocumentTransaction { Idle, Replacing, Printing, Destroying };
     DocumentTransaction documentTransaction { DocumentTransaction::Idle };
-    bool destroyAfterDocumentReplacement { false };
+    bool destroyAfterDocumentTransaction { false };
     unsigned editingDepth { 0 };
     bool destroyAfterEditing { false };
     bool updateWanted { false };
@@ -1669,6 +1671,8 @@ int32_t rv_abi_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "screen"))
         return 1;
+    if (!std::strcmp(feature, "printing-pdf"))
+        return ranvier_print_pdf_supported();
     if (!std::strcmp(feature, "capabilities"))
         return 1;
     if (!std::strcmp(feature, "svg-view-selection"))
@@ -2267,8 +2271,9 @@ void rv_host_destroy(RvHost* host)
     }
     if (host->documentTransaction == RvHost::DocumentTransaction::Destroying)
         return;
-    if (host->documentTransaction == RvHost::DocumentTransaction::Replacing) {
-        host->destroyAfterDocumentReplacement = true;
+    if (host->documentTransaction == RvHost::DocumentTransaction::Replacing
+        || host->documentTransaction == RvHost::DocumentTransaction::Printing) {
+        host->destroyAfterDocumentTransaction = true;
         return;
     }
     host->documentTransaction = RvHost::DocumentTransaction::Destroying;
@@ -2290,10 +2295,10 @@ void rv_host_destroy(RvHost* host)
     publishScreens();
 }
 
-static int32_t finishDocumentReplacement(RvHost* host)
+static int32_t finishDocumentTransaction(RvHost* host)
 {
     host->documentTransaction = RvHost::DocumentTransaction::Idle;
-    if (std::exchange(host->destroyAfterDocumentReplacement, false)) {
+    if (std::exchange(host->destroyAfterDocumentTransaction, false)) {
         rv_host_destroy(host);
         return RV_ERR_DETACHED;
     }
@@ -2316,15 +2321,15 @@ int32_t rv_host_load_html(RvHost* host, const uint8_t* html, int32_t html_length
     ranvier_custom_effect_callbacks_revoke_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_view_transitions_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_mutation_observers_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
-    if (host->destroyAfterDocumentReplacement)
-        return finishDocumentReplacement(host);
+    if (host->destroyAfterDocumentTransaction)
+        return finishDocumentTransaction(host);
     loadHTML(host->frame(), *markup);
     // The new document posts accessibility notifications once its cache exists.
-    if (host->destroyAfterDocumentReplacement)
-        return finishDocumentReplacement(host);
+    if (host->destroyAfterDocumentTransaction)
+        return finishDocumentTransaction(host);
     if (host->accessibility)
         host->document().axObjectCache();
-    return finishDocumentReplacement(host);
+    return finishDocumentTransaction(host);
 }
 
 int32_t rv_host_load_svg(RvHost* host, const uint8_t* svg, int32_t svg_length)
@@ -2342,14 +2347,73 @@ int32_t rv_host_load_svg(RvHost* host, const uint8_t* svg, int32_t svg_length)
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_view_transitions_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_mutation_observers_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
-    if (host->destroyAfterDocumentReplacement)
-        return finishDocumentReplacement(host);
+    if (host->destroyAfterDocumentTransaction)
+        return finishDocumentTransaction(host);
     loadDocument(host->frame(), *markup, "image/svg+xml"_s);
-    if (host->destroyAfterDocumentReplacement)
-        return finishDocumentReplacement(host);
+    if (host->destroyAfterDocumentTransaction)
+        return finishDocumentTransaction(host);
     if (host->accessibility)
         host->document().axObjectCache();
-    return finishDocumentReplacement(host);
+    return finishDocumentTransaction(host);
+}
+
+struct PrintCancellation {
+    RvHost* host;
+    RvPrintCancelPoll poll;
+    void* context;
+};
+
+static int32_t pollPrintCancellation(void* context)
+{
+    auto& value = *static_cast<PrintCancellation*>(context);
+    if (value.host->destroyAfterDocumentTransaction)
+        return 1;
+    auto cancelled = value.poll && value.poll(value.context);
+    return cancelled || value.host->destroyAfterDocumentTransaction;
+}
+
+int32_t rv_host_print_pdf(RvHost* host, const RvPrintOptions* options, RvPrintCancelPoll cancelPoll, void* cancelContext,
+    RvResourceCompletion callback, void* context, int32_t* pageCount, uint64_t* operation)
+{
+    if (pageCount)
+        *pageCount = 0;
+    if (operation)
+        *operation = 0;
+    if (!host || !options || !callback || !pageCount || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
+        return RV_ERR_DETACHED;
+    if (!ranvier_print_pdf_supported() || options->size != sizeof(RvPrintOptions) || host->inFrame)
+        return RV_ERR_UNSUPPORTED;
+    auto copiedOptions = *options;
+    auto* document = reinterpret_cast<RvNode*>(&host->document());
+    host->documentTransaction = RvHost::DocumentTransaction::Printing;
+    PrintCancellation cancellation { host, cancelPoll, cancelContext };
+    RvPrintPdfData* raw = nullptr;
+    auto status = ranvier_print_pdf(document, &copiedOptions, pollPrintCancellation, &cancellation, &raw);
+    std::unique_ptr<RvPrintPdfData, decltype(&ranvier_print_pdf_release)> result(raw, ranvier_print_pdf_release);
+    auto finished = finishDocumentTransaction(host);
+    if (finished != RV_OK)
+        return finished;
+    if (status != RV_OK)
+        return status;
+    const uint8_t* bytes = nullptr;
+    int64_t length = 0;
+    int32_t pages = 0;
+    int32_t cancelled = 0;
+    ranvier_print_pdf_data(result.get(), &bytes, &length, &pages, &cancelled);
+    status = ranvier_resource_settled_bytes_outcome(document, bytes, length, 0, 0,
+        cancelled ? RV_RESOURCE_CANCELLED : RV_RESOURCE_SUCCEEDED, callback, context, operation);
+    if (status == RV_OK)
+        *pageCount = pages;
+    return status;
+}
+
+int32_t rv_print_pdf_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length)
+{
+    return ranvier_resource_bytes(operation, buffer, capacity, length);
 }
 
 int32_t rv_host_select_svg_view(RvHost* host, const char* fragment, int32_t* selected)
@@ -2927,6 +2991,8 @@ int32_t rv_host_paint_rgba(RvHost* host, uint8_t* rgba, int32_t length)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
+    if (host->documentTransaction == RvHost::DocumentTransaction::Printing)
+        return RV_ERR_UNSUPPORTED;
     return paintArea(*host, rgba, length, { { }, host->size });
 }
 
@@ -2936,6 +3002,8 @@ int32_t rv_host_paint_rgba_rect(RvHost* host, uint8_t* rgba, int32_t length, int
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
+    if (host->documentTransaction == RvHost::DocumentTransaction::Printing)
+        return RV_ERR_UNSUPPORTED;
     if (width < 0 || height < 0)
         return RV_ERR_UNSUPPORTED;
     return paintArea(*host, rgba, length, { x, y, width, height });
@@ -4614,6 +4682,8 @@ int32_t rv_host_update(RvHost* host)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
+    if (host->documentTransaction == RvHost::DocumentTransaction::Printing)
+        return RV_ERR_UNSUPPORTED;
     Ref page = host->page;
     host->inFrame = true;
     host->frameRequested = false;

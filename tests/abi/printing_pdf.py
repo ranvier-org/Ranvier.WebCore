@@ -12,8 +12,7 @@ import threading
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'printing'))
 from svg_paint_probe import SvgProbe
-from print177_probe import markup
-from pypdf import PdfReader
+from document_fixture import markup
 
 P, I, U64, I64 = C.c_void_p, C.c_int32, C.c_uint64, C.c_int64
 Cancel = C.CFUNCTYPE(I, P)
@@ -41,8 +40,19 @@ def run(args):
         release = p.bind('rv_resource_release', I, [U64])
         cycle = p.bind('rv_run_loop_cycle', I, [I])
         check = p.expect
-        check(p.bind('rv_abi_has', I, [C.c_char_p])(b'printing-pdf') == 1, 'PDF renderer capability')
+        capability = p.bind('rv_abi_has', I, [C.c_char_p])(b'printing-pdf')
+        check(capability == (0 if args.expect_unsupported else 1), 'PDF renderer capability is truthful')
         check(C.sizeof(Options) == 72, 'typed options layout')
+        if args.expect_unsupported:
+            events = []
+            cancel = Cancel(lambda _: 0)
+            completed = Completion(lambda *values: events.append(values))
+            options, pages, token = Options(), I(-1), U64(0xdead)
+            check(export(p.host, C.byref(options), cancel, None, completed, None, C.byref(pages), C.byref(token)) == -9,
+                  'unsupported backend returns controlled status')
+            check(pages.value == token.value == 0 and not events, 'unsupported backend publishes no operation')
+            args.report.write_text(json.dumps({'assertions': p.assertions, 'unsupported': True}) + '\n')
+            return
         p.load(markup(args.webkit_source), standalone=False)
         for _ in range(200):
             p.update()
@@ -104,11 +114,15 @@ def run(args):
 
         try:
             _, pdf = request('three-pages')
-            parsed = PdfReader(io.BytesIO(pdf), strict=True)
-            check(len(parsed.pages) == 3, 'real three-page PDF')
-            for index, page in enumerate(parsed.pages):
-                check([float(page.mediabox.width), float(page.mediabox.height)] == [576, 720], 'point page box')
-                check('PRINT177 PAGE ' + str(index + 1) in page.extract_text(), 'actual DOM text remains text')
+            check(pdf.startswith(b'%PDF-') and pdf.rstrip().endswith(b'%%EOF'), 'complete PDF output')
+            (args.report.parent / 'host-output.pdf').write_bytes(pdf)
+            if args.inspect_pdf:
+                from pypdf import PdfReader
+                parsed = PdfReader(io.BytesIO(pdf), strict=True)
+                check(len(parsed.pages) == 3, 'real three-page PDF')
+                for index, page in enumerate(parsed.pages):
+                    check([float(page.mediabox.width), float(page.mediabox.height)] == [576, 720], 'point page box')
+                    check('PRINT177 PAGE ' + str(index + 1) in page.extract_text(), 'actual DOM text remains text')
             request('cancel-before', cancel_action=lambda count: True, expected_outcome=3)
             request('cancel-after-first-page', cancel_action=lambda count: count >= 3, expected_outcome=3)
             request('output-budget', options=Options(output_budget_bytes=128), expected_status=-5)
@@ -174,4 +188,6 @@ if __name__ == '__main__':
     parser.add_argument('--native-directory', type=Path, required=True)
     parser.add_argument('--webkit-source', type=Path, required=True)
     parser.add_argument('--report', type=Path, required=True)
+    parser.add_argument('--inspect-pdf', action='store_true', help='Use an already installed analysis-only pypdf, without adding a renderer dependency')
+    parser.add_argument('--expect-unsupported', action='store_true')
     run(parser.parse_args())
