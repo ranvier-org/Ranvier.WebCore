@@ -10,6 +10,7 @@
 #include <string>
 #include <thread>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 namespace {
@@ -23,6 +24,8 @@ constexpr auto action = "org.a11y.atspi.Action";
 constexpr auto value = "org.a11y.atspi.Value";
 constexpr auto text = "org.a11y.atspi.Text";
 constexpr auto editableText = "org.a11y.atspi.EditableText";
+constexpr auto cache = "org.a11y.atspi.Cache";
+constexpr auto cachePath = "/org/a11y/atspi/cache";
 
 std::string protocolText(const char* bytes, size_t length)
 {
@@ -63,12 +66,16 @@ struct TextSnapshot {
     std::vector<int> utf16 { 0 };
     std::vector<size_t> utf8 { 0 };
 
-    explicit TextSnapshot(RvAxNode* node)
+    static std::string read(RvAxNode* node)
     {
         auto length = rv_ax_text_length(node);
         if (length < 0)
-            return;
-        bytes = readString([&](char* buffer, int capacity, int* count) { return rv_ax_text(node, 0, length, buffer, capacity, count); });
+            return {};
+        return readString([&](char* buffer, int capacity, int* count) { return rv_ax_text(node, 0, length, buffer, capacity, count); });
+    }
+    explicit TextSnapshot(RvAxNode* node) : TextSnapshot(read(node)) { }
+    explicit TextSnapshot(std::string value) : bytes(std::move(value))
+    {
         for (const char* cursor = bytes.data(); cursor < bytes.data() + bytes.size();) {
             auto character = g_utf8_get_char(cursor);
             cursor = g_utf8_next_char(cursor);
@@ -166,14 +173,29 @@ constexpr StateMapping stateMapping[] {
 
 struct Bridge;
 struct Node {
-    Bridge* bridge { nullptr };
+    std::weak_ptr<Bridge> bridge;
     RvAxNode* native { nullptr };
     std::string path;
     std::vector<unsigned> registrations;
     std::vector<const char*> interfaces;
     int states { 0 };
+    std::string previousText;
+    bool detached { false };
     ~Node() { if (native) rv_ax_release(native); }
 };
+
+uint64_t platformStates(Node& node)
+{
+    uint64_t state = 0;
+    if (!node.native) return state;
+    auto native = rv_ax_states(node.native);
+    if (native < 0) return uint64_t { 1 } << ATSPI_STATE_DEFUNCT;
+    for (auto mapping : stateMapping) if (native & mapping.native) state |= uint64_t { 1 } << mapping.atspi;
+    if (!(native & RV_AX_DISABLED)) state |= (uint64_t { 1 } << ATSPI_STATE_ENABLED) | (uint64_t { 1 } << ATSPI_STATE_SENSITIVE);
+    state |= uint64_t { 1 } << ATSPI_STATE_VISIBLE;
+    if (!(native & RV_AX_OFFSCREEN)) state |= uint64_t { 1 } << ATSPI_STATE_SHOWING;
+    return state;
+}
 
 struct Bridge : std::enable_shared_from_this<Bridge> {
     RvHost* host;
@@ -182,14 +204,29 @@ struct Bridge : std::enable_shared_from_this<Bridge> {
     std::thread::id owner { std::this_thread::get_id() };
     RvAtspiGeometry geometry;
     std::string name;
-    std::unordered_map<int64_t, std::unique_ptr<Node>> nodes;
-    std::unique_ptr<Node> applicationNode;
+    std::unordered_map<int64_t, std::shared_ptr<Node>> nodes;
+    std::shared_ptr<Node> applicationNode;
+    std::shared_ptr<Node> cacheNode;
     bool closed { false };
     bool ownsAccessibility { false };
     int applicationId { 0 };
+    unsigned registryWatch { 0 };
+    bool embedding { false };
+    std::string desktopBus;
+    std::string desktopPath;
+    GCancellable* embedCancellation { g_cancellable_new() };
 
     Bridge(RvHost* host, RvAtspiGeometry geometry, std::string name) : host(host), geometry(geometry), name(std::move(name)) { }
-    ~Bridge() { close(); if (schema) g_dbus_node_info_unref(schema); if (connection) g_object_unref(connection); }
+    ~Bridge()
+    {
+        close();
+        g_object_unref(embedCancellation);
+        if (schema) g_dbus_node_info_unref(schema);
+        if (connection) {
+            g_dbus_connection_flush(connection, nullptr, nullptr, nullptr);
+            g_object_unref(connection);
+        }
+    }
     const char* bus() const { return g_dbus_connection_get_unique_name(connection); }
     bool onOwner() const { return owner == std::this_thread::get_id(); }
     GVariant* reference(const char* path) const { return g_variant_new("(so)", bus(), path); }
@@ -201,15 +238,26 @@ struct Bridge : std::enable_shared_from_this<Bridge> {
 
     void unregister(Node& node)
     {
+        node.detached = true;
         for (auto id : node.registrations)
             g_dbus_connection_unregister_object(connection, id);
         node.registrations.clear();
+        if (node.native) {
+            auto* native = node.native;
+            node.native = nullptr;
+            rv_ax_release(native);
+        }
     }
     void close()
     {
         if (closed)
             return;
         closed = true;
+        if (registryWatch) { g_bus_unwatch_name(registryWatch); registryWatch = 0; }
+        g_cancellable_cancel(embedCancellation);
+        if (!desktopBus.empty())
+            g_dbus_connection_call(connection, "org.a11y.atspi.Registry", rootPath, "org.a11y.atspi.Socket", "Unembed",
+                g_variant_new("((so))", bus(), rootPath), nullptr, G_DBUS_CALL_FLAGS_NONE, 1000, nullptr, nullptr, nullptr);
         if (ownsAccessibility) {
             rv_host_set_accessibility(host, 0, nullptr, nullptr);
             ownsAccessibility = false;
@@ -221,13 +269,17 @@ struct Bridge : std::enable_shared_from_this<Bridge> {
             unregister(*applicationNode);
             applicationNode.reset();
         }
+        if (cacheNode) { unregister(*cacheNode); cacheNode.reset(); }
     }
-    bool registerNode(Node& node)
+    bool registerNode(const std::shared_ptr<Node>& protectedNode)
     {
-        node.interfaces = { accessible };
-        if (!node.native)
-            node.interfaces.push_back(application);
+        auto& node = *protectedNode;
+        if (node.path == cachePath)
+            node.interfaces = { cache };
+        else if (!node.native)
+            node.interfaces = { accessible, application };
         else {
+            node.interfaces = { accessible };
             node.interfaces.push_back(component);
             node.interfaces.push_back(action);
             double number;
@@ -240,8 +292,12 @@ struct Bridge : std::enable_shared_from_this<Bridge> {
         }
         for (auto* interface : node.interfaces) {
             GError* error = nullptr;
-            auto id = g_dbus_connection_register_object(connection, node.path.c_str(), g_dbus_node_info_lookup_interface(schema, interface), &vtable, &node, nullptr, &error);
+            auto* lease = new std::shared_ptr<Node>(protectedNode);
+            auto id = g_dbus_connection_register_object(connection, node.path.c_str(), g_dbus_node_info_lookup_interface(schema, interface), &vtable, lease,
+                [](void* data) { delete static_cast<std::shared_ptr<Node>*>(data); }, &error);
             if (!id) {
+                delete lease;
+                g_warning("AT-SPI registration failed for %s: %s", interface, error ? error->message : "unknown");
                 g_clear_error(&error);
                 unregister(node);
                 return false;
@@ -257,12 +313,14 @@ struct Bridge : std::enable_shared_from_this<Bridge> {
         auto id = rv_ax_id(native);
         if (id < 0) { rv_ax_release(native); return nullptr; }
         if (auto found = nodes.find(id); found != nodes.end()) { rv_ax_release(native); return found->second.get(); }
-        auto node = std::make_unique<Node>();
-        node->bridge = this;
+        auto node = std::make_shared<Node>();
+        node->bridge = shared_from_this();
         node->native = native;
         node->states = rv_ax_states(native);
+        if (rv_abi_has("accessibility-text") && rv_ax_text_length(native) >= 0)
+            node->previousText = TextSnapshot(native).bytes;
         node->path = "/org/a11y/atspi/accessible/node_" + std::to_string(id);
-        if (!registerNode(*node))
+        if (!registerNode(node))
             return nullptr;
         auto* result = node.get();
         nodes.emplace(id, std::move(node));
@@ -289,9 +347,122 @@ struct Bridge : std::enable_shared_from_this<Bridge> {
     }
     GVariant* parent(Node& node)
     {
-        if (!node.native) return nullReference();
+        if (!node.native) return desktopBus.empty() ? nullReference() : g_variant_new("(so)", desktopBus.c_str(), desktopPath.c_str());
         if (auto* parent = remember(rv_ax_parent(node.native))) return reference(parent);
         return reference(rootPath);
+    }
+    bool coordinateOrigin(Node& node, unsigned coordinates, double& x, double& y)
+    {
+        x = y = 0;
+        if (coordinates == ATSPI_COORD_TYPE_SCREEN) {
+            if (!geometry.screen_position_known) return false;
+            x = geometry.screen_x; y = geometry.screen_y;
+        } else if (coordinates == ATSPI_COORD_TYPE_PARENT) {
+            if (auto* parent = remember(rv_ax_parent(node.native))) {
+                double width, height;
+                if (rv_ax_rect(parent->native, &x, &y, &width, &height) != RV_OK) return false;
+                x *= -geometry.device_scale; y *= -geometry.device_scale;
+            }
+        } else if (coordinates != ATSPI_COORD_TYPE_WINDOW) return false;
+        return true;
+    }
+    GVariant* relations(Node& node)
+    {
+        GVariantBuilder result; g_variant_builder_init(&result, G_VARIANT_TYPE("a(ua(so))"));
+        if (node.native && rv_abi_has("accessibility-relations")) {
+            constexpr std::pair<int, unsigned> mappings[] {
+                { RV_AX_RELATION_CONTROLS, ATSPI_RELATION_CONTROLLER_FOR },
+                { RV_AX_RELATION_DESCRIBED_BY, ATSPI_RELATION_DESCRIBED_BY },
+                { RV_AX_RELATION_DETAILS, ATSPI_RELATION_DETAILS },
+                { RV_AX_RELATION_ERROR_MESSAGE, ATSPI_RELATION_ERROR_MESSAGE },
+                { RV_AX_RELATION_FLOW_TO, ATSPI_RELATION_FLOWS_TO },
+                { RV_AX_RELATION_LABELLED_BY, ATSPI_RELATION_LABELLED_BY },
+                { RV_AX_RELATION_OWNS, ATSPI_RELATION_NODE_PARENT_OF }
+            };
+            for (auto [kind, platform] : mappings) {
+                int count = 0;
+                auto status = rv_ax_relations(node.native, kind, nullptr, 0, &count);
+                if ((status != RV_OK && status != RV_ERR_BUFFER_TOO_SMALL) || count <= 0) continue;
+                std::vector<RvAxNode*> raw(count);
+                if (rv_ax_relations(node.native, kind, raw.data(), count, &count) != RV_OK) continue;
+                GVariantBuilder targets; g_variant_builder_init(&targets, G_VARIANT_TYPE("a(so)"));
+                for (auto* target : raw) if (auto* known = remember(target)) g_variant_builder_add_value(&targets, reference(known));
+                g_variant_builder_add(&result, "(ua(so))", platform, &targets);
+            }
+        }
+        return g_variant_new("(a(ua(so)))", &result);
+    }
+    GVariant* cacheItem(Node& node)
+    {
+        auto descendants = children(node);
+        int index = 0;
+        if (node.native) if (auto* parentNode = remember(rv_ax_parent(node.native))) {
+            auto siblings = children(*parentNode);
+            auto found = std::find(siblings.begin(), siblings.end(), &node);
+            index = found == siblings.end() ? -1 : static_cast<int>(found - siblings.begin());
+        }
+        GVariantBuilder interfaces; g_variant_builder_init(&interfaces, G_VARIANT_TYPE("as"));
+        for (auto* interface : node.interfaces) g_variant_builder_add(&interfaces, "s", interface);
+        auto state = platformStates(node);
+        GVariantBuilder states; g_variant_builder_init(&states, G_VARIANT_TYPE("au"));
+        g_variant_builder_add(&states, "u", static_cast<uint32_t>(state));
+        g_variant_builder_add(&states, "u", static_cast<uint32_t>(state >> 32));
+        return g_variant_new("(@(so)@(so)@(so)ii@assus@au)", reference(&node), reference(rootPath), parent(node), index,
+            static_cast<int>(descendants.size()), g_variant_builder_end(&interfaces),
+            node.native ? nativeString(node.native, RV_AX_NAME).c_str() : name.c_str(),
+            node.native ? roleOf(node.native) : ATSPI_ROLE_APPLICATION,
+            node.native ? nativeString(node.native, RV_AX_DESCRIPTION).c_str() : "", g_variant_builder_end(&states));
+    }
+    GVariant* cacheItems()
+    {
+        std::vector<Node*> all { applicationNode.get() };
+        std::unordered_set<Node*> visited;
+        for (size_t i = 0; i < all.size(); ++i) {
+            if (!visited.insert(all[i]).second) continue;
+            for (auto* child : children(*all[i])) if (!visited.contains(child)) all.push_back(child);
+        }
+        GVariantBuilder items; g_variant_builder_init(&items, G_VARIANT_TYPE("a((so)(so)(so)iiassusau)"));
+        visited.clear();
+        for (auto* node : all) if (visited.insert(node).second) g_variant_builder_add_value(&items, cacheItem(*node));
+        return g_variant_new("(a((so)(so)(so)iiassusau))", &items);
+    }
+    void embed()
+    {
+        if (closed || embedding) return;
+        embedding = true;
+        auto* retained = new std::shared_ptr<Bridge>(shared_from_this());
+        g_dbus_connection_call(connection, "org.a11y.atspi.Registry", rootPath, "org.a11y.atspi.Socket", "Embed",
+            g_variant_new("((so))", bus(), rootPath), G_VARIANT_TYPE("((so))"), G_DBUS_CALL_FLAGS_NONE, 2000, embedCancellation,
+            [](GObject* source, GAsyncResult* result, void* context) {
+                auto retained = std::unique_ptr<std::shared_ptr<Bridge>>(static_cast<std::shared_ptr<Bridge>*>(context));
+                auto& bridge = **retained;
+                bridge.embedding = false;
+                GError* error = nullptr;
+                auto* reply = g_dbus_connection_call_finish(G_DBUS_CONNECTION(source), result, &error);
+                if (reply) {
+                    if (!bridge.closed) {
+                        const char* name; const char* path;
+                        g_variant_get(reply, "((&s&o))", &name, &path);
+                        bridge.desktopBus = name;
+                        bridge.desktopPath = path;
+                        bridge.event(*bridge.applicationNode, "PropertyChange", "accessible-parent", 0, 0, g_variant_new("(so)", name, path));
+                    }
+                    g_variant_unref(reply);
+                }
+                g_clear_error(&error);
+            }, retained);
+    }
+    void watchRegistry()
+    {
+        registryWatch = g_bus_watch_name_on_connection(connection, "org.a11y.atspi.Registry", G_BUS_NAME_WATCHER_FLAGS_NONE,
+            [](GDBusConnection*, const char*, const char*, void* context) {
+                auto bridge = static_cast<Bridge*>(context)->shared_from_this();
+                bridge->embed();
+            },
+            [](GDBusConnection*, const char*, void* context) {
+                auto bridge = static_cast<Bridge*>(context)->shared_from_this();
+                bridge->desktopBus.clear(); bridge->desktopPath.clear();
+            }, this, nullptr);
     }
     void event(Node& node, const char* signal, const char* detail, int first, int second, GVariant* data)
     {
@@ -331,6 +502,19 @@ struct Bridge : std::enable_shared_from_this<Bridge> {
                 if ((node->states ^ current) & mapping.native)
                     bridge.event(*node, "StateChanged", mapping.name, !!(current & mapping.native), 0, g_variant_new_string(""));
             node->states = current;
+        } else if (type == RV_AX_EVENT_TEXT) {
+            TextSnapshot previous(node->previousText);
+            TextSnapshot current(native);
+            int prefix = 0, suffix = 0;
+            while (prefix < previous.size() && prefix < current.size() && previous.slice(prefix, prefix + 1) == current.slice(prefix, prefix + 1)) ++prefix;
+            while (suffix < previous.size() - prefix && suffix < current.size() - prefix
+                && previous.slice(previous.size() - suffix - 1, previous.size() - suffix) == current.slice(current.size() - suffix - 1, current.size() - suffix)) ++suffix;
+            int removed = previous.size() - prefix - suffix, inserted = current.size() - prefix - suffix;
+            if (removed)
+                bridge.event(*node, "TextChanged", "delete", prefix, removed, g_variant_new_string(previous.slice(prefix, previous.size() - suffix).c_str()));
+            if (inserted)
+                bridge.event(*node, "TextChanged", "insert", prefix, inserted, g_variant_new_string(current.slice(prefix, current.size() - suffix).c_str()));
+            node->previousText = std::move(current.bytes);
         } else if (type == RV_AX_EVENT_TEXT_SELECTION) {
             bridge.event(*node, "TextSelectionChanged", "", 0, 0, g_variant_new_string(""));
             bridge.event(*node, "TextCaretMoved", "", TextSnapshot(native).fromNative(rv_ax_text_caret(native)), 0, g_variant_new_string(""));
@@ -342,7 +526,8 @@ GDBusInterfaceVTable Bridge::vtable { Bridge::method, Bridge::property, Bridge::
 
 bool alive(Node& node, GError** error)
 {
-    if (!node.bridge->closed && (!node.native || rv_ax_id(node.native) >= 0))
+    auto bridge = node.bridge.lock();
+    if (bridge && !bridge->closed && !node.detached && (!node.native || rv_ax_id(node.native) >= 0))
         return true;
     g_set_error_literal(error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_OBJECT, "The native accessible object is detached");
     return false;
@@ -368,10 +553,11 @@ std::vector<std::pair<const char*, int>> actions(Node& node)
 
 GVariant* Bridge::property(GDBusConnection*, const char*, const char*, const char* interface, const char* property, GError** error, void* data)
 {
-    auto& node = *static_cast<Node*>(data);
-    auto protectedBridge = node.bridge->shared_from_this();
-    auto& bridge = *node.bridge;
+    auto protectedNode = *static_cast<std::shared_ptr<Node>*>(data);
+    auto& node = *protectedNode;
+    auto protectedBridge = node.bridge.lock();
     if (!alive(node, error)) return nullptr;
+    auto& bridge = *protectedBridge;
     if (!strcmp(interface, accessible)) {
         if (!strcmp(property, "Name")) return g_variant_new_string(node.native ? nativeString(node.native, RV_AX_NAME).c_str() : bridge.name.c_str());
         if (!strcmp(property, "Description")) return g_variant_new_string(node.native ? nativeString(node.native, RV_AX_DESCRIPTION).c_str() : "");
@@ -401,10 +587,11 @@ GVariant* Bridge::property(GDBusConnection*, const char*, const char*, const cha
 
 gboolean Bridge::setProperty(GDBusConnection*, const char*, const char*, const char* interface, const char* property, GVariant* input, GError** error, void* data)
 {
-    auto& node = *static_cast<Node*>(data);
-    auto protectedBridge = node.bridge->shared_from_this();
+    auto protectedNode = *static_cast<std::shared_ptr<Node>*>(data);
+    auto& node = *protectedNode;
+    auto protectedBridge = node.bridge.lock();
     if (!alive(node, error)) return false;
-    if (!strcmp(interface, application) && !strcmp(property, "Id")) { node.bridge->applicationId = g_variant_get_int32(input); return true; }
+    if (!strcmp(interface, application) && !strcmp(property, "Id")) { protectedBridge->applicationId = g_variant_get_int32(input); return true; }
     if (!strcmp(interface, value) && !strcmp(property, "CurrentValue") && !(rv_ax_states(node.native) & RV_AX_DISABLED)
         && rv_ax_set_number(node.native, g_variant_get_double(input)) == 1) return true;
     g_set_error_literal(error, G_DBUS_ERROR, G_DBUS_ERROR_NOT_SUPPORTED, "The native accessibility value cannot be changed");
@@ -413,13 +600,15 @@ gboolean Bridge::setProperty(GDBusConnection*, const char*, const char*, const c
 
 void Bridge::method(GDBusConnection*, const char*, const char*, const char* interface, const char* method, GVariant* input, GDBusMethodInvocation* invocation, void* data)
 {
-    auto& node = *static_cast<Node*>(data);
-    auto protectedBridge = node.bridge->shared_from_this();
-    auto& bridge = *node.bridge;
+    auto protectedNode = *static_cast<std::shared_ptr<Node>*>(data);
+    auto& node = *protectedNode;
+    auto protectedBridge = node.bridge.lock();
     GError* error = nullptr;
     if (!alive(node, &error)) { g_dbus_method_invocation_return_gerror(invocation, error); g_clear_error(&error); return; }
+    auto& bridge = *protectedBridge;
     auto answer = [&](GVariant* result) { g_dbus_method_invocation_return_value(invocation, result); };
     auto unsupported = [&] { g_dbus_method_invocation_return_error_literal(invocation, G_DBUS_ERROR, G_DBUS_ERROR_NOT_SUPPORTED, "The native accessibility operation is unavailable"); };
+    if (!strcmp(interface, cache) && !strcmp(method, "GetItems")) { answer(bridge.cacheItems()); return; }
     if (!strcmp(interface, accessible)) {
         if (!strcmp(method, "GetRole")) { answer(g_variant_new("(u)", node.native ? roleOf(node.native) : ATSPI_ROLE_APPLICATION)); return; }
         if (!strcmp(method, "GetRoleName") || !strcmp(method, "GetLocalizedRoleName")) { answer(g_variant_new("(s)", node.native ? nativeString(node.native, RV_AX_ROLE_NAME).c_str() : "application")); return; }
@@ -457,19 +646,12 @@ void Bridge::method(GDBusConnection*, const char*, const char*, const char* inte
             answer(g_variant_new("(a{ss})", &builder)); return;
         }
         if (!strcmp(method, "GetState")) {
-            uint64_t state = 0;
-            if (node.native) {
-                auto native = rv_ax_states(node.native);
-                for (auto mapping : stateMapping) if (native & mapping.native) state |= uint64_t { 1 } << mapping.atspi;
-                if (!(native & RV_AX_DISABLED)) state |= (uint64_t { 1 } << ATSPI_STATE_ENABLED) | (uint64_t { 1 } << ATSPI_STATE_SENSITIVE);
-                state |= uint64_t { 1 } << ATSPI_STATE_VISIBLE;
-                if (!(native & RV_AX_OFFSCREEN)) state |= uint64_t { 1 } << ATSPI_STATE_SHOWING;
-            }
+            auto state = platformStates(node);
             GVariantBuilder builder; g_variant_builder_init(&builder, G_VARIANT_TYPE("au"));
             g_variant_builder_add(&builder, "u", static_cast<uint32_t>(state)); g_variant_builder_add(&builder, "u", static_cast<uint32_t>(state >> 32));
             answer(g_variant_new("(au)", &builder)); return;
         }
-        if (!strcmp(method, "GetRelationSet")) { GVariantBuilder builder; g_variant_builder_init(&builder, G_VARIANT_TYPE("a(ua(so))")); answer(g_variant_new("(a(ua(so)))", &builder)); return; }
+        if (!strcmp(method, "GetRelationSet")) { answer(bridge.relations(node)); return; }
     } else if (!strcmp(interface, application)) {
         if (!strcmp(method, "GetLocale")) { answer(g_variant_new("(s)", g_get_language_names()[0])); return; }
         if (!strcmp(method, "RegisterEventListener") || !strcmp(method, "DeregisterEventListener")) { answer(nullptr); return; }
@@ -493,7 +675,7 @@ void Bridge::method(GDBusConnection*, const char*, const char*, const char* inte
         if (!strcmp(method, "GrabFocus")) { answer(g_variant_new("(b)", !(rv_ax_states(node.native) & RV_AX_DISABLED) && rv_ax_action(node.native, RV_AX_FOCUS) == 1)); return; }
         if (!strcmp(method, "GetLayer")) { answer(g_variant_new("(u)", ATSPI_LAYER_WIDGET)); return; }
         if (!strcmp(method, "GetMDIZOrder")) { answer(g_variant_new("(n)", 0)); return; }
-        if (!strcmp(method, "GetAlpha")) { answer(g_variant_new("(d)", 1.0)); return; }
+        if (!strcmp(method, "GetAlpha")) { unsupported(); return; }
         if (!strcmp(method, "ScrollTo")) { answer(g_variant_new("(b)", rv_ax_action(node.native, RV_AX_SCROLL_INTO_VIEW) == 1)); return; }
         unsigned coordinates = ATSPI_COORD_TYPE_WINDOW;
         int x = 0, y = 0;
@@ -501,6 +683,16 @@ void Bridge::method(GDBusConnection*, const char*, const char*, const char* inte
         else if (strcmp(method, "GetSize")) {
             if (!strcmp(method, "GetExtents") || !strcmp(method, "GetPosition")) g_variant_get(input, "(u)", &coordinates);
             else { unsupported(); return; }
+        }
+        if (!strcmp(method, "GetAccessibleAtPoint")) {
+            double originX, originY;
+            if (!bridge.coordinateOrigin(node, coordinates, originX, originY)) { unsupported(); return; }
+            auto* hit = bridge.remember(rv_host_ax_hit_test(bridge.host,
+                static_cast<int>(std::floor((x - originX) / bridge.geometry.device_scale)),
+                static_cast<int>(std::floor((y - originY) / bridge.geometry.device_scale))));
+            auto* ancestor = hit;
+            while (ancestor && ancestor != &node && node.native) ancestor = bridge.remember(rv_ax_parent(ancestor->native));
+            answer(g_variant_new("(@(so))", ancestor ? bridge.reference(hit) : bridge.nullReference())); return;
         }
         double left, top, width, height;
         if (rv_ax_rect(node.native, &left, &top, &width, &height) != RV_OK) { unsupported(); return; }
@@ -531,6 +723,33 @@ void Bridge::method(GDBusConnection*, const char*, const char*, const char* inte
         }
     } else if (!strcmp(interface, text)) {
         TextSnapshot snapshot(node.native);
+        if (!strcmp(method, "GetCharacterExtents") || !strcmp(method, "GetRangeExtents")) {
+            int start, end; unsigned coordinates;
+            if (!strcmp(method, "GetCharacterExtents")) {
+                g_variant_get(input, "(iu)", &start, &coordinates);
+                if (!snapshot.valid(start) || start == snapshot.size()) { unsupported(); return; }
+                end = start + 1;
+            }
+            else g_variant_get(input, "(iiu)", &start, &end, &coordinates);
+            double originX, originY;
+            if (!snapshot.valid(start) || !snapshot.valid(end) || end < start
+                || !bridge.coordinateOrigin(node, coordinates, originX, originY)) { unsupported(); return; }
+            int count = 0;
+            auto status = rv_ax_text_rects(node.native, snapshot.utf16[start], snapshot.utf16[end], nullptr, 0, &count);
+            if ((status != RV_OK && status != RV_ERR_BUFFER_TOO_SMALL) || count <= 0) { unsupported(); return; }
+            std::vector<double> rects(static_cast<size_t>(count) * 4);
+            if (rv_ax_text_rects(node.native, snapshot.utf16[start], snapshot.utf16[end], rects.data(), count, &count) != RV_OK) { unsupported(); return; }
+            double left = rects[0], top = rects[1], right = left + rects[2], bottom = top + rects[3];
+            for (int i = 1; i < count; ++i) {
+                left = std::min(left, rects[i * 4]); top = std::min(top, rects[i * 4 + 1]);
+                right = std::max(right, rects[i * 4] + rects[i * 4 + 2]); bottom = std::max(bottom, rects[i * 4 + 1] + rects[i * 4 + 3]);
+            }
+            int x = static_cast<int>(std::floor(left * bridge.geometry.device_scale + originX));
+            int y = static_cast<int>(std::floor(top * bridge.geometry.device_scale + originY));
+            int width = static_cast<int>(std::ceil(right * bridge.geometry.device_scale + originX)) - x;
+            int height = static_cast<int>(std::ceil(bottom * bridge.geometry.device_scale + originY)) - y;
+            answer(g_variant_new("(iiii)", x, y, width, height)); return;
+        }
         if (!strcmp(method, "GetText")) {
             int start, end; g_variant_get(input, "(ii)", &start, &end); if (end == -1) end = snapshot.size();
             if (!snapshot.valid(start) || !snapshot.valid(end) || end < start) { unsupported(); return; }
@@ -615,17 +834,22 @@ int32_t rv_atspi_bridge_create(RvHost* host, const char* address, const uint8_t*
     if (!bridge->connection) { g_clear_error(&error); return RV_ERR_UNSUPPORTED; }
     g_dbus_connection_set_exit_on_close(bridge->connection, false);
     bridge->schema = g_dbus_node_info_new_for_xml(interfaceXml, &error);
-    if (!bridge->schema) { g_clear_error(&error); return RV_ERR_UNSUPPORTED; }
+    if (!bridge->schema) { g_warning("AT-SPI XML failure: %s", error ? error->message : "unknown"); g_clear_error(&error); return RV_ERR_UNSUPPORTED; }
     if (rv_host_set_accessibility(host, 1, Bridge::notification, bridge.get()) != RV_OK) return RV_ERR_UNSUPPORTED;
     bridge->ownsAccessibility = true;
     providerOwner = std::this_thread::get_id();
-    bridge->applicationNode = std::make_unique<Node>();
-    bridge->applicationNode->bridge = bridge.get();
+    bridge->applicationNode = std::make_shared<Node>();
+    bridge->applicationNode->bridge = bridge;
     bridge->applicationNode->native = nullptr;
     bridge->applicationNode->path = rootPath;
-    if (!bridge->registerNode(*bridge->applicationNode) || !bridge->root()) return RV_ERR_UNSUPPORTED;
+    if (!bridge->registerNode(bridge->applicationNode) || !bridge->root()) { g_warning("AT-SPI native root unavailable"); return RV_ERR_UNSUPPORTED; }
+    bridge->cacheNode = std::make_shared<Node>();
+    bridge->cacheNode->bridge = bridge;
+    bridge->cacheNode->path = cachePath;
+    if (!bridge->registerNode(bridge->cacheNode)) return RV_ERR_UNSUPPORTED;
     auto id = nextBridge++;
-    bridges.emplace(id, std::move(bridge));
+    bridges.emplace(id, bridge);
+    bridge->watchRegistry();
     *result = id;
     return RV_OK;
 }
