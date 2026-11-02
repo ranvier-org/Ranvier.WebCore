@@ -46,6 +46,10 @@ def server(args):
     add_listener = bind(native, 'rv_node_add_event_listener', C.c_void_p, C.c_void_p, C.c_char_p, C.c_int, C.c_int, event_callback, C.c_void_p)
     remove_listener = bind(native, 'rv_listener_remove', C.c_int, C.c_void_p)
     release_node = bind(native, 'rv_node_release', None, C.c_void_p)
+    remove_node = bind(native, 'rv_node_remove', C.c_int, C.c_void_p)
+    create_element = bind(native, 'rv_document_create_element', C.c_void_p, C.c_void_p, C.c_char_p)
+    set_attribute = bind(native, 'rv_element_set_attribute', C.c_int, C.c_void_p, C.c_char_p, C.c_char_p, C.c_int)
+    append_child = bind(native, 'rv_node_append_child', C.c_int, C.c_void_p, C.c_void_p)
     assert C.sizeof(Geometry) == 24
     geometry = Geometry(24, 1, 100, 200, 1.5)
     host = create(400, 300)
@@ -55,11 +59,12 @@ def server(args):
 body{margin:0}button,input{position:absolute}#activate{left:10px;top:20px;width:80px;height:30px}
 #name{left:10px;top:70px;width:180px}#agree{left:10px;top:120px}#range{left:10px;top:160px}
 #disabled{left:200px;top:20px}</style>
-<button id="activate" aria-label="Activate" aria-describedby="help">Activate</button><span id="help" aria-label="Help">Instruction</span>
+<body id="fixture"><button id="activate" aria-label="Activate" aria-describedby="help">Activate</button><span id="help" aria-label="Help">Instruction</span>
 <input id="name" aria-label="Name" value="A😀é">
 <input id="agree" type="checkbox" aria-label="Agree">
 <input id="range" type="range" min="0" max="10" value="3" aria-label="Level">
-<button id="disabled" disabled aria-label="Disabled">Disabled</button>'''.encode()
+<button id="disabled" disabled aria-label="Disabled">Disabled</button>
+<div role="group" aria-label="Group" style="position:absolute;left:230px;top:160px"><button id="last" aria-label="Last">Last</button></div>'''.encode()
     assertions = 0
     listener = None
     callback = None
@@ -124,6 +129,22 @@ body{margin:0}button,input{position:absolute}#activate{left:10px;top:20px;width:
                     paused = False
                 elif command['action'] == 'pause':
                     paused = True
+                elif command['action'] in ['remove-field', 'remove-last']:
+                    identifier = b'name' if command['action'] == 'remove-field' else b'last'
+                    element = element_by_id(host, identifier, len(identifier))
+                    assert element
+                    assert remove_node(element) == 0
+                    release_node(element)
+                    assert update(host) == 0
+                elif command['action'] == 'add-control':
+                    parent = element_by_id(host, b'fixture', 7)
+                    element = create_element(host, b'button')
+                    assert parent and element
+                    assert set_attribute(element, b'aria-label', b'Dynamic', 7) == 0
+                    assert append_child(parent, element) == 0
+                    release_node(element)
+                    release_node(parent)
+                    assert update(host) == 0
                 else:
                     raise AssertionError(command)
                 (args.output / 'response.json').write_text(json.dumps(command))
@@ -150,6 +171,9 @@ def client(args):
     events = []
     subscription = connection.signal_subscribe(ready['bus'], 'org.a11y.atspi.Event.Object', None, None, None,
         Gio.DBusSignalFlags.NONE, lambda connection, sender, path, interface, signal, parameters, data: events.append(dict(path=path, signal=signal, parameters=parameters.unpack())), None)
+    cache_events = []
+    cache_subscription = connection.signal_subscribe(ready['bus'], 'org.a11y.atspi.Cache', None, None, None,
+        Gio.DBusSignalFlags.NONE, lambda connection, sender, path, interface, signal, parameters, data: cache_events.append(dict(signal=signal, parameters=parameters.unpack())), None)
 
     def check(condition, label):
         rows.append(dict(label=label, passed=bool(condition)))
@@ -250,6 +274,33 @@ def client(args):
         except GLib.Error:
             rejected = True
         check(rejected, 'invalid text range returns a D-Bus error')
+        request('add-control')
+        deadline = time.monotonic() + 2
+        added = lambda: any(event['signal'] == 'ChildrenChanged' and event['parameters'][0] == 'add' for event in events)
+        while not added() and time.monotonic() < deadline:
+            while context.pending(): context.iteration(False)
+            time.sleep(0.005)
+        visit(root)
+        check('Dynamic' in found and added(), 'adding a native control exposes its child-addition event and accessible object')
+        check(any(event['signal'] == 'AddAccessible' and event['parameters'][0][0] == (ready['bus'], found['Dynamic']) for event in cache_events), 'new native control updates the AT-SPI cache')
+        request('remove-field')
+        deadline = time.monotonic() + 2
+        removed = lambda: any(event['signal'] == 'ChildrenChanged' and event['parameters'][0] == 'remove'
+            and event['parameters'][3] == (ready['bus'], field) for event in events)
+        while not removed() and time.monotonic() < deadline:
+            while context.pending(): context.iteration(False)
+            time.sleep(0.005)
+        check(removed(), 'removing a native control delivers its exact accessible child-removal identity')
+        check(any(event['signal'] == 'RemoveAccessible' and event['parameters'][0] == (ready['bus'], field) for event in cache_events), 'detached native control is retired from the AT-SPI cache')
+        request('remove-last')
+        deadline = time.monotonic() + 2
+        last_removed = lambda: any(event['signal'] == 'ChildrenChanged' and event['path'] == found['Group']
+            and event['parameters'][0] == 'remove' and event['parameters'][3] == (ready['bus'], found['Last']) for event in events)
+        while not last_removed() and time.monotonic() < deadline:
+            while context.pending(): context.iteration(False)
+            time.sleep(0.005)
+        check(last_removed(), 'removing the final child reports its original parent and identity')
+        check(call(found['Group'], accessible, 'GetChildren')[0] == [], 'empty native child lists do not retain the old cache snapshot')
         old_field = field
         request('reload')
         rejected = False
@@ -298,8 +349,9 @@ def client(args):
                 time.sleep(0.01)
             check(desktop.get_child_count() == 0, 'released application is removed from the real registry')
     finally:
-        (args.output / 'client-report.json').write_text(json.dumps(dict(assertions=len(rows), rows=rows, events=events), indent=2))
+        (args.output / 'client-report.json').write_text(json.dumps(dict(assertions=len(rows), rows=rows, events=events, cacheEvents=cache_events), indent=2))
         connection.signal_unsubscribe(subscription)
+        connection.signal_unsubscribe(cache_subscription)
         connection.close_sync(None)
 
 
