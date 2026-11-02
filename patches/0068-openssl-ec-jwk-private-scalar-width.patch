@@ -1,0 +1,12 @@
+diff --git a/Source/WebCore/crypto/openssl/CryptoKeyECOpenSSL.cpp b/Source/WebCore/crypto/openssl/CryptoKeyECOpenSSL.cpp
+--- a/Source/WebCore/crypto/openssl/CryptoKeyECOpenSSL.cpp
++++ b/Source/WebCore/crypto/openssl/CryptoKeyECOpenSSL.cpp
+@@ -414,7 +414,7 @@
+     if (type() == Type::Private) {
+         const BIGNUM* privateKey = EC_KEY_get0_private_key(key);
+         if (privateKey)
+-            jwk.d = base64URLEncodeToString(convertToBytes(privateKey));
++            jwk.d = base64URLEncodeToString(convertToBytesExpand(privateKey, keySizeInBytes));
+     }
+     return true;
+ }

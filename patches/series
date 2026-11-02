@@ -60,3 +60,4 @@
 0061-svg-failed-image-paint.patch
 0063-gcrypt-aes-cbc-padding.patch
 0067-openssl-ec-jwk-canonical-coordinates.patch
+0068-openssl-ec-jwk-private-scalar-width.patch
