@@ -94,6 +94,26 @@ def main(directory):
                         page.host, detached, 0, None, None, 0) < 0, 'removed control rejects late completion')
     finally:
         page.close()
+    page = Case(n, '<input id="moving" type="file" style="position:absolute;left:0;top:0;width:100px;height:40px">')
+    other = Case(n, '<p>other page</p>')
+    try:
+        n.ok('rv_host_set_file_picker_handler', [P, PICKER, P], page.host, callback, None)
+        moving = page.node('moving')
+        for action in (0, 1, 2):
+            n.expect(n.call('rv_host_mouse', [P, I, I, I, I, I, I], page.host, action, 20, 20, 0, 1, 0) >= 0, 'trusted pointer input')
+        moved = requests[-1][0]
+        body = n.bind('rv_document_body', P, [P])(other.host)
+        try:
+            n.ok('rv_node_append_child', [P, P], body, moving)
+        finally:
+            n.bind('rv_node_release', None, [P])(body)
+        n.expect(n.call('rv_run_loop_cycle', [I], 0) >= 0, 'run loop after adoption')
+        n.expect((moved, 1, 0) in requests, 'control adopted by another host invalidates request')
+        n.expect(n.call('rv_host_file_picker_complete', [P, U64, I, C.POINTER(C.c_char_p), C.POINTER(I), I],
+                        page.host, moved, 0, None, None, 0) < 0, 'adopted control rejects old host completion')
+    finally:
+        other.close()
+        page.close()
     for terminate in ('navigation', 'destroy'):
         page = Case(n, '<input type="file" style="position:absolute;left:0;top:0;width:100px;height:40px">')
         try:

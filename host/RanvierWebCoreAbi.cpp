@@ -3813,7 +3813,8 @@ int32_t rv_run_loop_cycle(int32_t milliseconds)
         auto hosts = liveHosts;
         for (auto* host : hosts) {
             if (liveHosts.contains(host) && host->filePicker && (!host->filePicker->isValid()
-                    || !host->filePickerElement || !host->filePickerElement->isConnected()))
+                    || !host->filePickerElement || !host->filePickerElement->isConnected()
+                    || host->filePickerElement->document().page() != host->page.ptr()))
                 invalidateFilePicker(*host);
         }
         deliverNotificationRequests();
@@ -5964,7 +5965,8 @@ static int32_t filePickerStatus(RvHost* host, uint64_t request)
         return RV_ERR_DETACHED;
     if (!request || host->filePickerId != request || !host->filePicker)
         return RV_ERR_DETACHED;
-    if (!host->filePicker->isValid() || !host->filePickerElement || !host->filePickerElement->isConnected()) {
+    if (!host->filePicker->isValid() || !host->filePickerElement || !host->filePickerElement->isConnected()
+        || host->filePickerElement->document().page() != host->page.ptr()) {
         invalidateFilePicker(*host);
         return RV_ERR_DETACHED;
     }
