@@ -6,6 +6,7 @@
 #include <wtf/text/Base64.h>
 #include "RanvierResourceGlue.h"
 #include "RanvierEventGlue.h"
+#include "RanvierMutationGlue.h"
 #include "RanvierTransferGlue.h"
 #include "RanvierPointerGlue.h"
 #include "RanvierViewportGlue.h"
@@ -1689,6 +1690,8 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "accessibility-events"))
         return 1;
 #endif
+    if (!std::strcmp(feature, "mutation-observation"))
+        return 1;
     return 0;
 }
 
@@ -2179,6 +2182,7 @@ void rv_host_destroy(RvHost* host)
     ranvier_notifications_drop(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_custom_effect_callbacks_revoke_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_view_transitions_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
+    ranvier_mutation_observers_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     rv_host_detach_uia(host);
     rv_host_set_accelerated_compositing(host, RV_COMPOSITING_OFF);
     host->noScript.reset();
@@ -2201,6 +2205,7 @@ int32_t rv_host_load_html(RvHost* host, const uint8_t* html, int32_t html_length
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_custom_effect_callbacks_revoke_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_view_transitions_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
+    ranvier_mutation_observers_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     loadHTML(host->frame(), *markup);
     // The new document posts accessibility notifications once its cache exists.
     if (host->accessibility)
@@ -2218,6 +2223,7 @@ int32_t rv_host_load_svg(RvHost* host, const uint8_t* svg, int32_t svg_length)
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_view_transitions_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
+    ranvier_mutation_observers_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     loadDocument(host->frame(), *markup, "image/svg+xml"_s);
     if (host->accessibility)
         host->document().axObjectCache();
@@ -7835,4 +7841,59 @@ int32_t rv_image_bitmap_result(uint64_t operation, RvImageBitmap** bitmap)
 int32_t rv_image_bitmap_error(uint64_t operation, char* buffer, int32_t capacity, int32_t* length)
 {
     return ranvier_image_bitmap_error(operation, buffer, capacity, length);
+}
+
+int32_t rv_host_create_mutation_observer(RvHost* host, RvMutationCallback callback, void* context,
+    RvMutationContextRelease release, RvMutationObserver** result)
+{
+    if (!result)
+        return RV_ERR_NULL_ARGUMENT;
+    *result = nullptr;
+    if (!host || !callback || !release)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_DETACHED;
+    return ranvier_mutation_observer_create(reinterpret_cast<RvNode*>(&host->document()), callback, context, release, result);
+}
+
+int32_t rv_mutation_observer_observe(RvMutationObserver* observer, RvNode* target, const RvMutationObserverOptions* options)
+{
+    return ranvier_mutation_observer_observe(observer, target, options);
+}
+
+int32_t rv_mutation_observer_disconnect(RvMutationObserver* observer)
+{
+    return ranvier_mutation_observer_disconnect(observer);
+}
+
+int32_t rv_mutation_observer_take_records(RvMutationObserver* observer, RvMutationRecordBatch** result)
+{
+    return ranvier_mutation_observer_take_records(observer, result);
+}
+
+int32_t rv_mutation_observer_release(RvMutationObserver* observer)
+{
+    return ranvier_mutation_observer_release(observer);
+}
+
+int32_t rv_mutation_record_batch_retain(RvMutationRecordBatch* records)
+{
+    return ranvier_mutation_record_batch_retain(records);
+}
+
+int32_t rv_mutation_record_batch_release(RvMutationRecordBatch* records)
+{
+    return ranvier_mutation_record_batch_release(records);
+}
+
+int32_t rv_mutation_record_batch_get_count(RvMutationRecordBatch* records, int32_t* result)
+{
+    return ranvier_mutation_record_batch_get_count(records, result);
+}
+
+int32_t rv_mutation_record_batch_get_record(RvMutationRecordBatch* records, int32_t index, RvMutationRecordView* result)
+{
+    return ranvier_mutation_record_batch_get_record(records, index, result);
 }

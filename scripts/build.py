@@ -209,7 +209,7 @@ def prepare():
     (api / 'RanvierAbi' / 'dom').mkdir(exist_ok=True)
     for name in ['RanvierWebCoreAbi.h', 'RanvierWebCoreAbi.cpp', 'RanvierWebCoreDom.h', 'RanvierWebCoreDom.cpp',
                  'RanvierWebCoreUia.cpp', 'RanvierWebCoreD3D11.h', 'RanvierWebCoreD3D11.cpp', 'RanvierWebCoreEGL.h', 'RanvierWebCoreEGL.cpp', 'RanvierImageEncoding.h', 'RanvierImageEncoding.cpp', 'dom/RanvierDomGlue.h',
-                 'RanvierCapabilities.inc', 'RanvierCapabilityCatalogue.inc', 'RanvierSvgViewGlue.h', 'RanvierResourceGlue.h', 'RanvierEventGlue.h', 'RanvierViewportGlue.h', 'RanvierInspectGlue.h', 'RanvierCanvasGlue.h', 'RanvierWakeLockGlue.h', 'RanvierNotificationGlue.h', 'RanvierTransferGlue.h', 'RanvierPointerGlue.h', 'RanvierCanvasPixelsGlue.h', 'RanvierCanvasExportGlue.h']:
+                 'RanvierCapabilities.inc', 'RanvierCapabilityCatalogue.inc', 'RanvierSvgViewGlue.h', 'RanvierResourceGlue.h', 'RanvierEventGlue.h', 'RanvierMutationGlue.h', 'RanvierViewportGlue.h', 'RanvierInspectGlue.h', 'RanvierCanvasGlue.h', 'RanvierWakeLockGlue.h', 'RanvierNotificationGlue.h', 'RanvierTransferGlue.h', 'RanvierPointerGlue.h', 'RanvierCanvasPixelsGlue.h', 'RanvierCanvasExportGlue.h']:
         shutil.copy2(root / 'host' / name, api / 'RanvierAbi' / name)
     git('checkout', commit, '--', 'Tools/TestWebKitAPI/CMakeLists.txt', cwd=source)
     cmake = api / 'CMakeLists.txt'

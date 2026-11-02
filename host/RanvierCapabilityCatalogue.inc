@@ -481,6 +481,7 @@ static constexpr const char* capabilityAbiNames[] = {
     "presentation-d3d11",
     "presentation-egl",
     "accessibility-events",
+    "mutation-observation",
 };
 static constexpr CapabilityBuildFlag capabilityBuildFlags[] = {
 #if defined(RV_CAP_ENABLE_ACCESSIBILITY)

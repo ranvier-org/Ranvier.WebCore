@@ -52,6 +52,8 @@ jobs:
       - run: python -I tests/test_build_sccache_launcher.py
       - run: python -I tests/test_sccache_workflow.py
       - run: python -I tests/test_host_prepare.py
+      - run: python -I tests/test_mutation_contract.py
+      - run: python -I tests/test_mutation_routing.py
       - run: python -I tests/generator/test_domgen.py
       - run: python -I scripts/capability_catalogue.py --check
       - run: python -I tests/abi/generate_native.py check
@@ -603,6 +605,15 @@ jobs:
         # scripts/smoke.py, as a local build.py all runs it: the host loads from the staged package, and on macOS
         # no staged library names the build tree. On Linux, loading is untested and the step checks the manifest.
         run: python scripts/build.py smoke --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
+
+      - name: Verify mutation observation delivery and ownership
+        timeout-minutes: 5
+        env:
+          EGL_PLATFORM: ${{ startsWith(matrix.rid, 'linux-') && 'surfaceless' || '' }}
+          LIBGL_ALWAYS_SOFTWARE: ${{ startsWith(matrix.rid, 'linux-') && '1' || '' }}
+        run: >-
+          python -I -X utf8 tests/abi/mutation_observation.py
+          --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
       # Every probe in scripts/probes.py that applies to the runtime, each with its own condition and timeout. The
       # step runs them all and fails at the end when any failed, so one run reports every failing probe.

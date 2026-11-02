@@ -54,10 +54,11 @@ class PackagedGpuTests(unittest.TestCase):
 
             with patch('subprocess.run', side_effect=execute):
                 probe.verify(self.package(Path(directory)), gpu=True)
-        self.assertEqual(len(calls), 3)
+        self.assertEqual(len(calls), 4)
         self.assertTrue(calls[0][2].endswith('sdl_runtime.py'))
         self.assertTrue(Path(calls[1][2]).as_posix().endswith('tests/gpu/run.py'))
         self.assertEqual(calls[1][-2:], ['--teardown', 'all'])
+        self.assertTrue(calls[3][4].endswith('mutation_observation.py'))
 
     def test_gpu_package_gate_rejects_the_wrong_flavor_or_rid_without_running_it(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -74,8 +75,9 @@ class PackagedGpuTests(unittest.TestCase):
 
                 def execute(command, **kwargs):
                     calls.append((command, kwargs))
-                    if command[3] == '--native-directory':
-                        self.assertEqual((Path(command[4]) / 'libRanvierWebCoreHost.so').read_bytes(), b'packaged host')
+                    if '--native-directory' in command:
+                        native = Path(command[command.index('--native-directory') + 1])
+                        self.assertEqual((native / 'libRanvierWebCoreHost.so').read_bytes(), b'packaged host')
                     else:
                         self.assertEqual(Path(command[3]).read_bytes(), b'packaged host')
 

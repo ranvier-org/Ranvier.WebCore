@@ -179,6 +179,8 @@ PROBES = [
           'python -I -X utf8 tests/abi/resize_observation.py --native-directory {native}'),
     probe('Verify intersection observation roots, margins, entries and takeRecords against the Chromium oracle',
           'python -I -X utf8 tests/abi/intersection_observation.py --native-directory {native}'),
+    probe('Verify mutation records, deferred delivery and context ownership',
+          'python -I -X utf8 tests/abi/mutation_observation.py --native-directory {native}', flavor=None),
     probe('Verify media capability queries, their delivery and teardown against the Chromium oracle',
           'python -I -X utf8 tests/abi/media_capabilities.py --native-directory {native}'),
     probe('Verify snapshot scale, crop, color space, encodings and delivery',

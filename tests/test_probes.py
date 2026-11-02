@@ -159,6 +159,8 @@ class WorkflowTests(unittest.TestCase):
         workflow = (ROOT / '.github/workflows/build.yml').read_text()
         native = workflow.split('\n  native:\n', 1)[1].split('\n  managed:\n', 1)[0]
         self.assertIn('python -I scripts/probes.py run', native)
+        self.assertEqual(native.count('tests/abi/mutation_observation.py'), 1)
+        native = native.replace('tests/abi/mutation_observation.py', 'explicit-mutation-observation')
         for script in ['tests/abi/', 'tests/uia/', 'tests/generator/native_types.py']:
             self.assertNotIn(script, native)
 
