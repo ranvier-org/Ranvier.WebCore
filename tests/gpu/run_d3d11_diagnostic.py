@@ -5,8 +5,11 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import zipfile
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from d3d11_diagnostic_process import bounded
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--package', type=Path, required=True)
@@ -40,11 +43,11 @@ shutil.copy2(args.sdl, out / 'SDL3.dll')
 env = dict(os.environ)
 if not shutil.which('cl'):
     vswhere = Path(os.environ.get('ProgramFiles(x86)', 'C:/Program Files (x86)')) / 'Microsoft Visual Studio/Installer/vswhere.exe'
-    installation = subprocess.check_output([str(vswhere), '-latest', '-products', '*', '-requires', 'Microsoft.VisualStudio.Component.VC.Tools.x86.x64', '-property', 'installationPath'], text=True).strip()
+    installation = subprocess.check_output([str(vswhere), '-latest', '-products', '*', '-requires', 'Microsoft.VisualStudio.Component.VC.Tools.x86.x64', '-property', 'installationPath'], text=True, timeout=30).strip()
     assert installation, 'No Visual Studio C++ compiler'
     script = out / 'compiler-environment.cmd'
     script.write_text(f'@call "{installation}/VC/Auxiliary/Build/vcvars64.bat" >nul\n@set PATH\n@set INCLUDE\n@set LIB\n', newline='\r\n')
-    for line in subprocess.check_output(['cmd', '/d', '/c', str(script)], text=True).splitlines():
+    for line in subprocess.check_output(['cmd', '/d', '/c', str(script)], text=True, timeout=60).splitlines():
         if '=' in line and not line.startswith('='):
             key, value = line.split('=', 1)
             env[key.upper()] = value
@@ -61,27 +64,15 @@ command = [compiler, '/nologo', '/std:c++20', '/EHsc', '/W4', '/I' + str(root / 
 receipt = {'officialSource': '05ba023551aaf58946cbc0ca7099ca65d9860e14', 'packageSha256': expected,
            'manifest': manifest, 'sourceSha256': sha(source), 'publicHeaderSha256': sha(header), 'publicHeaderCanonicalSha256': canonical_header, 'sdlSha256': sha(args.sdl),
            'compileCommand': command, 'payloadsBefore': payloads, 'originalExpectationPreserved': True,
+           'setupTimeoutsSeconds': {'vswhere': 30, 'vcvars': 60}, 'runtimeTimeoutSeconds': 45, 'maximumCleanupGraceSeconds': 9,
            'nativeProductBuildInvoked': False, 'publishInvoked': False}
 result_code = 1
-def bounded(command, timeout):
-    process = subprocess.Popen(command, cwd=out, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    event = {'pid': process.pid, 'command': command}
-    receipt.setdefault('ownedProcesses', []).append(event)
-    try:
-        stdout, stderr = process.communicate(timeout=timeout)
-    except subprocess.TimeoutExpired:
-        subprocess.run(['taskkill', '/PID', str(process.pid), '/T', '/F'], capture_output=True)
-        stdout, stderr = process.communicate()
-        event['timedOut'] = True
-    event['exit'] = process.returncode
-    return subprocess.CompletedProcess(command, process.returncode, stdout, stderr)
-
 try:
-    compiled = bounded(command, 120)
+    compiled = bounded(command, cwd=out, env=env, timeout=120, events=receipt.setdefault('ownedProcesses', []))
     receipt['compileExit'] = compiled.returncode
     (out / 'diagnostic-compile.log').write_text(compiled.stdout + compiled.stderr)
     assert compiled.returncode == 0, compiled.stdout + compiled.stderr
-    run = bounded([str(exe), 'diagnostic'], 45)
+    run = bounded([str(exe), 'diagnostic'], cwd=out, env=env, timeout=45, events=receipt['ownedProcesses'])
     receipt['runtimeExit'] = run.returncode
     (out / 'diagnostic-runtime.log').write_text(run.stdout + run.stderr)
     print(run.stdout + run.stderr, flush=True)
