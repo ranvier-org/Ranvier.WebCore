@@ -111,6 +111,22 @@ class PackagedGpuTests(unittest.TestCase):
                 self.assertEqual(calls[0][1]['env']['EGL_PLATFORM'], 'surfaceless')
                 self.assertEqual(calls[0][1]['env']['LIBGL_ALWAYS_SOFTWARE'], '1')
 
+    def test_linux_gpu_package_checks_native_input_on_the_extracted_payload(self):
+        with tempfile.TemporaryDirectory() as directory:
+            for rid in ['linux-x64', 'linux-arm64']:
+                calls = []
+                def execute(command, **kwargs):
+                    if Path(command[2]).name == 'compositor_input_linux.py':
+                        calls.append((command, kwargs))
+                        native = Path(command[command.index('--native-directory') + 1])
+                        self.assertEqual((native / 'libRanvierWebCoreHost.so').read_bytes(), b'packaged host')
+                with self.subTest(rid=rid), patch('subprocess.run', side_effect=execute):
+                    probe.verify(self.package(Path(directory), rid=rid), gpu=True)
+                self.assertEqual(len(calls), 1)
+                self.assertTrue(calls[0][1]['check'])
+                self.assertIn('--report', calls[0][0])
+                self.assertEqual(calls[0][1]['env']['EGL_PLATFORM'], 'surfaceless')
+
 
 if __name__ == '__main__':
     unittest.main()

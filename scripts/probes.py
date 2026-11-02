@@ -26,6 +26,11 @@ def probe(name, *commands, rid=None, flavor=('slim', 'gpu'), timeout=TIMEOUT, en
 
 
 PROBES = [
+    *[probe('Verify native EGL texture input and fractional-DPI DOM composition',
+            'python -I tests/gpu/compositor_input_linux.py --native-directory {native} --report {work}/gpu-compositor-input-linux.json',
+            rid=rid, flavor='gpu',
+            env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
+      for rid in ['linux-x64', 'linux-arm64']],
     probe('Verify native texture input and fractional-DPI GPU composition',
           'python -I tests/gpu/compositor_windows.py --native-directory {native} --output {work}/gpu-compositor-input',
           rid='win-x64', flavor='gpu'),
