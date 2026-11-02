@@ -490,6 +490,7 @@ static constexpr const char* capabilityAbiNames[] = {
     "texture-input-egl",
     "accessibility-events",
     "mutation-observation",
+    "file-picker",
 };
 static constexpr CapabilityBuildFlag capabilityBuildFlags[] = {
 #if defined(RV_CAP_ENABLE_ACCESSIBILITY)
