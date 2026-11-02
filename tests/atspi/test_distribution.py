@@ -26,6 +26,12 @@ class DistributionPolicyTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'qualified'):
             package.validate_distribution('linux-arm64', '5b34cc0dd3932d434fd3f0c35c6bfc6497c3bd6c')
 
+    def test_arm_test_only_mode_does_not_enable_ordinary_distribution(self):
+        revision = '1' * 40
+        package.validate_distribution('linux-arm64', revision, test_only_arm64=True)
+        with self.assertRaisesRegex(ValueError, 'ARM64'):
+            package.validate_distribution('linux-x64', revision, test_only_arm64=True)
+
     def test_malformed_caller_source_claim_is_rejected(self):
         for revision in ['', 'HEAD', '../source', '5b34cc0d']:
             with self.subTest(revision=revision), self.assertRaisesRegex(ValueError, 'revision'):

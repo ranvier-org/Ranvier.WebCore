@@ -14,6 +14,8 @@ target_link_libraries(RanvierWebCoreAtspi PRIVATE PkgConfig::GIO "${RANVIER_WEBC
 set_target_properties(RanvierWebCoreAtspi PROPERTIES BUILD_RPATH "$ORIGIN" INSTALL_RPATH "$ORIGIN")
 install(TARGETS RanvierWebCoreAtspi LIBRARY DESTINATION lib)
 install(FILES RanvierAtspi.h ../../host/RanvierWebCoreAbi.h DESTINATION include)
+install(FILES NOTICE.md THIRD-PARTY.md DESTINATION share/doc/RanvierWebCoreAtspi)
+install(FILES licenses/LGPL-2.1.txt DESTINATION share/licenses/RanvierWebCoreAtspi)
 add_executable(atspi-layout ../../tests/atspi/layout.c)
 target_include_directories(atspi-layout PRIVATE ../../host)
 enable_testing()
