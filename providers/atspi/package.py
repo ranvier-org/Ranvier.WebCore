@@ -14,8 +14,10 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def validate_distribution(rid, source_revision):
-    if rid != 'linux-x64':
+def validate_distribution(rid, source_revision, test_only_arm64=False):
+    if test_only_arm64 and rid != 'linux-arm64':
+        raise ValueError('The test-only override is restricted to ARM64 qualification artifacts.')
+    if rid != 'linux-x64' and not (rid == 'linux-arm64' and test_only_arm64):
         raise ValueError('Only linux-x64 has a qualified real renderer/provider cohort; ARM64 remains preparatory.')
     if not re.fullmatch(r'[0-9a-f]{40}', source_revision):
         raise ValueError('The provider source revision must be a full lowercase Git commit.')
@@ -50,8 +52,8 @@ def validate_runtime(provider, native, rid):
     return abi
 
 
-def pack(provider, native, rid, package_id, version, output, source_revision):
-    validate_distribution(rid, source_revision)
+def pack(provider, native, rid, package_id, version, output, source_revision, test_only_arm64=False):
+    validate_distribution(rid, source_revision, test_only_arm64)
     validate_identity(package_id, version)
     abi = validate_runtime(provider, native, rid)
     root = Path(__file__).resolve().parent
@@ -67,10 +69,13 @@ def pack(provider, native, rid, package_id, version, output, source_revision):
         'include/RanvierWebCoreAbi.h': (root.parents[1] / 'host/RanvierWebCoreAbi.h').read_bytes(),
         'README.md': (root / 'README.md').read_bytes(),
         'NOTICE.md': (root / 'NOTICE.md').read_bytes(),
+        'THIRD-PARTY.md': (root / 'THIRD-PARTY.md').read_bytes(),
+        'licenses/LGPL-2.1.txt': (root / 'licenses/LGPL-2.1.txt').read_bytes(),
     }
     manifest = dict(id=package_id, version=version, rid=rid, abi=abi,
         callerClaimedProviderSourceRevision=source_revision, sourceProvenance='unverified-caller-claim',
-        qualificationScope='private-style-only-ABI63',
+        qualificationScope='ARM64-test-only-unqualified' if test_only_arm64 else 'private-style-only-ABI63',
+        licenseReviewStatus='pending-project-license-and-embedded-WebKit-XML-terms',
         hostSha256=sha(native), providerSha256=sha(provider),
         requiredCapability='accessibility-text-style', hostBundled=False,
         dependencies='System GIO/GObject/GLib; no renderer package is selected by this optional provider.',
@@ -96,6 +101,7 @@ if __name__ == '__main__':
     parser.add_argument('--version', required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--source-revision', required=True, help='Caller-claimed provider commit; syntax checked, provenance unverified.')
+    parser.add_argument('--test-only-arm64', action='store_true', help='Build a private ARM64 test artifact; confers no runtime qualification or distribution support.')
     args = parser.parse_args()
-    destination, manifest = pack(args.provider, args.native, args.rid, args.id, args.version, args.output, args.source_revision)
+    destination, manifest = pack(args.provider, args.native, args.rid, args.id, args.version, args.output, args.source_revision, args.test_only_arm64)
     print(json.dumps(dict(path=str(destination), sha256=sha(destination), manifest=manifest)))

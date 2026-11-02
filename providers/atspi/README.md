@@ -69,3 +69,23 @@ publish to NuGet. Final integration must repeat all gates against the frozen #17
 
 Public release review must supply applicable project/source license texts and finalize notices. The current qualification
 notice records packaged and system components without assigning an unreviewed license to the provider.
+`THIRD-PARTY.md` inventories the embedded WebKit protocol XML and identified LGPL dependency/header sources; its
+unresolved XML and project license questions keep public package/license metadata unallocated.
+
+## ARM64 test preparation
+
+The ordinary producer workflow already uses `ubuntu-24.04-arm` for `linux-arm64`; runner availability does not make
+the immutable ABI62 cohort compatible with this provider. The private style-only ABI63 host also lacks the #171
+union exports. `.github/workflows/atspi-arm64-qualification.yml` is statically disabled with `if: ${{ false }}`.
+Enabling it requires a separate source review after a final matching producer is frozen; no ARM workflow has been
+dispatched for this preparation.
+
+Its staging gate requires an independently reviewed host hash and full source pin, ELF64/AArch64, artifact manifest
+ABI63/clean-source/RID match and all three exports: `rv_host_ime_surrounding`, `rv_host_ime_delete_surrounding` and
+`rv_ax_text_style_run`. The manifest source remains an artifact claim, not authenticated provenance. Reviewers must
+match independent producer receipts. The real ABI/capability check, build, direct style/protocol checks and ordinary
+SDK publish/load must then run on ARM64. `--test-only-arm64` allows only private qualification packages labeled
+`ARM64-test-only-unqualified`; ordinary ARM64 distribution remains rejected. This override does not qualify a runtime.
+
+Even a green ARM64 distribution job leaves real managed Window normal/traced NativeAOT lifecycle and optional-module/
+missing-bus checks, complete matching final cohort acceptance and public license/version review outstanding.
