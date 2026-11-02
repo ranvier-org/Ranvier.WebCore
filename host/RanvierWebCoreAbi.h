@@ -2844,7 +2844,7 @@ RV_EXPORT int32_t rv_host_file_picker_complete(RvHost*, uint64_t request, int32_
  * text-decoration-line, visibility or direction. Hidden text is omitted as in rv_ax_text.
  * Adjacent equal computed values form one maximal run; offset at the end selects the last run.
  * On RV_OK or RV_ERR_BUFFER_TOO_SMALL, start/end describe that run and length is the required UTF-8
- * byte count excluding its terminator. Capacity includes the terminator. Other failures clear these outputs.
+ * byte count. No terminator is copied. Other failures clear these outputs.
  * No borrowed style/renderer object escapes the owning-thread call. */
 RV_EXPORT int32_t rv_ax_text_style_run(RvAxNode*, int32_t offset, const char* property,
     int32_t* start, int32_t* end, char* buffer, int32_t capacity, int32_t* length);
