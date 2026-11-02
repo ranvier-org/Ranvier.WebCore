@@ -2682,6 +2682,55 @@ RV_EXPORT int32_t rv_image_bitmap_result(uint64_t operation, RvImageBitmap** bit
  * rv_last_exception. RV_ERR_UNSUPPORTED for another operation or outcome. */
 RV_EXPORT int32_t rv_image_bitmap_error(uint64_t operation, char* buffer, int32_t capacity, int32_t* length);
 
+/* Mutation records borrow UTF-16 strings and node arrays from their record batch. Length -1 is null, 0 is empty.
+ * Retain nodes before releasing the batch when they must outlive its snapshot. */
+typedef struct RvMutationObserver RvMutationObserver;
+typedef struct RvMutationRecordBatch RvMutationRecordBatch;
+
+typedef struct { int32_t present; int32_t value; } RvMutationOptionalBool;
+typedef struct { const uint16_t* data; int32_t length; } RvMutationString;
+typedef struct { int32_t present; const RvMutationString* items; int32_t count; } RvMutationOptionalStrings;
+typedef struct { RvNode* const* items; int32_t count; } RvMutationNodes;
+
+typedef struct RvMutationObserverOptions {
+    uint32_t size;
+    int32_t child_list;
+    int32_t subtree;
+    RvMutationOptionalBool attributes;
+    RvMutationOptionalBool character_data;
+    RvMutationOptionalBool attribute_old_value;
+    RvMutationOptionalBool character_data_old_value;
+    RvMutationOptionalStrings attribute_filter;
+} RvMutationObserverOptions;
+
+typedef struct RvMutationRecordView {
+    uint32_t size;
+    RvMutationString type;
+    RvNode* target;
+    RvMutationNodes added_nodes;
+    RvMutationNodes removed_nodes;
+    RvNode* previous_sibling;
+    RvNode* next_sibling;
+    RvMutationString attribute_name;
+    RvMutationString attribute_namespace;
+    RvMutationString old_value;
+} RvMutationRecordView;
+
+typedef void (*RvMutationCallback)(void* context, RvMutationObserver* observer, RvMutationRecordBatch* records);
+typedef void (*RvMutationContextRelease)(void* context);
+
+/* Creates a disconnected observer. callback and context release are required; success transfers the context lease.
+ * Host replacement/destruction closes it. An in-flight callback keeps the lease until callback return. */
+RV_EXPORT int32_t rv_host_create_mutation_observer(RvHost*, RvMutationCallback callback, void* context, RvMutationContextRelease release, RvMutationObserver** result);
+RV_EXPORT int32_t rv_mutation_observer_observe(RvMutationObserver*, RvNode* target, const RvMutationObserverOptions* options);
+RV_EXPORT int32_t rv_mutation_observer_disconnect(RvMutationObserver*);
+RV_EXPORT int32_t rv_mutation_observer_take_records(RvMutationObserver*, RvMutationRecordBatch** result);
+RV_EXPORT int32_t rv_mutation_observer_release(RvMutationObserver*);
+RV_EXPORT int32_t rv_mutation_record_batch_retain(RvMutationRecordBatch*);
+RV_EXPORT int32_t rv_mutation_record_batch_release(RvMutationRecordBatch*);
+RV_EXPORT int32_t rv_mutation_record_batch_get_count(RvMutationRecordBatch*, int32_t* result);
+RV_EXPORT int32_t rv_mutation_record_batch_get_record(RvMutationRecordBatch*, int32_t index, RvMutationRecordView* result);
+
 #ifdef __cplusplus
 }
 #endif

@@ -36,7 +36,7 @@ KEYWORDS = set(
 )
 
 # The parameter name for an unnamed handle, by its pointee type.
-HANDLE_NAMES = {"RvHost": "host", "RvNode": "node", "RvEvent": "event", "RvWatch": "watch", "RvListener": "listener", "RvAnimation": "animation", "RvAxNode": "ax", "RvEventTarget": "target", "RvNodeFilter": "filter"}
+HANDLE_NAMES = {"RvHost": "host", "RvNode": "node", "RvEvent": "event", "RvWatch": "watch", "RvListener": "listener", "RvAnimation": "animation", "RvAxNode": "ax", "RvEventTarget": "target", "RvNodeFilter": "filter", "RvMutationObserver": "observer", "RvMutationRecordBatch": "records"}
 
 
 def strip_comments(text: str) -> str:
@@ -125,6 +125,10 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
         return "nativeint", ""
     if ctype == "const RvImageBitmapOptions*":
         return "nativeint", ""
+    if ctype == "const RvMutationObserverOptions*":
+        return "MutationObserverOptions&", ""
+    if ctype == "RvMutationRecordView*":
+        return "MutationRecordView&", ""
     if ctype == "const RvEventInit*":
         return "EventInit&", ""
     if ctype == "const RvNotificationOptions*":
@@ -135,7 +139,7 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
         return "TextSegments&", ""
     if ctype == "void**":
         return "nativeint&", ""
-    if ctype in ("RvGpuFrame**", "RvCanvasRenderingContext2D**", "RvViewTransitionObserver**"):
+    if ctype in ("RvGpuFrame**", "RvCanvasRenderingContext2D**", "RvViewTransitionObserver**", "RvMutationObserver**", "RvMutationRecordBatch**"):
         return "nativeint&", ""
     if re.fullmatch(r"Rv\w+\*\*", ctype):
         return "nativeint[]", ""
@@ -147,6 +151,41 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
 
 def fsharp_name(name: str) -> str:
     return f"``{name}``" if name in KEYWORDS else name
+
+
+def mutation_types() -> list[str]:
+    structs = [
+        ("MutationOptionalBool", "Presence 0 omits the option; value is 0 or 1.",
+         [("present", "int"), ("value", "int")]),
+        ("MutationString", "Borrowed UTF-16 code units; length -1 is null and 0 is empty.",
+         [("data", "nativeint"), ("length", "int")]),
+        ("MutationOptionalStrings", "Presence-preserving filter strings; items points to count MutationString values.",
+         [("present", "int"), ("items", "nativeint"), ("count", "int")]),
+        ("MutationNodes", "Borrowed nodes; retain each node before releasing its record batch to keep it.",
+         [("items", "nativeint"), ("count", "int")]),
+        ("MutationObserverOptions", "Observation options and copied filter inputs; size is the native structure byte count.",
+         [("size", "uint32"), ("child_list", "int"), ("subtree", "int"),
+          ("attributes", "MutationOptionalBool"), ("character_data", "MutationOptionalBool"),
+          ("attribute_old_value", "MutationOptionalBool"), ("character_data_old_value", "MutationOptionalBool"),
+          ("attribute_filter", "MutationOptionalStrings")]),
+        ("MutationRecordView", "Borrowed strings and nodes remain valid until their owning record batch is released.",
+         [("size", "uint32"), ("type", "MutationString"), ("target", "nativeint"),
+          ("added_nodes", "MutationNodes"), ("removed_nodes", "MutationNodes"),
+          ("previous_sibling", "nativeint"), ("next_sibling", "nativeint"),
+          ("attribute_name", "MutationString"), ("attribute_namespace", "MutationString"),
+          ("old_value", "MutationString")]),
+    ]
+    lines = []
+    for name, summary, fields in structs:
+        lines += ["", f"/// <summary>{summary}</summary>", "[<Struct; StructLayout(LayoutKind.Sequential)>]", f"type {name} ="]
+        lines += [f"    val mutable {fsharp_name(field)}: {kind}" for field, kind in fields]
+    lines += ["", "/// <summary>A borrowed record batch callback; retain its batch to keep records after return.</summary>",
+              "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+              "type MutationCallback = delegate of context: nativeint * observer: nativeint * records: nativeint -> unit",
+              "", "/// <summary>Releases callback context after closure and the final in-flight callback return.</summary>",
+              "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+              "type MutationContextRelease = delegate of context: nativeint -> unit"]
+    return lines
 
 
 def generated(header: str) -> str:
@@ -349,6 +388,7 @@ def generated(header: str) -> str:
         "type NodeFilterRelease = delegate of context: nativeint -> unit",
     ]
 
+    lines += mutation_types()
     found = declarations(header)
     lines += [
         "",
@@ -434,7 +474,7 @@ def preamble_types(fsharp: str):
     head = fsharp.split("module Calls", 1)[0]
     found = []
     for match in re.finditer(r"^type (\w+) =(.*?)(?=^(?:///|\[<|type |module )|\Z)", head, flags=re.M | re.S):
-        fields = re.findall(r"val mutable (\w+): (\S+)", match.group(2))
+        fields = [(name.strip("`"), kind) for name, kind in re.findall(r"val mutable (``[^`]+``|\w+): (\S+)", match.group(2))]
         delegate = " ".join(match.group(2).split()) if "delegate of" in match.group(2) else None
         found.append((match.group(1), fields, delegate))
     return found
