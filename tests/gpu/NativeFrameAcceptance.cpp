@@ -201,7 +201,14 @@ int main(int argc, char** argv) try {
     }
     require(rv_host_set_device_scale(host, 2) == RV_OK, "set device scale");
     require(rv_host_update(host) == RV_OK, "rendering update after scale");
-    require(rv_host_acquire_d3d11_frame(host, device, &frame) == RV_ERR_UNSUPPORTED && !frame, "nonunit scale fallback");
+    if (rv_abi_has("compositor-device-scale")) {
+        require(rv_host_acquire_d3d11_frame(host, device, &frame) == RV_OK && frame, "nonunit scale GPU frame");
+        void* scaledTexture = nullptr; int scaledWidth = 0, scaledHeight = 0, scaledFormat = 0;
+        require(rv_gpu_frame_info(frame, &scaledTexture, &scaledWidth, &scaledHeight, &scaledFormat) == RV_OK
+            && scaledTexture && scaledWidth == 64 && scaledHeight == 64 && scaledFormat == RV_GPU_RGBA8_PREMULTIPLIED, "nonunit scale physical frame metadata");
+        require(rv_gpu_frame_release(frame) == RV_OK, "release nonunit scale frame"); frame = nullptr;
+    } else
+        require(rv_host_acquire_d3d11_frame(host, device, &frame) == RV_ERR_UNSUPPORTED && !frame, "nonunit scale fallback");
     std::vector<unsigned char> pixels(64 * 64 * 4);
     require(rv_host_paint_rgba(host, pixels.data(), static_cast<int>(pixels.size())) == RV_OK, "CPU fallback after GPU unsupported");
     std::printf("CPU fallback top=%u,%u,%u,%u\n",pixels[0],pixels[1],pixels[2],pixels[3]);

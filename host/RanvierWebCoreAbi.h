@@ -178,7 +178,7 @@ RV_EXPORT int32_t rv_host_set_accelerated_compositing(RvHost*, int32_t mode);
 enum { RV_GPU_RGBA8_PREMULTIPLIED = 1 };
 /* Acquires a Windows D3D11 frame without CPU pixel readback. Call rv_host_update before acquire, as before
  * CPU paint, to advance animations and update compositing layers. consumerDevice is a live ID3D11Device*
- * (for SDL, SDL_PROP_RENDERER_D3D11_DEVICE_POINTER). Requires compositing enabled, scale 1 and a GPU build;
+ * (for SDL, SDL_PROP_RENDERER_D3D11_DEVICE_POINTER). Requires compositing enabled and a GPU build;
  * otherwise returns RV_ERR_UNSUPPORTED so the caller can paint with rv_host_paint_rgba. An outstanding
  * frame on the same surface also returns RV_ERR_UNSUPPORTED immediately. Other GPU waits are bounded.
  * Writes NULL to *frame on failure. The frame owns its resources independently of host/renderer/window;
@@ -208,6 +208,23 @@ RV_EXPORT int32_t rv_gpu_frame_info(RvGpuFrame*, void** texture, int32_t* width,
  * the consumer immediate context, returns the keyed mutex to the producer and frees this frame handle.
  * The SDL wrapper and all frame handles must be disposed before unloading their native DLLs. */
 RV_EXPORT int32_t rv_gpu_frame_release(RvGpuFrame*);
+
+/* Binds a native D3D11 RGBA8 UNORM texture with premultiplied sRGB bytes to this host's current-document element.
+ * The target needs a composited RenderBox (for example will-change:transform). DOM layout, clipping, scrolling,
+ * transforms, opacity and stacking apply. Single mip/sample/array and NTshared+keyedmutex flags are required.
+ * Producer acquires key0, renders/flushes and releases key1 before each host frame; composition returns key0.
+ * The host retains the COM texture until replacement, unbind (NULL), element removal or document/host teardown.
+ * compositor_input_windows.py verifies native GPU pixels, DPR, loss, bounded waits and lifetime. Owner thread only. */
+RV_EXPORT int32_t rv_host_bind_d3d11_texture(RvHost*, RvNode* target, void* texture);
+/* Linux GPU input: imports an RGBA8 premultiplied sRGB EGLImage from the configured display on the owner thread.
+ * Keep its producer context current for binding. The host retains an image sibling; the caller may destroy the
+ * EGLImage handle after success. Complete producer writes with glFinish before each host acquisition, and do not
+ * modify the image during that synchronous call. flipY is 0 for top-row-first content, 1 for GL bottom-row-first.
+ * NULL unbinds. Geometry and teardown follow the D3D11 binding; the producer context is restored before return. */
+RV_EXPORT int32_t rv_host_bind_egl_image(RvHost*, RvNode* target, void* image, int32_t flipY);
+/* Queues a frame after the app publishes a bound native texture. Does not invalidate the base DOM backing.
+ * Call on the host owner thread after the producer synchronization above; returns UNSUPPORTED without a binding. */
+RV_EXPORT int32_t rv_host_native_texture_changed(RvHost*, RvNode* target);
 
 /* Bits of the capture parameter of rv_node_add_event_listener. Values 0 and 1 retain their original
  * bubbling/capturing behavior. PASSIVE has an effect only together with PASSIVE_SPECIFIED; omitting

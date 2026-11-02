@@ -481,8 +481,11 @@ static constexpr const char* capabilityAbiNames[] = {
     "intersection-entries",
     "data-transfer-files",
     "compositing",
+    "compositor-device-scale",
     "presentation-d3d11",
+    "texture-input-d3d11",
     "presentation-egl",
+    "texture-input-egl",
     "accessibility-events",
     "mutation-observation",
 };
