@@ -2818,6 +2818,23 @@ typedef struct RvHostErrorRecord {
 } RvHostErrorRecord;
 RV_EXPORT int32_t rv_host_error_enable(RvHost*, int32_t enabled);
 RV_EXPORT int32_t rv_host_error_take(RvHost*, RvHostErrorRecord* record, int32_t* present);
+/* File-control requests are delivered on the host thread. A callback schedules its provider and must not call
+ * this ABI. SHOW supplies a process-unique request id and flags; INVALIDATE asks the provider to dismiss that
+ * request. A provider copies any filters it needs while the request is live. */
+enum { RV_FILE_PICKER_SHOW = 0, RV_FILE_PICKER_INVALIDATE = 1 };
+enum { RV_FILE_PICKER_MULTIPLE = 1, RV_FILE_PICKER_DIRECTORIES = 2 };
+enum { RV_FILE_PICKER_CANCEL = 0, RV_FILE_PICKER_ACCEPT = 1 };
+enum { RV_FILE_PICKER_MIME = 0, RV_FILE_PICKER_EXTENSION = 1 };
+typedef void (*RvFilePickerCallback)(void* context, uint64_t request, int32_t action, int32_t flags);
+RV_EXPORT int32_t rv_host_set_file_picker_handler(RvHost*, RvFilePickerCallback callback, void* context);
+/* Returns 1 when this host has a provider, 0 when it has none, or a negative status. */
+RV_EXPORT int32_t rv_host_file_picker_available(RvHost*);
+RV_EXPORT int32_t rv_host_file_picker_filter_count(RvHost*, uint64_t request, int32_t kind, int32_t* count);
+RV_EXPORT int32_t rv_host_file_picker_filter(RvHost*, uint64_t request, int32_t kind, int32_t index, char* buffer, int32_t capacity, int32_t* length);
+/* Completes a live request once. ACCEPT takes one or more absolute UTF-8 paths; CANCEL takes none. Late,
+ * invalidated and duplicate request ids return RV_ERR_DETACHED. The originating WebCore chooser owns the result. */
+RV_EXPORT int32_t rv_host_file_picker_complete(RvHost*, uint64_t request, int32_t outcome,
+    const uint8_t* const* paths, const int32_t* lengths, int32_t count);
 
 #ifdef __cplusplus
 }

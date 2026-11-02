@@ -113,6 +113,10 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
         return "byte[]", "[<In; Out>] "
     if ctype == "const uint8_t*":
         return "byte[]", "[<In>] "
+    if ctype == "const uint8_t* const*":
+        return "nativeint[]", "[<In>] "
+    if ctype == "const int32_t*":
+        return "int[]", "[<In>] "
     if ctype == "const double*":
         return "float[]", "[<In>] "
     if ctype == "int32_t*":

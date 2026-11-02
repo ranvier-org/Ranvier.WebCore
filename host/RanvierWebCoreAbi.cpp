@@ -99,6 +99,8 @@
 #include <WebCore/BlobRegistry.h>
 #include <WebCore/BlobRegistryImpl.h>
 #include <WebCore/File.h>
+#include <WebCore/FileChooser.h>
+#include <WebCore/FileInputType.h>
 #include <WebCore/FileList.h>
 #include <WebCore/CachedResource.h>
 #include <WebCore/HTTPHeaderNames.h>
@@ -278,6 +280,7 @@ private:
     void setCursor(const WebCore::Cursor&) final;
     void mouseDidMoveOverElement(const HitTestResult&, OptionSet<PlatformEventModifier>, const String& toolTip, TextDirection) final;
     RefPtr<PopupMenu> createPopupMenu(PopupMenuClient&) const final;
+    void runOpenPanel(LocalFrame&, FileChooser&) final;
     // The pointing devices of rv_host_set_media_preferences.
     bool hoverSupportedByPrimaryPointingDevice() const final;
     bool hoverSupportedByAnyAvailablePointingDevice() const final;
@@ -988,6 +991,11 @@ struct RvHost {
     String tooltip;
     RvPopupCallback popupCallback { nullptr };
     void* popupContext { nullptr };
+    RvFilePickerCallback filePickerCallback { nullptr };
+    void* filePickerContext { nullptr };
+    RefPtr<FileChooser> filePicker;
+    RefPtr<HTMLInputElement> filePickerElement;
+    uint64_t filePickerId { 0 };
     int32_t clipboardStyle { RV_CLIPBOARD_DOM };
     RvClipboardWrite clipboardWrite { nullptr };
     RvClipboardRead clipboardRead { nullptr };
@@ -1075,6 +1083,32 @@ private:
     RvHost& m_host;
     std::optional<uint64_t> m_previousDocumentGeneration;
 };
+static uint64_t nextFilePickerId = 1;
+
+static void invalidateFilePicker(RvHost& host)
+{
+    auto id = std::exchange(host.filePickerId, 0);
+    host.filePicker = nullptr;
+    host.filePickerElement = nullptr;
+    if (id && host.filePickerCallback)
+        host.filePickerCallback(host.filePickerContext, id, RV_FILE_PICKER_INVALIDATE, 0);
+}
+
+void RvChromeClient::runOpenPanel(LocalFrame&, FileChooser& chooser)
+{
+    if (!host || !host->filePickerCallback)
+        return;
+    invalidateFilePicker(*host);
+    host->filePicker = &chooser;
+    host->filePickerElement = FileInputType::elementForFileChooserClient(chooser.client());
+    host->filePickerId = nextFilePickerId++;
+    if (!host->filePickerId)
+        host->filePickerId = nextFilePickerId++;
+    auto& settings = chooser.settings();
+    int32_t flags = (settings.allowsMultipleFiles ? RV_FILE_PICKER_MULTIPLE : 0)
+        | (settings.allowsDirectories ? RV_FILE_PICKER_DIRECTORIES : 0);
+    host->filePickerCallback(host->filePickerContext, host->filePickerId, RV_FILE_PICKER_SHOW, flags);
+}
 
 void RvChromeClient::invalidate(const IntRect& rect)
 {
@@ -1894,6 +1928,8 @@ int32_t rv_abi_has(const char* feature)
 #endif
     if (!std::strcmp(feature, "mutation-observation"))
         return 1;
+    if (!std::strcmp(feature, "file-picker"))
+        return 1;
     return 0;
 }
 
@@ -2399,6 +2435,7 @@ void rv_host_destroy(RvHost* host)
 #if (defined(_WIN32) || defined(__linux__)) && RANVIER_COMPOSITING
     host->nativeTextures.clear();
 #endif
+    invalidateFilePicker(*host);
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_notifications_drop(reinterpret_cast<RvNode*>(&host->document()));
@@ -2440,6 +2477,7 @@ int32_t rv_host_load_html(RvHost* host, const uint8_t* html, int32_t html_length
 #if (defined(_WIN32) || defined(__linux__)) && RANVIER_COMPOSITING
     host->nativeTextures.clear();
 #endif
+    invalidateFilePicker(*host);
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_custom_effect_callbacks_revoke_document(reinterpret_cast<RvNode*>(&host->document()));
@@ -2470,6 +2508,7 @@ int32_t rv_host_load_svg(RvHost* host, const uint8_t* svg, int32_t svg_length)
 #if (defined(_WIN32) || defined(__linux__)) && RANVIER_COMPOSITING
     host->nativeTextures.clear();
 #endif
+    invalidateFilePicker(*host);
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_view_transitions_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
@@ -4193,6 +4232,13 @@ int32_t rv_run_loop_cycle(int32_t milliseconds)
         RunLoop::cycle();
 #endif
         ++cycles;
+        auto hosts = liveHosts;
+        for (auto* host : hosts) {
+            if (liveHosts.contains(host) && host->filePicker && (!host->filePicker->isValid()
+                    || !host->filePickerElement || !host->filePickerElement->isConnected()
+                    || host->filePickerElement->document().page() != host->page.ptr()))
+                invalidateFilePicker(*host);
+        }
         deliverNotificationRequests();
         ranvier_view_transitions_deliver();
         if (MonotonicTime::now() < deadline)
@@ -6418,6 +6464,107 @@ int32_t rv_host_snapshot(RvHost* host, RvNode* element, const RvSnapshotOptions*
 int32_t rv_snapshot_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length)
 {
     return ranvier_resource_bytes(operation, buffer, capacity, length);
+}
+
+static int32_t filePickerStatus(RvHost* host, uint64_t request)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
+        return RV_ERR_DETACHED;
+    if (!request || host->filePickerId != request || !host->filePicker)
+        return RV_ERR_DETACHED;
+    if (!host->filePicker->isValid() || !host->filePickerElement || !host->filePickerElement->isConnected()
+        || host->filePickerElement->document().page() != host->page.ptr()) {
+        invalidateFilePicker(*host);
+        return RV_ERR_DETACHED;
+    }
+    return RV_OK;
+}
+
+int32_t rv_host_set_file_picker_handler(RvHost* host, RvFilePickerCallback callback, void* context)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
+        return RV_ERR_DETACHED;
+    invalidateFilePicker(*host);
+    host->filePickerCallback = callback;
+    host->filePickerContext = context;
+    return RV_OK;
+}
+
+int32_t rv_host_file_picker_available(RvHost* host)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
+        return RV_ERR_DETACHED;
+    return !!host->filePickerCallback;
+}
+
+int32_t rv_host_file_picker_filter_count(RvHost* host, uint64_t request, int32_t kind, int32_t* count)
+{
+    if (!count)
+        return RV_ERR_NULL_ARGUMENT;
+    if (auto status = filePickerStatus(host, request))
+        return status;
+    auto& settings = host->filePicker->settings();
+    if (kind == RV_FILE_PICKER_MIME)
+        *count = static_cast<int32_t>(settings.acceptMIMETypes.size());
+    else if (kind == RV_FILE_PICKER_EXTENSION)
+        *count = static_cast<int32_t>(settings.acceptFileExtensions.size());
+    else
+        return RV_ERR_UNSUPPORTED;
+    return RV_OK;
+}
+
+int32_t rv_host_file_picker_filter(RvHost* host, uint64_t request, int32_t kind, int32_t index, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (auto status = filePickerStatus(host, request))
+        return status;
+    auto& settings = host->filePicker->settings();
+    auto* values = kind == RV_FILE_PICKER_MIME ? &settings.acceptMIMETypes
+        : kind == RV_FILE_PICKER_EXTENSION ? &settings.acceptFileExtensions : nullptr;
+    if (!values || index < 0 || static_cast<size_t>(index) >= values->size())
+        return RV_ERR_UNSUPPORTED;
+    return copyString((*values)[index], buffer, capacity, length);
+}
+
+int32_t rv_host_file_picker_complete(RvHost* host, uint64_t request, int32_t outcome,
+    const uint8_t* const* paths, const int32_t* lengths, int32_t count)
+{
+    if (auto status = filePickerStatus(host, request))
+        return status;
+    if ((outcome != RV_FILE_PICKER_CANCEL && outcome != RV_FILE_PICKER_ACCEPT) || count < 0
+        || (outcome == RV_FILE_PICKER_CANCEL && count) || (outcome == RV_FILE_PICKER_ACCEPT && !count)
+        || (count && (!paths || !lengths)) || (count > 1 && !host->filePicker->settings().allowsMultipleFiles))
+        return RV_ERR_UNSUPPORTED;
+    Vector<String> files;
+    for (int32_t index = 0; index < count; ++index) {
+        auto text = requiredUtf8(paths[index], lengths[index]);
+        if (!text || text->isEmpty() || text->contains('\0'))
+            return RV_ERR_UNSUPPORTED;
+        auto native = std::filesystem::path(std::u8string_view { reinterpret_cast<const char8_t*>(paths[index]), static_cast<size_t>(lengths[index]) });
+        if (!native.is_absolute())
+            return RV_ERR_UNSUPPORTED;
+        files.append(WTF::move(*text));
+    }
+    RefPtr chooser = std::exchange(host->filePicker, nullptr);
+    host->filePickerElement = nullptr;
+    host->filePickerId = 0;
+    return dispatchCountingFailures([&] {
+        if (outcome == RV_FILE_PICKER_ACCEPT)
+            chooser->chooseFiles(files);
+        else
+            chooser->cancelFileChoosing();
+    });
 }
 
 int32_t rv_host_set_popup_handler(RvHost* host, RvPopupCallback callback, void* context)
