@@ -287,6 +287,23 @@ type PrintOptions =
 [<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]
 type PrintCancelPoll = delegate of context: nativeint -> int
 
+/// <summary>Host rendering trace event; times are monotonic nanoseconds.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type HostTraceEvent =
+    val mutable phase: int
+    val mutable source: int
+    val mutable start_ns: uint64
+    val mutable duration_ns: uint64
+    val mutable sequence: uint64
+
+/// <summary>Latest native presentation failure and platform-specific status.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type HostErrorRecord =
+    val mutable operation: int
+    val mutable source: int
+    val mutable status: int
+    val mutable native_code: int
+
 /// <summary>
 /// Per-function counts and Stopwatch ticks of the calls made while <c>On</c>, indexed as <c>Names</c>. The ticks of a
 /// call span its P/Invoke transition, marshalling and native work.
@@ -629,6 +646,15 @@ module Calls =
             "rv_mutation_record_batch_get_record"
             "rv_host_print_pdf"
             "rv_print_pdf_result"
+            "rv_host_trace_enable"
+            "rv_host_trace_drain"
+            "rv_host_error_enable"
+            "rv_host_error_take"
+            "rv_host_set_file_picker_handler"
+            "rv_host_file_picker_available"
+            "rv_host_file_picker_filter_count"
+            "rv_host_file_picker_filter"
+            "rv_host_file_picker_complete"
         |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
@@ -2026,6 +2052,48 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_print_pdf_result(uint64 operation, [<In; Out>] byte[] buffer, int64 capacity, int64& length)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_trace_enable(nativeint host, int enabled)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_trace_drain(nativeint host, nativeint events, int capacity, int& written, uint64& dropped)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_error_enable(nativeint host, int enabled)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_error_take(nativeint host, nativeint record, int& present)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_set_file_picker_handler(nativeint host, nativeint callback, nativeint context)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_file_picker_available(nativeint host)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_file_picker_filter_count(nativeint host, uint64 request, int kind, int& count)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_file_picker_filter(
+        nativeint host,
+        uint64 request,
+        int kind,
+        int index,
+        byte[] buffer,
+        int capacity,
+        int[] length
+    )
+
+    [<DllImport(Lib)>]
+    extern int rv_host_file_picker_complete(
+        nativeint host,
+        uint64 request,
+        int outcome,
+        [<In>] nativeint[] paths,
+        [<In>] int[] lengths,
+        int count
+    )
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -6373,6 +6441,126 @@ let rv_print_pdf_result (operation: uint64, buffer: byte[], capacity: int64, len
         result
     else
         Raw.rv_print_pdf_result (operation, buffer, capacity, &length)
+
+let rv_host_trace_enable (host: nativeint, enabled: int) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_trace_enable (host, enabled)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[335] <- Calls.Counts[335] + 1L
+        Calls.Ticks[335] <- Calls.Ticks[335] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_trace_enable (host, enabled)
+
+let rv_host_trace_drain
+    (host: nativeint, events: nativeint, capacity: int, written: byref<int>, dropped: byref<uint64>)
+    : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_trace_drain (host, events, capacity, &written, &dropped)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[336] <- Calls.Counts[336] + 1L
+        Calls.Ticks[336] <- Calls.Ticks[336] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_trace_drain (host, events, capacity, &written, &dropped)
+
+let rv_host_error_enable (host: nativeint, enabled: int) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_error_enable (host, enabled)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[337] <- Calls.Counts[337] + 1L
+        Calls.Ticks[337] <- Calls.Ticks[337] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_error_enable (host, enabled)
+
+let rv_host_error_take (host: nativeint, record: nativeint, present: byref<int>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_error_take (host, record, &present)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[338] <- Calls.Counts[338] + 1L
+        Calls.Ticks[338] <- Calls.Ticks[338] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_error_take (host, record, &present)
+
+let rv_host_set_file_picker_handler (host: nativeint, callback: nativeint, context: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_set_file_picker_handler (host, callback, context)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[339] <- Calls.Counts[339] + 1L
+        Calls.Ticks[339] <- Calls.Ticks[339] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_set_file_picker_handler (host, callback, context)
+
+let rv_host_file_picker_available (host: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_file_picker_available (host)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[340] <- Calls.Counts[340] + 1L
+        Calls.Ticks[340] <- Calls.Ticks[340] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_file_picker_available (host)
+
+let rv_host_file_picker_filter_count (host: nativeint, request: uint64, kind: int, count: byref<int>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_file_picker_filter_count (host, request, kind, &count)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[341] <- Calls.Counts[341] + 1L
+        Calls.Ticks[341] <- Calls.Ticks[341] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_file_picker_filter_count (host, request, kind, &count)
+
+let rv_host_file_picker_filter
+    (host: nativeint, request: uint64, kind: int, index: int, buffer: byte[], capacity: int, length: int[])
+    : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+
+        let result =
+            Raw.rv_host_file_picker_filter (host, request, kind, index, buffer, capacity, length)
+
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[342] <- Calls.Counts[342] + 1L
+        Calls.Ticks[342] <- Calls.Ticks[342] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_file_picker_filter (host, request, kind, index, buffer, capacity, length)
+
+let rv_host_file_picker_complete
+    (host: nativeint, request: uint64, outcome: int, paths: nativeint[], lengths: int[], count: int)
+    : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+
+        let result =
+            Raw.rv_host_file_picker_complete (host, request, outcome, paths, lengths, count)
+
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[343] <- Calls.Counts[343] + 1L
+        Calls.Ticks[343] <- Calls.Ticks[343] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_file_picker_complete (host, request, outcome, paths, lengths, count)
 
 // END GENERATED
 

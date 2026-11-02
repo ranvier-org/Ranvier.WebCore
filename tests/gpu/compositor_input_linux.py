@@ -115,6 +115,8 @@ def run(directory, report, scales=(1,1.5,2)):
     native = Native(directory)
     assert native.call('rv_abi_has',[C.c_char_p],b'texture-input-egl') == 1
     consumer = InputConsumer(native)
+    get_string=consumer.bind(consumer.gl,'glGetString',C.c_char_p,[U])
+    backend={name:(get_string(token) or b'').decode(errors='replace') for name,token in [('vendor',0x1F00),('renderer',0x1F01),('version',0x1F02)]}
     rows,lifetimes = [],[]
     try:
         for scale in scales:
@@ -229,7 +231,7 @@ def run(directory, report, scales=(1,1.5,2)):
                         native.ok('rv_gpu_frame_release',[P],held)
     finally:
         consumer.close()
-        report.write_text(json.dumps(dict(rows=rows,lifetimes=lifetimes,assertions=native.assertions,hostCpuPaintCalls=0,transport='native GLES texture/EGLImage -> DOM -> EGLImage output'),indent=2)+'\n')
+        report.write_text(json.dumps(dict(rows=rows,lifetimes=lifetimes,backend=backend,assertions=native.assertions,hostCpuPaintCalls=0,transport='native GLES texture/EGLImage -> DOM -> EGLImage output'),indent=2)+'\n')
     print('PASS Linux native texture DOM input',len(rows),'frames',native.assertions,'assertions')
 
 

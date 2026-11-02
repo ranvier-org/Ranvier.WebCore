@@ -29,6 +29,12 @@ def main():
                 timeout=120)
             if result.returncode:
                 failures.append((name, result.returncode))
+        for name in ['host_tracing', 'host_errors', 'host_error_lifetime']:
+            result = subprocess.run([
+                sys.executable, '-I', str(Path(__file__).resolve().parents[1] / 'abi' / (name + '.py')),
+                str(args.native_directory.resolve()), str(library)], timeout=120)
+            if result.returncode:
+                failures.append((name, result.returncode))
         assert not failures, failures
     finally:
         assert consumer.parent == args.output.resolve()

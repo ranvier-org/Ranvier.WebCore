@@ -1,11 +1,19 @@
 
 # Ranvier native WebCore C ABI experiment: a shared library over the TestWebCore host and frameworks.
 if (ENABLE_WEBCORE)
+    set(_ranvier_compositing 0)
+    if (USE_GRAPHICS_LAYER_TEXTURE_MAPPER AND NOT USE_GPU_STUB)
+        set(_ranvier_compositing 1)
+    endif ()
     foreach (_ranvier_embedder_source IN LISTS WebCore_EMBEDDER_SOURCES)
         if (_ranvier_embedder_source MATCHES "RanvierPrintGlue\\.cpp$")
             set_source_files_properties("${_ranvier_embedder_source}" TARGET_DIRECTORY WebCore PROPERTIES
                 SKIP_PRECOMPILE_HEADERS ON
                 COMPILE_DEFINITIONS "RANVIER_ENABLE_PDF=$<BOOL:${RANVIER_ENABLE_PDF}>"
+            )
+        elseif (_ranvier_embedder_source MATCHES "RanvierNativeTextureDraw\\.cpp$")
+            set_source_files_properties("${_ranvier_embedder_source}" TARGET_DIRECTORY WebCore PROPERTIES
+                COMPILE_DEFINITIONS "RANVIER_COMPOSITING=${_ranvier_compositing}"
             )
         endif ()
     endforeach ()
@@ -52,7 +60,7 @@ if (ENABLE_WEBCORE)
     set(RanvierWebCoreHost_DEFINITIONS BUILDING_TestWebCore NO_GTEST_USAGE)
     # Accelerated compositing (rv_host_set_accelerated_compositing) needs GraphicsLayerTextureMapper, which
     # coordinated graphics replaces, and the GPU code that patch 0004's USE_GPU_STUB removes.
-    if (USE_GRAPHICS_LAYER_TEXTURE_MAPPER AND NOT USE_GPU_STUB)
+    if (_ranvier_compositing)
         list(APPEND RanvierWebCoreHost_DEFINITIONS RANVIER_COMPOSITING=1)
         if (WIN32)
             list(APPEND RanvierWebCoreHost_LIBRARIES ANGLE::GLES ANGLE::EGL d3d11 dxgi)

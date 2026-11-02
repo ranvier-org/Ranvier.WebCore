@@ -17,7 +17,9 @@
 #include "RanvierInspectGlue.h"
 #include "RanvierWakeLockGlue.h"
 #include "RanvierNotificationGlue.h"
+#include <array>
 #include <atomic>
+#include <chrono>
 #include <memory>
 #include <string>
 #include <vector>
@@ -97,6 +99,8 @@
 #include <WebCore/BlobRegistry.h>
 #include <WebCore/BlobRegistryImpl.h>
 #include <WebCore/File.h>
+#include <WebCore/FileChooser.h>
+#include <WebCore/FileInputType.h>
 #include <WebCore/FileList.h>
 #include <WebCore/CachedResource.h>
 #include <WebCore/HTTPHeaderNames.h>
@@ -237,6 +241,10 @@
 #include "RanvierWebCoreEGL.h"
 #else
 #include <GLES2/gl2.h>
+#if defined(_WIN32)
+#include <d3d11.h>
+#include <wrl/client.h>
+#endif
 #endif
 #include <WebCore/GLContext.h>
 #include <WebCore/GraphicsLayerTextureMapper.h>
@@ -273,6 +281,7 @@ private:
     void setCursor(const WebCore::Cursor&) final;
     void mouseDidMoveOverElement(const HitTestResult&, OptionSet<PlatformEventModifier>, const String& toolTip, TextDirection) final;
     RefPtr<PopupMenu> createPopupMenu(PopupMenuClient&) const final;
+    void runOpenPanel(LocalFrame&, FileChooser&) final;
     // The pointing devices of rv_host_set_media_preferences.
     bool hoverSupportedByPrimaryPointingDevice() const final;
     bool hoverSupportedByAnyAvailablePointingDevice() const final;
@@ -903,6 +912,35 @@ struct RvCompositor final : GraphicsLayerClient {
 };
 #endif
 
+static uint64_t traceNow()
+{
+    using namespace std::chrono;
+    return static_cast<uint64_t>(duration_cast<nanoseconds>(steady_clock::now().time_since_epoch()).count());
+}
+
+struct RvHostTraceBuffer {
+    std::array<RvHostTraceEvent, 256> events { };
+    size_t head { 0 };
+    size_t count { 0 };
+    uint64_t dropped { 0 };
+    uint64_t sequence { 0 };
+    bool enabled { true };
+
+    void record(int32_t phase, uint64_t start, uint64_t duration)
+    {
+        if (!enabled)
+            return;
+        if (count == events.size()) {
+            if (dropped != UINT64_MAX)
+                ++dropped;
+            return;
+        }
+        auto index = (head + count) % events.size();
+        events[index] = { phase, RV_HOST_TRACE_SOURCE_HOST, start, duration, ++sequence };
+        ++count;
+    }
+};
+
 struct RvHost {
     Ref<Page> page;
     IntSize size;
@@ -941,16 +979,24 @@ struct RvHost {
     bool frameRequested { false };
     // Inside rv_host_update or rv_host_paint_rgba, which call no callback.
     bool inFrame { false };
-    enum class DocumentTransaction { Idle, Replacing, Printing, Destroying };
+    enum class DocumentTransaction { Idle, Replacing, Printing, Rendering, Destroying };
     DocumentTransaction documentTransaction { DocumentTransaction::Idle };
     bool destroyAfterDocumentTransaction { false };
     unsigned editingDepth { 0 };
     bool destroyAfterEditing { false };
     bool updateWanted { false };
+    std::shared_ptr<RvHostTraceBuffer> traceBuffer;
+    bool errorRecordsEnabled { false };
+    std::optional<RvHostErrorRecord> lastHostError;
     int32_t cursor { RV_CURSOR_DEFAULT };
     String tooltip;
     RvPopupCallback popupCallback { nullptr };
     void* popupContext { nullptr };
+    RvFilePickerCallback filePickerCallback { nullptr };
+    void* filePickerContext { nullptr };
+    RefPtr<FileChooser> filePicker;
+    RefPtr<HTMLInputElement> filePickerElement;
+    uint64_t filePickerId { 0 };
     int32_t clipboardStyle { RV_CLIPBOARD_DOM };
     RvClipboardWrite clipboardWrite { nullptr };
     RvClipboardRead clipboardRead { nullptr };
@@ -1003,6 +1049,23 @@ struct RvHost {
     }
 };
 
+class RvTraceSpan {
+public:
+    RvTraceSpan(RvHost& host, int32_t phase)
+        : m_buffer(host.traceBuffer), m_phase(phase), m_start(m_buffer ? traceNow() : 0) { }
+    ~RvTraceSpan()
+    {
+        if (m_buffer && m_buffer->enabled) {
+            auto end = traceNow();
+            m_buffer->record(m_phase, m_start, end - m_start);
+        }
+    }
+private:
+    std::shared_ptr<RvHostTraceBuffer> m_buffer;
+    int32_t m_phase;
+    uint64_t m_start;
+};
+
 class RvEditingScope {
 public:
     explicit RvEditingScope(RvHost& host)
@@ -1021,11 +1084,39 @@ private:
     RvHost& m_host;
     std::optional<uint64_t> m_previousDocumentGeneration;
 };
+static uint64_t nextFilePickerId = 1;
+
+static void invalidateFilePicker(RvHost& host)
+{
+    auto id = std::exchange(host.filePickerId, 0);
+    host.filePicker = nullptr;
+    host.filePickerElement = nullptr;
+    if (id && host.filePickerCallback)
+        host.filePickerCallback(host.filePickerContext, id, RV_FILE_PICKER_INVALIDATE, 0);
+}
+
+void RvChromeClient::runOpenPanel(LocalFrame&, FileChooser& chooser)
+{
+    if (!host || !host->filePickerCallback)
+        return;
+    invalidateFilePicker(*host);
+    host->filePicker = &chooser;
+    host->filePickerElement = FileInputType::elementForFileChooserClient(chooser.client());
+    host->filePickerId = nextFilePickerId++;
+    if (!host->filePickerId)
+        host->filePickerId = nextFilePickerId++;
+    auto& settings = chooser.settings();
+    int32_t flags = (settings.allowsMultipleFiles ? RV_FILE_PICKER_MULTIPLE : 0)
+        | (settings.allowsDirectories ? RV_FILE_PICKER_DIRECTORIES : 0);
+    host->filePickerCallback(host->filePickerContext, host->filePickerId, RV_FILE_PICKER_SHOW, flags);
+}
 
 void RvChromeClient::invalidate(const IntRect& rect)
 {
     if (!host)
         return;
+    if (host->traceBuffer)
+        host->traceBuffer->record(RV_HOST_TRACE_UPDATE_REQUESTED, traceNow(), 0);
     host->dirty.unite(intersection(rect, IntRect { { }, host->size }));
     host->requestFrame();
 }
@@ -1114,6 +1205,8 @@ void RvChromeClient::wantUpdate()
 {
     if (!host)
         return;
+    if (host->traceBuffer)
+        host->traceBuffer->record(RV_HOST_TRACE_UPDATE_REQUESTED, traceNow(), 0);
     host->updateWanted = true;
     host->requestFrame();
 }
@@ -1678,6 +1771,9 @@ static int32_t fail(const Exception& exception) { return Ranvier::recordExceptio
 template<typename T> static int32_t status(const ExceptionOr<T>& result) { return result.hasException() ? fail(result.exception()) : RV_OK; }
 
 // The layouts tests/abi/abi_layouts.py checks from ctypes and the F# interop declares.
+static_assert(sizeof(RvHostTraceEvent) == 32 && offsetof(RvHostTraceEvent, start_ns) == 8
+    && offsetof(RvHostTraceEvent, duration_ns) == 16 && offsetof(RvHostTraceEvent, sequence) == 24);
+static_assert(sizeof(RvHostErrorRecord) == 16 && offsetof(RvHostErrorRecord, native_code) == 12);
 static_assert(sizeof(void*) != 8 || (sizeof(RvFormSubmission) == 72 && offsetof(RvFormSubmission, method) == 8 && offsetof(RvFormSubmission, content_type) == 32
     && offsetof(RvFormSubmission, body_length) == 48 && offsetof(RvFormSubmission, form) == 56 && offsetof(RvFormSubmission, submitter) == 64));
 static_assert(sizeof(void*) != 8 || (sizeof(RvTextSegments) == 32 && offsetof(RvTextSegments, starts) == 8 && offsetof(RvTextSegments, locale) == 24));
@@ -1696,7 +1792,7 @@ static_assert(sizeof(RvMediaVideoConfiguration) == 64 && offsetof(RvMediaVideoCo
 static_assert(sizeof(RvSnapshotOptions) == 64 && offsetof(RvSnapshotOptions, scale) == 8 && offsetof(RvSnapshotOptions, x) == 24 && offsetof(RvSnapshotOptions, quality) == 64 - 8);
 static_assert(sizeof(RvMediaAudioConfiguration) == 64 && offsetof(RvMediaAudioConfiguration, bitrate) == 40 && offsetof(RvMediaAudioConfiguration, spatial_rendering) == 56);
 
-int32_t rv_abi_version(void) { return 60; }
+int32_t rv_abi_version(void) { return 62; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -1710,6 +1806,10 @@ int32_t rv_abi_has(const char* feature)
 {
     if (!feature)
         return 0;
+    if (!std::strcmp(feature, "host-tracing"))
+        return 1;
+    if (!std::strcmp(feature, "host-errors"))
+        return 1;
     if (!std::strcmp(feature, "editing-undo"))
         return 1;
     if (!std::strcmp(feature, "screen"))
@@ -1828,6 +1928,8 @@ int32_t rv_abi_has(const char* feature)
         return 1;
 #endif
     if (!std::strcmp(feature, "mutation-observation"))
+        return 1;
+    if (!std::strcmp(feature, "file-picker"))
         return 1;
     return 0;
 }
@@ -2321,15 +2423,21 @@ void rv_host_destroy(RvHost* host)
     if (host->documentTransaction == RvHost::DocumentTransaction::Destroying)
         return;
     if (host->documentTransaction == RvHost::DocumentTransaction::Replacing
-        || host->documentTransaction == RvHost::DocumentTransaction::Printing) {
+        || host->documentTransaction == RvHost::DocumentTransaction::Printing
+        || host->documentTransaction == RvHost::DocumentTransaction::Rendering) {
         host->destroyAfterDocumentTransaction = true;
         return;
     }
     host->documentTransaction = RvHost::DocumentTransaction::Destroying;
+    if (host->traceBuffer) {
+        host->traceBuffer->enabled = false;
+        host->traceBuffer.reset();
+    }
     static_cast<RvEditorClient&>(host->page->editorClient()).documentWillChange();
 #if (defined(_WIN32) || defined(__linux__)) && RANVIER_COMPOSITING
     host->nativeTextures.clear();
 #endif
+    invalidateFilePicker(*host);
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_notifications_drop(reinterpret_cast<RvNode*>(&host->document()));
@@ -2371,6 +2479,7 @@ int32_t rv_host_load_html(RvHost* host, const uint8_t* html, int32_t html_length
 #if (defined(_WIN32) || defined(__linux__)) && RANVIER_COMPOSITING
     host->nativeTextures.clear();
 #endif
+    invalidateFilePicker(*host);
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_custom_effect_callbacks_revoke_document(reinterpret_cast<RvNode*>(&host->document()));
@@ -2401,6 +2510,7 @@ int32_t rv_host_load_svg(RvHost* host, const uint8_t* svg, int32_t svg_length)
 #if (defined(_WIN32) || defined(__linux__)) && RANVIER_COMPOSITING
     host->nativeTextures.clear();
 #endif
+    invalidateFilePicker(*host);
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_view_transitions_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
@@ -2911,23 +3021,33 @@ int32_t rv_host_acquire_egl_frame(RvHost* host, RvGpuFrame** frame)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_DETACHED;
 #if defined(__linux__) && RANVIER_COMPOSITING
     auto pixelSize = paintSize(*host);
     if (!configuredEGLDisplay || eglGetCurrentDisplay() != configuredEGLDisplay || eglGetCurrentContext() == EGL_NO_CONTEXT
-        || host->compositingMode == RV_COMPOSITING_OFF || host->inFrame)
+        || host->compositingMode == RV_COMPOSITING_OFF || host->inFrame
+        || host->documentTransaction != RvHost::DocumentTransaction::Idle)
         return RV_ERR_UNSUPPORTED;
     if (host->presentationSurface && !host->presentationSurface->available())
         return RV_ERR_UNSUPPORTED;
     auto consumerContext = eglGetCurrentContext();
-    RvEGLContextScope contextScope;
+    RvEGLContextScope returnContext;
+    host->documentTransaction = RvHost::DocumentTransaction::Rendering;
     auto result = [&]() -> int32_t {
         SetForScope inFrame(host->inFrame, true);
         host->frameRequested = false;
-        host->document().updateLayoutIgnorePendingStylesheets();
-        RefPtr view = host->frame().view();
-        if (!view)
-            return RV_ERR_PAINT_FAILED;
-        view->updateLayoutAndStyleIfNeededRecursive();
+        RefPtr<LocalFrameView> view;
+        {
+            RvTraceSpan span(*host, RV_HOST_TRACE_STYLE_LAYOUT);
+            host->document().updateLayoutIgnorePendingStylesheets();
+            view = host->frame().view();
+            if (!view)
+                return RV_ERR_PAINT_FAILED;
+            view->updateLayoutAndStyleIfNeededRecursive();
+        }
+        if (host->destroyAfterDocumentTransaction)
+            return RV_ERR_DETACHED;
         if (!view->clipLayer())
             return RV_ERR_UNSUPPORTED;
         if (host->compositor && (host->compositor->size != host->size || host->compositor->scale != host->deviceScale))
@@ -2945,7 +3065,11 @@ int32_t rv_host_acquire_egl_frame(RvHost* host, RvGpuFrame** frame)
         auto surface = host->presentationSurface;
         if (!surface || !surface->beginProducer())
             return RV_ERR_UNSUPPORTED;
-        auto paintResult = composite(*host, *host->compositor, *view, nullptr, surface->framebuffer());
+        int32_t paintResult;
+        {
+            RvTraceSpan span(*host, RV_HOST_TRACE_PAINT);
+            paintResult = composite(*host, *host->compositor, *view, nullptr, surface->framebuffer());
+        }
         if (paintResult != RV_OK || !surface->finishProducer(consumerContext)) {
             surface->cancelProducer();
             host->presentationSurface = nullptr;
@@ -2955,8 +3079,18 @@ int32_t rv_host_acquire_egl_frame(RvHost* host, RvGpuFrame** frame)
         *frame = new RvGpuFrame { WTF::move(surface) };
         return RV_OK;
     }();
-    if (host->updateWanted)
+    returnContext.restore();
+    if (result != RV_OK && host->errorRecordsEnabled)
+        host->lastHostError = RvHostErrorRecord { RV_HOST_ERROR_ACQUIRE_FRAME, RV_HOST_ERROR_SOURCE_EGL, result, 0 };
+    if (host->updateWanted && !host->destroyAfterDocumentTransaction)
         host->requestFrame();
+    if (host->destroyAfterDocumentTransaction && *frame) {
+        auto* abandoned = std::exchange(*frame, nullptr);
+        if (rv_gpu_frame_release(abandoned) != RV_OK)
+            delete abandoned;
+    }
+    if (finishDocumentTransaction(host) != RV_OK)
+        return RV_ERR_DETACHED;
     return result;
 #else
     return RV_ERR_UNSUPPORTED;
@@ -2972,21 +3106,32 @@ int32_t rv_host_acquire_d3d11_frame(RvHost* host, void* consumerDevice, RvGpuFra
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_DETACHED;
 #if defined(_WIN32) && RANVIER_COMPOSITING
     auto pixelSize = paintSize(*host);
-    if (host->compositingMode == RV_COMPOSITING_OFF || host->inFrame)
+    if (host->compositingMode == RV_COMPOSITING_OFF || host->inFrame
+        || host->documentTransaction != RvHost::DocumentTransaction::Idle)
         return RV_ERR_UNSUPPORTED;
     if (host->presentationSurface && host->presentationSurface->matches(consumerDevice, pixelSize.width(), pixelSize.height())
         && !host->presentationSurface->available())
         return RV_ERR_UNSUPPORTED;
+    Microsoft::WRL::ComPtr<ID3D11Device> retainedDevice = static_cast<ID3D11Device*>(consumerDevice);
+    host->documentTransaction = RvHost::DocumentTransaction::Rendering;
     auto result = [&]() -> int32_t {
         SetForScope inFrame(host->inFrame, true);
         host->frameRequested = false;
-        host->document().updateLayoutIgnorePendingStylesheets();
-        RefPtr view = host->frame().view();
-        if (!view)
-            return RV_ERR_PAINT_FAILED;
-        view->updateLayoutAndStyleIfNeededRecursive();
+        RefPtr<LocalFrameView> view;
+        {
+            RvTraceSpan span(*host, RV_HOST_TRACE_STYLE_LAYOUT);
+            host->document().updateLayoutIgnorePendingStylesheets();
+            view = host->frame().view();
+            if (!view)
+                return RV_ERR_PAINT_FAILED;
+            view->updateLayoutAndStyleIfNeededRecursive();
+        }
+        if (host->destroyAfterDocumentTransaction)
+            return RV_ERR_DETACHED;
         if (!view->clipLayer())
             return RV_ERR_UNSUPPORTED;
         if (host->compositor && (host->compositor->size != host->size || host->compositor->scale != host->deviceScale))
@@ -3006,7 +3151,11 @@ int32_t rv_host_acquire_d3d11_frame(RvHost* host, void* consumerDevice, RvGpuFra
             host->presentationSurface = nullptr;
             return RV_ERR_UNSUPPORTED;
         }
-        auto paintResult = composite(*host, *host->compositor, *view, nullptr, surface->framebuffer());
+        int32_t paintResult;
+        {
+            RvTraceSpan span(*host, RV_HOST_TRACE_PAINT);
+            paintResult = composite(*host, *host->compositor, *view, nullptr, surface->framebuffer());
+        }
         bool transferred = paintResult == RV_OK && surface->finishProducer();
         if (!transferred) {
             surface->cancelProducer();
@@ -3018,8 +3167,18 @@ int32_t rv_host_acquire_d3d11_frame(RvHost* host, void* consumerDevice, RvGpuFra
         }
         return transferred ? RV_OK : RV_ERR_PAINT_FAILED;
     }();
-    if (host->updateWanted)
+    if (result != RV_OK && host->errorRecordsEnabled) {
+        auto reason = retainedDevice->GetDeviceRemovedReason();
+        host->lastHostError = RvHostErrorRecord { RV_HOST_ERROR_ACQUIRE_FRAME, RV_HOST_ERROR_SOURCE_D3D11, result, static_cast<int32_t>(reason) };
+    }
+    if (host->updateWanted && !host->destroyAfterDocumentTransaction)
         host->requestFrame();
+    if (host->destroyAfterDocumentTransaction && *frame) {
+        rv_gpu_frame_release(*frame);
+        *frame = nullptr;
+    }
+    if (finishDocumentTransaction(host) != RV_OK)
+        return RV_ERR_DETACHED;
     return result;
 #else
     return RV_ERR_UNSUPPORTED;
@@ -3080,13 +3239,17 @@ static int32_t paintArea(RvHost& host, uint8_t* rgba, int32_t length, IntRect ar
     area.intersect({ { }, host.size });
     host.inFrame = true;
     host.frameRequested = false;
-    host.document().updateLayoutIgnorePendingStylesheets();
-    RefPtr view = host.frame().view();
-    if (!view) {
-        host.inFrame = false;
-        return RV_ERR_PAINT_FAILED;
+    RefPtr<LocalFrameView> view;
+    {
+        RvTraceSpan span(host, RV_HOST_TRACE_STYLE_LAYOUT);
+        host.document().updateLayoutIgnorePendingStylesheets();
+        view = host.frame().view();
+        if (!view) {
+            host.inFrame = false;
+            return RV_ERR_PAINT_FAILED;
+        }
+        view->updateLayoutAndStyleIfNeededRecursive();
     }
-    view->updateLayoutAndStyleIfNeededRecursive();
 #if RANVIER_COMPOSITING
     // A paint of the whole viewport composites when the host is in compositing mode. In
     // RV_COMPOSITING_WHEN_NEEDED a frame without a clip layer is not in compositing mode and takes the CPU path.
@@ -3098,7 +3261,11 @@ static int32_t paintArea(RvHost& host, uint8_t* rgba, int32_t length, IntRect ar
         if (!host.compositor)
             host.compositor = RvCompositor::create(host.size, host.deviceScale);
         if (host.compositor) {
-            auto result = composite(host, *host.compositor, *view, rgba);
+            int32_t result;
+            {
+                RvTraceSpan span(host, RV_HOST_TRACE_PAINT);
+                result = composite(host, *host.compositor, *view, rgba);
+            }
             host.dirty = { };
             host.inFrame = false;
             if (host.updateWanted)
@@ -3117,7 +3284,10 @@ static int32_t paintArea(RvHost& host, uint8_t* rgba, int32_t length, IntRect ar
             buffer->context().translate(-area.x(), -area.y());
             auto behavior = view->paintBehavior();
             view->setPaintBehavior(behavior | PaintBehavior::FlattenCompositingLayers);
-            view->paint(buffer->context(), area);
+            {
+                RvTraceSpan span(host, RV_HOST_TRACE_PAINT);
+                view->paint(buffer->context(), area);
+            }
             view->setPaintBehavior(behavior);
         }
     }
@@ -4091,6 +4261,13 @@ int32_t rv_run_loop_cycle(int32_t milliseconds)
         RunLoop::cycle();
 #endif
         ++cycles;
+        auto hosts = liveHosts;
+        for (auto* host : hosts) {
+            if (liveHosts.contains(host) && host->filePicker && (!host->filePicker->isValid()
+                    || !host->filePickerElement || !host->filePickerElement->isConnected()
+                    || host->filePickerElement->document().page() != host->page.ptr()))
+                invalidateFilePicker(*host);
+        }
         deliverNotificationRequests();
         ranvier_view_transitions_deliver();
         if (MonotonicTime::now() < deadline)
@@ -4841,25 +5018,109 @@ int32_t rv_host_set_frame_callback(RvHost* host, RvFrameCallback callback, void*
     return RV_OK;
 }
 
+int32_t rv_host_trace_enable(RvHost* host, int32_t enabled)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_DETACHED;
+    if (enabled != 0 && enabled != 1)
+        return RV_ERR_UNSUPPORTED;
+    if (enabled && !host->traceBuffer)
+        host->traceBuffer = std::make_shared<RvHostTraceBuffer>();
+    else if (!enabled && host->traceBuffer) {
+        host->traceBuffer->enabled = false;
+        host->traceBuffer.reset();
+    }
+    return RV_OK;
+}
+
+int32_t rv_host_error_enable(RvHost* host, int32_t enabled)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_DETACHED;
+    if (enabled != 0 && enabled != 1)
+        return RV_ERR_UNSUPPORTED;
+    if (host->errorRecordsEnabled != static_cast<bool>(enabled)) {
+        host->lastHostError.reset();
+        host->errorRecordsEnabled = enabled;
+    }
+    return RV_OK;
+}
+
+int32_t rv_host_error_take(RvHost* host, RvHostErrorRecord* record, int32_t* present)
+{
+    if (!host || !record || !present)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_DETACHED;
+    *present = host->lastHostError.has_value();
+    if (host->lastHostError) {
+        *record = *host->lastHostError;
+        host->lastHostError.reset();
+    }
+    return RV_OK;
+}
+
+int32_t rv_host_trace_drain(RvHost* host, RvHostTraceEvent* events, int32_t capacity, int32_t* written, uint64_t* dropped)
+{
+    if (!host || !written || !dropped || (capacity > 0 && !events))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_DETACHED;
+    if (capacity < 0 || capacity > 256)
+        return RV_ERR_UNSUPPORTED;
+    auto buffer = host->traceBuffer;
+    if (!buffer) {
+        *written = 0;
+        *dropped = 0;
+        return RV_OK;
+    }
+    auto count = std::min(static_cast<size_t>(capacity), buffer->count);
+    for (size_t i = 0; i < count; ++i)
+        events[i] = buffer->events[(buffer->head + i) % buffer->events.size()];
+    buffer->head = (buffer->head + count) % buffer->events.size();
+    buffer->count -= count;
+    *written = static_cast<int32_t>(count);
+    *dropped = std::exchange(buffer->dropped, 0);
+    return RV_OK;
+}
+
 int32_t rv_host_update(RvHost* host)
 {
     if (!host)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
-    if (host->documentTransaction == RvHost::DocumentTransaction::Printing)
+    if (!liveHosts.contains(host))
+        return RV_ERR_DETACHED;
+    if (host->documentTransaction != RvHost::DocumentTransaction::Idle || host->inFrame)
         return RV_ERR_UNSUPPORTED;
+    host->documentTransaction = RvHost::DocumentTransaction::Rendering;
     Ref page = host->page;
     host->inFrame = true;
     host->frameRequested = false;
     host->updateWanted = false;
-    page->updateRendering();
-    page->finalizeRenderingUpdate({ });
+    {
+        RvTraceSpan span(*host, RV_HOST_TRACE_RENDERING_UPDATE);
+        page->updateRendering();
+        page->finalizeRenderingUpdate({ });
+    }
     host->inFrame = false;
     // A running animation asked for the next frame during this one.
-    if (host->updateWanted)
+    if (host->updateWanted && !host->destroyAfterDocumentTransaction)
         host->requestFrame();
-    return RV_OK;
+    return finishDocumentTransaction(host);
 }
 
 int32_t rv_host_dirty_rect(RvHost* host, int32_t* x, int32_t* y, int32_t* width, int32_t* height)
@@ -6235,6 +6496,107 @@ int32_t rv_host_snapshot(RvHost* host, RvNode* element, const RvSnapshotOptions*
 int32_t rv_snapshot_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length)
 {
     return ranvier_resource_bytes(operation, buffer, capacity, length);
+}
+
+static int32_t filePickerStatus(RvHost* host, uint64_t request)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
+        return RV_ERR_DETACHED;
+    if (!request || host->filePickerId != request || !host->filePicker)
+        return RV_ERR_DETACHED;
+    if (!host->filePicker->isValid() || !host->filePickerElement || !host->filePickerElement->isConnected()
+        || host->filePickerElement->document().page() != host->page.ptr()) {
+        invalidateFilePicker(*host);
+        return RV_ERR_DETACHED;
+    }
+    return RV_OK;
+}
+
+int32_t rv_host_set_file_picker_handler(RvHost* host, RvFilePickerCallback callback, void* context)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
+        return RV_ERR_DETACHED;
+    invalidateFilePicker(*host);
+    host->filePickerCallback = callback;
+    host->filePickerContext = context;
+    return RV_OK;
+}
+
+int32_t rv_host_file_picker_available(RvHost* host)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
+        return RV_ERR_DETACHED;
+    return !!host->filePickerCallback;
+}
+
+int32_t rv_host_file_picker_filter_count(RvHost* host, uint64_t request, int32_t kind, int32_t* count)
+{
+    if (!count)
+        return RV_ERR_NULL_ARGUMENT;
+    if (auto status = filePickerStatus(host, request))
+        return status;
+    auto& settings = host->filePicker->settings();
+    if (kind == RV_FILE_PICKER_MIME)
+        *count = static_cast<int32_t>(settings.acceptMIMETypes.size());
+    else if (kind == RV_FILE_PICKER_EXTENSION)
+        *count = static_cast<int32_t>(settings.acceptFileExtensions.size());
+    else
+        return RV_ERR_UNSUPPORTED;
+    return RV_OK;
+}
+
+int32_t rv_host_file_picker_filter(RvHost* host, uint64_t request, int32_t kind, int32_t index, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (auto status = filePickerStatus(host, request))
+        return status;
+    auto& settings = host->filePicker->settings();
+    auto* values = kind == RV_FILE_PICKER_MIME ? &settings.acceptMIMETypes
+        : kind == RV_FILE_PICKER_EXTENSION ? &settings.acceptFileExtensions : nullptr;
+    if (!values || index < 0 || static_cast<size_t>(index) >= values->size())
+        return RV_ERR_UNSUPPORTED;
+    return copyString((*values)[index], buffer, capacity, length);
+}
+
+int32_t rv_host_file_picker_complete(RvHost* host, uint64_t request, int32_t outcome,
+    const uint8_t* const* paths, const int32_t* lengths, int32_t count)
+{
+    if (auto status = filePickerStatus(host, request))
+        return status;
+    if ((outcome != RV_FILE_PICKER_CANCEL && outcome != RV_FILE_PICKER_ACCEPT) || count < 0
+        || (outcome == RV_FILE_PICKER_CANCEL && count) || (outcome == RV_FILE_PICKER_ACCEPT && !count)
+        || (count && (!paths || !lengths)) || (count > 1 && !host->filePicker->settings().allowsMultipleFiles))
+        return RV_ERR_UNSUPPORTED;
+    Vector<String> files;
+    for (int32_t index = 0; index < count; ++index) {
+        auto text = requiredUtf8(paths[index], lengths[index]);
+        if (!text || text->isEmpty() || text->contains('\0'))
+            return RV_ERR_UNSUPPORTED;
+        auto native = std::filesystem::path(std::u8string_view { reinterpret_cast<const char8_t*>(paths[index]), static_cast<size_t>(lengths[index]) });
+        if (!native.is_absolute())
+            return RV_ERR_UNSUPPORTED;
+        files.append(WTF::move(*text));
+    }
+    RefPtr chooser = std::exchange(host->filePicker, nullptr);
+    host->filePickerElement = nullptr;
+    host->filePickerId = 0;
+    return dispatchCountingFailures([&] {
+        if (outcome == RV_FILE_PICKER_ACCEPT)
+            chooser->chooseFiles(files);
+        else
+            chooser->cancelFileChoosing();
+    });
 }
 
 int32_t rv_host_set_popup_handler(RvHost* host, RvPopupCallback callback, void* context)
