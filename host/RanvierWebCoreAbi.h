@@ -918,7 +918,9 @@ enum {
 };
 
 /* Editing commands of rv_host_edit. Undo/redo require rv_abi_has("editing-undo").
- * History belongs to the engine editor, resets on document replacement and is separate from application history. */
+ * History belongs to the engine editor, resets on document replacement and is separate from application history.
+ * Nested editing input during undo/redo returns RV_ERR_UNSUPPORTED; cancel beforeinput and retry after the outer call.
+ * Destruction requested by an editing callback is deferred until the outer editing call returns. */
 enum {
     RV_EDIT_COPY = 0,
     RV_EDIT_CUT = 1,

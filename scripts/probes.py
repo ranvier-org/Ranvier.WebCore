@@ -136,6 +136,8 @@ PROBES = [
           'python -I tests/abi/focus_input.py --native-directory {native}'),
     probe('Verify touch frames, touch lists and touch pointer events',
           'python -I tests/abi/touch_input.py --native-directory {native}'),
+    probe('Verify native editor undo, redo and callback lifetime',
+          'python -I tests/abi/editing_undo.py --native-directory {native}'),
     probe('Verify pen and mouse pointer fidelity and pen capture',
           'python -I tests/abi/pen_input.py --native-directory {native}'),
     probe('Verify pointer lock requests, relative movement and loss',

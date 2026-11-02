@@ -5,6 +5,7 @@ import ctypes
 from pathlib import Path
 import sys
 import threading
+import subprocess
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
@@ -74,5 +75,16 @@ def run(directory):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('native_directory')
-    run(parser.parse_args().native_directory)
+    parser.add_argument('native_directory', nargs='?')
+    parser.add_argument('--native-directory', dest='native_option')
+    args = parser.parse_args()
+    directory = args.native_option or args.native_directory
+    if not directory:
+        parser.error('native directory required')
+    run(directory)
+    callback = Path(__file__).with_name('editing_undo_callback.py')
+    cases = [(scenario, operation) for scenario in ['newedit', 'replace', 'destroy'] for operation in ['undo', 'redo']]
+    cases.append(('destroy', 'commit'))
+    for scenario, operation in cases:
+        subprocess.run([sys.executable, '-I', str(callback), directory, scenario, operation], check=True, timeout=30)
+    print('Native editing: 7 isolated callback cases PASS')

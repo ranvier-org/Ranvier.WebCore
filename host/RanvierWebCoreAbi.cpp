@@ -387,6 +387,7 @@ class RvEditorClient final : public EditorClient {
 public:
     RvEditorClient() = default;
     ~RvEditorClient() final { clearUndoRedoOperations(); }
+    bool isReplayingHistory() const { return m_replaying != Replay::None; }
 private:
     // Key down runs the key's editing command; key press inserts the characters it produced.
     void handleKeyboardEvent(KeyboardEvent& event) final
@@ -458,6 +459,7 @@ private:
     Vector<Ref<UndoStep>> m_redo;
     Replay m_replaying { Replay::None };
     uint64_t m_historyGeneration { 0 };
+    uint64_t m_replayGeneration { 0 };
 
     static void discard(Vector<Ref<UndoStep>>& history)
     {
@@ -468,13 +470,24 @@ private:
 
     void registerUndoStep(UndoStep& step) final
     {
+        if (m_replaying == Replay::Redo && m_replayGeneration != m_historyGeneration) {
+            step.didRemoveFromUndoManager();
+            return;
+        }
         if (m_replaying != Replay::Redo) {
             ++m_historyGeneration;
             discard(m_redo);
         }
         m_undo.append(step);
     }
-    void registerRedoStep(UndoStep& step) final { m_redo.append(step); }
+    void registerRedoStep(UndoStep& step) final
+    {
+        if (m_replaying == Replay::Undo && m_replayGeneration != m_historyGeneration) {
+            step.didRemoveFromUndoManager();
+            return;
+        }
+        m_redo.append(step);
+    }
     void clearUndoRedoOperations() final
     {
         ++m_historyGeneration;
@@ -490,6 +503,7 @@ private:
             return;
         Ref step = source.takeLast();
         auto generation = m_historyGeneration;
+        SetForScope replayGeneration(m_replayGeneration, generation);
         auto transferred = destination.size();
         SetForScope replaying(m_replaying, direction);
         if (direction == Replay::Undo)
@@ -892,6 +906,8 @@ struct RvHost {
     enum class DocumentTransaction { Idle, Replacing, Destroying };
     DocumentTransaction documentTransaction { DocumentTransaction::Idle };
     bool destroyAfterDocumentReplacement { false };
+    unsigned editingDepth { 0 };
+    bool destroyAfterEditing { false };
     bool updateWanted { false };
     int32_t cursor { RV_CURSOR_DEFAULT };
     String tooltip;
@@ -947,6 +963,18 @@ struct RvHost {
         frameRequested = true;
         frameCallback(frameContext);
     }
+};
+
+class RvEditingScope {
+public:
+    explicit RvEditingScope(RvHost& host) : m_host(host) { ++m_host.editingDepth; }
+    ~RvEditingScope()
+    {
+        if (!--m_host.editingDepth && std::exchange(m_host.destroyAfterEditing, false))
+            rv_host_destroy(&m_host);
+    }
+private:
+    RvHost& m_host;
 };
 
 void RvChromeClient::invalidate(const IntRect& rect)
@@ -2233,6 +2261,10 @@ void rv_host_destroy(RvHost* host)
 {
     if (!host || !onOwningThread() || !liveHosts.contains(host))
         return;
+    if (host->editingDepth) {
+        host->destroyAfterEditing = true;
+        return;
+    }
     if (host->documentTransaction == RvHost::DocumentTransaction::Destroying)
         return;
     if (host->documentTransaction == RvHost::DocumentTransaction::Replacing) {
@@ -4180,6 +4212,11 @@ static OptionSet<PlatformEvent::Modifier> platformModifiers(int32_t bits)
 // returns, so their invalidations and frame request do too.
 template<typename Handle> static int32_t handleInput(RvHost& host, Handle&& handle)
 {
+    if (host.destroyAfterEditing)
+        return RV_ERR_DETACHED;
+    if (static_cast<RvEditorClient&>(host.page->editorClient()).isReplayingHistory())
+        return RV_ERR_UNSUPPORTED;
+    RvEditingScope editing(host);
     bool handled = false;
     auto status = dispatchCountingFailures([&] { handled = handle(); });
     host.document().updateStyleIfNeeded();
@@ -4921,10 +4958,11 @@ int32_t rv_host_scroll_to(RvHost* host, int32_t x, int32_t y)
 template<typename Edit> static int32_t compose(RvHost& host, Edit&& edit)
 {
     Ref frame = host.frame();
-    return handleInput(host, [&] {
+    auto status = handleInput(host, [&] {
         edit(frame->editor());
         return true;
-    }) < 0 ? RV_ERR_LISTENER_FAILED : RV_OK;
+    });
+    return status < 0 ? status : RV_OK;
 }
 
 int32_t rv_host_ime_set_composition(RvHost* host, const uint8_t* text, int32_t text_length, int32_t selectionStart, int32_t selectionEnd)
@@ -6260,6 +6298,11 @@ int32_t rv_host_edit(RvHost* host, int32_t command)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
+    if (host->destroyAfterEditing)
+        return RV_ERR_DETACHED;
+    if (static_cast<RvEditorClient&>(host->page->editorClient()).isReplayingHistory())
+        return RV_ERR_UNSUPPORTED;
+    RvEditingScope editing(*host);
     int32_t result = 0;
     auto status = dispatchCountingFailures([&] { result = runEdit(*host, command); });
     host->document().updateStyleIfNeeded();
