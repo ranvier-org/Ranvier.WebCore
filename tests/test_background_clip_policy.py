@@ -35,7 +35,7 @@ class PaintPolicyTests(unittest.TestCase):
         self.assertEqual(len(selected), 1)
         self.assertEqual(selected[0]['rid'], 'linux-x64')
         self.assertEqual(selected[0]['flavor'], 'gpu')
-        self.assertIn('background_content_clip_regression.py', selected[0]['commands'][0])
+        self.assertIn('qualify_producer_gpu_clipping.py', selected[0]['commands'][0])
 
     def test_half_coverage_also_handles_the_reverse_rounding_direction(self):
         before, after = bytes([127,127,127,255]), bytes([128,128,128,255])

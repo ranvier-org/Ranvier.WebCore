@@ -76,13 +76,25 @@ class ProbeRunnerTests(unittest.TestCase):
 
     def test_content_clipping_gate_uses_only_proven_gpu_baseline_profiles(self):
         gates = [entry for entry in probes.PROBES if any(
-            'background_content_clip_regression.py' in command for command in entry['commands'])]
+            'qualify_producer_gpu_clipping.py' in command for command in entry['commands'])]
         self.assertEqual({entry['rid'] for entry in gates}, {'linux-x64', 'win-x64'})
         for entry in gates:
             self.assertTrue(probes.applies(entry, entry['rid'], 'gpu'))
             self.assertFalse(probes.applies(entry, entry['rid'], 'slim'))
             for unproven in ['linux-arm64', 'win-arm64', 'osx-arm64']:
                 self.assertFalse(probes.applies(entry, unproven, 'gpu'))
+            self.assertIn('--output {work}/gpu-clipping-qualification', entry['commands'][0])
+
+    def test_producer_clipping_evidence_and_dependency_are_automatic(self):
+        workflow = (ROOT / '.github/workflows/build.yml').read_text()
+        dependency = workflow.split('      - name: Install the bounded GPU qualification dependency\n',1)[1].split('\n      - name:',1)[0]
+        self.assertIn("env.FLAVOR == 'gpu'",dependency)
+        self.assertIn("matrix.rid == 'win-x64'",dependency)
+        self.assertIn("matrix.rid == 'linux-x64'",dependency)
+        self.assertIn('numpy==2.4.3',dependency)
+        evidence = workflow.split('      - name: Retain clipping pixel results\n',1)[1].split('\n      - name:',1)[0]
+        self.assertIn('if: always()',evidence)
+        self.assertIn('/gpu-clipping-qualification',evidence)
 
     def test_probe_environment_reaches_the_child_without_changing_the_parent(self):
         entry = probes.probe('environment', 'python -c "import os; print(os.environ.get(\'RANVIER_PROBE_ENV_TEST\'))"')

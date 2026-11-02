@@ -52,8 +52,8 @@ PROBES = [
           'python -I tests/gpu/compositor_windows.py --native-directory {native} --output {work}/gpu-compositor-input',
           rid='win-x64', flavor='gpu'),
     *[probe('Verify fixed content clipping masks and complete pointwise paint stability',
-            f'python -I tests/abi/background_content_clip_regression.py --native-directory {{native}} --rid {rid} --report {{work}}/background-content-clipping-regression.json',
-            rid=rid, flavor='gpu',
+            f'python -I scripts/qualify_producer_gpu_clipping.py --native-directory {{native}} --rid {rid} --report {{work}}/background-content-clipping-regression.json --output {{work}}/gpu-clipping-qualification',
+            rid=rid, flavor='gpu', timeout=600,
             env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1',
                  'FONTCONFIG_FILE': str(root / 'tests/fixtures/background-content-clip-baselines/linux-fonts.conf')}
             if rid.startswith('linux') else None)

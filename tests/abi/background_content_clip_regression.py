@@ -16,6 +16,7 @@ import zlib
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from background_content_clip_capture import capture_samples, FIXTURES, Native, I
+from form_collections import ABI
 
 BASELINES = FIXTURES / 'background-content-clip-baselines'
 FIXED = {'bordered-half-phase', 'negative-origin', 'nested-offset', 'always-composited'}
@@ -109,14 +110,14 @@ def load_inputs(rid, fixtures=None, baselines=None):
     return profile,cases,expected,before,targets
 
 
-def verify(directory, rid):
+def verify(directory, rid, *, expected_abi=ABI, retain_all_raw=False):
     assert rid in PROFILES and sys.platform == PROFILES[rid], 'Unproven native platform/RID'
     assert platform.machine().lower() in ['amd64', 'x86_64'], 'No ARM baseline has been qualified'
     manifest = json.loads((Path(directory).resolve().parents[2] / 'manifest.json').read_text())
-    assert (manifest['rid'],manifest['flavor'],manifest['abi']) == (rid,'gpu',62), 'Unproven package profile'
+    assert (manifest['rid'],manifest['flavor'],manifest['abi']) == (rid,'gpu',expected_abi), 'Unproven package profile'
     font = font_identity(rid)
     native = Native(directory)
-    assert native.bind('rv_abi_version', I, [])() == 63
+    assert native.bind('rv_abi_version', I, [])() == expected_abi
     assert native.call('rv_abi_has', [ctypes.c_char_p], b'compositing') == 1, 'Only the GPU profile is qualified'
     profile,cases,expected,before,targets = load_inputs(rid)
     results, seen = [], set()
@@ -133,7 +134,7 @@ def verify(directory, rid):
             entry = dict(name=name,scale=scale,strictFixedCase=name in FIXED,
                          contentMaskDifference=mask_difference,rgbaMatchesChrome=raw == chrome,
                          rgbaSha256=hashlib.sha256(raw).hexdigest(),**policy)
-            if policy['worsePixels'] or (name in FIXED and mask_difference):
+            if retain_all_raw or policy['worsePixels'] or (name in FIXED and mask_difference):
                 entry['rgbaZlibBase64'] = base64.b64encode(zlib.compress(raw,6)).decode()
             results.append(entry)
     assert seen == expected and len(results) == 54

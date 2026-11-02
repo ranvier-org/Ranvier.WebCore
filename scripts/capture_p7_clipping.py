@@ -10,7 +10,7 @@ import background_content_clip_regression as gate
 
 native = Path(sys.argv[1])
 work = Path(sys.argv[2])
-report = gate.verify(native, 'win-x64')
+report = gate.verify(native, 'win-x64', expected_abi=62)
 (work / 'original-report.json').write_text(json.dumps(report, indent=2))
 gl = ctypes.WinDLL(str(native / 'libGLESv2.dll'))
 gl.glGetString.argtypes = [ctypes.c_uint]
