@@ -182,7 +182,8 @@ enum { RV_GPU_RGBA8_PREMULTIPLIED = 1 };
  * otherwise returns RV_ERR_UNSUPPORTED so the caller can paint with rv_host_paint_rgba. An outstanding
  * frame on the same surface also returns RV_ERR_UNSUPPORTED immediately. Other GPU waits are bounded.
  * Writes NULL to *frame on failure. The frame owns its resources independently of host/renderer/window;
- * it remains valid over resize or rv_host_destroy and must be released on the owner thread. */
+ * it remains valid over resize or rv_host_destroy and must be released on the owner thread. A destruction request
+ * during acquisition is deferred; the call returns RV_ERR_DETACHED without a frame. */
 RV_EXPORT int32_t rv_host_acquire_d3d11_frame(RvHost*, void* consumerDevice, RvGpuFrame** frame);
 /* Linux GPU startup: call on the future host thread before the first host, with the initialized EGLDisplay
  * used by the consumer. The display is borrowed for the process lifetime; the host never terminates it.
@@ -190,6 +191,7 @@ RV_EXPORT int32_t rv_host_acquire_d3d11_frame(RvHost*, void* consumerDevice, RvG
 RV_EXPORT int32_t rv_configure_egl_display(void* display);
 /* Linux EGLImage transport; requires the configured display's consumer context current on the owner thread.
  * Restores that context before returning. There is no CPU fallback. Held frames survive resize/host destruction.
+ * A destruction request during acquisition is deferred and returns RV_ERR_DETACHED without a frame.
  * linux_egl.py verifies image import, pixels, ownership and teardown with independent producer/consumer contexts. */
 RV_EXPORT int32_t rv_host_acquire_egl_frame(RvHost*, RvGpuFrame** frame);
 /* Returns a borrowed ID3D11Texture2D*, physical dimensions and RV_GPU_RGBA8_PREMULTIPLIED. Row 0 is the
@@ -509,7 +511,8 @@ typedef void (*RvFrameCallback)(void* context);
 /* Sets the host's frame callback, or with a NULL callback removes it. */
 RV_EXPORT int32_t rv_host_set_frame_callback(RvHost*, RvFrameCallback callback, void* context);
 /* Runs WebCore's rendering update for now: animations and transitions advance, resize and intersection
- * observers run, and style and layout update. */
+ * observers run, and style and layout update. A destruction request from a callback is deferred until the update
+ * ends, which returns RV_ERR_DETACHED. */
 RV_EXPORT int32_t rv_host_update(RvHost*);
 /* Writes the bounds of the viewport area invalidated since the last rv_host_paint_rgba, in CSS pixels, and
  * returns 1, or returns 0 and writes zeros when no area was. A scroll of the viewport invalidates all of it. */
