@@ -368,6 +368,10 @@ static String keyCommand(const String& key, bool shift, bool control)
         return shift ? "InsertLineBreak"_s : "InsertNewline"_s;
     if (control && (key == "a"_s || key == "A"_s))
         return "SelectAll"_s;
+    if (control && (key == "z"_s || key == "Z"_s))
+        return shift ? "Redo"_s : "Undo"_s;
+    if (control && (key == "y"_s || key == "Y"_s))
+        return "Redo"_s;
     return { };
 }
 
@@ -380,6 +384,9 @@ static int32_t runEdit(Page*, int32_t command);
 class RvEditorClient final : public EditorClient {
     WTF_MAKE_TZONE_ALLOCATED_INLINE(RvEditorClient);
     WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(RvEditorClient);
+public:
+    RvEditorClient() = default;
+    ~RvEditorClient() final { clearUndoRedoOperations(); }
 private:
     // Key down runs the key's editing command; key press inserts the characters it produced.
     void handleKeyboardEvent(KeyboardEvent& event) final
@@ -446,9 +453,53 @@ private:
     void requestCandidatesForSelection(const VisibleSelection&) final { }
     void handleAcceptedCandidateWithSoftSpaces(TextCheckingResult) final { }
 
-    void registerUndoStep(UndoStep&) final { }
-    void registerRedoStep(UndoStep&) final { }
-    void clearUndoRedoOperations() final { }
+    enum class Replay { None, Undo, Redo };
+    Vector<Ref<UndoStep>> m_undo;
+    Vector<Ref<UndoStep>> m_redo;
+    Replay m_replaying { Replay::None };
+    uint64_t m_historyGeneration { 0 };
+
+    static void discard(Vector<Ref<UndoStep>>& history)
+    {
+        auto removed = std::exchange(history, { });
+        for (auto& step : removed)
+            step->didRemoveFromUndoManager();
+    }
+
+    void registerUndoStep(UndoStep& step) final
+    {
+        if (m_replaying != Replay::Redo) {
+            ++m_historyGeneration;
+            discard(m_redo);
+        }
+        m_undo.append(step);
+    }
+    void registerRedoStep(UndoStep& step) final { m_redo.append(step); }
+    void clearUndoRedoOperations() final
+    {
+        ++m_historyGeneration;
+        discard(m_undo);
+        discard(m_redo);
+    }
+
+    void replay(Replay direction)
+    {
+        auto& source = direction == Replay::Undo ? m_undo : m_redo;
+        auto& destination = direction == Replay::Undo ? m_redo : m_undo;
+        if (m_replaying != Replay::None || source.isEmpty())
+            return;
+        Ref step = source.takeLast();
+        auto generation = m_historyGeneration;
+        auto transferred = destination.size();
+        SetForScope replaying(m_replaying, direction);
+        if (direction == Replay::Undo)
+            step->unapply();
+        else
+            step->reapply();
+        // A canceled beforeinput leaves the engine step in the original history.
+        if (generation == m_historyGeneration && destination.size() == transferred)
+            source.append(WTF::move(step));
+    }
 
     DOMPasteAccessResponse requestDOMPasteAccess(DOMPasteAccessCategory, FrameIdentifier, const String&) final { return DOMPasteAccessResponse::DeniedForGesture; }
 #if PLATFORM(COCOA)
@@ -457,11 +508,11 @@ private:
 
     bool canCopyCut(LocalFrame*, bool defaultValue) const final { return defaultValue; }
     bool canPaste(LocalFrame*, bool defaultValue) const final { return defaultValue; }
-    bool canUndo() const final { return false; }
-    bool canRedo() const final { return false; }
+    bool canUndo() const final { return m_replaying == Replay::None && !m_undo.isEmpty(); }
+    bool canRedo() const final { return m_replaying == Replay::None && !m_redo.isEmpty(); }
 
-    void undo() final { }
-    void redo() final { }
+    void undo() final { replay(Replay::Undo); }
+    void redo() final { replay(Replay::Redo); }
 
     void textFieldDidBeginEditing(Element&) final { }
     void textFieldDidEndEditing(Element&) final { }
@@ -1586,6 +1637,8 @@ int32_t rv_abi_has(const char* feature)
 {
     if (!feature)
         return 0;
+    if (!std::strcmp(feature, "editing-undo"))
+        return 1;
     if (!std::strcmp(feature, "screen"))
         return 1;
     if (!std::strcmp(feature, "capabilities"))
@@ -2187,6 +2240,7 @@ void rv_host_destroy(RvHost* host)
         return;
     }
     host->documentTransaction = RvHost::DocumentTransaction::Destroying;
+    host->page->editorClient().clearUndoRedoOperations();
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_notifications_drop(reinterpret_cast<RvNode*>(&host->document()));
@@ -2224,6 +2278,7 @@ int32_t rv_host_load_html(RvHost* host, const uint8_t* html, int32_t html_length
     if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
         return RV_ERR_DETACHED;
     host->documentTransaction = RvHost::DocumentTransaction::Replacing;
+    host->page->editorClient().clearUndoRedoOperations();
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_custom_effect_callbacks_revoke_document(reinterpret_cast<RvNode*>(&host->document()));
@@ -2250,6 +2305,7 @@ int32_t rv_host_load_svg(RvHost* host, const uint8_t* svg, int32_t svg_length)
     if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
         return RV_ERR_DETACHED;
     host->documentTransaction = RvHost::DocumentTransaction::Replacing;
+    host->page->editorClient().clearUndoRedoOperations();
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_view_transitions_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
@@ -6184,6 +6240,10 @@ static int32_t runEdit(RvHost& host, int32_t command)
         return editor.command("SelectAll"_s).execute() ? 1 : 0;
     case RV_EDIT_DELETE:
         return editor.command("Delete"_s).execute() ? 1 : 0;
+    case RV_EDIT_UNDO:
+        return editor.command("Undo"_s).execute() ? 1 : 0;
+    case RV_EDIT_REDO:
+        return editor.command("Redo"_s).execute() ? 1 : 0;
     }
     return RV_ERR_UNSUPPORTED;
 }

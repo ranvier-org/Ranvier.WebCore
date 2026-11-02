@@ -917,7 +917,8 @@ enum {
     RV_CLIPBOARD_DOM = 2,
 };
 
-/* Editing commands of rv_host_edit. */
+/* Editing commands of rv_host_edit. Undo/redo require rv_abi_has("editing-undo").
+ * History belongs to the engine editor, resets on document replacement and is separate from application history. */
 enum {
     RV_EDIT_COPY = 0,
     RV_EDIT_CUT = 1,
@@ -926,6 +927,8 @@ enum {
     RV_EDIT_PASTE_PLAIN = 3,
     RV_EDIT_SELECT_ALL = 4,
     RV_EDIT_DELETE = 5,
+    RV_EDIT_UNDO = 6,
+    RV_EDIT_REDO = 7,
 };
 
 typedef struct RvClipboardRequest RvClipboardRequest;
