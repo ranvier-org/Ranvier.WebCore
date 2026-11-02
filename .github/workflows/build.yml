@@ -22,13 +22,60 @@ on:
         description: Build from scratch, without restoring the cached build tree
         type: boolean
         default: false
+      diagnostic_d3d11:
+        description: Diagnose the frozen preview2 D3D consumer only; no native build or publish
+        type: boolean
+        default: false
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}-${{ inputs.flavor || 'slim' }}
-  cancel-in-progress: true
+  group: ${{ inputs.diagnostic_d3d11 && format('d3d11-diagnostic-{0}', github.run_id) || format('{0}-{1}-{2}', github.workflow, github.ref, inputs.flavor || 'slim') }}
+  cancel-in-progress: ${{ !inputs.diagnostic_d3d11 }}
 
 jobs:
+  diagnostic-d3d11:
+    if: github.event_name == 'workflow_dispatch' && inputs.diagnostic_d3d11
+    runs-on: windows-2025
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 41356950088
+          name: package-win-x64-gpu
+          path: artifacts/diagnostic-package
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 41356950088
+          name: manifest-win-x64-gpu
+          path: artifacts/diagnostic-manifest
+          github-token: ${{ github.token }}
+      - name: Stage the pinned SDL consumer dependency
+        run: python -I scripts/sdl_runtime.py --out artifacts/diagnostic-sdl
+      - name: Diagnose the exact frozen preview2 package
+        run: >-
+          python -I tests/gpu/run_d3d11_diagnostic.py
+          --package artifacts/diagnostic-package/Ranvier.WebCore.Native.Gpu.win-x64.0.1.1-preview.2.nupkg
+          --manifest artifacts/diagnostic-manifest/manifest.json
+          --sdl artifacts/diagnostic-sdl/SDL3.dll
+          --output artifacts/d3d11-diagnostic
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: d3d11-preview2-diagnostic
+          path: |
+            artifacts/d3d11-diagnostic/diagnostic-*.log
+            artifacts/d3d11-diagnostic/diagnostic-receipt.json
+          if-no-files-found: warn
+
   package-contract:
+    if: ${{ !inputs.diagnostic_d3d11 }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -85,6 +132,7 @@ jobs:
           if-no-files-found: ignore
 
   plan:
+    if: ${{ !inputs.diagnostic_d3d11 }}
     # The matrix, filtered by the manual run's rids input. On a version tag whose release holds a runtime's
     # package, attached by scripts/release.py as the repository owner, that runtime goes to prebuilt instead.
     runs-on: ubuntu-latest
@@ -158,7 +206,7 @@ jobs:
     # A runtime whose package was built and checked on the owner's machine by scripts/release.py: checked
     # again here, on a clean runner of its platform, against the tag's commit, then passed to publish.
     needs: plan
-    if: needs.plan.outputs.prebuilt != ''
+    if: ${{ !inputs.diagnostic_d3d11 && needs.plan.outputs.prebuilt != '' }}
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.plan.outputs.prebuilt) }}
@@ -202,7 +250,7 @@ jobs:
 
   native:
     needs: plan
-    if: needs.plan.outputs.matrix != ''
+    if: ${{ !inputs.diagnostic_d3d11 && needs.plan.outputs.matrix != '' }}
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
@@ -487,7 +535,7 @@ jobs:
   managed:
     needs: [native, prebuilt, package-contract]
     if: >-
-      ${{ !cancelled() && inputs.rids == '' && (inputs.flavor == '' || inputs.flavor == 'slim') &&
+      ${{ !inputs.diagnostic_d3d11 && !cancelled() && inputs.rids == '' && (inputs.flavor == '' || inputs.flavor == 'slim') &&
           !(github.event_name == 'pull_request' && !startsWith(github.head_ref, 'codex/batch-') &&
             !contains(github.event.pull_request.labels.*.name, 'full-matrix')) &&
           (needs.native.result == 'success' || needs.native.result == 'skipped') &&
@@ -528,7 +576,7 @@ jobs:
     # as workflow artifacts. Every selected runtime and the contract gate must pass before any push;
     # a full slim release also requires the paired managed cohort.
     if: >-
-      ${{ !cancelled() && startsWith(github.ref, 'refs/tags/v') && vars.NUGET_USER != '' &&
+      ${{ !inputs.diagnostic_d3d11 && !cancelled() && startsWith(github.ref, 'refs/tags/v') && vars.NUGET_USER != '' &&
           needs.package-contract.result == 'success' &&
           (needs.native.result == 'success' || needs.native.result == 'skipped') &&
           (needs.prebuilt.result == 'success' || needs.prebuilt.result == 'skipped') &&
@@ -558,7 +606,7 @@ jobs:
   windows-gpu-cohort:
     needs: publish
     if: >-
-      ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') &&
+      ${{ !inputs.diagnostic_d3d11 && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') &&
           needs.publish.result == 'success' }}
     runs-on: ubuntu-latest
     permissions:

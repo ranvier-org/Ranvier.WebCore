@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def permits_publish(native='success', prebuilt='skipped', managed='success', contract='success', flavor='', cancelled=False,
-                    ref='refs/tags/v0.1.0-preview.14', owner='owner'):
+                    ref='refs/tags/v0.1.0-preview.14', owner='owner', diagnostic=False):
     workflow = (ROOT / '.github/workflows/build.yml').read_text()
     job = workflow.split('\n  publish:\n', 1)[1]
     expression = job.split('if:', 1)[1].split('${{', 1)[1].split('}}', 1)[0]
@@ -16,11 +16,16 @@ def permits_publish(native='success', prebuilt='skipped', managed='success', con
     expression = re.sub(r'needs\.([a-z-]+)\.result', lambda match: repr(results[match[1]]), expression)
     for name, value in [('github.ref', ref), ('vars.NUGET_USER', owner), ('inputs.flavor', flavor)]:
         expression = expression.replace(name, repr(value))
+    expression = expression.replace('!inputs.diagnostic_d3d11', repr(not diagnostic))
     expression = expression.replace('!cancelled()', repr(not cancelled)).replace('&&', ' and ').replace('||', ' or ')
     return eval(' '.join(expression.split()), {'__builtins__': {}}, {'startsWith': lambda value, prefix: value.startswith(prefix)})
 
 
 class PublishGateTests(unittest.TestCase):
+    def test_diagnostic_cannot_publish_even_with_successful_release_dependencies(self):
+        self.assertFalse(permits_publish(diagnostic=True))
+        self.assertFalse(permits_publish(diagnostic=True, flavor='gpu', managed='skipped'))
+
     def test_a_failed_runtime_cannot_publish_an_uploaded_package(self):
         self.assertFalse(permits_publish(native='failure', managed='skipped'))
 
@@ -56,6 +61,21 @@ class PublishGateTests(unittest.TestCase):
 
 
 class GpuCohortTests(unittest.TestCase):
+    def test_diagnostic_concurrency_preserves_normal_groups_and_never_cancels_them(self):
+        workflow = (ROOT / '.github/workflows/build.yml').read_text()
+        expression = re.search(r'^  group: \$\{\{ (.+) \}\}$', workflow, re.MULTILINE)[1]
+        for diagnostic in [False, True]:
+            for flavor in ['', 'slim', 'gpu', 'lean']:
+                values = {'inputs.diagnostic_d3d11': diagnostic, 'github.run_id': 123, 'github.workflow': 'build',
+                          'github.ref': 'refs/heads/diagnostic', 'inputs.flavor': flavor}
+                selected = expression
+                for name, value in values.items():
+                    selected = selected.replace(name, repr(value))
+                selected = selected.replace('&&', ' and ').replace('||', ' or ')
+                group = eval(selected, {'__builtins__': {}}, {'format': lambda value, *args: value.format(*args)})
+                self.assertEqual(group, 'd3d11-diagnostic-123' if diagnostic else f'build-refs/heads/diagnostic-{flavor or "slim"}')
+        self.assertIn('cancel-in-progress: ${{ !inputs.diagnostic_d3d11 }}', workflow)
+
     def test_successful_version_tag_dispatches_only_the_matching_windows_gpu_cohort(self):
         workflow = (ROOT / '.github/workflows/build.yml').read_text()
         self.assertIn('\n  windows-gpu-cohort:\n', workflow)
