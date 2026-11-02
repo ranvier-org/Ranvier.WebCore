@@ -19,7 +19,13 @@ unembedding through an independent libatspi client. It uses the ordinary `rv_run
 inside an accessibility action completes its reply before the connection closes.
 Windows uses its existing UI Automation implementation and acceptance fixture. macOS follows after Linux.
 
-This checkpoint is offscreen Host qualification. Automatic SDL Window/Host ownership is pending. The provider exposes
+The protocol checkpoint qualifies offscreen Hosts. A separate managed adapter owns SDL Window/Host cleanup. The provider exposes
 forward ARIA relations available through `rv_ax_relations`, native hit-testing, and physical text-range geometry.
 Opacity queries return unsupported because the portable accessibility contract does not expose opacity. Text attribute
-runs, bounded ranges, inverse relationships and incremental cache events are not yet implemented.
+runs, bounded ranges and inverse relationships are not yet implemented. Native child additions/removals emit identity-
+preserving children and cache events; detached nodes are unregistered and their native references released.
+
+A null bus address discovers `AT_SPI_BUS_ADDRESS`, then the session's `org.a11y.Bus.GetAddress`; connection work is
+bounded to two seconds. Tests provide isolated services for both discovery paths. Queued property setters use GIO's
+method dispatcher so unregistering an application rejects already queued `Properties.Set` calls before accessing its
+lease. GLib 2.80's direct setter callback lacks that admission check.

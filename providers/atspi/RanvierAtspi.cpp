@@ -180,6 +180,7 @@ struct Node {
     std::vector<const char*> interfaces;
     int states { 0 };
     std::string previousText;
+    std::vector<std::string> previousChildren;
     bool detached { false };
     ~Node() { if (native) rv_ax_release(native); }
 };
@@ -336,13 +337,16 @@ struct Bridge : std::enable_shared_from_this<Bridge> {
         }
         int count = 0;
         auto status = rv_ax_children(node.native, nullptr, 0, &count);
-        if ((status != RV_OK && status != RV_ERR_BUFFER_TOO_SMALL) || count <= 0)
+        if (status != RV_OK && status != RV_ERR_BUFFER_TOO_SMALL)
             return {};
+        if (count <= 0) { node.previousChildren.clear(); return {}; }
         std::vector<RvAxNode*> raw(count);
         if (rv_ax_children(node.native, raw.data(), count, &count) != RV_OK)
             return {};
         std::vector<Node*> result;
         for (auto* item : raw) if (auto* child = remember(item)) result.push_back(child);
+        node.previousChildren.clear();
+        for (auto* child : result) node.previousChildren.push_back(child->path);
         return result;
     }
     GVariant* parent(Node& node)
@@ -487,7 +491,27 @@ struct Bridge : std::enable_shared_from_this<Bridge> {
         }
         auto* node = bridge.remember(rv_ax_retain(native));
         if (!node) return;
-        if (type == RV_AX_EVENT_FOCUS)
+        if (type == RV_AX_EVENT_CHILDREN) {
+            auto previous = node->previousChildren;
+            auto current = bridge.children(*node);
+            for (size_t i = 0; i < previous.size(); ++i)
+                if (std::find(node->previousChildren.begin(), node->previousChildren.end(), previous[i]) == node->previousChildren.end())
+                    bridge.event(*node, "ChildrenChanged", "remove", static_cast<int>(i), 0, bridge.reference(previous[i].c_str()));
+            for (size_t i = 0; i < current.size(); ++i)
+                if (std::find(previous.begin(), previous.end(), current[i]->path) == previous.end()) {
+                    bridge.event(*node, "ChildrenChanged", "add", static_cast<int>(i), 0, bridge.reference(current[i]));
+                    g_dbus_connection_emit_signal(bridge.connection, nullptr, cachePath, cache, "AddAccessible",
+                        g_variant_new("(@((so)(so)(so)iiassusau))", bridge.cacheItem(*current[i])), nullptr);
+                }
+            for (auto entry = bridge.nodes.begin(); entry != bridge.nodes.end();) {
+                if (rv_ax_id(entry->second->native) >= 0) { ++entry; continue; }
+                bridge.event(*entry->second, "StateChanged", "defunct", 1, 0, g_variant_new_string(""));
+                g_dbus_connection_emit_signal(bridge.connection, nullptr, cachePath, cache, "RemoveAccessible",
+                    g_variant_new("(@(so))", bridge.reference(entry->second.get())), nullptr);
+                bridge.unregister(*entry->second);
+                entry = bridge.nodes.erase(entry);
+            }
+        } else if (type == RV_AX_EVENT_FOCUS)
             bridge.event(*node, "StateChanged", "focused", 1, 0, g_variant_new_string(""));
         else if (type == RV_AX_EVENT_NAME || type == RV_AX_EVENT_DESCRIPTION)
             bridge.event(*node, "PropertyChange", type == RV_AX_EVENT_NAME ? "accessible-name" : "accessible-description", 0, 0,
