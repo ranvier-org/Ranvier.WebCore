@@ -49,6 +49,9 @@ def verify(package, gpu=False):
             subprocess.run([sys.executable, '-I', str(root / 'tests/gpu/windows_view_transition_pixels.py'),
                             '--native-directory', str(destination), '--output', str(destination.parent / 'transition-readback')],
                            check=True)
+            subprocess.run([sys.executable, '-I', str(root / 'tests/gpu/compositor_windows.py'),
+                            '--native-directory', str(destination), '--output', str(destination.parent / 'compositor-input')],
+                           check=True)
         else:
             for name in ['css_supports', 'computed_style', 'fragment_rectangles', 'keyframe_rules', 'counter_style_rules', 'custom_properties', 'typed_style_values', 'style_property_maps', 'declared_style_maps', 'style_map_entries', 'geometry_values', 'matrix_values', 'css_transforms', 'detached_cssom_context']:
                 subprocess.run([sys.executable, '-I', str(root / 'tests/abi' / (name + '.py')),

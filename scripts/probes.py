@@ -26,6 +26,9 @@ def probe(name, *commands, rid=None, flavor=('slim', 'gpu'), timeout=TIMEOUT, en
 
 
 PROBES = [
+    probe('Verify native texture input and fractional-DPI GPU composition',
+          'python -I tests/gpu/compositor_windows.py --native-directory {native} --output {work}/gpu-compositor-input',
+          rid='win-x64', flavor='gpu'),
     *[probe('Verify fixed content clipping masks and complete pointwise paint stability',
             f'python -I tests/abi/background_content_clip_regression.py --native-directory {{native}} --rid {rid} --report {{work}}/background-content-clipping-regression.json',
             rid=rid, flavor='gpu',

@@ -89,6 +89,15 @@ class ProbeRunnerTests(unittest.TestCase):
 
 
 class WorkflowTests(unittest.TestCase):
+    def test_windows_gpu_runs_native_texture_and_fractional_compositor_frames(self):
+        entries = [entry for entry in probes.PROBES if any(
+            'compositor_windows.py' in command for command in entry['commands'])]
+        self.assertEqual(len(entries), 1)
+        self.assertTrue(probes.applies(entries[0], 'win-x64', 'gpu'))
+        self.assertFalse(probes.applies(entries[0], 'win-x64', 'slim'))
+        self.assertFalse(probes.applies(entries[0], 'linux-x64', 'gpu'))
+        self.assertIn('--native-directory ' + probes.NATIVE, entries[0]['commands'][0])
+
     def test_c_abi_layout_probe_runs_for_every_native_flavor(self):
         layouts = [entry for entry in probes.PROBES if 'tests/abi/abi_layouts.py' in ' '.join(entry['commands'])]
         self.assertEqual(len(layouts), 1)
