@@ -17,7 +17,7 @@ let private options () =
     value.margin_bottom_points <- 36.0
     value.margin_left_points <- 36.0
     value.output_budget_bytes <- 8UL * 1024UL * 1024UL
-    value.raster_dpi <- 144.0f
+    value.raster_dpi <- 0.0f
     value
 
 /// <summary>Exercises the actual PDF P/Invoke, deferred completion and resource byte lifetime.</summary>

@@ -1,5 +1,6 @@
 #include "config.h"
 #include "RanvierPrintGlue.h"
+#include "RanvierPrintOptions.h"
 #include <memory>
 #include <vector>
 #include <wtf/MainThread.h>
@@ -8,12 +9,11 @@
 #define RANVIER_ENABLE_PDF 0
 #endif
 
-#if USE(SKIA) && RANVIER_ENABLE_PDF
+#if (USE(SKIA) || USE(CG)) && RANVIER_ENABLE_PDF
 #include "CSSUnits.h"
 #include "Document.h"
 #include "DocumentView.h"
 #include "FrameDestructionObserverInlines.h"
-#include "GraphicsContextSkia.h"
 #include "LocalFrame.h"
 #include "LocalFrameView.h"
 #include "Node.h"
@@ -21,11 +21,18 @@
 #include "RenderView.h"
 #include "RenderingMode.h"
 #include <cmath>
+#if USE(SKIA)
+#include "GraphicsContextSkia.h"
 #include <include/core/SkCanvas.h>
 #include <include/core/SkDocument.h>
 #include <include/core/SkStream.h>
 #include <include/docs/SkPDFDocument.h>
 #include <include/docs/SkPDFJpegHelpers.h>
+#elif USE(CG)
+#include "GraphicsContextCG.h"
+#include <CoreGraphics/CoreGraphics.h>
+#include <wtf/RetainPtr.h>
+#endif
 #endif
 
 struct RvPrintPdfData {
@@ -34,15 +41,15 @@ struct RvPrintPdfData {
     bool cancelled { false };
 };
 
-#if USE(SKIA) && RANVIER_ENABLE_PDF
+#if (USE(SKIA) || USE(CG)) && RANVIER_ENABLE_PDF
 namespace {
 using namespace WebCore;
 
-class BoundedStream final : public SkWStream {
+class BoundedOutput {
 public:
-    explicit BoundedStream(uint64_t budget)
+    explicit BoundedOutput(uint64_t budget)
         : m_budget(budget) { }
-    bool write(const void* data, size_t count) final
+    bool write(const void* data, size_t count)
     {
         if (m_failed || count > m_budget - m_bytes.size()) {
             m_failed = true;
@@ -54,7 +61,7 @@ public:
         }
         return true;
     }
-    size_t bytesWritten() const final { return m_bytes.size(); }
+    size_t bytesWritten() const { return m_bytes.size(); }
     bool failed() const { return m_failed; }
     std::vector<uint8_t> take() { return std::move(m_bytes); }
 
@@ -63,6 +70,17 @@ private:
     bool m_failed { false };
     std::vector<uint8_t> m_bytes;
 };
+
+#if USE(SKIA)
+class BoundedStream final : public SkWStream {
+public:
+    explicit BoundedStream(BoundedOutput& output) : m_output(output) { }
+    bool write(const void* data, size_t count) final { return m_output.write(data, count); }
+    size_t bytesWritten() const final { return m_output.bytesWritten(); }
+private:
+    BoundedOutput& m_output;
+};
+#endif
 
 class PrintGuard {
 public:
@@ -90,22 +108,6 @@ private:
     ScrollPosition m_scroll;
     bool m_begun { false };
 };
-
-bool valid(const RvPrintOptions& options)
-{
-    if (options.reserved || !options.max_pages || options.max_pages > 4096)
-        return false;
-    for (double value : { options.paper_width_points, options.paper_height_points,
-             options.margin_top_points, options.margin_right_points,
-             options.margin_bottom_points, options.margin_left_points }) {
-        if (!std::isfinite(value) || value < 0 || value > 14400)
-            return false;
-    }
-    return options.paper_width_points - options.margin_left_points - options.margin_right_points >= 1
-        && options.paper_height_points - options.margin_top_points - options.margin_bottom_points >= 1
-        && options.output_budget_bytes && options.output_budget_bytes <= 64 * 1024 * 1024
-        && std::isfinite(options.raster_dpi) && options.raster_dpi >= 72 && options.raster_dpi <= 600;
-}
 
 int32_t paint(Document& document, LocalFrame& frame, const RvPrintOptions& options,
     RvPrintCancelPoll cancel, void* cancelContext, RvPrintPdfData& result)
@@ -141,7 +143,9 @@ int32_t paint(Document& document, LocalFrame& frame, const RvPrintOptions& optio
     if (!context.pageCount() || context.pageCount() > options.max_pages)
         return RV_ERR_UNSUPPORTED;
     result.pageCount = context.pageCount();
-    BoundedStream stream(options.output_budget_bytes);
+    BoundedOutput output(options.output_budget_bytes);
+#if USE(SKIA)
+    BoundedStream stream(output);
     auto metadata = SkPDF::JPEG::MetadataWithCallbacks();
     metadata.fRasterDPI = options.raster_dpi;
     auto pdf = SkPDF::MakeDocument(&stream, metadata);
@@ -167,15 +171,58 @@ int32_t paint(Document& document, LocalFrame& frame, const RvPrintOptions& optio
         }
         canvas->restore();
         pdf->endPage();
-        if (stream.failed()) {
+        if (output.failed()) {
             pdf->abort();
             return RV_ERR_PAINT_FAILED;
         }
     }
     pdf->close();
-    if (stream.failed())
+    if (output.failed())
         return RV_ERR_PAINT_FAILED;
-    result.bytes = stream.take();
+#elif USE(CG)
+    CGDataConsumerCallbacks callbacks {
+        [](void* info, const void* bytes, size_t count) -> size_t {
+            return static_cast<BoundedOutput*>(info)->write(bytes, count) ? count : 0;
+        },
+        nullptr
+    };
+    auto consumer = adoptCF(CGDataConsumerCreate(&output, &callbacks));
+    if (!consumer)
+        return RV_ERR_PAINT_FAILED;
+    CGRect mediaBox = CGRectMake(0, 0, options.paper_width_points, options.paper_height_points);
+    auto pdf = adoptCF(CGPDFContextCreate(consumer.get(), &mediaBox, nullptr));
+    if (!pdf)
+        return RV_ERR_PAINT_FAILED;
+    for (size_t index = 0; index < context.pageCount(); ++index) {
+        if (cancelled()) {
+            result.cancelled = true;
+            CGPDFContextClose(pdf.get());
+            return RV_OK;
+        }
+        CGPDFContextBeginPage(pdf.get(), nullptr);
+        CGContextSaveGState(pdf.get());
+        CGContextTranslateCTM(pdf.get(), 0, options.paper_height_points);
+        CGContextScaleCTM(pdf.get(), 1, -1);
+        CGContextTranslateCTM(pdf.get(), effectiveMargins.left(), effectiveMargins.top());
+        CGContextClipToRect(pdf.get(), CGRectMake(0, 0, pageSize.width(), pageSize.height()));
+        {
+            GraphicsContextCG graphics(pdf.get(), GraphicsContextCG::Unknown, RenderingMode::PDFDocument);
+            context.spoolPage(graphics, static_cast<int>(index), pageSize.width());
+        }
+        CGContextRestoreGState(pdf.get());
+        CGPDFContextEndPage(pdf.get());
+        if (output.failed()) {
+            CGPDFContextClose(pdf.get());
+            return RV_ERR_PAINT_FAILED;
+        }
+    }
+    CGPDFContextClose(pdf.get());
+    pdf = nullptr;
+    consumer = nullptr;
+    if (output.failed())
+        return RV_ERR_PAINT_FAILED;
+#endif
+    result.bytes = output.take();
     return result.bytes.empty() ? RV_ERR_PAINT_FAILED : RV_OK;
 }
 }
@@ -183,7 +230,7 @@ int32_t paint(Document& document, LocalFrame& frame, const RvPrintOptions& optio
 
 extern "C" int32_t ranvier_print_pdf_supported()
 {
-#if USE(SKIA) && RANVIER_ENABLE_PDF
+#if (USE(SKIA) || USE(CG)) && RANVIER_ENABLE_PDF
     return 1;
 #else
     return 0;
@@ -195,12 +242,13 @@ extern "C" int32_t ranvier_print_pdf(RvNode* handle, const RvPrintOptions* input
 {
     if (output)
         *output = nullptr;
-    if (!handle || !input || !output)
+    if (!handle || !output)
         return RV_ERR_NULL_ARGUMENT;
     if (!WTF::isMainThread())
         return RV_ERR_WRONG_THREAD;
-#if USE(SKIA) && RANVIER_ENABLE_PDF
-    if (input->size != sizeof(RvPrintOptions) || !valid(*input))
+#if (USE(SKIA) || USE(CG)) && RANVIER_ENABLE_PDF
+    auto options = input ? *input : ranvierPrintDefaultOptions();
+    if (!ranvierPrintNormalizeOptions(options, USE(CG)))
         return RV_ERR_UNSUPPORTED;
     auto* candidate = WTF::dynamicDowncast<WebCore::Document>(reinterpret_cast<WebCore::Node*>(handle));
     if (!candidate || !candidate->frame() || !candidate->frame()->view() || candidate->printing())
@@ -208,7 +256,7 @@ extern "C" int32_t ranvier_print_pdf(RvNode* handle, const RvPrintOptions* input
     Ref document = *candidate;
     Ref frame = *document->frame();
     auto result = std::make_unique<RvPrintPdfData>();
-    auto status = paint(document, frame, *input, cancel, cancelContext, *result);
+    auto status = paint(document, frame, options, cancel, cancelContext, *result);
     if (status != RV_OK)
         return status;
     *output = result.release();

@@ -8,6 +8,7 @@
 #include "RanvierEventGlue.h"
 #include "RanvierMutationGlue.h"
 #include "RanvierPrintGlue.h"
+#include "RanvierPrintOptions.h"
 #include "RanvierTransferGlue.h"
 #include "RanvierPointerGlue.h"
 #include "RanvierViewportGlue.h"
@@ -2547,15 +2548,15 @@ int32_t rv_host_print_pdf(RvHost* host, const RvPrintOptions* options, RvPrintCa
         *pageCount = 0;
     if (operation)
         *operation = 0;
-    if (!host || !options || !callback || !pageCount || !operation)
+    if (!host || !callback || !pageCount || !operation)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
         return RV_ERR_DETACHED;
-    if (!ranvier_print_pdf_supported() || options->size != sizeof(RvPrintOptions) || host->inFrame)
+    if (!ranvier_print_pdf_supported() || (options && options->size != sizeof(RvPrintOptions)) || host->inFrame)
         return RV_ERR_UNSUPPORTED;
-    auto copiedOptions = *options;
+    auto copiedOptions = options ? *options : ranvierPrintDefaultOptions();
     auto* document = reinterpret_cast<RvNode*>(&host->document());
     host->documentTransaction = RvHost::DocumentTransaction::Printing;
     PrintCancellation cancellation { host, cancelPoll, cancelContext };
