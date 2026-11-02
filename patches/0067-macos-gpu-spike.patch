@@ -209,6 +209,29 @@ diff --git a/Source/WebCore/platform/graphics/texmap/GraphicsLayerTextureMapper.
      notifyChange(ContentChange);
  
      if (m_contentsLayer)
+@@ -356,7 +376,12 @@
+ 
+ void GraphicsLayerTextureMapper::setContentsDisplayDelegate(RefPtr<GraphicsLayerContentsDisplayDelegate>&& displayDelegate, ContentsLayerPurpose purpose)
+ {
++#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
++    RELEASE_ASSERT(!displayDelegate);
++    setTextureMapperContents(nullptr, purpose);
++#else
+     PlatformLayer* platformLayer = displayDelegate ? displayDelegate->platformLayer() : nullptr;
+     setContentsToPlatformLayer(platformLayer, purpose);
++#endif
+ }
+ 
+@@ -527,8 +552,8 @@
+         m_layer.setRepaintCount(repaintCount());
+     }
+ 
+     if (m_changeMask & ContentChange)
+-        m_layer.setContentsLayer(platformLayer());
++        m_layer.setContentsLayer(m_contentsLayer);
+ 
+     if (m_changeMask & AnimationChange)
+         m_layer.setAnimations(m_animations);
 diff --git a/Source/WebCore/platform/graphics/egl/GLDisplay.h b/Source/WebCore/platform/graphics/egl/GLDisplay.h
 --- a/Source/WebCore/platform/graphics/egl/GLDisplay.h
 +++ b/Source/WebCore/platform/graphics/egl/GLDisplay.h
