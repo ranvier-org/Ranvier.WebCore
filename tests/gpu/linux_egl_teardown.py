@@ -60,6 +60,7 @@ if wrong_context:
     get_proc = bind(egl, 'eglGetProcAddress', P, C.c_char_p)
     destroy_image = C.CFUNCTYPE(U, P, P)(get_proc(b'eglDestroyImageKHR'))
     assert image and not destroy_image(display, image), 'unexposed image must have been destroyed after release failure'
+    assert bind(egl, 'eglGetCurrentContext', P)() == context
 else:
     assert callback_context == [context], 'consumer context must be current before frame delivery and teardown'
     assert bind(egl, 'eglGetCurrentContext', P)() == context

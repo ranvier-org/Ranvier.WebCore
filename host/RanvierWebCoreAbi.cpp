@@ -2969,6 +2969,7 @@ int32_t rv_host_acquire_egl_frame(RvHost* host, RvGpuFrame** frame)
     if (host->presentationSurface && !host->presentationSurface->available())
         return RV_ERR_UNSUPPORTED;
     auto consumerContext = eglGetCurrentContext();
+    RvEGLContextScope returnContext;
     host->documentTransaction = RvHost::DocumentTransaction::Rendering;
     auto result = [&]() -> int32_t {
         RvEGLContextScope contextScope;
