@@ -52,25 +52,27 @@ module private Ownership =
             raise (ExternalException(operation + " failed", status))
 
 type internal PendingFrameCleanup(owner: int) =
-    let mutable pending: (unit -> unit) option = None
+    let mutable pending: ((unit -> unit) * (unit -> bool)) option = None
 
-    member _.Rollback(cleanup) =
+    member _.Rollback(cleanup, isReleased) =
         Ownership.thread owner
         try cleanup ()
-        with _ -> pending <- Some cleanup
+        with _ ->
+            if not (isReleased ()) then pending <- Some (cleanup, isReleased)
 
     member _.Retry() =
         Ownership.thread owner
         match pending with
         | None -> ()
-        | Some cleanup ->
-            cleanup ()
-            pending <- None
+        | Some (cleanup, isReleased) ->
+            try cleanup ()
+            finally
+                if isReleased () then pending <- None
 
 /// <summary>A bound video publication retaining its provider and texture until disposal.</summary>
 /// <remarks>Finish and release the native composition lease before disposing this lease on the creating thread.</remarks>
 [<Sealed>]
-type VideoFrameLease internal (owner: int, info: NativeFrameInfo, release: unit -> unit) =
+type VideoFrameLease internal (owner: int, info: NativeFrameInfo, release: unit -> unit, isReleased: unit -> bool) =
     let mutable disposed = false
     let ensure () =
         Ownership.thread owner
@@ -89,14 +91,16 @@ type VideoFrameLease internal (owner: int, info: NativeFrameInfo, release: unit 
         member _.Dispose() =
             if not disposed then
                 Ownership.thread owner
-                release ()
-                disposed <- true
+                try release ()
+                finally
+                    if isReleased () then disposed <- true
 
 /// <summary>An optional Windows Media Foundation player with explicit owner-thread and video-publication lifetime.</summary>
 /// <remarks>
 /// Dispose frame leases before destroying their View host. Player disposal pauses/revokes actions immediately;
 /// live frames defer provider teardown. Failed publication rollback retains its frame; the next owner-thread
-/// call or Dispose retries unbinding before releasing it. A failed retry leaves disposal retryable.
+/// call or Dispose retries unbinding before releasing it. A failed retry remains retryable while the native
+/// lease is owned; a consumed lease closes even when native cleanup reports an error.
 /// </remarks>
 [<Sealed>]
 type WindowsPlayback private (initial: nativeint) =
@@ -141,13 +145,15 @@ type WindowsPlayback private (initial: nativeint) =
                     | :? ObjectDisposedException -> ()
                     let status = Native.ranvier_media_frame_release(&held)
                     Ownership.check "media frame release" status
-                ValueSome (new VideoFrameLease(owner, info, release))
+                ValueSome (new VideoFrameLease(owner, info, release, fun () -> held = 0n))
             with _ ->
-                pending.Rollback(fun () ->
-                    if bound then
-                        try host.BindD3D11Texture(target, 0n)
-                        with :? ObjectDisposedException -> ()
-                    Native.ranvier_media_frame_release(&frame) |> Ownership.check "media publication rollback")
+                pending.Rollback(
+                    (fun () ->
+                        if bound then
+                            try host.BindD3D11Texture(target, 0n)
+                            with :? ObjectDisposedException -> ()
+                        Native.ranvier_media_frame_release(&frame) |> Ownership.check "media publication rollback"),
+                    fun () -> frame = 0n)
                 reraise ()
 
     /// <summary>Creates an OS player on the calling thread; no file or media session controls are opened.</summary>

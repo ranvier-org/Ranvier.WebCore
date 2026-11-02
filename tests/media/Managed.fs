@@ -37,7 +37,7 @@ let internal verifyOwnership check =
     let first =
         try
             try raise original
-            with _ -> pending.Rollback cleanup; reraise ()
+            with _ -> pending.Rollback(cleanup, fun () -> released <> 0); reraise ()
         with error -> error
     check (obj.ReferenceEquals(first, original)) "double failure preserves original publication exception"
     check (bound && released = 0 && unbindAttempts = 1) "failed rollback retains bound frame"
@@ -56,12 +56,46 @@ let internal verifyOwnership check =
     pending.Retry()
     check (not bound && released = 1 && unbindAttempts = 3 && sessionReleased) "retry unbinds before one provider release"
     let disposedHost = PendingFrameCleanup(Environment.CurrentManagedThreadId)
-    disposedHost.Rollback(fun () ->
-        try raise (ObjectDisposedException "host")
-        with :? ObjectDisposedException -> ()
-        released <- released + 1)
+    disposedHost.Rollback(
+        (fun () ->
+            try raise (ObjectDisposedException "host")
+            with :? ObjectDisposedException -> ()
+            released <- released + 1),
+        fun () -> released = 2)
     disposedHost.Retry()
     check (released = 2) "definitively disposed host permits release without pending ownership"
+    let nativeError = ExternalException("post-consumption cleanup error", int 0x80004005u)
+    let mutable nativeOwned, consumeCalls = true, 0
+    let mutable info = Unchecked.defaultof<NativeFrameInfo>
+    info.Texture <- 123n
+    let frame = new VideoFrameLease(
+        Environment.CurrentManagedThreadId, info,
+        (fun () -> nativeOwned <- false; consumeCalls <- consumeCalls + 1; raise nativeError),
+        fun () -> not nativeOwned)
+    let consumedError = try (frame :> IDisposable).Dispose(); 0 with error -> error.HResult
+    check (consumedError = nativeError.HResult) "consumed frame release preserves native cleanup HRESULT"
+    let closed = try frame.Texture |> ignore; false with :? ObjectDisposedException -> true
+    check closed "consumed-with-error frame never exposes its retired texture"
+    (frame :> IDisposable).Dispose()
+    check (consumeCalls = 1) "consumed-with-error frame is not released twice"
+    let pendingConsumed = PendingFrameCleanup(Environment.CurrentManagedThreadId)
+    let mutable nativePendingOwned, pendingCalls = true, 0
+    pendingConsumed.Rollback(
+        (fun () ->
+            pendingCalls <- pendingCalls + 1
+            if pendingCalls = 1 then invalidOp "initial unbind failure"
+            nativePendingOwned <- false
+            raise nativeError),
+        fun () -> not nativePendingOwned)
+    let postConsumptionError =
+        try
+            pendingConsumed.Retry()
+            0
+        with error -> error.HResult
+    check (postConsumptionError = nativeError.HResult) "pending consumed cleanup reports its native error"
+    let callsAfterConsumption = pendingCalls
+    pendingConsumed.Retry()
+    check (pendingCalls = callsAfterConsumption) "pending consumed lease is cleared despite cleanup error"
 
 /// <summary>Runs actual managed playback, GPU composition, clock, OS actions and publication teardown.</summary>
 [<EntryPoint>]
@@ -77,7 +111,7 @@ let main arguments =
             invalidOp "Absent optional DLL unexpectedly created a provider"
         with :? MediaProviderUnavailableException as error ->
             check (error.HResult < 0) "unavailable keeps actual HRESULT"
-            Console.WriteLine "MEDIA_MANAGED_UNAVAILABLE_ASSERTIONS=7"
+            Console.WriteLine "MEDIA_MANAGED_UNAVAILABLE_ASSERTIONS=12"
             0
     else
         if arguments.Length <> 2 then invalidArg "arguments" "Expected native directory and original media fixture"

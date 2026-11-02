@@ -122,7 +122,7 @@ def main():
             (absent / 'RanvierNativeMedia.dll').unlink()
             absent_runtime = [str(absent / 'Managed.exe')] if mode == 'aot' else ['dotnet', str(absent / 'Managed.dll')]
             run(mode + '-absent', absent_runtime + ['--unavailable'])
-            assert 'MEDIA_MANAGED_UNAVAILABLE_ASSERTIONS=7' in (output / (mode + '-absent.log')).read_text()
+            assert 'MEDIA_MANAGED_UNAVAILABLE_ASSERTIONS=12' in (output / (mode + '-absent.log')).read_text()
         report['buildReady'] = True
         report['passed'] = args.phase != 'build'
     finally:

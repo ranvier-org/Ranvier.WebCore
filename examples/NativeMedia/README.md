@@ -50,8 +50,11 @@ the native wrong-thread HRESULT. Disposal is mandatory and idempotent.
 If publication notification and rollback unbinding both fail, the original
 publication error is reported and the player retains cleanup ownership. Its
 next owner-thread call or `Dispose` retries unbinding before releasing the frame;
-a failed retry remains retryable. A definitively disposed host has already
-released its renderer bindings and permits provider cleanup.
+a failed retry remains retryable while the native frame pointer is still owned.
+When native release consumes that pointer but reports a cleanup HRESULT, the
+error is preserved and the frame is closed; it cannot expose a retired texture
+or release it twice. A definitively disposed host has already released its
+renderer bindings and permits provider cleanup.
 
 `WindowsPlayback.h` owns one local source per initialized session. Call
 `initialize()`, then `openFile(path)` on the owning application thread. A second
