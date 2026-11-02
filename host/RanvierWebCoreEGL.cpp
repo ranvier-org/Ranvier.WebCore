@@ -21,6 +21,11 @@ RvEGLContextScope::RvEGLContextScope()
 
 RvEGLContextScope::~RvEGLContextScope()
 {
+    restore();
+}
+
+void RvEGLContextScope::restore()
+{
     if (nativeContext) {
         nativeContext->makeContextCurrent();
         return;

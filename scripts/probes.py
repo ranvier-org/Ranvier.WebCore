@@ -26,6 +26,13 @@ def probe(name, *commands, rid=None, flavor=('slim', 'gpu'), timeout=TIMEOUT, en
 
 
 PROBES = [
+    *[probe('Verify host file picker ownership and invalidation',
+            'python -I tests/abi/file_picker.py --native-directory {native}', rid=rid, flavor=None)
+      for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],
+    *[probe('Verify host tracing and deferred rendering teardown',
+            'python -I tests/abi/host_tracing.py {native}',
+            'python -I tests/abi/host_error_lifetime.py {native}', rid=rid, flavor=None)
+      for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],
     *[probe('Verify native EGL texture input and fractional-DPI DOM composition',
             'python -I tests/gpu/compositor_input_linux.py --native-directory {native} --report {work}/gpu-compositor-input-linux.json',
             rid=rid, flavor='gpu',
@@ -81,6 +88,8 @@ PROBES = [
     *[probe('Verify Linux shared EGLImage frames and retained lifetimes',
             'python -I tests/gpu/linux_egl.py {native}/libRanvierWebCoreHost.so',
             'python -I tests/gpu/linux_egl.py {native}/libRanvierWebCoreHost.so --context-lifecycle',
+            'python -I tests/gpu/linux_egl_teardown.py {native}/libRanvierWebCoreHost.so',
+            'python -I tests/gpu/linux_egl_teardown.py {native}/libRanvierWebCoreHost.so --wrong-context',
             rid=rid, flavor='gpu',
             env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
       for rid in ['linux-x64', 'linux-arm64']],
@@ -156,6 +165,12 @@ PROBES = [
           'python -I tests/abi/touch_input.py --native-directory {native}'),
     probe('Verify native editor undo, redo and callback lifetime',
           'python -I tests/abi/editing_undo.py --native-directory {native}'),
+    probe('Verify spelling range replacement, composition and callback lifetime',
+          'python -I -X utf8 tests/abi/spelling_replacement.py --native-directory {native} --report {work}/spelling-replacement.json',
+          flavor=None),
+    probe('Verify optional Windows spelling suggestions through the native renderer',
+          'python -I -X utf8 tests/spelling/windows.py --native-directory {native} --output {work}/spelling-provider',
+          rid='win-x64', flavor=None),
     probe('Verify pen and mouse pointer fidelity and pen capture',
           'python -I tests/abi/pen_input.py --native-directory {native}'),
     probe('Verify pointer lock requests, relative movement and loss',

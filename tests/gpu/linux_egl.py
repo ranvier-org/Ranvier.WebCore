@@ -57,8 +57,27 @@ read = bind(gl, "glReadPixels", None, integer, integer, integer, integer, uint, 
 image_target = C.CFUNCTYPE(None, uint, ptr)(get_proc(b"glEGLImageTargetTexture2DOES"))
 host = create(80, 60)
 assert host
+class TraceEvent(C.Structure):
+    _fields_ = [("phase", integer), ("source", integer), ("start_ns", C.c_uint64),
+                ("duration_ns", C.c_uint64), ("sequence", C.c_uint64)]
+
+trace_enable = bind(runtime, "rv_host_trace_enable", integer, ptr, integer)
+trace_drain = bind(runtime, "rv_host_trace_drain", integer, ptr, C.POINTER(TraceEvent), integer,
+                   C.POINTER(integer), C.POINTER(C.c_uint64))
+assert trace_enable(host, 1) == 0
 assert configure(display) == -9, "display selection is frozen once a host exists"
 assert mode(host, 1) == 0, "strict compositor must be supported"
+class ErrorRecord(C.Structure):
+    _fields_ = [("operation", integer), ("source", integer), ("status", integer), ("native_code", integer)]
+
+error_enable = bind(runtime, "rv_host_error_enable", integer, ptr, integer)
+error_take = bind(runtime, "rv_host_error_take", integer, ptr, C.POINTER(ErrorRecord), C.POINTER(integer))
+assert error_enable(host, 1) == 0
+empty_frame = ptr()
+assert acquire(host, C.byref(empty_frame)) == -9 and not empty_frame
+error, present = ErrorRecord(), integer()
+assert error_take(host, C.byref(error), C.byref(present)) == 0 and present.value == 1
+assert (error.operation, error.source, error.status, error.native_code) == (1, 2, -9, 0)
 if args.context_lifecycle:
     assert make_current(display, None, None, context)
     sentinels = (uint * 64)()
@@ -101,6 +120,9 @@ frame = ptr()
 assert acquire(None, C.byref(frame)) == -1 and not frame
 assert acquire(host, None) == -1
 assert acquire(host, C.byref(frame)) == 0 and frame
+trace_events, trace_count, trace_dropped = (TraceEvent * 256)(), integer(), C.c_uint64()
+assert trace_drain(host, trace_events, 256, C.byref(trace_count), C.byref(trace_dropped)) == 0
+assert trace_dropped.value == 0 and {2, 3}.issubset({event.phase for event in trace_events[:trace_count.value]})
 assert bind(egl, "eglGetCurrentContext", ptr)() == context
 second = ptr(1)
 assert acquire(host, C.byref(second)) == -9 and not second, "outstanding frame must not be overwritten"

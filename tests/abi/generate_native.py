@@ -113,6 +113,10 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
         return "byte[]", "[<In; Out>] "
     if ctype == "const uint8_t*":
         return "byte[]", "[<In>] "
+    if ctype == "const uint8_t* const*":
+        return "nativeint[]", "[<In>] "
+    if ctype == "const int32_t*":
+        return "int[]", "[<In>] "
     if ctype == "const double*":
         return "float[]", "[<In>] "
     if ctype == "int32_t*":
@@ -153,6 +157,18 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
 
 def fsharp_name(name: str) -> str:
     return f"``{name}``" if name in KEYWORDS else name
+
+
+def trace_types() -> list[str]:
+    fields = [("phase", "int"), ("source", "int"), ("start_ns", "uint64"),
+              ("duration_ns", "uint64"), ("sequence", "uint64")]
+    return ["", "/// <summary>Host rendering trace event; times are monotonic nanoseconds.</summary>",
+            "[<Struct; StructLayout(LayoutKind.Sequential)>]", "type HostTraceEvent ="] + [
+                f"    val mutable {name}: {kind}" for name, kind in fields] + [
+                "", "/// <summary>Latest native presentation failure and platform-specific status.</summary>",
+                "[<Struct; StructLayout(LayoutKind.Sequential)>]", "type HostErrorRecord =",
+                "    val mutable operation: int", "    val mutable source: int", "    val mutable status: int",
+                "    val mutable native_code: int"]
 
 
 def print_types() -> list[str]:
@@ -406,6 +422,7 @@ def generated(header: str) -> str:
 
     lines += mutation_types()
     lines += print_types()
+    lines += trace_types()
     found = declarations(header)
     lines += [
         "",

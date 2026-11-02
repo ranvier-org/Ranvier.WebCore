@@ -31,6 +31,14 @@ def run(entries, *options):
 
 
 class ProbeRunnerTests(unittest.TestCase):
+    def test_picker_tracing_and_teardown_are_routed_to_qualified_platforms(self):
+        for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']:
+            for flavor in ['slim', 'gpu']:
+                commands = [command for entry in probes.PROBES if probes.applies(entry, rid, flavor)
+                            for command in entry['commands']]
+                for name in ['file_picker.py', 'host_tracing.py', 'host_error_lifetime.py']:
+                    self.assertEqual(sum(name in command for command in commands), 1, (rid, flavor, name))
+
     def test_clipping_report_is_retained_even_when_a_probe_fails(self):
         workflow = (ROOT / '.github/workflows/build.yml').read_text()
         block = workflow.split('      - name: Retain clipping pixel results\n', 1)[1].split('\n      - name:', 1)[0]
@@ -96,6 +104,16 @@ class ProbeRunnerTests(unittest.TestCase):
 
 
 class WorkflowTests(unittest.TestCase):
+    def test_spelling_range_and_optional_os_provider_have_automatic_routes(self):
+        ranges = [entry for entry in probes.PROBES if 'spelling_replacement.py' in ' '.join(entry['commands'])]
+        self.assertEqual(len(ranges), 1)
+        self.assertIsNone(ranges[0]['rid'])
+        self.assertIsNone(ranges[0]['flavor'])
+        providers = [entry for entry in probes.PROBES if 'tests/spelling/windows.py' in ' '.join(entry['commands'])]
+        self.assertEqual(len(providers), 1)
+        self.assertEqual(providers[0]['rid'], 'win-x64')
+        self.assertIsNone(providers[0]['flavor'])
+
     def test_linux_gpu_runs_native_texture_input_on_both_gpu_rids(self):
         entries = [entry for entry in probes.PROBES if any(
             'compositor_input_linux.py' in command for command in entry['commands'])]
@@ -182,10 +200,12 @@ class WorkflowTests(unittest.TestCase):
             selected = [entry for entry in probes.PROBES if probes.applies(entry, rid, 'gpu')]
             frames = [entry for entry in selected if any('tests/gpu/linux_egl.py' in command for command in entry['commands'])]
             self.assertEqual(len(frames), 1, rid)
-            self.assertEqual(len(frames[0]['commands']), 2, rid)
+            self.assertEqual(len(frames[0]['commands']), 4, rid)
             self.assertIn(probes.NATIVE + '/libRanvierWebCoreHost.so', frames[0]['commands'][0])
             self.assertNotIn('--context-lifecycle', frames[0]['commands'][0])
             self.assertEqual(frames[0]['commands'][1], frames[0]['commands'][0] + ' --context-lifecycle')
+            self.assertIn('linux_egl_teardown.py', frames[0]['commands'][2])
+            self.assertEqual(frames[0]['commands'][3], frames[0]['commands'][2] + ' --wrong-context')
             self.assertEqual(frames[0]['env'], {'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
             self.assertFalse(probes.applies(frames[0], rid, 'slim'))
             self.assertFalse(probes.applies(frames[0], 'win-x64', 'gpu'))

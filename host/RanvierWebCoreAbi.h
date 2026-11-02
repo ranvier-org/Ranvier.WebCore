@@ -182,7 +182,8 @@ enum { RV_GPU_RGBA8_PREMULTIPLIED = 1 };
  * otherwise returns RV_ERR_UNSUPPORTED so the caller can paint with rv_host_paint_rgba. An outstanding
  * frame on the same surface also returns RV_ERR_UNSUPPORTED immediately. Other GPU waits are bounded.
  * Writes NULL to *frame on failure. The frame owns its resources independently of host/renderer/window;
- * it remains valid over resize or rv_host_destroy and must be released on the owner thread. */
+ * it remains valid over resize or rv_host_destroy and must be released on the owner thread. A destruction request
+ * during acquisition is deferred; the call returns RV_ERR_DETACHED without a frame. */
 RV_EXPORT int32_t rv_host_acquire_d3d11_frame(RvHost*, void* consumerDevice, RvGpuFrame** frame);
 /* Linux GPU startup: call on the future host thread before the first host, with the initialized EGLDisplay
  * used by the consumer. The display is borrowed for the process lifetime; the host never terminates it.
@@ -190,6 +191,7 @@ RV_EXPORT int32_t rv_host_acquire_d3d11_frame(RvHost*, void* consumerDevice, RvG
 RV_EXPORT int32_t rv_configure_egl_display(void* display);
 /* Linux EGLImage transport; requires the configured display's consumer context current on the owner thread.
  * Restores that context before returning. There is no CPU fallback. Held frames survive resize/host destruction.
+ * A destruction request during acquisition is deferred and returns RV_ERR_DETACHED without a frame.
  * linux_egl.py verifies image import, pixels, ownership and teardown with independent producer/consumer contexts. */
 RV_EXPORT int32_t rv_host_acquire_egl_frame(RvHost*, RvGpuFrame** frame);
 /* Returns a borrowed ID3D11Texture2D*, physical dimensions and RV_GPU_RGBA8_PREMULTIPLIED. Row 0 is the
@@ -509,7 +511,8 @@ typedef void (*RvFrameCallback)(void* context);
 /* Sets the host's frame callback, or with a NULL callback removes it. */
 RV_EXPORT int32_t rv_host_set_frame_callback(RvHost*, RvFrameCallback callback, void* context);
 /* Runs WebCore's rendering update for now: animations and transitions advance, resize and intersection
- * observers run, and style and layout update. */
+ * observers run, and style and layout update. A destruction request from a callback is deferred until the update
+ * ends, which returns RV_ERR_DETACHED. */
 RV_EXPORT int32_t rv_host_update(RvHost*);
 /* Writes the bounds of the viewport area invalidated since the last rv_host_paint_rgba, in CSS pixels, and
  * returns 1, or returns 0 and writes zeros when no area was. A scroll of the viewport invalidates all of it. */
@@ -1084,6 +1087,8 @@ typedef struct RvAbstractRange RvAbstractRange;
  * content, a dataTransfer of text/plain and text/html; then the edit and input. The dataTransfer stays readable while
  * a handle holds it. Returns 1 when the edit applied, 0 when a listener cancelled beforeinput or the range is not
  * editable, RV_ERR_WRONG_HOST for a range of another document. */
+/* Active IME composition or nested history replay returns RV_ERR_UNSUPPORTED without applying the correction.
+ * Destruction requested by an editing callback is deferred until the outer editing call returns. */
 RV_EXPORT int32_t rv_host_replace_range(RvHost*, RvAbstractRange* range, const uint8_t* text, int32_t text_length);
 
 /* "accessibility" for rv_abi_has: the page's accessibility tree, which the app exposes through the platform's
@@ -2779,6 +2784,60 @@ typedef int32_t (*RvPrintCancelPoll)(void* context);
 RV_EXPORT int32_t rv_host_print_pdf(RvHost*, const RvPrintOptions* options, RvPrintCancelPoll cancel_poll, void* cancel_context, RvResourceCompletion callback, void* context, int32_t* page_count, uint64_t* operation);
 /* Copies a completed PDF through the existing resource byte/capacity contract; release with rv_resource_release. */
 RV_EXPORT int32_t rv_print_pdf_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length);
+
+/* Host-observed rendering events. Times are monotonic nanoseconds with an unspecified epoch. UPDATE_REQUESTED
+ * includes invalidations; STYLE_LAYOUT measures combined host-invoked preparation, not separate engine style or
+ * layout phases. PAINT measures CPU paint or GPU compositing. RENDERING_UPDATE measures WebCore's page update. */
+enum {
+    RV_HOST_TRACE_UPDATE_REQUESTED = 1,
+    RV_HOST_TRACE_STYLE_LAYOUT = 2,
+    RV_HOST_TRACE_PAINT = 3,
+    RV_HOST_TRACE_RENDERING_UPDATE = 4,
+    RV_HOST_TRACE_SOURCE_HOST = 1,
+};
+typedef struct RvHostTraceEvent {
+    int32_t phase;
+    int32_t source;
+    uint64_t start_ns;
+    uint64_t duration_ns;
+    uint64_t sequence;
+} RvHostTraceEvent;
+/* Disabled by default. Each transition clears queued events and the dropped count. */
+RV_EXPORT int32_t rv_host_trace_enable(RvHost*, int32_t enabled);
+/* Copies and removes up to capacity oldest events. Capacity is 0..256; events may be NULL only for zero
+ * capacity. Writes the number copied and events dropped since the preceding drain, then clears that count. */
+RV_EXPORT int32_t rv_host_trace_drain(RvHost*, RvHostTraceEvent* events, int32_t capacity, int32_t* written, uint64_t* dropped);
+
+/* Disabled by default. The latest failure after presentation acquisition starts replaces any previous record. Argument,
+ * thread and preflight failures use the direct return status only. native_code is the
+ * signed D3D11 device removal HRESULT when available, otherwise zero. Taking a record clears it; a transition between
+ * enabled and disabled also clears it. Expected cancellation is reported by its existing resource completion, not here. */
+enum { RV_HOST_ERROR_ACQUIRE_FRAME = 1, RV_HOST_ERROR_SOURCE_D3D11 = 1, RV_HOST_ERROR_SOURCE_EGL = 2 };
+typedef struct RvHostErrorRecord {
+    int32_t operation;
+    int32_t source;
+    int32_t status;
+    int32_t native_code;
+} RvHostErrorRecord;
+RV_EXPORT int32_t rv_host_error_enable(RvHost*, int32_t enabled);
+RV_EXPORT int32_t rv_host_error_take(RvHost*, RvHostErrorRecord* record, int32_t* present);
+/* File-control requests are delivered on the host thread. A callback schedules its provider and must not call
+ * this ABI. SHOW supplies a process-unique request id and flags; INVALIDATE asks the provider to dismiss that
+ * request. A provider copies any filters it needs while the request is live. */
+enum { RV_FILE_PICKER_SHOW = 0, RV_FILE_PICKER_INVALIDATE = 1 };
+enum { RV_FILE_PICKER_MULTIPLE = 1, RV_FILE_PICKER_DIRECTORIES = 2 };
+enum { RV_FILE_PICKER_CANCEL = 0, RV_FILE_PICKER_ACCEPT = 1 };
+enum { RV_FILE_PICKER_MIME = 0, RV_FILE_PICKER_EXTENSION = 1 };
+typedef void (*RvFilePickerCallback)(void* context, uint64_t request, int32_t action, int32_t flags);
+RV_EXPORT int32_t rv_host_set_file_picker_handler(RvHost*, RvFilePickerCallback callback, void* context);
+/* Returns 1 when this host has a provider, 0 when it has none, or a negative status. */
+RV_EXPORT int32_t rv_host_file_picker_available(RvHost*);
+RV_EXPORT int32_t rv_host_file_picker_filter_count(RvHost*, uint64_t request, int32_t kind, int32_t* count);
+RV_EXPORT int32_t rv_host_file_picker_filter(RvHost*, uint64_t request, int32_t kind, int32_t index, char* buffer, int32_t capacity, int32_t* length);
+/* Completes a live request once. ACCEPT takes one or more absolute UTF-8 paths; CANCEL takes none. Late,
+ * invalidated and duplicate request ids return RV_ERR_DETACHED. The originating WebCore chooser owns the result. */
+RV_EXPORT int32_t rv_host_file_picker_complete(RvHost*, uint64_t request, int32_t outcome,
+    const uint8_t* const* paths, const int32_t* lengths, int32_t count);
 
 #ifdef __cplusplus
 }

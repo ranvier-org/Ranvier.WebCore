@@ -7,6 +7,7 @@ class RvEGLContextScope {
 public:
     RvEGLContextScope();
     ~RvEGLContextScope();
+    void restore();
 private:
     void* display;
     void* context;
