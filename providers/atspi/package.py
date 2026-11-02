@@ -27,7 +27,7 @@ def validate_identity(package_id, version):
     if not re.fullmatch(r'[A-Za-z0-9_.-]+', package_id) or not re.fullmatch(r'[A-Za-z0-9_.+-]+', version):
         raise ValueError('Invalid package identity.')
     if not package_id.startswith('Ranvier.Private.') or not re.fullmatch(r'0\.0\.0-(?:private[A-Za-z0-9.-]+|ci\.[0-9]+)', version):
-        raise ValueError('This packager permits private qualification identities only; public notices/version remain unallocated.')
+        raise ValueError('This packager permits private qualification identities only; the final public cohort/version remain unallocated.')
 
 
 def validate_runtime(provider, native, rid):
@@ -63,6 +63,7 @@ def pack(provider, native, rid, package_id, version, output, source_revision, te
                         ('description', 'Optional native AT-SPI accessibility provider; requires an application-selected matching WebCore host.'),
                         ('readme', 'README.md')]:
         ET.SubElement(fields, name).text = value
+    ET.SubElement(fields, 'license', type='file').text = 'NOTICE.md'
     payload = {
         'runtimes/' + rid + '/native/libRanvierWebCoreAtspi.so': provider.read_bytes(),
         'include/RanvierAtspi.h': (root / 'RanvierAtspi.h').read_bytes(),
@@ -75,7 +76,7 @@ def pack(provider, native, rid, package_id, version, output, source_revision, te
     manifest = dict(id=package_id, version=version, rid=rid, abi=abi,
         callerClaimedProviderSourceRevision=source_revision, sourceProvenance='unverified-caller-claim',
         qualificationScope='ARM64-test-only-unqualified' if test_only_arm64 else 'private-style-only-ABI63',
-        licenseReviewStatus='pending-project-license-and-embedded-WebKit-XML-terms',
+        licenseMetadataStatus='original-project-license-unspecified; embedded-XML-license-not-marked',
         hostSha256=sha(native), providerSha256=sha(provider),
         requiredCapability='accessibility-text-style', hostBundled=False,
         dependencies='System GIO/GObject/GLib; no renderer package is selected by this optional provider.',
