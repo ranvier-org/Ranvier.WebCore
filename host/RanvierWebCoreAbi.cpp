@@ -735,6 +735,8 @@ public:
 // As there, a root layer of the host's own paints the frame's content that has no layer of its own, under
 // the compositor's tree: on the Windows port the frame's root layer paints into the window, not into a
 // layer (RenderLayerBacking::paintsIntoWindow).
+#include "RanvierNativeTextureInput.h"
+
 struct RvCompositor final : GraphicsLayerClient {
     GLContext* context { nullptr };
     std::unique_ptr<TextureMapper> textureMapper;
@@ -742,14 +744,21 @@ struct RvCompositor final : GraphicsLayerClient {
     // The view root paints during composite.
     LocalFrameView* view { nullptr };
     IntSize size;
+    IntSize pixelSize;
+    float scale { 1 };
     GLuint texture { 0 };
     GLuint depthStencil { 0 };
     GLuint framebuffer { 0 };
 
-    static std::unique_ptr<RvCompositor> create(IntSize size)
+    static std::unique_ptr<RvCompositor> create(IntSize size, float scale)
     {
         auto compositor = std::make_unique<RvCompositor>();
         compositor->size = size;
+        compositor->scale = scale;
+        auto scaledSize = FloatSize { size };
+        scaledSize.scale(scale);
+        compositor->pixelSize = IntSize { scaledSize };
+        auto pixelSize = compositor->pixelSize;
         compositor->context = compositingContext();
         if (!compositor->context || !compositor->context->makeContextCurrent())
             return nullptr;
@@ -759,16 +768,18 @@ struct RvCompositor final : GraphicsLayerClient {
         compositor->root->setDrawsContent(true);
         compositor->root->setContentsOpaque(true);
         compositor->root->setSize(FloatSize { size });
+        compositor->root->setAnchorPoint({ 0, 0, 0 });
+        compositor->root->setTransform(TransformationMatrix { }.scale(scale));
         glGenTextures(1, &compositor->texture);
         glBindTexture(GL_TEXTURE_2D, compositor->texture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.width(), size.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pixelSize.width(), pixelSize.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBindTexture(GL_TEXTURE_2D, 0);
         // TextureMapper clips with the stencil buffer and sorts 3D planes with the depth buffer.
         glGenRenderbuffers(1, &compositor->depthStencil);
         glBindRenderbuffer(GL_RENDERBUFFER, compositor->depthStencil);
-        glRenderbufferStorage(GL_RENDERBUFFER, 0x88F0 /* GL_DEPTH24_STENCIL8_OES */, size.width(), size.height());
+        glRenderbufferStorage(GL_RENDERBUFFER, 0x88F0 /* GL_DEPTH24_STENCIL8_OES */, pixelSize.width(), pixelSize.height());
         glGenFramebuffers(1, &compositor->framebuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, compositor->framebuffer);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, compositor->texture, 0);
@@ -778,6 +789,8 @@ struct RvCompositor final : GraphicsLayerClient {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         return complete ? WTF::move(compositor) : nullptr;
     }
+
+    float deviceScaleFactor() const final { return scale; }
 
     void paintContents(const GraphicsLayer&, GraphicsContext& context, const FloatRect& clip, OptionSet<GraphicsLayerPaintBehavior>) final
     {
@@ -829,6 +842,9 @@ struct RvHost {
 #endif
 #endif
     float deviceScale { 1 };
+#if defined(_WIN32) && RANVIER_COMPOSITING
+    Vector<std::unique_ptr<RvNativeTextureInput>> nativeTextures;
+#endif
     // The viewport area invalidated since the last paint.
     IntRect dirty;
     RvFrameCallback frameCallback { nullptr };
@@ -2144,7 +2160,7 @@ int32_t rv_host_set_accelerated_compositing(RvHost* host, int32_t mode)
         return RV_OK;
     }
     if (mode == RV_COMPOSITING_ALWAYS && !host->compositor) {
-        auto compositor = RvCompositor::create(host->size);
+        auto compositor = RvCompositor::create(host->size, host->deviceScale);
         if (!compositor)
             return RV_ERR_UNSUPPORTED;
         host->compositor = WTF::move(compositor);
@@ -2174,6 +2190,9 @@ void rv_host_destroy(RvHost* host)
 {
     if (!host || !onOwningThread())
         return;
+#if defined(_WIN32) && RANVIER_COMPOSITING
+    host->nativeTextures.clear();
+#endif
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_notifications_drop(reinterpret_cast<RvNode*>(&host->document()));
@@ -2197,6 +2216,9 @@ int32_t rv_host_load_html(RvHost* host, const uint8_t* html, int32_t html_length
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
+#if defined(_WIN32) && RANVIER_COMPOSITING
+    host->nativeTextures.clear();
+#endif
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_custom_effect_callbacks_revoke_document(reinterpret_cast<RvNode*>(&host->document()));
@@ -2215,6 +2237,9 @@ int32_t rv_host_load_svg(RvHost* host, const uint8_t* svg, int32_t svg_length)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
+#if defined(_WIN32) && RANVIER_COMPOSITING
+    host->nativeTextures.clear();
+#endif
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_view_transitions_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
@@ -2479,7 +2504,7 @@ void rv_node_release(RvNode* target)
 }
 
 #if RANVIER_COMPOSITING
-static int32_t composite(RvCompositor& compositor, LocalFrameView& view, uint8_t* rgba, GLuint targetFramebuffer = 0)
+static int32_t composite(RvHost& host, RvCompositor& compositor, LocalFrameView& view, uint8_t* rgba, GLuint targetFramebuffer = 0)
 {
     if (!compositor.context->makeContextCurrent())
         return RV_ERR_PAINT_FAILED;
@@ -2499,11 +2524,24 @@ static int32_t composite(RvCompositor& compositor, LocalFrameView& view, uint8_t
     compositor.root->setNeedsDisplay();
     compositor.root->flushCompositingStateForThisLayerOnly();
     view.flushCompositingStateIncludingSubframes();
+#if defined(_WIN32)
+    host.nativeTextures.removeAllMatching([&](auto& input) {
+        return !input->element->isConnected() || &input->element->document() != &host.document();
+    });
+    struct InputLocks {
+        RvHost& host;
+        ~InputLocks() { for (auto& input : host.nativeTextures) input->end(); }
+    } inputLocks { host };
+    for (auto& input : host.nativeTextures) {
+        if (input->attach() && !input->begin())
+            return RV_ERR_UNSUPPORTED;
+    }
+#endif
     auto& rootLayer = downcast<GraphicsLayerTextureMapper>(*compositor.root);
     rootLayer.updateBackingStoreIncludingSubLayers(*compositor.textureMapper);
     compositor.view = nullptr;
 
-    auto size = compositor.size;
+    auto size = compositor.pixelSize;
     glBindFramebuffer(GL_FRAMEBUFFER, targetFramebuffer ? targetFramebuffer : compositor.framebuffer);
     glViewport(0, 0, size.width(), size.height());
     glClearColor(0, 0, 0, 0);
@@ -2547,6 +2585,39 @@ struct RvGpuFrame {
 #endif
 };
 
+extern "C" RV_EXPORT int32_t rv_host_bind_d3d11_texture(RvHost* host, RvNode* target, void* texture)
+{
+    if (!host || !target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_DETACHED;
+#if defined(_WIN32) && RANVIER_COMPOSITING
+    if (host->inFrame)
+        return RV_ERR_UNSUPPORTED;
+    auto* element = dynamicDowncast<Element>(*node(target));
+    if (!element || &element->document() != &host->document() || !element->isConnected())
+        return RV_ERR_WRONG_HOST;
+    std::unique_ptr<RvNativeTextureInput> input;
+    if (texture) {
+        input = RvNativeTextureInput::create(*element, texture, [] {
+            auto* context = compositingContext();
+            return context && context->makeContextCurrent();
+        });
+        if (!input)
+            return RV_ERR_UNSUPPORTED;
+    }
+    host->nativeTextures.removeAllMatching([&](auto& prior) { return prior->element.get() == element; });
+    if (input)
+        host->nativeTextures.append(WTF::move(input));
+    host->requestFrame();
+    return RV_OK;
+#else
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
 int32_t rv_host_acquire_egl_frame(RvHost* host, RvGpuFrame** frame)
 {
     if (!frame)
@@ -2557,8 +2628,9 @@ int32_t rv_host_acquire_egl_frame(RvHost* host, RvGpuFrame** frame)
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
 #if defined(__linux__) && RANVIER_COMPOSITING
+    auto pixelSize = paintSize(*host);
     if (!configuredEGLDisplay || eglGetCurrentDisplay() != configuredEGLDisplay || eglGetCurrentContext() == EGL_NO_CONTEXT
-        || host->deviceScale != 1 || host->compositingMode == RV_COMPOSITING_OFF || host->inFrame)
+        || host->compositingMode == RV_COMPOSITING_OFF || host->inFrame)
         return RV_ERR_UNSUPPORTED;
     if (host->presentationSurface && !host->presentationSurface->available())
         return RV_ERR_UNSUPPORTED;
@@ -2574,14 +2646,14 @@ int32_t rv_host_acquire_egl_frame(RvHost* host, RvGpuFrame** frame)
         view->updateLayoutAndStyleIfNeededRecursive();
         if (!view->clipLayer())
             return RV_ERR_UNSUPPORTED;
-        if (host->compositor && host->compositor->size != host->size)
+        if (host->compositor && (host->compositor->size != host->size || host->compositor->scale != host->deviceScale))
             host->compositor = nullptr;
         if (!host->compositor)
-            host->compositor = RvCompositor::create(host->size);
+            host->compositor = RvCompositor::create(host->size, host->deviceScale);
         if (!host->compositor)
             return RV_ERR_UNSUPPORTED;
-        if (!host->presentationSurface || !host->presentationSurface->matches(host->size.width(), host->size.height())) {
-            host->presentationSurface = RvEGLSurface::create(host->size.width(), host->size.height(), [] {
+        if (!host->presentationSurface || !host->presentationSurface->matches(pixelSize.width(), pixelSize.height())) {
+            host->presentationSurface = RvEGLSurface::create(pixelSize.width(), pixelSize.height(), [] {
                 auto* context = compositingContext();
                 return context && context->makeContextCurrent();
             });
@@ -2589,7 +2661,7 @@ int32_t rv_host_acquire_egl_frame(RvHost* host, RvGpuFrame** frame)
         auto surface = host->presentationSurface;
         if (!surface || !surface->beginProducer())
             return RV_ERR_UNSUPPORTED;
-        auto paintResult = composite(*host->compositor, *view, nullptr, surface->framebuffer());
+        auto paintResult = composite(*host, *host->compositor, *view, nullptr, surface->framebuffer());
         if (paintResult != RV_OK || !surface->finishProducer(consumerContext)) {
             surface->cancelProducer();
             host->presentationSurface = nullptr;
@@ -2617,9 +2689,10 @@ int32_t rv_host_acquire_d3d11_frame(RvHost* host, void* consumerDevice, RvGpuFra
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
 #if defined(_WIN32) && RANVIER_COMPOSITING
-    if (host->deviceScale != 1 || host->compositingMode == RV_COMPOSITING_OFF || host->inFrame)
+    auto pixelSize = paintSize(*host);
+    if (host->compositingMode == RV_COMPOSITING_OFF || host->inFrame)
         return RV_ERR_UNSUPPORTED;
-    if (host->presentationSurface && host->presentationSurface->matches(consumerDevice, host->size.width(), host->size.height())
+    if (host->presentationSurface && host->presentationSurface->matches(consumerDevice, pixelSize.width(), pixelSize.height())
         && !host->presentationSurface->available())
         return RV_ERR_UNSUPPORTED;
     auto result = [&]() -> int32_t {
@@ -2632,14 +2705,14 @@ int32_t rv_host_acquire_d3d11_frame(RvHost* host, void* consumerDevice, RvGpuFra
         view->updateLayoutAndStyleIfNeededRecursive();
         if (!view->clipLayer())
             return RV_ERR_UNSUPPORTED;
-        if (host->compositor && host->compositor->size != host->size)
+        if (host->compositor && (host->compositor->size != host->size || host->compositor->scale != host->deviceScale))
             host->compositor = nullptr;
         if (!host->compositor)
-            host->compositor = RvCompositor::create(host->size);
+            host->compositor = RvCompositor::create(host->size, host->deviceScale);
         if (!host->compositor)
             return RV_ERR_UNSUPPORTED;
-        if (!host->presentationSurface || !host->presentationSurface->matches(consumerDevice, host->size.width(), host->size.height())) {
-            host->presentationSurface = RvD3D11Surface::create(consumerDevice, host->size.width(), host->size.height(), [] {
+        if (!host->presentationSurface || !host->presentationSurface->matches(consumerDevice, pixelSize.width(), pixelSize.height())) {
+            host->presentationSurface = RvD3D11Surface::create(consumerDevice, pixelSize.width(), pixelSize.height(), [] {
                 auto* context = compositingContext();
                 return context && context->makeContextCurrent();
             });
@@ -2649,7 +2722,7 @@ int32_t rv_host_acquire_d3d11_frame(RvHost* host, void* consumerDevice, RvGpuFra
             host->presentationSurface = nullptr;
             return RV_ERR_UNSUPPORTED;
         }
-        auto paintResult = composite(*host->compositor, *view, nullptr, surface->framebuffer());
+        auto paintResult = composite(*host, *host->compositor, *view, nullptr, surface->framebuffer());
         bool transferred = paintResult == RV_OK && surface->finishProducer();
         if (!transferred) {
             surface->cancelProducer();
@@ -2732,16 +2805,15 @@ static int32_t paintArea(RvHost& host, uint8_t* rgba, int32_t length, IntRect ar
 #if RANVIER_COMPOSITING
     // A paint of the whole viewport composites when the host is in compositing mode. In
     // RV_COMPOSITING_WHEN_NEEDED a frame without a clip layer is not in compositing mode and takes the CPU path.
-    // The compositor paints CSS pixels one to one, so a device scale other than 1 takes the CPU path too, as
-    // does a paint of part of the viewport.
-    if (area == IntRect { { }, host.size } && host.compositingMode != RV_COMPOSITING_OFF && view->clipLayer() && host.deviceScale == 1) {
+    // Partial paints use the CPU path.
+    if (area == IntRect { { }, host.size } && host.compositingMode != RV_COMPOSITING_OFF && view->clipLayer()) {
         // A resize since the compositor was made needs a framebuffer of the new size.
-        if (host.compositor && host.compositor->size != host.size)
+        if (host.compositor && (host.compositor->size != host.size || host.compositor->scale != host.deviceScale))
             host.compositor = nullptr;
         if (!host.compositor)
-            host.compositor = RvCompositor::create(host.size);
+            host.compositor = RvCompositor::create(host.size, host.deviceScale);
         if (host.compositor) {
-            auto result = composite(*host.compositor, *view, rgba);
+            auto result = composite(host, *host.compositor, *view, rgba);
             host.dirty = { };
             host.inFrame = false;
             if (host.updateWanted)
