@@ -14,6 +14,20 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def validate_distribution(rid, source_revision):
+    if rid != 'linux-x64':
+        raise ValueError('Only linux-x64 has a qualified real renderer/provider cohort; ARM64 remains preparatory.')
+    if not re.fullmatch(r'[0-9a-f]{40}', source_revision):
+        raise ValueError('The provider source revision must be a full lowercase Git commit.')
+
+
+def validate_identity(package_id, version):
+    if not re.fullmatch(r'[A-Za-z0-9_.-]+', package_id) or not re.fullmatch(r'[A-Za-z0-9_.+-]+', version):
+        raise ValueError('Invalid package identity.')
+    if not package_id.startswith('Ranvier.Private.') or not re.fullmatch(r'0\.0\.0-(?:private[A-Za-z0-9.-]+|ci\.[0-9]+)', version):
+        raise ValueError('This packager permits private qualification identities only; public notices/version remain unallocated.')
+
+
 def validate_runtime(provider, native, rid):
     machine = {'linux-x64': 62, 'linux-arm64': 183}[rid]
     for path in [provider, native]:
@@ -36,9 +50,9 @@ def validate_runtime(provider, native, rid):
     return abi
 
 
-def pack(provider, native, rid, package_id, version, output):
-    if not re.fullmatch(r'[A-Za-z0-9_.-]+', package_id) or not re.fullmatch(r'[A-Za-z0-9_.+-]+', version):
-        raise ValueError('Invalid package identity.')
+def pack(provider, native, rid, package_id, version, output, source_revision):
+    validate_distribution(rid, source_revision)
+    validate_identity(package_id, version)
     abi = validate_runtime(provider, native, rid)
     root = Path(__file__).resolve().parent
     metadata = ET.Element('package')
@@ -50,10 +64,12 @@ def pack(provider, native, rid, package_id, version, output):
     payload = {
         'runtimes/' + rid + '/native/libRanvierWebCoreAtspi.so': provider.read_bytes(),
         'include/RanvierAtspi.h': (root / 'RanvierAtspi.h').read_bytes(),
+        'include/RanvierWebCoreAbi.h': (root.parents[1] / 'host/RanvierWebCoreAbi.h').read_bytes(),
         'README.md': (root / 'README.md').read_bytes(),
         'NOTICE.md': (root / 'NOTICE.md').read_bytes(),
     }
     manifest = dict(id=package_id, version=version, rid=rid, abi=abi,
+        providerSourceRevision=source_revision, qualificationScope='private-style-only-ABI63',
         hostSha256=sha(native), providerSha256=sha(provider),
         requiredCapability='accessibility-text-style', hostBundled=False,
         dependencies='System GIO/GObject/GLib; no renderer package is selected by this optional provider.',
@@ -78,6 +94,7 @@ if __name__ == '__main__':
     parser.add_argument('--id', required=True)
     parser.add_argument('--version', required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--source-revision', required=True, help='Reviewed source commit used to build the provider.')
     args = parser.parse_args()
-    destination, manifest = pack(args.provider, args.native, args.rid, args.id, args.version, args.output)
+    destination, manifest = pack(args.provider, args.native, args.rid, args.id, args.version, args.output, args.source_revision)
     print(json.dumps(dict(path=str(destination), sha256=sha(destination), manifest=manifest)))

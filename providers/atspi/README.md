@@ -38,3 +38,31 @@ checks ELF architecture and the actual host capability, and packs the module wit
 a dependency on a renderer flavor. System GIO, GObject and GLib provide the D-Bus implementation; libatspi is used only
 for build headers and independent test clients. A missing module or accessibility bus leaves ordinary window rendering
 usable and reports accessibility attachment as unavailable.
+
+## Delivery and SDK integration
+
+The reserved public package ID is `Ranvier.WebCore.Accessibility.Atspi`. A public version is not allocated.
+Its version must follow the final matching Native ABI63 cohort; immutable ABI62 releases cannot supply this module.
+Current artifacts use explicitly private identities and versions. `provider-manifest.json` records the reviewed provider
+source commit, selected host hash, provider hash, payload hashes and private style-only qualification scope.
+`--source-revision` names the commit that produced the binary; repackaging an archived binary must retain that commit.
+The packager rejects public package IDs and versions while the final cohort, version and source licenses await review.
+
+Only `linux-x64` is currently eligible for packaging and the opt-in workflow. ARM64 source/compilation is preparatory:
+enable distribution only after a matching actual ARM64 Native ABI63 host, provider, protocol and ordinary Window/AOT
+cohort passes. Windows continues through UIA. macOS has no adapter in this package.
+
+Use an ordinary SDK `PackageReference` to the provider alongside the application's chosen matching renderer package.
+The SDK copies `runtimes/linux-x64/native/libRanvierWebCoreAtspi.so` into RID-specific publish output. The optional module
+shares that directory with the selected `libRanvierWebCoreHost.so`; no search-path environment override is required.
+Native consumers use both packaged headers from `include/` with `#include "RanvierAtspi.h"`.
+
+`tests/atspi/consumer.py` restores from an owned local feed, publishes an ordinary .NET 10 SDK application, checks the
+provider payload hash and resolves its four exports through assembly-aware `NativeLibrary.Load`. It copies only the
+explicitly hash-matched selected host for this distribution check. This verifies package discovery and dynamic loading;
+the separate protocol and managed Window normal/traced NativeAOT receipts supply rendering and accessibility proof.
+The opt-in CI workflow retains this consumer receipt with native/protocol reports and the private package. It does not
+publish to NuGet. Final integration must repeat all gates against the frozen #171/#182 union and public managed cohort.
+
+Public release review must supply applicable project/source license texts and finalize notices. The current qualification
+notice records packaged and system components without assigning an unreviewed license to the provider.

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../host/RanvierWebCoreAbi.h"
+#include "RanvierWebCoreAbi.h"
 
 #ifdef __cplusplus
 extern "C" {
