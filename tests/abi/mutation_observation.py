@@ -452,7 +452,7 @@ def run(directory, report_path=None):
         try:
             doomed_target = doomed.node('doomed')
             doomed_observer, doomed_events, doomed_releases = p.create(
-                doomed.document, destroy_while_delivering, provider_closed)
+                doomed.host, destroy_while_delivering, provider_closed)
             p.observe(doomed_observer, doomed_target, Options(attributes=True))
             p.set_attribute(doomed_target, 'data-destroy', 'now')
             p.pump(lambda: bool(doomed_events), timeout=2)
