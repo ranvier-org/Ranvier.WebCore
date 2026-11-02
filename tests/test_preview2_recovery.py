@@ -329,12 +329,30 @@ class RecoveryPackageControls(unittest.TestCase):
                    '--receipt', str(self.receipt)]
         checked = subprocess.run(command, capture_output=True, text=True,
                                  env=dict(os.environ, GITHUB_SHA=orchestrator_sha), timeout=15)
-        self.assertEqual(checked.returncode, 0, checked.stderr)
-        (self.root / 'evidence/smoke.log').write_bytes(b'changed after qualification')
-        checked = subprocess.run(command, capture_output=True, text=True,
-                                 env=dict(os.environ, GITHUB_SHA=orchestrator_sha), timeout=15)
         self.assertNotEqual(checked.returncode, 0)
-        self.assertIn('Proof file', checked.stderr)
+        self.assertIn('preview.2 recovery is retired', checked.stderr)
+        with mock.patch.dict(os.environ, {'GITHUB_SHA': orchestrator_sha}):
+            self.assertTrue(module.verify_publication(self.root / 'work/export', self.root / 'evidence', self.contract)['publicationReady'])
+        (self.root / 'evidence/smoke.log').write_bytes(b'changed after qualification')
+        with mock.patch.dict(os.environ, {'GITHUB_SHA': orchestrator_sha}):
+            with self.assertRaisesRegex(ValueError, 'Proof file'):
+                module.verify_publication(self.root / 'work/export', self.root / 'evidence', self.contract)
+
+    def test_retired_commands_refuse_before_reading_inputs_or_creating_outputs(self):
+        missing = self.root / 'does-not-exist'
+        receipt = self.root / 'retired-receipt.json'
+        commands = [
+            ['publication', '--export', str(missing), '--evidence', str(missing), '--contract', str(missing), '--receipt', str(receipt)],
+            ['qualify', '--package', str(missing), '--manifest', str(missing), '--test-root', str(missing),
+             '--work', str(missing), '--evidence', str(missing), '--contract', str(missing)],
+        ]
+        for arguments in commands:
+            with self.subTest(command=arguments[0]):
+                result = subprocess.run([sys.executable, '-I', '-B', str(SCRIPT), *arguments], capture_output=True, text=True, timeout=15)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn('preview.2 recovery is retired', result.stderr)
+                self.assertFalse(receipt.exists())
+                self.assertFalse(missing.exists())
 
     def test_failed_actual_probe_preserves_partial_evidence_without_exporting(self):
         module, tree, orchestrator_sha, fetch = self.qualification_fixture(failing_probe=True)

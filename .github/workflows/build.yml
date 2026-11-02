@@ -23,7 +23,7 @@ on:
         type: boolean
         default: false
       recover_preview2_gpu:
-        description: Qualify and publish the fixed existing preview2 Windows GPU artifact, without rebuilding
+        description: Retired preview2 recovery (qualification and publication are refused)
         type: boolean
         default: false
 
