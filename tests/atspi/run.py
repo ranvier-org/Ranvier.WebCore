@@ -28,6 +28,9 @@ def server(args):
     from gi.repository import GLib
     native = C.CDLL(str(args.native))
     provider = C.CDLL(str(args.provider))
+    abi = bind(native, 'rv_abi_version', C.c_int)
+    loaded_native = sorted({line.split()[-1] for line in Path('/proc/self/maps').read_text().splitlines() if line.split()[-1].endswith('/libRanvierWebCoreHost.so')})
+    assert loaded_native == [str(args.native.resolve())], loaded_native
     create = bind(native, 'rv_host_create', C.c_void_p, C.c_int, C.c_int)
     destroy = bind(native, 'rv_host_destroy', None, C.c_void_p)
     load = bind(native, 'rv_host_load_html', C.c_int, C.c_void_p, C.c_char_p, C.c_int)
@@ -70,7 +73,8 @@ body{margin:0}button,input{position:absolute}#activate{left:10px;top:20px;width:
         bad = Geometry(0, 1, 100, 200, 1.5)
         assert attach(host, args.address.encode(), application_name, len(application_name), C.byref(bad), C.byref(rejected)) != 0 and rejected.value == 0
         assertions += 1
-        assert attach(host, args.address.encode(), application_name, len(application_name), C.byref(geometry), C.byref(token)) == 0 and token.value
+        address = None if args.discovery else args.address.encode()
+        assert attach(host, address, application_name, len(application_name), C.byref(geometry), C.byref(token)) == 0 and token.value
         assertions += 1
         assert attach(host, args.address.encode(), application_name, len(application_name), C.byref(geometry), C.byref(rejected)) != 0 and rejected.value == 0
         assertions += 1
@@ -85,10 +89,11 @@ body{margin:0}button,input{position:absolute}#activate{left:10px;top:20px;width:
         buffer = C.create_string_buffer(length.value)
         assert name(token.value, buffer, length.value, C.byref(length)) == 0
         assertions += 2
-        ready = dict(pid=os.getpid(), bus=buffer.raw.decode(), root='/org/a11y/atspi/accessible/root', assertions=assertions)
+        ready = dict(pid=os.getpid(), bus=buffer.raw.decode(), root='/org/a11y/atspi/accessible/root', assertions=assertions, nativeAbi=abi(), loadedNative=loaded_native)
         (args.output / 'ready.tmp').write_text(json.dumps(ready))
         (args.output / 'ready.tmp').replace(args.output / 'ready.json')
         deadline = time.monotonic() + 60
+        paused = False
         while not (args.output / 'stop.json').exists():
             assert time.monotonic() < deadline, 'Provider fixture lifetime exceeded'
             request = args.output / 'request.json'
@@ -112,12 +117,18 @@ body{margin:0}button,input{position:absolute}#activate{left:10px;top:20px;width:
                     release_node(element)
                     assert listener
                 elif command['action'] == 'release':
+                    if paused:
+                        time.sleep(0.05)
                     assert release(token.value) == 0
                     token.value = 0
+                    paused = False
+                elif command['action'] == 'pause':
+                    paused = True
                 else:
                     raise AssertionError(command)
                 (args.output / 'response.json').write_text(json.dumps(command))
-            cycle(0)
+            if not paused:
+                cycle(0)
             time.sleep(0.002)
     finally:
         if listener:
@@ -250,8 +261,30 @@ def client(args):
         found.clear()
         visit(root)
         check('Replacement' in found and 'Name' not in found, 'replacement document is exposed without old controls')
-        request('arm-release')
-        check(call(found['Replacement'], action, 'DoAction', '(i)', (0,))[0], 'native action completes while its application releases the provider reentrantly')
+        if args.queued_set:
+            request('pause')
+            completion = []
+
+            def completed(connection, result):
+                try:
+                    connection.call_finish(result)
+                    completion.append('success')
+                except GLib.Error as error:
+                    completion.append(Gio.DBusError.get_remote_error(error))
+
+            connection.call(ready['bus'], root, 'org.freedesktop.DBus.Properties', 'Set',
+                GLib.Variant('(ssv)', ('org.a11y.atspi.Application', 'Id', GLib.Variant('i', 42))),
+                None, Gio.DBusCallFlags.NONE, 3000, None, completed)
+            connection.flush_sync(None)
+            request('release')
+            deadline = time.monotonic() + 4
+            while not completion and time.monotonic() < deadline:
+                while context.pending(): context.iteration(False)
+                time.sleep(0.005)
+            check(completion == ['org.freedesktop.DBus.Error.UnknownMethod'], 'queued property setter rejects an unregistered application without invoking stale state')
+        else:
+            request('arm-release')
+            check(call(found['Replacement'], action, 'DoAction', '(i)', (0,))[0], 'native action completes while its application releases the provider reentrantly')
         rejected = False
         try:
             prop(root, accessible, 'Name')
@@ -270,6 +303,25 @@ def client(args):
         connection.close_sync(None)
 
 
+def bus_service(args):
+    from gi.repository import Gio, GLib
+    connection = Gio.DBusConnection.new_for_address_sync(args.address, Gio.DBusConnectionFlags.AUTHENTICATION_CLIENT | Gio.DBusConnectionFlags.MESSAGE_BUS_CONNECTION, None, None)
+    schema = Gio.DBusNodeInfo.new_for_xml('<node><interface name="org.a11y.Bus"><method name="GetAddress"><arg type="s" direction="out"/></method></interface></node>')
+    registration = connection.register_object('/org/a11y/bus', schema.interfaces[0],
+        lambda connection, sender, path, interface, method, parameters, invocation: invocation.return_value(GLib.Variant('(s)', (args.address,))), None, None)
+    result = connection.call_sync('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus', 'RequestName', GLib.Variant('(su)', ('org.a11y.Bus', 0)), None, Gio.DBusCallFlags.NONE, 1000, None)
+    assert result.unpack()[0] == 1
+    (args.output / 'bus-service-ready.json').write_text('{}')
+    context = GLib.MainContext.default()
+    try:
+        while not (args.output / 'stop.json').exists():
+            while context.pending(): context.iteration(False)
+            time.sleep(0.002)
+    finally:
+        connection.unregister_object(registration)
+        connection.close_sync(None)
+
+
 def run(args):
     args.output.mkdir(parents=True, exist_ok=False)
     before = hashlib.sha256(args.native.read_bytes()).hexdigest()
@@ -277,6 +329,8 @@ def run(args):
     child = None
     registry = None
     registry_log = None
+    discovery_service = None
+    discovery_log = None
     started = time.monotonic()
     try:
         bus = subprocess.Popen(['/usr/bin/dbus-daemon', '--session', '--nofork', '--print-address=1'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -299,21 +353,46 @@ def run(args):
         common = ['--native', str(args.native), '--provider', str(args.provider), '--output', str(args.output), '--address', address]
         if args.registry:
             common += ['--registry']
-        with (args.output / 'server.log').open('w') as output:
-            child = subprocess.Popen([sys.executable, __file__, 'server'] + common, env=environment, stdout=output, stderr=subprocess.STDOUT)
-            deadline = time.monotonic() + 10
-            while not (args.output / 'ready.json').exists():
-                assert child.poll() is None, (args.output / 'server.log').read_text()
-                assert time.monotonic() < deadline, 'Provider did not become ready'
-                time.sleep(0.02)
-            with (args.output / 'client.log').open('w') as client_log:
-                result = subprocess.run([sys.executable, __file__, 'client'] + common, env=environment, stdout=client_log, stderr=subprocess.STDOUT, timeout=40)
-            assert result.returncode == 0, (args.output / 'client.log').read_text()
+        if args.discovery:
+            common += ['--discovery', args.discovery]
+        if args.queued_set:
+            common += ['--queued-set']
+        if args.discovery == 'session':
+            discovery_log = (args.output / 'bus-service.log').open('w')
+            discovery_service = subprocess.Popen([sys.executable, __file__, 'bus_service'] + common, env=environment, stdout=discovery_log, stderr=subprocess.STDOUT)
+            deadline = time.monotonic() + 5
+            while not (args.output / 'bus-service-ready.json').exists():
+                assert discovery_service.poll() is None
+                assert time.monotonic() < deadline
+                time.sleep(0.01)
+        server_environment = environment.copy()
+        if args.discovery == 'session':
+            server_environment.pop('AT_SPI_BUS_ADDRESS', None)
+        if args.managed_command:
+            command = json.loads(args.managed_command.read_text())
+            server_environment.update(LD_LIBRARY_PATH=str(args.provider.parent) + ':' + str(args.native.parent),
+                SDL_VIDEODRIVER='x11', RANVIER_ATSPI_OWNED_BUS_TEST='1')
+            if args.provider_disabled:
+                server_environment['LD_LIBRARY_PATH'] = str(args.native.parent)
+                server_environment['RANVIER_ATSPI_OWNED_BUS_TEST'] = '0'
+            with (args.output / 'managed.log').open('w') as output:
+                child = subprocess.Popen(command, env=server_environment, stdout=output, stderr=subprocess.STDOUT)
+                code = child.wait(timeout=90)
+            (args.output / 'managed-exit.json').write_text(json.dumps(dict(pid=child.pid, command=command, exit=code)))
+            assert code == 0, (code, str(args.output / 'managed.log'), (args.output / 'managed.log').read_text()[-2500:])
+            (args.output / 'client-report.json').write_text(json.dumps(dict(assertions=1, managedCommand=command, managedExit=code)))
+        else:
+            child = run_protocol_client(args, common, server_environment, environment)
     finally:
         (args.output / 'stop.json').write_text('{}')
         if child:
             try: child.wait(timeout=5)
             except subprocess.TimeoutExpired: child.kill(); child.wait(timeout=5)
+        if discovery_service:
+            try: discovery_service.wait(timeout=5)
+            except subprocess.TimeoutExpired: discovery_service.kill(); discovery_service.wait(timeout=5)
+        if discovery_log:
+            discovery_log.close()
         if bus:
             if registry:
                 registry.terminate()
@@ -327,20 +406,45 @@ def run(args):
         after = hashlib.sha256(args.native.read_bytes()).hexdigest()
         assert before == after
         receipt = dict(nativeBefore=before, nativeAfter=after, providerSha256=hashlib.sha256(args.provider.read_bytes()).hexdigest(),
-                       busPid=bus.pid if bus else None, serverPid=child.pid if child else None, registryPid=registry.pid if registry else None, allOwnedProcessesExited=True,
+                       busPid=bus.pid if bus else None, serverPid=child.pid if child else None, registryPid=registry.pid if registry else None, discoveryPid=discovery_service.pid if discovery_service else None, allOwnedProcessesExited=True,
                        seconds=time.monotonic()-started)
         (args.output / 'receipt.json').write_text(json.dumps(receipt, indent=2))
     report = json.loads((args.output / 'client-report.json').read_text())
     print(json.dumps(dict(assertions=report['assertions'], nativeUnchanged=before == after, processesExited=True)))
 
 
+def run_protocol_client(args, common, server_environment, environment):
+    child = None
+    try:
+        with (args.output / 'server.log').open('w') as output:
+            child = subprocess.Popen([sys.executable, __file__, 'server'] + common, env=server_environment, stdout=output, stderr=subprocess.STDOUT)
+            deadline = time.monotonic() + 10
+            while not (args.output / 'ready.json').exists():
+                assert child.poll() is None, (args.output / 'server.log').read_text()
+                assert time.monotonic() < deadline, 'Provider did not become ready'
+                time.sleep(0.02)
+            with (args.output / 'client.log').open('w') as client_log:
+                result = subprocess.run([sys.executable, __file__, 'client'] + common, env=environment, stdout=client_log, stderr=subprocess.STDOUT, timeout=40)
+            assert result.returncode == 0, (args.output / 'client.log').read_text()
+    finally:
+        (args.output / 'stop.json').write_text('{}')
+        if child:
+            try: child.wait(timeout=5)
+            except subprocess.TimeoutExpired: child.kill(); child.wait(timeout=5)
+    return child
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('mode', choices=['run', 'server', 'client'])
+    parser.add_argument('mode', choices=['run', 'server', 'client', 'bus_service'])
     parser.add_argument('--native', type=Path, required=True)
     parser.add_argument('--provider', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--address')
     parser.add_argument('--registry', action='store_true')
+    parser.add_argument('--discovery', choices=['environment', 'session'])
+    parser.add_argument('--managed-command', type=Path)
+    parser.add_argument('--provider-disabled', action='store_true')
+    parser.add_argument('--queued-set', action='store_true')
     arguments = parser.parse_args()
     globals()[arguments.mode](arguments)

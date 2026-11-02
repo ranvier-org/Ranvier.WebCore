@@ -522,7 +522,8 @@ struct Bridge : std::enable_shared_from_this<Bridge> {
     }
 };
 
-GDBusInterfaceVTable Bridge::vtable { Bridge::method, Bridge::property, Bridge::setProperty, { nullptr } };
+// GIO's method dispatcher checks unregister admission before a queued Properties.Set; its direct setter does not.
+GDBusInterfaceVTable Bridge::vtable { Bridge::method, Bridge::property, nullptr, { nullptr } };
 
 bool alive(Node& node, GError** error)
 {
@@ -608,6 +609,15 @@ void Bridge::method(GDBusConnection*, const char*, const char*, const char* inte
     auto& bridge = *protectedBridge;
     auto answer = [&](GVariant* result) { g_dbus_method_invocation_return_value(invocation, result); };
     auto unsupported = [&] { g_dbus_method_invocation_return_error_literal(invocation, G_DBUS_ERROR, G_DBUS_ERROR_NOT_SUPPORTED, "The native accessibility operation is unavailable"); };
+    if (!strcmp(interface, "org.freedesktop.DBus.Properties") && !strcmp(method, "Set")) {
+        const char* propertyInterface; const char* propertyName; GVariant* value;
+        g_variant_get(input, "(&s&sv)", &propertyInterface, &propertyName, &value);
+        bool changed = setProperty(nullptr, nullptr, nullptr, propertyInterface, propertyName, value, &error, data);
+        g_variant_unref(value);
+        if (changed) answer(nullptr);
+        else { g_dbus_method_invocation_return_gerror(invocation, error); g_clear_error(&error); }
+        return;
+    }
     if (!strcmp(interface, cache) && !strcmp(method, "GetItems")) { answer(bridge.cacheItems()); return; }
     if (!strcmp(interface, accessible)) {
         if (!strcmp(method, "GetRole")) { answer(g_variant_new("(u)", node.native ? roleOf(node.native) : ATSPI_ROLE_APPLICATION)); return; }
@@ -811,7 +821,7 @@ int32_t rv_atspi_bridge_create(RvHost* host, const char* address, const uint8_t*
     std::lock_guard lock(registryMutex);
     if (result) *result = 0;
     if (providerOwner != std::thread::id {} && providerOwner != std::this_thread::get_id()) return RV_ERR_WRONG_THREAD;
-    if (!host || !address || !result || nameLength < 0 || (nameLength && !name)) return RV_ERR_NULL_ARGUMENT;
+    if (!host || !result || nameLength < 0 || (nameLength && !name)) return RV_ERR_NULL_ARGUMENT;
     if (!geometryValid(geometry)) return RV_ERR_UNSUPPORTED;
     for (auto& entry : bridges) if (entry.second->host == host) return RV_ERR_UNSUPPORTED;
     auto bridge = std::make_shared<Bridge>(host, *geometry, protocolText(reinterpret_cast<const char*>(name), nameLength));
@@ -825,8 +835,26 @@ int32_t rv_atspi_bridge_create(RvHost* host, const char* address, const uint8_t*
         if (!timerWake.wait_for(timerLock, std::chrono::seconds(2), [&] { return connected; }))
             g_cancellable_cancel(cancellable);
     });
-    bridge->connection = g_dbus_connection_new_for_address_sync(address,
-        static_cast<GDBusConnectionFlags>(G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT | G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION), nullptr, cancellable, &error);
+    std::string discovered;
+    if (!address) {
+        if (auto* environment = g_getenv("AT_SPI_BUS_ADDRESS"); environment && *environment)
+            discovered = environment;
+        else if (auto* session = g_bus_get_sync(G_BUS_TYPE_SESSION, cancellable, &error)) {
+            auto* response = g_dbus_connection_call_sync(session, "org.a11y.Bus", "/org/a11y/bus", "org.a11y.Bus", "GetAddress",
+                nullptr, G_VARIANT_TYPE("(s)"), G_DBUS_CALL_FLAGS_NONE, 1500, cancellable, &error);
+            if (response) {
+                const char* value;
+                g_variant_get(response, "(&s)", &value);
+                discovered = value;
+                g_variant_unref(response);
+            }
+            g_object_unref(session);
+        }
+        address = discovered.empty() ? nullptr : discovered.c_str();
+    }
+    if (address)
+        bridge->connection = g_dbus_connection_new_for_address_sync(address,
+            static_cast<GDBusConnectionFlags>(G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT | G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION), nullptr, cancellable, &error);
     { std::lock_guard timerLock(timerMutex); connected = true; }
     timerWake.notify_one();
     timeout.join();
