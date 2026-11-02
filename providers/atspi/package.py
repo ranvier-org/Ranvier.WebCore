@@ -1,0 +1,83 @@
+"""Pack an already qualified optional provider; never build or publish a renderer."""
+import argparse
+import ctypes
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+import xml.etree.ElementTree as ET
+import zipfile
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def validate_runtime(provider, native, rid):
+    machine = {'linux-x64': 62, 'linux-arm64': 183}[rid]
+    for path in [provider, native]:
+        data = path.read_bytes()
+        if data[:6] != b'\x7fELF\x02\x01' or int.from_bytes(data[18:20], 'little') != machine:
+            raise ValueError('The ELF architecture does not match ' + rid)
+    dynamic = subprocess.check_output(['readelf', '-d', str(provider)], text=True)
+    runpath = re.findall(r'\((?:RUNPATH|RPATH)\).*?\[(.*?)\]', dynamic)
+    if runpath != ['$ORIGIN']:
+        raise ValueError('Package the installed provider with only its sibling runtime search path.')
+    if 'libatspi' in dynamic:
+        raise ValueError('The independent AT-SPI client must not become a provider runtime dependency.')
+    host = ctypes.CDLL(str(native.resolve()))
+    host.rv_abi_version.restype = ctypes.c_int32
+    host.rv_abi_has.argtypes = [ctypes.c_char_p]
+    host.rv_abi_has.restype = ctypes.c_int32
+    abi = host.rv_abi_version()
+    if abi != 63 or host.rv_abi_has(b'accessibility-text-style') != 1:
+        raise ValueError('The provider requires the matching ABI63 style-run host.')
+    return abi
+
+
+def pack(provider, native, rid, package_id, version, output):
+    if not re.fullmatch(r'[A-Za-z0-9_.-]+', package_id) or not re.fullmatch(r'[A-Za-z0-9_.+-]+', version):
+        raise ValueError('Invalid package identity.')
+    abi = validate_runtime(provider, native, rid)
+    root = Path(__file__).resolve().parent
+    metadata = ET.Element('package')
+    fields = ET.SubElement(metadata, 'metadata')
+    for name, value in [('id', package_id), ('version', version), ('authors', 'Ranvier'),
+                        ('description', 'Optional native AT-SPI accessibility provider; requires an application-selected matching WebCore host.'),
+                        ('readme', 'README.md')]:
+        ET.SubElement(fields, name).text = value
+    payload = {
+        'runtimes/' + rid + '/native/libRanvierWebCoreAtspi.so': provider.read_bytes(),
+        'include/RanvierAtspi.h': (root / 'RanvierAtspi.h').read_bytes(),
+        'README.md': (root / 'README.md').read_bytes(),
+        'NOTICE.md': (root / 'NOTICE.md').read_bytes(),
+    }
+    manifest = dict(id=package_id, version=version, rid=rid, abi=abi,
+        hostSha256=sha(native), providerSha256=sha(provider),
+        requiredCapability='accessibility-text-style', hostBundled=False,
+        dependencies='System GIO/GObject/GLib; no renderer package is selected by this optional provider.',
+        payloads={name: hashlib.sha256(data).hexdigest() for name, data in payload.items()})
+    payload['provider-manifest.json'] = json.dumps(manifest, indent=2).encode()
+    output.mkdir(parents=True, exist_ok=True)
+    destination = output / (package_id + '.' + version + '.nupkg')
+    if destination.exists():
+        raise FileExistsError(destination)
+    with zipfile.ZipFile(destination, 'x', zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr(package_id + '.nuspec', ET.tostring(metadata, encoding='utf-8', xml_declaration=True))
+        for name, data in payload.items():
+            archive.writestr(name, data)
+    return destination, manifest
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--provider', type=Path, required=True)
+    parser.add_argument('--native', type=Path, required=True)
+    parser.add_argument('--rid', choices=['linux-x64', 'linux-arm64'], required=True)
+    parser.add_argument('--id', required=True)
+    parser.add_argument('--version', required=True)
+    parser.add_argument('--output', type=Path, required=True)
+    args = parser.parse_args()
+    destination, manifest = pack(args.provider, args.native, args.rid, args.id, args.version, args.output)
+    print(json.dumps(dict(path=str(destination), sha256=sha(destination), manifest=manifest)))
