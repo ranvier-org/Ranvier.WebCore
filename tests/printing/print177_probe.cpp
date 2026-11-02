@@ -1,5 +1,6 @@
 #include "config.h"
 #include "print177_probe.h"
+#include "CSSUnits.h"
 #include "Document.h"
 #include "DocumentView.h"
 #include "FrameDestructionObserverInlines.h"
@@ -115,7 +116,8 @@ void paint(Document& document, LocalFrame& frame, const Print177Options& options
     auto pageSize = context.computedPageSize(available, margins);
     if (pageSize.isEmpty())
         return;
-    guard.begin(pageSize.width(), pageSize.height());
+    auto layoutInputScale = static_cast<float>(CSS::pixelsPerPt / PrintContext::minimumShrinkFactor());
+    guard.begin(pageSize.width() * layoutInputScale, pageSize.height() * layoutInputScale);
     if (document.frame() != &frame || !frame.view())
         return;
     float pageHeight = 0;
