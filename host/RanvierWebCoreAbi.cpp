@@ -1792,7 +1792,7 @@ static_assert(sizeof(RvMediaVideoConfiguration) == 64 && offsetof(RvMediaVideoCo
 static_assert(sizeof(RvSnapshotOptions) == 64 && offsetof(RvSnapshotOptions, scale) == 8 && offsetof(RvSnapshotOptions, x) == 24 && offsetof(RvSnapshotOptions, quality) == 64 - 8);
 static_assert(sizeof(RvMediaAudioConfiguration) == 64 && offsetof(RvMediaAudioConfiguration, bitrate) == 40 && offsetof(RvMediaAudioConfiguration, spatial_rendering) == 56);
 
-int32_t rv_abi_version(void) { return 62; }
+int32_t rv_abi_version(void) { return 63; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -1894,7 +1894,7 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "accessibility-uia"))
         return 1;
 #endif
-    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop", "drag-out", "clipboard-files", "range-replacement", "accessibility", "accessibility-text", "svg-document", "resize-entries", "resize-device-pixel-content-box", "intersection-entries" }) {
+    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop", "drag-out", "clipboard-files", "range-replacement", "accessibility", "accessibility-text", "accessibility-text-style", "svg-document", "resize-entries", "resize-device-pixel-content-box", "intersection-entries" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -8104,6 +8104,76 @@ static int32_t textStatus(RvAxNode* handle, std::optional<SimpleRange>& scope)
         return status;
     scope = textScope(*axObject(handle));
     return scope ? RV_OK : RV_ERR_UNSUPPORTED;
+}
+
+int32_t rv_ax_text_style_run(RvAxNode* handle, int32_t offset, const char* property,
+    int32_t* start, int32_t* end, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (start) *start = 0;
+    if (end) *end = 0;
+    if (length) *length = 0;
+    if (!property || !start || !end || !length || (capacity > 0 && !buffer))
+        return RV_ERR_NULL_ARGUMENT;
+    if (auto status = axStatus(handle))
+        return status;
+    if (capacity < 0)
+        return RV_ERR_UNSUPPORTED;
+    bool supported = false;
+    for (auto* name : { "color", "background-color", "font-family", "font-size", "font-weight", "font-style",
+             "text-decoration-line", "visibility", "direction" })
+        supported |= !std::strcmp(property, name);
+    if (!supported)
+        return RV_ERR_UNSUPPORTED;
+    Ref object = *axObject(handle);
+    auto scope = textScope(object);
+    if (isGone(object))
+        return RV_ERR_DETACHED;
+    if (!scope)
+        return RV_ERR_UNSUPPORTED;
+    auto count = static_cast<int32_t>(characterCount(*scope));
+    if (offset < 0 || offset > count)
+        return RV_ERR_UNSUPPORTED;
+    struct StyleRun { int32_t start; int32_t end; String value; };
+    Vector<StyleRun> runs;
+    auto computed = [&](Node* node) -> String {
+        RefPtr<Element> element = dynamicDowncast<Element>(node);
+        if (!element && node) element = node->parentElement();
+        if (!element) element = dynamicDowncast<Element>(scope->start.container.get());
+        if (!element) element = scope->start.container->document().documentElement();
+        if (!element) return { };
+        Ref<CSSStyleDeclaration> style = CSSComputedStyleDeclaration::create(*element, CSSComputedStyleDeclaration::AllowVisited::No);
+        return style->getPropertyValue(utf8(property));
+    };
+    int32_t cursor = 0;
+    for (TextIterator iterator(*scope); !iterator.atEnd(); iterator.advance()) {
+        auto size = static_cast<int32_t>(iterator.text().length());
+        if (!size) continue;
+        auto value = computed(iterator.node());
+        if (value.isEmpty()) return RV_ERR_UNSUPPORTED;
+        if (!runs.isEmpty() && runs.last().value == value)
+            runs.last().end += size;
+        else runs.append(StyleRun { cursor, cursor + size, WTF::move(value) });
+        cursor += size;
+    }
+    if (cursor != count)
+        return RV_ERR_UNSUPPORTED;
+    if (runs.isEmpty()) {
+        auto value = computed(object->node());
+        if (value.isEmpty()) return RV_ERR_UNSUPPORTED;
+        runs.append(StyleRun { 0, 0, WTF::move(value) });
+    }
+    auto position = count && offset == count ? offset - 1 : offset;
+    for (auto& run : runs) {
+        if (position < run.start || (position >= run.end && count)) continue;
+        if (isGone(object)) return RV_ERR_DETACHED;
+        auto status = copyString(run.value, buffer, capacity, length);
+        if (status == RV_OK || status == RV_ERR_BUFFER_TOO_SMALL) {
+            *start = run.start;
+            *end = run.end;
+        }
+        return status;
+    }
+    return RV_ERR_UNSUPPORTED;
 }
 
 int32_t rv_ax_text_child_range(RvAxNode* ancestor, RvAxNode* child, int32_t* start, int32_t* end)

@@ -59,12 +59,13 @@ def server(args):
 body{margin:0}button,input{position:absolute}#activate{left:10px;top:20px;width:80px;height:30px}
 #name{left:10px;top:70px;width:180px}#agree{left:10px;top:120px}#range{left:10px;top:160px}
 #disabled{left:200px;top:20px}</style>
-<body id="fixture"><button id="activate" aria-label="Activate" aria-describedby="help">Activate</button><span id="help" aria-label="Help">Instruction</span>
-<input id="name" aria-label="Name" value="A😀é">
+<body id="fixture"><button id="activate" aria-label="Activate" aria-describedby="help" aria-controls="name" aria-flowto="disabled">Activate</button><span id="help" aria-label="Help">Instruction</span>
+<input id="name" aria-label="Name" aria-describedby="help" value="A😀é">
 <input id="agree" type="checkbox" aria-label="Agree">
 <input id="range" type="range" min="0" max="10" value="3" aria-label="Level">
 <button id="disabled" disabled aria-label="Disabled">Disabled</button>
-<div role="group" aria-label="Group" style="position:absolute;left:230px;top:160px"><button id="last" aria-label="Last">Last</button></div>'''.encode()
+<div role="group" aria-label="Group" style="position:absolute;left:230px;top:160px"><button id="last" aria-label="Last">Last</button></div>
+<p aria-label="Styled text" style="position:absolute;left:10px;top:200px;font-family:serif;font-size:16px;color:rgb(1,2,3)">A<span style="font-weight:700;color:rgb(4,5,6)">😀B</span>C</p>'''.encode()
     assertions = 0
     listener = None
     callback = None
@@ -241,6 +242,47 @@ def client(args):
         check(char_window[2] > 0 and char_window[3] > 0, 'non-BMP character exposes native text geometry')
         check(char_screen == (char_window[0] + 100, char_window[1] + 200, char_window[2], char_window[3]), 'text geometry uses physical screen translation')
         check(call(field, text, 'GetRangeExtents', '(iiu)', (1, 2, int(Atspi.CoordType.WINDOW))) == char_window, 'scalar character and surrogate-pair range geometry agree')
+        if args.extended_text:
+            def extended(label, path, interface, method, signature, arguments, predicate):
+                try:
+                    actual = call(path, interface, method, signature, arguments)
+                    rows.append(dict(label=label, passed=bool(predicate(actual)), actual=actual))
+                except GLib.Error as error:
+                    rows.append(dict(label=label, passed=False, error=str(error)))
+
+            relation_cases = [
+                ('Help', Atspi.RelationType.DESCRIPTION_FOR, ['Activate', 'Name']),
+                ('Name', Atspi.RelationType.CONTROLLED_BY, ['Activate']),
+                ('Disabled', Atspi.RelationType.FLOWS_FROM, ['Activate'])]
+            for source, kind, names in relation_cases:
+                expected_targets = {(ready['bus'], found[name]) for name in names}
+                extended('inverse relation ' + source, found[source], accessible, 'GetRelationSet', None, (),
+                         lambda result, kind=kind, expected=expected_targets: any(
+                             relation == int(kind) and set(targets) == expected for relation, targets in result[0]))
+            extended('physical point maps through native UTF16 to scalar offset', field, text, 'GetOffsetAtPoint', '(iiu)',
+                     (char_window[0] + max(1, char_window[2] // 4), char_window[1] + char_window[3] // 2, int(Atspi.CoordType.WINDOW)),
+                     lambda result: result == (1,))
+            styled = found['Styled text']
+            extended('styled accessible text preserves scalar content', styled, text, 'GetText', '(ii)', (0, -1),
+                     lambda result: result == ('A😀BC',))
+            extended('default text attributes reflect the native computed style', styled, text, 'GetDefaultAttributes', None, (),
+                     lambda result: result[0].get('weight') == '400' and result[0].get('fg-color') == '1,2,3' and result[0].get('size') == '12pt')
+            extended('attribute run retains nonBMP scalar boundaries and overrides', styled, text, 'GetAttributeRun', '(ib)', (1, False),
+                     lambda result: result[1:] == (1, 3) and result[0].get('weight') == '700' and result[0].get('fg-color') == '4,5,6')
+            extended('attribute run includes requested defaults', styled, text, 'GetAttributeRun', '(ib)', (2, True),
+                     lambda result: result[1:] == (1, 3) and result[0].get('size') == '12pt' and result[0].get('weight') == '700')
+            extended('default run omits inherited defaults', styled, text, 'GetAttributes', '(i)', (0,),
+                     lambda result: result == ({}, 0, 1))
+            extended('trailing default run remains separate from styled span', styled, text, 'GetAttributes', '(i)', (3,),
+                     lambda result: result == ({}, 3, 4))
+            extended('named text attribute lookup', styled, text, 'GetAttributeValue', '(is)', (1, 'weight'),
+                     lambda result: result == ('700',))
+            extended('bounded range uses scalar offsets around a complete nonBMP glyph', field, text, 'GetBoundedRanges', '(iiiiuuu)',
+                     (*char_window, int(Atspi.CoordType.WINDOW), int(Atspi.TextClipType.BOTH), int(Atspi.TextClipType.BOTH)),
+                     lambda result: [(item[0], item[1], item[2]) for item in result[0]] == [(1, 2, '😀')])
+            extended('empty physical text intersection returns no range', field, text, 'GetBoundedRanges', '(iiiiuuu)',
+                     (100000, 100000, 20, 20, int(Atspi.CoordType.WINDOW), int(Atspi.TextClipType.NONE), int(Atspi.TextClipType.NONE)),
+                     lambda result: result == ([],))
         check(call(field, text, 'SetCaretOffset', '(i)', (2,))[0], 'scalar caret forwards native UTF-16 offset')
         check(prop(field, text, 'CaretOffset') == 2, 'native caret maps back to scalar offset')
         check(call(field, text, 'SetSelection', '(iii)', (0, 1, 3))[0], 'native selection action')
@@ -348,6 +390,8 @@ def client(args):
                 while context.pending(): context.iteration(False)
                 time.sleep(0.01)
             check(desktop.get_child_count() == 0, 'released application is removed from the real registry')
+        if args.extended_text:
+            assert all(row['passed'] for row in rows), [row['label'] for row in rows if not row['passed']]
     finally:
         (args.output / 'client-report.json').write_text(json.dumps(dict(assertions=len(rows), rows=rows, events=events, cacheEvents=cache_events), indent=2))
         connection.signal_unsubscribe(subscription)
@@ -409,6 +453,8 @@ def run(args):
             common += ['--discovery', args.discovery]
         if args.queued_set:
             common += ['--queued-set']
+        if args.extended_text:
+            common += ['--extended-text']
         if args.discovery == 'session':
             discovery_log = (args.output / 'bus-service.log').open('w')
             discovery_service = subprocess.Popen([sys.executable, __file__, 'bus_service'] + common, env=environment, stdout=discovery_log, stderr=subprocess.STDOUT)
@@ -498,5 +544,6 @@ if __name__ == '__main__':
     parser.add_argument('--managed-command', type=Path)
     parser.add_argument('--provider-disabled', action='store_true')
     parser.add_argument('--queued-set', action='store_true')
+    parser.add_argument('--extended-text', action='store_true')
     arguments = parser.parse_args()
     globals()[arguments.mode](arguments)

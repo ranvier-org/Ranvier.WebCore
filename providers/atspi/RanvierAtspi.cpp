@@ -4,7 +4,11 @@
 #include <algorithm>
 #include <cmath>
 #include <condition_variable>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
+#include <map>
+#include <limits>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -93,6 +97,97 @@ struct TextSnapshot {
     }
     std::string slice(int start, int end) const { return bytes.substr(utf8[start], utf8[end] - utf8[start]); }
 };
+
+using TextAttributes = std::map<std::string, std::string>;
+struct AttributeRun { int start; int end; TextAttributes attributes; };
+
+TextAttributes textAttributes(RvAxNode* accessibleNode, int offset = -1, int* runStart = nullptr, int* runEnd = nullptr, bool* valid = nullptr)
+{
+    auto release = [](RvNode* node) { if (node) rv_node_release(node); };
+    std::unique_ptr<RvNode, decltype(release)> element(rv_ax_dom_node(accessibleNode), release);
+    while (element && rv_node_type(element.get()) != 1)
+        element.reset(rv_node_relative(element.get(), RV_RELATION_PARENT));
+    if (!element) return {};
+    auto style = [&](const char* property) {
+        return readString([&](char* buffer, int capacity, int* length) {
+            if (offset >= 0) {
+                int start = 0, end = 0;
+                auto status = rv_ax_text_style_run(accessibleNode, offset, property, &start, &end, buffer, capacity, length);
+                if (status == RV_OK || status == RV_ERR_BUFFER_TOO_SMALL) {
+                    *runStart = std::max(*runStart, start);
+                    *runEnd = std::min(*runEnd, end);
+                } else *valid = false;
+                return status;
+            }
+            return rv_element_computed_style(element.get(), property, buffer, capacity, length);
+        });
+    };
+    TextAttributes result;
+    auto add = [&](const char* key, std::string value) { if (!value.empty()) result[key] = std::move(value); };
+    auto color = [&](const char* key, const char* property) {
+        auto value = style(property);
+        int red, green, blue;
+        double alpha = 1;
+        bool parsed = std::sscanf(value.c_str(), "rgb(%d, %d, %d)", &red, &green, &blue) == 3;
+        if (!parsed) parsed = std::sscanf(value.c_str(), "rgba(%d, %d, %d, %lf)", &red, &green, &blue, &alpha) == 4;
+        if (parsed && alpha > 0 && red >= 0 && red <= 255 && green >= 0 && green <= 255 && blue >= 0 && blue <= 255)
+            result[key] = std::to_string(red) + ',' + std::to_string(green) + ',' + std::to_string(blue);
+    };
+    color("fg-color", "color");
+    color("bg-color", "background-color");
+    auto family = style("font-family");
+    char quote = 0;
+    bool escaped = false;
+    size_t familyEnd = 0;
+    for (; familyEnd < family.size(); ++familyEnd) {
+        char character = family[familyEnd];
+        if (escaped) { escaped = false; continue; }
+        if (character == '\\') { escaped = true; continue; }
+        if (quote) { if (character == quote) quote = 0; }
+        else if (character == '\'' || character == '"') quote = character;
+        else if (character == ',') break;
+    }
+    family.resize(familyEnd);
+    while (!family.empty() && g_ascii_isspace(family.back())) family.pop_back();
+    if (family.size() >= 2 && ((family.front() == '"' && family.back() == '"') || (family.front() == '\'' && family.back() == '\'')))
+        family = family.substr(1, family.size() - 2);
+    add("family-name", family);
+    auto size = style("font-size");
+    char* end = nullptr;
+    double pixels = std::strtod(size.c_str(), &end);
+    if (end != size.c_str() && !strcmp(end, "px") && std::isfinite(pixels) && pixels >= 0)
+        result["size"] = std::to_string(static_cast<int64_t>(std::round(pixels * 72 / 96))) + "pt";
+    add("weight", style("font-weight"));
+    auto slope = style("font-style");
+    if (!slope.empty()) result["style"] = slope == "normal" ? "normal" : "italic";
+    auto decoration = style("text-decoration-line");
+    if (!decoration.empty()) {
+        result["strikethrough"] = decoration.find("line-through") != std::string::npos ? "true" : "false";
+        result["underline"] = decoration.find("underline") != std::string::npos ? "single" : "none";
+    }
+    auto visibility = style("visibility");
+    if (!visibility.empty()) result["invisible"] = visibility == "hidden" ? "true" : "false";
+    add("direction", style("direction"));
+    auto states = rv_ax_states(accessibleNode);
+    if (states >= 0) result["editable"] = states & RV_AX_EDITABLE ? "true" : "false";
+    while (element) {
+        auto language = readString([&](char* buffer, int capacity, int* length) {
+            return rv_element_get_attribute(element.get(), "lang", buffer, capacity, length);
+        });
+        if (!language.empty()) { result["language"] = language; break; }
+        element.reset(rv_node_relative(element.get(), RV_RELATION_PARENT));
+        while (element && rv_node_type(element.get()) != 1)
+            element.reset(rv_node_relative(element.get(), RV_RELATION_PARENT));
+    }
+    return result;
+}
+
+GVariant* attributeVariant(const TextAttributes& attributes)
+{
+    GVariantBuilder result; g_variant_builder_init(&result, G_VARIANT_TYPE("a{ss}"));
+    for (auto& [key, value] : attributes) g_variant_builder_add(&result, "{ss}", key.c_str(), value.c_str());
+    return g_variant_builder_end(&result);
+}
 
 unsigned roleOf(RvAxNode* node)
 {
@@ -372,29 +467,61 @@ struct Bridge : std::enable_shared_from_this<Bridge> {
     }
     GVariant* relations(Node& node)
     {
-        GVariantBuilder result; g_variant_builder_init(&result, G_VARIANT_TYPE("a(ua(so))"));
+        std::map<unsigned, std::vector<Node*>> relations;
         if (node.native && rv_abi_has("accessibility-relations")) {
-            constexpr std::pair<int, unsigned> mappings[] {
-                { RV_AX_RELATION_CONTROLS, ATSPI_RELATION_CONTROLLER_FOR },
-                { RV_AX_RELATION_DESCRIBED_BY, ATSPI_RELATION_DESCRIBED_BY },
-                { RV_AX_RELATION_DETAILS, ATSPI_RELATION_DETAILS },
-                { RV_AX_RELATION_ERROR_MESSAGE, ATSPI_RELATION_ERROR_MESSAGE },
-                { RV_AX_RELATION_FLOW_TO, ATSPI_RELATION_FLOWS_TO },
-                { RV_AX_RELATION_LABELLED_BY, ATSPI_RELATION_LABELLED_BY },
-                { RV_AX_RELATION_OWNS, ATSPI_RELATION_NODE_PARENT_OF }
+            constexpr struct { int native; unsigned forward; unsigned inverse; } mappings[] {
+                { RV_AX_RELATION_CONTROLS, ATSPI_RELATION_CONTROLLER_FOR, ATSPI_RELATION_CONTROLLED_BY },
+                { RV_AX_RELATION_DESCRIBED_BY, ATSPI_RELATION_DESCRIBED_BY, ATSPI_RELATION_DESCRIPTION_FOR },
+                { RV_AX_RELATION_DETAILS, ATSPI_RELATION_DETAILS, ATSPI_RELATION_DETAILS_FOR },
+                { RV_AX_RELATION_ERROR_MESSAGE, ATSPI_RELATION_ERROR_MESSAGE, ATSPI_RELATION_ERROR_FOR },
+                { RV_AX_RELATION_FLOW_TO, ATSPI_RELATION_FLOWS_TO, ATSPI_RELATION_FLOWS_FROM },
+                { RV_AX_RELATION_LABELLED_BY, ATSPI_RELATION_LABELLED_BY, ATSPI_RELATION_LABEL_FOR },
+                { RV_AX_RELATION_OWNS, ATSPI_RELATION_NODE_PARENT_OF, ATSPI_RELATION_NODE_CHILD_OF }
             };
-            for (auto [kind, platform] : mappings) {
+            auto related = [&](Node& source, int kind) {
+                std::vector<Node*> result;
                 int count = 0;
-                auto status = rv_ax_relations(node.native, kind, nullptr, 0, &count);
-                if ((status != RV_OK && status != RV_ERR_BUFFER_TOO_SMALL) || count <= 0) continue;
+                auto status = rv_ax_relations(source.native, kind, nullptr, 0, &count);
+                if ((status != RV_OK && status != RV_ERR_BUFFER_TOO_SMALL) || count <= 0) return result;
                 std::vector<RvAxNode*> raw(count);
-                if (rv_ax_relations(node.native, kind, raw.data(), count, &count) != RV_OK) continue;
-                GVariantBuilder targets; g_variant_builder_init(&targets, G_VARIANT_TYPE("a(so)"));
-                for (auto* target : raw) if (auto* known = remember(target)) g_variant_builder_add_value(&targets, reference(known));
-                g_variant_builder_add(&result, "(ua(so))", platform, &targets);
+                if (rv_ax_relations(source.native, kind, raw.data(), count, &count) != RV_OK) return result;
+                for (auto* target : raw) if (auto* known = remember(target)) result.push_back(known);
+                return result;
+            };
+            for (auto mapping : mappings) {
+                auto direct = related(node, mapping.native);
+                if (!direct.empty()) relations[mapping.forward] = std::move(direct);
+            }
+            std::vector<Node*> pending;
+            if (auto* currentRoot = root()) pending.push_back(currentRoot);
+            std::unordered_set<std::string> visited;
+            while (!pending.empty()) {
+                auto* source = pending.back(); pending.pop_back();
+                if (!visited.insert(source->path).second) continue;
+                for (auto mapping : mappings) {
+                    auto targets = related(*source, mapping.native);
+                    if (std::find(targets.begin(), targets.end(), &node) != targets.end())
+                        relations[mapping.inverse].push_back(source);
+                }
+                auto descendants = children(*source);
+                pending.insert(pending.end(), descendants.rbegin(), descendants.rend());
             }
         }
+        GVariantBuilder result; g_variant_builder_init(&result, G_VARIANT_TYPE("a(ua(so))"));
+        for (auto& [kind, relatedNodes] : relations) {
+            GVariantBuilder targets; g_variant_builder_init(&targets, G_VARIANT_TYPE("a(so)"));
+            for (auto* target : relatedNodes) g_variant_builder_add_value(&targets, reference(target));
+            g_variant_builder_add(&result, "(ua(so))", kind, &targets);
+        }
         return g_variant_new("(a(ua(so)))", &result);
+    }
+    std::vector<AttributeRun> attributeRuns(Node& node, const TextSnapshot& snapshot, int offset)
+    {
+        int start = 0, end = snapshot.utf16.back();
+        bool valid = true;
+        auto attributes = textAttributes(node.native, snapshot.utf16[offset], &start, &end, &valid);
+        if (!valid || start < 0 || end < start || end > snapshot.utf16.back()) return {};
+        return { { snapshot.fromNative(start), snapshot.fromNative(end), std::move(attributes) } };
     }
     GVariant* cacheItem(Node& node)
     {
@@ -757,6 +884,93 @@ void Bridge::method(GDBusConnection*, const char*, const char*, const char* inte
         }
     } else if (!strcmp(interface, text)) {
         TextSnapshot snapshot(node.native);
+        if (!strcmp(method, "GetDefaultAttributes") || !strcmp(method, "GetDefaultAttributeSet")) {
+            answer(g_variant_new("(@a{ss})", attributeVariant(textAttributes(node.native)))); return;
+        }
+        if (!strcmp(method, "GetAttributes") || !strcmp(method, "GetAttributeRun") || !strcmp(method, "GetAttributeValue")) {
+            int offset;
+            gboolean includeDefaults = false;
+            const char* attribute = nullptr;
+            if (!strcmp(method, "GetAttributeRun")) g_variant_get(input, "(ib)", &offset, &includeDefaults);
+            else if (!strcmp(method, "GetAttributeValue")) g_variant_get(input, "(i&s)", &offset, &attribute);
+            else g_variant_get(input, "(i)", &offset);
+            if (!snapshot.valid(offset)) { unsupported(); return; }
+            auto runs = bridge.attributeRuns(node, snapshot, offset);
+            auto position = offset == snapshot.size() && offset ? offset - 1 : offset;
+            auto run = std::find_if(runs.begin(), runs.end(), [&](auto& candidate) {
+                return position >= candidate.start && (position < candidate.end || !snapshot.size());
+            });
+            if (run == runs.end()) { unsupported(); return; }
+            if (attribute) {
+                auto found = run->attributes.find(attribute);
+                answer(g_variant_new("(s)", found == run->attributes.end() ? "" : found->second.c_str())); return;
+            }
+            auto attributes = run->attributes;
+            if (!includeDefaults) {
+                auto defaults = textAttributes(node.native);
+                for (auto entry = attributes.begin(); entry != attributes.end();) {
+                    auto inherited = defaults.find(entry->first);
+                    if (inherited != defaults.end() && inherited->second == entry->second) entry = attributes.erase(entry);
+                    else ++entry;
+                }
+            }
+            answer(g_variant_new("(@a{ss}ii)", attributeVariant(attributes), run->start, run->end)); return;
+        }
+        if (!strcmp(method, "GetOffsetAtPoint")) {
+            int x, y; unsigned coordinates;
+            g_variant_get(input, "(iiu)", &x, &y, &coordinates);
+            double originX, originY;
+            if (!bridge.coordinateOrigin(node, coordinates, originX, originY)) { unsupported(); return; }
+            double nativeX = std::floor((x - originX) / bridge.geometry.device_scale);
+            double nativeY = std::floor((y - originY) / bridge.geometry.device_scale);
+            if (!std::isfinite(nativeX) || !std::isfinite(nativeY) || nativeX < std::numeric_limits<int>::min()
+                || nativeX > std::numeric_limits<int>::max() || nativeY < std::numeric_limits<int>::min() || nativeY > std::numeric_limits<int>::max()) { unsupported(); return; }
+            answer(g_variant_new("(i)", snapshot.fromNative(rv_ax_text_offset_at(node.native, static_cast<int>(nativeX), static_cast<int>(nativeY))))); return;
+        }
+        if (!strcmp(method, "GetBoundedRanges")) {
+            int x, y, width, height; unsigned coordinates, clipX, clipY;
+            g_variant_get(input, "(iiiiuuu)", &x, &y, &width, &height, &coordinates, &clipX, &clipY);
+            double originX, originY;
+            if (width < 0 || height < 0 || clipX > ATSPI_TEXT_CLIP_BOTH || clipY > ATSPI_TEXT_CLIP_BOTH
+                || !bridge.coordinateOrigin(node, coordinates, originX, originY)) { unsupported(); return; }
+            auto within = [](double start, double end, double minimum, double maximum, unsigned clip) {
+                if (end <= minimum || start >= maximum) return false;
+                if ((clip == ATSPI_TEXT_CLIP_MIN || clip == ATSPI_TEXT_CLIP_BOTH) && start < minimum) return false;
+                if ((clip == ATSPI_TEXT_CLIP_MAX || clip == ATSPI_TEXT_CLIP_BOTH) && end > maximum) return false;
+                return true;
+            };
+            GVariantBuilder ranges; g_variant_builder_init(&ranges, G_VARIANT_TYPE("a(iisv)"));
+            int first = -1;
+            for (int character = 0; character <= snapshot.size(); ++character) {
+                bool included = false;
+                if (character < snapshot.size()) {
+                    int count = 0;
+                    auto status = rv_ax_text_rects(node.native, snapshot.utf16[character], snapshot.utf16[character + 1], nullptr, 0, &count);
+                    if ((status == RV_OK || status == RV_ERR_BUFFER_TOO_SMALL) && count > 0) {
+                        std::vector<double> rects(static_cast<size_t>(count) * 4);
+                        if (rv_ax_text_rects(node.native, snapshot.utf16[character], snapshot.utf16[character + 1], rects.data(), count, &count) == RV_OK) {
+                            for (int index = 0; index < count; ++index) {
+                                auto* rect = &rects[index * 4];
+                                double left = std::floor(rect[0] * bridge.geometry.device_scale + originX);
+                                double top = std::floor(rect[1] * bridge.geometry.device_scale + originY);
+                                double right = std::ceil((rect[0] + rect[2]) * bridge.geometry.device_scale + originX);
+                                double bottom = std::ceil((rect[1] + rect[3]) * bridge.geometry.device_scale + originY);
+                                if (std::isfinite(left) && std::isfinite(top) && std::isfinite(right) && std::isfinite(bottom)
+                                    && within(left, right, x, static_cast<double>(x) + width, clipX)
+                                    && within(top, bottom, y, static_cast<double>(y) + height, clipY)) included = true;
+                            }
+                        }
+                    }
+                }
+                if (included && first == -1) first = character;
+                if (!included && first != -1) {
+                    auto contents = snapshot.slice(first, character);
+                    g_variant_builder_add(&ranges, "(iisv)", first, character, contents.c_str(), g_variant_new_int32(0));
+                    first = -1;
+                }
+            }
+            answer(g_variant_new("(a(iisv))", &ranges)); return;
+        }
         if (!strcmp(method, "GetCharacterExtents") || !strcmp(method, "GetRangeExtents")) {
             int start, end; unsigned coordinates;
             if (!strcmp(method, "GetCharacterExtents")) {
