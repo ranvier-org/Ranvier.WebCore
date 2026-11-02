@@ -216,10 +216,15 @@ def verify_private_jwk(directory,path,bridge_library=None):
             result=backend.run(case['label'],case['algorithm'],'import',format='jwk',jwk=case['jwk'],curve=case['curve'],usages=case['usages'])
             if result['exception']!=case['expectedError']:
                 failures.append(dict(label=case['label'],expectedError=case['expectedError'],actual=result))
-            if case['expectedError'] is None and result['firstKey']:
-                exported=backend.run(case['label']+'/export',case['algorithm'],'export',key=result['firstKey'],format='jwk',curve=case['curve'])
-                if exported['exception'] or any(exported['jwk'].get(k)!=case['jwk'][k] for k in ['x','y','d']):
-                    failures.append(dict(label=exported['label'],actual=exported))
+            if case['expectedError'] is None:
+                if not result['firstKey']:
+                    failures.append(dict(label=case['label'],expected='nonnull imported key',actual=result))
+                else:
+                    exported=backend.run(case['label']+'/export',case['algorithm'],'export',key=result['firstKey'],format='jwk',curve=case['curve'])
+                    if exported['exception'] or any(exported['jwk'].get(k)!=case['jwk'][k] for k in ['x','y','d']):
+                        failures.append(dict(label=exported['label'],actual=exported))
+            elif result['firstKey'] or result['secondKey']:
+                failures.append(dict(label=case['label'],expected='no returned keys on rejection',actual=result))
         backend.check_script_guard()
         return dict(result='FAIL' if failures else 'PASS',imports=len(fixture['cases']),records=backend.records,failures=failures,
                     fixtureSha256=hashlib.sha256(path.read_bytes()).hexdigest(),validationBasis=fixture['validationBasis'],
