@@ -1,4 +1,5 @@
 #include "config.h"
+#if USE(TEXTURE_MAPPER) && !USE(COORDINATED_GRAPHICS)
 #include "TextureMapper.h"
 #include "TextureMapperFlags.h"
 #include "Element.h"
@@ -24,3 +25,13 @@ extern "C" WEBCORE_EXPORT void rv_native_texture_draw(WebCore::TextureMapper* ma
 {
     mapper->drawTexture(texture, WebCore::TextureMapperFlags::ShouldBlend, *target, *matrix, opacity);
 }
+
+extern "C" WEBCORE_EXPORT void rv_native_texture_draw_flipped(WebCore::TextureMapper* mapper, unsigned texture,
+    const WebCore::FloatRect* target, const WebCore::TransformationMatrix* matrix, float opacity, bool flipY)
+{
+    OptionSet<WebCore::TextureMapperFlags> flags { WebCore::TextureMapperFlags::ShouldBlend };
+    if (flipY)
+        flags.add(WebCore::TextureMapperFlags::ShouldFlipTexture);
+    mapper->drawTexture(texture, flags, *target, *matrix, opacity);
+}
+#endif

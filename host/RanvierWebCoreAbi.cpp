@@ -736,6 +736,7 @@ public:
 // the compositor's tree: on the Windows port the frame's root layer paints into the window, not into a
 // layer (RenderLayerBacking::paintsIntoWindow).
 #include "RanvierNativeTextureInput.h"
+#include "RanvierNativeTextureEGLInput.h"
 
 struct RvCompositor final : GraphicsLayerClient {
     GLContext* context { nullptr };
@@ -844,6 +845,8 @@ struct RvHost {
     float deviceScale { 1 };
 #if defined(_WIN32) && RANVIER_COMPOSITING
     Vector<std::unique_ptr<RvNativeTextureInput>> nativeTextures;
+#elif defined(__linux__) && RANVIER_COMPOSITING
+    Vector<std::unique_ptr<RvNativeEGLTextureInput>> nativeTextures;
 #endif
     // The viewport area invalidated since the last paint.
     IntRect dirty;
@@ -1689,11 +1692,17 @@ int32_t rv_abi_has(const char* feature)
 #if RANVIER_COMPOSITING
     if (!std::strcmp(feature, "compositing"))
         return 1;
+    if (!std::strcmp(feature, "compositor-device-scale"))
+        return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "presentation-d3d11"))
         return 1;
+    if (!std::strcmp(feature, "texture-input-d3d11"))
+        return 1;
 #elif defined(__linux__)
     if (!std::strcmp(feature, "presentation-egl"))
+        return 1;
+    if (!std::strcmp(feature, "texture-input-egl"))
         return 1;
 #endif
 #endif
@@ -2190,7 +2199,7 @@ void rv_host_destroy(RvHost* host)
 {
     if (!host || !onOwningThread())
         return;
-#if defined(_WIN32) && RANVIER_COMPOSITING
+#if (defined(_WIN32) || defined(__linux__)) && RANVIER_COMPOSITING
     host->nativeTextures.clear();
 #endif
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
@@ -2216,7 +2225,7 @@ int32_t rv_host_load_html(RvHost* host, const uint8_t* html, int32_t html_length
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
-#if defined(_WIN32) && RANVIER_COMPOSITING
+#if (defined(_WIN32) || defined(__linux__)) && RANVIER_COMPOSITING
     host->nativeTextures.clear();
 #endif
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
@@ -2237,7 +2246,7 @@ int32_t rv_host_load_svg(RvHost* host, const uint8_t* svg, int32_t svg_length)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
-#if defined(_WIN32) && RANVIER_COMPOSITING
+#if (defined(_WIN32) || defined(__linux__)) && RANVIER_COMPOSITING
     host->nativeTextures.clear();
 #endif
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
@@ -2524,7 +2533,7 @@ static int32_t composite(RvHost& host, RvCompositor& compositor, LocalFrameView&
         compositor.root->setNeedsDisplay();
     compositor.root->flushCompositingStateForThisLayerOnly();
     view.flushCompositingStateIncludingSubframes();
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(__linux__)
     host.nativeTextures.removeAllMatching([&](auto& input) {
         return !input->element->isConnected() || &input->element->document() != &host.document();
     });
@@ -2611,6 +2620,65 @@ extern "C" RV_EXPORT int32_t rv_host_bind_d3d11_texture(RvHost* host, RvNode* ta
     host->nativeTextures.removeAllMatching([&](auto& prior) { return prior->element.get() == element; });
     if (input)
         host->nativeTextures.append(WTF::move(input));
+    host->requestFrame();
+    return RV_OK;
+#else
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+int32_t rv_host_bind_egl_image(RvHost* host, RvNode* target, void* image, int32_t flipY)
+{
+    if (!host || !target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_DETACHED;
+#if defined(__linux__) && RANVIER_COMPOSITING
+    if (host->inFrame || (flipY != 0 && flipY != 1))
+        return RV_ERR_UNSUPPORTED;
+    auto* element = dynamicDowncast<Element>(*node(target));
+    if (!element || &element->document() != &host->document() || !element->isConnected())
+        return RV_ERR_WRONG_HOST;
+    if (image && (!configuredEGLDisplay || eglGetCurrentDisplay() != configuredEGLDisplay || eglGetCurrentContext() == EGL_NO_CONTEXT))
+        return RV_ERR_UNSUPPORTED;
+    RvEGLContextScope contextScope;
+    std::unique_ptr<RvNativeEGLTextureInput> input;
+    if (image) {
+        input = RvNativeEGLTextureInput::create(*element, image, flipY, [] {
+            auto* context = compositingContext();
+            return context && context->makeContextCurrent();
+        });
+        if (!input)
+            return RV_ERR_UNSUPPORTED;
+    }
+    host->nativeTextures.removeAllMatching([&](auto& prior) { return prior->element.get() == element; });
+    if (input)
+        host->nativeTextures.append(WTF::move(input));
+    host->requestFrame();
+    return RV_OK;
+#else
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+int32_t rv_host_native_texture_changed(RvHost* host, RvNode* target)
+{
+    if (!host || !target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_DETACHED;
+#if (defined(_WIN32) || defined(__linux__)) && RANVIER_COMPOSITING
+    if (host->inFrame)
+        return RV_ERR_UNSUPPORTED;
+    auto* element = dynamicDowncast<Element>(*node(target));
+    if (!element || &element->document() != &host->document() || !element->isConnected())
+        return RV_ERR_WRONG_HOST;
+    if (!host->nativeTextures.containsIf([&](auto& input) { return input->element.get() == element; }))
+        return RV_ERR_UNSUPPORTED;
     host->requestFrame();
     return RV_OK;
 #else
