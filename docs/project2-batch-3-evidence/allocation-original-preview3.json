@@ -1,0 +1,210 @@
+{
+  "owner": "Codex acceptance/integration",
+  "checkedAtUtc": "2026-11-01T22:01:55.646005+00:00",
+  "nativeProductWindowsSource": "de2281031ed5e9e2d12d8143080d9a13b962b314",
+  "nativeProductLinuxSource": "b2f8d1ff0c68ec4186b16d4d4cc84a99bce667a5",
+  "productTreesExactlyEqual": "290e14d8628ae8718c64b45fe0674c9cb25dddcd",
+  "abiDecision": {
+    "abi": 60,
+    "newKinds": [],
+    "publicHeaderTokensIdenticalToFirstRelease": true,
+    "unchangedGeneratedAndInteropHashes": {
+      "host/RanvierWebCoreDom.h": "81d52c9b692dbe9ecb182d473f25b765b51ba8ee10b0e5326251162e8021fd81",
+      "gen/dom-api.json": "6e4431300e1573b5ad269b0460607b2fc88eb1f4018f8a96f5f891022ace0b6d",
+      "gen/Ranvier.Dom.fs": "01a67670c26173a803f5ef2014fb856597e72e5ad98e47e08cb9120fa0262cfc",
+      "tests/abi/Native.fs": "8c4d85e27c46df635a352df5be81f888b3c45bbedcff3081618ab990665393ff",
+      "tests/abi/NativeDom.fs": "eeee7250edd36db0d37d1bfea9bf6550e66cf7881e1be9e5a760eca7f5795baf"
+    },
+    "reason": "Existing reserved resize fields and box enum are activated through capability discovery; public C declarations, layouts, enums and generated DOM contracts do not change."
+  },
+  "allocation": {
+    "native": "0.1.1-preview.3",
+    "dom": "0.1.0-alpha.55 unchanged; no Core release/source pin change required",
+    "viewStable": "0.1.46",
+    "viewBackend": "0.1.0-alpha.46"
+  },
+  "packageAbsence": [
+    {
+      "id": "Ranvier.WebCore",
+      "version": "0.1.1-preview.3",
+      "url": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore/0.1.1-preview.3/ranvier.webcore.0.1.1-preview.3.nupkg",
+      "status": 404,
+      "serverDate": "Sun, 01 Nov 2026 22:01:50 GMT"
+    },
+    {
+      "id": "Ranvier.WebCore.Native",
+      "version": "0.1.1-preview.3",
+      "url": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native/0.1.1-preview.3/ranvier.webcore.native.0.1.1-preview.3.nupkg",
+      "status": 404,
+      "serverDate": "Sun, 01 Nov 2026 22:01:50 GMT"
+    },
+    {
+      "id": "Ranvier.WebCore.Native.win-x64",
+      "version": "0.1.1-preview.3",
+      "url": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.win-x64/0.1.1-preview.3/ranvier.webcore.native.win-x64.0.1.1-preview.3.nupkg",
+      "status": 404,
+      "serverDate": "Sun, 01 Nov 2026 22:01:50 GMT"
+    },
+    {
+      "id": "Ranvier.WebCore.Native.win-arm64",
+      "version": "0.1.1-preview.3",
+      "url": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.win-arm64/0.1.1-preview.3/ranvier.webcore.native.win-arm64.0.1.1-preview.3.nupkg",
+      "status": 404,
+      "serverDate": "Sun, 01 Nov 2026 22:01:50 GMT"
+    },
+    {
+      "id": "Ranvier.WebCore.Native.linux-x64",
+      "version": "0.1.1-preview.3",
+      "url": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.linux-x64/0.1.1-preview.3/ranvier.webcore.native.linux-x64.0.1.1-preview.3.nupkg",
+      "status": 404,
+      "serverDate": "Sun, 01 Nov 2026 22:01:50 GMT"
+    },
+    {
+      "id": "Ranvier.WebCore.Native.linux-arm64",
+      "version": "0.1.1-preview.3",
+      "url": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.linux-arm64/0.1.1-preview.3/ranvier.webcore.native.linux-arm64.0.1.1-preview.3.nupkg",
+      "status": 404,
+      "serverDate": "Sun, 01 Nov 2026 22:01:50 GMT"
+    },
+    {
+      "id": "Ranvier.WebCore.Native.osx-arm64",
+      "version": "0.1.1-preview.3",
+      "url": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.osx-arm64/0.1.1-preview.3/ranvier.webcore.native.osx-arm64.0.1.1-preview.3.nupkg",
+      "status": 404,
+      "serverDate": "Sun, 01 Nov 2026 22:01:50 GMT"
+    },
+    {
+      "id": "Ranvier.WebCore.Native.Gpu.win-x64",
+      "version": "0.1.1-preview.3",
+      "url": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.gpu.win-x64/0.1.1-preview.3/ranvier.webcore.native.gpu.win-x64.0.1.1-preview.3.nupkg",
+      "status": 404,
+      "serverDate": "Sun, 01 Nov 2026 22:01:50 GMT"
+    },
+    {
+      "id": "Ranvier.WebCore.Native.Gpu.linux-x64",
+      "version": "0.1.1-preview.3",
+      "url": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.gpu.linux-x64/0.1.1-preview.3/ranvier.webcore.native.gpu.linux-x64.0.1.1-preview.3.nupkg",
+      "status": 404,
+      "serverDate": "Sun, 01 Nov 2026 22:01:50 GMT"
+    },
+    {
+      "id": "Ranvier.WebCore.Native.Gpu.linux-arm64",
+      "version": "0.1.1-preview.3",
+      "url": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.gpu.linux-arm64/0.1.1-preview.3/ranvier.webcore.native.gpu.linux-arm64.0.1.1-preview.3.nupkg",
+      "status": 404,
+      "serverDate": "Sun, 01 Nov 2026 22:01:50 GMT"
+    },
+    {
+      "id": "Ranvier.View",
+      "version": "0.1.46",
+      "url": "https://api.nuget.org/v3-flatcontainer/ranvier.view/0.1.46/ranvier.view.0.1.46.nupkg",
+      "status": 404,
+      "serverDate": "Sun, 01 Nov 2026 22:01:50 GMT"
+    },
+    {
+      "id": "Ranvier.View.Dom",
+      "version": "0.1.46",
+      "url": "https://api.nuget.org/v3-flatcontainer/ranvier.view.dom/0.1.46/ranvier.view.dom.0.1.46.nupkg",
+      "status": 404,
+      "serverDate": "Sun, 01 Nov 2026 22:01:50 GMT"
+    },
+    {
+      "id": "Ranvier.View.Anime",
+      "version": "0.1.46",
+      "url": "https://api.nuget.org/v3-flatcontainer/ranvier.view.anime/0.1.46/ranvier.view.anime.0.1.46.nupkg",
+      "status": 404,
+      "serverDate": "Sun, 01 Nov 2026 22:01:50 GMT"
+    },
+    {
+      "id": "Fable.Ranvier.Anime",
+      "version": "0.1.46",
+      "url": "https://api.nuget.org/v3-flatcontainer/fable.ranvier.anime/0.1.46/fable.ranvier.anime.0.1.46.nupkg",
+      "status": 404,
+      "serverDate": "Sun, 01 Nov 2026 22:01:50 GMT"
+    },
+    {
+      "id": "Ranvier.View.Traced",
+      "version": "0.1.46",
+      "url": "https://api.nuget.org/v3-flatcontainer/ranvier.view.traced/0.1.46/ranvier.view.traced.0.1.46.nupkg",
+      "status": 404,
+      "serverDate": "Sun, 01 Nov 2026 22:01:50 GMT"
+    },
+    {
+      "id": "Ranvier.View.Dom.Traced",
+      "version": "0.1.46",
+      "url": "https://api.nuget.org/v3-flatcontainer/ranvier.view.dom.traced/0.1.46/ranvier.view.dom.traced.0.1.46.nupkg",
+      "status": 404,
+      "serverDate": "Sun, 01 Nov 2026 22:01:50 GMT"
+    },
+    {
+      "id": "Ranvier.View.Anime.Traced",
+      "version": "0.1.46",
+      "url": "https://api.nuget.org/v3-flatcontainer/ranvier.view.anime.traced/0.1.46/ranvier.view.anime.traced.0.1.46.nupkg",
+      "status": 404,
+      "serverDate": "Sun, 01 Nov 2026 22:01:50 GMT"
+    },
+    {
+      "id": "Fable.Ranvier.Anime.Traced",
+      "version": "0.1.46",
+      "url": "https://api.nuget.org/v3-flatcontainer/fable.ranvier.anime.traced/0.1.46/fable.ranvier.anime.traced.0.1.46.nupkg",
+      "status": 404,
+      "serverDate": "Sun, 01 Nov 2026 22:01:50 GMT"
+    },
+    {
+      "id": "Ranvier.View.WebCore",
+      "version": "0.1.0-alpha.46",
+      "url": "https://api.nuget.org/v3-flatcontainer/ranvier.view.webcore/0.1.0-alpha.46/ranvier.view.webcore.0.1.0-alpha.46.nupkg",
+      "status": 404,
+      "serverDate": "Sun, 01 Nov 2026 22:01:50 GMT"
+    },
+    {
+      "id": "Ranvier.View.WebCore.Sdl",
+      "version": "0.1.0-alpha.46",
+      "url": "https://api.nuget.org/v3-flatcontainer/ranvier.view.webcore.sdl/0.1.0-alpha.46/ranvier.view.webcore.sdl.0.1.0-alpha.46.nupkg",
+      "status": 404,
+      "serverDate": "Sun, 01 Nov 2026 22:01:50 GMT"
+    },
+    {
+      "id": "Ranvier.View.WebCore.Traced",
+      "version": "0.1.0-alpha.46",
+      "url": "https://api.nuget.org/v3-flatcontainer/ranvier.view.webcore.traced/0.1.0-alpha.46/ranvier.view.webcore.traced.0.1.0-alpha.46.nupkg",
+      "status": 404,
+      "serverDate": "Sun, 01 Nov 2026 22:01:51 GMT"
+    },
+    {
+      "id": "Ranvier.View.WebCore.Sdl.Traced",
+      "version": "0.1.0-alpha.46",
+      "url": "https://api.nuget.org/v3-flatcontainer/ranvier.view.webcore.sdl.traced/0.1.0-alpha.46/ranvier.view.webcore.sdl.traced.0.1.0-alpha.46.nupkg",
+      "status": 404,
+      "serverDate": "Sun, 01 Nov 2026 22:01:51 GMT"
+    }
+  ],
+  "githubAbsence": [
+    {
+      "repository": "Ranvier.WebCore",
+      "endpoint": "git/ref/tags/v0.1.1-preview.3",
+      "status": 404
+    },
+    {
+      "repository": "Ranvier.WebCore",
+      "endpoint": "releases/tags/v0.1.1-preview.3",
+      "status": 404
+    },
+    {
+      "repository": "Ranvier.View",
+      "endpoint": "git/ref/tags/v0.1.46",
+      "status": 404
+    },
+    {
+      "repository": "Ranvier.View",
+      "endpoint": "releases/tags/v0.1.46",
+      "status": 404
+    }
+  ],
+  "matchingOpenReservations": [],
+  "status": "ALLOCATED before version edits",
+  "sourceScope": "#146/#230/#210 with load-bearing#232/#214; exclude private143/0060/0062. Current private packages retain actual de228/b2 source/version; allocated integration is not a rebuilt/public candidate.",
+  "fullScratchReceiptSha256": "3ed2c28112326c49141b04d298f13f96262817993511bbcae9c94820037ed062",
+  "firstCohortNativeReleaseSource": "05ba023551aaf58946cbc0ca7099ca65d9860e14",
+  "sourceTruth": "Version allocation does not rebuild or relabel private de228/b2 packages. Final build/source/public evidence is still required."
+}
