@@ -73,6 +73,12 @@ def main(directory):
         events.clear()
         click_first()
         canceled = requests[-1][0]
+        relative = b'relative.txt'
+        relative_paths = (C.c_char_p * 1)(relative)
+        relative_lengths = (I * 1)(len(relative))
+        n.expect(n.call('rv_host_file_picker_complete', [P, U64, I, C.POINTER(C.c_char_p), C.POINTER(I), I],
+                        page.host, canceled, 1, relative_paths, relative_lengths, 1) < 0, 'relative paths are rejected')
+        n.expect(events == [], 'invalid completion leaves request pending')
         n.ok('rv_host_file_picker_complete', [P, U64, I, C.POINTER(C.c_char_p), C.POINTER(I), I],
              page.host, canceled, 0, None, None, 0)
         n.expect(events == ['cancel'], 'cancellation reports cancel without input or change')
