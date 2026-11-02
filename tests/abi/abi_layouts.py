@@ -20,6 +20,8 @@ class RvDomUtf8StringInput(ctypes.Structure):
 
 # Each struct: its ctypes fields, the expected size and offsets, and the F# type name with its field names.
 LAYOUTS = {
+    'RvHostErrorRecord': ([('operation', I), ('source', I), ('status', I), ('native_code', I)],
+                          16, [0, 4, 8, 12], 'HostErrorRecord'),
     'RvHostTraceEvent': ([('phase', I), ('source', I), ('start_ns', ctypes.c_uint64),
                           ('duration_ns', ctypes.c_uint64), ('sequence', ctypes.c_uint64)],
                          32, [0, 4, 8, 16, 24], 'HostTraceEvent'),

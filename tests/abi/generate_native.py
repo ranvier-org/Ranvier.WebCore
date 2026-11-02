@@ -160,7 +160,11 @@ def trace_types() -> list[str]:
               ("duration_ns", "uint64"), ("sequence", "uint64")]
     return ["", "/// <summary>Host rendering trace event; times are monotonic nanoseconds.</summary>",
             "[<Struct; StructLayout(LayoutKind.Sequential)>]", "type HostTraceEvent ="] + [
-                f"    val mutable {name}: {kind}" for name, kind in fields]
+                f"    val mutable {name}: {kind}" for name, kind in fields] + [
+                "", "/// <summary>Latest native presentation failure and platform-specific status.</summary>",
+                "[<Struct; StructLayout(LayoutKind.Sequential)>]", "type HostErrorRecord =",
+                "    val mutable operation: int", "    val mutable source: int", "    val mutable status: int",
+                "    val mutable native_code: int"]
 
 
 def print_types() -> list[str]:

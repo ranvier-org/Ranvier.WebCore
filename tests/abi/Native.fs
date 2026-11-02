@@ -296,6 +296,14 @@ type HostTraceEvent =
     val mutable duration_ns: uint64
     val mutable sequence: uint64
 
+/// <summary>Latest native presentation failure and platform-specific status.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type HostErrorRecord =
+    val mutable operation: int
+    val mutable source: int
+    val mutable status: int
+    val mutable native_code: int
+
 /// <summary>
 /// Per-function counts and Stopwatch ticks of the calls made while <c>On</c>, indexed as <c>Names</c>. The ticks of a
 /// call span its P/Invoke transition, marshalling and native work.
@@ -640,6 +648,8 @@ module Calls =
             "rv_print_pdf_result"
             "rv_host_trace_enable"
             "rv_host_trace_drain"
+            "rv_host_error_enable"
+            "rv_host_error_take"
         |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
@@ -2043,6 +2053,12 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_host_trace_drain(nativeint host, nativeint events, int capacity, int& written, uint64& dropped)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_error_enable(nativeint host, int enabled)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_error_take(nativeint host, nativeint record, int& present)
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -6416,6 +6432,30 @@ let rv_host_trace_drain
         result
     else
         Raw.rv_host_trace_drain (host, events, capacity, &written, &dropped)
+
+let rv_host_error_enable (host: nativeint, enabled: int) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_error_enable (host, enabled)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[337] <- Calls.Counts[337] + 1L
+        Calls.Ticks[337] <- Calls.Ticks[337] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_error_enable (host, enabled)
+
+let rv_host_error_take (host: nativeint, record: nativeint, present: byref<int>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_error_take (host, record, &present)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[338] <- Calls.Counts[338] + 1L
+        Calls.Ticks[338] <- Calls.Ticks[338] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_error_take (host, record, &present)
 
 // END GENERATED
 

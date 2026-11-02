@@ -2805,6 +2805,20 @@ RV_EXPORT int32_t rv_host_trace_enable(RvHost*, int32_t enabled);
  * capacity. Writes the number copied and events dropped since the preceding drain, then clears that count. */
 RV_EXPORT int32_t rv_host_trace_drain(RvHost*, RvHostTraceEvent* events, int32_t capacity, int32_t* written, uint64_t* dropped);
 
+/* Disabled by default. The latest failure after presentation acquisition starts replaces any previous record. Argument,
+ * thread and preflight failures use the direct return status only. native_code is the
+ * signed D3D11 device removal HRESULT when available, otherwise zero. Taking a record clears it; a transition between
+ * enabled and disabled also clears it. Expected cancellation is reported by its existing resource completion, not here. */
+enum { RV_HOST_ERROR_ACQUIRE_FRAME = 1, RV_HOST_ERROR_SOURCE_D3D11 = 1, RV_HOST_ERROR_SOURCE_EGL = 2 };
+typedef struct RvHostErrorRecord {
+    int32_t operation;
+    int32_t source;
+    int32_t status;
+    int32_t native_code;
+} RvHostErrorRecord;
+RV_EXPORT int32_t rv_host_error_enable(RvHost*, int32_t enabled);
+RV_EXPORT int32_t rv_host_error_take(RvHost*, RvHostErrorRecord* record, int32_t* present);
+
 #ifdef __cplusplus
 }
 #endif
