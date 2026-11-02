@@ -2,6 +2,9 @@ namespace Ranvier.Examples.NativeMedia
 
 open System.Runtime.InteropServices
 
+[<assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Managed")>]
+do ()
+
 /// <summary>The application DLL's copied playback state.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type internal NativeSnapshot =

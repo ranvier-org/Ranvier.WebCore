@@ -24,6 +24,45 @@ let private page =
     + "#caption{position:absolute;left:20px;top:90px;font:20px sans-serif}</style>"
     + "<div id='clip'><div id='video'></div></div><div id='caption'></div>"
 
+let internal verifyOwnership check =
+    let pending = PendingFrameCleanup(Environment.CurrentManagedThreadId)
+    let original = InvalidOperationException "notification failed"
+    let mutable unbindAttempts, released = 0, 0
+    let mutable bound = true
+    let cleanup () =
+        unbindAttempts <- unbindAttempts + 1
+        if unbindAttempts <= 2 then invalidOp "unbind failed"
+        bound <- false
+        released <- released + 1
+    let first =
+        try
+            try raise original
+            with _ -> pending.Rollback cleanup; reraise ()
+        with error -> error
+    check (obj.ReferenceEquals(first, original)) "double failure preserves original publication exception"
+    check (bound && released = 0 && unbindAttempts = 1) "failed rollback retains bound frame"
+    let mutable retryWrongThread = 0
+    let retryThread = Thread(fun () ->
+        try pending.Retry()
+        with error -> retryWrongThread <- error.HResult)
+    retryThread.Start()
+    retryThread.Join()
+    check (retryWrongThread = int 0x8001010Eu && unbindAttempts = 1) "wrong-thread retry cannot consume pending ownership"
+    let mutable sessionReleased = false
+    let dispose () = pending.Retry(); sessionReleased <- true
+    let retryError = try dispose (); false with :? InvalidOperationException -> true
+    check (retryError && bound && released = 0 && not sessionReleased) "failed disposal remains retryable"
+    dispose ()
+    pending.Retry()
+    check (not bound && released = 1 && unbindAttempts = 3 && sessionReleased) "retry unbinds before one provider release"
+    let disposedHost = PendingFrameCleanup(Environment.CurrentManagedThreadId)
+    disposedHost.Rollback(fun () ->
+        try raise (ObjectDisposedException "host")
+        with :? ObjectDisposedException -> ()
+        released <- released + 1)
+    disposedHost.Retry()
+    check (released = 2) "definitively disposed host permits release without pending ownership"
+
 /// <summary>Runs actual managed playback, GPU composition, clock, OS actions and publication teardown.</summary>
 [<EntryPoint>]
 let main arguments =
@@ -31,13 +70,14 @@ let main arguments =
     let check condition message =
         assertions <- assertions + 1
         if not condition then invalidOp message
+    verifyOwnership check
     if arguments.Length = 1 && arguments[0] = "--unavailable" then
         try
             use unexpected = WindowsPlayback.Create()
             invalidOp "Absent optional DLL unexpectedly created a provider"
         with :? MediaProviderUnavailableException as error ->
             check (error.HResult < 0) "unavailable keeps actual HRESULT"
-            Console.WriteLine "MEDIA_MANAGED_UNAVAILABLE_ASSERTIONS=1"
+            Console.WriteLine "MEDIA_MANAGED_UNAVAILABLE_ASSERTIONS=7"
             0
     else
         if arguments.Length <> 2 then invalidArg "arguments" "Expected native directory and original media fixture"

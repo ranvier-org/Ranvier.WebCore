@@ -47,6 +47,11 @@ Dispose frame leases before destroying their View host. Player disposal revokes
 controls and pauses immediately; an outstanding frame defers final provider
 destruction. Wrong-thread calls and releases preserve ownership and fail with
 the native wrong-thread HRESULT. Disposal is mandatory and idempotent.
+If publication notification and rollback unbinding both fail, the original
+publication error is reported and the player retains cleanup ownership. Its
+next owner-thread call or `Dispose` retries unbinding before releasing the frame;
+a failed retry remains retryable. A definitively disposed host has already
+released its renderer bindings and permits provider cleanup.
 
 `WindowsPlayback.h` owns one local source per initialized session. Call
 `initialize()`, then `openFile(path)` on the owning application thread. A second
@@ -123,3 +128,6 @@ and renderer hashes, retains command/log receipts, and removes disposable build
 outputs. Its inspection-only SDK helper reads the composed GPU frame and the
 process's own audio/OS session; the application adapter itself uses only public
 View APIs. Run under the normal native-process and memory limits.
+Call `--phase build` and then `--phase run` with the same arguments when build
+and runtime grants are separate. The first retains its owned build directory;
+the second verifies unchanged inputs and cleans it after execution.

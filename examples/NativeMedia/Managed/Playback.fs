@@ -51,6 +51,22 @@ module private Ownership =
         if status < 0 then
             raise (ExternalException(operation + " failed", status))
 
+type internal PendingFrameCleanup(owner: int) =
+    let mutable pending: (unit -> unit) option = None
+
+    member _.Rollback(cleanup) =
+        Ownership.thread owner
+        try cleanup ()
+        with _ -> pending <- Some cleanup
+
+    member _.Retry() =
+        Ownership.thread owner
+        match pending with
+        | None -> ()
+        | Some cleanup ->
+            cleanup ()
+            pending <- None
+
 /// <summary>A bound video publication retaining its provider and texture until disposal.</summary>
 /// <remarks>Finish and release the native composition lease before disposing this lease on the creating thread.</remarks>
 [<Sealed>]
@@ -79,16 +95,19 @@ type VideoFrameLease internal (owner: int, info: NativeFrameInfo, release: unit 
 /// <summary>An optional Windows Media Foundation player with explicit owner-thread and video-publication lifetime.</summary>
 /// <remarks>
 /// Dispose frame leases before destroying their View host. Player disposal pauses/revokes actions immediately;
-/// live frames defer provider teardown.
+/// live frames defer provider teardown. Failed publication rollback retains its frame; the next owner-thread
+/// call or Dispose retries unbinding before releasing it. A failed retry leaves disposal retryable.
 /// </remarks>
 [<Sealed>]
 type WindowsPlayback private (initial: nativeint) =
     let owner = Environment.CurrentManagedThreadId
     let mutable handle = initial
+    let pending = PendingFrameCleanup(owner)
 
     let ensure () =
         Ownership.thread owner
         if handle = 0n then raise (ObjectDisposedException "WindowsPlayback")
+        pending.Retry()
 
     let command name call =
         ensure ()
@@ -123,11 +142,13 @@ type WindowsPlayback private (initial: nativeint) =
                     let status = Native.ranvier_media_frame_release(&held)
                     Ownership.check "media frame release" status
                 ValueSome (new VideoFrameLease(owner, info, release))
-            with error ->
-                if bound then
-                    try host.BindD3D11Texture(target, 0n) with _ -> ()
-                Native.ranvier_media_frame_release(&frame) |> ignore
-                raise error
+            with _ ->
+                pending.Rollback(fun () ->
+                    if bound then
+                        try host.BindD3D11Texture(target, 0n)
+                        with :? ObjectDisposedException -> ()
+                    Native.ranvier_media_frame_release(&frame) |> Ownership.check "media publication rollback")
+                reraise ()
 
     /// <summary>Creates an OS player on the calling thread; no file or media session controls are opened.</summary>
     /// <exception cref="T:System.PlatformNotSupportedException">The application is not running on Windows.</exception>
@@ -182,4 +203,5 @@ type WindowsPlayback private (initial: nativeint) =
         member _.Dispose() =
             if handle <> 0n then
                 Ownership.thread owner
+                pending.Retry()
                 Native.ranvier_media_release(&handle) |> Ownership.check "media release"
