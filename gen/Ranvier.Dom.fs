@@ -6779,10 +6779,37 @@ and [<RequireQualifiedAccess>] UnrestrictedDoubleOrCustomAnimationOptions =
     | CustomAnimationOptions of CustomAnimationOptions
 
 /// <summary>DOMStringOrCanvasGradientOrCanvasPattern in the scoped DOM interface model.</summary>
+#if !FABLE_COMPILER
+and [<System.Diagnostics.DebuggerDisplay("{ToString(),nq}"); RequireQualifiedAccess>] DOMStringOrCanvasGradientOrCanvasPattern =
+#else
 and [<RequireQualifiedAccess>] DOMStringOrCanvasGradientOrCanvasPattern =
+#endif
     | DOMString of string
     | CanvasGradient of CanvasGradient
     | CanvasPattern of CanvasPattern
+
+#if !FABLE_COMPILER
+    member internal this.NativeDisplay(context: NativeDisplay.Context, depth: int, precedence: int) =
+        NativeDisplay.union context depth precedence (box (this)) (fun n0 ->
+            match this with
+            | DOMStringOrCanvasGradientOrCanvasPattern.DOMString (v0_0) -> "DOMString", [ Some (fun p -> NativeDisplay.text context n0 (v0_0)) ]
+            | DOMStringOrCanvasGradientOrCanvasPattern.CanvasGradient (v0_0) ->
+                "CanvasGradient",
+                [
+                    Some (fun p -> NativeDisplay.opaque context n0 "<Ranvier.Dom.CanvasGradient>" (box (v0_0)))
+                ]
+            | DOMStringOrCanvasGradientOrCanvasPattern.CanvasPattern (v0_0) ->
+                "CanvasPattern",
+                [
+                    Some (fun p -> NativeDisplay.opaque context n0 "<Ranvier.Dom.CanvasPattern>" (box (v0_0)))
+                ])
+
+    override this.ToString() =
+        if System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeSupported then
+            sprintf "%+A" this
+        else
+            NativeDisplay.format (fun context depth precedence -> this.NativeDisplay (context, depth, precedence))
+#endif
 
 /// <summary>HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue in the scoped DOM interface model.</summary>
 and [<RequireQualifiedAccess>] HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue =
@@ -6793,9 +6820,40 @@ and [<RequireQualifiedAccess>] HTMLImageElementOrSVGImageElementOrHTMLCanvasElem
     | CSSStyleImageValue of CSSImageValue
 
 /// <summary>UnrestrictedDoubleOrDOMPointInit in the scoped DOM interface model.</summary>
+#if !FABLE_COMPILER
+and [<System.Diagnostics.DebuggerDisplay("{ToString(),nq}"); RequireQualifiedAccess>] UnrestrictedDoubleOrDOMPointInit =
+#else
 and [<RequireQualifiedAccess>] UnrestrictedDoubleOrDOMPointInit =
+#endif
     | UnrestrictedDouble of float
     | DOMPointInit of DOMPointInit
+
+#if !FABLE_COMPILER
+    member internal this.NativeDisplay(context: NativeDisplay.Context, depth: int, precedence: int) =
+        NativeDisplay.union context depth precedence (box this) (fun nested ->
+            match this with
+            | UnrestrictedDoubleOrDOMPointInit.UnrestrictedDouble value ->
+                "UnrestrictedDouble",
+                [
+                    Some (fun _ ->
+                        NativeDisplay.manual context nested (box value) (fun () ->
+                            if Double.IsNaN value then "nan"
+                            elif Double.IsPositiveInfinity value then "infinity"
+                            elif Double.IsNegativeInfinity value then "-infinity"
+                            else
+                                let text = value.ToString("G10", Globalization.CultureInfo.InvariantCulture).ToLowerInvariant ()
+                                if text.Contains "." || text.Contains "e" then text else text + ".0"))
+                ]
+            | UnrestrictedDoubleOrDOMPointInit.DOMPointInit value ->
+                "DOMPointInit",
+                [ Some (fun _ -> NativeDisplay.opaque context nested "Ranvier.Dom.DOMPointInit" (box value)) ])
+
+    override this.ToString() =
+        if System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeSupported then
+            sprintf "%+A" this
+        else
+            NativeDisplay.format (fun context depth precedence -> this.NativeDisplay (context, depth, precedence))
+#endif
 
 /// <summary>NodeOrDOMString in the scoped DOM interface model.</summary>
 #if !FABLE_COMPILER
@@ -7223,21 +7281,65 @@ and [<DomStringEnum; RequireQualifiedAccess>] CanvasDirection =
     | [<CompiledName("inherit")>] Inherit
 
 /// <summary>CanvasFillRule in the scoped DOM interface model.</summary>
+#if !FABLE_COMPILER
+and [<System.Diagnostics.DebuggerDisplay("{ToString(),nq}"); DomStringEnum; RequireQualifiedAccess>] CanvasFillRule =
+#else
 and [<DomStringEnum; RequireQualifiedAccess>] CanvasFillRule =
+#endif
     | [<CompiledName("nonzero")>] Nonzero
     | [<CompiledName("evenodd")>] Evenodd
 
+#if !FABLE_COMPILER
+    override this.ToString() =
+        if System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeSupported then
+            sprintf "%+A" this
+        else
+            match this with
+            | CanvasFillRule.Nonzero -> "Nonzero"
+            | CanvasFillRule.Evenodd -> "Evenodd"
+#endif
+
 /// <summary>CanvasLineCap in the scoped DOM interface model.</summary>
+#if !FABLE_COMPILER
+and [<System.Diagnostics.DebuggerDisplay("{ToString(),nq}"); DomStringEnum; RequireQualifiedAccess>] CanvasLineCap =
+#else
 and [<DomStringEnum; RequireQualifiedAccess>] CanvasLineCap =
+#endif
     | [<CompiledName("butt")>] Butt
     | [<CompiledName("round")>] Round
     | [<CompiledName("square")>] Square
 
+#if !FABLE_COMPILER
+    override this.ToString() =
+        if System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeSupported then
+            sprintf "%+A" this
+        else
+            match this with
+            | CanvasLineCap.Butt -> "Butt"
+            | CanvasLineCap.Round -> "Round"
+            | CanvasLineCap.Square -> "Square"
+#endif
+
 /// <summary>CanvasLineJoin in the scoped DOM interface model.</summary>
+#if !FABLE_COMPILER
+and [<System.Diagnostics.DebuggerDisplay("{ToString(),nq}"); DomStringEnum; RequireQualifiedAccess>] CanvasLineJoin =
+#else
 and [<DomStringEnum; RequireQualifiedAccess>] CanvasLineJoin =
+#endif
     | [<CompiledName("round")>] Round
     | [<CompiledName("bevel")>] Bevel
     | [<CompiledName("miter")>] Miter
+
+#if !FABLE_COMPILER
+    override this.ToString() =
+        if System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeSupported then
+            sprintf "%+A" this
+        else
+            match this with
+            | CanvasLineJoin.Round -> "Round"
+            | CanvasLineJoin.Bevel -> "Bevel"
+            | CanvasLineJoin.Miter -> "Miter"
+#endif
 
 /// <summary>CanvasTextAlign in the scoped DOM interface model.</summary>
 and [<DomStringEnum; RequireQualifiedAccess>] CanvasTextAlign =
@@ -7257,10 +7359,25 @@ and [<DomStringEnum; RequireQualifiedAccess>] CanvasTextBaseline =
     | [<CompiledName("bottom")>] Bottom
 
 /// <summary>ImageSmoothingQuality in the scoped DOM interface model.</summary>
+#if !FABLE_COMPILER
+and [<System.Diagnostics.DebuggerDisplay("{ToString(),nq}"); DomStringEnum; RequireQualifiedAccess>] ImageSmoothingQuality =
+#else
 and [<DomStringEnum; RequireQualifiedAccess>] ImageSmoothingQuality =
+#endif
     | [<CompiledName("low")>] Low
     | [<CompiledName("medium")>] Medium
     | [<CompiledName("high")>] High
+
+#if !FABLE_COMPILER
+    override this.ToString() =
+        if System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeSupported then
+            sprintf "%+A" this
+        else
+            match this with
+            | ImageSmoothingQuality.Low -> "Low"
+            | ImageSmoothingQuality.Medium -> "Medium"
+            | ImageSmoothingQuality.High -> "High"
+#endif
 
 /// <summary>HighlightType in the scoped DOM interface model.</summary>
 and [<DomStringEnum; RequireQualifiedAccess>] HighlightType =
