@@ -22,13 +22,15 @@ class HostPrepare(unittest.TestCase):
             program.write_text('#include <cstdint>\n#include <cstring>\n#include <initializer_list>\n'
                 '#define USE(feature) USE_##feature\n#define ENABLE(feature) 0\n#define PLATFORM(feature) 0\n'
                 'int ranvier_dom_has(const char*) { return 0; }\n'
+                'int ranvier_print_pdf_supported() { return PRINT_SUPPORTED; }\n'
                 'int32_t rv_abi_has(const char* feature)'+capability+'\n}\n'
-                'int main() { return rv_abi_has("view-transitions") != EXPECT_SUPPORTED; }\n')
-            for name,stub,compositor,expected in [('windows-slim',1,0,0),('wpe-slim',0,0,0),('gpu',0,1,1)]:
+                'int main() { return rv_abi_has("view-transitions") != EXPECT_SUPPORTED || '
+                'rv_abi_has("printing-pdf") != PRINT_SUPPORTED; }\n')
+            for name,stub,compositor,expected,printing in [('windows-slim',1,0,0,0),('wpe-slim',0,0,0,1),('gpu',0,1,1,1)]:
                 with self.subTest(profile=name):
                     executable=directory/(name+('.exe' if os.name=='nt' else ''))
                     result=subprocess.run([compiler,'-std=c++20',f'-DUSE_GPU_STUB={stub}',
-                        f'-DRANVIER_COMPOSITING={compositor}',f'-DEXPECT_SUPPORTED={expected}',
+                        f'-DRANVIER_COMPOSITING={compositor}',f'-DEXPECT_SUPPORTED={expected}',f'-DPRINT_SUPPORTED={printing}',
                         str(program),'-o',str(executable)],capture_output=True,text=True)
                     self.assertEqual(result.returncode,0,result.stdout+result.stderr)
                     self.assertEqual(subprocess.run([str(executable)]).returncode,0,
