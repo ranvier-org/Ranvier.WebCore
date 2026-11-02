@@ -179,6 +179,49 @@ def run(args):
                  'reentrant close defers until print state is restored and publishes no operation')
         p.host = None
         report['assertions'] += p.assertions
+    for action in ['close-before-completion', 'release-before-completion']:
+        with SvgProbe(args.native_directory, 100, 100) as p:
+            p.load('<p>owned PDF completion lifetime</p>', standalone=False)
+            p.update()
+            events = []
+            cancel = Cancel(lambda _: 0)
+            completed = Completion(lambda _, outcome, width, height: events.append([outcome, width, height]))
+            options, pages, token = Options(), I(-1), U64(0xdead)
+            export = p.bind('rv_host_print_pdf', I, [P, C.POINTER(Options), Cancel, P, Completion, P, C.POINTER(I), C.POINTER(U64)])
+            result_of = p.bind('rv_print_pdf_result', I, [U64, P, I64, C.POINTER(I64)])
+            release = p.bind('rv_resource_release', I, [U64])
+            cycle = p.bind('rv_run_loop_cycle', I, [I])
+            p.expect(export(p.host, C.byref(options), cancel, None, completed, None, C.byref(pages), C.byref(token)) == 0,
+                     action + ': admitted output')
+            p.expect(pages.value == 1 and bool(token.value) and not events, action + ': completion deferred')
+            length = I64(-1)
+            p.expect(result_of(token.value, None, 0, C.byref(length)) == -9, action + ': pending bytes unavailable')
+            try:
+                if action == 'close-before-completion':
+                    p.release_nodes()
+                    p.dispose_host()
+                    p.expect(not events, action + ': host teardown does not deliver inside close')
+                    for _ in range(100):
+                        if events:
+                            break
+                        cycle(1)
+                    p.expect(events == [[0, 0, 0]], action + ': retained terminal completion after close')
+                    p.expect(result_of(token.value, None, 0, C.byref(length)) == -6 and length.value > 5,
+                             action + ': owned result size after close')
+                    data = C.create_string_buffer(length.value)
+                    p.expect(result_of(token.value, data, len(data), C.byref(length)) == 0 and data.raw.startswith(b'%PDF-'),
+                             action + ': owned complete PDF after close')
+                else:
+                    p.expect(release(token.value) == 0, action + ': release flushes existing terminal completion')
+                    p.expect(events == [[0, 0, 0]], action + ': exactly one completion during release')
+                    p.expect(result_of(token.value, None, 0, C.byref(length)) == -9, action + ': released bytes unavailable')
+                for _ in range(5):
+                    cycle(1)
+                p.expect(events == [[0, 0, 0]], action + ': no later duplicate callback')
+            finally:
+                p.expect(release(token.value) == 0, action + ': idempotent final release')
+            report['cases'].append({'label': action, 'pages': pages.value, 'events': events})
+            report['assertions'] += p.assertions
     args.report.write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps(report))
 
