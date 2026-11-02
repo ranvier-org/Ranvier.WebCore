@@ -849,6 +849,12 @@ jobs:
           run-id: 41456798523
           name: p4-clipping-diagnostic
           path: original/evidence
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 41436552210
+          name: probe-logs-win-x64-gpu
+          path: original/probe
       - name: Verify exact producer package and reviewed consumer qualification
         env:
           GH_TOKEN: ${{ github.token }}
@@ -856,6 +862,7 @@ jobs:
           python -I scripts/recover_preview4_gpu.py
           --package original/package/Ranvier.WebCore.Native.Gpu.win-x64.0.1.1-preview.4.nupkg
           --manifest original/manifest/manifest.json --evidence original/evidence
+          --producer-summary original/probe/summary.txt
           --receipt recovery/verification.json --export recovery/export
       - uses: actions/upload-artifact@v4
         with:
@@ -901,6 +908,12 @@ jobs:
           run-id: 41456798523
           name: p4-clipping-diagnostic
           path: original/evidence
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 41436552210
+          name: probe-logs-win-x64-gpu
+          path: original/probe
       - name: Revalidate the exact package and qualification before authentication
         env:
           GH_TOKEN: ${{ github.token }}
@@ -908,6 +921,7 @@ jobs:
           python -I scripts/recover_preview4_gpu.py
           --package original/package/Ranvier.WebCore.Native.Gpu.win-x64.0.1.1-preview.4.nupkg
           --manifest original/manifest/manifest.json --evidence original/evidence
+          --producer-summary original/probe/summary.txt
           --receipt recovery/pre-push-verification.json --export recovery/export
       - uses: actions/upload-artifact@v4
         with:

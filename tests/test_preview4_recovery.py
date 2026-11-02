@@ -33,13 +33,18 @@ class RecoveryTests(unittest.TestCase):
         self.report = {'result': 'PASS', 'rid': 'win-x64', 'completeKeys': 54, 'strictContentMaskKeys': 12,
                        'results': [{} for _ in range(54)], 'failures': []}
         self.write_evidence()
-        self.jobs = {'jobs': [{'name': 'diagnose-p4-clipping', 'conclusion': 'success', 'steps': [
+        self.jobs = {'total_count': 2, 'jobs': [{'name': 'diagnose-p4-clipping', 'conclusion': 'success', 'steps': [
             {'name': 'Verify diagnostic guards and bounded cleanup', 'conclusion': 'success'},
             {'name': 'Replay exact failed package and retain full pixels and adapter identity', 'conclusion': 'success'}]},
             {'name': 'publish', 'conclusion': 'skipped'}]}
-        self.producer = {'head_sha': recovery.PRODUCT, 'status': 'completed', 'conclusion': 'failure'}
+        self.producer = {'head_sha': recovery.PRODUCT, 'status': 'completed', 'conclusion': 'failure',
+                         'event': 'workflow_dispatch', 'head_branch': 'v0.1.1-preview.4',
+                         'path': '.github/workflows/build.yml', 'run_attempt': 1}
         self.qualification = {'head_sha': recovery.POLICY, 'event': 'workflow_dispatch',
                               'status': 'completed', 'conclusion': 'success'}
+        self.summary = self.root / 'summary.txt'
+        self.summary.write_text('FAIL Verify fixed content clipping masks and complete pointwise paint stability\n'
+                                + 'PASS control\n' * 102)
 
     def write_evidence(self):
         (self.root / 'receipt.json').write_text(json.dumps(self.receipt))
@@ -47,15 +52,16 @@ class RecoveryTests(unittest.TestCase):
 
     def run_verify(self):
         def api(path):
-            if path.endswith('/jobs'):
+            if '/jobs?' in path:
                 return self.jobs
             return self.producer if path.endswith(str(recovery.PRODUCER)) else self.qualification
         with patch.object(recovery, 'api', side_effect=api), \
              patch.object(recovery, 'PACKAGE_SHA', recovery.sha(self.package.read_bytes())), \
              patch.object(recovery, 'MANIFEST_SHA', recovery.sha(self.manifest_path.read_bytes())), \
              patch.object(recovery, 'REPORT_SHA', recovery.sha((self.root / 'background-content-clipping-regression.json').read_bytes())), \
-             patch.object(recovery, 'RECEIPT_SHA', recovery.sha((self.root / 'receipt.json').read_bytes())):
-            return recovery.verify(self.package, self.manifest_path, self.root)
+             patch.object(recovery, 'RECEIPT_SHA', recovery.sha((self.root / 'receipt.json').read_bytes())), \
+             patch.object(recovery, 'SUMMARY_SHA', recovery.sha(self.summary.read_bytes())):
+            return recovery.verify(self.package, self.manifest_path, self.root, self.summary)
 
     def test_complete_fixed_evidence(self):
         self.assertEqual(self.run_verify()['nativeFiles'], 26)
@@ -70,7 +76,16 @@ class RecoveryTests(unittest.TestCase):
                 self.qualification[key] = original
 
     def test_unexpected_job_or_missing_guard_refused(self):
+        self.jobs['total_count'] = 3
+        with self.assertRaises(ValueError):
+            self.run_verify()
+        self.jobs['total_count'] = 2
         self.jobs['jobs'][1]['conclusion'] = 'success'
+        with self.assertRaises(ValueError):
+            self.run_verify()
+
+    def test_extra_producer_failure_refused(self):
+        self.summary.write_text(self.summary.read_text().replace('PASS control', 'FAIL control', 1))
         with self.assertRaises(ValueError):
             self.run_verify()
         self.jobs['jobs'][1]['conclusion'] = 'skipped'
