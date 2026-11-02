@@ -10,6 +10,55 @@ import unittest
 
 
 class HostPrepare(unittest.TestCase):
+    def test_texture_helper_and_host_share_the_configured_compositor_profile(self):
+        cmake = shutil.which('cmake')
+        if not cmake:
+            self.skipTest('CMake is not available')
+        root = Path(__file__).resolve().parents[1]
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            for name, mapper, stub, expected in [('windows-slim', 1, 1, 0),
+                                                  ('coordinated', 0, 0, 0), ('gpu', 1, 0, 1)]:
+                with self.subTest(profile=name):
+                    output = directory / (name + '.txt')
+                    script = directory / (name + '.cmake')
+                    script.write_text('set(ENABLE_WEBCORE ON)\nset(PORT Test)\n'
+                        f'set(USE_GRAPHICS_LAYER_TEXTURE_MAPPER {mapper})\nset(USE_GPU_STUB {stub})\n'
+                        f'set(WebCore_EMBEDDER_SOURCES "{root.as_posix()}/host/RanvierNativeTextureDraw.cpp")\n'
+                        'macro(set_source_files_properties)\n'
+                        '  set(arguments ${ARGN})\n'
+                        '  list(FIND arguments COMPILE_DEFINITIONS index)\n'
+                        '  math(EXPR index "${index} + 1")\n'
+                        '  list(GET arguments ${index} definitions)\n'
+                        f'  file(WRITE "{output.as_posix()}" "${{definitions}}")\nendmacro()\n'
+                        'macro(add_library)\nendmacro()\n'
+                        'macro(target_compile_definitions)\nendmacro()\n'
+                        'macro(set_target_properties)\nendmacro()\n'
+                        'macro(target_link_libraries)\nendmacro()\n'
+                        'macro(_WEBKIT_TARGET_LINK_FRAMEWORK)\nendmacro()\n'
+                        'macro(_WEBKIT_TARGET)\nendmacro()\n'
+                        f'include("{root.as_posix()}/host/RanvierWebCoreHost.cmake")\n')
+                    result = subprocess.run([cmake, '-P', str(script)], capture_output=True, text=True)
+                    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                    self.assertEqual(output.read_text(), f'RANVIER_COMPOSITING={expected}')
+
+    def test_texture_helpers_do_not_reference_gpu_headers_in_a_stub_build(self):
+        compiler = shutil.which('c++') or shutil.which('clang++')
+        if not compiler:
+            self.skipTest('A C++ compiler is not available')
+        source = Path(__file__).resolve().parents[1] / 'host/RanvierNativeTextureDraw.cpp'
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            (directory / 'config.h').write_text('#define USE(feature) USE_##feature\n'
+                                                '#define USE_TEXTURE_MAPPER 1\n'
+                                                '#define USE_COORDINATED_GRAPHICS 0\n')
+            command = [compiler, '-std=c++20', '-fsyntax-only', '-I', str(directory), str(source)]
+            result = subprocess.run(command + ['-DRANVIER_COMPOSITING=0'], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            gpu = subprocess.run(command + ['-DRANVIER_COMPOSITING=1'], capture_output=True, text=True)
+            self.assertNotEqual(gpu.returncode, 0)
+            self.assertIn('TextureMapper.h', gpu.stderr)
+
     def test_view_transitions_require_the_host_compositor(self):
         compiler=shutil.which('c++') or shutil.which('clang++')
         if not compiler:self.skipTest('A C++ compiler is not available')
