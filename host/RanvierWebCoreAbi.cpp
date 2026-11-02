@@ -2792,7 +2792,7 @@ extern "C" RV_EXPORT int32_t rv_host_bind_d3d11_texture(RvHost* host, RvNode* ta
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
-    if (!liveHosts.contains(host))
+    if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
         return RV_ERR_DETACHED;
 #if defined(_WIN32) && RANVIER_COMPOSITING
     if (host->inFrame)
@@ -2825,7 +2825,7 @@ int32_t rv_host_bind_egl_image(RvHost* host, RvNode* target, void* image, int32_
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
-    if (!liveHosts.contains(host))
+    if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
         return RV_ERR_DETACHED;
 #if defined(__linux__) && RANVIER_COMPOSITING
     if (host->inFrame || (flipY != 0 && flipY != 1))
@@ -2861,7 +2861,7 @@ int32_t rv_host_native_texture_changed(RvHost* host, RvNode* target)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
-    if (!liveHosts.contains(host))
+    if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
         return RV_ERR_DETACHED;
 #if (defined(_WIN32) || defined(__linux__)) && RANVIER_COMPOSITING
     if (host->inFrame)
