@@ -3,6 +3,8 @@
 import argparse
 import ctypes as C
 import json
+import subprocess
+import tempfile
 from pathlib import Path
 import sys
 import threading
@@ -206,7 +208,7 @@ class Probe:
         self.live_batches.clear()
 
 
-def run(directory, report_path=None):
+def run(directory, report_path=None, reentry_modes=None):
     p = Probe(directory)
     n = p.n
     page = Case(n, '<div id="root"><span id="a">start</span><span id="b"></span></div><div id="destination"></div>')
@@ -491,7 +493,7 @@ def run(directory, report_path=None):
             if not raw_closed:
                 raw_owner.close()
         reentry = {}
-        for mode in ['destroy', 'html', 'svg']:
+        for mode in (['destroy', 'html', 'svg'] if reentry_modes is None else reentry_modes):
             invalidating = Case(n, '<div id="invalidating"></div>')
             invalidating_closed = False
             attempts, reloads, rejected_releases = [], [], []
@@ -520,6 +522,9 @@ def run(directory, report_path=None):
                 else:
                     markup = '<div>outer reload</div>' if mode == 'html' else '<svg xmlns="http://www.w3.org/2000/svg"/>'
                     n.ok('rv_host_load_' + mode, [P, Utf8], invalidating.host, markup)
+                    fresh, _, fresh_releases = p.create(invalidating.host)
+                    p.release(fresh)
+                    n.expect(fresh_releases == ['release'], 'normal replacement admits a fresh observer afterward')
                 p.pump()
                 p.release_batch(retained)
                 reentry[mode] = {'admissions': attempts, 'reloads': reloads,
@@ -529,7 +534,7 @@ def run(directory, report_path=None):
                     invalidating.close()
         if report_path:
             report_path.write_text(json.dumps({'partial': True, 'invalidation_reentry': reentry}, indent=2), encoding='utf-8')
-        n.expect(all(row['admissions'] == [(-10, None), (-10, None)] and row['reloads'] == [OK]
+        n.expect(all(row['admissions'] == [(-10, None), (-10, None)] and row['reloads'] == [-10]
                      and not row['unexpected_transferred_context_releases'] for row in reentry.values()),
                  f'invalidating contexts reject admission before and after nested reload: {reentry}')
         n.expect(not p.live_observers and not p.live_batches and p.accepted_contexts == p.released_contexts, 'all provider tokens, context leases and batches are released')
@@ -543,16 +548,109 @@ def run(directory, report_path=None):
         page.close()
 
 
+def run_destroy_reentry(directory, mode, report_path):
+    p = Probe(directory)
+    n = p.n
+    case = Case(n, '<div id="target"></div>')
+    target = case.node('target')
+    progress = []
+
+    def save(stage, **values):
+        progress.append({'stage': stage, **values})
+        if report_path:
+            report_path.write_text(json.dumps({'partial': True, 'progress': progress}, indent=2), encoding='utf-8')
+
+    def closed(handle):
+        p.release(handle)
+        save('before reentrant destroy', contexts=[p.accepted_contexts, p.released_contexts], tokens=len(p.live_observers))
+        n.bind('rv_host_destroy', None, [P])(case.host)
+        save('after reentrant destroy', contexts=[p.accepted_contexts, p.released_contexts], tokens=len(p.live_observers))
+
+    token, _, releases = p.create(case.host, on_closed=closed)
+    p.observe(token, target, Options(attributes=True))
+    p.set_attribute(target, 'data-retained', 'yes')
+    batch = p.take(token)
+    save('before outer transaction', mode=mode)
+    if mode == 'destroy':
+        case.close()
+    else:
+        markup = '<div>outer reload</div>' if mode == 'html' else '<svg xmlns="http://www.w3.org/2000/svg"/>'
+        status = n.call('rv_host_load_' + mode, [P, Utf8], case.host, markup)
+        save('after outer replacement', status=status)
+        n.expect(status == -10, 'replacement honors deferred destruction before returning detached')
+    save('after outer transaction', contexts=[p.accepted_contexts, p.released_contexts], tokens=len(p.live_observers))
+    rejected_releases = []
+    sink = CALLBACK(lambda *_: None)
+    release = RELEASE(lambda _: rejected_releases.append(True))
+    output = P(1)
+    status = p.call('create', case.host, sink, None, release, C.byref(output))
+    save('post-destroy factory', status=status, handle=output.value)
+    if status == OK:
+        p.ok('release', output)
+    n.expect(status == -10 and not output.value and not rejected_releases,
+             'destroyed host rejects creation without transferring context ownership')
+    n.expect(releases == ['release'] and p.accepted_contexts == p.released_contexts and not p.live_observers,
+             'reentrant destruction ends its context and external token exactly once')
+    n.expect(not p.callback_errors, f'context release callback exceptions: {p.callback_errors}')
+    p.release_batch(batch)
+    if mode != 'destroy':
+        for node in case.owned + list(case.created.values()) + [case.document]:
+            n.bind('rv_node_release', None, [P])(node)
+    n.bind('rv_host_destroy', None, [P])(case.host)
+    p.close()
+    save('final retained-batch and node cleanup')
+    return {'assertions': n.assertions, 'progress': progress,
+            'accepted_contexts': p.accepted_contexts, 'released_contexts': p.released_contexts}
+
+
+ISOLATED_CASES = ('common', 'destroy', 'html', 'svg', 'raw-destroy', 'destroy-during-html', 'destroy-during-svg')
+
+
+def run_isolated(directory):
+    rows = []
+    with tempfile.TemporaryDirectory(prefix='ranvier-mutation-') as temporary:
+        for mode in ISOLATED_CASES:
+            report = Path(temporary) / (mode + '.json')
+            command = [sys.executable, '-I', '-B', '-X', 'utf8', str(Path(__file__).resolve()),
+                       '--native-directory', str(directory), '--isolated-case', mode, '--report', str(report)]
+            row = {'case': mode}
+            try:
+                process = subprocess.run(command, capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=30)
+                row.update(exit=process.returncode, stdout=process.stdout, stderr=process.stderr)
+            except subprocess.TimeoutExpired:
+                row.update(exit=None, timeout=True)
+            try:
+                row['result'] = json.loads(report.read_text(encoding='utf-8'))
+            except (OSError, json.JSONDecodeError) as error:
+                row['report_error'] = str(error)
+                if row['exit'] == 0:
+                    row['exit'] = 1
+            rows.append(row)
+            print(f"mutation isolated {mode}: {row['exit']}", flush=True)
+            if row['exit'] != 0:
+                print(row.get('stdout', ''), end='')
+                print(row.get('stderr', ''), end='')
+    return {'cases': rows, 'assertions': sum(row.get('result', {}).get('assertions', 0) for row in rows)}, all(row['exit'] == 0 for row in rows)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--native-directory', required=True)
     parser.add_argument('--report', type=Path)
+    parser.add_argument('--isolated-case', choices=ISOLATED_CASES, help=argparse.SUPPRESS)
     args = parser.parse_args()
-    result = run(args.native_directory, args.report)
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
+    if args.isolated_case is None:
+        result, passed = run_isolated(args.native_directory)
+    elif args.isolated_case in ('raw-destroy', 'destroy-during-html', 'destroy-during-svg'):
+        mode = {'raw-destroy': 'destroy', 'destroy-during-html': 'html', 'destroy-during-svg': 'svg'}[args.isolated_case]
+        result, passed = run_destroy_reentry(args.native_directory, mode, args.report), True
+    else:
+        modes = [] if args.isolated_case == 'common' else [args.isolated_case]
+        result = run(args.native_directory, args.report, modes)
+        passed = result['host_teardown']['automatic']
+    if args.report:
         args.report.write_text(json.dumps(result, indent=2), encoding='utf-8')
-    print(f"PASS mutation_observation: {result['assertions']} assertions")
-    if not result['host_teardown']['automatic']:
-        print('FAIL automatic host teardown: fixture requires the production host invalidation hook')
-        raise SystemExit(1)
+    print(f"{'PASS' if passed else 'FAIL'} mutation_observation: {result['assertions']} assertions")
+    raise SystemExit(0 if passed else 1)

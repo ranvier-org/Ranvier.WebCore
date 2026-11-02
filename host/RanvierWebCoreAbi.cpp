@@ -838,6 +838,9 @@ struct RvHost {
     bool frameRequested { false };
     // Inside rv_host_update or rv_host_paint_rgba, which call no callback.
     bool inFrame { false };
+    enum class DocumentTransaction { Idle, Replacing, Destroying };
+    DocumentTransaction documentTransaction { DocumentTransaction::Idle };
+    bool destroyAfterDocumentReplacement { false };
     bool updateWanted { false };
     int32_t cursor { RV_CURSOR_DEFAULT };
     String tooltip;
@@ -2175,8 +2178,15 @@ static void releasePointerLock(RvHost& host)
 
 void rv_host_destroy(RvHost* host)
 {
-    if (!host || !onOwningThread())
+    if (!host || !onOwningThread() || !liveHosts.contains(host))
         return;
+    if (host->documentTransaction == RvHost::DocumentTransaction::Destroying)
+        return;
+    if (host->documentTransaction == RvHost::DocumentTransaction::Replacing) {
+        host->destroyAfterDocumentReplacement = true;
+        return;
+    }
+    host->documentTransaction = RvHost::DocumentTransaction::Destroying;
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_notifications_drop(reinterpret_cast<RvNode*>(&host->document()));
@@ -2194,6 +2204,16 @@ void rv_host_destroy(RvHost* host)
     publishScreens();
 }
 
+static int32_t finishDocumentReplacement(RvHost* host)
+{
+    host->documentTransaction = RvHost::DocumentTransaction::Idle;
+    if (std::exchange(host->destroyAfterDocumentReplacement, false)) {
+        rv_host_destroy(host);
+        return RV_ERR_DETACHED;
+    }
+    return RV_OK;
+}
+
 int32_t rv_host_load_html(RvHost* host, const uint8_t* html, int32_t html_length)
 {
     auto markup = requiredUtf8(html, html_length);
@@ -2201,16 +2221,23 @@ int32_t rv_host_load_html(RvHost* host, const uint8_t* html, int32_t html_length
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
+        return RV_ERR_DETACHED;
+    host->documentTransaction = RvHost::DocumentTransaction::Replacing;
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_custom_effect_callbacks_revoke_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_view_transitions_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_mutation_observers_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
+    if (host->destroyAfterDocumentReplacement)
+        return finishDocumentReplacement(host);
     loadHTML(host->frame(), *markup);
     // The new document posts accessibility notifications once its cache exists.
+    if (host->destroyAfterDocumentReplacement)
+        return finishDocumentReplacement(host);
     if (host->accessibility)
         host->document().axObjectCache();
-    return RV_OK;
+    return finishDocumentReplacement(host);
 }
 
 int32_t rv_host_load_svg(RvHost* host, const uint8_t* svg, int32_t svg_length)
@@ -2220,14 +2247,21 @@ int32_t rv_host_load_svg(RvHost* host, const uint8_t* svg, int32_t svg_length)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
+        return RV_ERR_DETACHED;
+    host->documentTransaction = RvHost::DocumentTransaction::Replacing;
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_view_transitions_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_mutation_observers_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
+    if (host->destroyAfterDocumentReplacement)
+        return finishDocumentReplacement(host);
     loadDocument(host->frame(), *markup, "image/svg+xml"_s);
+    if (host->destroyAfterDocumentReplacement)
+        return finishDocumentReplacement(host);
     if (host->accessibility)
         host->document().axObjectCache();
-    return RV_OK;
+    return finishDocumentReplacement(host);
 }
 
 int32_t rv_host_select_svg_view(RvHost* host, const char* fragment, int32_t* selected)
@@ -7858,7 +7892,7 @@ int32_t rv_host_create_mutation_observer(RvHost* host, RvMutationCallback callba
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
-    if (!liveHosts.contains(host))
+    if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
         return RV_ERR_DETACHED;
     return ranvier_mutation_observer_create(reinterpret_cast<RvNode*>(&host->document()), callback, context, release, result);
 }

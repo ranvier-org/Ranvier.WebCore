@@ -31,6 +31,11 @@ View provider uses its context-release callback to notify the shared `onClosed` 
 the shared callback, abort registration and provider handle. Callback exceptions must be caught
 and reported by the provider; they must not cross the native callback boundary.
 
+While a host is invalidating its document, observer creation and nested HTML/SVG replacement return
+`RV_ERR_DETACHED`. Reentering destruction during destruction has no effect. Destruction requested
+during replacement is deferred until the transaction can destroy the host safely; the outer load
+returns `RV_ERR_DETACHED` after honoring that request. A normal replacement remains usable afterward.
+
 `RanvierMutationGlue.cpp` compiles into WebCore through `WebCore_EMBEDDER_SOURCES`; the host exposes
 thin forwards and lifecycle hooks. The DOM generator and vendor WebKit series are unchanged. The
 canonical P/Invoke generator preserves six structs, two delegates and nine functions. Observer and
@@ -42,6 +47,7 @@ runtime qualification. The source tests compile C11/C++20 sizes and every field 
 64-bit layouts. The public runtime probe exercises delivery, draining, options, foreign documents,
 adoption, reentrancy, host replacement/destruction, context ownership and output-size/thread errors.
 It is selected by the catalogue, extracted-package checks and an explicit native workflow step.
+The probe isolates teardown modes in separate processes so a crash cannot hide later controls.
 
 ```shell
 python -I tests/test_mutation_contract.py
