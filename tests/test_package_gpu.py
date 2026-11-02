@@ -54,11 +54,12 @@ class PackagedGpuTests(unittest.TestCase):
 
             with patch('subprocess.run', side_effect=execute):
                 probe.verify(self.package(Path(directory)), gpu=True)
-        self.assertEqual(len(calls), 4)
+        self.assertEqual(len(calls), 5)
         self.assertTrue(calls[0][2].endswith('sdl_runtime.py'))
         self.assertTrue(Path(calls[1][2]).as_posix().endswith('tests/gpu/run.py'))
         self.assertEqual(calls[1][-2:], ['--teardown', 'all'])
-        self.assertTrue(calls[3][4].endswith('mutation_observation.py'))
+        self.assertTrue(calls[3][2].endswith('compositor_windows.py'))
+        self.assertTrue(calls[4][4].endswith('mutation_observation.py'))
 
     def test_gpu_package_gate_rejects_the_wrong_flavor_or_rid_without_running_it(self):
         with tempfile.TemporaryDirectory() as directory:

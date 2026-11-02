@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import linux_view_transition_pixels as scenario
 
 
-def build_helper(output, compiler_environment=None):
+def build_helper(output, compiler_environment=None, *, texture_input=False):
     output.mkdir(parents=True, exist_ok=True)
     environment = dict(os.environ)
     if compiler_environment or not shutil.which('cl'):
@@ -42,9 +42,11 @@ def build_helper(output, compiler_environment=None):
                    cwd=output, env=environment, check=True)
     subprocess.run([str(test)], cwd=output, check=True, timeout=30)
     library = output / 'D3DFrameReadback.dll'
+    source = sources / ('D3DTextureInputTests.cpp' if texture_input else 'D3DFrameReadback.cpp')
     subprocess.run([compiler, '/nologo', '/std:c++20', '/EHsc', '/W4', '/WX', '/LD', '/MT',
-                    str(Path(__file__).with_name('D3DFrameReadback.cpp')), f'/Fe:{library}', f'/Fo:{output}/',
-                    '/link', 'd3d11.lib', 'dxgi.lib'], cwd=output, env=environment, check=True)
+                    str(source), f'/Fe:{library}', f'/Fo:{output}/',
+                    '/link', 'd3d11.lib', 'dxgi.lib', *(['d3d12.lib'] if texture_input else [])],
+                   cwd=output, env=environment, check=True)
     return library
 
 
