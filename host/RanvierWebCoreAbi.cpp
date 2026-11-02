@@ -15,6 +15,9 @@
 #include "RanvierInspectGlue.h"
 #include "RanvierWakeLockGlue.h"
 #include "RanvierNotificationGlue.h"
+#if USE(GCRYPT)
+#include <pal/crypto/gcrypt/Initialization.h>
+#endif
 #include <atomic>
 #include <string>
 #include <vector>
@@ -2070,6 +2073,11 @@ RvHost* rv_host_create(int32_t width, int32_t height)
 {
     static bool initialized;
     if (!initialized) {
+#if USE(GCRYPT)
+        gcry_check_version(nullptr);
+        if (!gcry_control(GCRYCTL_INITIALIZATION_FINISHED_P))
+            PAL::GCrypt::initialize();
+#endif
         JSC::initialize();
         WTF::initializeMainThread();
         setPlatformStrategies(new RvPlatformStrategies);

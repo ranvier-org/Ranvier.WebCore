@@ -7,6 +7,7 @@
 #include "CryptoAlgorithmRSA_OAEP.h"
 #include "CryptoAlgorithmRSA_PSS.h"
 #include "CryptoAlgorithmRSASSA_PKCS1_v1_5.h"
+#include "CryptoAlgorithmX25519.h"
 #include "CryptoAlgorithmAESGCM.h"
 #include "CryptoAlgorithmEcKeyParams.h"
 #include "CryptoAlgorithmEcdhKeyDeriveParams.h"
@@ -26,6 +27,10 @@
 #include <wtf/ThreadSafeRefCounted.h>
 #include <wtf/WorkQueue.h>
 #include <wtf/text/CString.h>
+#include <wtf/text/Base64.h>
+#if USE(GCRYPT)
+#include <gcrypt.h>
+#endif
 
 using namespace WebCore;
 
@@ -347,5 +352,60 @@ extern "C" WEBCORE_EXPORT int32_t ranvier_test_asymmetric_key_release(void* toke
     auto* handle = static_cast<KeyHandle*>(token);
     if (handle->owner != std::this_thread::get_id()) return -2;
     delete handle;
+    return 0;
+}
+
+extern "C" WEBCORE_EXPORT int32_t ranvier_test_gcrypt_control_command(int32_t command)
+{
+#if USE(GCRYPT)
+    switch (command) {
+    case 0: return GCRYCTL_INITIALIZATION_FINISHED_P;
+    case 1: return GCRYCTL_DISABLE_SECMEM;
+    case 2: return GCRYCTL_INITIALIZATION_FINISHED;
+    }
+#endif
+    return -1;
+}
+
+extern "C" WEBCORE_EXPORT int32_t ranvier_test_gcrypt_startup_import(int32_t requestedFormat)
+{
+    Vector<uint8_t> scalar { 0x77, 0x07, 0x6d, 0x0a, 0x73, 0x18, 0xa5, 0x7d,
+        0x3c, 0x16, 0xc1, 0x72, 0x51, 0xb2, 0x66, 0x45, 0xdf, 0x4c, 0x2f, 0x87,
+        0xeb, 0xc0, 0x99, 0x2a, 0xb1, 0x77, 0xfb, 0xa5, 0x1d, 0xb9, 0x2c, 0x2a };
+    Vector<uint8_t> publicPoint { 0x85, 0x20, 0xf0, 0x09, 0x89, 0x30, 0xa7, 0x54,
+        0x74, 0x8b, 0x7d, 0xdc, 0xb4, 0x3e, 0xf7, 0x5a, 0x0d, 0xbf, 0x3a, 0x0d,
+        0x26, 0x38, 0x1a, 0xf4, 0xeb, 0xa4, 0xa9, 0x8e, 0xaa, 0x9b, 0x4e, 0x6a };
+    auto algorithm = CryptoAlgorithmX25519::create();
+    KeyData data;
+    CryptoKeyFormat selectedFormat { CryptoKeyFormat::Jwk };
+    if (requestedFormat == 1) {
+        JsonWebKey jwk;
+        jwk.kty = "OKP"_s;
+        jwk.crv = "X25519"_s;
+        jwk.x = base64URLEncodeToString(publicPoint.span());
+        jwk.d = base64URLEncodeToString(scalar.span());
+        data = WTF::move(jwk);
+        selectedFormat = CryptoKeyFormat::Jwk;
+    } else if (requestedFormat == 2) {
+        Vector<uint8_t> der { 0x30, 0x2e, 0x02, 0x01, 0x00, 0x30, 0x05, 0x06,
+            0x03, 0x2b, 0x65, 0x6e, 0x04, 0x22, 0x04, 0x20 };
+        der.appendVector(scalar);
+        data = WTF::move(der);
+        selectedFormat = CryptoKeyFormat::Pkcs8;
+    } else
+        return -1000;
+    RefPtr<CryptoKey> key;
+    std::optional<ExceptionCode> error;
+    int terminalCount { 0 };
+    algorithm->importKey(selectedFormat, WTF::move(data), CryptoAlgorithmParameters { algorithm->identifier() }, true, CryptoKeyUsageDeriveBits,
+        [&](CryptoKey& borrowed) { key = &borrowed; ++terminalCount; },
+        [&](ExceptionCode value) { error = value; ++terminalCount; });
+    if (terminalCount != 1)
+        return -1001;
+    if (error)
+        return -static_cast<int32_t>(*error);
+    if (!key || key->type() != CryptoKeyType::Private || key->algorithmIdentifier() != CryptoAlgorithmIdentifier::X25519
+        || !key->extractable() || key->usagesBitmap() != CryptoKeyUsageDeriveBits)
+        return -1002;
     return 0;
 }

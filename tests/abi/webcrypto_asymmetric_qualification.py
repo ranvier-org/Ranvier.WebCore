@@ -136,6 +136,55 @@ def validate_fixture(path):
     assert fixture['vectors'][2]['initiator']['d'].startswith('00')
     return fixture
 
+def verify_gcrypt_startup(directory,external=False,bridge_library=None):
+    native=Native(directory)
+    library=C.CDLL(bridge_library) if bridge_library else native.library
+    command=bind_utf8(library,'ranvier_test_gcrypt_control_command',I,[I])
+    imported=bind_utf8(library,'ranvier_test_gcrypt_startup_import',I,[I])
+    finished,disable,finish=[command(i) for i in range(3)]
+    assert min(finished,disable,finish)>=0,'GCrypt startup probe requires a GCrypt profile'
+    gcrypt=C.CDLL('libgcrypt.so.20')
+    control=gcrypt.gcry_control;control.restype=C.c_uint;control.argtypes=[I]
+    if external:
+        version=gcrypt.gcry_check_version;version.restype=C.c_char_p;version.argtypes=[C.c_char_p]
+        assert version(None)
+        assert control(disable,C.c_int(0))==0
+        assert control(finish,C.c_int(0))==0
+        assert control(finished)
+    records=[]
+    pages=[]
+    try:
+        def imports(label):
+            for form,name in [(1,'jwk'),(2,'pkcs8')]:
+                result=imported(form)
+                records.append(dict(label=label+'/'+name,status=result))
+        for i in range(2):
+            pages.append(Case(native,'<p>native startup ownership</p>'))
+            assert native.call('rv_host_scripts_enabled',[P],pages[-1].host)==0
+            assert native.call('rv_host_vm_entry_disallowed',[P],pages[-1].host)==1
+            imports('host-'+str(i))
+        pages[0].close();pages[0]=None
+        imports('second-host-after-first-close')
+        pages[1].close();pages[1]=None
+        pages.append(Case(native,'<p>reopen after both hosts close</p>'))
+        imports('reopened-host')
+        initialized=bool(control(finished))
+        external_policy=None
+        if external:
+            allocate=gcrypt.gcry_malloc_secure;allocate.restype=P;allocate.argtypes=[C.c_size_t]
+            secure=gcrypt.gcry_is_secure;secure.restype=I;secure.argtypes=[P]
+            free=gcrypt.gcry_free;free.restype=None;free.argtypes=[P]
+            pointer=allocate(16);assert pointer
+            try:external_policy=secure(pointer)==0
+            finally:free(pointer)
+        return dict(result='PASS' if initialized and all(r['status']==0 for r in records) and external_policy is not False else 'FAIL',
+                    initialized=initialized,externalInitialization=external,externalDisabledSecureMemoryPreserved=external_policy,
+                    hostCreates=3,simultaneousHosts=2,records=records,
+                    scope='Fresh process first-use private imports; no explicit probe initialization in the default variant')
+    finally:
+        for page in reversed(pages):
+            if page is not None:page.close()
+
 def verify(directory,jws_path,ecdh_path,bridge_library=None):
     backend=Backend(directory,bridge_library)
     failures=[]
@@ -315,13 +364,16 @@ if __name__=='__main__':
     parser.add_argument('--ecdh-fixture',type=Path,default=Path(__file__).resolve().parents[1]/'fixtures/crypto-ecdh-rfc5903.json')
     parser.add_argument('--report',type=Path)
     parser.add_argument('--validate-fixture',action='store_true')
+    parser.add_argument('--gcrypt-startup-only',action='store_true')
+    parser.add_argument('--external-gcrypt-init',action='store_true')
     args=parser.parse_args()
     if args.validate_fixture:
         validate_fixture(args.ecdh_fixture)
         print('RFC5903 structural validation PASS:3curves/8published fields/leading zeros')
     else:
         assert args.native_directory and args.report
-        try: report=verify(args.native_directory,args.jws_fixture,args.ecdh_fixture,args.bridge_library)
+        try:
+            report=verify_gcrypt_startup(args.native_directory,args.external_gcrypt_init,args.bridge_library) if args.gcrypt_startup_only else verify(args.native_directory,args.jws_fixture,args.ecdh_fixture,args.bridge_library)
         except Exception as error:
             traceback.print_exc()
             report=dict(result='FAIL',infrastructureFailure=repr(error))
