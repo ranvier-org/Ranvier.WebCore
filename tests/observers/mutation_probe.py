@@ -192,8 +192,8 @@ class Probe:
 def run(directory, bridge, report_path=None):
     p = Probe(directory, bridge)
     n = p.n
-    initial = p.counts()
     page = Case(n, '<div id="root"><span id="a">start</span><span id="b"></span></div><div id="destination"></div>')
+    initial = p.counts()
     foreign = None
     transcript = {}
     try:
