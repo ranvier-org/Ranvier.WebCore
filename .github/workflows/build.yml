@@ -634,6 +634,14 @@ jobs:
           path: ${{ env.RANVIER_WORK }}/probe-logs
           if-no-files-found: ignore
 
+      - name: Retain clipping pixel results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clipping-report-${{ matrix.rid }}-${{ env.FLAVOR }}
+          path: ${{ env.RANVIER_WORK }}/background-content-clipping-regression.json
+          if-no-files-found: ignore
+
       - name: Upload the CMake logs on failure
         if: failure()
         uses: actions/upload-artifact@v4

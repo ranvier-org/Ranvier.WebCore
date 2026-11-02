@@ -31,6 +31,13 @@ def run(entries, *options):
 
 
 class ProbeRunnerTests(unittest.TestCase):
+    def test_clipping_report_is_retained_even_when_a_probe_fails(self):
+        workflow = (ROOT / '.github/workflows/build.yml').read_text()
+        block = workflow.split('      - name: Retain clipping pixel results\n', 1)[1].split('\n      - name:', 1)[0]
+        self.assertIn('if: always()', block)
+        self.assertIn('background-content-clipping-regression.json', block)
+        self.assertIn('clipping-report-${{ matrix.rid }}-${{ env.FLAVOR }}', block)
+
     def test_content_clipping_gate_uses_only_proven_gpu_baseline_profiles(self):
         gates = [entry for entry in probes.PROBES if any(
             'background_content_clip_regression.py' in command for command in entry['commands'])]
