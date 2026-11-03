@@ -1,10 +1,7 @@
 diff --git a/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp b/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp
 --- a/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp
 +++ b/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp
-@@ -416,7 +416,7 @@ void BitmapTexture::updateContents(GraphicsLayer* sourceLayer, const IntRect& target
-     GraphicsContext& context = imageBuffer->context();
-     context.setTextDrawingMode(TextDrawingMode::Fill);
- 
+@@ -419,4 +419,4 @@ void BitmapTexture::updateContents(GraphicsLayer* sourceLayer, const IntRect& target
 -    IntRect sourceRect(targetRect);
 +    FloatRect sourceRect(targetRect);
      sourceRect.setLocation(offset);
