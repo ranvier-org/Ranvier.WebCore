@@ -150,5 +150,15 @@ class AggregatePolicyTests(unittest.TestCase):
             self.mutate_package(rid,lambda _manifest,payload:payload.update({'licenses/LGPL-2.1.txt':b'matching placeholder'}))
         with self.assertRaisesRegex(ValueError,'license|notice'): aggregate.prepare(self.policy,self.inputs,self.receipts)
 
+    def test_aggregate_workflow_is_unarmed_and_contains_no_publication_step(self):
+        path=ROOT/'.github/workflows/atspi-public-aggregate.yml'
+        self.assertTrue(path.exists(),'The aggregate artifact workflow is missing.')
+        text=path.read_text()
+        self.assertIn('if: ${{ false }}',text)
+        self.assertIn('public_aggregate.py',text)
+        self.assertIn('receiptSha256',text)
+        self.assertNotIn('NuGet/login',text)
+        self.assertNotIn('nuget push',text)
+
 
 if __name__=='__main__': unittest.main()
