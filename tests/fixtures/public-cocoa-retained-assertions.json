@@ -1,0 +1,14 @@
+{
+  "source": "7ab207b7795c664e1ced4ed5d5e16bc34c2c3c55",
+  "normalization": "ast.dump with explicitshow_emptyTrue on>=3.13, default3.12",
+  "files": {
+    "tests/controls/cocoa_progress_paths.py": {
+      "sourceSha256": "34a5c810cb7bb7d30e8c382edd85576d69fa368b54ead01764e6788a9ac522d5",
+      "astSha256": "a8bf9a26026092b4dfa85c00373ab2f6ec45fad755ec99f5273c4782d5e89cf7"
+    },
+    "tests/controls/cocoa_contrast_paths.py": {
+      "sourceSha256": "fb67950299d6684007ac8185a8616816a514542e26eb98bc79b6cc911d746d91",
+      "astSha256": "de6e5b5f4c7d8564bb3fe38b0566fd222c9a72acbea21e804dd1cc2a616d0064"
+    }
+  }
+}
