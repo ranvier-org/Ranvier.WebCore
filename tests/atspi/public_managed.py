@@ -31,8 +31,12 @@ PUBLIC={
  'Ranvier.Dom':('0.1.0-alpha.58','3888a085a01676f95e59cb5a0a91449daf99a7ee05f00ff8f1883547990f0658'),
  'Ranvier.Dom.Traced':('0.1.0-alpha.58','663ef00ed6fddbc022ab09a619cf902c7ca78c26f0b068246611c338d3e8392e'),
  'Ranvier.WebCore':('0.1.1-preview.11','761136a5f618755ebbfa698afe4a2fbdd5893bc28812fbfd274633b7c674577b'),
+ 'Ranvier.WebCore.Native':('0.1.1-preview.11','a69add6e149b9b8bb285da369e6ba3efb61240adf494b51ff01851647a89b2b8'),
  'Ranvier.WebCore.Native.linux-x64':('0.1.1-preview.11','0be487e2bafacf7930ae98ed6b15e6fe1080bfdaf31a694b983abbdc4925abe2'),
  'Ranvier.WebCore.Native.linux-arm64':('0.1.1-preview.11','649d7e9e405cda6bda5c4a11fb02c774673b5ba6e3e29de3ef0601fdd0ed70c4'),
+ 'Ranvier.WebCore.Native.osx-arm64':('0.1.1-preview.11','010be9d6d02c3ff9473f1eeb1e18957604ccbfc9979a3d3d9091ac5bd5fb8085'),
+ 'Ranvier.WebCore.Native.win-arm64':('0.1.1-preview.11','b93918377a8461daca4f2f7b8f9f14a53dc5958076a3545218833e68e7644665'),
+ 'Ranvier.WebCore.Native.win-x64':('0.1.1-preview.11','63c8af9f391788823c1f4dacc301106023e3214a2bdb71661481db639b860c47'),
 }
 HOST={'linux-x64':'29d884e207dadf98cfb11552faa6d5304856c43b6516b19d4ae278cbdb6dd0ac',
       'linux-arm64':'daa08ce43551bd04c819c09d5d4ac6b8a89ae7a776b3135373e3266170c5a388'}
@@ -41,7 +45,8 @@ HOST={'linux-x64':'29d884e207dadf98cfb11552faa6d5304856c43b6516b19d4ae278cbdb6dd
 def selected(mode,rid):
     if mode not in ('normal','traced') or rid not in HOST: raise ValueError('Unsupported mode or RID')
     suffix='.Traced' if mode=='traced' else ''
-    return {name+suffix for name in ('Ranvier','Ranvier.Dom','Ranvier.View','Ranvier.View.Dom','Ranvier.View.WebCore','Ranvier.View.WebCore.Sdl')} | {'Ranvier.WebCore','Ranvier.WebCore.Native.'+rid}
+    return ({name+suffix for name in ('Ranvier','Ranvier.Dom','Ranvier.View','Ranvier.View.Dom','Ranvier.View.WebCore','Ranvier.View.WebCore.Sdl')}
+            | {name for name in PUBLIC if name=='Ranvier.WebCore' or name.startswith('Ranvier.WebCore.Native')})
 
 
 def program_bytes(path):
@@ -104,7 +109,9 @@ def project_file(path,mode,rid,provider_id,provider_version):
     root=ET.Element('Project',Sdk='Microsoft.NET.Sdk');props=ET.SubElement(root,'PropertyGroup')
     for name,value in [('OutputType','Exe'),('TargetFramework','net10.0'),('AssemblyName','AccessibilityAot'),('FSharpCoreImplicitPackageVersion','10.1.403'),('DefineConstants','ATSPI_STYLE_TRIAL'),('PublishAot','true'),('TrimmerSingleWarn','false'),('TreatWarningsAsErrors','true'),('IlcTreatWarningsAsErrors','true'),('ILLinkTreatWarningsAsErrors','true')]: ET.SubElement(props,name).text=value
     items=ET.SubElement(root,'ItemGroup');ET.SubElement(items,'Compile',Include='Program.fs')
-    for name in sorted(selected(mode,rid)): ET.SubElement(items,'PackageReference',Include=name,Version='['+PUBLIC[name][0]+']')
+    for name in sorted(selected(mode,rid)):
+        if name.startswith('Ranvier.WebCore.Native.') and name!='Ranvier.WebCore.Native.'+rid: continue
+        ET.SubElement(items,'PackageReference',Include=name,Version='['+PUBLIC[name][0]+']')
     ET.SubElement(items,'PackageReference',Include=provider_id,Version='['+provider_version+']')
     ET.ElementTree(root).write(path,encoding='utf-8',xml_declaration=True)
 

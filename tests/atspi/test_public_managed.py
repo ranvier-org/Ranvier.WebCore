@@ -43,7 +43,7 @@ class PublicManagedTests(unittest.TestCase):
     def test_project_opposing_mode_duplicate_provider_and_wrong_rid_fail(self):
         cases=[('Project/1',{'type':'project'}),('rAnViEr.ViEw.TrAcEd/9.0',{'type':'package'}),
                (self.provider.lower()+'/0.0.0-private12.2',{'type':'package'}),
-               ('Ranvier.WebCore.Native.linux-arm64/0.1.1-preview.11',{'type':'package'}),
+               ('Ranvier.WebCore.Native.linux-riscv64/0.1.1-preview.11',{'type':'package'}),
                ('Ranvier.WebCore.Native.Gpu.linux-x64/0.1.1-preview.11',{'type':'package'})]
         for key,value in cases:
             with self.subTest(key=key):
