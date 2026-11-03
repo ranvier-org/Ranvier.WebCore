@@ -109,16 +109,16 @@ class ReleaseTests(unittest.TestCase):
                 self.assertEqual(len(frames), 1)
                 self.assertIn('--gpu', frames[0])
 
-    def test_only_windows_x64_gpu_release_uses_automatic_only_guidance(self):
-        self.invoke('gpu', dry_run=False)
-        self.assertIn('automatically dispatches', self.transcript)
-        self.assertNotIn('gh workflow run', self.transcript)
-        for rids in [('linux-x64',), ('osx-arm64',), ('win-arm64',), ('win-x64', 'linux-x64')]:
+    def test_supported_gpu_releases_use_automatic_cohort_guidance(self):
+        for rids in [('win-x64',), ('linux-x64',), ('linux-arm64',), ('osx-arm64',), ('win-x64', 'linux-x64')]:
             with self.subTest(rids=rids):
                 self.invoke('gpu', rids=rids, dry_run=False)
-                self.assertIn('gh workflow run', self.transcript)
-                self.assertIn('--field flavor=gpu', self.transcript)
-                self.assertIn('--field rids=' + ','.join(rids), self.transcript)
+                self.assertIn('automatically dispatches', self.transcript)
+                self.assertNotIn('gh workflow run', self.transcript)
+        self.invoke('gpu', rids=('win-arm64',), dry_run=False)
+        self.assertIn('gh workflow run', self.transcript)
+        self.assertIn('--field flavor=gpu', self.transcript)
+        self.assertIn('--field rids=win-arm64', self.transcript)
 
     def test_gpu_release_still_rejects_dirty_source(self):
         code, calls = self.invoke('gpu', dirty=True)
