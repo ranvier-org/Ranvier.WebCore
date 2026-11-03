@@ -39,7 +39,7 @@ def main():
     ET.SubElement(sources, 'add', key='nuget', value='https://api.nuget.org/v3/index.json')
     config.write_bytes(ET.tostring(root))
     publish = args.output / 'publish'
-    subprocess.run([args.dotnet, 'publish', str(project / 'Consumer.csproj'), '-c', 'Release',
+    subprocess.run([args.dotnet, 'publish', str(project / 'Consumer.csproj'), '-c', 'Release', '-m:1', '/nr:false',
         '-r', manifest['rid'], '--self-contained', 'false', '-o', str(publish),
         '--configfile', str(config), '-p:NuGetAudit=false',
         '-p:RestorePackagesPath=' + str(args.output / 'packages'),
