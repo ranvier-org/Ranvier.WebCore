@@ -1,7 +1,8 @@
 name: Private coherent2a dirty-phase counter
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [codex/project2-macos-public-transport]
 
 permissions:
   contents: read
@@ -13,7 +14,7 @@ concurrency:
 
 jobs:
   replay:
-    if: ${{ false && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/codex/project2-macos-public-transport' }}
+    if: ${{ false && github.event_name == 'push' && github.ref == 'refs/heads/codex/project2-macos-public-transport' }}
     runs-on: macos-26
     timeout-minutes: 20
     steps:
