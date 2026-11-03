@@ -12,6 +12,26 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class ProducerSidecarAdmission(unittest.TestCase):
+    def test_cxx_driver_keeps_clang_plus_plus_invocation_while_hashing_resolved_clang(self):
+        spec = importlib.util.spec_from_file_location('producer_sidecars', ROOT / 'tests/controls/build_cocoa_sidecars.py')
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        self.assertTrue(hasattr(module, 'cxx_compiler'), 'Preserve the C++ driver name instead of invoking its resolved C-driver target')
+        with tempfile.TemporaryDirectory() as directory:
+            clang = Path(directory) / 'clang'
+            invocation = Path(directory) / 'clang++'
+            clang.write_bytes(b'exact compiler binary')
+            invocation.write_bytes(clang.read_bytes())
+            resolve = Path.resolve
+            with patch.object(Path, 'resolve', lambda path, **kwargs: clang if path == invocation else resolve(path, **kwargs)):
+                driver, binary, digest = module.cxx_compiler(str(invocation))
+            self.assertEqual(driver, invocation)
+            self.assertEqual(binary, clang)
+            self.assertEqual(digest, module.sha(clang))
+            for value in ['clang++', str(clang)]:
+                with self.assertRaisesRegex(ValueError, r'C\+\+ compiler'):
+                    module.cxx_compiler(value)
+
     def test_external_controller_uses_clean_producer_sources_and_retains_appkit_failure_inputs(self):
         spec = importlib.util.spec_from_file_location('producer_sidecars', ROOT / 'tests/controls/build_cocoa_sidecars.py')
         module = importlib.util.module_from_spec(spec)
@@ -45,7 +65,7 @@ class ProducerSidecarAdmission(unittest.TestCase):
                 archive.writestr('manifest.json', json.dumps(manifest))
                 for row in files:
                     archive.write(native / row['name'], 'runtimes/osx-arm64/native/' + row['name'])
-            compiler, sdk = root / 'clang', root / 'sdk'
+            compiler, sdk = root / 'clang++', root / 'sdk'
             compiler.write_bytes(b'not executable')
             sdk.mkdir()
             output = root / 'output'

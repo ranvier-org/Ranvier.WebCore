@@ -32,6 +32,14 @@ def clean_source(root):
     return head
 
 
+def cxx_compiler(value):
+    invocation = Path(value)
+    if not invocation.is_absolute() or invocation.name != 'clang++' or not invocation.is_file():
+        raise ValueError('Require the actual absolute xcrun C++ compiler path')
+    binary = invocation.resolve(strict=True)
+    return invocation, binary, sha(binary)
+
+
 def admit_stage(stage):
     stage = stage.resolve(strict=True)
     manifest = json.loads((stage / 'manifest.json').read_text())
@@ -126,9 +134,9 @@ def main():
                 raise ValueError('Helper compilation failed its unchanged-input contract')
             helper = Path(proof['helperPath'])
             receipt['helpers'][name] = dict(path=helper.relative_to(output).as_posix(), sha256=sha(helper))
-        compiler = Path(subprocess.check_output(['xcrun', '--find', 'clang++'], text=True, timeout=30).strip()).resolve(strict=True)
+        compiler, compiler_binary, compiler_sha = cxx_compiler(subprocess.check_output(['xcrun', '--find', 'clang++'], text=True, timeout=30).strip())
         sdk = subprocess.check_output(['xcrun', '--sdk', 'macosx', '--show-sdk-path'], text=True, timeout=30).strip()
-        receipt.update(appkitCompilerSha256=sha(compiler), appkitSdk=sdk)
+        receipt.update(appkitCompilerInvocation=str(compiler), appkitCompilerResolvedPath=str(compiler_binary), appkitCompilerSha256=compiler_sha, appkitSdk=sdk)
         run('appkit-toolchain', [compiler, '--version'])
         appkit_inputs = set()
         appkit_before = {}
