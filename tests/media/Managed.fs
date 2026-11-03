@@ -245,7 +245,9 @@ let main arguments =
         let mutable pausedPeak, pausedActive = 1.0f, 0
         check (Support.media_test_audio(&pausedPeak, &pausedActive) = 0 && pausedPeak < 0.0001f) "paused own audio sink is silent"
         player.Seek 0.25
-        wait "seek completes on same native clock" (fun sample -> not sample.Seeking && abs (sample.PositionSeconds - 0.25) < 0.05)
+        wait "seek transfers a new frame on the same native clock" (fun sample ->
+            not sample.Seeking && abs (sample.PositionSeconds - 0.25) < 0.05
+            && abs (float lastPresentationTicks / float TimeSpan.TicksPerSecond - 0.25) <= 1.0 / 30.0)
         match player.TryRepublishFrame(host, target) with
         | ValueNone -> invalidOp "paused republish has no retained frame"
         | ValueSome frame ->
