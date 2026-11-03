@@ -1,0 +1,158 @@
+diff --git a/Source/WTF/wtf/RunLoop.h b/Source/WTF/wtf/RunLoop.h
+--- a/Source/WTF/wtf/RunLoop.h
++++ b/Source/WTF/wtf/RunLoop.h
+@@ -111,6 +111,9 @@
+     WTF_EXPORT_PRIVATE static void dispatch(const SchedulePairHashSet&, Function<void()>&&);
+ #endif
+ 
++#if USE(COCOA_EVENT_LOOP)
++    WTF_EXPORT_PRIVATE void dispatchDueTimers();
++#endif
+     WTF_EXPORT_PRIVATE static void run();
+     WTF_EXPORT_PRIVATE void stop();
+     WTF_EXPORT_PRIVATE void wakeUp();
+diff --git a/Source/WTF/wtf/cf/RunLoopCF.cpp b/Source/WTF/wtf/cf/RunLoopCF.cpp
+--- a/Source/WTF/wtf/cf/RunLoopCF.cpp
++++ b/Source/WTF/wtf/cf/RunLoopCF.cpp
+@@ -28,8 +28,27 @@
+ 
+ #include <wtf/AutodrainedPool.h>
+ #include <wtf/SchedulePair.h>
++#include <wtf/Vector.h>
++#include <wtf/SetForScope.h>
++#include <cmath>
+ 
+ namespace WTF {
++
++struct TimerCallout {
++    CFRunLoopTimerRef timer;
++    TimerCallout* previous;
++};
++
++static thread_local TimerCallout* activeTimerCallout;
++
++static bool timerCalloutIsActive(CFRunLoopTimerRef timer)
++{
++    for (auto* callout = activeTimerCallout; callout; callout = callout->previous) {
++        if (callout->timer == timer)
++            return true;
++    }
++    return false;
++}
+ 
+ static RetainPtr<CFRunLoopTimerRef> createTimer(Seconds interval, bool repeat, void(*timerFired)(CFRunLoopTimerRef, void*), void* info)
+ {
+@@ -70,6 +89,60 @@
+     return CycleResult::Continue;
+ }
+ 
++void RunLoop::dispatchDueTimers()
++{
++    releaseAssertIsCurrent(*this);
++    AutodrainedPool pool;
++    auto cutoff = CFAbsoluteTimeGetCurrent();
++    struct DueTimer {
++        TimerBase* timer;
++        RetainPtr<CFRunLoopTimerRef> cfTimer;
++        CFAbsoluteTime fireDate;
++    };
++    Vector<DueTimer, 64> due;
++    {
++        Locker locker { m_registeredTimerLock };
++        for (auto* timer : m_registeredTimers) {
++            auto cfTimer = timer->m_timer;
++            if (!cfTimer || timerCalloutIsActive(cfTimer.get()) || !CFRunLoopTimerIsValid(cfTimer.get()))
++                continue;
++            auto fireDate = CFRunLoopTimerGetNextFireDate(cfTimer.get());
++            if (fireDate > cutoff)
++                continue;
++            size_t index = 0;
++            while (index < due.size() && due[index].fireDate <= fireDate)
++                ++index;
++            if (index == 64)
++                continue;
++            if (due.size() == 64)
++                due.removeLast();
++            due.insert(index, DueTimer { timer, WTF::move(cfTimer), fireDate });
++        }
++    }
++    for (auto& candidate : due) {
++        auto* timer = candidate.timer;
++        auto& cfTimer = candidate.cfTimer;
++        {
++            Locker locker { m_registeredTimerLock };
++            if (!m_registeredTimers.contains(timer) || timer->m_timer != cfTimer || timerCalloutIsActive(cfTimer.get()) || !CFRunLoopTimerIsValid(cfTimer.get()))
++                continue;
++            auto nextFireDate = CFRunLoopTimerGetNextFireDate(cfTimer.get());
++            if (nextFireDate > cutoff)
++                continue;
++            auto interval = CFRunLoopTimerGetInterval(cfTimer.get());
++            if (interval > 0) {
++                auto now = CFAbsoluteTimeGetCurrent();
++                auto intervals = std::floor((now - nextFireDate) / interval) + 1;
++                CFRunLoopTimerSetNextFireDate(cfTimer.get(), nextFireDate + intervals * interval);
++            } else
++                CFRunLoopTimerInvalidate(cfTimer.get());
++        }
++        TimerCallout callout { cfTimer.get(), activeTimerCallout };
++        SetForScope scope { activeTimerCallout, &callout };
++        timer->fired();
++    }
++}
++
+ void RunLoop::run()
+ {
+     AutodrainedPool pool;
+@@ -114,6 +187,7 @@
+ 
+ void RunLoop::TimerBase::start(Seconds interval, bool repeat)
+ {
++    Locker locker { m_runLoop->m_registeredTimerLock };
+     if (m_timer) {
+         bool canReschedule = !repeat && !CFRunLoopTimerDoesRepeat(m_timer.get()) && CFRunLoopTimerIsValid(m_timer.get());
+         if (canReschedule) {
+@@ -134,9 +208,15 @@
+         AutodrainedPool pool;
+ 
+         auto timer = static_cast<TimerBase*>(context);
+-        if (!CFRunLoopTimerDoesRepeat(cfTimer))
+-            CFRunLoopTimerInvalidate(cfTimer);
+-
++        {
++            Locker locker { timer->m_runLoop->m_registeredTimerLock };
++            if (timer->m_timer.get() != cfTimer || timerCalloutIsActive(cfTimer) || !CFRunLoopTimerIsValid(cfTimer))
++                return;
++            if (!CFRunLoopTimerDoesRepeat(cfTimer))
++                CFRunLoopTimerInvalidate(cfTimer);
++        }
++        TimerCallout callout { cfTimer, activeTimerCallout };
++        SetForScope scope { activeTimerCallout, &callout };
+         timer->fired();
+     }, this);
+ 
+@@ -145,6 +225,7 @@
+ 
+ void RunLoop::TimerBase::stop()
+ {
++    Locker locker { m_runLoop->m_registeredTimerLock };
+     if (!m_timer)
+         return;
+ 
+@@ -161,12 +242,16 @@
+ 
+ bool RunLoop::TimerBase::isActive() const
+ {
++    Locker locker { m_runLoop->m_registeredTimerLock };
+     return m_timer && CFRunLoopTimerIsValid(m_timer.get());
+ }
+ 
+ Seconds RunLoop::TimerBase::secondsUntilFire() const
+ {
+-    if (isActive())
++    Locker locker { m_runLoop->m_registeredTimerLock };
++    if (m_timer && timerCalloutIsActive(m_timer.get()))
++        return 0_s;
++    if (m_timer && CFRunLoopTimerIsValid(m_timer.get()))
+         return std::max<Seconds>(Seconds { CFRunLoopTimerGetNextFireDate(m_timer.get()) - CFAbsoluteTimeGetCurrent() }, 0_s);
+     return 0_s;
+ }

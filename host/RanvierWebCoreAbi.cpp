@@ -4296,8 +4296,7 @@ static void deliverNotificationRequests()
 }
 
 #if PLATFORM(COCOA)
-// RunLoop::cycle() waits up to 50 ms for a source on Cocoa. Zero-limit passes deliver the pending sources without
-// waiting; the kernel can deliver a due timer's port message after them, so a due WebCore shared timer fires directly.
+// Drain ready CF sources without waiting, then deliver already-due WTF timers and the WebCore shared timer.
 static void cycleCocoaRunLoop()
 {
     constexpr int maximumSourcePasses = 64;
@@ -4305,6 +4304,9 @@ static void cycleCocoaRunLoop()
         if (CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, true) != kCFRunLoopRunHandledSource)
             break;
     }
+#if USE(COCOA_EVENT_LOOP)
+    RunLoop::currentSingleton().dispatchDueTimers();
+#endif
     if (CFRunLoopGetNextTimerFireDate(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode) <= CFAbsoluteTimeGetCurrent())
         MainThreadSharedTimer::restartSharedTimer();
 }
