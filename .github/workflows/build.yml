@@ -674,6 +674,14 @@ jobs:
             ${{ env.RANVIER_WORK }}/gpu-child-cleanup-control.json
           if-no-files-found: ignore
 
+      - name: Retain Windows owner-thread exit results
+        if: always() && matrix.rid == 'win-x64'
+        uses: actions/upload-artifact@v4
+        with:
+          name: owner-thread-exit-report-${{ matrix.rid }}-${{ env.FLAVOR }}
+          path: ${{ env.RANVIER_WORK }}/owner-thread-exit.json
+          if-no-files-found: ignore
+
       - name: Retain IME mutation and reentry results
         if: always()
         uses: actions/upload-artifact@v4

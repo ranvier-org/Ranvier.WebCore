@@ -26,6 +26,9 @@ def probe(name, *commands, rid=None, flavor=('slim', 'gpu'), timeout=TIMEOUT, en
 
 
 PROBES = [
+    probe('Verify Windows native owner-thread exit and font timer teardown',
+          'python -I tests/abi/owner_thread_exit.py --native-directory {native} --report {work}/owner-thread-exit.json',
+          rid='win-x64', flavor=None, timeout=180),
     *[probe('Verify committed IME surrounding text and cancellation',
             'python -I tests/abi/ime_surrounding.py --native-directory {native}',
             'python -I tests/abi/ime_surrounding_delete.py --native-directory {native}', rid=rid, flavor=None)

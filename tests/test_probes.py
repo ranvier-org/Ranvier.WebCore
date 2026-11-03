@@ -31,6 +31,20 @@ def run(entries, *options):
 
 
 class ProbeRunnerTests(unittest.TestCase):
+    def test_windows_owner_exit_runs_all_flavors_and_retains_failure_report(self):
+        for flavor in ['slim', 'gpu', 'lite']:
+            commands = [command for entry in probes.PROBES if probes.applies(entry, 'win-x64', flavor)
+                        for command in entry['commands'] if 'owner_thread_exit.py' in command]
+            self.assertEqual(len(commands), 1)
+            self.assertIn('--report {work}/owner-thread-exit.json', commands[0])
+        for rid in ['win-arm64', 'linux-x64', 'osx-arm64']:
+            self.assertFalse(any('owner_thread_exit.py' in command for entry in probes.PROBES
+                                 if probes.applies(entry, rid, 'gpu') for command in entry['commands']))
+        workflow = (ROOT / '.github/workflows/build.yml').read_text()
+        block = workflow.split('      - name: Retain Windows owner-thread exit results\n', 1)[1].split('\n      - name:', 1)[0]
+        self.assertIn("if: always() && matrix.rid == 'win-x64'", block)
+        self.assertIn('owner-thread-exit.json', block)
+
     def test_mac_pdf_runs_the_actual_core_graphics_profile(self):
         for rid in ['osx-arm64', 'osx-x64']:
             commands = [command for entry in probes.PROBES if probes.applies(entry, rid, 'slim')
