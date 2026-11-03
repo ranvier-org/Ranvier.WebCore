@@ -66,3 +66,4 @@
 0068-windows-owner-thread-font-cache.patch
 0069-cocoa-due-runloop-timers.patch
 0070-cocoa-texture-mapper-angle-dispatch.patch
+0071-view-transition-context-stop.patch

@@ -244,6 +244,8 @@ PROBES = [
           'python -I -X utf8 tests/abi/custom_effects.py --native-directory {native}'),
     probe('Verify same-document view transitions and the slim compositing gate',
           'python -I -X utf8 tests/abi/view_transitions.py --native-directory {native}', flavor=None),
+    probe('Verify view-transition callback teardown and document replacement',
+          'python -I -X utf8 tests/abi/view_transition_lifecycle.py --native-directory {native}', flavor=None),
     probe('Verify ARIA element reflection and accessibility relations against the Chromium oracle',
           'python -I -X utf8 tests/abi/aria_relations.py --native-directory {native}'),
     probe('Verify the visual viewport, page scale and obscured insets against the Chromium oracle',

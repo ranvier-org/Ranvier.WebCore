@@ -1,0 +1,30 @@
+diff --git a/Source/WebCore/dom/ViewTransition.cpp b/Source/WebCore/dom/ViewTransition.cpp
+--- a/Source/WebCore/dom/ViewTransition.cpp
++++ b/Source/WebCore/dom/ViewTransition.cpp
+@@ -301,7 +301,7 @@
+         return;
+ 
+     Ref document = *this->document();
+-    Ref callbackPromise = [&] -> Ref<DOMPromise> {
++    RefPtr callbackPromise = [&] -> RefPtr<DOMPromise> {
+         if (!m_updateCallback) {
+             auto promiseAndWrapper = createPromiseAndWrapper(document);
+             protect(promiseAndWrapper.second)->resolve();
+@@ -309,6 +309,8 @@
+         }
+ 
+         auto result = protect(m_updateCallback)->invoke();
++        if (isContextStopped())
++            return nullptr;
+         if (result.type() != CallbackResultType::Success || result.returnValue()->isSuspended()) {
+             auto promiseAndWrapper = createPromiseAndWrapper(document);
+             // FIXME: First case should reject with `ExceptionCode::ExistingExceptionError`.
+@@ -321,6 +323,8 @@
+ 
+         return result.releaseReturnValue();
+     }();
++    if (!callbackPromise)
++        return;
+ 
+     if (settlesWithoutScript(document, m_updateCallback.get()) && callbackPromise->status() != DOMPromise::Status::Pending) {
+         protect(document->eventLoop())->queueMicrotask(document->vm(), [weakThis = WeakPtr { *this }, callbackPromise] {
