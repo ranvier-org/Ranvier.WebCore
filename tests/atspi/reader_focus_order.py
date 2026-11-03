@@ -13,7 +13,7 @@ focus = [i for i, line in events if 'object:state-changed:focused' in line and '
 caret = [i for i, line in events if 'object:text-caret-moved' in line]
 speech = [i for i, line in enumerate(lines) if 'SPEECH OUTPUT:' in line and args.label in line]
 report = {'label': args.label, 'focused': focus, 'caret': caret, 'spoken': speech,
-          'focusBeforeCaret': bool(focus and (not caret or focus[0] < caret[0])), 'labelSpoken': bool(speech)}
+          'focusBeforeCaret': bool(focus and caret and focus[0] < caret[0]), 'labelSpoken': bool(speech)}
 print(json.dumps(report))
 if not report['focusBeforeCaret'] or not report['labelSpoken']:
     raise SystemExit(1)
