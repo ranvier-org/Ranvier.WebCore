@@ -17,6 +17,7 @@ import time
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--work', type=Path, required=True)
+    parser.add_argument('--theme-only', action='store_true', help='compile only the actual RenderThemeCocoa engine translation unit')
     args = parser.parse_args()
     assert sys.platform == 'darwin' and platform.machine() == 'arm64'
     assert platform.mac_ver()[0].split('.')[0] == '26'
@@ -30,6 +31,8 @@ def main():
     sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
     receipt = {'scope': 'Private Cocoa GPU Host object/header qualification only; no engine compilation, link, compositor runtime or publication.',
                'platform': platform.platform(), 'commands': [], 'passed': False}
+    if args.theme_only:
+        receipt['scope'] = 'One actual Cocoa engine Theme object/header qualification; no engine link, native painter execution or publication.'
 
     def save():
         (output / 'receipt.json').write_text(json.dumps(receipt, indent=2))
@@ -82,17 +85,29 @@ def main():
         assert not re.search(r'(^|\s)(?:\S*/)?(?:clang\+\+|clang|swiftc)(?:\s|$)', plan), 'Header plan includes compiler work'
         run('headers', ['ninja', '-j1', *targets], build)
         entries = json.loads((build / 'compile_commands.json').read_text())
-        hosts = [row for row in entries if 'CMakeFiles/RanvierWebCoreHost.dir/' in row.get('command', '')]
-        assert len(hosts) == len({row['file'] for row in hosts}) == 7
-        assert {Path(row['file']).name for row in hosts} == {'RanvierWebCoreAbi.cpp', 'RanvierWebCoreDom.cpp',
-            'RanvierWebCoreUia.cpp', 'RanvierWebCoreD3D11.cpp', 'RanvierWebCoreEGL.cpp', 'RanvierImageEncoding.cpp', 'RanvierMacGpuSpike.mm'}
+        if args.theme_only:
+            hosts = [row for row in entries if Path(row['file']).name == 'RenderThemeCocoa.mm']
+            if not hosts:
+                hosts = [row for row in entries if 'CMakeFiles/WebCore.dir/' in row.get('command', '')
+                         and Path(row['file']).name.startswith('UnifiedSource')
+                         and Path(row['file']).suffix == '.mm'
+                         and 'RenderThemeCocoa.mm' in Path(row['file']).read_text()]
+            assert len(hosts) == 1, 'Require exactly one actual engine translation unit containing RenderThemeCocoa.mm'
+        else:
+            hosts = [row for row in entries if 'CMakeFiles/RanvierWebCoreHost.dir/' in row.get('command', '')]
+            assert len(hosts) == len({row['file'] for row in hosts}) == 7
+            assert {Path(row['file']).name for row in hosts} == {'RanvierWebCoreAbi.cpp', 'RanvierWebCoreDom.cpp',
+                'RanvierWebCoreUia.cpp', 'RanvierWebCoreD3D11.cpp', 'RanvierWebCoreEGL.cpp', 'RanvierImageEncoding.cpp', 'RanvierMacGpuSpike.mm'}
         receipt['objects'] = []
         dependencies = set()
         for number, entry in enumerate(hosts):
             argv = shlex.split(entry['command'])
             assert not any(x.startswith('@') for x in argv), 'Unproven compile response-file shape'
-            assert '-DRANVIER_COMPOSITING=1' in argv
-            assert '-I' + str(source / 'Source/WebCore/platform/graphics') in argv
+            if not args.theme_only:
+                assert '-DRANVIER_COMPOSITING=1' in argv
+                assert '-I' + str(source / 'Source/WebCore/platform/graphics') in argv
+            else:
+                assert '-include-pch' not in argv, 'Explicit PCH inputs require separately retained matching objects'
             obj = output / (Path(entry['file']).name + '.o')
             dep = obj.with_suffix('.d')
             argv[argv.index('-o') + 1] = str(obj)
@@ -107,7 +122,8 @@ def main():
                 assert '_GL_BindFramebuffer' in undefined, 'Host did not bind ANGLE framebuffer entry point'
             if Path(entry['file']).name == 'RanvierMacGpuSpike.mm':
                 assert '_GL_GetString' in undefined, 'Spike did not bind ANGLE renderer query'
-            receipt['objects'].append({'source': entry['file'], 'path': str(obj), 'sha256': sha(obj)})
+            receipt['objects'].append({'source': entry['file'], 'path': str(obj), 'sha256': sha(obj),
+                                       'sourceSha256': sha(Path(entry['file']))})
             text = dep.read_text().replace('\\\n', ' ')
             dependencies.update((Path(entry['directory']) / name).resolve() for name in shlex.split(text.split(':', 1)[1]))
         receipt['dependencyHashes'] = {str(path): sha(path) for path in sorted(dependencies)}
