@@ -12,9 +12,9 @@
 
 **Files:** `scripts/mac_preview12_recovery.py` owns admission and bounded phases; `.github/workflows/macos-preview12-recovery.yml` owns cache transport and artifact ordering; `tests/test_mac_preview12_recovery.py` owns negative controls.
 
-- [ ] Test and implement clean F/H separation, unique matching Host compile entry and rejection of unexpected engine compilation.
-- [ ] Implement canonical cache normalisation, environment-enabled compile database generation, warm build and exact F package admission.
-- [ ] Upload package and manifest before helpers; run corrected H helpers against F sources and independently collect unchanged F native gates. Retain SDK and helper evidence on failure.
-- [ ] Keep the workflow literally disabled, verify focused tests and source scope, then freeze for Root/QA review. Activation is a separate reviewed operation after the original tag job boundary is clear.
+- [x] Test and implement clean F/H separation, unique matching Host compile entry and rejection of unexpected engine compilation.
+- [x] Implement canonical cache normalisation, environment-enabled compile database generation, warm build and exact F package admission.
+- [x] Upload package and manifest before helpers; run corrected H helpers against F sources and independently collect unchanged F native gates. Retain SDK and helper evidence on failure.
+- [x] Keep the workflow literally disabled, verify focused tests and source scope, then freeze for Root/QA review. Activation remains a separate reviewed operation after the original tag job boundary is clear.
 
 Review focuses on dirty/wrong product source, builder paths entering product flags, duplicate or stale compile commands, cold engine rebuilds, package retention before helper failure, and cleanup of owned process groups. Existing d31 tags and product files remain immutable.

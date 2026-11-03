@@ -73,6 +73,12 @@ class BuildPlanTests(unittest.TestCase):
 
 
 class ProducerBoundaryTests(unittest.TestCase):
+    def test_separately_reviewed_helper_blobs_are_required(self):
+        with patch.object(recovery.subprocess, 'check_output', side_effect=list(recovery.HELPER_BLOBS.values())):
+            self.assertEqual(recovery.helper_identity(ROOT), recovery.HELPER_BLOBS)
+        with patch.object(recovery.subprocess, 'check_output', return_value='a' * 40), self.assertRaises(ValueError):
+            recovery.helper_identity(ROOT)
+
     def test_only_exact_failed_mac_job_is_eligible(self):
         job = dict(name='native (osx-arm64, macos-26, /Users/runner/rw)', status='completed', conclusion='failure')
         self.assertEqual(recovery.failed_mac_job([job]), job)

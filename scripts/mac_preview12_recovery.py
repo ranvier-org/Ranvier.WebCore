@@ -18,6 +18,11 @@ VERSION = '0.1.1-preview.12'
 CONTROL = Path(__file__).resolve().parents[1]
 SLIM_RUN = 41719479076
 PREWARM_RUN = 41720640443
+HELPER_SOURCE = '3f187c76e404ace64791d8996591ca8bd97183bf'
+HELPER_BLOBS = {
+    'tests/controls/build_cocoa_sidecars.py': 'd2ff164b0ce774ed5c129e95046028083d411425',
+    'tests/abi/build_cocoa_timer_contract.py': '55fd1261c444226578383efbb91accc9696cd1d6',
+}
 
 
 def sha(path):
@@ -31,6 +36,14 @@ def identity(root, expected=None):
     if dirty or not re.fullmatch('[0-9a-f]{40}', head) or expected is not None and head != expected:
         raise ValueError('Require the exact clean checkout: ' + str(root))
     return head
+
+
+def helper_identity(control):
+    actual = {name: subprocess.check_output(['git', 'rev-parse', 'HEAD:' + name], cwd=control, text=True).strip()
+              for name in HELPER_BLOBS}
+    if actual != HELPER_BLOBS:
+        raise ValueError('Require the separately reviewed helper implementation')
+    return actual
 
 
 def admit_compile_database(build, product, control):
@@ -128,6 +141,7 @@ def main():
         raise ValueError('Keep builder and evidence outside the original product checkout and producer tree')
     identity(product, PRODUCT_SOURCE)
     identity(control, args.control_source)
+    helper_blobs = helper_identity(control)
     if args.control_source != os.environ.get('GITHUB_SHA'):
         raise ValueError('Builder source must match the executing workflow head')
     output.mkdir(parents=True, exist_ok=True)
@@ -135,6 +149,7 @@ def main():
     receipt = json.loads(receipt_path.read_text()) if receipt_path.exists() else dict(
         scope='Immutable d31 warm Mac recovery; product F and helper builder H remain separate; no publication',
         productSource=PRODUCT_SOURCE, controlSource=args.control_source, flavor=args.flavor,
+        reviewedHelperSource=HELPER_SOURCE, helperBlobs=helper_blobs,
         productRoot=str(product), controlRoot=str(control), workflowRun=os.environ.get('GITHUB_RUN_ID'),
         version=VERSION, publication=False, phases={}, commands=[])
     receipt['restoredCacheKey'] = os.environ.get('RANVIER_RESTORED_CACHE_KEY')
