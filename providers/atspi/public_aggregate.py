@@ -37,10 +37,16 @@ def relative(name):
 
 
 def validate_policy(policy):
-    if policy.get('schemaVersion')!=1 or policy.get('armed') is not True:
+    if type(policy.get('schemaVersion')) is not int or policy['schemaVersion'] not in (1,2) or policy.get('armed') is not True:
         raise ValueError('The public aggregate is unarmed.')
-    if policy.get('id')!=IDENTITY or policy.get('version')!=policy.get('nativeVersion'):
+    if policy.get('id')!=IDENTITY:
         raise ValueError('Use the reserved public ID and coordinated Native version.')
+    if policy['schemaVersion']==1 and policy.get('version')!=policy.get('nativeVersion'):
+        raise ValueError('Use the reserved public ID and coordinated Native version.')
+    if policy['schemaVersion']==2 and tuple(policy.get(field) for field in ('version','nativeVersion','nativeSource','providerSourceClaim'))!=(
+            '0.1.1-preview.12','0.1.1-preview.11','8b8db298eba294876c27bd9a3200881f872684df',
+            '05adae5c9829472306e85b6b3b4aac068e79a5ec'):
+        raise ValueError('The provider and Native versions or source claims do not match the reviewed compatibility pair.')
     if not isinstance(policy.get('version'),str) or not re.fullmatch(r'\d+\.\d+\.\d+(?:-[A-Za-z0-9]+(?:[.-][A-Za-z0-9]+)*)?',policy['version']):
         raise ValueError('An allocated public cohort version is required.')
     if re.search(r'(?:^|[.-])(?:private\w*|local\w*|ci)(?:[.-]|$)',policy['version'],re.I):
