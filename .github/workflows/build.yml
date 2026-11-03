@@ -641,6 +641,18 @@ jobs:
       - name: Package
         run: python scripts/build.py package --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: package-${{ matrix.rid }}-${{ env.FLAVOR }}
+          path: ${{ env.RANVIER_WORK }}/packages/*.nupkg
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: manifest-${{ matrix.rid }}-${{ env.FLAVOR }}
+          path: ${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/manifest.json
+          if-no-files-found: error
+
       - name: Build matching macOS CPU test sidecars
         if: matrix.rid == 'osx-arm64' && (env.FLAVOR == 'slim' || env.FLAVOR == 'gpu')
         timeout-minutes: 15
@@ -659,18 +671,6 @@ jobs:
           name: cocoa-sidecars-${{ matrix.rid }}-${{ env.FLAVOR }}
           path: ${{ runner.temp }}/cocoa-sidecars-${{ env.FLAVOR }}
           if-no-files-found: warn
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: package-${{ matrix.rid }}-${{ env.FLAVOR }}
-          path: ${{ env.RANVIER_WORK }}/packages/*.nupkg
-          if-no-files-found: error
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: manifest-${{ matrix.rid }}-${{ env.FLAVOR }}
-          path: ${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/manifest.json
-          if-no-files-found: error
 
       - uses: actions/upload-artifact@v4
         with:

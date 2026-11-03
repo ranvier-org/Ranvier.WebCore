@@ -28,6 +28,19 @@ publication, QA seals a separate consumer manifest against the signed nupkg only
 native payload identical. Signing the nupkg requires no helper rebuild. The raw producer receipt is
 retained unchanged, and the checked-in consumer policy remains unarmed.
 
+Mac configure explicitly enables `CMAKE_EXPORT_COMPILE_COMMANDS` and requires exactly one usable
+`RanvierWebCoreAbi.cpp` compiler stanza before the native build. Package and manifest artifacts upload
+before sidecar compilation, so a helper failure does not discard the already staged package. Timer/page
+and AppKit dependency capsules are byte-verified and written after dependency scanning, before compiling
+the helper; their receipts and archives remain available when compilation or strict linking fails.
+
+An external corrected controller checkout may use `--producer-root "$PRODUCER_ROOT"`. That producer
+checkout must be tracked-clean at exactly the staged manifest's source commit and supply the canonical
+349-declaration header plus all C++/AppKit probe sources. The controller and Python builder remain in
+their separate tracked-clean checkout. The receipt records both Git identities, both roots and the
+controller/builder hashes, then rechecks both sources and every native payload after the attempt. This
+permits a metadata-only recovery without editing or relabeling the immutable producer source.
+
 The existing public ABI deliberately initializes motion/contrast to Off and maps media preference0 to
 no preference, not `ForcedAccessibilityValue::System`. It also does not expose the per-page vector
 painter setting. The old fixture reached those controls through a private Host replacement. This route

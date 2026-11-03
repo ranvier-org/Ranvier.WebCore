@@ -83,6 +83,8 @@ def main():
         run('dependencies', dependency, cwd)
         text = (output / 'inputs.d').read_text().replace('\\\n', ' ')
         inputs = {str(args.runtime_hashes.resolve()), str(build / 'compile_commands.json'), str(Path(command[0]).resolve(strict=True))}
+        if args.public_sidecar:
+            inputs.add(str((build / 'cmakeconfig.h').resolve(strict=True)))
         for word in re.split(r'(?<!\\)\s+', text.split(':', 1)[1].strip()):
             path = Path(word.replace('\\ ', ' '))
             if not path.is_absolute():
@@ -102,6 +104,21 @@ def main():
                 if candidate.is_file():
                     inputs.add(str(candidate.resolve()))
         result['inputsBefore'] = {name: sha(Path(name)) for name in sorted(inputs)}
+        if args.public_sidecar:
+            capsule = output / 'consumed-inputs.zip'
+            with zipfile.ZipFile(capsule, 'x', zipfile.ZIP_DEFLATED) as archive:
+                for name in sorted(inputs):
+                    path = Path(name)
+                    if path.resolve().is_relative_to(runtime) or path.resolve() == Path(command[0]).resolve():
+                        continue
+                    data = path.read_bytes()
+                    assert hashlib.sha256(data).hexdigest() == result['inputsBefore'][name], 'Compiler input changed before capture'
+                    archive.writestr('inputs/' + str(path).lstrip('/'), data)
+            result['consumedInputsArchiveSha256'] = sha(capsule)
+            result['compilerSha256'] = sha(Path(command[0]).resolve())
+            result['compileCommandsSha256'] = sha(build / 'compile_commands.json')
+            result['producerConfigurationSha256'] = sha(build / 'cmakeconfig.h')
+            result['hostReplaced'] = result['headerReconstruction'] = result['engineCompilation'] = False
         run('compile', command, cwd)
         sdk = subprocess.check_output(['xcrun', '--sdk', 'macosx', '--show-sdk-path'], text=True, timeout=30).strip()
         helper = output / ('libRanvierCocoaPageControls.dylib' if args.link_webcore else 'libRanvierCocoaTimerContract.dylib')
@@ -119,20 +136,6 @@ def main():
             run('sign-helper', ['codesign', '--force', '--sign', '-', str(helper)], cwd)
             run('verify-helper-signature', ['codesign', '--verify', '--strict', str(helper)], cwd)
             run('helper-dependencies', ['otool', '-L', str(helper)], cwd)
-            capsule = output / 'consumed-inputs.zip'
-            with zipfile.ZipFile(capsule, 'x', zipfile.ZIP_DEFLATED) as archive:
-                for name in sorted(inputs):
-                    path = Path(name)
-                    if path.resolve().is_relative_to(runtime) or path.resolve() == Path(command[0]).resolve():
-                        continue
-                    data = path.read_bytes()
-                    assert hashlib.sha256(data).hexdigest() == result['inputsBefore'][name], 'Compiler input changed before capture'
-                    archive.writestr('inputs/' + str(path).lstrip('/'), data)
-            result['consumedInputsArchiveSha256'] = sha(capsule)
-            result['compilerSha256'] = sha(Path(command[0]).resolve())
-            result['compileCommandsSha256'] = sha(build / 'compile_commands.json')
-            result['producerConfigurationSha256'] = sha(build / 'cmakeconfig.h')
-            result['hostReplaced'] = result['headerReconstruction'] = result['engineCompilation'] = False
         result.update(status='compiled', helperPath=str(helper), helperSha256=sha(helper), sdk=sdk)
     except Exception as error:
         result.update(status='failed', error=repr(error))
