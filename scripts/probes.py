@@ -48,6 +48,7 @@ PROBES = [
       for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],
     *[probe('Verify native EGL texture input and fractional-DPI DOM composition',
             'python -I tests/gpu/compositor_input_linux.py --native-directory {native} --report {work}/gpu-compositor-input-linux.json',
+            'python -I tests/gpu/compositor_fractional_edges.py --native-directory {native} --report {work}/gpu-compositor-fractional-edges.json',
             rid=rid, flavor='gpu',
             env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
       for rid in ['linux-x64', 'linux-arm64']],
