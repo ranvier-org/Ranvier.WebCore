@@ -1,6 +1,7 @@
 """Exercise real WTF timers through the integrated public Cocoa host pump."""
 import argparse
 import ctypes as C
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -53,6 +54,11 @@ def run(directory, helper_path, captured=None, checkpoint=None, mode='baseline',
         assert state(handle, C.byref(callbacks), C.byref(active), C.byref(off_owner)) == 0
         return {'callbacks': callbacks.value, 'active': active.value, 'offOwnerCallbacks': off_owner.value}
     try:
+        if mode == 'owner-fatal-reference':
+            stage(mode)
+            fatal = bind(helper, 'rv_test_wtf_timer_owner_fatal_reference', I, [])
+            status = fatal()
+            raise AssertionError('owner-main fatal reference returned: ' + str(status))
         if mode == 'cross-thread-destroy-contract':
             stage(mode)
             handle = create()
@@ -177,10 +183,15 @@ MODES = ('baseline', 'nested-repeat', 'self-destroy', '72-due-one-shots',
          'cross-thread-destroy-contract')
 
 
-def expected_owner_assertion(code, output):
+def expected_owner_assertion(code, output, reference=None):
     fatal_signals = {-signal.SIGABRT, -signal.SIGILL}
     if hasattr(signal, 'SIGTRAP'):
         fatal_signals.add(-signal.SIGTRAP)
+    if reference and reference.get('platform') == 'darwin' and reference.get('exit') == code == -9:
+        same_helper = reference.get('helperBefore') == reference.get('helperAfter') and bool(reference.get('helperBefore'))
+        reference_output = reference.get('output', '')
+        if same_helper and 'WTF_TIMER_OWNER_FATAL_REFERENCE_BEFORE_ASSERT' in reference_output and 'WTF_TIMER_OWNER_FATAL_REFERENCE_RETURNED' not in reference_output:
+            fatal_signals.add(-9)
     return code in fatal_signals and 'WTF_TIMER_NEGATIVE_BEFORE_OWNER_VIOLATION' in output and 'WTF_TIMER_NEGATIVE_DESTRUCTOR_RETURNED' not in output
 
 
@@ -189,7 +200,7 @@ def main():
     parser.add_argument('--native-directory', required=True)
     parser.add_argument('--helper', required=True)
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--mode', choices=MODES)
+    parser.add_argument('--mode', choices=(*MODES, 'owner-fatal-reference'))
     parser.add_argument('--repeat-milliseconds', type=float, default=0.01,
                         help='Fairness interval; original 0.000001 ms subquantum case remains explicitly replayable')
     args = parser.parse_args()
@@ -209,7 +220,26 @@ def main():
             log = target.with_suffix('.log')
             log.write_text(output)
             if mode == 'cross-thread-destroy-contract':
-                expected_failure = expected_owner_assertion(code, output)
+                reference = None
+                if code == -9 and sys.platform == 'darwin':
+                    helper = Path(args.helper).resolve()
+                    helper_before = hashlib.sha256(helper.read_bytes()).hexdigest()
+                    reference_target = target.with_name(target.stem + '-reference.json')
+                    reference_command = [sys.executable, '-I', str(Path(__file__).resolve()),
+                        '--native-directory', args.native_directory, '--helper', args.helper,
+                        '--output', str(reference_target), '--mode', 'owner-fatal-reference']
+                    try:
+                        child_reference = subprocess.run(reference_command, capture_output=True, text=True, timeout=30)
+                        reference_exit = child_reference.returncode
+                        reference_output = child_reference.stdout + child_reference.stderr
+                    except subprocess.TimeoutExpired as error:
+                        reference_exit, reference_output = -999, repr(error)
+                    reference = {'platform': sys.platform, 'argv': reference_command, 'exit': reference_exit,
+                        'output': reference_output, 'helperBefore': helper_before,
+                        'helperAfter': hashlib.sha256(helper.read_bytes()).hexdigest()}
+                    reference_target.with_suffix('.log').write_text(reference_output, encoding='utf-8')
+                    report['ownerFatalReference'] = reference
+                expected_failure = expected_owner_assertion(code, output, reference)
                 verdict = 0 if expected_failure else 1
             else:
                 expected_failure, verdict = False, int(code != 0)

@@ -1,5 +1,6 @@
 #include "config.h"
 #include "RanvierWebCoreAbi.h"
+#include <wtf/Assertions.h>
 #include <wtf/RunLoop.h>
 #include <wtf/Seconds.h>
 #include <wtf/text/ASCIILiteral.h>
@@ -160,5 +161,16 @@ PROBE_EXPORT int rv_test_wtf_timer_destroy_unchecked(void* handle)
     std::fflush(stderr);
     delete probe;
     std::fputs("WTF_TIMER_NEGATIVE_DESTRUCTOR_RETURNED\n", stderr);
+    return 0;
+}
+
+PROBE_EXPORT int rv_test_wtf_timer_owner_fatal_reference()
+{
+    if (!RunLoop::isMain())
+        return -2;
+    std::fputs("WTF_TIMER_OWNER_FATAL_REFERENCE_BEFORE_ASSERT\n", stderr);
+    std::fflush(stderr);
+    RELEASE_ASSERT(false);
+    std::fputs("WTF_TIMER_OWNER_FATAL_REFERENCE_RETURNED\n", stderr);
     return 0;
 }
