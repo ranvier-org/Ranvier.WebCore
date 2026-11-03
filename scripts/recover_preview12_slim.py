@@ -291,7 +291,22 @@ def verify_mac_proof(proof, record, manifest, package, partial=False):
             require(any('-Wl,-undefined,error' in command and '-Wl,-install_name,@rpath/libTestWebCore.dylib' in command
                         for command in compiled.get('commands', [])), 'Mac helper strict-link boundary differs')
             with zipfile.ZipFile(io.BytesIO(capsule)) as captured:
-                require(safe_names(captured) and captured.testzip() is None, 'Invalid consumed SDK archive')
+                members = safe_names(captured)
+                require(members and captured.testzip() is None, 'Invalid consumed SDK archive')
+                for member in members:
+                    if member.endswith('/'):
+                        continue
+                    require(member.startswith('inputs/'), 'Invalid consumed SDK input path')
+                    source = '/' + member.removeprefix('inputs/')
+                    require(hashlib.sha256(captured.read(member)).hexdigest() == compiled['inputsBefore'].get(source),
+                            'Consumed SDK input bytes differ')
+                omitted = set(compiled['inputsBefore']) - {'/' + member.removeprefix('inputs/') for member in members if not member.endswith('/')}
+                runtime_prefix = '/Users/runner/rw/out/slim/runtimes/osx-arm64/native/'
+                for path in omitted:
+                    value = compiled['inputsBefore'][path]
+                    require((path.endswith('/clang') and value == compiled['compilerSha256']) or
+                            (path.startswith(runtime_prefix) and expected.get(path.removeprefix(runtime_prefix)) == value),
+                            'Consumed SDK input missing')
         retained = {name: dict(path=sidecars['helpers'][name]['path'], sha256=sidecars['helpers'][name]['sha256'],
                               receiptSha256=hashlib.sha256(archive.read(base + name + '/build-receipt.json')).hexdigest(),
                               capsuleSha256=hashlib.sha256(archive.read(base + name + '/consumed-inputs.zip')).hexdigest()) for name in ['timer', 'page']}
@@ -454,9 +469,21 @@ def origins(policy, output):
     return packages, manifests, dict(originalJobs=original_jobs, mac=mac_proof)
 
 
-def source_identity(root, expected):
+def source_identity(root, expected, allow_generated=False):
     require(subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root, text=True).strip() == expected
             and not subprocess.check_output(['git', 'status', '--porcelain', '--untracked-files=no'], cwd=root, text=True), 'Source checkout differs or is dirty')
+    allowed = ('packaging/obj/', 'packaging/bin/', 'src/Ranvier.WebCore/obj/', 'src/Ranvier.WebCore/bin/',
+               'tests/recovery/InteropMetadata/obj/', 'tests/recovery/InteropMetadata/bin/')
+    for ignored in (False, True):
+        argv = ['git', 'ls-files', '--others', '--exclude-standard', '-z']
+        if ignored:
+            argv.insert(3, '--ignored')
+        paths = subprocess.check_output(argv, cwd=root).decode().split('\0')
+        require(all(not path or (allow_generated and path.startswith(allowed)) for path in paths),
+                'Unexpected untracked or ignored source input')
+    for parent in root.resolve().parents:
+        require(not any(p.name.casefold() in {'directory.build.props', 'directory.build.targets', 'directory.packages.props'}
+                        for p in parent.iterdir()), 'Unexpected ancestor MSBuild import')
 
 
 def source_inputs(product):
@@ -585,12 +612,15 @@ def child(name, argv, output, cwd, environment, timeout=600):
 def verify_restore(product, packages, cache, manifests):
     path = product / 'packaging/obj/project.assets.json'
     assets = json.loads(path.read_text())
-    expected = {f'Ranvier.WebCore.Native.{rid}/{VERSION}' for rid in RIDS}
-    require({name for name in assets['libraries'] if name.startswith('Ranvier.WebCore.Native.')} == expected, 'Managed restore native graph differs')
+    expected = {f'Ranvier.WebCore.Native.{rid}/{VERSION}'.casefold() for rid in RIDS}
+    actual = [name.casefold() for name in assets['libraries'] if name.casefold().split('/', 1)[0] == 'ranvier.webcore.native'
+              or name.casefold().startswith('ranvier.webcore.native.')]
+    require(len(actual) == len(expected) and set(actual) == expected, 'Managed restore native graph differs')
+    resolved = {name.casefold(): row for name, row in assets['libraries'].items()}
     result = {}
     for rid in RIDS:
         name = f'Ranvier.WebCore.Native.{rid}'
-        folder = cache / assets['libraries'][name + '/' + VERSION]['path']
+        folder = cache / resolved[(name + '/' + VERSION).casefold()]['path']
         package = folder / f'{name}.{VERSION}.nupkg'.lower()
         metadata = json.loads((folder / '.nupkg.metadata').read_text())
         require(Path(metadata['source']).resolve() == packages.resolve() and sha(package) == sha(packages / f'{name}.{VERSION}.nupkg'),
@@ -657,8 +687,8 @@ def qualify(args, policy):
             except Exception as error:
                 receipt.update(accepted=False, nativeIdentityError=repr(error))
         try:
-            source_identity(product, PRODUCT)
-            source_identity(ROOT, policy['controllerSource'])
+            source_identity(product, PRODUCT, allow_generated=True)
+            source_identity(ROOT, policy['controllerSource'], allow_generated=True)
             receipt['sourcesUnchanged'] = source_inputs(product) == receipt['sourceInputs']
             receipt['accepted'] &= receipt['sourcesUnchanged']
         except Exception as error:

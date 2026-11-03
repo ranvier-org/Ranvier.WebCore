@@ -35,7 +35,7 @@ class MacProof(unittest.TestCase):
         for name in ['timer', 'page']:
             self.files[name + '/consumed-inputs.zip'] = capsule
             self.compile[name] = dict(status='compiled', inputsUnchanged=True, runtimeUnchanged=True,
-                runtimeBefore=native, runtimeAfter=native, inputsBefore={'fixture': 'a' * 64}, inputsAfter={'fixture': 'a' * 64},
+                runtimeBefore=native, runtimeAfter=native, inputsBefore={'/sdk/config.h': hashlib.sha256(b'immutable fixture input').hexdigest()}, inputsAfter={'/sdk/config.h': hashlib.sha256(b'immutable fixture input').hexdigest()},
                 hostReplaced=False, headerReconstruction=False, engineCompilation=False, compilerSha256='a' * 64,
                 compileCommandsSha256='b' * 64, producerConfigurationSha256='c' * 64,
                 consumedInputsArchiveSha256=hashlib.sha256(capsule).hexdigest(),
@@ -129,6 +129,21 @@ class MacProof(unittest.TestCase):
     def test_changed_sdk_capsule_rejects_even_if_artifact_map_is_rehashed(self):
         self.files['page/consumed-inputs.zip'] = b'changed'
         with self.assertRaisesRegex(ValueError, 'capsule'):
+            self.check()
+
+    def test_rehashed_capsule_with_changed_input_rejects(self):
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, 'w') as archive:
+            archive.writestr('inputs/sdk/config.h', 'changed input')
+        self.files['page/consumed-inputs.zip'] = buffer.getvalue()
+        self.compile['page']['consumedInputsArchiveSha256'] = hashlib.sha256(buffer.getvalue()).hexdigest()
+        with self.assertRaisesRegex(ValueError, 'input bytes'):
+            self.check()
+
+    def test_rehashed_capsule_with_missing_input_rejects(self):
+        self.compile['page']['inputsBefore']['/sdk/other.h'] = 'a' * 64
+        self.compile['page']['inputsAfter']['/sdk/other.h'] = 'a' * 64
+        with self.assertRaisesRegex(ValueError, 'input missing'):
             self.check()
 
     def completion_fixture(self):
