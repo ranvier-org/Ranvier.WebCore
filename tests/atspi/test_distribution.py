@@ -50,6 +50,13 @@ class DistributionPolicyTests(unittest.TestCase):
         package.validate_identity('Ranvier.Private.Atspi.Control', '0.0.0-private182.1')
         package.validate_identity('Ranvier.Private.Atspi.Control', '0.0.0-ci.1234')
 
+    def test_private_cohort_labels_are_claims_not_qualification(self):
+        for label in ['private-unspecified', 'private-style-only-abi63', 'private-da11-abi347']:
+            package.validate_cohort_label(label)
+        for label in ['', 'final-abi347', 'public-linux-x64', '../private-test', 'private-X64', 'private-', 'private-a/b', 'private-test\n']:
+            with self.subTest(label=label), self.assertRaisesRegex(ValueError, 'cohort label'):
+                package.validate_cohort_label(label)
+
 
 if __name__ == '__main__':
     unittest.main()
