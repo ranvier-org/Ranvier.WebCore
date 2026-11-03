@@ -84,5 +84,12 @@ class ManagedArm64Qualification(unittest.TestCase):
                 module.validate_assets(dict(libraries, **{extra: {}}), 'traced', '0.0.0-arm64.1', '0.0.0-ci.5')
 
 
+    def test_registry_dependency_is_explicit_for_both_runner_images(self):
+        for name in ('atspi-arm64-qualification.yml', 'atspi-x64-qualification.yml'):
+            workflow = (path.parents[2] / '.github/workflows' / name).read_text()
+            self.assertIn('libatspi2.0-dev at-spi2-core python3-gi', workflow)
+            self.assertIn('test -x /usr/libexec/at-spi2-registryd', workflow)
+
+
 if __name__ == '__main__':
     unittest.main()

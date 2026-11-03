@@ -61,8 +61,9 @@ jobs:
       - name: Install standalone provider and independent client prerequisites
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build pkg-config binutils clang zlib1g-dev xvfb libglib2.0-dev libatspi2.0-dev python3-gi gir1.2-atspi-2.0 dbus-x11 fonts-dejavu-core
+          sudo apt-get install -y cmake ninja-build pkg-config binutils clang zlib1g-dev xvfb libglib2.0-dev libatspi2.0-dev at-spi2-core python3-gi gir1.2-atspi-2.0 dbus-x11 fonts-dejavu-core
           sudo apt-get install -y libharfbuzz-icu0 libicu74 libjpeg-turbo8 libepoxy0 libgcrypt20 libsoup-3.0-0 libtasn1-6 libxkbcommon0 libxml2 libpng16-16t64 libsqlite3-0 libwebp7 libwebpdemux2 libwebpmux3 zlib1g libfreetype6 libfontconfig1 libwoff1 libdrm2 libegl1 libgles2 liblcms2-2 libatomic1
+          test -x /usr/libexec/at-spi2-registryd
       - name: Require the exact final x64 host before building a provider
         env:
           GH_TOKEN: ${{ github.token }}
