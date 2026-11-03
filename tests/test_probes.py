@@ -31,6 +31,48 @@ def run(entries, *options):
 
 
 class ProbeRunnerTests(unittest.TestCase):
+    def test_windows_owner_exit_runs_all_flavors_and_retains_failure_report(self):
+        for flavor in ['slim', 'gpu', 'lite']:
+            commands = [command for entry in probes.PROBES if probes.applies(entry, 'win-x64', flavor)
+                        for command in entry['commands'] if 'owner_thread_exit.py' in command]
+            self.assertEqual(len(commands), 1)
+            self.assertIn('--report {work}/owner-thread-exit.json', commands[0])
+        for rid in ['win-arm64', 'linux-x64', 'osx-arm64']:
+            self.assertFalse(any('owner_thread_exit.py' in command for entry in probes.PROBES
+                                 if probes.applies(entry, rid, 'gpu') for command in entry['commands']))
+        workflow = (ROOT / '.github/workflows/build.yml').read_text()
+        block = workflow.split('      - name: Retain Windows owner-thread exit results\n', 1)[1].split('\n      - name:', 1)[0]
+        self.assertIn("if: always() && matrix.rid == 'win-x64'", block)
+        self.assertIn('owner-thread-exit.json', block)
+
+    def test_mac_pdf_runs_the_actual_core_graphics_profile(self):
+        for rid in ['osx-arm64', 'osx-x64']:
+            commands = [command for entry in probes.PROBES if probes.applies(entry, rid, 'slim')
+                        for command in entry['commands'] if 'printing_pdf.py' in command]
+            self.assertEqual(len(commands), 1)
+            self.assertIn('--core-graphics', commands[0])
+            self.assertNotIn('--expect-unsupported', commands[0])
+
+    def test_pdf_artifacts_survive_a_later_probe_failure(self):
+        workflow = (ROOT / '.github/workflows/build.yml').read_text()
+        block = workflow.split('      - name: Retain native PDF output and ownership results\n', 1)[1].split('\n      - name:', 1)[0]
+        self.assertIn('if: always()', block)
+        self.assertIn('printing-pdf.json', block)
+        self.assertIn('host-output.pdf', block)
+
+    def test_ime_surrounding_cancellation_history_and_observation_are_routed(self):
+        for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']:
+            for flavor in ['slim', 'gpu']:
+                commands = [command for entry in probes.PROBES if probes.applies(entry, rid, flavor)
+                            for command in entry['commands']]
+                for name in ['ime_surrounding.py', 'ime_surrounding_delete.py',
+                             'ime_surrounding_history.py', 'ime_surrounding_observation.py']:
+                    self.assertEqual(sum(name in command for command in commands), 1, (rid, flavor, name))
+        workflow = (ROOT / '.github/workflows/build.yml').read_text()
+        block = workflow.split('      - name: Retain IME mutation and reentry results\n', 1)[1].split('\n      - name:', 1)[0]
+        self.assertIn('if: always()', block)
+        self.assertIn('ime-surrounding-observation*.json', block)
+
     def test_picker_tracing_and_teardown_are_routed_to_qualified_platforms(self):
         for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']:
             for flavor in ['slim', 'gpu']:
@@ -48,13 +90,25 @@ class ProbeRunnerTests(unittest.TestCase):
 
     def test_content_clipping_gate_uses_only_proven_gpu_baseline_profiles(self):
         gates = [entry for entry in probes.PROBES if any(
-            'background_content_clip_regression.py' in command for command in entry['commands'])]
+            'qualify_producer_gpu_clipping.py' in command for command in entry['commands'])]
         self.assertEqual({entry['rid'] for entry in gates}, {'linux-x64', 'win-x64'})
         for entry in gates:
             self.assertTrue(probes.applies(entry, entry['rid'], 'gpu'))
             self.assertFalse(probes.applies(entry, entry['rid'], 'slim'))
             for unproven in ['linux-arm64', 'win-arm64', 'osx-arm64']:
                 self.assertFalse(probes.applies(entry, unproven, 'gpu'))
+            self.assertIn('--output {work}/gpu-clipping-qualification', entry['commands'][0])
+
+    def test_producer_clipping_evidence_and_dependency_are_automatic(self):
+        workflow = (ROOT / '.github/workflows/build.yml').read_text()
+        dependency = workflow.split('      - name: Install the bounded GPU qualification dependency\n',1)[1].split('\n      - name:',1)[0]
+        self.assertIn("env.FLAVOR == 'gpu'",dependency)
+        self.assertIn("matrix.rid == 'win-x64'",dependency)
+        self.assertIn("matrix.rid == 'linux-x64'",dependency)
+        self.assertIn('numpy==2.4.3',dependency)
+        evidence = workflow.split('      - name: Retain clipping pixel results\n',1)[1].split('\n      - name:',1)[0]
+        self.assertIn('if: always()',evidence)
+        self.assertIn('/gpu-clipping-qualification',evidence)
 
     def test_probe_environment_reaches_the_child_without_changing_the_parent(self):
         entry = probes.probe('environment', 'python -c "import os; print(os.environ.get(\'RANVIER_PROBE_ENV_TEST\'))"')

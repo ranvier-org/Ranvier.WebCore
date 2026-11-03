@@ -1,0 +1,103 @@
+name: Optional native AT-SPI provider
+
+on:
+  workflow_dispatch:
+    inputs:
+      native_run:
+        description: Existing reviewed native producer run ID
+        type: string
+        required: true
+      native_artifact:
+        description: Exact package artifact from that run
+        type: string
+        required: true
+      native_sha256:
+        description: Reviewed SHA256 of the selected Host SO
+        type: string
+        required: true
+      rid:
+        description: Native provider architecture
+        type: choice
+        options: [linux-x64]
+        required: true
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: optional-atspi-${{ github.ref }}-${{ inputs.rid }}
+  cancel-in-progress: false
+
+jobs:
+  qualify:
+    runs-on: ${{ inputs.rid == 'linux-arm64' && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
+    timeout-minutes: 20
+    env:
+      EGL_PLATFORM: surfaceless
+      LIBGL_ALWAYS_SOFTWARE: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Initialize owned output paths
+        run: |
+          echo "ATSPI_WORK=$RUNNER_TEMP/ranvier-atspi" >> "$GITHUB_ENV"
+          mkdir "$RUNNER_TEMP/ranvier-atspi"
+      - name: Install optional provider and independent client prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build pkg-config libglib2.0-dev libatspi2.0-dev python3-gi gir1.2-atspi-2.0 dbus-x11 fonts-dejavu-core
+          sudo apt-get install -y libharfbuzz-icu0 libicu74 libjpeg-turbo8 libepoxy0 libgcrypt20 libsoup-3.0-0 libtasn1-6 libxkbcommon0 libxml2 libpng16-16t64 libsqlite3-0 libwebp7 libwebpdemux2 libwebpmux3 zlib1g libfreetype6 libfontconfig1 libwoff1 libdrm2 libegl1 libgles2 liblcms2-2 libatomic1
+      - name: Fetch only the reviewed producer artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NATIVE_RUN: ${{ inputs.native_run }}
+          NATIVE_ARTIFACT: ${{ inputs.native_artifact }}
+          NATIVE_SHA256: ${{ inputs.native_sha256 }}
+          NATIVE_RID: ${{ inputs.rid }}
+        run: |
+          gh run download "$NATIVE_RUN" --repo "$GITHUB_REPOSITORY" --name "$NATIVE_ARTIFACT" --dir "$ATSPI_WORK/artifact"
+          python3 -I tests/atspi/stage_native.py --artifacts "$ATSPI_WORK/artifact" --rid "$NATIVE_RID" --expected-sha256 "$NATIVE_SHA256" --output "$ATSPI_WORK/native"
+          ldd "$ATSPI_WORK/native/libRanvierWebCoreHost.so" | tee "$ATSPI_WORK/native/runtime-dependencies.txt"
+          if grep -q 'not found' "$ATSPI_WORK/native/runtime-dependencies.txt"; then exit 1; fi
+      - name: Build and install only the optional module
+        run: |
+          python3 -I -m unittest discover -s tests/atspi -p 'test_*.py'
+          cmake -S providers/atspi -B "$ATSPI_WORK/build" -G Ninja -DRANVIER_WEBCORE_LIBRARY:FILEPATH="$ATSPI_WORK/native/libRanvierWebCoreHost.so"
+          cmake --build "$ATSPI_WORK/build" --parallel 1
+          ctest --test-dir "$ATSPI_WORK/build" --output-on-failure
+          cmake --install "$ATSPI_WORK/build" --prefix "$ATSPI_WORK/install"
+      - name: Verify renderer runs and independent AT-SPI protocol
+        run: |
+          python3 -I tests/abi/accessibility_text_styles.py --native-directory "$ATSPI_WORK/native" --report "$ATSPI_WORK/direct-style-report.json"
+          python3 -I tests/atspi/run.py run --native "$ATSPI_WORK/native/libRanvierWebCoreHost.so" --provider "$ATSPI_WORK/install/lib/libRanvierWebCoreAtspi.so" --output "$ATSPI_WORK/protocol" --registry --extended-text
+          python3 -I tests/atspi/run.py run --native "$ATSPI_WORK/native/libRanvierWebCoreHost.so" --provider "$ATSPI_WORK/install/lib/libRanvierWebCoreAtspi.so" --output "$ATSPI_WORK/protocol-queued" --registry --extended-text --queued-set
+          python3 -I tests/atspi/run.py run --native "$ATSPI_WORK/native/libRanvierWebCoreHost.so" --provider "$ATSPI_WORK/install/lib/libRanvierWebCoreAtspi.so" --output "$ATSPI_WORK/protocol-session" --registry --extended-text --discovery session
+      - name: Pack a private qualification asset without a renderer dependency
+        env:
+          NATIVE_RID: ${{ inputs.rid }}
+        run: |
+          python3 -I providers/atspi/package.py --provider "$ATSPI_WORK/install/lib/libRanvierWebCoreAtspi.so" --native "$ATSPI_WORK/native/libRanvierWebCoreHost.so" --rid "$NATIVE_RID" --id Ranvier.Private.Accessibility.Atspi.Qualification --version "0.0.0-ci.$GITHUB_RUN_ID" --source-revision "$GITHUB_SHA" --output "$ATSPI_WORK/package"
+      - name: Ordinary SDK restore, publish and provider discovery
+        run: |
+          python3 -I tests/atspi/consumer.py --package "$ATSPI_WORK/package/Ranvier.Private.Accessibility.Atspi.Qualification.0.0.0-ci.$GITHUB_RUN_ID.nupkg" --native "$ATSPI_WORK/native/libRanvierWebCoreHost.so" --output "$ATSPI_WORK/consumer"
+      - name: Retain actual reports, first failure and optional assets
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: optional-atspi-${{ inputs.rid }}-${{ github.sha }}
+          path: |
+            ${{ env.ATSPI_WORK }}/native/producer-receipt.json
+            ${{ env.ATSPI_WORK }}/direct-style-report.json
+            ${{ env.ATSPI_WORK }}/protocol/
+            ${{ env.ATSPI_WORK }}/protocol-queued/
+            ${{ env.ATSPI_WORK }}/protocol-session/
+            ${{ env.ATSPI_WORK }}/package/
+            ${{ env.ATSPI_WORK }}/consumer/consumer-receipt.json
+            ${{ env.ATSPI_WORK }}/build/CMakeFiles/CMakeConfigureLog.yaml
+          if-no-files-found: warn
+          retention-days: 7

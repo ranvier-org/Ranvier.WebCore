@@ -48,7 +48,7 @@ let main _ =
         | dir -> dir
 
     Directory.CreateDirectory outDir |> ignore
-    require (rv_abi_version () = 62) "ABI version 62"
+    require (rv_abi_version () = 63) "ABI version 63"
 
     // RANVIER_WEBCORE_PROBE=teardown runs the teardown probes instead of the frames.
     if Environment.GetEnvironmentVariable "RANVIER_WEBCORE_PROBE" = "teardown" then

@@ -19,7 +19,7 @@ static constexpr const char* capabilityFacilityNames[] = {
     "jsc-inspector", "jit", "dfg-jit", "ftl-jit", "webassembly", "webassembly-bbq-jit", "webassembly-omg-jit",
     "accessibility", "accessibility-uia", "accessibility-events", "clipboard", "clipboard-read-callback",
     "clipboard-write-callback", "clipboard-file-write-callback", "clipboard-files", "drop", "drag-out", "data-transfer-files",
-    "range-replacement", "popups", "tooltip", "input", "ime", "frame", "scroll",
+    "range-replacement", "popups", "tooltip", "input", "ime", "ime-surrounding", "frame", "scroll",
     "speech-synthesis", "gamepad", "spellcheck", "pdfjs", "wk-web-extensions", "notifications", "diagnostics",
     "inspector-frontend", "cascade-diagnostics", "media-preferences", "media-color-scheme", "media-reduced-motion",
     "media-contrast", "media-pointer", "media-hover", "media-text-scale", "media-forced-colors", "media-contrast-less",
@@ -29,7 +29,7 @@ static constexpr const char* capabilityFacilityNames[] = {
     "snapshot-options", "snapshot-display-p3", "image-encoding-png", "image-encoding-jpeg", "image-encoding-webp"
 };
 
-static constexpr const char* capabilityHostFacilityNames[] = { "clipboard", "drop", "tooltip", "input", "ime", "scroll" };
+static constexpr const char* capabilityHostFacilityNames[] = { "clipboard", "drop", "tooltip", "input", "ime", "ime-surrounding", "scroll" };
 
 struct CapabilityResult {
     int facts[5] { -1, -1, -1, -1, -1 };

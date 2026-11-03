@@ -27,7 +27,7 @@ class Options(C.Structure):
                 ('output_budget_bytes', U64), ('raster_dpi', C.c_float), ('reserved', C.c_uint32)]
 
     def __init__(self, **changes):
-        super().__init__(C.sizeof(self), 16, 576, 720, 36, 36, 36, 36, 8 * 1024 * 1024, 144, 0)
+        super().__init__(C.sizeof(self), 16, 576, 720, 36, 36, 36, 36, 8 * 1024 * 1024, 0, 0)
         for name, value in changes.items():
             setattr(self, name, value)
 
@@ -76,7 +76,7 @@ def run(args):
             check(result_of(token, data, len(data), C.byref(length)) == 0, 'PDF bytes copy')
             return data.raw
 
-        def request(label, *, options=None, cancel_action=None, expected_status=0, expected_outcome=0):
+        def request(label, *, options=None, null_options=False, cancel_action=None, expected_status=0, expected_outcome=0):
             polls, events = [], []
 
             def poll(context):
@@ -91,13 +91,15 @@ def run(args):
             pages, token = I(-1), U64(0xdead)
             chosen = options or Options()
             before = hashlib.sha256(bytes(p.paint())).hexdigest()
-            status = export(p.host, C.byref(chosen), cancel, 123, completion, 456, C.byref(pages), C.byref(token))
+            status = export(p.host, None if null_options else C.byref(chosen), cancel, 123, completion, 456, C.byref(pages), C.byref(token))
             check(status == expected_status, label + ': status ' + str(status))
             check(not events, label + ': no callback inside synchronous render')
             check(hashlib.sha256(bytes(p.paint())).hexdigest() == before, label + ': screen restored')
             if status:
                 check(token.value == pages.value == 0, label + ': no result on admission/render failure')
                 check(not events, label + ': failed call owns no callback')
+                if label.startswith('unsupported-dpi'):
+                    check(not polls, label + ': rejected before layout/cancellation polling')
                 return 0, b''
             check(bool(token.value), label + ': existing resource token')
             tokens.append(token.value)
@@ -123,6 +125,13 @@ def run(args):
                 for index, page in enumerate(parsed.pages):
                     check([float(page.mediabox.width), float(page.mediabox.height)] == [576, 720], 'point page box')
                     check('PRINT177 PAGE ' + str(index + 1) in page.extract_text(), 'actual DOM text remains text')
+            request('null-options-default', null_options=True)
+            request('explicit-72-dpi', options=Options(raster_dpi=72))
+            if args.core_graphics:
+                for dpi in [73, 144, 600]:
+                    request('unsupported-dpi-' + str(dpi), options=Options(raster_dpi=dpi), expected_status=-9)
+            else:
+                request('explicit-144-dpi', options=Options(raster_dpi=144))
             request('cancel-before', cancel_action=lambda count: True, expected_outcome=3)
             request('cancel-after-first-page', cancel_action=lambda count: count >= 3, expected_outcome=3)
             request('output-budget', options=Options(output_budget_bytes=128), expected_status=-5)
@@ -233,4 +242,5 @@ if __name__ == '__main__':
     parser.add_argument('--report', type=Path, required=True)
     parser.add_argument('--inspect-pdf', action='store_true', help='Use an already installed analysis-only pypdf, without adding a renderer dependency')
     parser.add_argument('--expect-unsupported', action='store_true')
+    parser.add_argument('--core-graphics', action='store_true', help='Require the bounded 72-DPI CoreGraphics profile')
     run(parser.parse_args())

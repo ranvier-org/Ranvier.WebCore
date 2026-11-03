@@ -655,6 +655,9 @@ module Calls =
             "rv_host_file_picker_filter_count"
             "rv_host_file_picker_filter"
             "rv_host_file_picker_complete"
+            "rv_host_ime_surrounding"
+            "rv_host_ime_delete_surrounding"
+            "rv_ax_text_style_run"
         |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
@@ -2093,6 +2096,33 @@ module Raw =
         [<In>] nativeint[] paths,
         [<In>] int[] lengths,
         int count
+    )
+
+    [<DllImport(Lib)>]
+    extern int rv_host_ime_surrounding(
+        nativeint host,
+        byte[] buffer,
+        int capacity,
+        int[] length,
+        int& cursor,
+        int& anchor,
+        int& state,
+        uint64& token
+    )
+
+    [<DllImport(Lib)>]
+    extern int rv_host_ime_delete_surrounding(nativeint host, uint64 token, int start, int ``end``)
+
+    [<DllImport(Lib)>]
+    extern int rv_ax_text_style_run(
+        nativeint ax,
+        int offset,
+        [<MarshalAs(UnmanagedType.LPUTF8Str)>] string property,
+        int& start,
+        int& ``end``,
+        byte[] buffer,
+        int capacity,
+        int[] length
     )
 
 let rv_abi_version () : int =
@@ -6561,6 +6591,68 @@ let rv_host_file_picker_complete
         result
     else
         Raw.rv_host_file_picker_complete (host, request, outcome, paths, lengths, count)
+
+let rv_host_ime_surrounding
+    (
+        host: nativeint,
+        buffer: byte[],
+        capacity: int,
+        length: int[],
+        cursor: byref<int>,
+        anchor: byref<int>,
+        state: byref<int>,
+        token: byref<uint64>
+    ) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+
+        let result =
+            Raw.rv_host_ime_surrounding (host, buffer, capacity, length, &cursor, &anchor, &state, &token)
+
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[344] <- Calls.Counts[344] + 1L
+        Calls.Ticks[344] <- Calls.Ticks[344] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_ime_surrounding (host, buffer, capacity, length, &cursor, &anchor, &state, &token)
+
+let rv_host_ime_delete_surrounding (host: nativeint, token: uint64, start: int, ``end``: int) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_ime_delete_surrounding (host, token, start, ``end``)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[345] <- Calls.Counts[345] + 1L
+        Calls.Ticks[345] <- Calls.Ticks[345] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_ime_delete_surrounding (host, token, start, ``end``)
+
+let rv_ax_text_style_run
+    (
+        ax: nativeint,
+        offset: int,
+        property: string,
+        start: byref<int>,
+        ``end``: byref<int>,
+        buffer: byte[],
+        capacity: int,
+        length: int[]
+    ) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+
+        let result =
+            Raw.rv_ax_text_style_run (ax, offset, property, &start, &``end``, buffer, capacity, length)
+
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[346] <- Calls.Counts[346] + 1L
+        Calls.Ticks[346] <- Calls.Ticks[346] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_ax_text_style_run (ax, offset, property, &start, &``end``, buffer, capacity, length)
 
 // END GENERATED
 

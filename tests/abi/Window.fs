@@ -143,6 +143,12 @@ let run (outDir: string) =
 
     // Wheel: scrolling moves the box out of the viewport and invalidates all of it.
     let wheelHandled = host.Wheel (50, 50, 0.0f, 100.0f)
+    let wheelClock = Stopwatch.StartNew ()
+
+    while host.ScrollPosition <> (0, 100) && wheelClock.ElapsedMilliseconds < 2000L do
+        host.CycleRunLoop 16
+        host.Update ()
+
     let wheelDirty = host.DirtyRect
     let wheelPosition = host.ScrollPosition
     let scrolled = rgbAt (host.Paint ()) 240 50 75

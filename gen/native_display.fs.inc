@@ -312,6 +312,22 @@ module internal NativeDisplay =
                     Some (fun childPrecedence -> renderItem context nestedDepth childPrecedence item)
                 ])
 
+    /// <summary>Formats a result using statically typed payload renderers.</summary>
+    let result (context: Context) depth precedence renderOk renderError value =
+        match value with
+        | Ok item ->
+            union context depth precedence (box value) (fun nestedDepth ->
+                "Ok",
+                [
+                    Some (fun childPrecedence -> renderOk context nestedDepth childPrecedence item)
+                ])
+        | Error item ->
+            union context depth precedence (box value) (fun nestedDepth ->
+                "Error",
+                [
+                    Some (fun childPrecedence -> renderError context nestedDepth childPrecedence item)
+                ])
+
     /// <summary>Formats a nonnull opaque value with its declared marker and no user code.</summary>
     let opaque (context: Context) depth marker (value: obj) =
         context.Guard (
@@ -366,6 +382,33 @@ module internal NativeDisplay =
 
     let int32 context depth (value: int) =
         atom context depth (value.ToString (CultureInfo.InvariantCulture))
+
+    /// <summary>Formats a double as an F# structured numeric literal.</summary>
+    let float64 context depth (value: float) =
+        let text =
+            if Double.IsNaN value then
+                "nan"
+            elif Double.IsPositiveInfinity value then
+                "infinity"
+            elif Double.IsNegativeInfinity value then
+                "-infinity"
+            else
+                let number = value.ToString("G10", CultureInfo.InvariantCulture).ToLowerInvariant()
+
+                if number.Contains "." || number.Contains "e" then
+                    number
+                else
+                    number + ".0"
+
+        atom context depth text
+
+    /// <summary>Formats a byte as an F# structured numeric literal.</summary>
+    let uint8 context depth (value: byte) =
+        atom
+            context
+            depth
+            (value.ToString (CultureInfo.InvariantCulture)
+             + "uy")
 
     let int64 context depth (value: int64) =
         atom

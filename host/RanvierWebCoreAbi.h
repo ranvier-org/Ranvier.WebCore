@@ -613,6 +613,8 @@ RV_EXPORT int32_t rv_host_scroll_to(RvHost*, int32_t x, int32_t y);
 RV_EXPORT int32_t rv_host_ime_set_composition(RvHost*, const uint8_t* text, int32_t text_length, int32_t selectionStart, int32_t selectionEnd);
 /* Replaces the composition, or the selection when there is none, with text, as typed text. */
 RV_EXPORT int32_t rv_host_ime_commit(RvHost*, const uint8_t* text, int32_t text_length);
+/* Cancels the composition. If it replaced a selection and its editing step is still current, the host undoes
+ * that step before ending composition. A beforeinput listener can prevent this undo and preserve its own edit. */
 RV_EXPORT int32_t rv_host_ime_cancel(RvHost*);
 /* Writes the bounds of the composition's first line, or of the caret, in CSS pixels of the viewport, where an
  * input method places its candidate window, and returns 1; returns 0 and writes zeros when there is neither. */
@@ -2777,7 +2779,10 @@ typedef int32_t (*RvPrintCancelPoll)(void* context);
 /* "printing-pdf": synchronously renders the current DOM, then delivers the existing resource completion on a later
  * turn with zero width/height. Geometry is in points (72/inch); raster_dpi affects raster-only PDF effects.
  * Options are copied. Positive finite paper/printable sizes, nonnegative margins, max_pages 1..4096, output budget
- * 1..67108864 bytes, raster_dpi 72..600 and reserved=0 are required. Invalid options return UNSUPPORTED; output failure
+ * 1..67108864 bytes and reserved=0 are required. raster_dpi=0 selects the backend default (Skia 144, CoreGraphics 72).
+ * Skia accepts explicit 72..600 DPI; CoreGraphics accepts only explicit 72. Unsupported settings fail before layout.
+ * Null options select Letter 612x792 points, 36-point margins, 16 pages, 8 MiB and backend-default DPI.
+ * Invalid options return UNSUPPORTED; output failure
  * returns PAINT_FAILED. No failed call transfers an operation/context. Cancellation delivers RESOURCE_CANCELLED
  * without PDF bytes. Printing restores screen layout/scroll before returning; no OS dialog or spooler is invoked.
  * The app settles required fonts/images first. tests/abi/printing_pdf.py pins the output/teardown contract. */
@@ -2838,6 +2843,30 @@ RV_EXPORT int32_t rv_host_file_picker_filter(RvHost*, uint64_t request, int32_t 
  * invalidated and duplicate request ids return RV_ERR_DETACHED. The originating WebCore chooser owns the result. */
 RV_EXPORT int32_t rv_host_file_picker_complete(RvHost*, uint64_t request, int32_t outcome,
     const uint8_t* const* paths, const int32_t* lengths, int32_t count);
+
+/* Focused editable context, with cursor and anchor as UTF-16 offsets. State is 0 when no editable
+ * context is available, 1 for a snapshot (including a validated pre-composition snapshot),
+ * 2 when a composition snapshot cannot be validated, and 3 for a sensitive field.
+ * The buffer follows the standard UTF-8 output contract. A successful snapshot supplies a token
+ * identifying the exact document, editable, content, and selection state for a deletion request. */
+RV_EXPORT int32_t rv_host_ime_surrounding(RvHost*, char* buffer, int32_t capacity, int32_t* length,
+    int32_t* cursor, int32_t* anchor, int32_t* state, uint64_t* token);
+
+/* Deletes a UTF-16 snapshot range: 1 applied, 0 prevented, 2 prevention ended composition.
+ * Stale, split-surrogate or overlapping ranges are rejected. Internal failure returns UNSUPPORTED;
+ * read a new snapshot. Actual edits remain and composition ends. Partial/unknown failure clears ALL native
+ * undo/redo, including unrelated earlier edits; a proven unchanged no-op retains valid history. */
+RV_EXPORT int32_t rv_host_ime_delete_surrounding(RvHost*, uint64_t token, int32_t start, int32_t end);
+
+/* "accessibility-text-style": a rendered text run in the same UTF-16 coordinates as rv_ax_text.
+ * property is color, background-color, font-family, font-size, font-weight, font-style,
+ * text-decoration-line, visibility or direction. Hidden text is omitted as in rv_ax_text.
+ * Adjacent equal computed values form one maximal run; offset at the end selects the last run.
+ * On RV_OK or RV_ERR_BUFFER_TOO_SMALL, start/end describe that run and length is the required UTF-8
+ * byte count. No terminator is copied. Other failures clear these outputs.
+ * No borrowed style/renderer object escapes the owning-thread call. */
+RV_EXPORT int32_t rv_ax_text_style_run(RvAxNode*, int32_t offset, const char* property,
+    int32_t* start, int32_t* end, char* buffer, int32_t capacity, int32_t* length);
 
 #ifdef __cplusplus
 }

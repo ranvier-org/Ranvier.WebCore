@@ -1,0 +1,187 @@
+{
+  "webKitPin": "b95c91b1c0ee43cc86d25ff7af73038f67a88e04",
+  "windows": [
+    {
+      "name": "angle-d3d11-microsoft-basic-26100.33648",
+      "profile": {
+        "renderer": "ANGLE (Microsoft, Microsoft Basic Render Driver (0x0000008C) Direct3D11 vs_5_0 ps_5_0, D3D11-10.0.26100.33648)",
+        "vendor": "Google Inc. (Microsoft)",
+        "version": "OpenGL ES 3.0 (ANGLE 2.1.29096 git hash: e9f64dda0c5b)",
+        "subpixelBits": 4,
+        "shaderPrecision": {
+          "vertex": {
+            "low": {
+              "range": [
+                127,
+                127
+              ],
+              "fractionBits": 23
+            },
+            "medium": {
+              "range": [
+                127,
+                127
+              ],
+              "fractionBits": 23
+            },
+            "high": {
+              "range": [
+                127,
+                127
+              ],
+              "fractionBits": 23
+            }
+          },
+          "fragment": {
+            "low": {
+              "range": [
+                127,
+                127
+              ],
+              "fractionBits": 23
+            },
+            "medium": {
+              "range": [
+                127,
+                127
+              ],
+              "fractionBits": 23
+            },
+            "high": {
+              "range": [
+                127,
+                127
+              ],
+              "fractionBits": 23
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "angle-d3d11-rtx5080-32.0.16.1088",
+      "profile": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5080 (0x00002C02) Direct3D11 vs_5_0 ps_5_0, D3D11-32.0.16.1088)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "OpenGL ES 3.0 (ANGLE 2.1.29096 git hash: e9f64dda0c5b)",
+        "shaderPrecision": {
+          "vertex": {
+            "low": {
+              "range": [
+                127,
+                127
+              ],
+              "fractionBits": 23
+            },
+            "medium": {
+              "range": [
+                127,
+                127
+              ],
+              "fractionBits": 23
+            },
+            "high": {
+              "range": [
+                127,
+                127
+              ],
+              "fractionBits": 23
+            }
+          },
+          "fragment": {
+            "low": {
+              "range": [
+                127,
+                127
+              ],
+              "fractionBits": 23
+            },
+            "medium": {
+              "range": [
+                127,
+                127
+              ],
+              "fractionBits": 23
+            },
+            "high": {
+              "range": [
+                127,
+                127
+              ],
+              "fractionBits": 23
+            }
+          }
+        }
+      }
+    }
+  ],
+  "linux": [
+    {
+      "name": "mesa25.2.8-llvmpipe-llvm20.1.2",
+      "profile": {
+        "version": "OpenGL ES 3.2 Mesa 25.2.8-0ubuntu0.24.04.4",
+        "renderer": "llvmpipe (LLVM 20.1.2, 256 bits)",
+        "vendor": "Mesa",
+        "subpixelBits": 8,
+        "shaderPrecision": [
+          {
+            "shader": "vertex",
+            "kind": "low",
+            "range": [
+              15,
+              15
+            ],
+            "bits": 10
+          },
+          {
+            "shader": "vertex",
+            "kind": "medium",
+            "range": [
+              15,
+              15
+            ],
+            "bits": 10
+          },
+          {
+            "shader": "vertex",
+            "kind": "high",
+            "range": [
+              127,
+              127
+            ],
+            "bits": 23
+          },
+          {
+            "shader": "fragment",
+            "kind": "low",
+            "range": [
+              15,
+              15
+            ],
+            "bits": 10
+          },
+          {
+            "shader": "fragment",
+            "kind": "medium",
+            "range": [
+              15,
+              15
+            ],
+            "bits": 10
+          },
+          {
+            "shader": "fragment",
+            "kind": "high",
+            "range": [
+              127,
+              127
+            ],
+            "bits": 23
+          }
+        ]
+      },
+      "shaderCaptureLogSha256": "c8725b2468c0b5c87f138d0eb0cc8e171cbcd70ad8392a50f62e466f6aae8f1a"
+    }
+  ],
+  "scope": "Only reviewed actual renderer/precision profiles; changed or unknown driver fails pending qualification. No package/source/release hash selects a passing image model."
+}

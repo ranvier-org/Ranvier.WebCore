@@ -1,0 +1,70 @@
+{
+  "casesSha256": "77d7472d0cd458e439adf6b3b38e379437bc0f632390394a1666e05e314c71b1",
+  "actualProfile": {
+    "pid": 377,
+    "context": "0xc2d63d0",
+    "version": "OpenGL ES 3.2 Mesa 25.2.8-0ubuntu0.24.04.4",
+    "renderer": "llvmpipe (LLVM 20.1.2, 256 bits)",
+    "vendor": "Mesa",
+    "subpixelBits": 8,
+    "shaderPrecision": [
+      {
+        "shader": "vertex",
+        "kind": "low",
+        "range": [
+          15,
+          15
+        ],
+        "bits": 10
+      },
+      {
+        "shader": "vertex",
+        "kind": "medium",
+        "range": [
+          15,
+          15
+        ],
+        "bits": 10
+      },
+      {
+        "shader": "vertex",
+        "kind": "high",
+        "range": [
+          127,
+          127
+        ],
+        "bits": 23
+      },
+      {
+        "shader": "fragment",
+        "kind": "low",
+        "range": [
+          15,
+          15
+        ],
+        "bits": 10
+      },
+      {
+        "shader": "fragment",
+        "kind": "medium",
+        "range": [
+          15,
+          15
+        ],
+        "bits": 10
+      },
+      {
+        "shader": "fragment",
+        "kind": "high",
+        "range": [
+          127,
+          127
+        ],
+        "bits": 23
+      }
+    ]
+  },
+  "localAndCiIrSha256": "c8725b2468c0b5c87f138d0eb0cc8e171cbcd70ad8392a50f62e466f6aae8f1a",
+  "sourceCommit": "6f10bea17d7a1f22e5e97d472819c055fba3ef06",
+  "runtimeSha256": "c8c30f8ae6ea8d9d79bca9d40fcbf747176354e62437f6d9d74ec33230ca5f6d"
+}
