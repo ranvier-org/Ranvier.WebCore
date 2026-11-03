@@ -175,7 +175,7 @@ enum {
  * fails, the host switches to RV_COMPOSITING_OFF and paints that frame on the CPU. */
 RV_EXPORT int32_t rv_host_set_accelerated_compositing(RvHost*, int32_t mode);
 
-enum { RV_GPU_RGBA8_PREMULTIPLIED = 1 };
+enum { RV_GPU_RGBA8_PREMULTIPLIED = 1, RV_GPU_BGRA8_PREMULTIPLIED = 2 };
 /* Acquires a Windows D3D11 frame without CPU pixel readback. Call rv_host_update before acquire, as before
  * CPU paint, to advance animations and update compositing layers. consumerDevice is a live ID3D11Device*
  * (for SDL, SDL_PROP_RENDERER_D3D11_DEVICE_POINTER). Requires compositing enabled and a GPU build;
@@ -200,6 +200,8 @@ RV_EXPORT int32_t rv_host_acquire_egl_frame(RvHost*, RvGpuFrame** frame);
  * an opaque final image). The texture is consumer-locked until release. Do not update or retain it for
  * GPU use after frame release. On Linux the handle is an EGLImage for glEGLImageTargetTexture2DOES, imported
  * into a texture in the configured display; delete that texture and finish consumer use before release.
+ * On macOS the handle is an IOSurfaceRef and the format is RV_GPU_BGRA8_PREMULTIPLIED; import it as
+ * a Metal BGRA8Unorm texture and complete consumer GPU use before releasing the frame.
  * SDL may retain its COM reference, but must destroy its wrapper before
  * presenting a different resource. All arguments are required and calls use the host owner thread. */
 RV_EXPORT int32_t rv_gpu_frame_info(RvGpuFrame*, void** texture, int32_t* width, int32_t* height, int32_t* format);
@@ -2867,6 +2869,17 @@ RV_EXPORT int32_t rv_host_ime_delete_surrounding(RvHost*, uint64_t token, int32_
  * No borrowed style/renderer object escapes the owning-thread call. */
 RV_EXPORT int32_t rv_ax_text_style_run(RvAxNode*, int32_t offset, const char* property,
     int32_t* start, int32_t* end, char* buffer, int32_t capacity, int32_t* length);
+
+/* "iosurface-frames": macOS GPU acquisition after producer GPU completion. Use rv_gpu_frame_info/release
+ * on the owner thread. Frames survive resize and host destruction. Complete consumer GPU work before release.
+ * Unsupported builds return RV_ERR_UNSUPPORTED. Writes NULL to *frame on failure, including deferred host
+ * destruction during acquisition. The returned IOSurface contains premultiplied BGRA8 sRGB bytes. */
+RV_EXPORT int32_t rv_host_acquire_iosurface_frame(RvHost*, RvGpuFrame** frame);
+/* "iosurface-input": retains a nonplanar BGRA8 IOSurfaceRef until replacement, NULL unbind, target removal,
+ * or document/host teardown. Complete producer GPU writes before binding/notifying, and do not write
+ * during synchronous acquisition. flipY is 0 or 1. Failed replacement preserves the prior binding.
+ * The connected target needs a composited RenderBox; DOM geometry follows the D3D11 input contract. */
+RV_EXPORT int32_t rv_host_bind_iosurface(RvHost*, RvNode* target, void* surface, int32_t flipY);
 
 #ifdef __cplusplus
 }

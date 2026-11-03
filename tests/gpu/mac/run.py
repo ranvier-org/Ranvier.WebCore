@@ -58,6 +58,7 @@ def main():
     parser.add_argument('--jobs', type=int, default=4)
     parser.add_argument('--execute', action='store_true', help='run locally on macOS arm64; default prints commands')
     parser.add_argument('--texture-input', action='store_true', help='also compile/run the private native Metal IOSurface input fixture')
+    parser.add_argument('--public-transport', action='store_true', help='exercise the public common-frame IOSurface endpoints')
     args = parser.parse_args()
     work = args.work.expanduser().resolve()
     plan = commands(args.rid, args.mac_gpu_spike, work, args.jobs)
@@ -88,13 +89,14 @@ def main():
         run('xcode', ['xcodebuild', '-version'])
         sdl = shlex.split(run('sdl-flags', ['pkg-config', '--cflags', '--libs', 'sdl3']).strip())
         sdl_cflags = shlex.split(run('sdl-cflags', ['pkg-config', '--cflags', 'sdl3']).strip())
+        consumer_flags = ['-DRANVIER_MAC_PUBLIC_TRANSPORT=1'] if args.public_transport else []
         receipt['sdlVersion'] = run('sdl-version', ['pkg-config', '--modversion', 'sdl3']).strip()
         sources = ['spike.mm', 'texture_input.mm'] if args.texture_input else ['spike.mm']
         for name in sources:
             run('consumer-preflight-' + Path(name).stem,
                 ['xcrun', 'clang++', '-std=c++20', '-fobjc-arc', '-Wall', '-Wextra', '-Werror',
                  '-mmacosx-version-min=26.0', '-I' + str(ROOT / 'host'),
-                 *sdl_cflags,
+                 *sdl_cflags, *consumer_flags,
                  '-c', str(Path(__file__).with_name(name)), '-o', str(evidence / (name + '.o'))])
         for step in plan:
             run(step['name'], step['command'])
@@ -136,7 +138,7 @@ def main():
                 raise RuntimeError(name + ' still imports system GL entry points: ' + ', '.join(legacy))
         executable = evidence / 'mac-gpu-spike'
         run('proof-compile', ['xcrun', 'clang++', '-std=c++20', '-fobjc-arc', '-Wall', '-Wextra', '-Werror',
-                              '-mmacosx-version-min=26.0', '-I' + str(ROOT / 'host'),
+                              '-mmacosx-version-min=26.0', '-I' + str(ROOT / 'host'), *consumer_flags,
                               str(Path(__file__).with_name('spike.mm')), '-o', str(executable),
                               '-L' + str(stage), '-lRanvierWebCoreHost', '-Wl,-rpath,' + str(stage),
                               '-framework', 'Metal', '-framework', 'IOSurface', '-framework', 'Foundation', *sdl])
@@ -145,7 +147,7 @@ def main():
         if args.texture_input:
             input_executable = evidence / 'mac-texture-input'
             run('input-compile', ['xcrun', 'clang++', '-std=c++20', '-fobjc-arc', '-Wall', '-Wextra', '-Werror',
-                                  '-mmacosx-version-min=26.0', '-I' + str(ROOT / 'host'),
+                                  '-mmacosx-version-min=26.0', '-I' + str(ROOT / 'host'), *consumer_flags,
                                   str(Path(__file__).with_name('texture_input.mm')), '-o', str(input_executable),
                                   '-L' + str(stage), '-lRanvierWebCoreHost', '-Wl,-rpath,' + str(stage),
                                   '-framework', 'Metal', '-framework', 'IOSurface', '-framework', 'Foundation', *sdl])

@@ -1932,7 +1932,7 @@ static_assert(sizeof(RvMediaVideoConfiguration) == 64 && offsetof(RvMediaVideoCo
 static_assert(sizeof(RvSnapshotOptions) == 64 && offsetof(RvSnapshotOptions, scale) == 8 && offsetof(RvSnapshotOptions, x) == 24 && offsetof(RvSnapshotOptions, quality) == 64 - 8);
 static_assert(sizeof(RvMediaAudioConfiguration) == 64 && offsetof(RvMediaAudioConfiguration, bitrate) == 40 && offsetof(RvMediaAudioConfiguration, spatial_rendering) == 56);
 
-int32_t rv_abi_version(void) { return 63; }
+int32_t rv_abi_version(void) { return 64; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -1958,6 +1958,10 @@ int32_t rv_abi_has(const char* feature)
         return ranvier_print_pdf_supported();
     if (!std::strcmp(feature, "capabilities"))
         return 1;
+#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+    if (!std::strcmp(feature, "iosurface-frames") || !std::strcmp(feature, "iosurface-input"))
+        return 1;
+#endif
     if (!std::strcmp(feature, "svg-view-selection"))
         return 1;
     if (!std::strcmp(feature, "image-decode"))
@@ -3082,8 +3086,47 @@ struct RvGpuFrame {
     std::shared_ptr<RvD3D11Surface> surface;
 #elif defined(__linux__) && RANVIER_COMPOSITING
     std::shared_ptr<RvEGLSurface> surface;
+#elif defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+    std::unique_ptr<RvMacSpikeFrame> macFrame;
 #endif
 };
+
+int32_t rv_host_acquire_iosurface_frame(RvHost* host, RvGpuFrame** frame)
+{
+    if (!frame)
+        return RV_ERR_NULL_ARGUMENT;
+    *frame = nullptr;
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_DETACHED;
+#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+    RvMacSpikeFrame* acquired = nullptr;
+    auto result = rv_mac_spike_acquire_frame(host, &acquired);
+    if (result == RV_OK)
+        *frame = new RvGpuFrame { std::unique_ptr<RvMacSpikeFrame>(acquired) };
+    return result;
+#else
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+int32_t rv_host_bind_iosurface(RvHost* host, RvNode* target, void* surface, int32_t flipY)
+{
+#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+    return rv_mac_spike_bind_iosurface(host, target, surface, flipY);
+#else
+    if (!host || !target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
+        return RV_ERR_DETACHED;
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
 
 extern "C" RV_EXPORT int32_t rv_host_bind_d3d11_texture(RvHost* host, RvNode* target, void* texture)
 {
@@ -3368,6 +3411,11 @@ int32_t rv_gpu_frame_info(RvGpuFrame* frame, void** texture, int32_t* width, int
     *height = frame->surface->height();
     *format = RV_GPU_RGBA8_PREMULTIPLIED;
     return RV_OK;
+#elif defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+    auto result = rv_mac_spike_frame_info(frame->macFrame.get(), texture, width, height);
+    if (result == RV_OK)
+        *format = RV_GPU_BGRA8_PREMULTIPLIED;
+    return result;
 #else
     return RV_ERR_UNSUPPORTED;
 #endif
@@ -3387,6 +3435,9 @@ int32_t rv_gpu_frame_release(RvGpuFrame* frame)
     bool released = frame->surface->releaseConsumer();
     if (!released)
         return RV_ERR_PAINT_FAILED;
+    delete frame;
+    return RV_OK;
+#elif defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
     delete frame;
     return RV_OK;
 #else

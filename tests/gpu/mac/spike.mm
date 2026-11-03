@@ -3,6 +3,7 @@
 #import <Metal/Metal.h>
 #include <SDL3/SDL.h>
 #include "RanvierMacGpuSpike.h"
+#include "public_transport.h"
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
