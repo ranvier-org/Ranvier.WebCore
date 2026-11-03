@@ -2,6 +2,9 @@ import importlib.util
 from pathlib import Path
 import signal
 import sys
+import hashlib
+import json
+import tempfile
 import unittest
 
 directory = Path(__file__).parent / 'abi'
@@ -23,6 +26,7 @@ class OwnerAssertionVerdict(unittest.TestCase):
 
     def reference(self, **changes):
         return {'platform': 'darwin', 'exit': -9, 'helperBefore': 'a' * 64, 'helperAfter': 'a' * 64,
+                'verifiedRuntimeBranch': True,
                 'output': 'WTF_TIMER_OWNER_FATAL_REFERENCE_BEFORE_ASSERT\n', **changes}
 
     def test_kill_requires_matching_same_helper_owner_reference(self):
@@ -42,6 +46,30 @@ class OwnerAssertionVerdict(unittest.TestCase):
 
     def test_non_mac_kill_is_not_accepted(self):
         self.assertFalse(module.expected_owner_assertion(-9, 'WTF_TIMER_NEGATIVE_BEFORE_OWNER_VIOLATION\n', self.reference(platform='linux')))
+
+    def test_missing_verified_runtime_branch_is_rejected(self):
+        self.assertFalse(module.expected_owner_assertion(-9, 'WTF_TIMER_NEGATIVE_BEFORE_OWNER_VIOLATION\n', self.reference(verifiedRuntimeBranch=False)))
+
+    def test_branch_proof_is_bound_to_all_native_bytes(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            native = root / 'native'
+            native.mkdir()
+            (native / 'engine.dylib').write_bytes(b'engine')
+            digest = hashlib.sha256(b'engine').hexdigest()
+            hashes = {'/retained/baseline-native/engine.dylib': digest}
+            value = {'nativeBefore': hashes, 'nativeAfter': hashes,
+                     'ownerFatalProof': {'referenceExit': -9, 'wrongOwnerExit': -9,
+                         'branch': {'verified': True, 'isCurrentResultBit': 0,
+                                    'fatalInstruction': 'brk #0xbb08',
+                                    'frames': ['TimerBase', 'destroy_unchecked', '_pthread_start']}}}
+            path = root / 'proof.json'
+            path.write_text(json.dumps(value), encoding='utf-8')
+            sha = hashlib.sha256(path.read_bytes()).hexdigest()
+            self.assertEqual(module.verified_owner_branch(path, sha, native)['nativeHashes'], {'engine.dylib': digest})
+            (native / 'engine.dylib').write_bytes(b'another build')
+            with self.assertRaisesRegex(AssertionError, 'does not match'):
+                module.verified_owner_branch(path, sha, native)
 
     def test_timeout_is_not_accepted(self):
         self.assertFalse(module.expected_owner_assertion(-999, 'WTF_TIMER_NEGATIVE_BEFORE_OWNER_VIOLATION\n'))

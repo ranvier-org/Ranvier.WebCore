@@ -187,12 +187,33 @@ def expected_owner_assertion(code, output, reference=None):
     fatal_signals = {-signal.SIGABRT, -signal.SIGILL}
     if hasattr(signal, 'SIGTRAP'):
         fatal_signals.add(-signal.SIGTRAP)
-    if reference and reference.get('platform') == 'darwin' and reference.get('exit') == code == -9:
+    if reference and reference.get('platform') == 'darwin' and reference.get('exit') == code == -9 and reference.get('verifiedRuntimeBranch'):
         same_helper = reference.get('helperBefore') == reference.get('helperAfter') and bool(reference.get('helperBefore'))
         reference_output = reference.get('output', '')
         if same_helper and 'WTF_TIMER_OWNER_FATAL_REFERENCE_BEFORE_ASSERT' in reference_output and 'WTF_TIMER_OWNER_FATAL_REFERENCE_RETURNED' not in reference_output:
             fatal_signals.add(-9)
     return code in fatal_signals and 'WTF_TIMER_NEGATIVE_BEFORE_OWNER_VIOLATION' in output and 'WTF_TIMER_NEGATIVE_DESTRUCTOR_RETURNED' not in output
+
+
+def verified_owner_branch(path, expected_sha256, native_directory):
+    assert path and expected_sha256, 'Mac SIGKILL requires an explicit reviewed same-runtime branch proof'
+    value = Path(path).read_bytes()
+    assert hashlib.sha256(value).hexdigest() == expected_sha256, 'owner branch proof identity mismatch'
+    proof = json.loads(value)
+    assert proof['nativeBefore'] == proof['nativeAfter'], 'proof runtime changed'
+    native = {Path(name).name: digest for name, digest in proof['nativeBefore'].items()
+              if Path(name).parent.name == 'baseline-native'}
+    actual = {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
+              for p in Path(native_directory).iterdir() if p.is_file()}
+    assert native and native == actual, 'owner branch proof does not match this native runtime'
+    branch = proof['ownerFatalProof']['branch']
+    assert proof['ownerFatalProof']['referenceExit'] == proof['ownerFatalProof']['wrongOwnerExit'] == -9
+    assert branch['verified'] is True and branch['isCurrentResultBit'] == 0
+    assert branch['fatalInstruction'] == 'brk #0xbb08'
+    assert any('TimerBase' in name for name in branch['frames'])
+    assert any('destroy_unchecked' in name for name in branch['frames'])
+    assert any('_pthread_start' in name for name in branch['frames'])
+    return {'proofSha256': expected_sha256, 'nativeHashes': native, 'branch': branch}
 
 
 def main():
@@ -203,6 +224,8 @@ def main():
     parser.add_argument('--mode', choices=(*MODES, 'owner-fatal-reference'))
     parser.add_argument('--repeat-milliseconds', type=float, default=0.01,
                         help='Fairness interval; original 0.000001 ms subquantum case remains explicitly replayable')
+    parser.add_argument('--owner-assertion-proof', type=Path)
+    parser.add_argument('--owner-assertion-proof-sha256')
     args = parser.parse_args()
     args.output.parent.mkdir(parents=True, exist_ok=True)
     if not args.mode:
@@ -237,6 +260,13 @@ def main():
                     reference = {'platform': sys.platform, 'argv': reference_command, 'exit': reference_exit,
                         'output': reference_output, 'helperBefore': helper_before,
                         'helperAfter': hashlib.sha256(helper.read_bytes()).hexdigest()}
+                    try:
+                        reference['runtimeBranchProof'] = verified_owner_branch(args.owner_assertion_proof,
+                            args.owner_assertion_proof_sha256, args.native_directory)
+                        reference['verifiedRuntimeBranch'] = True
+                    except (AssertionError, KeyError, ValueError, OSError) as error:
+                        reference['verifiedRuntimeBranch'] = False
+                        reference['branchProofError'] = str(error)
                     reference_target.with_suffix('.log').write_text(reference_output, encoding='utf-8')
                     report['ownerFatalReference'] = reference
                 expected_failure = expected_owner_assertion(code, output, reference)
