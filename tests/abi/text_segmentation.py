@@ -15,7 +15,9 @@ import sys
 import threading
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
-ABI = 63
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from abi_expectation import expected_abi
+ABI = expected_abi()
 GRANULARITIES = ['grapheme', 'word', 'sentence', 'line']
 pointer, integer = ctypes.c_void_p, ctypes.c_int32
 

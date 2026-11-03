@@ -15,7 +15,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
 from utf8_inputs import Utf8
 
-ABI = 63
+from abi_expectation import expected_abi
+ABI = expected_abi()
 OK, NULL_ARGUMENT, DOM_EXCEPTION, UNSUPPORTED = 0, -1, -3, -9
 TWO_D = 1
 WHITE, BLACK = [255, 255, 255, 255], [0, 0, 0, 255]
