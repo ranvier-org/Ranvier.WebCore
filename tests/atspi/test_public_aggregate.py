@@ -80,7 +80,7 @@ class AggregatePolicyTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'unarmed'): aggregate.prepare(policy,self.inputs,self.receipts)
 
     def test_explicit_reviewed_provider12_host11_pair_is_closed(self):
-        unarmed=json.loads((ROOT/'providers/atspi/public-preview12.json').read_text())
+        unarmed=dict(json.loads((ROOT/'providers/atspi/public-preview12.json').read_text()),armed=False)
         with self.assertRaisesRegex(ValueError,'unarmed'): aggregate.validate_policy(unarmed)
         policy=deepcopy(self.policy)
         policy.update(schemaVersion=2,version='0.1.1-preview.12',nativeVersion='0.1.1-preview.11',

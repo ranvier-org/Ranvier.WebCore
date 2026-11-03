@@ -9,13 +9,13 @@ release=importlib.util.module_from_spec(spec);spec.loader.exec_module(release)
 
 
 class Preview12CandidateTests(unittest.TestCase):
-    def test_unarmed_exact_two_rid_policy_stops_before_network(self):
+    def test_exact_two_rid_policy_and_unarmed_copy_stops_before_network(self):
         policy=json.loads((release.PROVIDER/'public-preview12.json').read_text())
-        self.assertFalse(policy['armed']);self.assertEqual(policy['version'],'0.1.1-preview.12');self.assertEqual(policy['nativeVersion'],'0.1.1-preview.11')
+        self.assertTrue(policy['armed']);release.aggregate.validate_policy(policy);self.assertEqual(policy['version'],'0.1.1-preview.12');self.assertEqual(policy['nativeVersion'],'0.1.1-preview.11')
         self.assertEqual(policy['providerSourceClaim'],'05adae5c9829472306e85b6b3b4aac068e79a5ec')
         self.assertEqual(policy['rids']['linux-x64']['proofKind'],'local-qualified-relayed');self.assertEqual(policy['rids']['linux-arm64']['proofKind'],'runner-executed')
         with tempfile.TemporaryDirectory() as d,patch.object(release.subprocess,'check_output') as network:
-            with self.assertRaisesRegex(ValueError,'unarmed'):release.qualify_inputs(Path(d),policy)
+            with self.assertRaisesRegex(ValueError,'unarmed'):release.qualify_inputs(Path(d),dict(policy,armed=False))
             network.assert_not_called()
 
     def test_exact_run_path_head_event_and_outcome_are_required(self):
@@ -47,9 +47,9 @@ class Preview12CandidateTests(unittest.TestCase):
             release.absent_public_version();self.assertIn('/0.1.1-preview.12/',request.call_args.args[0])
         with patch.object(release.urllib.request,'urlopen'),self.assertRaises(ValueError):release.absent_public_version()
 
-    def test_candidate_workflow_is_disabled_and_never_publishes(self):
+    def test_candidate_workflow_is_manual_main_only_and_never_publishes(self):
         text=(ROOT/'.github/workflows/atspi-preview12-candidate.yml').read_text()
-        self.assertIn("false && github.event_name == 'workflow_dispatch'",text);self.assertIn("github.ref == 'refs/heads/main'",text)
+        self.assertIn("github.event_name == 'workflow_dispatch'",text);self.assertIn("github.ref == 'refs/heads/main'",text)
         self.assertNotIn('id-token:',text.lower());self.assertNotIn('nuget push',text.lower());self.assertNotIn('cmake',text.lower())
 
 

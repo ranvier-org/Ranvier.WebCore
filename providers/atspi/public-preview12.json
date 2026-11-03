@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "armed": false,
+  "armed": true,
   "id": "Ranvier.WebCore.Accessibility.Atspi",
   "version": "0.1.1-preview.12",
   "nativeVersion": "0.1.1-preview.11",
@@ -19,5 +19,5 @@
       "receiptSha256": "4444081e2d08edc336919339b262ae905597ca28c4ef44e6bf987a65aa61556d"
     }
   },
-  "scope": "Unarmed candidate preparation from accepted per-RID qualification inputs. The x64 proof is relayed, ARM evidence ran on its runner, and source fields remain unverified caller claims."
+  "scope": "Candidate-only preparation from accepted per-RID qualification inputs. The x64 proof is relayed, ARM evidence ran on its runner, and source fields remain unverified caller claims. Publication remains separately disabled."
 }
