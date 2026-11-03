@@ -23,6 +23,15 @@ draft-only upload, its owner, exact target commit, size and complete SHA-256. Th
 receiver rejects an unarmed policy before network use. Public preparation and
 publication remain disabled, with pending input/candidate pins.
 
+The first receiver, run 41639994860, stopped with HTTP 403 while reading the draft
+release, before asset download. GitHub documents draft release visibility as
+requiring push access. The relay job alone requests `contents: write` for draft
+visibility; its API commands remain GET-only, checkout does not persist credentials,
+and it has no NuGet authentication or publication step. This permission correction
+must be exercised by a changed receiver attempt; it does not alter accepted proof.
+
+Reference: https://docs.github.com/en/rest/releases/releases#list-releases
+
 The ARM qualification is pinned to push run 41627017174 at reviewed source
 `5b5ef82a0af3011fc6615d442e9d2618147b08a8` and its exact retained artifact,
 SDK package and summary receipt hashes. The x64 relay run tuple remains pending

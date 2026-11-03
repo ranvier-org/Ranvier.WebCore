@@ -87,16 +87,26 @@ class RelayControls(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'bundle bytes'):
                 relay.validate_bundle(path,self.policy)
 
-    def test_receiver_is_main_dispatch_only_without_publisher_or_compiler_permissions(self):
+    def test_receiver_is_main_dispatch_only_with_draft_read_access_and_no_publisher(self):
         text = (ROOT / '.github/workflows/build.yml').read_text()
         job = text.split('  relay-atspi-preview11-x64:',1)[1].split('  prepare-atspi-preview11:',1)[0]
         self.assertIn("github.event_name == 'workflow_dispatch'",job)
         self.assertIn("inputs.atspi_preview11 == 'relay-x64'",job)
         self.assertIn("github.ref == 'refs/heads/main'",job)
-        self.assertIn('contents: read',job)
-        for forbidden in ['dotnet', 'NuGet/login', 'id-token', 'cmake', 'ninja', 'contents: write']:
+        self.assertIn('contents: write',job)
+        self.assertIn('persist-credentials: false',job)
+        for forbidden in ['dotnet', 'NuGet/login', 'id-token', 'cmake', 'ninja']:
             self.assertNotIn(forbidden,job)
         self.assertIn(relay.ARTIFACT,job)
+
+    def test_receiver_requests_only_read_endpoints(self):
+        text = (ROOT/'scripts/relay_atspi_preview11_x64.py').read_text()
+        self.assertNotIn("'--method'",text)
+        self.assertNotIn("'-X'",text)
+        self.assertNotIn("'--field'",text)
+        self.assertNotIn("'--raw-field'",text)
+        self.assertIn("'repos/ranvier-org/Ranvier.WebCore/releases/'",text)
+        self.assertIn("'repos/ranvier-org/Ranvier.WebCore/releases/assets/'",text)
 
 
 if __name__ == '__main__':
