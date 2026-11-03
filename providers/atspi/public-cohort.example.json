@@ -3,9 +3,9 @@
   "armed": false,
   "id": "Ranvier.WebCore.Accessibility.Atspi",
   "version": null,
-  "nativeVersion": "0.1.1-preview.8",
-  "nativeSource": "b3073f604a4fba7a1a565d2893ff5791c603b759",
-  "providerSourceClaim": "b3073f604a4fba7a1a565d2893ff5791c603b759",
+  "nativeVersion": "0.1.1-preview.9",
+  "nativeSource": "e0e9a8007683d98785e8fb1b86d3b43359699858",
+  "providerSourceClaim": "e0e9a8007683d98785e8fb1b86d3b43359699858",
   "abi": 63,
   "rids": {
     "linux-x64": {"packageSha256": null, "receiptSha256": null},

@@ -10,8 +10,9 @@ Window/Host NativeAOT provider-present, module-absent and no-bus controls. ARM q
 does not qualify ARM. `qualification-receipt.example.json` is the unqualified summary shape, not evidence itself.
 Fill it only from actual raw reports and retain those reports for independent review.
 
-`public-cohort.example.json` is unarmed and has no initial provider version or expected input hashes. The Native P8
-version/source is recorded, but actual runtime receipts and initial public version coordination remain necessary.
+`public-cohort.example.json` is unarmed and has no initial provider version or expected input hashes. The allocated
+Native P9 version/source is recorded, but matching producer artifacts, actual runtime receipts and initial public
+version coordination remain necessary. P8's immutable failed producer remains historical evidence.
 Supply a cohort spec with the matching allocated version, exact Native/provider source claims, and each private
 package/independently supplied receipt SHA256. An input map names each RID's package and receipt files:
 
