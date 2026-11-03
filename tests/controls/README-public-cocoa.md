@@ -42,8 +42,9 @@ controller/builder hashes, then rechecks both sources and every native payload a
 permits a metadata-only recovery without editing or relabeling the immutable producer source.
 When an outer supervisor owns the POSIX process group, it sets `RANVIER_COCOA_OWNED_GROUP=1` so the
 orchestrator and nested builders inherit that group. The outer supervisor must kill and reap the
-whole group on completion or timeout. Without that flag each orchestrator child owns and reaps its
-own group; receipts distinguish group ownership from reaping only the immediate child.
+whole group on completion or timeout. Without that flag the orchestrator requests termination of each
+child's own group and waits for the immediate child. Receipts distinguish the group kill request from
+verified reaping of the immediate child; they do not claim that every group member has been observed absent.
 
 The existing public ABI deliberately initializes motion/contrast to Off and maps media preference0 to
 no preference, not `ForcedAccessibilityValue::System`. It also does not expose the per-page vector

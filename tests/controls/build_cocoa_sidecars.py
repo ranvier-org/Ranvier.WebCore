@@ -108,7 +108,7 @@ def main():
                 child.wait(timeout=10)
                 row['childReaped'] = True
                 if owns_group:
-                    row['processGroupReaped'] = True
+                    row['processGroupKillRequested'] = True
         if row['exit']:
             raise RuntimeError('Matching producer helper failed: ' + name)
 

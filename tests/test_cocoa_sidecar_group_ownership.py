@@ -19,7 +19,7 @@ class SidecarGroupOwnership(unittest.TestCase):
         exec(compile(ast.Module(body=[function], type_ignores=[]), 'actual-sidecar-run', 'exec'), namespace)
         return namespace['run']
 
-    def test_standalone_reaps_its_owned_group(self):
+    def test_standalone_requests_group_termination_and_reaps_its_child(self):
         with tempfile.TemporaryDirectory() as directory:
             receipt = dict(commands=[])
             child = Mock(pid=123456)
@@ -31,7 +31,8 @@ class SidecarGroupOwnership(unittest.TestCase):
             self.assertTrue(popen.call_args.kwargs['start_new_session'])
             killpg.assert_called_once_with(123456, 9)
             self.assertTrue(receipt['commands'][0]['ownsProcessGroup'])
-            self.assertTrue(receipt['commands'][0]['processGroupReaped'])
+            self.assertTrue(receipt['commands'][0]['processGroupKillRequested'])
+            self.assertNotIn('processGroupReaped', receipt['commands'][0])
             self.assertTrue(receipt['commands'][0]['childReaped'])
 
     def test_inherited_group_timeout_kills_only_child_and_leaves_group_to_outer_owner(self):
