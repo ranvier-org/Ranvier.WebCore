@@ -39,7 +39,7 @@ void* rvMacSpikeDisplay()
     if (!getPlatform)
         return nullptr;
     EGLint attributes[] { EGL_PLATFORM_ANGLE_TYPE_ANGLE, EGL_PLATFORM_ANGLE_TYPE_METAL_ANGLE, EGL_NONE };
-    auto candidate = getPlatform(EGL_PLATFORM_ANGLE_ANGLE, EGL_DEFAULT_DISPLAY, attributes);
+    auto candidate = getPlatform(EGL_PLATFORM_ANGLE_ANGLE, nullptr, attributes);
     if (candidate == EGL_NO_DISPLAY || !eglInitialize(candidate, nullptr, nullptr))
         return nullptr;
     if (!extension(eglQueryString(candidate, EGL_EXTENSIONS), "EGL_ANGLE_iosurface_client_buffer")) {
