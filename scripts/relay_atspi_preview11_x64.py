@@ -146,7 +146,8 @@ def validate_release(release, policy):
     require(len(assets) == 1, 'The exact draft asset is missing.')
     asset = assets[0]
     require(asset['name'] == policy['assetName'] and asset['size'] == policy['assetBytes']
-            and asset['state'] == 'uploaded' and asset['uploader']['login'] == policy['assetUploader'], 'The draft asset identity differs.')
+            and asset['state'] == 'uploaded' and asset['uploader']['login'] == policy['assetUploader']
+            and asset.get('digest') == 'sha256:' + policy['assetSha256'], 'The draft asset identity differs.')
 
 
 def receive(policy, work):

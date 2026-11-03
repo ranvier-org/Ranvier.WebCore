@@ -90,8 +90,11 @@ class Preview11Preparation(unittest.TestCase):
         for mode in ['prepare', 'publish', 'relay-x64']:
             for job in jobs:
                 with self.subTest(mode=mode, job=job):
-                    self.assertFalse(workflow.permitted(job, atspi11=mode))
+                    self.assertEqual(workflow.permitted(job, atspi11=mode), mode=='relay-x64' and job=='relay-atspi-preview11-x64')
                     self.assertFalse(workflow.permitted(job, atspi='prepare', atspi11=mode))
+        for options in [dict(event='push'),dict(ref='refs/heads/other'),dict(recovery=True),dict(recovery4=True),dict(recovery7=True),dict(recovery7windows=True)]:
+            with self.subTest(options=options):
+                self.assertFalse(workflow.permitted('relay-atspi-preview11-x64',atspi11='relay-x64',**options))
 
     def test_existing_trusted_subject_verifies_before_login_and_remains_disabled(self):
         prepare = workflow.job('prepare-atspi-preview11')

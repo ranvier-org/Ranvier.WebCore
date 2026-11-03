@@ -12,11 +12,13 @@ and candidate before using the existing main-ref trusted publishing subject.
 Source revision fields remain unverified caller claims. RID layout selection does
 not replace actual provider, protocol, SDK and normal/traced AOT execution.
 
-The disabled `relay-x64` job accepts the exact reviewed local evidence bundle
+The main-only `relay-x64` dispatch accepts the exact reviewed local evidence bundle
 from a pinned asset on a draft proof-only release. It validates every manifest
 member, raw normal/traced dependency graph, six runtime logs and binaries, SDK
 package and qualification receipts. It executes no renderer or qualification
 compiler. The aggregate labels this input `local-qualified-relayed`, separately
 from the ARM input's `runner-executed` proof. Neither label authenticates the
-caller-supplied source claim. Release/asset identities remain unset until the
-reviewed upload exists; the receiver rejects an unarmed policy before network use.
+caller-supplied source claim. Release 432676483 and asset 705558006 pin the reviewed
+draft-only upload, its owner, exact target commit, size and complete SHA-256. The
+receiver rejects an unarmed policy before network use. Public preparation and
+publication remain disabled, with pending input/candidate pins.

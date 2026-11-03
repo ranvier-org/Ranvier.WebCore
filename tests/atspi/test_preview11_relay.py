@@ -22,7 +22,7 @@ class RelayControls(unittest.TestCase):
     def test_unarmed_receiver_stops_before_network(self):
         with tempfile.TemporaryDirectory() as directory, patch.object(relay.subprocess, 'check_output') as network:
             with self.assertRaisesRegex(ValueError, 'unarmed'):
-                relay.receive(self.policy, Path(directory) / 'receive')
+                relay.receive(dict(self.policy, armed=False), Path(directory) / 'receive')
             network.assert_not_called()
 
     def test_transport_requires_every_exact_identity_pin(self):
@@ -36,16 +36,24 @@ class RelayControls(unittest.TestCase):
             with self.subTest(name=name), self.assertRaises(ValueError):
                 relay.validate_policy(dict(policy, **{name:value}))
 
+    def test_receiver_rejects_non_main_non_dispatch_identity_before_network(self):
+        for event, ref in [('push','refs/heads/main'), ('workflow_dispatch','refs/heads/other')]:
+            with self.subTest(event=event, ref=ref), patch.dict(relay.os.environ,
+                    dict(GITHUB_EVENT_NAME=event,GITHUB_REF=ref,GITHUB_SHA='a'*40)), patch.object(relay.subprocess,'check_output') as network:
+                with self.assertRaisesRegex(ValueError,'receiver identity'):
+                    relay.receive(self.policy,Path('not-created'))
+                network.assert_not_called()
+
     def test_release_target_author_and_asset_metadata_are_bound(self):
         policy = dict(self.policy, releaseId=1, assetId=2, assetName='proof.zip',
                       releaseAuthor='owner', assetUploader='owner')
         release = dict(id=1, draft=True, target_commitish=policy['releaseTargetCommit'], author=dict(login='owner'),
-                       assets=[dict(id=2, name='proof.zip', size=policy['assetBytes'], state='uploaded', uploader=dict(login='owner'))])
+                       assets=[dict(id=2, name='proof.zip', size=policy['assetBytes'], state='uploaded', uploader=dict(login='owner'), digest='sha256:' + policy['assetSha256'])])
         relay.validate_release(release, policy)
         for name, value in [('id',3), ('draft',False), ('target_commitish','main'), ('author',dict(login='other')), ('assets',[])]:
             with self.subTest(name=name), self.assertRaises(ValueError):
                 relay.validate_release(dict(release, **{name:value}), policy)
-        for name, value in [('id',3), ('name','other.zip'), ('size',1), ('state','new'), ('uploader',dict(login='other'))]:
+        for name, value in [('id',3), ('name','other.zip'), ('size',1), ('state','new'), ('uploader',dict(login='other')), ('digest','sha256:'+'0'*64)]:
             bad = deepcopy(release)
             bad['assets'][0][name] = value
             with self.subTest(name=name), self.assertRaises(ValueError):
@@ -79,10 +87,11 @@ class RelayControls(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'bundle bytes'):
                 relay.validate_bundle(path,self.policy)
 
-    def test_workflow_stays_disabled_without_publisher_or_compiler_permissions(self):
+    def test_receiver_is_main_dispatch_only_without_publisher_or_compiler_permissions(self):
         text = (ROOT / '.github/workflows/build.yml').read_text()
         job = text.split('  relay-atspi-preview11-x64:',1)[1].split('  prepare-atspi-preview11:',1)[0]
-        self.assertIn('if: ${{ false &&',job)
+        self.assertIn("github.event_name == 'workflow_dispatch'",job)
+        self.assertIn("inputs.atspi_preview11 == 'relay-x64'",job)
         self.assertIn("github.ref == 'refs/heads/main'",job)
         self.assertIn('contents: read',job)
         for forbidden in ['dotnet', 'NuGet/login', 'id-token', 'cmake', 'ninja', 'contents: write']:
