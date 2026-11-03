@@ -12,6 +12,12 @@ import threading
 import time
 
 
+def publish_response(directory, command):
+    temporary = directory / 'response.tmp'
+    temporary.write_text(json.dumps(command))
+    temporary.replace(directory / 'response.json')
+
+
 class Geometry(C.Structure):
     _fields_ = [('size', C.c_uint32), ('known', C.c_int32), ('x', C.c_int32), ('y', C.c_int32), ('scale', C.c_double)]
 
@@ -148,7 +154,7 @@ body{margin:0}button,input{position:absolute}#activate{left:10px;top:20px;width:
                     assert update(host) == 0
                 else:
                     raise AssertionError(command)
-                (args.output / 'response.json').write_text(json.dumps(command))
+                publish_response(args.output, command)
             if not paused:
                 cycle(0)
             time.sleep(0.002)

@@ -159,6 +159,10 @@ class AggregatePolicyTests(unittest.TestCase):
         self.assertIn('if: ${{ false }}',text)
         self.assertIn('public_aggregate.py',text)
         self.assertIn('receiptSha256',text)
+        self.assertIn('--layout-only',text)
+        self.assertIn('for rid in linux-x64 linux-arm64',text)
+        self.assertIn('release_candidate.py',text)
+        self.assertIn('release-candidate.json',text)
         self.assertNotIn('NuGet/login',text)
         self.assertNotIn('nuget push',text)
 
