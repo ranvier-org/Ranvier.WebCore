@@ -89,20 +89,26 @@ def main():
                    hostReplaced=False, headerReconstruction=False, engineCompilation=False)
 
     def run(name, command):
-        row = dict(name=name, argv=[str(value) for value in command])
+        owns_group = os.environ.get('RANVIER_COCOA_OWNED_GROUP') != '1'
+        row = dict(name=name, argv=[str(value) for value in command], ownsProcessGroup=owns_group)
         receipt['commands'].append(row)
         with (output / (name + '.log')).open('wb') as stream:
-            child = subprocess.Popen(row['argv'], stdout=stream, stderr=subprocess.STDOUT, start_new_session=True,
+            child = subprocess.Popen(row['argv'], stdout=stream, stderr=subprocess.STDOUT, start_new_session=owns_group,
                                      env=dict(os.environ, RANVIER_COCOA_OWNED_GROUP='1'))
             try:
                 row['exit'] = child.wait(timeout=300)
             finally:
-                try:
-                    os.killpg(child.pid, signal.SIGKILL)
-                except ProcessLookupError:
-                    pass
+                if owns_group:
+                    try:
+                        os.killpg(child.pid, signal.SIGKILL)
+                    except ProcessLookupError:
+                        pass
+                elif child.poll() is None:
+                    child.kill()
                 child.wait(timeout=10)
-                row['processGroupReaped'] = True
+                row['childReaped'] = True
+                if owns_group:
+                    row['processGroupKillRequested'] = True
         if row['exit']:
             raise RuntimeError('Matching producer helper failed: ' + name)
 
