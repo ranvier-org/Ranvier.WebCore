@@ -175,6 +175,13 @@ MODES = ('baseline', 'nested-repeat', 'self-destroy', '72-due-one-shots',
          'cross-thread-destroy-contract')
 
 
+def expected_owner_assertion(code, output):
+    fatal_signals = {-signal.SIGABRT, -signal.SIGILL}
+    if hasattr(signal, 'SIGTRAP'):
+        fatal_signals.add(-signal.SIGTRAP)
+    return code in fatal_signals and 'WTF_TIMER_NEGATIVE_BEFORE_OWNER_VIOLATION' in output and 'WTF_TIMER_NEGATIVE_DESTRUCTOR_RETURNED' not in output
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--native-directory', required=True)
@@ -197,8 +204,7 @@ def main():
             log = target.with_suffix('.log')
             log.write_text(output)
             if mode == 'cross-thread-destroy-contract':
-                fatal_signals = (-signal.SIGABRT, -signal.SIGILL, -signal.SIGTRAP)
-                expected_failure = code in fatal_signals and 'WTF_TIMER_NEGATIVE_BEFORE_OWNER_VIOLATION' in output and 'WTF_TIMER_NEGATIVE_DESTRUCTOR_RETURNED' not in output
+                expected_failure = expected_owner_assertion(code, output)
                 verdict = 0 if expected_failure else 1
             else:
                 expected_failure, verdict = False, int(code != 0)
