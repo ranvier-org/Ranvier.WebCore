@@ -130,7 +130,7 @@ diff --git a/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp b/Source/
 diff --git a/Source/WebCore/platform/graphics/texmap/GraphicsLayerTextureMapper.h b/Source/WebCore/platform/graphics/texmap/GraphicsLayerTextureMapper.h
 --- a/Source/WebCore/platform/graphics/texmap/GraphicsLayerTextureMapper.h
 +++ b/Source/WebCore/platform/graphics/texmap/GraphicsLayerTextureMapper.h
-@@ -35,6 +35,9 @@
+@@ -35,6 +35,12 @@
  
  class GraphicsLayerTextureMapper final : public GraphicsLayer, TextureMapperPlatformLayer::Client {
  public:
@@ -139,8 +139,11 @@ diff --git a/Source/WebCore/platform/graphics/texmap/GraphicsLayerTextureMapper.
 +#endif
      explicit GraphicsLayerTextureMapper(Type, GraphicsLayerClient&);
      virtual ~GraphicsLayerTextureMapper();
++#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
++    void setTextureMapperContents(TextureMapperPlatformLayer*, ContentsLayerPurpose);
++#endif
  
-@@ -81,7 +84,14 @@
+@@ -81,7 +87,14 @@
      void setContentsToPlatformLayer(PlatformLayer*, ContentsLayerPurpose) override;
      void setContentsDisplayDelegate(RefPtr<GraphicsLayerContentsDisplayDelegate>&&, ContentsLayerPurpose) override;
      bool usesContentsLayer() const override { return m_contentsLayer; }
@@ -156,16 +159,6 @@ diff --git a/Source/WebCore/platform/graphics/texmap/GraphicsLayerTextureMapper.
  
      void setShowDebugBorder(bool) override;
      void setDebugBorder(const Color&, float width) override;
-@@ -105,6 +115,9 @@
-     void platformLayerWillBeDestroyed() override { setContentsToPlatformLayer(0, ContentsLayerPurpose::None); }
-     void setPlatformLayerNeedsDisplay() override { setContentsNeedsDisplay(); }
- 
-+#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
-+    void setTextureMapperContents(TextureMapperPlatformLayer*, ContentsLayerPurpose);
-+#endif
-     void commitLayerChanges();
-     void updateDebugBorderAndRepaintCount();
-     void updateBackingStoreIfNeeded(TextureMapper&);
 diff --git a/Source/WebCore/platform/graphics/texmap/GraphicsLayerTextureMapper.cpp b/Source/WebCore/platform/graphics/texmap/GraphicsLayerTextureMapper.cpp
 --- a/Source/WebCore/platform/graphics/texmap/GraphicsLayerTextureMapper.cpp
 +++ b/Source/WebCore/platform/graphics/texmap/GraphicsLayerTextureMapper.cpp
