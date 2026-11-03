@@ -9,10 +9,12 @@
   "abi": 63,
   "rids": {
     "linux-x64": {
+      "proofKind": "local-qualified-relayed",
       "packageSha256": null,
       "receiptSha256": null
     },
     "linux-arm64": {
+      "proofKind": "runner-executed",
       "packageSha256": null,
       "receiptSha256": null
     }

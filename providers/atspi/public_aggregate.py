@@ -50,6 +50,8 @@ def validate_policy(policy):
     for field in ['nativeSource','providerSourceClaim']: full_hash(policy.get(field),40,field)
     for rid,pins in policy['rids'].items():
         for field in ['packageSha256','receiptSha256']: full_hash(pins.get(field),64,rid+' '+field)
+        if 'proofKind' in pins and pins['proofKind'] not in ('local-qualified-relayed','runner-executed'):
+            raise ValueError('Unknown qualification transport kind.')
 
 
 def checked_receipt(path,pins,policy,rid):
@@ -126,6 +128,8 @@ def prepare(policy,inputs,receipts):
         if license_status is not None and license_status!=manifest.get('licenseMetadataStatus'): raise ValueError('Input notice metadata contracts differ.')
         common=current; license_status=manifest.get('licenseMetadataStatus'); payload[asset]=module
         runtimes[rid]=dict(rid=rid,abi=63,callerClaimedProviderSourceRevision=policy['providerSourceClaim'],hostSha256=receipt['hostSha256'],providerSha256=receipt['providerSha256'],inputPackageSha256=policy['rids'][rid]['packageSha256'],qualificationReceiptSha256=policy['rids'][rid]['receiptSha256'])
+        if 'proofKind' in policy['rids'][rid]:
+            runtimes[rid]['qualificationProofKind']=policy['rids'][rid]['proofKind']
     payload.update(common)
     folded={name.casefold() for name in payload}
     for name in ['PUBLIC-README.md','PUBLIC-NOTICE.md','qualification-input/NOTICE.md','qualification-input/README.md']:

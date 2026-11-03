@@ -27,7 +27,8 @@ class Preview11Preparation(unittest.TestCase):
         self.assertEqual(policy['abi'], 63)
         self.assertEqual(set(policy['rids']), {'linux-x64', 'linux-arm64'})
         for rid, pins in policy['rids'].items():
-            self.assertEqual(pins, dict(packageSha256=None, receiptSha256=None))
+            self.assertEqual(pins, dict(packageSha256=None, receiptSha256=None,
+                                       proofKind='local-qualified-relayed' if rid=='linux-x64' else 'runner-executed'))
             self.assertEqual(release.QUALIFICATIONS[rid], (None, None, None, None, None))
         pins = json.loads((release.PROVIDER / 'preview11-publication.json').read_text())
         for name in ['candidateRun', 'candidateHead', 'packageSha256', 'candidateReceiptSha256']:
@@ -86,7 +87,7 @@ class Preview11Preparation(unittest.TestCase):
     def test_p11_modes_do_not_launch_engine_recovery_or_p10_jobs(self):
         text = (ROOT / '.github/workflows/build.yml').read_text()
         jobs = re.findall(r'^  ([a-z][a-z0-9-]*):$', text.split('jobs:', 1)[1], re.M)
-        for mode in ['prepare', 'publish']:
+        for mode in ['prepare', 'publish', 'relay-x64']:
             for job in jobs:
                 with self.subTest(mode=mode, job=job):
                     self.assertFalse(workflow.permitted(job, atspi11=mode))

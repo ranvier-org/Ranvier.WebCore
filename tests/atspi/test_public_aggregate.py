@@ -96,6 +96,18 @@ class AggregatePolicyTests(unittest.TestCase):
                 with self.assertRaises(ValueError): aggregate.prepare(self.policy,self.inputs,self.receipts)
                 self.mutate_package('linux-arm64',lambda _manifest,payload:payload.update({name:original}))
 
+    def test_optional_proof_transport_label_does_not_claim_relay_execution(self):
+        _, original=aggregate.prepare(self.policy,self.inputs,self.receipts)
+        self.assertNotIn('qualificationProofKind',original['runtimes']['linux-x64'])
+        for rid,kind in [('linux-x64','local-qualified-relayed'),('linux-arm64','runner-executed')]:
+            self.policy['rids'][rid]['proofKind']=kind
+        _, manifest=aggregate.prepare(self.policy,self.inputs,self.receipts)
+        self.assertEqual(manifest['runtimes']['linux-x64']['qualificationProofKind'],'local-qualified-relayed')
+        self.assertEqual(manifest['runtimes']['linux-arm64']['qualificationProofKind'],'runner-executed')
+        self.policy['rids']['linux-x64']['proofKind']='relay-executed-tests'
+        with self.assertRaisesRegex(ValueError,'transport kind'):
+            aggregate.prepare(self.policy,self.inputs,self.receipts)
+
     def test_mixed_abi_source_claim_capability_or_architecture_is_rejected(self):
         for name,value in [('abi',62),('abi',63.0),('callerClaimedProviderSourceRevision','9'*40),('sourceProvenance','verified'),('requiredCapability','old-style')]:
             with self.subTest(name=name):
