@@ -58,9 +58,13 @@ class HelperCompletionTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     completion.verify_archive(path, completion.sha(path))
 
-    def test_workflow_is_unarmed_read_only_and_has_no_producer_steps(self):
+    def test_workflow_has_exact_manual_main_gate_and_no_producer_steps(self):
         text = (ROOT / '.github/workflows/macos-preview12-helper-completion.yml').read_text()
-        self.assertIn("false && github.event_name == 'workflow_dispatch'", text)
+        gate, = [line for line in text.splitlines() if line.startswith('    if:')]
+        self.assertIn(gate, {
+            "    if: ${{ false && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}",
+            "    if: ${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}",
+        })
         self.assertIn('contents: read', text)
         self.assertIn('actions: read', text)
         self.assertNotIn('id-token:', text)
