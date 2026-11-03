@@ -1250,7 +1250,7 @@ jobs:
           retention-days: 30
 
   prepare-atspi-preview11:
-    if: ${{ (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && github.event_name == 'workflow_dispatch' && inputs.atspi_preview11 == 'prepare' && github.ref == 'refs/heads/main' && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows }}
+    if: ${{ false && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && github.event_name == 'workflow_dispatch' && inputs.atspi_preview11 == 'prepare' && github.ref == 'refs/heads/main' && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
@@ -1290,7 +1290,7 @@ jobs:
           if-no-files-found: warn
 
   publish-atspi-preview11:
-    if: ${{ false && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && github.event_name == 'workflow_dispatch' && inputs.atspi_preview11 == 'publish' && github.ref == 'refs/heads/main' && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && vars.NUGET_USER != '' }}
+    if: ${{ (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && github.event_name == 'workflow_dispatch' && inputs.atspi_preview11 == 'publish' && github.ref == 'refs/heads/main' && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && vars.NUGET_USER != '' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:

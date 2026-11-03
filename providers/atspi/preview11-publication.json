@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "id": "Ranvier.WebCore.Accessibility.Atspi",
   "version": "0.1.1-preview.11",
-  "candidateRun": null,
-  "candidateHead": null,
-  "packageSha256": null,
-  "candidateReceiptSha256": null,
-  "scope": "Unarmed. No P11 candidate has been prepared or independently audited."
+  "candidateRun": 41642147423,
+  "candidateHead": "708058bcd9ff83575cda85238d586dc31d03231b",
+  "packageSha256": "bd2b2d0d760d33efedac1aef0381b4019b495812152f3685d4f3520f3a33e1bb",
+  "candidateReceiptSha256": "9791aedf253c5307e114d50e8ca6f717a8337fd80e70ae1a37845ec40b3f937e",
+  "scope": "Exact independently audited P11 two-RID candidate. Existing main-only publisher re-downloads and verifies candidate, qualification inputs and SDK layout receipts before authentication. Local x64 proof remains relayed; source claims remain unverified."
 }
