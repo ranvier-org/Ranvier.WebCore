@@ -11,6 +11,28 @@ import sys
 import tempfile
 
 
+def check_package_graphs(artifacts, traced, sha):
+    suffix = '.Traced' if traced else ''
+    expected = {f'Ranvier.View.WebCore{suffix}/0.1.0-alpha.45'.casefold(),
+                f'Ranvier.View.WebCore.Sdl{suffix}/0.1.0-alpha.45'.casefold()}
+    families = ['Ranvier.View', 'Ranvier.View.Dom', 'Ranvier.View.WebCore', 'Ranvier.View.WebCore.Sdl']
+    opposing = {(name if traced else name + '.Traced').casefold() for name in families}
+    graphs = []
+    for path in artifacts.rglob('project.assets.json'):
+        assets = json.loads(path.read_text(encoding='utf-8'))
+        libraries = assets['libraries']
+        references = {name for name, value in libraries.items() if value['type'] == 'project'}
+        assert references <= {'NativeMedia/1.0.0'}, references
+        packages = {name for name, value in libraries.items() if value['type'] == 'package'}
+        mixed = {name for name in packages if name.split('/', 1)[0].casefold() in opposing}
+        assert not mixed, {'traced': traced, 'opposingViewPackages': sorted(mixed)}
+        graphs.append({'path': str(path), 'sha256': sha(path), 'projectReferences': sorted(references),
+                       'packageLibraries': sorted(packages)})
+    assert graphs and any(expected <= {name.casefold() for name in graph['packageLibraries']}
+                          for graph in graphs), expected
+    return graphs
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--native-stage', type=Path, required=True)
@@ -131,21 +153,7 @@ def main():
                                 '-p:ILLinkTreatWarningsAsErrors=true', '-p:IlcTreatWarningsAsErrors=true']
                 run(mode + '-build', command, timeout=540)
                 if args.package_only:
-                    suffix = '.Traced' if args.traced else ''
-                    expected = {f'Ranvier.View.WebCore{suffix}/0.1.0-alpha.45',
-                                f'Ranvier.View.WebCore.Sdl{suffix}/0.1.0-alpha.45'}
-                    graphs = []
-                    for path in artifacts.rglob('project.assets.json'):
-                        assets = json.loads(path.read_text(encoding='utf-8'))
-                        libraries = assets['libraries']
-                        references = {name for name, value in libraries.items() if value['type'] == 'project'}
-                        assert references <= {'NativeMedia/1.0.0'}, references
-                        graphs.append({'path': str(path), 'sha256': sha(path),
-                                       'projectReferences': sorted(references),
-                                       'packageLibraries': sorted(name for name, value in libraries.items()
-                                                                  if value['type'] == 'package')})
-                    assert graphs and any(expected <= set(graph['packageLibraries']) for graph in graphs), expected
-                    report[mode + 'PackageGraphs'] = graphs
+                    report[mode + 'PackageGraphs'] = check_package_graphs(artifacts, args.traced, sha)
             directory = artifacts / ('publish' if mode == 'aot' else 'bin') / 'Managed/release_win-x64'
             if args.phase == 'build':
                 continue
