@@ -55,4 +55,5 @@ jobs:
         with:
           name: immutable-d31-mac-slim-helper-completion
           path: ${{ env.EVIDENCE }}
+          include-hidden-files: true
           if-no-files-found: error

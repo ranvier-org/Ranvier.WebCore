@@ -142,4 +142,5 @@ jobs:
         with:
           name: immutable-d31-mac-${{ inputs.flavor }}-recovery-proof
           path: ${{ env.EVIDENCE }}
+          include-hidden-files: true
           if-no-files-found: warn

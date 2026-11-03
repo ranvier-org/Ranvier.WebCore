@@ -55,6 +55,7 @@ class ProofLayoutTests(unittest.TestCase):
         text = (ROOT / '.github/workflows/macos-preview12-recovery.yml').read_text()
         final = text[text.index('      - name: Always retain original SDK and helper proof'):]
         self.assertIn('path: ${{ env.EVIDENCE }}', final)
+        self.assertIn('include-hidden-files: true', final)
         self.assertNotIn('${{ env.RANVIER_WORK }}', final)
         self.assertLess(text.index('collect_mac_recovery_proof.py'), text.index('      - name: Always retain original SDK and helper proof'))
 

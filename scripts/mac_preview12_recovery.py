@@ -26,11 +26,27 @@ INDEPENDENT_GPU_NATIVE = {
     'win-x64': 126259024306,
     'linux-arm64': 126259024307,
 }
-HELPER_SOURCE = '3f187c76e404ace64791d8996591ca8bd97183bf'
+HELPER_SOURCE = '2203d5ff61928074363d8917691edc11995cc603'
 HELPER_BLOBS = {
-    'tests/controls/build_cocoa_sidecars.py': 'd2ff164b0ce774ed5c129e95046028083d411425',
+    'tests/controls/build_cocoa_sidecars.py': 'f626b86e23f8e78e5b08adcf17b58c7ec1efbf67',
     'tests/abi/build_cocoa_timer_contract.py': '55fd1261c444226578383efbb91accc9696cd1d6',
 }
+
+
+def glyph_recipe(product, native, output, sdl_flags):
+    source = product / 'tests/gpu/mac'
+    binary = output / 'glyph-orientation'
+    return [
+        ('glyph-compile', ['xcrun', 'clang++', '-std=c++20', '-fobjc-arc', '-Wall', '-Wextra', '-Werror',
+            '-DRANVIER_MAC_PUBLIC_TRANSPORT=1', '-mmacosx-version-min=26.0', '-I' + str(product / 'host'),
+            '-I' + str(source), source / 'glyph_orientation.mm', '-o', binary, '-L' + str(native),
+            '-lRanvierWebCoreHost', '-Wl,-rpath,' + str(native), '-Wl,-undefined,error',
+            '-framework', 'Metal', '-framework', 'IOSurface', '-framework', 'Foundation',
+            '-framework', 'CoreGraphics', *sdl_flags]),
+        ('glyph-capture', [binary, '--output', output]),
+        ('glyph-oracle', [sys.executable, '-I', source / 'glyph_orientation.py',
+            '--captures', output, '--output', output / 'orientation.json']),
+    ]
 
 
 def sha(path):
@@ -301,6 +317,27 @@ def main():
                 for name, command in groups:
                     try: run(name, command, timeout=1800)
                     except (RuntimeError, subprocess.TimeoutExpired) as error: failures.append(str(error))
+                if args.flavor == 'gpu':
+                    try:
+                        glyph = output / 'glyph-proof'
+                        glyph.mkdir(exist_ok=False)
+                        sdk = glyph / 'presenter-sdk'
+                        run('glyph-sdk', [sys.executable, '-I', product / 'tests/gpu/mac/prepare_sdk.py',
+                                          '--directory', sdk], timeout=300)
+                        glyph_environment = dict(PKG_CONFIG_PATH=str(sdk / 'lib/pkgconfig'),
+                            DYLD_LIBRARY_PATH=os.pathsep.join([str(native), str(sdk / 'lib')]))
+                        flags = shlex.split(run('glyph-flags', ['pkg-config', '--cflags', '--libs', 'sdl3'],
+                                                extra_env=glyph_environment))
+                        for name, command in glyph_recipe(product, native, glyph, flags):
+                            run(name, command, timeout=180, extra_env=glyph_environment)
+                        phase['gpuGlyph'] = dict(passed=True, source=PRODUCT_SOURCE,
+                                                 output='glyph-proof', publicTransport=True)
+                    except (RuntimeError, subprocess.TimeoutExpired) as error:
+                        phase['gpuGlyph'] = dict(passed=False, error=str(error))
+                        failures.append(str(error))
+                phase['nativeBefore'] = before
+                phase['nativeAfter'] = helper.snapshot(native)
+                phase['nativeUnchanged'] = phase['nativeAfter'] == before
                 phase['failures'] = failures
                 if failures:
                     raise RuntimeError('Independent product gates failed: ' + '; '.join(failures))
