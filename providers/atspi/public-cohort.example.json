@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "armed": false,
+  "id": "Ranvier.WebCore.Accessibility.Atspi",
+  "version": null,
+  "nativeVersion": "0.1.1-preview.9",
+  "nativeSource": "e0e9a8007683d98785e8fb1b86d3b43359699858",
+  "providerSourceClaim": "e0e9a8007683d98785e8fb1b86d3b43359699858",
+  "abi": 63,
+  "rids": {
+    "linux-x64": {"packageSha256": null, "receiptSha256": null},
+    "linux-arm64": {"packageSha256": null, "receiptSha256": null}
+  },
+  "scope": "Actual matching producer/protocol/SDK/managed qualification and coordinated initial public version are required; source claims are not authenticated by this file."
+}
