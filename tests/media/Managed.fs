@@ -112,6 +112,41 @@ let internal verifyOwnership check =
     check (pendingCalls = callsAfterConsumption) "pending consumed lease is cleared despite cleanup error"
 
 /// <summary>Runs actual managed playback, GPU composition, clock, OS actions and publication teardown.</summary>
+let private verifyRealHostDisposal (check: bool -> string -> unit) (window: Window) fixture =
+    let host = window.Host
+    let target = host.Document.getElementById "video"
+    use supplied = WindowsPlayback.Create()
+    supplied.OpenFile fixture
+    supplied.Play()
+    let watch = Stopwatch.StartNew()
+    let mutable held: VideoFrameLease option = None
+    while Option.isNone held && watch.Elapsed.TotalSeconds < 5 do
+        host.Cycle(milliseconds = 1)
+        match supplied.TryPublishFrame(host, target) with
+        | ValueSome frame -> held <- Some frame
+        | ValueNone -> Thread.Sleep 5
+    check (Option.isSome held) "actual host disposal holds a decoded publication"
+    use frame = held.Value
+    host.Frame()
+    window.Present()
+    let texture = frame.Texture
+    check (texture <> 0n) "live frame texture before actual window disposal"
+    (window :> IDisposable).Dispose()
+    let hostClosed = try host.BindD3D11Texture(target, 0n); false with :? ObjectDisposedException -> true
+    check hostClosed "actual disposed host rejects texture binding"
+    let mutable wrongThread = 0
+    let worker = Thread(fun () -> try (frame :> IDisposable).Dispose() with error -> wrongThread <- error.HResult)
+    worker.Start()
+    worker.Join()
+    check (wrongThread = int 0x8001010Eu && frame.Texture = texture)
+        "wrong-thread release after host disposal retains the native frame"
+    (supplied :> IDisposable).Dispose()
+    (frame :> IDisposable).Dispose()
+    (frame :> IDisposable).Dispose()
+    let consumed = try frame.Texture |> ignore; false with :? ObjectDisposedException -> true
+    check consumed "owner release after real host disposal consumes the native frame exactly once"
+    Console.WriteLine "MEDIA_REAL_HOST_DISPOSAL=PASS"
+
 [<EntryPoint>]
 let main arguments =
     let mutable assertions = 0
@@ -330,7 +365,16 @@ let main arguments =
         wait "OS seek reaches same managed provider" (fun sample -> not sample.Seeking && abs (sample.PositionSeconds - 1.0) < 0.05)
         osAction 2 0.0
         wait "OS stop reaches same managed provider" (fun sample -> sample.State = PlaybackState.Stopped && not sample.Seeking && sample.PositionSeconds < 0.05)
+        osAction 0 0.0
         player.DetachControls()
+        let mutable revokedStatus = 0
+        try player.DrainControls() with :? ExternalException as error -> revokedStatus <- error.HResult
+        check (revokedStatus = int 0x80000013u) "detached controls report the exact closed status"
+        let revokedWatch = Stopwatch.StartNew()
+        while revokedWatch.Elapsed.TotalSeconds < 0.2 do
+            host.Cycle(milliseconds = 1)
+        check (player.Snapshot().State = PlaybackState.Stopped) "accepted queued OS play cannot restart detached controls"
+        Console.WriteLine "MEDIA_OS_CONTROLS_REVOKED=PASS"
         player.Seek 1.5
         player.Play()
         let watch = Stopwatch.StartNew()
@@ -409,6 +453,18 @@ let main arguments =
         let mutable cancelledError = 0
         try cancelled.Play() with :? ExternalException as error -> cancelledError <- error.HResult
         check (cancelledError < 0) "cancelled provider cannot restart"
+        verifyRealHostDisposal check window (Path.GetFullPath arguments[1])
+        presentations <- presentations + 1
+        frames <- frames + 1
+        let audioWatch = Stopwatch.StartNew()
+        let mutable closedPeak, closedActive, audioStatus = 1.0f, 1, 0
+        while (closedActive <> 0 || closedPeak >= 0.0001f) && audioWatch.Elapsed.TotalSeconds < 2 do
+            audioStatus <- Support.media_test_audio(&closedPeak, &closedActive)
+            if closedActive <> 0 || closedPeak >= 0.0001f then Thread.Sleep 20
+        check (audioStatus = 0 && closedActive = 0 && closedPeak < 0.0001f)
+            "all released own audio sinks are inactive and silent"
+        Console.WriteLine("MEDIA_AUDIO_AFTER_CLOSE=" + closedActive.ToString(Globalization.CultureInfo.InvariantCulture)
+                          + ":" + closedPeak.ToString("R", Globalization.CultureInfo.InvariantCulture))
         Console.WriteLine("MEDIA_MANAGED_ASSERTIONS=" + assertions.ToString(Globalization.CultureInfo.InvariantCulture))
         Console.WriteLine("MEDIA_MANAGED_FRAMES=" + frames.ToString(Globalization.CultureInfo.InvariantCulture))
         Console.WriteLine("MEDIA_MANAGED_SDL_PRESENTATIONS=" + presentations.ToString(Globalization.CultureInfo.InvariantCulture))
