@@ -45,6 +45,10 @@ class ManagedArm64Qualification(unittest.TestCase):
         module.validate_assets(libraries, 'traced', '0.0.0-arm64.1', '0.0.0-ci.5')
         with self.assertRaises(ValueError):
             module.validate_assets(libraries, 'normal', '0.0.0-arm64.1', '0.0.0-ci.5')
+        for extra in ('Ranvier.Dom/0.1.0-alpha.56', 'Ranvier.WebCore/0.1.1-preview.7',
+                      module.PROVIDER_ID + '/0.0.0-ci.6'):
+            with self.subTest(extra=extra), self.assertRaises(ValueError):
+                module.validate_assets(dict(libraries, **{extra: {}}), 'traced', '0.0.0-arm64.1', '0.0.0-ci.5')
 
 
 if __name__ == '__main__':
