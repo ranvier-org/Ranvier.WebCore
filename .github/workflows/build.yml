@@ -65,6 +65,7 @@ jobs:
       - run: python -I tests/atspi/test_preview11_publication.py
       - run: python -I tests/atspi/test_arm64_managed.py
       - run: python -I tests/atspi/test_runtime_admission.py
+      - run: python -I tests/atspi/test_prepared_managed.py
       - run: python -I tests/test_package_contract.py
       - run: python -I tests/test_release.py
       - run: python -I tests/test_publish_gate.py
