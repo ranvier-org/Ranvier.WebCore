@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path, PurePosixPath
 import platform
+import re
 import signal
 import stat
 import subprocess
@@ -23,6 +24,7 @@ SOURCE_TREES = {'host':'d407cbe31b8bf47809b9f66412faf1fd8468b17d',
                 'tests/abi':'9fac47b7fd05d4d848a44e7c87fa5c5dd1b7deb0'}
 COUNTER_SOURCE_SHA = '1b03f8b0dddb42d2f040a72660974700178a0d0ec2febed11483f0e0bb5aa0a9'
 SCALES = ('1','1,1')
+SYMBOLS = {'libEGL.dylib': {'sha256': '935bb22fe657a30dc801770abbae2684451f0c0f7cb3a5fd2845725f7bb3c438', 'dwarf': 'libEGL.dylib'}, 'libGLESv2.dylib': {'sha256': '7a106a8e2b6ff89be5a920a2ce4180feee23b4a584a27decbcbd78f1aed411f7', 'dwarf': 'libGLESv2.dylib'}, 'libJavaScriptCore.dylib': {'sha256': '4a0bfeb745cd1b2d155bc8aa3b34ba94591289e1f5706082131e777bd45bfde0', 'dwarf': 'JavaScriptCore'}, 'libRanvierWebCoreHost.dylib': {'sha256': '385378ecb97fef8b2e06ee2be65d793c721a2886a5206de200d581e91a6ae660', 'dwarf': 'libRanvierWebCoreHost.dylib'}, 'libWebCore.dylib': {'sha256': '1f68134c311aec5240a0a39aad97f3e8d2c7a9b7949921584da0614174c2ad94', 'dwarf': 'WebCore'}, 'libWebGPU.dylib': {'sha256': '483905dc7b97d053825d44c4f5c447299a28eca0bcb81199d8a7408e1b8feee6', 'dwarf': 'WebGPU'}}
 NATIVE = {
     'libJavaScriptCore.dylib':'9f401b62e5c68fd62895728133f2b3ac823bd07c775afa52e4585bcf46afa8ab',
     'libEGL.dylib':'cb2d5331164dfe5c2e6be2b113c7a835787a9e50827a1544fd0b0e035f33724c',
@@ -205,11 +207,28 @@ def main():
             record['counterFixtureSha256']=sha(program)
             run('counter-imports',['xcrun','otool','-L',program])
             run('host-symbols',['xcrun','nm','-a',native/'libRanvierWebCoreHost.dylib'])
+            symbol_commands=[]
+            symbol_records=[]
+            for name,item in SYMBOLS.items():
+                digest=item['sha256']
+                symbol=stage/'symbols/osx-arm64'/(name+'.dSYM')
+                if sha(symbol/'Contents/Resources/DWARF'/item['dwarf'])!=digest:
+                    raise ValueError('Retained native symbols differ: '+name)
+                _,actual_uuid=run('uuid-'+name,['xcrun','dwarfdump','--uuid',native/name])
+                _,symbol_uuid=run('symbol-uuid-'+name,['xcrun','dwarfdump','--uuid',symbol])
+                actual=re.findall(r'UUID: ([0-9A-Fa-f-]+) \(arm64\)',actual_uuid)
+                debug=re.findall(r'UUID: ([0-9A-Fa-f-]+) \(arm64\)',symbol_uuid)
+                if len(actual)!=1 or actual!=debug:
+                    raise ValueError('Native/symbol UUID mismatch: '+name)
+                symbol_records.append(dict(module=name,uuid=actual[0],dwarfSha256=digest))
+                symbol_commands.extend(['target modules add '+str(native/name), 'target symbols add '+str(symbol)])
+            record['nativeSymbolIdentities']=symbol_records
             commands=output/'stack.lldb'
             commands.write_text(
                 'settings set target.disable-aslr false\n'
                 'settings set target.env-vars DYLD_LIBRARY_PATH='+str(native)+':'+str(sdl/'lib')+'\n'
                 'command script import '+str(ROOT/'tests/gpu/mac/dirty220_lldb.py')+'\n'
+                +'\n'.join(symbol_commands)+'\n'
                 'breakpoint set -r RvChromeClient::invalidate\n'
                 'breakpoint command add -F dirty220_lldb.on_invalidate 1\n'
                 'run --diagnostic-scales 1,1\n'
