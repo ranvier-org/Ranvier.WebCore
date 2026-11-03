@@ -17,6 +17,16 @@ def legacy_gl_imports(symbols, expected):
     return sorted(name for name in expected if re.search(r'(?<!\w)' + re.escape(name) + r'(?!\w)', symbols))
 
 
+def independent_groups(groups):
+    errors = []
+    for name, action in groups:
+        try:
+            action()
+        except Exception as error:
+            errors.append({'group': name, 'error': repr(error)})
+    return errors
+
+
 def run_step(name, command, producer, evidence, receipt, timeout=None):
     try:
         result = subprocess.run(command, cwd=producer, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
@@ -91,11 +101,13 @@ def main():
         sdl_cflags = shlex.split(run('sdl-cflags', ['pkg-config', '--cflags', 'sdl3']).strip())
         consumer_flags = ['-DRANVIER_MAC_PUBLIC_TRANSPORT=1'] if args.public_transport else []
         receipt['sdlVersion'] = run('sdl-version', ['pkg-config', '--modversion', 'sdl3']).strip()
-        sources = ['spike.mm', 'texture_input.mm'] if args.texture_input else ['spike.mm']
+        sources = ['spike.mm', 'glyph_orientation.mm']
+        if args.texture_input:
+            sources.append('texture_input.mm')
         for name in sources:
             run('consumer-preflight-' + Path(name).stem,
                 ['xcrun', 'clang++', '-std=c++20', '-fobjc-arc', '-Wall', '-Wextra', '-Werror',
-                 '-mmacosx-version-min=26.0', '-I' + str(ROOT / 'host'),
+                 '-mmacosx-version-min=26.0', '-I' + str(ROOT / 'host'), '-I' + str(Path(__file__).parent),
                  *sdl_cflags, *consumer_flags,
                  '-c', str(Path(__file__).with_name(name)), '-o', str(evidence / (name + '.o'))])
         for step in plan:
@@ -142,18 +154,41 @@ def main():
                               str(Path(__file__).with_name('spike.mm')), '-o', str(executable),
                               '-L' + str(stage), '-lRanvierWebCoreHost', '-Wl,-rpath,' + str(stage),
                               '-framework', 'Metal', '-framework', 'IOSurface', '-framework', 'Foundation', *sdl])
-        run('proof', [str(executable), '--output', str(evidence)])
-        run('unsupported-renderer', [str(executable), '--reject-software'])
+        groups = [('output', lambda: run('proof', [str(executable), '--output', str(evidence)])),
+                  ('software-rejection', lambda: run('unsupported-renderer', [str(executable), '--reject-software']))]
         if args.texture_input:
             input_executable = evidence / 'mac-texture-input'
-            run('input-compile', ['xcrun', 'clang++', '-std=c++20', '-fobjc-arc', '-Wall', '-Wextra', '-Werror',
+            def input_group():
+                run('input-compile', ['xcrun', 'clang++', '-std=c++20', '-fobjc-arc', '-Wall', '-Wextra', '-Werror',
                                   '-mmacosx-version-min=26.0', '-I' + str(ROOT / 'host'), *consumer_flags,
                                   str(Path(__file__).with_name('texture_input.mm')), '-o', str(input_executable),
                                   '-L' + str(stage), '-lRanvierWebCoreHost', '-Wl,-rpath,' + str(stage),
                                   '-framework', 'Metal', '-framework', 'IOSurface', '-framework', 'Foundation', *sdl])
-            run_step('input-proof', [str(input_executable), '--output', str(evidence)], ROOT, evidence, receipt, timeout=180)
+                run_step('input-proof', [str(input_executable), '--output', str(evidence)], ROOT, evidence, receipt, timeout=180)
+            groups.append(('input', input_group))
+        def glyph_group():
+            glyph = evidence / 'glyph-orientation'
+            run('glyph-compile', ['xcrun', 'clang++', '-std=c++20', '-fobjc-arc', '-Wall', '-Wextra', '-Werror',
+                '-mmacosx-version-min=26.0', '-I' + str(ROOT / 'host'), '-I' + str(Path(__file__).parent), *consumer_flags,
+                str(Path(__file__).with_name('glyph_orientation.mm')), '-o', str(glyph),
+                '-L' + str(stage), '-lRanvierWebCoreHost', '-Wl,-rpath,' + str(stage),
+                '-framework', 'Metal', '-framework', 'IOSurface', '-framework', 'Foundation', '-framework', 'CoreGraphics', *sdl])
+            run_step('glyph-capture', [str(glyph), '--output', str(evidence)], ROOT, evidence, receipt, timeout=180)
+            run('glyph-oracle', [sys.executable, '-I', str(Path(__file__).with_name('glyph_orientation.py')),
+                                '--captures', str(evidence), '--output', str(evidence / 'orientation.json')])
+        groups.append(('glyph-orientation', glyph_group))
+        groups.append(('native-catalogue', lambda: run_step('native-catalogue',
+            [sys.executable, '-I', str(ROOT / 'scripts/abi_tests.py'), '--stage', str(work / 'out/gpu'),
+             '--source', str(work / 'src')], ROOT, evidence, receipt, timeout=1800)))
+        before = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in stage.iterdir() if p.is_file()}
+        receipt['nativeBefore'] = before
+        receipt['runtimeFailures'] = independent_groups(groups)
         receipt['files'] = {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
                             for p in stage.iterdir() if p.is_file()}
+        if before != receipt['files']:
+            raise RuntimeError('Native files changed during the compositor controls')
+        if receipt['runtimeFailures']:
+            raise RuntimeError('Independent runtime groups failed: ' + json.dumps(receipt['runtimeFailures']))
         receipt['passed'] = True
     finally:
         (evidence / 'receipt.json').write_text(json.dumps(receipt, indent=2), encoding='utf-8')

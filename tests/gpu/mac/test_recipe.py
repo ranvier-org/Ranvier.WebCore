@@ -94,6 +94,20 @@ class RecipeTests(unittest.TestCase):
             '                 (undefined) external _GL_GetIntegerv (from libGLESv2)', inventory), [])
         self.assertEqual(recipe.legacy_gl_imports('_glGetIntegervExtra __ZN_glBindFramebuffer', inventory), [])
 
+    def test_runtime_failure_does_not_hide_independent_groups(self):
+        recipe = self.load()
+        called = []
+        def failed():
+            called.append('output')
+            raise RuntimeError('original resized pixel failure')
+        errors = recipe.independent_groups([
+            ('output', failed), ('input', lambda: called.append('input')),
+            ('glyph', lambda: called.append('glyph'))])
+        self.assertEqual(called, ['output', 'input', 'glyph'])
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0]['group'], 'output')
+        self.assertIn('original resized pixel failure', errors[0]['error'])
+
     def test_native_timeout_preserves_partial_log_and_failure(self):
         recipe = self.load()
         self.assertTrue(callable(getattr(recipe, 'run_step', None)), 'bounded step runner is missing')
