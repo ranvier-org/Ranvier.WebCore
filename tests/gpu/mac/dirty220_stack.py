@@ -157,6 +157,7 @@ def main():
             raise ValueError('The consumer SDK differs.')
         archive=work/'coherent2a.zip'
         run('download',[sys.executable,'-I',__file__,'--download',archive],timeout=240)
+        run('download-counter',[sys.executable,'-I',__file__,'--download-counter',work/'counter.zip'],timeout=240)
         environment.pop('GH_TOKEN',None)
         environment.pop('GITHUB_TOKEN',None)
         retained=work/'retained'
@@ -190,7 +191,6 @@ def main():
                 raise ValueError('The presenter SDK differs from the actual producer.')
             counter_environment=dict(environment,DYLD_LIBRARY_PATH=str(native)+':'+str(sdl/'lib'))
             counter_archive=work/'counter.zip'
-            run('download-counter',[sys.executable,'-I',__file__,'--download-counter',counter_archive],timeout=240)
             if sha(counter_archive)!='af77a0704e5ea8d36c2de9199a5a8b09485844cb8605d870c60b7131cf3f4ed4':
                 raise ValueError('The retained counter artifact differs.')
             with zipfile.ZipFile(counter_archive) as zipped:
