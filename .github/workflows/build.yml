@@ -221,10 +221,28 @@ jobs:
         shell: bash
         run: python -I scripts/check_package_api.py --package 'packages/${{ matrix.asset }}'
 
-      - name: Verify packaged GPU shared frames and lifetimes
-        if: env.FLAVOR == 'gpu' && (matrix.rid == 'win-x64' || startsWith(matrix.rid, 'linux-'))
+      - name: Select macOS packaged GPU consumer tools
+        if: env.FLAVOR == 'gpu' && matrix.rid == 'osx-arm64'
         shell: bash
-        run: python -I scripts/check_package_api.py --gpu --package 'packages/${{ matrix.asset }}'
+        run: |
+          xcode=$(find /Applications -maxdepth 1 -name 'Xcode_26*.app' ! -iname '*beta*' | sort -V | tail -1)
+          test -n "$xcode"
+          echo "DEVELOPER_DIR=$xcode/Contents/Developer" >> "$GITHUB_ENV"
+          export HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1
+          command -v pkg-config >/dev/null || brew install pkg-config
+
+      - name: Verify packaged GPU shared frames and lifetimes
+        if: env.FLAVOR == 'gpu' && (matrix.rid == 'win-x64' || startsWith(matrix.rid, 'linux-') || matrix.rid == 'osx-arm64')
+        shell: bash
+        run: python -I scripts/check_package_api.py --gpu --package 'packages/${{ matrix.asset }}' --evidence '${{ runner.temp }}/mac-gpu-public-qualification'
+
+      - name: Retain packaged macOS texture qualification
+        if: always() && env.FLAVOR == 'gpu' && matrix.rid == 'osx-arm64'
+        uses: actions/upload-artifact@v4
+        with:
+          name: packaged-mac-gpu-public-qualification
+          path: ${{ runner.temp }}/mac-gpu-public-qualification
+          if-no-files-found: warn
 
       - uses: actions/upload-artifact@v4
         with:
@@ -332,7 +350,7 @@ jobs:
           xcodebuild -version
           # No auto-update: it fetches Homebrew's taps, which installing a bottle does not need.
           export HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1
-          for tool in gperf ninja cmake; do
+          for tool in gperf ninja cmake pkg-config; do
             command -v $tool >/dev/null && continue
             for attempt in 1 2 3 4; do
               brew install $tool && break
@@ -658,6 +676,14 @@ jobs:
         with:
           name: probe-logs-${{ matrix.rid }}-${{ env.FLAVOR }}
           path: ${{ env.RANVIER_WORK }}/probe-logs
+
+      - name: Retain macOS public texture qualification
+        if: always() && env.FLAVOR == 'gpu' && matrix.rid == 'osx-arm64'
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-gpu-public-qualification
+          path: ${{ env.RANVIER_WORK }}/mac-gpu-public-qualification
+          if-no-files-found: warn
           if-no-files-found: ignore
 
       - name: Retain native PDF output and ownership results

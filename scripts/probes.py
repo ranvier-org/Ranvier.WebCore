@@ -26,6 +26,9 @@ def probe(name, *commands, rid=None, flavor=('slim', 'gpu'), timeout=TIMEOUT, en
 
 
 PROBES = [
+    probe('Verify macOS public IOSurface frames and native texture input',
+          'python -I tests/gpu/mac/qualify_package.py --native-directory {native} --output {work}/mac-gpu-public-qualification',
+          rid='osx-arm64', flavor='gpu', timeout=900),
     probe('Verify Windows native owner-thread exit and font timer teardown',
           'python -I tests/abi/owner_thread_exit.py --native-directory {native} --report {work}/owner-thread-exit.json',
           rid='win-x64', flavor=None, timeout=180),

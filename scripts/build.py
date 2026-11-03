@@ -219,7 +219,7 @@ def prepare():
                  'RanvierNativeTextureInput.h', 'RanvierNativeTextureEGLInput.h', 'RanvierImageEncoding.h', 'RanvierImageEncoding.cpp', 'dom/RanvierDomGlue.h',
                  'RanvierCapabilities.inc', 'RanvierCapabilityCatalogue.inc', 'RanvierSvgViewGlue.h', 'RanvierResourceGlue.h', 'RanvierEventGlue.h', 'RanvierMutationGlue.h', 'RanvierPrintGlue.h', 'RanvierPrintOptions.h', 'RanvierViewportGlue.h', 'RanvierInspectGlue.h', 'RanvierCanvasGlue.h', 'RanvierWakeLockGlue.h', 'RanvierNotificationGlue.h', 'RanvierTransferGlue.h', 'RanvierPointerGlue.h', 'RanvierCanvasPixelsGlue.h', 'RanvierCanvasExportGlue.h']:
         shutil.copy2(root / 'host' / name, api / 'RanvierAbi' / name)
-    if getattr(args, 'mac_gpu_spike', False):
+    if getattr(args, 'mac_gpu_spike', False) or (getattr(args, 'rid', '') == 'osx-arm64' and getattr(args, 'flavor', '') == 'gpu'):
         for name in ['RanvierMacGpuSpike.h', 'RanvierMacGpuSpike.mm', 'RanvierMacGpuSpike.inc', 'RanvierNativeTextureMacInput.h']:
             shutil.copy2(root / 'host' / name, api / 'RanvierAbi' / name)
     git('checkout', commit, '--', 'Tools/TestWebKitAPI/CMakeLists.txt', cwd=source)

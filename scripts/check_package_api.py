@@ -9,15 +9,15 @@ import tempfile
 import zipfile
 
 
-def verify(package, gpu=False):
+def verify(package, gpu=False, evidence=None):
     root = Path(__file__).resolve().parents[1]
     with tempfile.TemporaryDirectory(prefix='ranvier-package-api-') as temporary:
         destination = Path(temporary).resolve() / 'native'
         with zipfile.ZipFile(package) as archive:
             manifest = json.loads(archive.read('manifest.json'))
             rid = manifest['rid']
-            if gpu and (rid not in ['win-x64', 'linux-x64', 'linux-arm64'] or manifest.get('flavor') != 'gpu'):
-                raise ValueError('Shared-frame acceptance requires a supported GPU package (Windows x64 or Linux)')
+            if gpu and (rid not in ['win-x64', 'linux-x64', 'linux-arm64', 'osx-arm64'] or manifest.get('flavor') != 'gpu'):
+                raise ValueError('Shared-frame acceptance requires a supported GPU package (Windows x64, Linux or macOS arm64)')
             if rid not in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64', 'osx-arm64']:
                 raise ValueError('Unsupported package runtime: ' + str(rid))
             prefix = f'runtimes/{rid}/native/'
@@ -44,6 +44,9 @@ def verify(package, gpu=False):
             subprocess.run([sys.executable, '-I', str(root / 'tests/gpu/compositor_input_linux.py'),
                             '--native-directory', str(destination), '--report', str(destination.parent / 'compositor-input-linux.json')],
                            check=True, env=environment)
+        elif gpu and rid == 'osx-arm64':
+            subprocess.run([sys.executable, '-I', str(root / 'tests/gpu/mac/qualify_package.py'),
+                            '--native-directory', str(destination), '--output', str(evidence or destination.parent / 'mac-gpu')], check=True)
         elif gpu:
             sdl = destination.parent / 'sdl'
             subprocess.run([sys.executable, '-I', str(root / 'scripts/sdl_runtime.py'), '--out', str(sdl)], check=True)
@@ -68,6 +71,7 @@ def verify(package, gpu=False):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--package', type=Path, required=True)
-    parser.add_argument('--gpu', action='store_true', help='Verify shared frames and lifetimes (Windows x64 D3D11 or Linux EGLImage)')
+    parser.add_argument('--gpu', action='store_true', help='Verify shared frames and lifetimes (D3D11, EGLImage or IOSurface)')
+    parser.add_argument('--evidence', type=Path, help='retain the macOS public transport logs and receipts here')
     args = parser.parse_args()
-    verify(args.package, gpu=args.gpu)
+    verify(args.package, gpu=args.gpu, evidence=args.evidence)

@@ -38,7 +38,8 @@ class PackagedGpuTests(unittest.TestCase):
         archive = directory / 'runtime.nupkg'
         with zipfile.ZipFile(archive, 'w') as package:
             package.writestr('manifest.json', json.dumps({'rid': rid, 'flavor': flavor}))
-            library = 'libRanvierWebCoreHost.so' if rid.startswith('linux') else 'RanvierWebCoreHost.dll'
+            library = ('libRanvierWebCoreHost.so' if rid.startswith('linux') else
+                       'libRanvierWebCoreHost.dylib' if rid.startswith('osx') else 'RanvierWebCoreHost.dll')
             package.writestr(f'runtimes/{rid}/native/{library}', b'packaged host')
         return archive
 
@@ -63,11 +64,28 @@ class PackagedGpuTests(unittest.TestCase):
 
     def test_gpu_package_gate_rejects_the_wrong_flavor_or_rid_without_running_it(self):
         with tempfile.TemporaryDirectory() as directory:
-            for flavor, rid in [('slim', 'win-x64'), ('gpu', 'osx-arm64'), ('gpu', 'win-arm64')]:
+            for flavor, rid in [('slim', 'win-x64'), ('slim', 'osx-arm64'), ('gpu', 'win-arm64')]:
                 with self.subTest(flavor=flavor, rid=rid), patch('subprocess.run') as run:
                     with self.assertRaisesRegex(ValueError, 'supported GPU'):
                         probe.verify(self.package(Path(directory), flavor, rid), gpu=True)
                     run.assert_not_called()
+
+    def test_mac_gpu_package_checks_public_transport_on_the_extracted_payload(self):
+        with tempfile.TemporaryDirectory() as directory:
+            calls = []
+
+            def execute(command, **kwargs):
+                calls.append(command)
+                if Path(command[2]).name == 'qualify_package.py':
+                    native = Path(command[command.index('--native-directory') + 1])
+                    self.assertEqual((native / 'libRanvierWebCoreHost.dylib').read_bytes(), b'packaged host')
+                    self.assertTrue(kwargs['check'])
+
+            with patch('subprocess.run', side_effect=execute):
+                probe.verify(self.package(Path(directory), rid='osx-arm64'), gpu=True)
+            self.assertEqual(len(calls), 2)
+            self.assertEqual(Path(calls[0][2]).name, 'qualify_package.py')
+            self.assertEqual(Path(calls[1][4]).name, 'mutation_observation.py')
 
     def test_linux_gpu_package_checks_the_extracted_egl_payload_headlessly(self):
         with tempfile.TemporaryDirectory() as directory:

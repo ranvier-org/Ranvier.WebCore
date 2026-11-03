@@ -120,9 +120,9 @@ class RecipeTests(unittest.TestCase):
             self.assertFalse(work.exists())
 
     @unittest.skipUnless(shutil.which('cmake'), 'CMake is required for actual preset controls')
-    def test_actual_cmake_presets_keep_experiment_opt_in(self):
+    def test_actual_cmake_presets_enable_mac_transport_only_in_gpu_profiles(self):
         root = Path(__file__).resolve().parents[3]
-        cases = [('osx-arm64', 'slim', False), ('osx-arm64', 'mac-gpu-spike', True),
+        cases = [('osx-arm64', 'slim', False), ('osx-arm64', 'mac-gpu-spike', True), ('osx-arm64', 'gpu', True),
                  ('win-x64', 'gpu', False), ('linux-x64', 'gpu', False)]
         for rid, preset, expected in cases:
             with self.subTest(rid=rid, preset=preset), tempfile.TemporaryDirectory() as temporary:
