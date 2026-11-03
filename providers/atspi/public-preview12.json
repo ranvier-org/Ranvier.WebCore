@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 2,
+  "armed": false,
+  "id": "Ranvier.WebCore.Accessibility.Atspi",
+  "version": "0.1.1-preview.12",
+  "nativeVersion": "0.1.1-preview.11",
+  "nativeSource": "8b8db298eba294876c27bd9a3200881f872684df",
+  "providerSourceClaim": "05adae5c9829472306e85b6b3b4aac068e79a5ec",
+  "abi": 63,
+  "rids": {
+    "linux-x64": { "packageSha256": null, "receiptSha256": null },
+    "linux-arm64": { "packageSha256": null, "receiptSha256": null }
+  },
+  "scope": "Unarmed preparation. New per-RID provider builds and qualification are required; source fields are unverified caller claims."
+}
