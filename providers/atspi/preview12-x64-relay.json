@@ -17,10 +17,10 @@
   "assetBytes": 6109583,
   "evidenceManifestSha256": "e28b719cd5db6661674ce421cc622f40f2d0ee4c38740f265f54e7ca815558e3",
   "harnessSha256": "0784d72d7a7551c8c93691e9bbd7b343380026b43fa65008c7a3296e5c851eae",
-  "releaseId": null,
-  "assetId": null,
-  "releaseTargetCommit": null,
-  "releaseAuthor": null,
-  "assetUploader": null,
-  "assetName": null
+  "releaseId": 432911972,
+  "assetId": 706183647,
+  "releaseTargetCommit": "de9df4f1b505c3d421027da7421d173cfb81a525",
+  "releaseAuthor": "shayanhabibi",
+  "assetUploader": "shayanhabibi",
+  "assetName": "p12-x64-relay-proof-v2.zip"
 }
