@@ -1,0 +1,195 @@
+diff --git a/Source/WebCore/rendering/cocoa/RenderThemeCocoa.mm b/Source/WebCore/rendering/cocoa/RenderThemeCocoa.mm
+--- a/Source/WebCore/rendering/cocoa/RenderThemeCocoa.mm
++++ b/Source/WebCore/rendering/cocoa/RenderThemeCocoa.mm
+@@ -37,6 +37,7 @@
+ #import "DrawGlyphsRecorder.h"
+ #import "FloatRoundedRect.h"
+ #import "FontCacheCoreText.h"
++#import "ForcedAccessibilityValue.h"
+ #import "GraphicsContextCG.h"
+ #import "HTMLButtonElement.h"
+ #import "HTMLDataListElement.h"
+@@ -104,6 +105,21 @@
+ 
+ namespace WebCore {
+ 
++static bool prefersIncreasedContrastForRenderer([[maybe_unused]] const RenderObject& renderer)
++{
++#if PLATFORM(MAC)
++    switch (renderer.settings().forcedPrefersContrastAccessibilityValue()) {
++    case ForcedAccessibilityValue::On:
++        return true;
++    case ForcedAccessibilityValue::Off:
++        return false;
++    case ForcedAccessibilityValue::System:
++        break;
++    }
++#endif
++    return Theme::singleton().userPreferredContrast() == InterfaceContrastPreference::MoreContrast;
++}
++
+ #if !USE(APPLE_INTERNAL_SDK)
+ static constexpr auto switchCornerRadiusFraction = 0.f;
+ #endif
+@@ -261,7 +277,7 @@
+     Ref element = switchElement(renderer);
+ 
+     auto isOn = element->isSwitchVisuallyOn();
+-    auto isHighContrast = Theme::singleton().userPreferredContrast() == InterfaceContrastPreference::MoreContrast;
++    auto isHighContrast = prefersIncreasedContrastForRenderer(renderer);
+     auto isDark = styleColorOptions.contains(StyleColorOptions::UseDarkAppearance);
+     auto progress = easeInOut(element->switchAnimationVisuallyOnProgress());
+ 
+@@ -350,7 +366,7 @@
+     Ref element = switchElement(renderer);
+ 
+     auto isOn = element->isSwitchVisuallyOn();
+-    auto isHighContrast = Theme::singleton().userPreferredContrast() == InterfaceContrastPreference::MoreContrast;
++    auto isHighContrast = prefersIncreasedContrastForRenderer(renderer);
+     auto isInlineFlipped = states.contains(ControlStyle::State::InlineFlippedWritingMode);
+     auto isVertical = states.contains(ControlStyle::State::VerticalWritingMode);
+     auto isEnabled = states.contains(ControlStyle::State::Enabled);
+@@ -499,7 +515,7 @@
+     const auto zoomScale = style->usedZoom();
+ 
+     auto isOn = element->isSwitchVisuallyOn();
+-    auto isHighContrast = Theme::singleton().userPreferredContrast() == InterfaceContrastPreference::MoreContrast;
++    auto isHighContrast = prefersIncreasedContrastForRenderer(renderer);
+     auto isInlineFlipped = states.contains(ControlStyle::State::InlineFlippedWritingMode);
+     auto isVertical = states.contains(ControlStyle::State::VerticalWritingMode);
+     auto isEnabled = states.contains(ControlStyle::State::Enabled);
+@@ -664,7 +680,7 @@
+ 
+     context.restore();
+ 
+-    if (Theme::singleton().userPreferredContrast() == InterfaceContrastPreference::MoreContrast)
++    if (prefersIncreasedContrastForRenderer(renderer))
+         drawHighContrastOutline(context, thumbPath, renderer.styleColorOptions());
+ #else
+     const auto shadowColor = SRGBA<uint8_t> { 0, 0, 0, static_cast<uint8_t>(30.63 * shadowOpacityMultiplier) }; // opacity 0.12f
+@@ -719,7 +735,7 @@
+         paintLiquidGlassSwitchTrackOnOffLabels(states, renderer, paintInfo, trackRect);
+ 
+ #if PLATFORM(MAC)
+-    if (Theme::singleton().userPreferredContrast() == InterfaceContrastPreference::MoreContrast)
++    if (prefersIncreasedContrastForRenderer(renderer))
+         drawHighContrastOutline(context, trackPath, styleColorOptions);
+ 
+     // On macOS, the track color in the on-state and the focus ring color are almost
+@@ -2089,7 +2105,7 @@
+     context.fillPath(glyphPath);
+ 
+ #if PLATFORM(MAC)
+-    if (Theme::singleton().userPreferredContrast() == InterfaceContrastPreference::MoreContrast)
++    if (prefersIncreasedContrastForRenderer(box))
+         drawHighContrastOutline(context, path, box.styleColorOptions());
+ #endif
+ 
+@@ -2158,7 +2174,7 @@
+         context.fillEllipse(innerCircleRect);
+ 
+ #if PLATFORM(MAC)
+-    if (Theme::singleton().userPreferredContrast() == InterfaceContrastPreference::MoreContrast)
++    if (prefersIncreasedContrastForRenderer(box))
+         drawHighContrastOutline(context, boundingPath, box.styleColorOptions());
+ #endif
+     } else if (!isVision) {
+@@ -2220,7 +2236,7 @@
+     const auto boundingRect = buttonShape.boundingRect;
+ 
+ #if PLATFORM(MAC)
+-    const auto userPrefersContrast = Theme::singleton().userPreferredContrast() == InterfaceContrastPreference::MoreContrast;
++    const auto userPrefersContrast = prefersIncreasedContrastForRenderer(box);
+     const auto borderColor = userPrefersContrast ? highContrastOutlineColor(styleColorOptions) : systemColor(CSSValueWebkitControlBackground, styleColorOptions);
+ #else
+     const auto borderColor = systemColor(CSSValueWebkitControlBackground, styleColorOptions);
+@@ -2278,7 +2294,7 @@
+     context.fillRoundedRect(boundingRoundedRect, backgroundColor);
+ 
+ #if PLATFORM(MAC)
+-    if (Theme::singleton().userPreferredContrast() == InterfaceContrastPreference::MoreContrast) {
++    if (prefersIncreasedContrastForRenderer(box)) {
+         Path path;
+         path.addRoundedRect(boundingRoundedRect);
+         drawHighContrastOutline(context, path, box.styleColorOptions());
+@@ -2727,7 +2743,7 @@
+     context.fillPath(path);
+ 
+ #if PLATFORM(MAC)
+-    const auto userPrefersContrast = Theme::singleton().userPreferredContrast() == InterfaceContrastPreference::MoreContrast;
++    const auto userPrefersContrast = prefersIncreasedContrastForRenderer(box);
+ 
+     if (userPrefersContrast)
+         drawHighContrastOutline(context, path, styleColorOptions);
+@@ -3091,7 +3107,7 @@
+     const auto styleColorOptions = box.styleColorOptions();
+     auto backgroundColor = style->visitedDependentBackgroundColor();
+ #if PLATFORM(MAC)
+-    const auto prefersContrast = Theme::singleton().userPreferredContrast() == InterfaceContrastPreference::MoreContrast;
++    const auto prefersContrast = prefersIncreasedContrastForRenderer(box);
+     auto borderColor = prefersContrast ? highContrastOutlineColor(styleColorOptions) : RenderTheme::singleton().systemColor(CSSValueAppleSystemContainerBorder, styleColorOptions);
+ #else
+     auto borderColor = RenderTheme::singleton().systemColor(CSSValueAppleSystemContainerBorder, styleColorOptions);
+@@ -3536,7 +3552,7 @@
+     auto isHorizontalWritingMode = renderer.writingMode().isHorizontal();
+ 
+ #if PLATFORM(MAC)
+-    const auto userPrefersContrast = Theme::singleton().userPreferredContrast() == InterfaceContrastPreference::MoreContrast;
++    const auto userPrefersContrast = prefersIncreasedContrastForRenderer(renderer);
+     FloatRoundedRect boundingRoundedRect = roundedFillRect;
+     if (userPrefersContrast)
+         context.save();
+@@ -3716,7 +3732,7 @@
+     context.setFillColor(backgroundColor);
+     context.fillPath(backgroundPath);
+ 
+-    if (Theme::singleton().userPreferredContrast() == InterfaceContrastPreference::MoreContrast)
++    if (prefersIncreasedContrastForRenderer(box))
+         drawHighContrastOutline(context, backgroundPath, styleColorOptions);
+ #endif
+ 
+@@ -4183,7 +4199,7 @@
+     context.fillPath(sliderThumbPath);
+ 
+ #if PLATFORM(MAC)
+-    if (Theme::singleton().userPreferredContrast() == InterfaceContrastPreference::MoreContrast) {
++    if (prefersIncreasedContrastForRenderer(box)) {
+         drawHighContrastOutline(context, sliderThumbPath, styleColorOptions);
+         return true;
+     }
+@@ -4226,7 +4242,7 @@
+     const auto isEnabled = states.contains(ControlStyle::State::Enabled);
+ 
+ #if PLATFORM(MAC)
+-    auto userPrefersContrast = Theme::singleton().userPreferredContrast() == InterfaceContrastPreference::MoreContrast;
++    auto userPrefersContrast = prefersIncreasedContrastForRenderer(box);
+     auto isDarkMode = box.styleColorOptions().contains(StyleColorOptions::UseDarkAppearance);
+     Color borderColor;
+     if (userPrefersContrast)
+@@ -4340,7 +4356,7 @@
+     const auto isDarkMode = styleColorOptions.contains(StyleColorOptions::UseDarkAppearance);
+ 
+     Color fillColor;
+-    if (Theme::singleton().userPreferredContrast() == InterfaceContrastPreference::MoreContrast)
++    if (prefersIncreasedContrastForRenderer(box))
+         fillColor = highContrastOutlineColor(styleColorOptions);
+     else {
+         fillColor = isDarkMode ? SRGBA<uint8_t> { 161, 161, 161 } : SRGBA<uint8_t> { 76, 76, 76, 216 };
+@@ -4403,7 +4419,7 @@
+     // In dark mode, the high contrast color is darker than white, which is what
+     // we use if "Increase contrast" was off. To avoid decreasing contrast in this case,
+     // only behave as if "Increase contrast" is enabled when not in dark mode.
+-    auto userPrefersContrast = Theme::singleton().userPreferredContrast() == InterfaceContrastPreference::MoreContrast && !isDarkMode;
++    auto userPrefersContrast = prefersIncreasedContrastForRenderer(box) && !isDarkMode;
+     auto hasSearchResults = input && input->maxResults() > 0;
+ 
+     auto color = userPrefersContrast ? highContrastOutlineColor(styleColorOptions) : (isDarkMode ? colorForDarkMode : colorForLightMode);
+@@ -4568,7 +4584,7 @@
+     const auto styleColorOptions = renderer.styleColorOptions();
+ 
+     Color resizerColor;
+-    if (Theme::singleton().userPreferredContrast() == InterfaceContrastPreference::MoreContrast)
++    if (prefersIncreasedContrastForRenderer(renderer))
+         resizerColor = highContrastOutlineColor(styleColorOptions);
+     else
+         resizerColor = systemColor(CSSValueAppleSystemSecondaryLabel, styleColorOptions);
