@@ -1,6 +1,7 @@
 import importlib.util
 import json
 from pathlib import Path
+import re
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -130,9 +131,14 @@ class ProducerBoundaryTests(unittest.TestCase):
 
 
 class WorkflowTests(unittest.TestCase):
-    def test_disabled_and_product_artifacts_precede_helpers(self):
+    def test_only_explicit_manual_main_gate_and_product_artifact_order(self):
         text = (ROOT / '.github/workflows/macos-preview12-recovery.yml').read_text()
-        self.assertIn('false &&', text)
+        guards = re.findall(r'^    if: (.+)$', text, re.M)
+        disabled = "${{ false && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}"
+        enabled = "${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}"
+        self.assertEqual(len(guards), 1)
+        self.assertIn(guards[0], [disabled, enabled])
+        self.assertNotIn('  push:', text)
         self.assertIn(recovery.PRODUCT_SOURCE, text)
         self.assertLess(text.index('name: Retain immutable product package'), text.index('name: Build matching helpers'))
         self.assertIn('if: always()', text)
