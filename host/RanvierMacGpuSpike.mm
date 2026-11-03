@@ -90,6 +90,20 @@ std::unique_ptr<RvMacSpikeSurface> RvMacSpikeSurface::create(int width, int heig
     const char* renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
     if (!renderer || !std::strstr(renderer, "Metal"))
         return nullptr;
+    GLint maximumTexture = 0, maximumRenderbuffer = 0;
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maximumTexture);
+    glGetIntegerv(GL_MAX_RENDERBUFFER_SIZE, &maximumRenderbuffer);
+    if (maximumTexture <= 0 || maximumRenderbuffer <= 0 || width > maximumTexture || height > maximumTexture
+        || width > maximumRenderbuffer || height > maximumRenderbuffer || glGetError() != GL_NO_ERROR)
+        return nullptr;
+    constexpr size_t metalRowAlignment = 16;
+    auto minimumRowBytes = static_cast<size_t>(width) * 4;
+    if (minimumRowBytes > std::numeric_limits<size_t>::max() - (metalRowAlignment - 1))
+        return nullptr;
+    auto metalRowBytes = (minimumRowBytes + metalRowAlignment - 1) & ~(metalRowAlignment - 1);
+    auto rowBytes = IOSurfaceAlignProperty(kIOSurfaceBytesPerRow, metalRowBytes);
+    if (rowBytes < metalRowBytes || rowBytes % metalRowAlignment || rowBytes > std::numeric_limits<size_t>::max() / static_cast<size_t>(height))
+        return nullptr;
     if (identity.empty()) {
         identity = std::string(eglQueryString(display, EGL_VENDOR)) + "; "
             + eglQueryString(display, EGL_VERSION) + "; " + renderer + "; GL="
@@ -103,7 +117,7 @@ std::unique_ptr<RvMacSpikeSurface> RvMacSpikeSurface::create(int width, int heig
     @autoreleasepool {
         NSDictionary* properties = @{
             (__bridge id)kIOSurfaceWidth: @(width), (__bridge id)kIOSurfaceHeight: @(height),
-            (__bridge id)kIOSurfaceBytesPerElement: @4, (__bridge id)kIOSurfaceBytesPerRow: @(static_cast<size_t>(width) * 4),
+            (__bridge id)kIOSurfaceBytesPerElement: @4, (__bridge id)kIOSurfaceBytesPerRow: @(rowBytes),
             (__bridge id)kIOSurfacePixelFormat: @0x42475241
         };
         value->ioSurface = IOSurfaceCreate((__bridge CFDictionaryRef)properties);
