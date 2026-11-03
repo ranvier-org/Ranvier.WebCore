@@ -344,9 +344,7 @@ def verify_helper_completion(proof, completion, original, prior, manifest, packa
                 and receipt.get('sdk') == prior['sdk'] and PurePosixPath(receipt.get('compilerInvocation', '')).name == 'clang++',
                 'Stitched helper boundary or unchanged inputs differ')
         members = receipt.get('members', {})
-        require(set(name for name in names if not name.endswith('/')) == set(members) | {'helper-completion.json'}, 'Incomplete completion member inventory')
-        for name, expected_sha in members.items():
-            require(hashlib.sha256(archive.read(name)).hexdigest() == expected_sha, 'Completion artifact member differs')
+        alias = verify_completion_members(archive, receipt, package)
         require(members.get('proof.zip') == original['proofArtifact']['sha256']
                 and members.get('package.zip') == original['packageArtifact']['sha256'], 'Completion substituted original artifacts')
         helpers = receipt.get('helpers', {})
@@ -388,7 +386,33 @@ def verify_helper_completion(proof, completion, original, prior, manifest, packa
             compile_row, = [row for row in commands if row['name'] == name + '-compile']
             require(compile_row['argv'][0] == receipt['compilerInvocation'] and '-Wl,-undefined,error' in compile_row['argv'], 'AppKit C++ driver/strict link differs')
         return dict(run=completion['run'], controllerSource=completion['workflowSource'], receiptSha256=completion['receiptSha256'],
-                    originalRun=original['run'], runtimeConsumerQualification=False, stitchedHelpersCompiled=True)
+                    originalRun=original['run'], runtimeConsumerQualification=False, stitchedHelpersCompiled=True,
+                    uploadByteComplete=alias is None, packageMetadataAlias=alias)
+
+
+def verify_completion_members(archive, receipt, package):
+    actual = {name for name in safe_names(archive) if not name.endswith('/')}
+    members = receipt.get('members', {})
+    expected = set(members) | {'helper-completion.json'}
+    require(actual <= expected, 'Unexpected completion artifact member')
+    missing = expected - actual
+    alias = None
+    if missing:
+        name = 'stage/_rels/.rels'
+        source = f'package/Ranvier.WebCore.Native.osx-arm64.{VERSION}.nupkg'
+        digest = 'ffdb43dc427c61c172c7c6fa4dc013990649998e9b53fba3193774ce122140d7'
+        require(missing == {name} and receipt.get('originalRun') == 41733425197 and members.get(name) == digest
+                and source in actual and hashlib.sha256(archive.read(source)).hexdigest() == sha(package),
+                'Unqualified missing completion member')
+        with zipfile.ZipFile(io.BytesIO(archive.read(source))) as original_package:
+            safe_names(original_package)
+            require(hashlib.sha256(original_package.read('_rels/.rels')).hexdigest() == digest, 'Package metadata alias differs')
+        alias = dict(missingMember=name, sourcePackageMember=source, innerMember='_rels/.rels', sha256=digest,
+                     boundary='Single ancillary package metadata member; no artifact or receipt rewritten')
+    for name, expected_sha in members.items():
+        if name not in missing:
+            require(hashlib.sha256(archive.read(name)).hexdigest() == expected_sha, 'Completion artifact member differs')
+    return alias
 
 
 def origins(policy, output):

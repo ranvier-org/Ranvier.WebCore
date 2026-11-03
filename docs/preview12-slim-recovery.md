@@ -27,6 +27,12 @@ helper-failed run can instead be used only with the explicit `macRecovery.helper
 - `runtimeConsumerQualification=false` is preserved. Compiled sidecars do not claim the later public
   timer/motion/contrast consumer results or GPU/View acceptance.
 
+The actual helper-completion upload omitted the ancillary extracted `stage/_rels/.rels` member.
+Admission permits only that one reviewed metadata alias for original run41733425197: its exact
+`ffdb43dc...140d7` bytes must exist in `_rels/.rels` inside the identical retained Mac F nupkg.
+The raw ZIP and receipt are not rewritten; the qualification records `uploadByteComplete=false`
+and the precise package-backed alias. Missing native/helper/capsule/log or any other member rejects.
+
 Every ZIP rejects duplicate, case-colliding, unsafe and symlink members. Native nuspec IDs, manifests,
 source, complete resource sets, sizes, hashes and PE/ELF/Mach-O machine identities are checked.
 
