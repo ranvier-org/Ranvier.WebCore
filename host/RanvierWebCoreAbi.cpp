@@ -5622,7 +5622,7 @@ int32_t rv_host_ime_set_composition(RvHost* host, const uint8_t* text, int32_t t
                 result = rv_host_ime_surrounding(host, bytes.mutableSpan().data(), length, &length, &cursor, &anchor, &state, &token);
                 if (result == RV_OK && state == 1 && host->page->localTopDocument() == document.ptr()
                     && document->focusedElement() == target.get() && host->editingSequence == sequence) {
-                    host->imeSurrounding.emplace();
+                    host->imeSurrounding.emplace(RvHost::ImeSurrounding { });
                     host->imeSurrounding->document = document.ptr();
                     host->imeSurrounding->target = target.get();
                     host->imeSurrounding->original = String::fromUTF8(std::span<const char8_t> { reinterpret_cast<const char8_t*>(bytes.span().data()), static_cast<size_t>(length) });
@@ -5633,7 +5633,7 @@ int32_t rv_host_ime_set_composition(RvHost* host, const uint8_t* text, int32_t t
             host->imeUndo.reset();
             if (ownsComposition) {
                 editor.closeTyping();
-                host->imeUndo.emplace();
+                host->imeUndo.emplace(RvHost::ImeUndo { });
                 host->imeUndo->document = document.ptr();
                 host->imeUndo->target = target.get();
                 host->imeUndo->endSerial = editor.compositionEndSerial();
@@ -5942,7 +5942,7 @@ int32_t rv_host_ime_surrounding(RvHost* host, char* buffer, int32_t capacity, in
     if (!same) {
         if (!++imeServedSequence)
             ++imeServedSequence;
-        host->imeServed.emplace();
+        host->imeServed.emplace(RvHost::ImeServed { });
         auto& served = *host->imeServed;
         served.token = imeServedSequence;
         served.document = document.ptr();
@@ -6107,7 +6107,7 @@ int32_t rv_host_ime_delete_surrounding(RvHost* host, uint64_t token, int32_t sta
                 snapshot.selectionFocusOffset = focus->offset;
                 snapshot.expected = imeSurroundingCurrentText(*target, *editable);
                 snapshot.contents = editable->innerHTML();
-                host->imeUndo.emplace();
+                host->imeUndo.emplace(RvHost::ImeUndo { });
                 auto& undo = *host->imeUndo;
                 undo.step = client.lastUndoStep();
                 undo.generation = client.historyGeneration();
