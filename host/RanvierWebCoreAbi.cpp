@@ -406,10 +406,11 @@ public:
     void discardUnsafeCompositionHistory() { clearUndoRedoOperations(); }
     uint64_t historyGeneration() const { return m_historyGeneration; }
     UndoStep* lastUndoStep() const { return m_undo.isEmpty() ? nullptr : m_undo.last().ptr(); }
-    void undoOwnedComposition(UndoStep* step, uint64_t generation)
+    void undoOwnedComposition(UndoStep* step, uint64_t generation, const Function<bool(LocalFrame&)>* selectionObserver = nullptr)
     {
         if (!step || generation != m_historyGeneration || lastUndoStep() != step)
             return;
+        SetForScope observer(m_ownedCompositionSelectionObserver, selectionObserver);
         replay(Replay::Undo);
         if (generation == m_historyGeneration && !m_redo.isEmpty() && m_redo.last().ptr() == step) {
             Ref removed = m_redo.takeLast();
@@ -493,7 +494,14 @@ private:
 
     void didBeginEditing() final { }
     void respondToChangedContents() final { }
-    void respondToChangedSelection(LocalFrame*) final { }
+    void respondToChangedSelection(LocalFrame* frame) final
+    {
+        if (!frame || m_replaying != Replay::Undo || !m_ownedCompositionSelectionObserver)
+            return;
+        auto* observer = std::exchange(m_ownedCompositionSelectionObserver, nullptr);
+        if (!(*observer)(*frame))
+            m_ownedCompositionSelectionObserver = observer;
+    }
     void updateEditorStateAfterLayoutIfEditabilityChanged() final { }
     void discardedComposition(const Document&) final { }
     void canceledComposition() final { }
@@ -510,6 +518,7 @@ private:
     Vector<Ref<UndoStep>> m_undo;
     Vector<Ref<UndoStep>> m_redo;
     Replay m_replaying { Replay::None };
+    const Function<bool(LocalFrame&)>* m_ownedCompositionSelectionObserver { nullptr };
     bool m_compositionSuspended { false };
     uint64_t m_historyGeneration { 0 };
     uint64_t m_replayGeneration { 0 };
@@ -5729,6 +5738,9 @@ int32_t rv_host_ime_cancel(RvHost* host)
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     return compose(*host, [&](Editor& editor) {
+#if PLATFORM(MAC)
+        auto originalSurrounding = host->imeSurrounding;
+#endif
         host->imeSurrounding.reset();
         auto transaction = std::exchange(host->imeUndo, std::nullopt);
         if (!transaction) {
@@ -5738,11 +5750,39 @@ int32_t rv_host_ime_cancel(RvHost* host)
         }
         Ref document = host->document();
         auto& client = static_cast<RvEditorClient&>(host->page->editorClient());
+        RefPtr target = dynamicDowncast<Element>(transaction->target.get());
+        const Function<bool(LocalFrame&)>* selectionObserver = nullptr;
+#if PLATFORM(MAC)
+        auto sequence = host->editingSequence;
+        Function<bool(LocalFrame&)> restoreOriginalDirection = [&](LocalFrame& changedFrame) {
+            if (!originalSurrounding || originalSurrounding->cursor < 0 || originalSurrounding->cursor >= originalSurrounding->anchor
+                || originalSurrounding->document.get() != document.ptr() || originalSurrounding->target.get() != target.get()
+                || host->destroyAfterEditing || host->page->localTopDocument() != document.ptr()
+                || changedFrame.document() != document.ptr() || document->focusedElement() != target.get()
+                || host->editingSequence != sequence || client.historyGeneration() != transaction->generation)
+                return false;
+            RefPtr control = dynamicDowncast<HTMLTextFormControlElement>(target.get());
+            RefPtr editable = imeEditable(target.get());
+            if (!control || !editable || !target->isConnected() || &target->document() != document.ptr()
+                || control->selectionStart() != static_cast<unsigned>(originalSurrounding->cursor)
+                || control->selectionEnd() != static_cast<unsigned>(originalSurrounding->anchor)
+                || changedFrame.selection().selection().directionality() == Directionality::Strong
+                || imeSurroundingCurrentText(*target, *editable) != originalSurrounding->original)
+                return false;
+            control->setSelectionRange(static_cast<unsigned>(originalSurrounding->cursor),
+                static_cast<unsigned>(originalSurrounding->anchor), SelectionHasBackwardDirection);
+            return true;
+        };
+        selectionObserver = &restoreOriginalDirection;
+#endif
         if (editor.hasComposition() && transaction->step && transaction->document.get() == document.ptr()
             && transaction->target.get() == document->focusedElement()
-            && imeUndoMatches(*transaction, editor, document->focusedElement()))
-            client.undoOwnedComposition(transaction->step, transaction->generation);
-        RefPtr target = dynamicDowncast<Element>(transaction->target.get());
+            && imeUndoMatches(*transaction, editor, document->focusedElement())) {
+#if PLATFORM(MAC)
+            IgnoreSelectionChangeForScope ignoreSelection(host->frame());
+#endif
+            client.undoOwnedComposition(transaction->step, transaction->generation, selectionObserver);
+        }
         if (!host->destroyAfterEditing && host->page->localTopDocument() == document.ptr()
             && transaction->document.get() == document.ptr() && target && target->isConnected()
             && &target->document() == document.ptr())
@@ -6050,6 +6090,9 @@ int32_t rv_host_ime_delete_surrounding(RvHost* host, uint64_t token, int32_t sta
     bool failedCompositionTransaction = false;
     auto result = handleInput(*host, [&] {
         auto restoreSelection = [&] {
+#if PLATFORM(MAC)
+            IgnoreSelectionChangeForScope ignoreSelection(frame.get());
+#endif
             auto tracked = makeSimpleRange(*trackedSelection);
             const auto& base = originalSelection.isBaseFirst() ? tracked.start : tracked.end;
             const auto& extent = originalSelection.isBaseFirst() ? tracked.end : tracked.start;
