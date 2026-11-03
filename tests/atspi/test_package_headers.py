@@ -18,6 +18,12 @@ class PackageHeaderTests(unittest.TestCase):
     def test_checkout_line_endings_do_not_change_sdk_header_or_its_manifest_hash(self):
         expected = b'#pragma once\n#include "RanvierWebCoreAbi.h"\n'
         results = []
+        text_assets = {
+            'include/RanvierAtspi.h': expected,
+            'include/RanvierWebCoreAbi.h': b'#pragma once\n',
+            **{name: (ROOT / 'providers/atspi' / name).read_bytes().replace(b'\r\n', b'\n')
+               for name in ['README.md', 'NOTICE.md', 'THIRD-PARTY.md', 'licenses/LGPL-2.1.txt']},
+        }
         with tempfile.TemporaryDirectory() as directory:
             repository = Path(directory)
             source = repository / 'providers/atspi'
@@ -34,10 +40,17 @@ class PackageHeaderTests(unittest.TestCase):
             native.write_bytes(b'unit fixture, never loaded')
             for index, ending in enumerate([b'\n', b'\r\n']):
                 (source / 'RanvierAtspi.h').write_bytes(expected.replace(b'\n', ending))
+                for name, data in text_assets.items():
+                    target = (repository / 'host/RanvierWebCoreAbi.h' if name == 'include/RanvierWebCoreAbi.h'
+                              else source / ('RanvierAtspi.h' if name == 'include/RanvierAtspi.h' else name))
+                    target.write_bytes(data.replace(b'\n', ending))
                 with patch.object(package, '__file__', str(source / 'package.py')), patch.object(package, 'validate_runtime', return_value=63):
                     destination, manifest = package.pack(provider, native, 'linux-x64', 'Ranvier.Private.Atspi.HeaderControl', '0.0.0-privateheader.' + str(index), repository / 'output', 'a' * 40)
                 with zipfile.ZipFile(destination) as archive:
                     data = archive.read('include/RanvierAtspi.h')
+                    for name, canonical in text_assets.items():
+                        self.assertEqual(archive.read(name), canonical, name)
+                        self.assertEqual(manifest['payloads'][name], hashlib.sha256(canonical).hexdigest(), name)
                 self.assertEqual(data, expected)
                 self.assertEqual(manifest['payloads']['include/RanvierAtspi.h'], hashlib.sha256(expected).hexdigest())
                 results.append(data)

@@ -73,11 +73,11 @@ def pack(provider, native, rid, package_id, version, output, source_revision, te
     payload = {
         'runtimes/' + rid + '/native/libRanvierWebCoreAtspi.so': provider.read_bytes(),
         'include/RanvierAtspi.h': (root / 'RanvierAtspi.h').read_text(encoding='utf-8').encode('utf-8'),
-        'include/RanvierWebCoreAbi.h': (root.parents[1] / 'host/RanvierWebCoreAbi.h').read_bytes(),
-        'README.md': (root / 'README.md').read_bytes(),
-        'NOTICE.md': (root / 'NOTICE.md').read_bytes(),
-        'THIRD-PARTY.md': (root / 'THIRD-PARTY.md').read_bytes(),
-        'licenses/LGPL-2.1.txt': (root / 'licenses/LGPL-2.1.txt').read_bytes(),
+        'include/RanvierWebCoreAbi.h': (root.parents[1] / 'host/RanvierWebCoreAbi.h').read_text(encoding='utf-8').encode('utf-8'),
+        'README.md': (root / 'README.md').read_text(encoding='utf-8').encode('utf-8'),
+        'NOTICE.md': (root / 'NOTICE.md').read_text(encoding='utf-8').encode('utf-8'),
+        'THIRD-PARTY.md': (root / 'THIRD-PARTY.md').read_text(encoding='utf-8').encode('utf-8'),
+        'licenses/LGPL-2.1.txt': (root / 'licenses/LGPL-2.1.txt').read_text(encoding='utf-8').encode('utf-8'),
     }
     manifest = dict(id=package_id, version=version, rid=rid, abi=abi,
         callerClaimedProviderSourceRevision=source_revision, sourceProvenance='unverified-caller-claim',
