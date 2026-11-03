@@ -70,6 +70,7 @@ jobs:
             ${{ env.MAC220_WORK }}/build-mac-gpu-spike/libGLESv2.dylib
             ${{ env.MAC220_WORK }}/build-mac-gpu-spike/JavaScriptCore.framework/Versions/A/JavaScriptCore
             ${{ env.MAC220_WORK }}/build-mac-gpu-spike/WebGPU.framework/Versions/A/WebGPU
+            ${{ env.MAC220_WORK }}/build-mac-gpu-spike/WebCore.framework/Versions/A/WebCore
             ${{ env.MAC220_WORK }}/out/gpu/*.nupkg
             ${{ env.MAC220_SDL }}/sdk-receipt.json
           if-no-files-found: warn
