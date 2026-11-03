@@ -60,6 +60,8 @@ class ProducerSidecarAdmission(unittest.TestCase):
                 pid = 123456
                 def __init__(self, command, **kwargs):
                     commands.append(command)
+                    if kwargs['start_new_session']:
+                        raise AssertionError('An outer-owned group must be inherited')
                     self.code = 1 if '-dynamiclib' in command else 0
                     if '--probe-source' in command:
                         probe = Path(command[command.index('--probe-source') + 1])
@@ -77,6 +79,8 @@ class ProducerSidecarAdmission(unittest.TestCase):
                         Path(command[command.index('-MF') + 1]).write_text('helper: ' + probe.as_posix().replace(' ', '\\ '))
                 def wait(self, **kwargs):
                     return self.code
+                def poll(self):
+                    return self.code
 
             argv = ['builder', '--producer-root', str(producer), '--stage', str(stage), '--build', str(build),
                     '--webkit-source', str(webkit), '--packages', str(packages), '--output', str(output)]
@@ -85,7 +89,8 @@ class ProducerSidecarAdmission(unittest.TestCase):
                     patch.object(module.platform, 'mac_ver', return_value=('26.0', (), '')), \
                     patch.object(module.subprocess, 'check_output', side_effect=check_output), \
                     patch.object(module.subprocess, 'Popen', Child), patch.object(os, 'killpg', create=True), \
-                    patch.object(module.signal, 'SIGKILL', 9, create=True):
+                    patch.object(module.signal, 'SIGKILL', 9, create=True), \
+                    patch.dict(os.environ, {'RANVIER_COCOA_OWNED_GROUP': '1'}):
                 with self.assertRaisesRegex(RuntimeError, 'motion-compile'):
                     module.main()
             receipt = json.loads((output / 'producer-sidecars.json').read_text())
@@ -93,6 +98,8 @@ class ProducerSidecarAdmission(unittest.TestCase):
             self.assertEqual(receipt['controllerSource'], 'b' * 40)
             self.assertTrue(receipt['sourcesUnchanged'] and receipt['nativeUnchanged'])
             self.assertEqual(receipt['status'], 'failed')
+            self.assertTrue(all(row['childReaped'] and not row['ownsProcessGroup'] for row in receipt['commands']))
+            self.assertTrue(all('processGroupReaped' not in row for row in receipt['commands']))
             capsule = output / receipt['appkitConsumedInputs']['motion']['path']
             self.assertEqual(module.sha(capsule), receipt['appkitConsumedInputs']['motion']['sha256'])
             with zipfile.ZipFile(capsule) as archive:
