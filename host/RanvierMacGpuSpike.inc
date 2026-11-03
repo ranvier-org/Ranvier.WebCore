@@ -59,7 +59,7 @@ int32_t rv_mac_spike_acquire_frame(RvHost* host, RvMacSpikeFrame** frame)
         RefPtr view = host->frame().view();
         if (!view)
             return RV_ERR_PAINT_FAILED;
-        view->updateLayoutAndStyleIfNeededRecursive();
+        view->updateLayoutAndStyleIfNeededRecursive(LayoutOptions::UpdateCompositingLayers);
         if (host->destroyAfterDocumentTransaction)
             return RV_ERR_DETACHED;
         if (!view->clipLayer())
