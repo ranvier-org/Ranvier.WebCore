@@ -9,6 +9,35 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "abi"))
 
 
+def blue_columns(pixels, width=300):
+    return {x for y in range(20, 40) for x in range(20, 260)
+            if (lambda c: c[2] > c[0] + 25 and c[2] > c[1] + 20 and c[3] == 255)(
+                pixels[(y * width + x) * 4:(y * width + x) * 4 + 4])}
+
+
+def vector_reduced_contract(samples, empty, full, width=300):
+    center = (30 * width + 140) * 4
+    track = empty[center:center + 3]
+    opaque = full[center:center + 3]
+    channel = max(range(3), key=lambda index: abs(opaque[index] - track[index]))
+    delta = opaque[channel] - track[channel]
+    uncertainty = 1 / abs(delta) if delta else 1
+    alpha = [(pixels[center + channel] - track[channel]) / delta if delta else 0 for pixels in samples]
+    columns = blue_columns(full, width)
+    checks = [(len(columns) >= 180, 'opaque full-bar geometry control'),
+              (abs(delta) >= 128, 'interior opacity endpoints have sufficient channel contrast'),
+              (all(blue_columns(pixels, width) == columns for pixels in samples),
+               'reduced vector geometry stays full-width while opacity pulses'),
+              (all(0.3 - uncertainty <= value <= 0.6 + uncertainty for value in alpha),
+               'reduced vector opacity follows the source 0.3 to 0.6 envelope'),
+              (len({bytes(pixels[center:center + 3]) for pixels in samples}) > 1,
+               'existing reduced vector opacity pulse remains active')]
+    return checks, {'opacityEstimates': alpha, 'opacityChannel': channel,
+                    'quantizationAlphaUncertainty': uncertainty,
+                    'opacityMeasurement': 'Opaque interior, measured empty/full endpoints; one output-channel quantum',
+                    'sourceOpacityEnvelope': [0.3, 0.6], 'fullBarColumns': sorted(columns)}
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--native-directory', type=Path, required=True)
@@ -76,6 +105,7 @@ def main():
                             media.settle()
                             check(media.matches(query) == int(page_reduced), 'page media preference')
                             policy_hashes = []
+                            policy_pixels = []
                             for sample in range(3):
                                 if sample:
                                     cycle(100)
@@ -100,17 +130,31 @@ def main():
                                        'assertionScope': 'quarter/full vector geometry and motion' if vector else 'fixed visible legacy phase / advancing clock'}
                                 rows.append(row)
                                 policy_hashes.append(row['pixelSha256'])
+                                policy_pixels.append(pixels)
                                 check(ink > 100, label + ' painted actual native track')
                                 if vector:
                                     check(span >= 180 if page_reduced else 35 <= span <= 90, label + ' explicit vector geometry')
                             if page_reduced:
-                                check(len(set(policy_hashes)) == 1, 'resolved reduced motion remains pixel-identical over positive cycles')
+                                if not vector:
+                                    check(len(set(policy_hashes)) == 1, 'resolved legacy reduced motion remains pixel-identical over positive cycles')
                                 probe.call('rv_dom_element_set_attribute', [probe.pointer, Utf8, Utf8], progress, b'value', b'0')
                                 empty_track = bytes(probe.paint())
                                 check(hashlib.sha256(empty_track).hexdigest() != policy_hashes[0], 'reduced phase contains a visible indicator distinct from empty track')
                                 empty_label = f'system-{int(system_reduced)}-vector-{int(vector)}-page-{page_policy}-empty-track'
                                 (args.output / (empty_label + '.rgba')).write_bytes(empty_track)
                                 rows.append({'label': empty_label, 'systemReduced': system_reduced, 'vectorProfile': vector, 'pagePolicy': page_policy, 'determinateEmpty': True, 'pixelSha256': hashlib.sha256(empty_track).hexdigest()})
+                                if vector:
+                                    probe.call('rv_dom_element_set_attribute', [probe.pointer, Utf8, Utf8], progress, b'value', b'1')
+                                    full_bar = bytes(probe.paint())
+                                    full_label = empty_label.replace('empty-track', 'full-bar')
+                                    (args.output / (full_label + '.rgba')).write_bytes(full_bar)
+                                    checks, details = vector_reduced_contract(policy_pixels, empty_track, full_bar)
+                                    for condition, label in checks:
+                                        check(condition, full_label + ': ' + label)
+                                    rows.append({'label': full_label, 'systemReduced': system_reduced,
+                                                 'vectorProfile': True, 'pagePolicy': page_policy,
+                                                 'determinateFull': True, 'pixelSha256': hashlib.sha256(full_bar).hexdigest(),
+                                                 **details})
                                 probe.call('rv_dom_element_remove_attribute', [probe.pointer, Utf8], progress, b'value')
                                 media.settle()
                             else:
@@ -124,7 +168,8 @@ def main():
     check(before == after, 'native files unchanged')
     report = {'assertions': assertions, 'failures': failures, 'rows': rows,
               'nativeBefore': before, 'nativeAfter': after,
-              'scope': 'Pending actual patched-engine run: default legacy and explicit vector paths, per-page On/Off/System, stable reduced and advancing normal clocks',
+              'scope': 'Default legacy fixed phase and explicit vector stationary opacity pulse; per-page On/Off/System and advancing normal clocks',
+              'originalVectorIdentityRed': '41600462117 retained three overstrong vector pixel-identity failures; issue224 explicitly expects a reduced opacity pulse',
               'originalRed': '41504792300 default legacy painter evaluated with vector-only expectations; retained unchanged'}
     (args.output / 'progress-paths.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     print(json.dumps(report))
