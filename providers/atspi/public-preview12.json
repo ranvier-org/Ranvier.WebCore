@@ -19,5 +19,5 @@
       "receiptSha256": "4444081e2d08edc336919339b262ae905597ca28c4ef44e6bf987a65aa61556d"
     }
   },
-  "scope": "Unarmed preparation. New per-RID provider builds and qualification are required; source fields are unverified caller claims."
+  "scope": "Unarmed candidate preparation from accepted per-RID qualification inputs. The x64 proof is relayed, ARM evidence ran on its runner, and source fields remain unverified caller claims."
 }
