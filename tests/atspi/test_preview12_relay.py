@@ -19,11 +19,9 @@ class Preview12RelayTests(unittest.TestCase):
         self.libs.update({'FSharp.Core/10.1.403':{'type':'package'},self.provider+'/'+self.version:{'type':'package'}})
         self.assets=dict(libraries=self.libs,targets={'net10.0/linux-x64':{'Ranvier.WebCore.Native.linux-x64/0.1.1-preview.11':{'native':{'libRanvierWebCoreHost.so':{}}}}})
 
-    def test_local_policy_is_valid_and_disabled_copy_rejects_transport(self):
+    def test_unarmed_local_policy_is_valid_but_transport_rejected(self):
         relay.validate_policy(self.policy)
-        relay.validate_policy(self.policy,transport=True)
-        unarmed=deepcopy(self.policy);unarmed['armed']=False
-        with self.assertRaisesRegex(ValueError,'unarmed'):relay.validate_policy(unarmed,transport=True)
+        with self.assertRaisesRegex(ValueError,'unarmed'):relay.validate_policy(self.policy,transport=True)
 
     def test_source_and_execution_claims_cannot_be_relabelled(self):
         for key,value in [('providerSourceClaim','0'*40),('nativeSourceClaim','0'*40),('viewSource','0'*40),('testsExecutedByRelay',True),('nativeVersion','0.1.1-preview.12')]:
@@ -39,9 +37,9 @@ class Preview12RelayTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'workflow dispatch'):relay.receive(policy,Path('unused'))
             network.assert_not_called()
 
-    def test_relay_workflow_is_main_manual_only_without_publish_or_engine_step(self):
+    def test_relay_workflow_remains_disabled_and_has_no_publish_or_engine_step(self):
         text=(ROOT/'.github/workflows/atspi-preview12-relay.yml').read_text()
-        self.assertIn("github.event_name == 'workflow_dispatch'",text)
+        self.assertIn("false && github.event_name == 'workflow_dispatch'",text)
         self.assertIn("github.ref == 'refs/heads/main'",text)
         self.assertIn('persist-credentials: false',text)
         self.assertNotIn('nuget push',text.lower());self.assertNotIn('id-token:',text.lower());self.assertNotIn('cmake',text.lower())
