@@ -6,6 +6,7 @@ import os
 import platform
 import re
 import select
+import secrets
 import shutil
 import signal
 import subprocess
@@ -98,6 +99,32 @@ def config_file(path, feed, provider_id=PROVIDER_ID):
     path.write_bytes(ET.tostring(root))
 
 
+def await_runtime_admission(path, work, files, timeout=900):
+    """Synchronize a local lease handoff; the caller acquires and releases the actual leases."""
+    path, work = path.resolve(), work.resolve()
+    ready = path.with_suffix(path.suffix + '.ready')
+    if not path.is_relative_to(work) or path.exists() or ready.exists():
+        raise ValueError('Runtime admission must use a fresh path inside the owned output.')
+    expected = {str(file.resolve()):sha(file) for file in files}
+    token = secrets.token_hex(24)
+    data = dict(token=token, pid=os.getpid(), files=expected,
+                processStat=Path('/proc/self/stat').read_text() if Path('/proc/self/stat').exists() else None)
+    temporary = ready.with_suffix(ready.suffix + '.tmp')
+    temporary.write_text(json.dumps(data, indent=2))
+    temporary.replace(ready)
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        if path.exists():
+            permit = json.loads(path.read_text())
+            if permit.get('token') != token or permit.get('kind') != 'run-app' or not isinstance(permit.get('leaseId'), str) or not permit['leaseId']:
+                raise ValueError('Runtime admission differs from the fresh prepared lease handoff.')
+            if {name:sha(Path(name)) for name in expected} != expected:
+                raise ValueError('Prepared consumer inputs changed during the lease handoff.')
+            return dict(kind=permit['kind'], permitSha256=sha(path), readySha256=sha(ready))
+        time.sleep(0.05)
+    raise TimeoutError('The local runtime lease handoff was not admitted before its deadline.')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--view', type=Path, required=True)
@@ -108,6 +135,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--rid', choices=('linux-arm64', 'linux-x64'), default=RID)
     parser.add_argument('--dom-version', default='0.1.0-alpha.57')
+    parser.add_argument('--runtime-admission', type=Path, help='Optional fresh owned checkpoint after publish and before any runtime process.')
     parser.add_argument('--display', help='Existing X display for a local harness control; CI omits this option')
     args = parser.parse_args()
     rid = args.rid
@@ -183,6 +211,11 @@ def main():
                'providerSha256': manifest['providerSha256'], 'packageSha256': sha(package),
                'interopSha256': sha(interop), 'interopVersion': interop_version, 'domVersion': args.dom_version,
                'assetGraphs': asset_graphs, 'runs': []}
+    if args.runtime_admission:
+        files = [native, package, interop, *[Path(record['path']) for record in asset_graphs.values()]]
+        for published in projects.values():
+            files.extend(published / name for name in ['AccessibilityAot', 'libRanvierWebCoreHost.so', 'libRanvierWebCoreAtspi.so', 'libSDL3.so'])
+        receipt['runtimeAdmission'] = await_runtime_admission(args.runtime_admission, work, files)
     environment = dict(os.environ, SDL_VIDEODRIVER='x11', EGL_PLATFORM='surfaceless', LIBGL_ALWAYS_SOFTWARE='1')
     environment.pop('LD_LIBRARY_PATH', None)
 
