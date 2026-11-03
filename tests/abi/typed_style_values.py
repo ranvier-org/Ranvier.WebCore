@@ -7,6 +7,10 @@ import sys
 import threading
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from abi_expectation import expected_abi
+
+
 def verify(native_directory):
     directory = Path(native_directory).resolve()
     filename = {'win32': 'RanvierWebCoreHost.dll', 'darwin': 'libRanvierWebCoreHost.dylib'}.get(sys.platform, 'libRanvierWebCoreHost.so')
@@ -90,7 +94,7 @@ def verify(native_directory):
     host = bind('rv_host_create', pointer, [integer, integer])(320, 240)
     expect(bool(host), 'host creation')
     try:
-        expect(bind('rv_abi_version', unsigned, [])() == 63, 'Native ABI63 cohort')
+        expect(bind('rv_abi_version', unsigned, [])() == expected_abi(), 'Native ABI63 cohort')
         expect(bind('rv_abi_has', integer, [ctypes.c_char_p])(b'dom-css-style-values') == 1, 'static parser capability')
         body = bind('rv_document_body', pointer, [pointer])(host)
         retained.append(('rv_node_release', body))

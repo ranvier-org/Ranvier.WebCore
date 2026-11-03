@@ -11,6 +11,9 @@ from form_collections import CALLBACK, Native, Case, P, I, U
 from utf8_inputs import Utf8
 
 
+from abi_expectation import expected_abi
+
+
 def snapshot_with_token(native, host):
     data, length, cursor, anchor, state, token = C.create_string_buffer(4096), I(), I(), I(), I(), C.c_uint64()
     native.ok('rv_host_ime_surrounding', [P, P, I, C.POINTER(I), C.POINTER(I), C.POINTER(I), C.POINTER(I), C.POINTER(C.c_uint64)],
@@ -67,7 +70,7 @@ def empty_editable_cases(native):
 
 def run(directory):
     native = Native(directory)
-    native.expect(native.bind('rv_abi_version', I, [])() == 63, 'snapshot ABI version')
+    native.expect(native.bind('rv_abi_version', I, [])() == expected_abi(), 'snapshot ABI version')
     native.expect(native.call('rv_abi_has', [C.c_char_p], b'ime-surrounding') == 1, 'snapshot capability')
     empty_editable_cases(native)
     page = Case(native, '<input id="text" value="前😀中後"><input id="secret" type="password" value="private">'

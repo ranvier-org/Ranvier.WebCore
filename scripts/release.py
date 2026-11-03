@@ -56,9 +56,9 @@ for rid in args.rid:
     run(sys.executable, '-I', root / 'scripts/smoke.py', '--package', package, '--expect-commit', head,
         '--expect-version', version, '--expect-flavor', args.flavor, *(['--no-load'] if rid.startswith('linux') else []))
     if args.flavor == 'slim':
-        run(sys.executable, '-I', root / 'scripts/check_package_api.py', '--package', package)
+        run(sys.executable, '-I', root / 'scripts/check_package_api.py', '--package', package, '--expected-abi', '64')
     elif args.flavor == 'gpu' and (rid == 'win-x64' or rid.startswith('linux-') or rid == 'osx-arm64'):
-        run(sys.executable, '-I', root / 'scripts/check_package_api.py', '--gpu', '--package', package)
+        run(sys.executable, '-I', root / 'scripts/check_package_api.py', '--gpu', '--package', package, '--expected-abi', '64')
     packages.append(package)
 
 if args.dry_run:

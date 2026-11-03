@@ -179,7 +179,7 @@ def main():
         groups.append(('glyph-orientation', glyph_group))
         groups.append(('native-catalogue', lambda: run_step('native-catalogue',
             [sys.executable, '-I', str(ROOT / 'scripts/abi_tests.py'), '--stage', str(work / 'out/gpu'),
-             '--source', str(work / 'src')], ROOT, evidence, receipt, timeout=1800)))
+             '--source', str(work / 'src'), '--expected-abi', '64'], ROOT, evidence, receipt, timeout=1800)))
         before = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in stage.iterdir() if p.is_file()}
         receipt['nativeBefore'] = before
         receipt['runtimeFailures'] = independent_groups(groups)
