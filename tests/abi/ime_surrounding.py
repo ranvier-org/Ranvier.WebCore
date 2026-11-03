@@ -99,6 +99,30 @@ def run(directory):
                       'continued composition keeps the same committed context')
         native.ok('rv_host_ime_cancel', [P], page.host)
         native.expect(snapshot(native, page.host) == ('前😀中後', 1, 3), 'cancellation restores context')
+        native.expect(native.text('rv_dom_html_input_element_get_selection_direction', [P], field) == 'backward',
+                      'cancellation restores the original explicit backward direction')
+        application_selections = []
+        def select_forward(_context, event):
+            if native.text('rv_dom_input_event_get_input_type', [P], event) == 'historyUndo':
+                start, end = I(), I()
+                native.ok('rv_text_selection', [P, C.POINTER(I), C.POINTER(I)], field, C.byref(start), C.byref(end))
+                application_selections.append((native.text('rv_dom_html_input_element_get_selection_direction', [P], field),
+                                               start.value, end.value))
+                native.ok('rv_dom_html_input_element_set_selection_range', [P, U, U, Utf8], field, 1, 3, b'forward')
+            return 0
+        selection_callback = CALLBACK(select_forward)
+        selection_listener = native.bind('rv_node_add_event_listener', P, [P, Utf8, I, CALLBACK, P])(
+            field, b'input', 0, selection_callback, None)
+        native.expect(bool(selection_listener), 'application selection listener')
+        page.listeners.append(selection_listener)
+        native.ok('rv_host_ime_set_composition', [P, Utf8, I, I], page.host, 'かなあ'.encode(), 3, 3)
+        native.ok('rv_host_ime_cancel', [P], page.host)
+        native.expect(application_selections == [('backward', 1, 3)], 'historyUndo input observes backward selection before application changes it')
+        native.expect(snapshot(native, page.host) == ('前😀中後', 3, 1)
+                      and native.text('rv_dom_html_input_element_get_selection_direction', [P], field) == 'forward',
+                      'application selection direction survives cancellation')
+        native.call('rv_listener_remove', [P], selection_listener)
+        page.listeners.remove(selection_listener)
         native.ok('rv_host_ime_set_composition', [P, Utf8, I, I], page.host, 'かな'.encode(), 2, 2)
         native.ok('rv_host_ime_commit', [P, Utf8], page.host, '仮'.encode())
         native.expect(snapshot(native, page.host) == ('前仮中後', 2, 2), 'commit publishes committed text and caret')
