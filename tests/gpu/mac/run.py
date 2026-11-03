@@ -91,6 +91,20 @@ def main():
                     if not re.search(r'^#define\s+' + name + r'\s+1\s*$', configured, re.M):
                         raise RuntimeError('actual configuration did not enable ' + name)
                 receipt['cmakeconfigSHA256'] = hashlib.sha256(configuration.read_bytes()).hexdigest()
+                build = work / 'build-mac-gpu-spike'
+                run('egl-build', ['cmake', '--build', str(build), '--target', 'EGL', '--parallel', str(args.jobs)])
+                symbols = run('egl-exports', ['xcrun', 'nm', '-gU', str(build / 'libEGL.dylib')])
+                required = ('eglBindAPI', 'eglChooseConfig', 'eglCreateContext', 'eglCreatePbufferSurface',
+                            'eglCreateWindowSurface', 'eglDestroyContext', 'eglDestroySurface',
+                            'eglGetConfigAttrib', 'eglGetCurrentContext', 'eglGetCurrentDisplay',
+                            'eglGetCurrentSurface', 'eglGetError', 'eglGetProcAddress', 'eglInitialize',
+                            'eglMakeCurrent', 'eglQueryString', 'eglSwapBuffers', 'eglTerminate')
+                exported = {line.split()[-1] for line in symbols.splitlines() if line.split()}
+                missing = sorted(set('_' + name for name in required) - exported)
+                if missing:
+                    raise RuntimeError('EGL shared-library export preflight failed: ' + ', '.join(missing))
+                receipt['eglExportPreflight'] = {'required': list(required), 'missing': missing,
+                    'librarySHA256': hashlib.sha256((build / 'libEGL.dylib').read_bytes()).hexdigest()}
         stage = work / 'out/gpu/runtimes/osx-arm64/native'
         run('stage-manifest', [sys.executable, str(ROOT / 'scripts/smoke.py'), '--stage', str(work / 'out/gpu'),
                                '--build-dir', str(work / 'build-mac-gpu-spike'), '--expect-flavor', 'gpu', '--no-load'])
