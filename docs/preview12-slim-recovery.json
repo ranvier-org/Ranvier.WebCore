@@ -4,60 +4,70 @@
   "publicationEnabled": false,
   "version": "0.1.1-preview.12",
   "productSource": "d31c3631ed4bbe6520f7f5f7c7e7d34499c38122",
-  "controllerSource": null,
+  "controllerSource": "d8c1e6442a2f1db8e1febf07a7678267c5a9069c",
   "producerRun": 41719479076,
   "original": {
     "win-x64": {
+      "packageSha256": "992ecd175196919ed7da4b232779e0edf3c141db28aa33fbbbac023841df2a02",
       "artifact": {
-        "id": null,
+        "id": 13273839658,
         "name": "package-win-x64-slim",
-        "sha256": null
-      },
-      "packageSha256": null
+        "sha256": "cfeae40bfd3e90c77cdd0a8bc86105ec6b38d2c579ff746a76f85b205e97e797"
+      }
     },
     "win-arm64": {
+      "packageSha256": "0ee4c5bf16cc5b73be63f75ab0c068354faa4c93d9b2c3c44efa538ff2da9c4c",
       "artifact": {
-        "id": null,
+        "id": 13274701347,
         "name": "package-win-arm64-slim",
-        "sha256": null
-      },
-      "packageSha256": null
+        "sha256": "909cfb22b2bc3cb68f8873c40829d314201396a2f820bce3c2c44001c243dae3"
+      }
     },
     "linux-x64": {
+      "packageSha256": "561ffe613020c11bd6b9c1ff780cc7960d5054c2bd168d1b8f6f415d12e655bf",
       "artifact": {
-        "id": null,
+        "id": 13276341996,
         "name": "package-linux-x64-slim",
-        "sha256": null
-      },
-      "packageSha256": null
+        "sha256": "15fa7f0a20e01c2c2f4778f7a46e3fba7e47aed54adb3bc371492e10c509327e"
+      }
     },
     "linux-arm64": {
+      "packageSha256": "8b3ee47733f0d23b6cb1059648325d7e0062c20f3b9d9db7f6649c8ccd160051",
       "artifact": {
-        "id": null,
+        "id": 13273738596,
         "name": "package-linux-arm64-slim",
-        "sha256": null
-      },
-      "packageSha256": null
+        "sha256": "ef7c3ce657161121448358ec8c9b51651a0770de232646de06f04ac7dc4e7ca5"
+      }
     }
   },
   "macRecovery": {
-    "run": null,
-    "workflowSource": null,
+    "run": 41733425197,
+    "workflowSource": "0b8a621280dbb51545bb969d1638a8d2342d68ad",
     "packageArtifact": {
-      "id": null,
+      "id": 13276668223,
       "name": "package-osx-arm64-slim",
-      "sha256": null
+      "sha256": "0def7fcded4a6ad1010a6d1a3af66f9563d31a8e072fa8bb1214cb7b824c6fdb"
     },
     "proofArtifact": {
-      "id": null,
+      "id": 13277478890,
       "name": "immutable-d31-mac-slim-recovery-proof",
-      "sha256": null
+      "sha256": "18208d6fb35de73c88838a107953e17113e31251dea4e3b3e22954ff7fd780cb"
     },
-    "packageSha256": null,
-    "recoveryReceiptSha256": null,
-    "sidecarReceiptSha256": null,
-    "proofPrefix": null,
-    "helperCompletion": null
+    "packageSha256": "5d4173fda8cf47097d7f3f2b3e8d30ede05a55ce1127bc41f330468d92905169",
+    "recoveryReceiptSha256": "0311d76b0fa40dd8fa9f108d4b66f540e02d2cb7d96c734361301533d200e270",
+    "sidecarReceiptSha256": "4488b1e0f082f3820c49c0e7cb49d55fc02043ca3efa49ff4fbaa70df4e433e6",
+    "proofPrefix": "work/_temp/immutable-d31-slim/",
+    "helperCompletion": {
+      "run": 41739805271,
+      "workflowSource": "a105f055317378482903ccfb19d99fdc6544e667",
+      "artifact": {
+        "id": 13279324076,
+        "name": "immutable-d31-mac-slim-helper-completion",
+        "sha256": "f9df9780e848a4c05fa7141febb545e4557d871db835919c4c7f666eed0a9c5b"
+      },
+      "receiptSha256": "6589a05c7267169121cac613bfa2cd238f9cf514172b268286f4d1fab6d120d6",
+      "inputsContractSha256": "dfe3b55fc23eb96615ca0829ce9e0c7b3c1f27de8d45ef19a528b5c6581e5ed5"
+    }
   },
   "qualification": null
 }
