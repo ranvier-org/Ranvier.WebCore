@@ -71,7 +71,7 @@ def main():
 
     def run(name, command):
         return run_step(name, command, ROOT, evidence, receipt,
-                        timeout=180 if name in ('proof', 'unsupported-renderer') else None)
+                        timeout=180 if name in ('proof', 'unsupported-renderer') or name.startswith('consumer-preflight-') else None)
 
     try:
         receipt['sourceCommit'] = run('producer-commit', ['git', 'rev-parse', 'HEAD']).strip()
@@ -82,6 +82,16 @@ def main():
         receipt['webkitPin'] = json.loads((ROOT / 'pins.json').read_text())['webkit']['commit']
         run('environment', ['xcrun', '--show-sdk-version'])
         run('xcode', ['xcodebuild', '-version'])
+        sdl = shlex.split(run('sdl-flags', ['pkg-config', '--cflags', '--libs', 'sdl3']).strip())
+        sdl_cflags = shlex.split(run('sdl-cflags', ['pkg-config', '--cflags', 'sdl3']).strip())
+        receipt['sdlVersion'] = run('sdl-version', ['pkg-config', '--modversion', 'sdl3']).strip()
+        sources = ['spike.mm', 'texture_input.mm'] if args.texture_input else ['spike.mm']
+        for name in sources:
+            run('consumer-preflight-' + Path(name).stem,
+                ['xcrun', 'clang++', '-std=c++20', '-fobjc-arc', '-Wall', '-Wextra', '-Werror',
+                 '-mmacosx-version-min=26.0', '-I' + str(ROOT / 'host'),
+                 *sdl_cflags,
+                 '-c', str(Path(__file__).with_name(name)), '-o', str(evidence / (name + '.o'))])
         for step in plan:
             run(step['name'], step['command'])
             if step['name'] == 'configure':
@@ -110,8 +120,6 @@ def main():
                                '--build-dir', str(work / 'build-mac-gpu-spike'), '--expect-flavor', 'gpu', '--no-load'])
         run('exports', [sys.executable, str(Path(__file__).with_name('check_exports.py')), str(stage),
                         *(['--texture-input'] if args.texture_input else [])])
-        sdl = shlex.split(run('sdl-flags', ['pkg-config', '--cflags', '--libs', 'sdl3']).strip())
-        receipt['sdlVersion'] = run('sdl-version', ['pkg-config', '--modversion', 'sdl3']).strip()
         executable = evidence / 'mac-gpu-spike'
         run('proof-compile', ['xcrun', 'clang++', '-std=c++20', '-fobjc-arc', '-Wall', '-Wextra', '-Werror',
                               '-mmacosx-version-min=26.0', '-I' + str(ROOT / 'host'),
