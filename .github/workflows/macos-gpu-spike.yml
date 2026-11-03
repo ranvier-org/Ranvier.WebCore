@@ -55,7 +55,7 @@ jobs:
           echo "PKG_CONFIG_PATH=$MAC220_SDL/lib/pkgconfig" >> "$GITHUB_ENV"
           echo "DYLD_LIBRARY_PATH=$MAC220_SDL/lib" >> "$GITHUB_ENV"
       - name: Run the isolated native experiment
-        run: python3 -I tests/gpu/mac/run.py --rid osx-arm64 --mac-gpu-spike --work "$MAC220_WORK" --jobs 4 --texture-input --execute
+        run: python3 -I tests/gpu/mac/run.py --rid osx-arm64 --mac-gpu-spike --work "$MAC220_WORK" --jobs 4 --texture-input --public-transport --execute
       - name: Retain source identity, first failure and runtime evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -67,6 +67,7 @@ jobs:
             ${{ env.MAC220_WORK }}/build-mac-gpu-spike/compile_commands.json
             ${{ env.MAC220_WORK }}/build-mac-gpu-spike/CMakeCache.txt
             ${{ env.MAC220_WORK }}/build-mac-gpu-spike/build.ninja
+            ${{ env.MAC220_WORK }}/build-mac-gpu-spike/Tools/TestWebKitAPI/CMakeFiles/RanvierWebCoreHost.dir/RanvierAbi/
             ${{ env.MAC220_WORK }}/build-mac-gpu-spike/availability-overlay.yaml
             ${{ env.MAC220_WORK }}/build-mac-gpu-spike/CMakeFiles/CMakeConfigureLog.yaml
             ${{ env.MAC220_WORK }}/build-mac-gpu-spike/libEGL.dylib
