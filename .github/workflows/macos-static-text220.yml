@@ -33,10 +33,10 @@ jobs:
           xcode=$(find /Applications -maxdepth 1 -name 'Xcode_26*.app' ! -iname '*beta*' | sort -V | tail -1)
           test -n "$xcode"
           echo "DEVELOPER_DIR=$xcode/Contents/Developer" >> "$GITHUB_ENV"
-      - name: Collect repeated backing counters with hard pixel and lifetime gates
+      - name: Verify bounded startup backing and strict repeated GPU animation
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 -I tests/gpu/mac/backing_repeat220.py --work "$RUNNER_TEMP/coherent2a-static-text220"
+        run: python3 -I tests/gpu/mac/steady_backing220.py --work "$RUNNER_TEMP/coherent2a-static-text220"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
