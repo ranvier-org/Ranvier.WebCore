@@ -3,8 +3,7 @@
 This provider mirrors the existing `rv_ax_*` tree through GDBus. It stays outside the lean WebCore renderer and
 does not connect WebCore's platform AT-SPI wrappers. The application owns its native window, host and event pump.
 
-`Ranvier.WebCore.Accessibility.Atspi` preview10 is published for Linux x64 and ARM64.
-The matching preview11 release remains unarmed preparation. The module's
+The current module remains a private delivery candidate. Its
 interfaces are Accessible, Application, Component, Action, Value and Text. It preserves native object identity and
 performs native work exclusively on the host thread. AT-SPI character offsets are converted at the UTF-16 boundary.
 Unknown screen position reports unsupported screen coordinates; window coordinates remain available.
@@ -95,16 +94,3 @@ SDK publish/load must then run on ARM64. `--test-only-arm64` allows only private
 
 Even a green ARM64 distribution job leaves real managed Window normal/traced NativeAOT lifecycle and optional-module/
 missing-bus checks, complete matching final cohort acceptance and public version allocation outstanding.
-### Preview11 preparation
-
-`public-preview11.json` reserves `Ranvier.WebCore.Accessibility.Atspi` version
-`0.1.1-preview.11` for the matching Native ABI63 cohort. Both RID qualification
-inputs and the independently reviewed candidate hashes are pending. Its prepare
-and publish jobs in the existing `build.yml` are disabled; the helper also rejects
-the unarmed policy before downloading inputs. P10 qualification is retained under
-its original identity. No Host or renderer dependency is added to the provider.
-
-The future publisher re-downloads and verifies the exact accepted two-RID inputs
-and candidate before using the existing main-ref trusted publishing subject.
-Source revision fields remain unverified caller claims. RID layout selection does
-not replace actual provider, protocol, SDK and normal/traced AOT execution.
