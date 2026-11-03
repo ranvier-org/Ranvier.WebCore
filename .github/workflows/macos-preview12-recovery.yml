@@ -130,14 +130,16 @@ jobs:
           --phase qualify --producer-root "$GITHUB_WORKSPACE" --control-source "$GITHUB_SHA"
           --flavor "$FLAVOR" --output "$EVIDENCE"
 
+      - name: Consolidate the explicit owned proof root
+        if: ${{ always() && env.EVIDENCE != '' }}
+        run: >-
+          python -B -I "$CONTROL_ROOT/scripts/collect_mac_recovery_proof.py"
+          --evidence "$EVIDENCE" --work "$RANVIER_WORK" --flavor "$FLAVOR"
+
       - name: Always retain original SDK and helper proof
-        if: always()
+        if: ${{ always() && env.EVIDENCE != '' }}
         uses: actions/upload-artifact@v4
         with:
           name: immutable-d31-mac-${{ inputs.flavor }}-recovery-proof
-          path: |
-            ${{ env.EVIDENCE }}
-            ${{ env.RANVIER_WORK }}/probe-logs
-            ${{ env.RANVIER_WORK }}/mac-gpu-public-qualification
-            ${{ env.RANVIER_WORK }}/out/${{ inputs.flavor }}/symbols
+          path: ${{ env.EVIDENCE }}
           if-no-files-found: warn

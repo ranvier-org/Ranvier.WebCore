@@ -142,7 +142,7 @@ class WorkflowTests(unittest.TestCase):
         self.assertNotIn('  push:', text)
         self.assertIn(recovery.PRODUCT_SOURCE, text)
         self.assertLess(text.index('name: Retain immutable product package'), text.index('name: Build matching helpers'))
-        self.assertIn('if: always()', text)
+        self.assertIn("always() && env.EVIDENCE != ''", text)
         self.assertNotIn('id-token:', text)
         self.assertNotIn('contents: write', text)
 
