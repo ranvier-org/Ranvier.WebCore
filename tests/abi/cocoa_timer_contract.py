@@ -6,6 +6,7 @@ import math
 from pathlib import Path
 import sys
 import subprocess
+import signal
 import threading
 import time
 
@@ -52,6 +53,15 @@ def run(directory, helper_path, captured=None, checkpoint=None, mode='baseline')
         assert state(handle, C.byref(callbacks), C.byref(active), C.byref(off_owner)) == 0
         return {'callbacks': callbacks.value, 'active': active.value, 'offOwnerCallbacks': off_owner.value}
     try:
+        if mode == 'cross-thread-destroy-contract':
+            stage(mode)
+            handle = create()
+            assert handle and arm(handle, 1000, 0, 0) == 0
+            destroy_unchecked = bind(helper, 'rv_test_wtf_timer_destroy_unchecked', I, [P])
+            worker = threading.Thread(target=lambda: destroy_unchecked(handle))
+            worker.start()
+            worker.join(timeout=10)
+            raise AssertionError('active timer destruction on a foreign thread did not terminate at the ownership assertion')
         for action, name in ((3, 'nested-repeat'), (4, 'self-destroy')):
             if mode != name:
                 continue
@@ -161,7 +171,8 @@ def run(directory, helper_path, captured=None, checkpoint=None, mode='baseline')
 
 
 MODES = ('baseline', 'nested-repeat', 'self-destroy', '72-due-one-shots',
-         '72-fast-repeat-fairness', 'wrong-owner-rejection', 'concurrent-cross-thread-arm')
+         '72-fast-repeat-fairness', 'wrong-owner-rejection', 'concurrent-cross-thread-arm',
+         'cross-thread-destroy-contract')
 
 
 def main():
@@ -185,10 +196,17 @@ def main():
                 code, output = -999, repr(error)
             log = target.with_suffix('.log')
             log.write_text(output)
-            report['results'].append({'mode': mode, 'exit': code, 'report': target.name, 'log': log.name})
+            if mode == 'cross-thread-destroy-contract':
+                fatal_signals = (-signal.SIGABRT, -signal.SIGILL, -signal.SIGTRAP)
+                expected_failure = code in fatal_signals and 'WTF_TIMER_NEGATIVE_BEFORE_OWNER_VIOLATION' in output and 'WTF_TIMER_NEGATIVE_DESTRUCTOR_RETURNED' not in output
+                verdict = 0 if expected_failure else 1
+            else:
+                expected_failure, verdict = False, int(code != 0)
+            report['results'].append({'mode': mode, 'exit': code, 'expectedOwnerAssertionTermination': expected_failure,
+                                      'verdict': verdict, 'report': target.name, 'log': log.name})
             args.output.write_text(json.dumps(report, indent=2))
             print(mode, code, flush=True)
-        return int(any(row['exit'] != 0 for row in report['results']))
+        return int(any(row['verdict'] != 0 for row in report['results']))
     report = {'mode': args.mode, 'stage': 'starting', 'failures': []}
     args.output.write_text(json.dumps(report, indent=2))
     try:

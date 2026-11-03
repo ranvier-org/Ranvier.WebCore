@@ -4,6 +4,7 @@
 #include <wtf/Seconds.h>
 #include <wtf/text/ASCIILiteral.h>
 #include <atomic>
+#include <cstdio>
 
 using namespace WTF;
 using namespace WTF::StringLiterals;
@@ -146,4 +147,18 @@ PROBE_EXPORT int rv_test_wtf_timer_nested_status(void* handle)
     if (!probe.owner->isCurrent())
         return -2;
     return probe.nestedPumpStatus;
+}
+
+PROBE_EXPORT int rv_test_wtf_timer_destroy_unchecked(void* handle)
+{
+    if (!handle)
+        return -1;
+    auto* probe = static_cast<TimerProbe*>(handle);
+    if (probe->owner->isCurrent())
+        return -2;
+    std::fputs("WTF_TIMER_NEGATIVE_BEFORE_OWNER_VIOLATION\n", stderr);
+    std::fflush(stderr);
+    delete probe;
+    std::fputs("WTF_TIMER_NEGATIVE_DESTRUCTOR_RETURNED\n", stderr);
+    return 0;
 }

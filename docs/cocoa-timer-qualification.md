@@ -32,3 +32,12 @@ self-destruction, nested pumping, 72-timer fairness, wrong-owner rejection and
 cross-thread arming with callbacks on the owner. Retain all input and runtime
 hashes before and after. Actual coherent Mac runtime qualification remains open
 until this gate and the native catalogue pass on the rebuilt source.
+
+An eighth isolated mode deliberately destroys an active timer on a foreign
+thread and requires fatal assertion termination after the helper's explicit
+ownership-violation marker. This exercises the pinned TimerBase owner contract;
+it is separate from supported wrong-thread API calls, which must return refusal
+without changing ownership. CF retention keeps a snapshot identity alive, not
+the TimerBase: owner-thread-only destruction prevents supported concurrent
+destruction between snapshot validation and callback entry. The callback may
+destroy its own timer; dispatch never dereferences it afterward.
