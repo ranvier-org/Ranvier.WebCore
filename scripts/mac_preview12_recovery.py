@@ -78,11 +78,17 @@ def require_run(run, branch, event):
         raise ValueError('Original producer run identity differs')
 
 
-def failed_mac_job(jobs):
+def recoverable_mac_job(jobs):
     selected = [job for job in jobs if job.get('name', '').startswith('native (osx-arm64,')]
-    if len(selected) != 1 or selected[0].get('status') != 'completed' or selected[0].get('conclusion') != 'failure':
+    if len(selected) != 1 or selected[0].get('status') != 'completed':
         raise ValueError('Do not duplicate a healthy, live, missing or ambiguous immutable-F Mac job')
-    return selected[0]
+    job = selected[0]
+    if job.get('conclusion') == 'failure':
+        return dict(job=job, classification='terminal-failure')
+    if (job.get('conclusion') == 'cancelled' and type(job.get('runner_id')) is int and job['runner_id'] == 0
+            and job.get('runner_name') == '' and job.get('steps') == []):
+        return dict(job=job, classification='acquisition-only-cancelled-before-runner')
+    raise ValueError('Require a failed Mac job or an explicitly unacquired cancellation')
 
 
 def recovery_boundary(flavor):
@@ -96,12 +102,12 @@ def recovery_boundary(flavor):
     slim = api('actions/runs/' + str(SLIM_RUN))
     require_run(slim, 'v' + VERSION, 'push')
     if flavor == 'slim':
-        return dict(slimRun=SLIM_RUN, failedJob=failed_mac_job(jobs(SLIM_RUN)))
+        return dict(slimRun=SLIM_RUN, macJob=recoverable_mac_job(jobs(SLIM_RUN)))
     if slim['status'] != 'completed':
         raise ValueError('Wait for the original Slim run and its automatic GPU decision to finish')
     prewarm = api('actions/runs/' + str(PREWARM_RUN))
     require_run(prewarm, 'main', 'workflow_dispatch')
-    prewarm_job = failed_mac_job(jobs(PREWARM_RUN))
+    prewarm_job = recoverable_mac_job(jobs(PREWARM_RUN))
     listing = api('actions/workflows/build.yml/runs?event=workflow_dispatch&branch=v' + VERSION + '&per_page=100')
     candidates = listing['workflow_runs']
     if listing['total_count'] != len(candidates):
@@ -115,10 +121,10 @@ def recovery_boundary(flavor):
             raise ValueError('An immutable-F GPU dispatch is still active; no overlapping recovery')
         run_jobs = jobs(run['id'])
         if any(job.get('name', '').startswith('native (osx-arm64,') for job in run_jobs):
-            checked.append(dict(run=run['id'], failedJob=failed_mac_job(run_jobs)))
+            checked.append(dict(run=run['id'], macJob=recoverable_mac_job(run_jobs)))
     if slim.get('conclusion') == 'success' and not checked:
         raise ValueError('Wait for the automatically dispatched tag GPU Mac job; no absent-list shortcut')
-    return dict(slimRun=SLIM_RUN, prewarmRun=PREWARM_RUN, prewarmFailedJob=prewarm_job, tagGpuRuns=checked)
+    return dict(slimRun=SLIM_RUN, prewarmRun=PREWARM_RUN, prewarmMacJob=prewarm_job, tagGpuRuns=checked)
 
 
 def main():

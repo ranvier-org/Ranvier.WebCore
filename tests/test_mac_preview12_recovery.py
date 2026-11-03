@@ -1,6 +1,7 @@
 import importlib.util
 import json
 from pathlib import Path
+import re
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -81,10 +82,21 @@ class ProducerBoundaryTests(unittest.TestCase):
 
     def test_only_exact_failed_mac_job_is_eligible(self):
         job = dict(name='native (osx-arm64, macos-26, /Users/runner/rw)', status='completed', conclusion='failure')
-        self.assertEqual(recovery.failed_mac_job([job]), job)
+        self.assertEqual(recovery.recoverable_mac_job([job]), dict(job=job, classification='terminal-failure'))
         for changed in [[], [job, job], [job | {'status': 'in_progress'}], [job | {'conclusion': 'success'}]]:
             with self.subTest(jobs=changed), self.assertRaises(ValueError):
-                recovery.failed_mac_job(changed)
+                recovery.recoverable_mac_job(changed)
+
+    def test_cancelled_before_runner_is_distinct_acquisition_only(self):
+        job = dict(name='native (osx-arm64, macos-26, /Users/runner/rw)', status='completed',
+                   conclusion='cancelled', runner_id=0, runner_name='', steps=[])
+        self.assertEqual(recovery.recoverable_mac_job([job]),
+                         dict(job=job, classification='acquisition-only-cancelled-before-runner'))
+        for field, value in [('runner_id', 1), ('runner_id', '0'), ('runner_id', False),
+                             ('runner_name', 'acquired-runner'), ('runner_name', None),
+                             ('steps', [{}]), ('steps', None), ('status', 'in_progress')]:
+            with self.subTest(field=field, value=value), self.assertRaises(ValueError):
+                recovery.recoverable_mac_job([job | {field: value}])
 
     def test_source_branch_and_event_are_exact(self):
         run = dict(head_sha=recovery.PRODUCT_SOURCE, head_branch='v' + recovery.VERSION, event='push', path='.github/workflows/build.yml')
@@ -119,9 +131,14 @@ class ProducerBoundaryTests(unittest.TestCase):
 
 
 class WorkflowTests(unittest.TestCase):
-    def test_disabled_and_product_artifacts_precede_helpers(self):
+    def test_only_explicit_manual_main_gate_and_product_artifact_order(self):
         text = (ROOT / '.github/workflows/macos-preview12-recovery.yml').read_text()
-        self.assertIn('false &&', text)
+        guards = re.findall(r'^    if: (.+)$', text, re.M)
+        disabled = "${{ false && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}"
+        enabled = "${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}"
+        self.assertEqual(len(guards), 1)
+        self.assertIn(guards[0], [disabled, enabled])
+        self.assertNotIn('  push:', text)
         self.assertIn(recovery.PRODUCT_SOURCE, text)
         self.assertLess(text.index('name: Retain immutable product package'), text.index('name: Build matching helpers'))
         self.assertIn('if: always()', text)
