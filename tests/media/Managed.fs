@@ -17,12 +17,26 @@ module private Support =
     extern int media_test_audio(float32& peak, int& active)
     [<DllImport("MediaManagedTestSupport", CallingConvention = CallingConvention.Cdecl)>]
     extern int media_test_render(nativeint host, nativeint inputTexture, byte[] output, uint32 capacity, int& width, int& height)
+    [<DllImport("SDL3", EntryPoint = "SDL_SetWindowSize", CallingConvention = CallingConvention.Cdecl)>]
+    extern byte sdl_set_window_size(nativeint window, int width, int height)
+    [<DllImport("SDL3", EntryPoint = "SDL_GetWindowSize", CallingConvention = CallingConvention.Cdecl)>]
+    extern byte sdl_get_window_size(nativeint window, int& width, int& height)
+    [<DllImport("SDL3", EntryPoint = "SDL_GetWindowSizeInPixels", CallingConvention = CallingConvention.Cdecl)>]
+    extern byte sdl_get_window_size_in_pixels(nativeint window, int& width, int& height)
+    [<DllImport("SDL3", EntryPoint = "SDL_GetWindowDisplayScale", CallingConvention = CallingConvention.Cdecl)>]
+    extern float32 sdl_get_window_display_scale(nativeint window)
 
 let private page =
     "<style>body{margin:0;background:white}#clip{position:absolute;left:20px;top:20px;width:90px;height:50px;overflow:hidden;will-change:transform}"
     + "#video{width:96px;height:64px;will-change:transform;transform:translateX(5px);opacity:.75}"
     + "#caption{position:absolute;left:20px;top:90px;font:20px sans-serif}</style>"
     + "<div id='clip'><div id='video'></div></div><div id='caption'></div>"
+
+let private captionRegion width scale (pixels: byte[]) =
+    [| for y in int (90.0 * scale) .. int (118.0 * scale) - 1 do
+           for x in int (20.0 * scale) .. int (190.0 * scale) - 1 do
+               for channel in 0 .. 3 do
+                   yield pixels[(y * width + x) * 4 + channel] |]
 
 let internal verifyOwnership check =
     let pending = PendingFrameCleanup(Environment.CurrentManagedThreadId)
@@ -124,6 +138,7 @@ let main arguments =
         use window = Window.Create("Managed native media qualification", 320, 200, hidden = true, renderer = "direct3d11")
         check (Support.media_test_identity() = 0) "own identity retained after SDL initialization"
         let host = window.Host
+        let mutable logicalWidth, logicalHeight = 320, 200
         host.Document.body.innerHTML <- page
         let target = host.Document.getElementById "video"
         let caption = host.Document.getElementById "caption"
@@ -140,6 +155,12 @@ let main arguments =
         let phases = Collections.Generic.HashSet<int>()
         let mutable peak = 0.0f
         let mutable clockAdvanced = false
+        let cueHashes = Array.init 3 (fun _ -> Collections.Generic.HashSet<string>(StringComparer.Ordinal))
+        let mutable collectInitialCues = true
+        let mutable lastCaptionHash, lastCue = "", ""
+        let mutable lastPresentationTicks = 0L
+        let mutable lastPhysicalSize = struct (0, 0)
+        let mutable surfaceCases, windowSteps = 0, 0
         let render present (frame: VideoFrameLease) =
             let phase = phaseOf frame
             let cue = [| "red cue"; "green cue"; "blue cue" |][phase]
@@ -157,7 +178,7 @@ let main arguments =
                 check (Support.media_test_render(host.Handle, frame.Texture, pixels, uint32 pixels.Length, &actualWidth, &actualHeight) = 0)
                     "actual GPU-only composition/readback"
                 check (actualWidth = width && actualHeight = height) "physical dimensions"
-                let scale = float width / 320.0
+                let scale = float width / float logicalWidth
                 let pixel x y =
                     let offset = (int (float y * scale) * width + int (float x * scale)) * 4
                     Array.sub pixels offset 4
@@ -171,6 +192,12 @@ let main arguments =
                         let offset = (y * width + x) * 4
                         if pixels[offset] < 100uy && pixels[offset + 1] < 100uy && pixels[offset + 2] < 100uy then ink <- ink + 1
                 check (ink > 20) "caption glyphs are painted in the actual frame"
+                let captionBytes = captionRegion width scale pixels
+                lastCaptionHash <- Convert.ToHexString(Security.Cryptography.SHA256.HashData captionBytes)
+                lastCue <- cue
+                lastPresentationTicks <- frame.PresentationTime.Ticks
+                lastPhysicalSize <- struct (width, height)
+                if collectInitialCues then cueHashes[phase].Add lastCaptionHash |> ignore
                 phases.Add phase |> ignore
                 frames <- frames + 1
         let turn () =
@@ -204,6 +231,11 @@ let main arguments =
             check finished label
         player.Play()
         wait "all decoded phases, caption frames and audible OS clock" (fun _ -> phases.Count = 3 && peak > 0.0001f && clockAdvanced)
+        for first in 0 .. 2 do
+            check (cueHashes[first].Count > 0) "each timestamp cue has an actual painted caption crop"
+            for second in first + 1 .. 2 do
+                check (not (cueHashes[first].Overlaps cueHashes[second])) "different timestamp cues change actual caption glyph pixels"
+        collectInitialCues <- false
         wait "OS end reaches managed provider state" (fun sample -> sample.State = PlaybackState.Ended)
         check (frames > 2) "multiple actual decoded frames"
         player.Pause()
@@ -219,6 +251,60 @@ let main arguments =
         | ValueSome frame ->
             use frame = frame
             render false frame
+        let pausedPosition = player.Snapshot().PositionSeconds
+        let displayScale = Support.sdl_get_window_display_scale window.SdlWindow
+        check (Single.IsFinite displayScale && displayScale > 0.0f) "actual owned window display scale"
+        let retained present =
+            match player.TryRepublishFrame(host, target) with
+            | ValueNone -> invalidOp "surface transition lost the retained paused frame"
+            | ValueSome frame ->
+                use frame = frame
+                render present frame
+        let captureSurface label expectedPhysical =
+            retained true
+            retained false
+            check (lastPhysicalSize = expectedPhysical) "resize/DPI output dimensions are exact"
+            check (lastCue = "red cue" && lastPresentationTicks < 6666666L) "resized frame and caption retain the paused timestamp phase"
+            check (abs (player.Snapshot().PositionSeconds - pausedPosition) < 0.03) "resize/DPI does not advance the paused native clock"
+            surfaceCases <- surfaceCases + 1
+            let struct (width, height) = lastPhysicalSize
+            Console.WriteLine("MEDIA_RESIZE_DPI=" + label + ";logical=" + logicalWidth.ToString() + "x" + logicalHeight.ToString()
+                              + ";physical=" + width.ToString() + "x" + height.ToString() + ";pts=" + lastPresentationTicks.ToString()
+                              + ";cue=" + lastCue + ";caption=" + lastCaptionHash)
+        let resizeOwnedWindow width height =
+            host.SetDeviceScale displayScale
+            check (Support.sdl_set_window_size(window.SdlWindow, width, height) <> 0uy) "actual SDL window resize succeeds"
+            logicalWidth <- width
+            logicalHeight <- height
+            let timer = Stopwatch.StartNew()
+            let mutable matched = false
+            let mutable pixelWidth, pixelHeight = 0, 0
+            while not matched && timer.Elapsed.TotalSeconds < 2.0 do
+                do
+                    match player.TryRepublishFrame(host, target) with
+                    | ValueNone -> invalidOp "SDL resize lost retained video"
+                    | ValueSome frame ->
+                        use frame = frame
+                        caption.textContent <- [| "red cue"; "green cue"; "blue cue" |][phaseOf frame]
+                        check (window.Step(0)) "owned window stays open during resize"
+                        windowSteps <- windowSteps + 1
+                let mutable actualWidth, actualHeight = 0, 0
+                check (Support.sdl_get_window_size(window.SdlWindow, &actualWidth, &actualHeight) <> 0uy) "actual SDL logical size available"
+                check (Support.sdl_get_window_size_in_pixels(window.SdlWindow, &pixelWidth, &pixelHeight) <> 0uy) "actual SDL pixel size available"
+                matched <- actualWidth = width && actualHeight = height && host.PaintSize = struct (pixelWidth, pixelHeight)
+                if not matched then Thread.Sleep 5
+            check matched "SDL resize events update the native host before deadline"
+            captureSurface "window-resize" (struct (pixelWidth, pixelHeight))
+        for width, height in [360, 240; 420, 260] do
+            resizeOwnedWindow width height
+            for scale in [1.0f; 1.5f; 2.0f] do
+                host.SetDeviceScale scale
+                let expected = struct (int (ceil (float width * float scale)), int (ceil (float height * float scale)))
+                captureSurface ("renderer-scale-" + scale.ToString("R", Globalization.CultureInfo.InvariantCulture)) expected
+        resizeOwnedWindow 320 200
+        check (surfaceCases = 9 && windowSteps >= 3) "all owned resize and renderer-scale transitions execute"
+        Console.WriteLine("MEDIA_RESIZE_DPI_CASES=" + surfaceCases.ToString())
+        Console.WriteLine("MEDIA_WINDOW_RESIZE_STEPS=" + windowSteps.ToString())
         let mutable wrong = 0
         let other = Thread(fun () -> try player.Play() with error -> wrong <- error.HResult)
         other.Start(); other.Join()
