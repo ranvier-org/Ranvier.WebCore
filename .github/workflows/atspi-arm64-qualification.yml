@@ -123,6 +123,10 @@ jobs:
             ${{ env.ATSPI_WORK }}/consumer/consumer-receipt.json
             ${{ env.ATSPI_WORK }}/managed-aot/*.json
             ${{ env.ATSPI_WORK }}/managed-aot/*.log
+            ${{ env.ATSPI_WORK }}/managed-aot/feed/*.nupkg
+            ${{ env.ATSPI_WORK }}/managed-aot/artifacts-*/obj/AccessibilityAot/project.assets.json
+            ${{ env.ATSPI_WORK }}/managed-aot/publish-normal/AccessibilityAot
+            ${{ env.ATSPI_WORK }}/managed-aot/publish-traced/AccessibilityAot
             ${{ env.ATSPI_WORK }}/qualification-receipt.json
             ${{ env.ATSPI_WORK }}/build/CMakeFiles/CMakeConfigureLog.yaml
           if-no-files-found: warn
