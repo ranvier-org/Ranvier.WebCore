@@ -7,7 +7,7 @@ on:
         type: choice
         options: [slim, gpu]
         required: true
-        description: Recover one terminal failed immutable-d31 Mac flavor
+        description: Recover one failed or unacquired-cancelled immutable-d31 Mac flavor
 
 permissions:
   contents: read

@@ -81,10 +81,21 @@ class ProducerBoundaryTests(unittest.TestCase):
 
     def test_only_exact_failed_mac_job_is_eligible(self):
         job = dict(name='native (osx-arm64, macos-26, /Users/runner/rw)', status='completed', conclusion='failure')
-        self.assertEqual(recovery.failed_mac_job([job]), job)
+        self.assertEqual(recovery.recoverable_mac_job([job]), dict(job=job, classification='terminal-failure'))
         for changed in [[], [job, job], [job | {'status': 'in_progress'}], [job | {'conclusion': 'success'}]]:
             with self.subTest(jobs=changed), self.assertRaises(ValueError):
-                recovery.failed_mac_job(changed)
+                recovery.recoverable_mac_job(changed)
+
+    def test_cancelled_before_runner_is_distinct_acquisition_only(self):
+        job = dict(name='native (osx-arm64, macos-26, /Users/runner/rw)', status='completed',
+                   conclusion='cancelled', runner_id=0, runner_name='', steps=[])
+        self.assertEqual(recovery.recoverable_mac_job([job]),
+                         dict(job=job, classification='acquisition-only-cancelled-before-runner'))
+        for field, value in [('runner_id', 1), ('runner_id', '0'), ('runner_id', False),
+                             ('runner_name', 'acquired-runner'), ('runner_name', None),
+                             ('steps', [{}]), ('steps', None), ('status', 'in_progress')]:
+            with self.subTest(field=field, value=value), self.assertRaises(ValueError):
+                recovery.recoverable_mac_job([job | {field: value}])
 
     def test_source_branch_and_event_are_exact(self):
         run = dict(head_sha=recovery.PRODUCT_SOURCE, head_branch='v' + recovery.VERSION, event='push', path='.github/workflows/build.yml')
