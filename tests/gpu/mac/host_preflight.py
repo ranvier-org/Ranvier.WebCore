@@ -101,7 +101,12 @@ def main():
             else:
                 argv += ['-MD', '-MF', str(dep)]
             run('host-' + str(number), argv, Path(entry['directory']))
-            run('undefined-' + str(number), ['xcrun', 'nm', '-u', str(obj)])
+            undefined = run('undefined-' + str(number), ['xcrun', 'nm', '-u', str(obj)])
+            assert not re.search(r'(?m)^\s*(?:U\s+)?_gl[A-Z]\w*\s*$', undefined), 'Host still references system OpenGL entry points'
+            if Path(entry['file']).name == 'RanvierWebCoreAbi.cpp':
+                assert '_GL_BindFramebuffer' in undefined, 'Host did not bind ANGLE framebuffer entry point'
+            if Path(entry['file']).name == 'RanvierMacGpuSpike.mm':
+                assert '_GL_GetString' in undefined, 'Spike did not bind ANGLE renderer query'
             receipt['objects'].append({'source': entry['file'], 'path': str(obj), 'sha256': sha(obj)})
             text = dep.read_text().replace('\\\n', ' ')
             dependencies.update((Path(entry['directory']) / name).resolve() for name in shlex.split(text.split(':', 1)[1]))
@@ -111,7 +116,7 @@ def main():
         receipt['error'] = repr(error)
         raise
     finally:
-        for name in ['cmakeconfig.h', 'CMakeCache.txt', 'compile_commands.json']:
+        for name in ['cmakeconfig.h', 'CMakeCache.txt', 'compile_commands.json', 'availability-overlay.yaml']:
             if (build / name).exists():
                 shutil.copy2(build / name, output / name)
         save()

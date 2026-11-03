@@ -85,6 +85,15 @@ class RecipeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, '1.*4'):
             recipe.commands('osx-arm64', True, Path('/private/spike'), 16)
 
+    def test_gl_import_gate_distinguishes_angle_from_system_gl(self):
+        recipe = self.load()
+        inventory = ['_glGetIntegerv', '_glBindFramebuffer']
+        self.assertEqual(recipe.legacy_gl_imports(
+            '                 (undefined) external _glGetIntegerv (from OpenGL)', inventory), ['_glGetIntegerv'])
+        self.assertEqual(recipe.legacy_gl_imports(
+            '                 (undefined) external _GL_GetIntegerv (from libGLESv2)', inventory), [])
+        self.assertEqual(recipe.legacy_gl_imports('_glGetIntegervExtra __ZN_glBindFramebuffer', inventory), [])
+
     def test_native_timeout_preserves_partial_log_and_failure(self):
         recipe = self.load()
         self.assertTrue(callable(getattr(recipe, 'run_step', None)), 'bounded step runner is missing')

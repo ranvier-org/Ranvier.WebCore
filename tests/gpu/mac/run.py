@@ -13,6 +13,10 @@ import sys
 ROOT = Path(__file__).resolve().parents[3]
 
 
+def legacy_gl_imports(symbols, expected):
+    return sorted(name for name in expected if re.search(r'(?<!\w)' + re.escape(name) + r'(?!\w)', symbols))
+
+
 def run_step(name, command, producer, evidence, receipt, timeout=None):
     try:
         result = subprocess.run(command, cwd=producer, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
@@ -95,6 +99,8 @@ def main():
         for step in plan:
             run(step['name'], step['command'])
             if step['name'] == 'configure':
+                run('compile-database', ['cmake', '-S', str(work / 'src'), '-B', str(work / 'build-mac-gpu-spike'),
+                                         '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON'])
                 configuration = work / 'build-mac-gpu-spike' / 'cmakeconfig.h'
                 configured = configuration.read_text()
                 for name in ('RANVIER_MAC_GPU_SPIKE', 'USE_TEXTURE_MAPPER', 'USE_GRAPHICS_LAYER_TEXTURE_MAPPER'):
@@ -120,6 +126,14 @@ def main():
                                '--build-dir', str(work / 'build-mac-gpu-spike'), '--expect-flavor', 'gpu', '--no-load'])
         run('exports', [sys.executable, str(Path(__file__).with_name('check_exports.py')), str(stage),
                         *(['--texture-input'] if args.texture_input else [])])
+        dispatch = json.loads((ROOT / 'tests/fixtures/cocoa-angle-gl-dispatch.json').read_text())
+        receipt['glDispatchPreflight'] = {}
+        for name in ['libRanvierWebCoreHost.dylib', 'libWebCore.dylib']:
+            symbols = run('gl-imports-' + name, ['xcrun', 'nm', '-m', '-u', str(stage / name)])
+            legacy = legacy_gl_imports(symbols, dispatch['systemOpenGLImports'])
+            receipt['glDispatchPreflight'][name] = {'legacyImports': legacy}
+            if legacy:
+                raise RuntimeError(name + ' still imports system GL entry points: ' + ', '.join(legacy))
         executable = evidence / 'mac-gpu-spike'
         run('proof-compile', ['xcrun', 'clang++', '-std=c++20', '-fobjc-arc', '-Wall', '-Wextra', '-Werror',
                               '-mmacosx-version-min=26.0', '-I' + str(ROOT / 'host'),

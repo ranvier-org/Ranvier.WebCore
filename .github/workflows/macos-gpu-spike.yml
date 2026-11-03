@@ -65,6 +65,9 @@ jobs:
             ${{ env.MAC220_WORK }}/spike-evidence/
             ${{ env.MAC220_WORK }}/build-mac-gpu-spike/cmakeconfig.h
             ${{ env.MAC220_WORK }}/build-mac-gpu-spike/compile_commands.json
+            ${{ env.MAC220_WORK }}/build-mac-gpu-spike/CMakeCache.txt
+            ${{ env.MAC220_WORK }}/build-mac-gpu-spike/build.ninja
+            ${{ env.MAC220_WORK }}/build-mac-gpu-spike/availability-overlay.yaml
             ${{ env.MAC220_WORK }}/build-mac-gpu-spike/CMakeFiles/CMakeConfigureLog.yaml
             ${{ env.MAC220_WORK }}/build-mac-gpu-spike/libEGL.dylib
             ${{ env.MAC220_WORK }}/build-mac-gpu-spike/libGLESv2.dylib
