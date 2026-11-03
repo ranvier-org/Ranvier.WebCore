@@ -19,7 +19,9 @@ VERSION = '0.1.1-preview.11'
 ARTIFACT = 'atspi-preview11-candidate'
 QUALIFICATIONS = {
     'linux-x64': (None, None, None, None, None),
-    'linux-arm64': (None, None, None, None, None),
+    'linux-arm64': (41627017174, '5b5ef82a0af3011fc6615d442e9d2618147b08a8',
+                    'unqualified-atspi-arm64-5b5ef82a0af3011fc6615d442e9d2618147b08a8',
+                    'push', '.github/workflows/atspi-p11-arm64-qualification.yml'),
 }
 
 

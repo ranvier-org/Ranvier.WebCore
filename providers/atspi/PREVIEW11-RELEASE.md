@@ -22,3 +22,9 @@ caller-supplied source claim. Release 432676483 and asset 705558006 pin the revi
 draft-only upload, its owner, exact target commit, size and complete SHA-256. The
 receiver rejects an unarmed policy before network use. Public preparation and
 publication remain disabled, with pending input/candidate pins.
+
+The ARM qualification is pinned to push run 41627017174 at reviewed source
+`5b5ef82a0af3011fc6615d442e9d2618147b08a8` and its exact retained artifact,
+SDK package and summary receipt hashes. The x64 relay run tuple remains pending
+independent receiver acceptance. These pins preserve the actual qualification
+sources; they do not relabel either proof as public View46 execution.
