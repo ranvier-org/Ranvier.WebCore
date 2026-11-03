@@ -676,6 +676,7 @@ jobs:
         with:
           name: probe-logs-${{ matrix.rid }}-${{ env.FLAVOR }}
           path: ${{ env.RANVIER_WORK }}/probe-logs
+          if-no-files-found: ignore
 
       - name: Retain macOS public texture qualification
         if: always() && env.FLAVOR == 'gpu' && matrix.rid == 'osx-arm64'
@@ -684,7 +685,6 @@ jobs:
           name: mac-gpu-public-qualification
           path: ${{ env.RANVIER_WORK }}/mac-gpu-public-qualification
           if-no-files-found: warn
-          if-no-files-found: ignore
 
       - name: Retain native PDF output and ownership results
         if: always()
