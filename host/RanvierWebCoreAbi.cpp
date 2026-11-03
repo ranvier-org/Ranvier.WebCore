@@ -244,6 +244,9 @@
 #include "RanvierWebCoreEGL.h"
 #else
 #include <GLES2/gl2.h>
+#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+#include <WebCore/TextureMapperANGLEDispatch.h>
+#endif
 #if defined(_WIN32)
 #include <d3d11.h>
 #include <wrl/client.h>

@@ -10,6 +10,7 @@
 #include <EGL/eglext_angle.h>
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
+#include <WebCore/TextureMapperANGLEDispatch.h>
 #include <cstring>
 #include <limits>
 #include <string>
