@@ -54,9 +54,9 @@ class Preview12CandidateTests(unittest.TestCase):
         self.assertIn('if: ${{ false &&',text)
         self.assertNotIn('id-token:',text.lower());self.assertNotIn('nuget push',text.lower());self.assertNotIn('cmake',text.lower())
 
-    def test_publisher_is_disabled_and_verifies_before_authentication(self):
+    def test_publisher_is_main_manual_and_verifies_before_authentication(self):
         text=(ROOT/'.github/workflows/build.yml').read_text().split('  publish-atspi-preview12:',1)[1]
-        self.assertIn("if: ${{ false &&",text)
+        self.assertNotIn("if: ${{ false &&",text)
         self.assertIn("inputs.atspi_preview11 == 'publish-p12'",text)
         self.assertIn("github.event_name == 'workflow_dispatch'",text)
         self.assertIn("github.ref == 'refs/heads/main'",text)
