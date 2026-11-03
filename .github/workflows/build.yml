@@ -60,8 +60,10 @@ jobs:
       - run: python -I tests/test_preview4_recovery.py
       - run: python -I tests/test_preview7_recovery.py
       - run: python -I tests/test_probes.py
+      - run: python -I tests/test_native_media.py
       - run: python -I tests/test_background_clip_policy.py
       - run: python -I tests/test_producer_gpu_clipping.py
+      - run: python -I tests/test_native_media_packages.py
       - run: python -I tests/test_sdl_runtime.py
       - run: python -I tests/test_package_gpu.py
       - run: python -I tests/test_sccache_cache_policy.py
