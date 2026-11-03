@@ -76,6 +76,7 @@ jobs:
       - run: python -I tests/test_preview7_recovery.py
       - run: python -I tests/test_probes.py
       - run: python -I tests/test_abi_cohort_entry.py
+      - run: python -I tests/test_abi_driver_workspace.py
       - run: python -I tests/abi/test_abi_expectation.py
       - run: python -I tests/atspi/test_distribution.py
       - run: python -I tests/test_native_media.py
