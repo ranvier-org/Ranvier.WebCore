@@ -9,6 +9,7 @@ import time
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'abi'))
 from form_collections import Native, Case, P, I, U
+from abi_expectation import expected_abi
 from view_transitions import UPDATE, Options, SETTLED
 from web_animations import Animations, Time
 
@@ -101,7 +102,7 @@ def animations(n, document):
 
 def run(directory, consumer_type=Consumer):
     n = Native(directory)
-    assert n.bind('rv_abi_version', I, [])() == 63
+    assert n.bind('rv_abi_version', I, [])() == expected_abi()
     assert n.call('rv_abi_has', [C.c_char_p], b'view-transitions')
     consumer = consumer_type(n)
     page = Case(n, PAGE)
