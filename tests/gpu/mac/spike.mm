@@ -14,6 +14,7 @@
 #include <stdexcept>
 #include <string>
 #include <thread>
+#include <vector>
 
 namespace {
 int assertions;
@@ -214,6 +215,8 @@ void cycle(int index, float scale)
     uint64_t gpu = 0, readback = 0, basePaints = 0;
     require(rv_mac_spike_counters(host.get(), &gpu, &readback, &basePaints) == RV_OK && gpu == 1 && readback == 0, "GPU first frame counters");
     auto stablePaints = basePaints;
+    std::printf("MAC_GPU_COUNTER cycle=%d scale=%g phase=initial gpu=%llu readback=%llu base=%llu\n", index, scale,
+        static_cast<unsigned long long>(gpu), static_cast<unsigned long long>(readback), static_cast<unsigned long long>(basePaints));
     for (int repeat = 0; repeat < 3; ++repeat) {
         Frame unchanged;
         require(rv_mac_spike_acquire_frame(host.get(), &unchanged.value) == RV_OK && unchanged.value, "unchanged frame");
@@ -234,8 +237,12 @@ void cycle(int index, float scale)
         Frame animated;
         require(rv_mac_spike_acquire_frame(host.get(), &animated.value) == RV_OK && animated.value, "animated GPU frame");
         validate(present(renderer.get(), animated.value).get(), milliseconds ? 60 : 0, scale, milliseconds ? 64 : 128);
-        require(rv_mac_spike_counters(host.get(), &gpu, &readback, &basePaints) == RV_OK
-                && basePaints == stablePaints && readback == 0, "transform and opacity animation reuse base backing");
+        auto counterResult = rv_mac_spike_counters(host.get(), &gpu, &readback, &basePaints);
+        std::printf("MAC_GPU_COUNTER cycle=%d scale=%g seek=%d result=%d gpu=%llu readback=%llu stable=%llu base=%llu\n", index, scale, milliseconds, counterResult,
+            static_cast<unsigned long long>(gpu), static_cast<unsigned long long>(readback),
+            static_cast<unsigned long long>(stablePaints), static_cast<unsigned long long>(basePaints));
+        std::fflush(stdout);
+        require(counterResult == RV_OK && basePaints == stablePaints && readback == 0, "transform and opacity animation reuse base backing");
     }
     animation.reset();
     if (!outputDirectory.empty())
@@ -291,11 +298,28 @@ int main(int argc, char** argv)
             }
             Frame invalid;
             require(rv_mac_spike_acquire_frame(nullptr, &invalid.value) == RV_ERR_NULL_ARGUMENT && !invalid.value, "null host guard");
-            for (int index = 0; index < 3; ++index)
-                cycle(index, index == 0 ? 1.0f : index == 1 ? 1.5f : 2.0f);
+            std::vector<float> scales { 1.0f, 1.5f, 2.0f };
+            bool diagnostic = argc == 3 && std::strcmp(argv[1], "--diagnostic-scales") == 0;
+            if (diagnostic) {
+                scales.clear();
+                std::string selected = argv[2];
+                size_t start = 0;
+                do {
+                    auto end = selected.find(',', start);
+                    auto item = selected.substr(start, end == std::string::npos ? end : end - start);
+                    require(item == "1" || item == "1.5" || item == "2", "diagnostic scale must be 1, 1.5 or 2");
+                    scales.push_back(item == "1" ? 1.0f : item == "1.5" ? 1.5f : 2.0f);
+                    require(scales.size() <= 3, "at most three diagnostic host cycles");
+                    if (end == std::string::npos)
+                        break;
+                    start = end + 1;
+                } while (true);
+            }
+            for (size_t index = 0; index < scales.size(); ++index)
+                cycle(static_cast<int>(index), scales[index]);
             SDL_Quit();
-            std::printf("MAC_GPU_SPIKE PASS assertions=%d presented=%llu cycles=3 label=experimental\n", assertions,
-                static_cast<unsigned long long>(presented));
+            std::printf("MAC_GPU_SPIKE PASS assertions=%d presented=%llu cycles=%zu label=%s\n", assertions,
+                static_cast<unsigned long long>(presented), scales.size(), diagnostic ? "diagnostic-selected-scales" : "experimental");
             return 0;
         } catch (const std::exception& error) {
             std::fprintf(stderr, "MAC_GPU_SPIKE FAIL %s\n", error.what());
