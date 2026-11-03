@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "armed": false,
+  "publicationEnabled": false,
+  "version": "0.1.1-preview.12",
+  "productSource": "d31c3631ed4bbe6520f7f5f7c7e7d34499c38122",
+  "controllerSource": null,
+  "producerRun": 41719479076,
+  "original": {
+    "win-x64": {
+      "artifact": {
+        "id": null,
+        "name": "package-win-x64-slim",
+        "sha256": null
+      },
+      "packageSha256": null
+    },
+    "win-arm64": {
+      "artifact": {
+        "id": null,
+        "name": "package-win-arm64-slim",
+        "sha256": null
+      },
+      "packageSha256": null
+    },
+    "linux-x64": {
+      "artifact": {
+        "id": null,
+        "name": "package-linux-x64-slim",
+        "sha256": null
+      },
+      "packageSha256": null
+    },
+    "linux-arm64": {
+      "artifact": {
+        "id": null,
+        "name": "package-linux-arm64-slim",
+        "sha256": null
+      },
+      "packageSha256": null
+    }
+  },
+  "macRecovery": {
+    "run": null,
+    "workflowSource": null,
+    "packageArtifact": {
+      "id": null,
+      "name": "package-osx-arm64-slim",
+      "sha256": null
+    },
+    "proofArtifact": {
+      "id": null,
+      "name": "immutable-d31-mac-slim-recovery-proof",
+      "sha256": null
+    },
+    "packageSha256": null,
+    "recoveryReceiptSha256": null,
+    "sidecarReceiptSha256": null,
+    "proofPrefix": null,
+    "helperCompletion": null
+  },
+  "qualification": null
+}
