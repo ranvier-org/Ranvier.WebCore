@@ -99,6 +99,9 @@ let run (outDir: string) =
     let edText =
         readString "ed text" (fun b c l -> rv_node_get_string (ed.Handle, 1, b, c, l))
 
+    let edHtml =
+        readString "ed html" (fun b c l -> rv_node_get_string (ed.Handle, 4, b, c, l))
+
     System.GC.KeepAlive onStart
 
     let summary =
@@ -110,6 +113,7 @@ let run (outDir: string) =
             linkItems = linkItems |> List.map (fun (k, v) -> $"{k}={v}")
             dropped = dropped
             edText = edText
+            edHtml = edHtml
             events = List.ofSeq events
         |}
 
@@ -133,7 +137,7 @@ let run (outDir: string) =
         "the link drag carries its URL"
 
     require
-        (dropped = 1 && edText.Contains "https://example.test/page")
+        (dropped = 1 && edText = "link" && edHtml = "<a href=\"https://example.test/page\">link</a>")
         "the drag drops into the page through rv_host_drag"
 
     require (List.ofSeq events = [ "dragstart"; "dragend" ]) "the box gets dragstart, then dragend at rv_drag_end"
