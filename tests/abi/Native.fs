@@ -658,6 +658,8 @@ module Calls =
             "rv_host_ime_surrounding"
             "rv_host_ime_delete_surrounding"
             "rv_ax_text_style_run"
+            "rv_host_acquire_iosurface_frame"
+            "rv_host_bind_iosurface"
         |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
@@ -2124,6 +2126,12 @@ module Raw =
         int capacity,
         int[] length
     )
+
+    [<DllImport(Lib)>]
+    extern int rv_host_acquire_iosurface_frame(nativeint host, nativeint& frame)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_bind_iosurface(nativeint host, nativeint target, nativeint surface, int flipY)
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -6653,6 +6661,30 @@ let rv_ax_text_style_run
         result
     else
         Raw.rv_ax_text_style_run (ax, offset, property, &start, &``end``, buffer, capacity, length)
+
+let rv_host_acquire_iosurface_frame (host: nativeint, frame: byref<nativeint>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_acquire_iosurface_frame (host, &frame)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[347] <- Calls.Counts[347] + 1L
+        Calls.Ticks[347] <- Calls.Ticks[347] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_acquire_iosurface_frame (host, &frame)
+
+let rv_host_bind_iosurface (host: nativeint, target: nativeint, surface: nativeint, flipY: int) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_bind_iosurface (host, target, surface, flipY)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[348] <- Calls.Counts[348] + 1L
+        Calls.Ticks[348] <- Calls.Ticks[348] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_bind_iosurface (host, target, surface, flipY)
 
 // END GENERATED
 

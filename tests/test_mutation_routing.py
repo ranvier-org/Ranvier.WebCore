@@ -45,7 +45,7 @@ class MutationRoutingTests(unittest.TestCase):
                 with self.subTest(rid=rid, gpu=gpu):
                     package = Path(directory) / (rid + str(gpu) + '.nupkg')
                     with zipfile.ZipFile(package, 'w') as archive:
-                        archive.writestr('manifest.json', json.dumps({'rid': rid, 'flavor': 'gpu' if gpu else 'slim'}))
+                        archive.writestr('manifest.json', json.dumps({'abi': 63, 'rid': rid, 'flavor': 'gpu' if gpu else 'slim'}))
                         archive.writestr(f'runtimes/{rid}/native/fixture.bin', b'not-a-runtime')
                     with mock.patch.object(package_api.subprocess, 'run') as run:
                         package_api.verify(package, gpu=gpu)

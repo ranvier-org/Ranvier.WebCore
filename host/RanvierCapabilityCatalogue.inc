@@ -419,6 +419,8 @@ static constexpr const char* capabilityAbiNames[] = {
     "screen",
     "printing-pdf",
     "capabilities",
+    "iosurface-frames",
+    "iosurface-input",
     "svg-view-selection",
     "image-decode",
     "font-load",

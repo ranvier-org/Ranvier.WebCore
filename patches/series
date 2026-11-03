@@ -61,6 +61,11 @@
 0062-skia-pdf-path-dump.patch
 0063-file-picker-embedder-hook.patch
 0064-ime-cancellation-target.patch
+0065-cocoa-progress-reduced-motion.patch
+0067-macos-gpu-spike.patch
 0068-windows-owner-thread-font-cache.patch
+0069-cocoa-due-runloop-timers.patch
+0070-cocoa-texture-mapper-angle-dispatch.patch
 0071-view-transition-context-stop.patch
+0072-cocoa-page-contrast.patch
 0073-texture-mapper-fractional-paint-bounds.patch

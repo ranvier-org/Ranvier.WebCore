@@ -1,0 +1,195 @@
+diff --git a/Source/WebCore/platform/graphics/egl/GLContext.cpp b/Source/WebCore/platform/graphics/egl/GLContext.cpp
+--- a/Source/WebCore/platform/graphics/egl/GLContext.cpp
++++ b/Source/WebCore/platform/graphics/egl/GLContext.cpp
+@@ -36,6 +36,10 @@
+ #include <EGL/eglext.h>
+ #include <GLES2/gl2.h>
+ #include <GLES2/gl2ext.h>
++#endif
++
++#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
++#include "TextureMapperANGLEDispatch.h"
+ #endif
+ 
+ namespace WebCore {
+diff --git a/Source/WebCore/platform/graphics/egl/GLDisplay.cpp b/Source/WebCore/platform/graphics/egl/GLDisplay.cpp
+--- a/Source/WebCore/platform/graphics/egl/GLDisplay.cpp
++++ b/Source/WebCore/platform/graphics/egl/GLDisplay.cpp
+@@ -69,6 +69,10 @@
+ #define EGL_RENDERER_EXT 0x335F
+ #endif
+ 
++#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
++#include "TextureMapperANGLEDispatch.h"
++#endif
++
+ namespace WebCore {
+ 
+ RefPtr<GLDisplay> GLDisplay::create(EGLDisplay eglDisplay)
+diff --git a/Source/WebCore/platform/graphics/egl/GLFenceEGL.cpp b/Source/WebCore/platform/graphics/egl/GLFenceEGL.cpp
+--- a/Source/WebCore/platform/graphics/egl/GLFenceEGL.cpp
++++ b/Source/WebCore/platform/graphics/egl/GLFenceEGL.cpp
+@@ -30,6 +30,10 @@
+ #include <EGL/egl.h>
+ #include <EGL/eglext.h>
+ #include <GLES2/gl2.h>
++#endif
++
++#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
++#include "TextureMapperANGLEDispatch.h"
+ #endif
+ 
+ namespace WebCore {
+diff --git a/Source/WebCore/platform/graphics/egl/GLFenceGL.cpp b/Source/WebCore/platform/graphics/egl/GLFenceGL.cpp
+--- a/Source/WebCore/platform/graphics/egl/GLFenceGL.cpp
++++ b/Source/WebCore/platform/graphics/egl/GLFenceGL.cpp
+@@ -26,6 +26,10 @@
+ #include <epoxy/gl.h>
+ #else
+ #include <GLES3/gl3.h>
++#endif
++
++#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
++#include "TextureMapperANGLEDispatch.h"
+ #endif
+ 
+ namespace WebCore {
+diff --git a/Source/WebCore/platform/graphics/texmap/TextureMapperANGLEDispatch.h b/Source/WebCore/platform/graphics/texmap/TextureMapperANGLEDispatch.h
+new file mode 100644
+--- /dev/null
++++ b/Source/WebCore/platform/graphics/texmap/TextureMapperANGLEDispatch.h
+@@ -0,0 +1,85 @@
++#pragma once
++
++#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
++#include <ANGLE/entry_points_gles_2_0_autogen.h>
++#include <ANGLE/entry_points_gles_3_0_autogen.h>
++#include <ANGLE/entry_points_gles_ext_autogen.h>
++
++#define glActiveTexture GL_ActiveTexture
++#define glAttachShader GL_AttachShader
++#define glBindBuffer GL_BindBuffer
++#define glBindFramebuffer GL_BindFramebuffer
++#define glBindRenderbuffer GL_BindRenderbuffer
++#define glBindTexture GL_BindTexture
++#define glBlendFunc GL_BlendFunc
++#define glBufferData GL_BufferData
++#define glBufferSubData GL_BufferSubData
++#define glCheckFramebufferStatus GL_CheckFramebufferStatus
++#define glClear GL_Clear
++#define glClearColor GL_ClearColor
++#define glClearStencil GL_ClearStencil
++#define glClientWaitSync GL_ClientWaitSync
++#define glCompileShader GL_CompileShader
++#define glCopyTexSubImage2D GL_CopyTexSubImage2D
++#define glCreateProgram GL_CreateProgram
++#define glCreateShader GL_CreateShader
++#define glDebugMessageCallbackKHR GL_DebugMessageCallbackKHR
++#define glDeleteBuffers GL_DeleteBuffers
++#define glDeleteFramebuffers GL_DeleteFramebuffers
++#define glDeleteProgram GL_DeleteProgram
++#define glDeleteRenderbuffers GL_DeleteRenderbuffers
++#define glDeleteShader GL_DeleteShader
++#define glDeleteSync GL_DeleteSync
++#define glDeleteTextures GL_DeleteTextures
++#define glDepthFunc GL_DepthFunc
++#define glDetachShader GL_DetachShader
++#define glDisable GL_Disable
++#define glDisableVertexAttribArray GL_DisableVertexAttribArray
++#define glDrawArrays GL_DrawArrays
++#define glEGLImageTargetTexture2DOES GL_EGLImageTargetTexture2DOES
++#define glEnable GL_Enable
++#define glEnableVertexAttribArray GL_EnableVertexAttribArray
++#define glFenceSync GL_FenceSync
++#define glFinish GL_Finish
++#define glFlush GL_Flush
++#define glFramebufferRenderbuffer GL_FramebufferRenderbuffer
++#define glFramebufferTexture2D GL_FramebufferTexture2D
++#define glGenBuffers GL_GenBuffers
++#define glGenFramebuffers GL_GenFramebuffers
++#define glGenRenderbuffers GL_GenRenderbuffers
++#define glGenTextures GL_GenTextures
++#define glGetAttribLocation GL_GetAttribLocation
++#define glGetError GL_GetError
++#define glGetIntegerv GL_GetIntegerv
++#define glGetProgramInfoLog GL_GetProgramInfoLog
++#define glGetProgramiv GL_GetProgramiv
++#define glGetShaderInfoLog GL_GetShaderInfoLog
++#define glGetShaderiv GL_GetShaderiv
++#define glGetString GL_GetString
++#define glGetUniformLocation GL_GetUniformLocation
++#define glIsEnabled GL_IsEnabled
++#define glLineWidth GL_LineWidth
++#define glLinkProgram GL_LinkProgram
++#define glPixelStorei GL_PixelStorei
++#define glReadPixels GL_ReadPixels
++#define glRenderbufferStorage GL_RenderbufferStorage
++#define glScissor GL_Scissor
++#define glShaderSource GL_ShaderSource
++#define glStencilFunc GL_StencilFunc
++#define glStencilMask GL_StencilMask
++#define glStencilOp GL_StencilOp
++#define glTexImage2D GL_TexImage2D
++#define glTexParameteri GL_TexParameteri
++#define glTexSubImage2D GL_TexSubImage2D
++#define glUniform1f GL_Uniform1f
++#define glUniform1fv GL_Uniform1fv
++#define glUniform1i GL_Uniform1i
++#define glUniform2f GL_Uniform2f
++#define glUniform4f GL_Uniform4f
++#define glUniform4fv GL_Uniform4fv
++#define glUniformMatrix4fv GL_UniformMatrix4fv
++#define glUseProgram GL_UseProgram
++#define glVertexAttribPointer GL_VertexAttribPointer
++#define glViewport GL_Viewport
++#define glWaitSync GL_WaitSync
++#endif
+diff --git a/Source/WebCore/platform/graphics/texmap/TextureMapperGLHeaders.h b/Source/WebCore/platform/graphics/texmap/TextureMapperGLHeaders.h
+--- a/Source/WebCore/platform/graphics/texmap/TextureMapperGLHeaders.h
++++ b/Source/WebCore/platform/graphics/texmap/TextureMapperGLHeaders.h
+@@ -25,7 +25,9 @@
+ 
+ #pragma once
+ 
+-#if USE(LIBEPOXY)
++#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
++#include "TextureMapperANGLEDispatch.h"
++#elif USE(LIBEPOXY)
+ #include <epoxy/gl.h>
+ #else
+ #include <GLES2/gl2.h>
+diff --git a/Source/WebCore/PlatformMac.cmake b/Source/WebCore/PlatformMac.cmake
+--- a/Source/WebCore/PlatformMac.cmake
++++ b/Source/WebCore/PlatformMac.cmake
+@@ -20,6 +20,7 @@
+         platform/graphics/egl/GLFenceGL.cpp
+     )
+     list(APPEND WebCore_PRIVATE_FRAMEWORK_HEADERS
++        platform/graphics/texmap/TextureMapperANGLEDispatch.h
+         platform/graphics/PlatformDisplay.h
+         platform/graphics/egl/GLContext.h
+         platform/graphics/egl/GLContextWrapper.h
+diff --git a/Source/ThirdParty/ANGLE/CMakeLists.txt b/Source/ThirdParty/ANGLE/CMakeLists.txt
+--- a/Source/ThirdParty/ANGLE/CMakeLists.txt
++++ b/Source/ThirdParty/ANGLE/CMakeLists.txt
+@@ -237,7 +237,7 @@
+ 
+ WEBKIT_ADD_PREFIX_HEADER(ANGLE ANGLEPrefix.h PREFIX_LANGUAGES CXX OBJCXX)
+ 
+-if (ENABLE_WEBGL)
++if (ENABLE_WEBGL OR RANVIER_MAC_GPU_SPIKE)
+     set(libglesv2_entry_points_headers
+         src/libGLESv2/entry_points_egl_autogen.h
+         src/libGLESv2/entry_points_egl_ext_autogen.h
+diff --git a/Source/ThirdParty/ANGLE/include/CMakeLists.txt b/Source/ThirdParty/ANGLE/include/CMakeLists.txt
+--- a/Source/ThirdParty/ANGLE/include/CMakeLists.txt
++++ b/Source/ThirdParty/ANGLE/include/CMakeLists.txt
+@@ -31,7 +31,7 @@
+     )
+ endif ()
+ 
+-if (ENABLE_WEBGL)
++if (ENABLE_WEBGL OR RANVIER_MAC_GPU_SPIKE)
+     set(ANGLE_WEBGL_HEADERS
+         export.h
+         ${khr_headers}

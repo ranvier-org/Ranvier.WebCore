@@ -244,12 +244,21 @@
 #include "RanvierWebCoreEGL.h"
 #else
 #include <GLES2/gl2.h>
+#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+#include <WebCore/TextureMapperANGLEDispatch.h>
+#endif
 #if defined(_WIN32)
 #include <d3d11.h>
 #include <wrl/client.h>
 #endif
 #endif
 #include <WebCore/GLContext.h>
+#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+#include <EGL/egl.h>
+#include <WebCore/GLDisplay.h>
+#include <WebCore/GraphicsLayerFactory.h>
+#include "RanvierMacGpuSpike.h"
+#endif
 #include <WebCore/GraphicsLayerTextureMapper.h>
 #include <WebCore/PlatformDisplay.h>
 #include <WebCore/TextureMapper.h>
@@ -263,6 +272,22 @@ using namespace WebCore;
 
 struct RvHost;
 
+#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+class RvMacSpikeLayerFactory final : public GraphicsLayerFactory {
+public:
+    Ref<GraphicsLayer> createGraphicsLayer(GraphicsLayerType type, GraphicsLayerClient& client) final
+    {
+        return adoptRef(*new GraphicsLayerTextureMapper(type, client));
+    }
+};
+
+static GraphicsLayerFactory* macSpikeLayerFactory()
+{
+    static RvMacSpikeLayerFactory factory;
+    return &factory;
+}
+#endif
+
 // Reports the page's invalidations and rendering update requests to its host, which turns them into a dirty
 // rectangle and a frame callback.
 class RvChromeClient final : public EmptyChromeClient {
@@ -270,6 +295,9 @@ class RvChromeClient final : public EmptyChromeClient {
 public:
     RvHost* host { nullptr };
     bool isEmptyChromeClient() const final { return false; }
+#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+    GraphicsLayerFactory* graphicsLayerFactory() const final { return macSpikeLayerFactory(); }
+#endif
 
 private:
     void invalidateRootView(const IntRect& rect) final { invalidate(rect); }
@@ -852,7 +880,9 @@ static GLContext* compositingContext()
 
 #if PLATFORM(WPE)
 static EGLDisplay configuredEGLDisplay { EGL_NO_DISPLAY };
+#endif
 
+#if PLATFORM(WPE) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE)
 class RvEGLPlatformDisplay final : public PlatformDisplay {
 public:
     explicit RvEGLPlatformDisplay(Ref<GLDisplay>&& display)
@@ -869,6 +899,9 @@ public:
 // layer (RenderLayerBacking::paintsIntoWindow).
 #include "RanvierNativeTextureInput.h"
 #include "RanvierNativeTextureEGLInput.h"
+#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+#include "RanvierNativeTextureMacInput.h"
+#endif
 
 struct RvCompositor final : GraphicsLayerClient {
     GLContext* context { nullptr };
@@ -882,6 +915,9 @@ struct RvCompositor final : GraphicsLayerClient {
     GLuint texture { 0 };
     GLuint depthStencil { 0 };
     GLuint framebuffer { 0 };
+#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+    uint64_t macSpikeBasePaints { 0 };
+#endif
 
     static std::unique_ptr<RvCompositor> create(IntSize size, float scale)
     {
@@ -897,7 +933,11 @@ struct RvCompositor final : GraphicsLayerClient {
             return nullptr;
         // The TextureMapper takes its shaders and limits from the current context.
         compositor->textureMapper = TextureMapper::create();
+#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+        compositor->root = GraphicsLayer::create(macSpikeLayerFactory(), *compositor);
+#else
         compositor->root = GraphicsLayer::create(nullptr, *compositor);
+#endif
         compositor->root->setDrawsContent(true);
         compositor->root->setContentsOpaque(true);
         compositor->root->setSize(FloatSize { size });
@@ -929,6 +969,9 @@ struct RvCompositor final : GraphicsLayerClient {
     {
         if (!view)
             return;
+#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+        ++macSpikeBasePaints;
+#endif
         context.save();
         context.clip(clip);
         view->paint(context, enclosingIntRect(clip));
@@ -983,6 +1026,10 @@ struct RvHost {
     Ref<Page> page;
     IntSize size;
     std::optional<JSC::DisallowVMEntry> noScript;
+#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+    uint64_t macSpikeGpuFrames { 0 };
+    uint64_t macSpikeReadbackFrames { 0 };
+#endif
     RvResourceHandler resourceHandler { nullptr };
     void* resourceContext { nullptr };
     RvFormSubmissionHandler formSubmissionHandler { nullptr };
@@ -1008,6 +1055,8 @@ struct RvHost {
     Vector<std::unique_ptr<RvNativeTextureInput>> nativeTextures;
 #elif defined(__linux__) && RANVIER_COMPOSITING
     Vector<std::unique_ptr<RvNativeEGLTextureInput>> nativeTextures;
+#elif defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE && RANVIER_COMPOSITING
+    Vector<std::unique_ptr<RvNativeMacTextureInput>> nativeTextures;
 #endif
     // The viewport area invalidated since the last paint.
     IntRect dirty;
@@ -1883,7 +1932,7 @@ static_assert(sizeof(RvMediaVideoConfiguration) == 64 && offsetof(RvMediaVideoCo
 static_assert(sizeof(RvSnapshotOptions) == 64 && offsetof(RvSnapshotOptions, scale) == 8 && offsetof(RvSnapshotOptions, x) == 24 && offsetof(RvSnapshotOptions, quality) == 64 - 8);
 static_assert(sizeof(RvMediaAudioConfiguration) == 64 && offsetof(RvMediaAudioConfiguration, bitrate) == 40 && offsetof(RvMediaAudioConfiguration, spatial_rendering) == 56);
 
-int32_t rv_abi_version(void) { return 63; }
+int32_t rv_abi_version(void) { return 64; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -1909,6 +1958,10 @@ int32_t rv_abi_has(const char* feature)
         return ranvier_print_pdf_supported();
     if (!std::strcmp(feature, "capabilities"))
         return 1;
+#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+    if (!std::strcmp(feature, "iosurface-frames") || !std::strcmp(feature, "iosurface-input"))
+        return 1;
+#endif
     if (!std::strcmp(feature, "svg-view-selection"))
         return 1;
     if (!std::strcmp(feature, "image-decode"))
@@ -2406,6 +2459,17 @@ RvHost* rv_host_create(int32_t width, int32_t height)
         JSC::initialize();
         WTF::initializeMainThread();
         setPlatformStrategies(new RvPlatformStrategies);
+#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+        if (!PlatformDisplay::sharedDisplayIfExists()) {
+            auto rawDisplay = rvMacSpikeDisplay();
+            if (!rawDisplay)
+                return nullptr;
+            auto display = GLDisplay::create(rawDisplay);
+            if (!display)
+                return nullptr;
+            PlatformDisplay::setSharedDisplay(std::make_unique<RvEGLPlatformDisplay>(display.releaseNonNull()));
+        }
+#endif
 #if PLATFORM(MAC)
         // Overlay scrollbars take no layout width, as on the Adwaita ports and in Chromium.
         DeprecatedGlobalSettings::setUsesOverlayScrollbars(true);
@@ -2440,6 +2504,9 @@ RvHost* rv_host_create(int32_t width, int32_t height)
     ranvier_notifications_attach(reinterpret_cast<RvNode*>(&host->document()));
     host->noScript.emplace(host->document().vm());
 #if RANVIER_COMPOSITING
+#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+    host->page->settings().setScrollingCoordinatorEnabled(false);
+#endif
     applyCompositingMode(*host, RV_COMPOSITING_WHEN_NEEDED);
 #endif
     liveHosts.append(host);
@@ -2525,7 +2592,7 @@ void rv_host_destroy(RvHost* host)
         host->traceBuffer.reset();
     }
     static_cast<RvEditorClient&>(host->page->editorClient()).documentWillChange();
-#if (defined(_WIN32) || defined(__linux__)) && RANVIER_COMPOSITING
+#if (defined(_WIN32) || defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE)) && RANVIER_COMPOSITING
     host->nativeTextures.clear();
 #endif
     invalidateFilePicker(*host);
@@ -2567,7 +2634,7 @@ int32_t rv_host_load_html(RvHost* host, const uint8_t* html, int32_t html_length
         return RV_ERR_DETACHED;
     host->documentTransaction = RvHost::DocumentTransaction::Replacing;
     static_cast<RvEditorClient&>(host->page->editorClient()).documentWillChange();
-#if (defined(_WIN32) || defined(__linux__)) && RANVIER_COMPOSITING
+#if (defined(_WIN32) || defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE)) && RANVIER_COMPOSITING
     host->nativeTextures.clear();
 #endif
     invalidateFilePicker(*host);
@@ -2598,7 +2665,7 @@ int32_t rv_host_load_svg(RvHost* host, const uint8_t* svg, int32_t svg_length)
         return RV_ERR_DETACHED;
     host->documentTransaction = RvHost::DocumentTransaction::Replacing;
     static_cast<RvEditorClient&>(host->page->editorClient()).documentWillChange();
-#if (defined(_WIN32) || defined(__linux__)) && RANVIER_COMPOSITING
+#if (defined(_WIN32) || defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE)) && RANVIER_COMPOSITING
     host->nativeTextures.clear();
 #endif
     invalidateFilePicker(*host);
@@ -2950,7 +3017,7 @@ static int32_t composite(RvHost& host, RvCompositor& compositor, LocalFrameView&
         compositor.root->setNeedsDisplay();
     compositor.root->flushCompositingStateForThisLayerOnly();
     view.flushCompositingStateIncludingSubframes();
-#if defined(_WIN32) || defined(__linux__)
+#if defined(_WIN32) || defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE)
     host.nativeTextures.removeAllMatching([&](auto& input) {
         return !input->element->isConnected() || &input->element->document() != &host.document();
     });
@@ -2980,6 +3047,13 @@ static int32_t composite(RvHost& host, RvCompositor& compositor, LocalFrameView&
 #endif
     rootLayer.layer().paint(*compositor.textureMapper);
     compositor.textureMapper->endPainting();
+#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+    for (auto& input : host.nativeTextures) {
+        input->end();
+        if (input->failed)
+            return RV_ERR_PAINT_FAILED;
+    }
+#endif
     if (!rgba) {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         return glGetError() == GL_NO_ERROR ? RV_OK : RV_ERR_PAINT_FAILED;
@@ -3003,13 +3077,56 @@ static int32_t composite(RvHost& host, RvCompositor& compositor, LocalFrameView&
 }
 #endif
 
+#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+#include "RanvierMacGpuSpike.inc"
+#endif
+
 struct RvGpuFrame {
 #if defined(_WIN32) && RANVIER_COMPOSITING
     std::shared_ptr<RvD3D11Surface> surface;
 #elif defined(__linux__) && RANVIER_COMPOSITING
     std::shared_ptr<RvEGLSurface> surface;
+#elif defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+    std::unique_ptr<RvMacSpikeFrame> macFrame;
 #endif
 };
+
+int32_t rv_host_acquire_iosurface_frame(RvHost* host, RvGpuFrame** frame)
+{
+    if (!frame)
+        return RV_ERR_NULL_ARGUMENT;
+    *frame = nullptr;
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_DETACHED;
+#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+    RvMacSpikeFrame* acquired = nullptr;
+    auto result = rv_mac_spike_acquire_frame(host, &acquired);
+    if (result == RV_OK)
+        *frame = new RvGpuFrame { std::unique_ptr<RvMacSpikeFrame>(acquired) };
+    return result;
+#else
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+int32_t rv_host_bind_iosurface(RvHost* host, RvNode* target, void* surface, int32_t flipY)
+{
+#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+    return rv_mac_spike_bind_iosurface(host, target, surface, flipY);
+#else
+    if (!host || !target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
+        return RV_ERR_DETACHED;
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
 
 extern "C" RV_EXPORT int32_t rv_host_bind_d3d11_texture(RvHost* host, RvNode* target, void* texture)
 {
@@ -3088,7 +3205,7 @@ int32_t rv_host_native_texture_changed(RvHost* host, RvNode* target)
         return RV_ERR_WRONG_THREAD;
     if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
         return RV_ERR_DETACHED;
-#if (defined(_WIN32) || defined(__linux__)) && RANVIER_COMPOSITING
+#if (defined(_WIN32) || defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE)) && RANVIER_COMPOSITING
     if (host->inFrame)
         return RV_ERR_UNSUPPORTED;
     auto* element = dynamicDowncast<Element>(*node(target));
@@ -3294,6 +3411,11 @@ int32_t rv_gpu_frame_info(RvGpuFrame* frame, void** texture, int32_t* width, int
     *height = frame->surface->height();
     *format = RV_GPU_RGBA8_PREMULTIPLIED;
     return RV_OK;
+#elif defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+    auto result = rv_mac_spike_frame_info(frame->macFrame.get(), texture, width, height);
+    if (result == RV_OK)
+        *format = RV_GPU_BGRA8_PREMULTIPLIED;
+    return result;
 #else
     return RV_ERR_UNSUPPORTED;
 #endif
@@ -3315,6 +3437,9 @@ int32_t rv_gpu_frame_release(RvGpuFrame* frame)
         return RV_ERR_PAINT_FAILED;
     delete frame;
     return RV_OK;
+#elif defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+    delete frame;
+    return RV_OK;
 #else
     return RV_ERR_UNSUPPORTED;
 #endif
@@ -3323,6 +3448,9 @@ int32_t rv_gpu_frame_release(RvGpuFrame* frame)
 // Paints area, in CSS pixels of the viewport, into its place in rgba, an image of paintSize.
 static int32_t paintArea(RvHost& host, uint8_t* rgba, int32_t length, IntRect area)
 {
+#if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+    ++host.macSpikeReadbackFrames;
+#endif
     auto pixelSize = paintSize(host);
     size_t required = static_cast<size_t>(pixelSize.width()) * pixelSize.height() * 4;
     if (length < 0 || static_cast<size_t>(length) < required)
@@ -4305,8 +4433,7 @@ static void deliverNotificationRequests()
 }
 
 #if PLATFORM(COCOA)
-// RunLoop::cycle() waits up to 50 ms for a source on Cocoa. Zero-limit passes deliver the pending sources without
-// waiting; the kernel can deliver a due timer's port message after them, so a due WebCore shared timer fires directly.
+// Drain ready CF sources without waiting, then deliver already-due WTF timers and the WebCore shared timer.
 static void cycleCocoaRunLoop()
 {
     constexpr int maximumSourcePasses = 64;
@@ -4314,6 +4441,9 @@ static void cycleCocoaRunLoop()
         if (CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, true) != kCFRunLoopRunHandledSource)
             break;
     }
+#if USE(COCOA_EVENT_LOOP)
+    RunLoop::currentSingleton().dispatchDueTimers();
+#endif
     if (CFRunLoopGetNextTimerFireDate(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode) <= CFAbsoluteTimeGetCurrent())
         MainThreadSharedTimer::restartSharedTimer();
 }

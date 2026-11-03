@@ -12,6 +12,8 @@
 import argparse, json, os, pathlib, re, shlex, signal, subprocess, sys, threading, time
 
 root = pathlib.Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(root / 'tests/abi'))
+from abi_expectation import producer_environment, ENVIRONMENT
 TIMEOUT = 600
 
 # Placeholders of the commands, with the workflow expressions they stand for.
@@ -26,6 +28,9 @@ def probe(name, *commands, rid=None, flavor=('slim', 'gpu'), timeout=TIMEOUT, en
 
 
 PROBES = [
+    probe('Verify macOS public IOSurface frames and native texture input',
+          'python -I tests/gpu/mac/qualify_package.py --native-directory {native} --output {work}/mac-gpu-public-qualification',
+          rid='osx-arm64', flavor='gpu', timeout=900),
     probe('Verify Windows native owner-thread exit and font timer teardown',
           'python -I tests/abi/owner_thread_exit.py --native-directory {native} --report {work}/owner-thread-exit.json',
           rid='win-x64', flavor=None, timeout=180),
@@ -421,6 +426,10 @@ def execute(command, log, deadline, env=None):
 
 
 def run(args):
+    stage = pathlib.Path(args.work) / 'out' / args.flavor
+    manifest = json.loads((stage / 'manifest.json').read_text())
+    revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root, text=True).strip()
+    cohort = producer_environment(manifest, args.expected_abi, revision, args.rid, args.flavor)
     values = {'work': str(pathlib.Path(args.work)), 'flavor': args.flavor, 'rid': args.rid}
     logs = pathlib.Path(args.logs or pathlib.Path(args.work) / 'probe-logs')
     logs.mkdir(parents=True, exist_ok=True)
@@ -437,7 +446,10 @@ def run(args):
         outcome = 'PASS'
         with open(path, 'wb') as log:
             for command in entry['commands']:
-                code = execute(argv(command, values, args.no_dump), log, deadline, entry.get('env'))
+                overrides = dict(entry.get('env') or {})
+                if ENVIRONMENT in overrides and overrides[ENVIRONMENT] != cohort[ENVIRONMENT]:
+                    raise ValueError('A probe cannot replace the admitted ABI cohort.')
+                code = execute(argv(command, values, args.no_dump), log, deadline, dict(overrides, **cohort))
                 if code is None:
                     outcome = f'FAIL (timed out after {timeout} s)'
                 elif code:
@@ -482,6 +494,7 @@ def main(argv=None):
     r.add_argument('--rid', required=True)
     r.add_argument('--flavor', required=True)
     r.add_argument('--work', required=True, help='the work directory: the staged runtime is <work>/out/<flavor>')
+    r.add_argument('--expected-abi', type=int, choices=[63, 64], help='Explicitly admit the matching staged ABI; standalone default remains 63.')
     r.add_argument('--logs', help='the directory for the probe logs (default: <work>/probe-logs)')
     r.add_argument('--only', help='run only the probes whose name or commands contain the text')
     r.add_argument('--timeout', type=float, help='seconds each probe may take, in place of its own limit')

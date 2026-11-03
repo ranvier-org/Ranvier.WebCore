@@ -1,0 +1,85 @@
+import importlib.util
+from pathlib import Path
+import signal
+import sys
+import hashlib
+import json
+import tempfile
+import unittest
+
+directory = Path(__file__).parent / 'abi'
+sys.path.insert(0, str(directory))
+spec = importlib.util.spec_from_file_location('cocoa_timer_contract', directory / 'cocoa_timer_contract.py')
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+
+
+class OwnerAssertionVerdict(unittest.TestCase):
+    def test_fatal_after_explicit_ownership_violation(self):
+        self.assertTrue(module.expected_owner_assertion(-signal.SIGILL, 'WTF_TIMER_NEGATIVE_BEFORE_OWNER_VIOLATION\n'))
+
+    def test_success_is_not_an_expected_failure(self):
+        self.assertFalse(module.expected_owner_assertion(0, 'WTF_TIMER_NEGATIVE_BEFORE_OWNER_VIOLATION\n'))
+
+    def test_unrelated_failure_is_not_accepted(self):
+        self.assertFalse(module.expected_owner_assertion(-9, 'WTF_TIMER_NEGATIVE_BEFORE_OWNER_VIOLATION\n'))
+
+    def reference(self, **changes):
+        return {'platform': 'darwin', 'exit': -9, 'helperBefore': 'a' * 64, 'helperAfter': 'a' * 64,
+                'verifiedRuntimeBranch': True,
+                'output': 'WTF_TIMER_OWNER_FATAL_REFERENCE_BEFORE_ASSERT\n', **changes}
+
+    def test_kill_requires_matching_same_helper_owner_reference(self):
+        self.assertTrue(module.expected_owner_assertion(-9, 'WTF_TIMER_NEGATIVE_BEFORE_OWNER_VIOLATION\n', self.reference()))
+
+    def test_different_reference_signal_is_rejected(self):
+        self.assertFalse(module.expected_owner_assertion(-9, 'WTF_TIMER_NEGATIVE_BEFORE_OWNER_VIOLATION\n', self.reference(exit=-5)))
+
+    def test_changed_helper_is_rejected(self):
+        self.assertFalse(module.expected_owner_assertion(-9, 'WTF_TIMER_NEGATIVE_BEFORE_OWNER_VIOLATION\n', self.reference(helperAfter='b' * 64)))
+
+    def test_reference_before_marker_is_required(self):
+        self.assertFalse(module.expected_owner_assertion(-9, 'WTF_TIMER_NEGATIVE_BEFORE_OWNER_VIOLATION\n', self.reference(output='')))
+
+    def test_returned_reference_is_rejected(self):
+        self.assertFalse(module.expected_owner_assertion(-9, 'WTF_TIMER_NEGATIVE_BEFORE_OWNER_VIOLATION\n', self.reference(output='WTF_TIMER_OWNER_FATAL_REFERENCE_BEFORE_ASSERT\nWTF_TIMER_OWNER_FATAL_REFERENCE_RETURNED\n')))
+
+    def test_non_mac_kill_is_not_accepted(self):
+        self.assertFalse(module.expected_owner_assertion(-9, 'WTF_TIMER_NEGATIVE_BEFORE_OWNER_VIOLATION\n', self.reference(platform='linux')))
+
+    def test_missing_verified_runtime_branch_is_rejected(self):
+        self.assertFalse(module.expected_owner_assertion(-9, 'WTF_TIMER_NEGATIVE_BEFORE_OWNER_VIOLATION\n', self.reference(verifiedRuntimeBranch=False)))
+
+    def test_branch_proof_is_bound_to_all_native_bytes(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            native = root / 'native'
+            native.mkdir()
+            (native / 'engine.dylib').write_bytes(b'engine')
+            digest = hashlib.sha256(b'engine').hexdigest()
+            hashes = {'/retained/baseline-native/engine.dylib': digest}
+            value = {'nativeBefore': hashes, 'nativeAfter': hashes,
+                     'ownerFatalProof': {'referenceExit': -9, 'wrongOwnerExit': -9,
+                         'branch': {'verified': True, 'isCurrentResultBit': 0,
+                                    'fatalInstruction': 'brk #0xbb08',
+                                    'frames': ['TimerBase', 'destroy_unchecked', '_pthread_start']}}}
+            path = root / 'proof.json'
+            path.write_text(json.dumps(value), encoding='utf-8')
+            sha = hashlib.sha256(path.read_bytes()).hexdigest()
+            self.assertEqual(module.verified_owner_branch(path, sha, native)['nativeHashes'], {'engine.dylib': digest})
+            (native / 'engine.dylib').write_bytes(b'another build')
+            with self.assertRaisesRegex(AssertionError, 'does not match'):
+                module.verified_owner_branch(path, sha, native)
+
+    def test_timeout_is_not_accepted(self):
+        self.assertFalse(module.expected_owner_assertion(-999, 'WTF_TIMER_NEGATIVE_BEFORE_OWNER_VIOLATION\n'))
+
+    def test_crash_before_admission_is_not_accepted(self):
+        self.assertFalse(module.expected_owner_assertion(-signal.SIGILL, 'unrelated crash'))
+
+    def test_returned_destructor_is_not_accepted(self):
+        self.assertFalse(module.expected_owner_assertion(-signal.SIGILL, 'WTF_TIMER_NEGATIVE_BEFORE_OWNER_VIOLATION\nWTF_TIMER_NEGATIVE_DESTRUCTOR_RETURNED\n'))
+
+
+if __name__ == '__main__':
+    unittest.main()

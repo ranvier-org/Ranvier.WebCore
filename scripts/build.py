@@ -25,6 +25,7 @@ steps = ['fetch', 'prepare', 'configure', 'build', 'package', 'smoke']
 parser = argparse.ArgumentParser()
 parser.add_argument('step', choices=steps + ['all'])
 parser.add_argument('--flavor', choices=['slim', 'gpu', 'lean'], default='slim')
+parser.add_argument('--mac-gpu-spike', action='store_true', help='opt-in experimental osx-arm64 gpu compositor')
 parser.add_argument('--work', default=os.environ.get('RANVIER_WORK'),
                     help='work directory; on Windows keep it short, WebKit paths exceed MAX_PATH under deep roots '
                          '(default C:/rw on Windows, ~/rw elsewhere)')
@@ -48,6 +49,8 @@ parser.add_argument('--rid', default='win-x64', choices=['win-x64', 'win-arm64',
 parser.add_argument('--version', default=os.environ.get('RANVIER_PACKAGE_VERSION') or pins['package']['version'],
                     help='package version (default RANVIER_PACKAGE_VERSION, else pins.json)')
 args = parser.parse_args()
+if args.mac_gpu_spike and (args.rid != 'osx-arm64' or args.flavor != 'gpu'):
+    parser.error('--mac-gpu-spike requires --rid osx-arm64 --flavor gpu')
 
 system, arch = args.rid.split('-')
 windows = system == 'win'
@@ -216,6 +219,9 @@ def prepare():
                  'RanvierNativeTextureInput.h', 'RanvierNativeTextureEGLInput.h', 'RanvierImageEncoding.h', 'RanvierImageEncoding.cpp', 'dom/RanvierDomGlue.h',
                  'RanvierCapabilities.inc', 'RanvierCapabilityCatalogue.inc', 'RanvierSvgViewGlue.h', 'RanvierResourceGlue.h', 'RanvierEventGlue.h', 'RanvierMutationGlue.h', 'RanvierPrintGlue.h', 'RanvierPrintOptions.h', 'RanvierViewportGlue.h', 'RanvierInspectGlue.h', 'RanvierCanvasGlue.h', 'RanvierWakeLockGlue.h', 'RanvierNotificationGlue.h', 'RanvierTransferGlue.h', 'RanvierPointerGlue.h', 'RanvierCanvasPixelsGlue.h', 'RanvierCanvasExportGlue.h']:
         shutil.copy2(root / 'host' / name, api / 'RanvierAbi' / name)
+    if getattr(args, 'mac_gpu_spike', False) or (getattr(args, 'rid', '') == 'osx-arm64' and getattr(args, 'flavor', '') == 'gpu'):
+        for name in ['RanvierMacGpuSpike.h', 'RanvierMacGpuSpike.mm', 'RanvierMacGpuSpike.inc', 'RanvierNativeTextureMacInput.h']:
+            shutil.copy2(root / 'host' / name, api / 'RanvierAbi' / name)
     git('checkout', commit, '--', 'Tools/TestWebKitAPI/CMakeLists.txt', cwd=source)
     cmake = api / 'CMakeLists.txt'
     cmake.write_text(cmake.read_text() + (root / 'host/RanvierWebCoreHost.cmake').read_text(), newline='\n')
@@ -263,7 +269,7 @@ def configure(env):
     build.mkdir(parents=True, exist_ok=True)
     # RANVIER_RID comes before -C: config/common.cmake picks the port from it.
     command = ['cmake', '-S', source, '-B', build, '-G', 'Ninja', f'-DRANVIER_RID={args.rid}',
-               '-C', root / 'config' / f'{args.flavor}.cmake', *stable_interpreters(env)]
+               '-C', root / 'config' / ('mac-gpu-spike.cmake' if getattr(args, 'mac_gpu_spike', False) else f'{args.flavor}.cmake'), *stable_interpreters(env)]
     command.append('-DRANVIER_ENABLE_PDF=' + ('ON' if getattr(args, 'enable_pdf', True) else 'OFF'))
     if windows:
         clang = (llvm / 'clang-cl.exe').as_posix()
@@ -441,7 +447,7 @@ for step in selected:
         run([sys.executable, '-I', root / 'scripts/smoke.py', '--stage', out, '--build-dir', build]
             + (['--no-load'] if system == 'linux' else []))
         if system != 'linux':
-            run([sys.executable, '-I', root / 'scripts/abi_tests.py', '--stage', out, '--source', source])
+            run([sys.executable, '-I', root / 'scripts/abi_tests.py', '--stage', out, '--source', source, '--expected-abi', '64'])
         continue
     env = env or toolchain_env()
     {'configure': configure, 'build': build_step, 'package': package}[step](env)

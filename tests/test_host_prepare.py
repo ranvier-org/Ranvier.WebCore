@@ -10,6 +10,31 @@ import unittest
 
 
 class HostPrepare(unittest.TestCase):
+    def test_mac_input_headers_are_installed_for_the_mac_gpu_profile(self):
+        root = Path(__file__).resolve().parents[1]
+        tree = ast.parse((root / 'scripts/build.py').read_text())
+        prepare = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == 'prepare')
+        cases = [('osx-arm64', 'slim', False, False), ('osx-arm64', 'gpu', False, True),
+                 ('osx-arm64', 'gpu', True, True), ('win-x64', 'gpu', False, False),
+                 ('linux-x64', 'gpu', False, False)]
+        for rid, flavor, opt_in, enabled in cases:
+            with self.subTest(rid=rid, flavor=flavor, opt_in=opt_in), tempfile.TemporaryDirectory() as temporary:
+                source = Path(temporary)
+                api = source / 'Tools/TestWebKitAPI'
+                api.mkdir(parents=True)
+                (api / 'CMakeLists.txt').write_text('# isolated fixture\n')
+                scope = dict(root=root, source=source, shutil=shutil, commit='fixture',
+                    args=types.SimpleNamespace(strict=True, mac_gpu_spike=opt_in, rid=rid, flavor=flavor),
+                    sys=types.SimpleNamespace(executable='unused'), run=lambda *args: None, git=lambda *args, **kwargs: None,
+                    subprocess=types.SimpleNamespace(run=lambda *args, **kwargs: types.SimpleNamespace(returncode=0)))
+                exec(compile(ast.Module(body=[prepare], type_ignores=[]), '<actual-prepare>', 'exec'), scope)
+                scope['prepare']()
+                for name in ('RanvierMacGpuSpike.h', 'RanvierMacGpuSpike.mm', 'RanvierMacGpuSpike.inc', 'RanvierNativeTextureMacInput.h'):
+                    installed = api / 'RanvierAbi' / name
+                    self.assertEqual(installed.exists(), enabled, name)
+                    if enabled:
+                        self.assertEqual(installed.read_bytes(), (root / 'host' / name).read_bytes())
+
     def test_texture_helper_and_host_share_the_configured_compositor_profile(self):
         cmake = shutil.which('cmake')
         if not cmake:

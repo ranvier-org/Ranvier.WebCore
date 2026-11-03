@@ -1,0 +1,159 @@
+{
+  "pairs": {
+    "libRanvierWebCoreHost.dylib": {
+      "rawPath": "C:\\wk\\project2\\macos41631451500-triage\\retained\\ranvier-mac220\\build-mac-gpu-spike\\lib\\ranvier\\libRanvierWebCoreHost.dylib",
+      "packagedPath": "C:\\wk\\project2\\macos41631451500-triage\\retained\\ranvier-mac220\\out\\gpu\\runtimes\\osx-arm64\\native\\libRanvierWebCoreHost.dylib",
+      "before": {
+        "raw": "35bcf45482c2be5e5676e392cd8f2732e40177587147ee629bac7bd506b2987b",
+        "packaged": "9bfd1f8a6a7128dc19630a0e675118632cdab6ea83006c22cfa6760b0439115c"
+      },
+      "uuid": "cdb47d4b417530f6bd8c6953faf16f92",
+      "text": {
+        "address": 15232,
+        "size": 271932,
+        "offset": 15232,
+        "index": 1
+      },
+      "textSha256": "06eb4cebcceddaa0c06dc07999e4e37d46c4a97402f50519a60960027ba659b5",
+      "textBytesEqual": true,
+      "textSymbols": 4987,
+      "imageBase": 0,
+      "after": {
+        "raw": "35bcf45482c2be5e5676e392cd8f2732e40177587147ee629bac7bd506b2987b",
+        "packaged": "9bfd1f8a6a7128dc19630a0e675118632cdab6ea83006c22cfa6760b0439115c"
+      }
+    },
+    "libWebCore.dylib": {
+      "rawPath": "C:\\wk\\project2\\macos41631451500-triage\\retained\\ranvier-mac220\\build-mac-gpu-spike\\WebCore.framework\\Versions\\A\\WebCore",
+      "packagedPath": "C:\\wk\\project2\\macos41631451500-triage\\retained\\ranvier-mac220\\out\\gpu\\runtimes\\osx-arm64\\native\\libWebCore.dylib",
+      "before": {
+        "raw": "18ac3df3deec664d9abb4fda0589bbbdd3ab72be9cd66db9c2df3e601ae1dda8",
+        "packaged": "fa6680992b1b4ce8f0cfe189a33b1aad182681f05139c5e685bcffb3bbd75233"
+      },
+      "uuid": "b6b52e94ebf234f6906becc316d155f1",
+      "text": {
+        "address": 62720,
+        "size": 58218460,
+        "offset": 62720,
+        "index": 1
+      },
+      "textSha256": "93be05af4b2f79fcd89bfab15d40bef69386910c3452ff2ed0878114a44ffaff",
+      "textBytesEqual": true,
+      "textSymbols": 305717,
+      "imageBase": 0,
+      "after": {
+        "raw": "18ac3df3deec664d9abb4fda0589bbbdd3ab72be9cd66db9c2df3e601ae1dda8",
+        "packaged": "fa6680992b1b4ce8f0cfe189a33b1aad182681f05139c5e685bcffb3bbd75233"
+      }
+    },
+    "libJavaScriptCore.dylib": {
+      "rawPath": "C:\\wk\\project2\\macos41631451500-triage\\retained\\ranvier-mac220\\build-mac-gpu-spike\\JavaScriptCore.framework\\Versions\\A\\JavaScriptCore",
+      "packagedPath": "C:\\wk\\project2\\macos41631451500-triage\\retained\\ranvier-mac220\\out\\gpu\\runtimes\\osx-arm64\\native\\libJavaScriptCore.dylib",
+      "before": {
+        "raw": "0d8dd8e0f05b8cd55c12dd70acae881a7771013912e4b32e2b91b31702a1180d",
+        "packaged": "9f401b62e5c68fd62895728133f2b3ac823bd07c775afa52e4585bcf46afa8ab"
+      },
+      "uuid": "3da13cff4cd23a58943aa8b0f8af0bf1",
+      "text": {
+        "address": 15728,
+        "size": 12516840,
+        "offset": 15728,
+        "index": 1
+      },
+      "textSha256": "684f80438ebda77fcad5affce5a5e8df03d447b7c995f236152924d07892b902",
+      "textBytesEqual": true,
+      "textSymbols": 45452,
+      "imageBase": 0,
+      "after": {
+        "raw": "0d8dd8e0f05b8cd55c12dd70acae881a7771013912e4b32e2b91b31702a1180d",
+        "packaged": "9f401b62e5c68fd62895728133f2b3ac823bd07c775afa52e4585bcf46afa8ab"
+      }
+    },
+    "libWebGPU.dylib": {
+      "rawPath": "C:\\wk\\project2\\macos41631451500-triage\\retained\\ranvier-mac220\\build-mac-gpu-spike\\WebGPU.framework\\Versions\\A\\WebGPU",
+      "packagedPath": "C:\\wk\\project2\\macos41631451500-triage\\retained\\ranvier-mac220\\out\\gpu\\runtimes\\osx-arm64\\native\\libWebGPU.dylib",
+      "before": {
+        "raw": "fd8525b78f4dbbb577ff1266bdba4157b60b71e1f3bc4ae351560b6a263d4bd6",
+        "packaged": "f25896ebade7f0b107bd699062d1fbdfe5ec8a0c6b85493ec7fb1733fb29891c"
+      },
+      "uuid": "d268cbef197c32e393ecab87196d6d95",
+      "text": {
+        "address": 4928,
+        "size": 2095564,
+        "offset": 4928,
+        "index": 1
+      },
+      "textSha256": "3cdf7a3e30dc5277c71edc802711ec0cda66f9cde46a04e6ea75f377b3c9f800",
+      "textBytesEqual": true,
+      "textSymbols": 8390,
+      "imageBase": 0,
+      "after": {
+        "raw": "fd8525b78f4dbbb577ff1266bdba4157b60b71e1f3bc4ae351560b6a263d4bd6",
+        "packaged": "f25896ebade7f0b107bd699062d1fbdfe5ec8a0c6b85493ec7fb1733fb29891c"
+      }
+    },
+    "libEGL.dylib": {
+      "rawPath": "C:\\wk\\project2\\macos41631451500-triage\\retained\\ranvier-mac220\\build-mac-gpu-spike\\libEGL.dylib",
+      "packagedPath": "C:\\wk\\project2\\macos41631451500-triage\\retained\\ranvier-mac220\\out\\gpu\\runtimes\\osx-arm64\\native\\libEGL.dylib",
+      "before": {
+        "raw": "6700d553517fffa9f3f657f7aae4c3b13262bae34a03219ede640237fbb10e90",
+        "packaged": "cb2d5331164dfe5c2e6be2b113c7a835787a9e50827a1544fd0b0e035f33724c"
+      },
+      "uuid": "ef95b454ad533672985d30efa18610a7",
+      "text": {
+        "address": 4048,
+        "size": 460,
+        "offset": 4048,
+        "index": 1
+      },
+      "textSha256": "2ee08d48aa0befd29c3f989841cdd4ce27460305a75c20ce14b67e9f94b33dcb",
+      "textBytesEqual": true,
+      "textSymbols": 115,
+      "imageBase": 0,
+      "after": {
+        "raw": "6700d553517fffa9f3f657f7aae4c3b13262bae34a03219ede640237fbb10e90",
+        "packaged": "cb2d5331164dfe5c2e6be2b113c7a835787a9e50827a1544fd0b0e035f33724c"
+      }
+    },
+    "libGLESv2.dylib": {
+      "rawPath": "C:\\wk\\project2\\macos41631451500-triage\\retained\\ranvier-mac220\\build-mac-gpu-spike\\libGLESv2.dylib",
+      "packagedPath": "C:\\wk\\project2\\macos41631451500-triage\\retained\\ranvier-mac220\\out\\gpu\\runtimes\\osx-arm64\\native\\libGLESv2.dylib",
+      "before": {
+        "raw": "a53b71f6705b70cdaa68d0477e1b1f3f94e8847dbe61cf37bc62bdb369e5e968",
+        "packaged": "f66c0299af00619c0a5f172fa8750e9b4807fd74d940b876a611a9ae30630693"
+      },
+      "uuid": "d02ea1e4b7903aeead39a40f65c50640",
+      "text": {
+        "address": 15272,
+        "size": 3262768,
+        "offset": 15272,
+        "index": 1
+      },
+      "textSha256": "e922d97582e04faea301313cdf2c9470c28045b8a2946e9e4d7f78c294da8115",
+      "textBytesEqual": true,
+      "textSymbols": 14592,
+      "imageBase": 0,
+      "after": {
+        "raw": "a53b71f6705b70cdaa68d0477e1b1f3f94e8847dbe61cf37bc62bdb369e5e968",
+        "packaged": "f66c0299af00619c0a5f172fa8750e9b4807fd74d940b876a611a9ae30630693"
+      }
+    }
+  },
+  "limitations": "Text symbols are nearest-address hints, not source lines or verified function extents.",
+  "hostEntries": {
+    "__ZN14RvChromeClient10invalidateERKN7WebCore7IntRectE": 15284,
+    "__ZN14RvChromeClient18invalidateRootViewERKN7WebCore7IntRectE": 143840,
+    "__ZN14RvChromeClient29invalidateContentsAndRootViewERKN7WebCore7IntRectE": 143844,
+    "__ZN14RvChromeClient31invalidateContentsForSlowScrollERKN7WebCore7IntRectE": 143848
+  },
+  "counter": {
+    "sha256": "4c1aaa98754817bc5b6bc2de49fee400ef1476119a3b33531a282ddfd68f89f6",
+    "uuid": "ee25ed9321ac3c3cac946316378eb2e5",
+    "fileAddress": 4294991708,
+    "imageBase": 4294967296
+  },
+  "sourceReceiptSha256": "f57d5607d1cef0b2c84244f3fb2a4c16cff42c429abacfcda1369500b96c0fb8",
+  "sourceArchiveSha256": "2ece47757b0a002fc4122f0f8fc181b879ed95cda29b29224e4d7e88732031e7",
+  "nativeSource": "2a15536b89aa6a72164762803dac76291973d0a0",
+  "symbolMapSha256": "7f95461da2104bb11ef1b8d4764e499d4913534a54b24fb7e8b46fe8dd991199"
+}

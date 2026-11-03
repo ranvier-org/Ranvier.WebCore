@@ -9,6 +9,9 @@ import tempfile
 import time
 import sys
 import unittest
+import json
+import subprocess
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('probes', ROOT / 'scripts/probes.py')
@@ -21,6 +24,12 @@ def run(entries, *options):
     saved = probes.PROBES
     probes.PROBES = entries
     logs = Path(tempfile.mkdtemp())
+    stage = logs / 'out/slim'
+    stage.mkdir(parents=True)
+    revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
+    abi = int(options[options.index('--expected-abi') + 1]) if '--expected-abi' in options else 63
+    (stage / 'manifest.json').write_text(json.dumps(dict(rid='linux-x64', flavor='slim', abi=abi,
+                                                       source=dict(commit=revision, dirty=False))))
     try:
         with contextlib.redirect_stdout(io.TextIOWrapper(io.BytesIO(), write_through=True)):
             code = probes.main(['run', '--rid', 'linux-x64', '--flavor', 'slim', '--work', str(logs),
@@ -31,6 +40,12 @@ def run(entries, *options):
 
 
 class ProbeRunnerTests(unittest.TestCase):
+    def test_explicit64_reaches_the_actual_child_without_inheriting_another_cohort(self):
+        entry = probes.probe('cohort child', 'python -c "import os; assert os.environ[\'RANVIER_ABI_TEST_EXPECTED\']==\'64\'"')
+        with patch.dict(os.environ, RANVIER_ABI_TEST_EXPECTED='65'):
+            code, lines, _ = run([entry], '--expected-abi', '64')
+        self.assertEqual(code, 0, lines)
+
     def test_windows_owner_exit_runs_all_flavors_and_retains_failure_report(self):
         for flavor in ['slim', 'gpu', 'lite']:
             commands = [command for entry in probes.PROBES if probes.applies(entry, 'win-x64', flavor)

@@ -6,13 +6,18 @@
 #   abi_tests.py --stage DIR --source DIR    a directory build.py package staged, and the WebKit checkout
 #                                            (the resources test serves its Ahem font)
 import argparse, glob, json, os, pathlib, shutil, subprocess, sys, tempfile, time
+from contextlib import nullcontext
 
 root = pathlib.Path(__file__).resolve().parents[1]
 tests = root / 'tests' / 'abi'
+sys.path.insert(0, str(tests))
+from abi_expectation import expected_environment
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--stage', required=True)
 parser.add_argument('--source', required=True)
+parser.add_argument('--evidence-directory', type=pathlib.Path)
+parser.add_argument('--expected-abi', type=int)
 args = parser.parse_args()
 
 
@@ -29,7 +34,7 @@ def probe(command):
     """Runs one probe script and records its failure, so one run reports every failing probe."""
     command = [str(c) for c in command]
     print('>', subprocess.list2cmdline(command), flush=True)
-    code = subprocess.run(command).returncode
+    code = subprocess.run(command, env=probe_env).returncode
     if code:
         name = next(pathlib.Path(c).name for c in command if c.endswith('.py'))
         print(f'FAIL {name} (exit {code})', flush=True)
@@ -83,15 +88,28 @@ def report_crash(started, stage, rid, temp):
                 print(f'  {name} +{frame.get("imageOffset", 0):#x} {symbol}', flush=True)
 
 
+stage = pathlib.Path(args.stage)
+manifest = json.loads((stage / 'manifest.json').read_text())
+rid = manifest['rid']
+try:
+    probe_env = expected_environment(manifest, args.expected_abi, os.environ)
+except ValueError as error:
+    parser.error(str(error))
 run([sys.executable, '-I', tests / 'generate_native.py', 'check'])
 run([sys.executable, '-I', root / 'gen' / 'domgen.py', 'check', '--source', args.source])
-stage = pathlib.Path(args.stage)
-rid = json.loads((stage / 'manifest.json').read_text())['rid']
-with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+if args.evidence_directory:
+    evidence = args.evidence_directory.resolve()
+    if evidence.is_relative_to(root) or evidence.is_relative_to(stage.resolve()):
+        parser.error('Retained evidence must be outside the source and staged runtime.')
+    evidence.mkdir(parents=True, exist_ok=False)
+    workspace = nullcontext(str(evidence))
+else:
+    workspace = tempfile.TemporaryDirectory(ignore_cleanup_errors=True)
+with workspace as temp:
     out = pathlib.Path(temp) / 'driver'
     run(['dotnet', 'build', tests / 'RanvierWebCoreAbi.Driver.fsproj', '-c', 'Release', '--nologo', '-v', 'q', '-o', out])
     shutil.copytree(stage / 'runtimes' / rid / 'native', out, dirs_exist_ok=True)
-    env = dict(os.environ, RANVIER_WEBKIT_SOURCE=args.source, RANVIER_WEBCORE_OUT=str(pathlib.Path(temp) / 'run'),
+    env = dict(probe_env, RANVIER_WEBKIT_SOURCE=args.source, RANVIER_WEBCORE_OUT=str(pathlib.Path(temp) / 'run'),
                RANVIER_TRACE='1')
     if sys.platform == 'darwin':
         # A native crash writes .NET's crash report, with the native frames of each thread, next to a minidump.

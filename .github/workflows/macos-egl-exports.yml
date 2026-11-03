@@ -1,0 +1,32 @@
+name: Private Cocoa EGL export control
+
+on:
+  push:
+    branches: [codex/project2-macos220-egl-exports]
+
+permissions:
+  contents: read
+
+jobs:
+  exports:
+    runs-on: macos-26
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: WebKit/WebKit
+          ref: b95c91b1c0ee43cc86d25ff7af73038f67a88e04
+          path: webkit
+          sparse-checkout: |
+            Source/ThirdParty/ANGLE
+            Source/cmake/OptionsCocoa.cmake
+          sparse-checkout-cone-mode: false
+      - name: Compile actual pinned EGL wrapper with original and corrected flags
+        run: python3 -I tests/gpu/mac/egl_visibility.py --source webkit --output qualification
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: private-cocoa-egl-exports
+          path: qualification
+          if-no-files-found: error

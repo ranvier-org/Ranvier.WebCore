@@ -1,0 +1,41 @@
+name: Private Cocoa GPU retained runtime diagnostic
+
+on:
+  push:
+    branches: [codex/project2-macos220-replay]
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  diagnostic:
+    runs-on: macos-26
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Select actual Mac SDK
+        run: |
+          xcode=$(find /Applications -maxdepth 1 -name 'Xcode_26*.app' ! -iname '*beta*' | sort -V | tail -1)
+          test -n "$xcode"
+          echo "DEVELOPER_DIR=$xcode/Contents/Developer" >> "$GITHUB_ENV"
+      - name: Download two immutable producer input artifacts
+        run: |
+          gh run download 41585383488 --repo ranvier-org/Ranvier.WebCore --name private-macos220-206a9c89008fc67a47252885524dd62c3ce41106 --dir "$RUNNER_TEMP/mac220-replay-inputs/full"
+          gh run download 41584465145 --repo ranvier-org/Ranvier.WebCore --name private-cocoa-gpu-host-preflight --dir "$RUNNER_TEMP/mac220-replay-inputs/sdk"
+      - name: Prepare exact presenter SDK
+        run: python3 -I tests/gpu/mac/prepare_sdk.py --directory "$RUNNER_TEMP/ranvier-mac220-sdl"
+      - name: Link retained objects and capture runtime stack
+        run: python3 -I tests/gpu/mac/replay_retained.py --inputs "$RUNNER_TEMP/mac220-replay-inputs" --output "$RUNNER_TEMP/mac220-replay" --sdl "$RUNNER_TEMP/ranvier-mac220-sdl"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: private-cocoa-gpu-replay
+          path: ${{ runner.temp }}/mac220-replay/
+          if-no-files-found: warn
+          retention-days: 3

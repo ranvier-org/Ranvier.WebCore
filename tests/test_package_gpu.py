@@ -34,13 +34,25 @@ class PackagedGpuTests(unittest.TestCase):
         self.assertIn('gpu', inspect.signature(probe.verify).parameters,
                       'Packaged GPU payloads need a shared-frame acceptance mode')
 
-    def package(self, directory, flavor='gpu', rid='win-x64'):
+    def package(self, directory, flavor='gpu', rid='win-x64', abi=63):
         archive = directory / 'runtime.nupkg'
         with zipfile.ZipFile(archive, 'w') as package:
-            package.writestr('manifest.json', json.dumps({'rid': rid, 'flavor': flavor}))
-            library = 'libRanvierWebCoreHost.so' if rid.startswith('linux') else 'RanvierWebCoreHost.dll'
+            package.writestr('manifest.json', json.dumps({'rid': rid, 'flavor': flavor, 'abi': abi}))
+            library = ('libRanvierWebCoreHost.so' if rid.startswith('linux') else
+                       'libRanvierWebCoreHost.dylib' if rid.startswith('osx') else 'RanvierWebCoreHost.dll')
             package.writestr(f'runtimes/{rid}/native/{library}', b'packaged host')
         return archive
+
+    def test_explicit64_scopes_child_environment_and_rejects_mismatched_package(self):
+        with tempfile.TemporaryDirectory() as directory:
+            calls = []
+            with patch('subprocess.run', side_effect=lambda command, **kw: calls.append(kw)):
+                probe.verify(self.package(Path(directory), abi=64), gpu=True, expected_abi=64)
+            self.assertTrue(calls)
+            self.assertTrue(all(row['env']['RANVIER_ABI_TEST_EXPECTED'] == '64' for row in calls))
+            with patch('subprocess.run') as execute, self.assertRaises(ValueError):
+                probe.verify(self.package(Path(directory), abi=63), gpu=True, expected_abi=64)
+            execute.assert_not_called()
 
     def test_gpu_package_runs_shared_frame_lifetime_checks_on_the_extracted_payload(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -63,11 +75,28 @@ class PackagedGpuTests(unittest.TestCase):
 
     def test_gpu_package_gate_rejects_the_wrong_flavor_or_rid_without_running_it(self):
         with tempfile.TemporaryDirectory() as directory:
-            for flavor, rid in [('slim', 'win-x64'), ('gpu', 'osx-arm64'), ('gpu', 'win-arm64')]:
+            for flavor, rid in [('slim', 'win-x64'), ('slim', 'osx-arm64'), ('gpu', 'win-arm64')]:
                 with self.subTest(flavor=flavor, rid=rid), patch('subprocess.run') as run:
                     with self.assertRaisesRegex(ValueError, 'supported GPU'):
                         probe.verify(self.package(Path(directory), flavor, rid), gpu=True)
                     run.assert_not_called()
+
+    def test_mac_gpu_package_checks_public_transport_on_the_extracted_payload(self):
+        with tempfile.TemporaryDirectory() as directory:
+            calls = []
+
+            def execute(command, **kwargs):
+                calls.append(command)
+                if Path(command[2]).name == 'qualify_package.py':
+                    native = Path(command[command.index('--native-directory') + 1])
+                    self.assertEqual((native / 'libRanvierWebCoreHost.dylib').read_bytes(), b'packaged host')
+                    self.assertTrue(kwargs['check'])
+
+            with patch('subprocess.run', side_effect=execute):
+                probe.verify(self.package(Path(directory), rid='osx-arm64'), gpu=True)
+            self.assertEqual(len(calls), 2)
+            self.assertEqual(Path(calls[0][2]).name, 'qualify_package.py')
+            self.assertEqual(Path(calls[1][4]).name, 'mutation_observation.py')
 
     def test_linux_gpu_package_checks_the_extracted_egl_payload_headlessly(self):
         with tempfile.TemporaryDirectory() as directory:

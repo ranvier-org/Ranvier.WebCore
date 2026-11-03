@@ -58,6 +58,20 @@ if (ENABLE_WEBCORE)
         ${TESTWEBKITAPI_DIR}/RanvierAbi
     )
     set(RanvierWebCoreHost_DEFINITIONS BUILDING_TestWebCore NO_GTEST_USAGE)
+    if (RANVIER_MAC_GPU_SPIKE)
+        list(APPEND RanvierWebCoreHost_SOURCES RanvierAbi/RanvierMacGpuSpike.mm)
+        list(APPEND RanvierWebCoreHost_PRIVATE_INCLUDE_DIRECTORIES "${WEBCORE_DIR}/platform/graphics")
+        list(APPEND RanvierWebCoreHost_LIBRARIES ANGLE::GLES ANGLE::EGL)
+        find_library(RANVIER_MAC_FOUNDATION_LIBRARY Foundation REQUIRED)
+        find_library(RANVIER_MAC_IOSURFACE_LIBRARY IOSurface REQUIRED)
+        find_library(RANVIER_MAC_METAL_LIBRARY Metal REQUIRED)
+        list(APPEND RanvierWebCoreHost_LIBRARIES
+            ${RANVIER_MAC_FOUNDATION_LIBRARY}
+            ${RANVIER_MAC_IOSURFACE_LIBRARY}
+            ${RANVIER_MAC_METAL_LIBRARY}
+        )
+        set_source_files_properties(RanvierAbi/RanvierMacGpuSpike.mm PROPERTIES COMPILE_FLAGS "-fobjc-arc")
+    endif ()
     # Accelerated compositing (rv_host_set_accelerated_compositing) needs GraphicsLayerTextureMapper, which
     # coordinated graphics replaces, and the GPU code that patch 0004's USE_GPU_STUB removes.
     if (_ranvier_compositing)

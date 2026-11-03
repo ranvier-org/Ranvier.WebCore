@@ -48,7 +48,8 @@ let main _ =
         | dir -> dir
 
     Directory.CreateDirectory outDir |> ignore
-    require (rv_abi_version () = 63) "ABI version 63"
+    let expectedAbi = AbiCohort.expectedVersion (Environment.GetEnvironmentVariable "RANVIER_ABI_TEST_EXPECTED")
+    require (rv_abi_version () = expectedAbi) $"ABI version {expectedAbi}"
 
     // RANVIER_WEBCORE_PROBE=teardown runs the teardown probes instead of the frames.
     if Environment.GetEnvironmentVariable "RANVIER_WEBCORE_PROBE" = "teardown" then

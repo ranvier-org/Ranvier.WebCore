@@ -1,0 +1,31 @@
+{
+  "fullRun": 41585383488,
+  "fullSource": "206a9c89008fc67a47252885524dd62c3ce41106",
+  "sdkRun": 41584465145,
+  "sdkSource": "25bec3f9f628796ecd244282e2bcda23c86f3d1f",
+  "fullFiles": {
+    "ranvier-mac220/build-mac-gpu-spike/libEGL.dylib": "6700d553517fffa9f3f657f7aae4c3b13262bae34a03219ede640237fbb10e90",
+    "ranvier-mac220/build-mac-gpu-spike/libGLESv2.dylib": "a53b71f6705b70cdaa68d0477e1b1f3f94e8847dbe61cf37bc62bdb369e5e968",
+    "ranvier-mac220/build-mac-gpu-spike/WebCore.framework/Versions/A/WebCore": "3c2a1f365fbb58ecccc5e5b1ca6185ab3dbeef8b66f310991960b3cf3b560905",
+    "ranvier-mac220/build-mac-gpu-spike/JavaScriptCore.framework/Versions/A/JavaScriptCore": "0d8dd8e0f05b8cd55c12dd70acae881a7771013912e4b32e2b91b31702a1180d",
+    "ranvier-mac220/build-mac-gpu-spike/WebGPU.framework/Versions/A/WebGPU": "fd8525b78f4dbbb577ff1266bdba4157b60b71e1f3bc4ae351560b6a263d4bd6",
+    "ranvier-mac220/spike-evidence/receipt.json": "38c8bb2ce5c498297492b963ae621247c714030a2054c6bc87cd9cf319f6d92b",
+    "ranvier-mac220/spike-evidence/mac-gpu-spike": "00fc41949a94be2e9f87bf01941c91e3432fbd30779e4c130d9c6e3c076f9a3a",
+    "ranvier-mac220/spike-evidence/environment.log": "25205f2e2f02dc71036ee827e19c49b893b231a3d1af240e35a3ac55aa8cdcb6",
+    "ranvier-mac220/spike-evidence/xcode.log": "18730ed2ae28a2c9cf0c2d5db549033a4f07089331391a7133b7b32187454fa9",
+    "ranvier-mac220/build-mac-gpu-spike/cmakeconfig.h": "8191d76a4e8416b267d6ccd040d24c9e583e8f0c98335ad846c0890833acc8a4"
+  },
+  "sdkFiles": {
+    "receipt.json": "7ba86fb538ca524e626bcd1a9453bfe530784185e7f72a02b5e24cc586c0c627",
+    "cmakeconfig.h": "8191d76a4e8416b267d6ccd040d24c9e583e8f0c98335ad846c0890833acc8a4",
+    "RanvierWebCoreAbi.cpp.o": "118618ee0a508f610f0c6fc5d9d0e472075ca012a1b2356376563136be8ab0bb",
+    "RanvierWebCoreDom.cpp.o": "af9a24f536f40c207f85528081f9dac6303f1a8866d02dcdb70d252663f57b54",
+    "RanvierWebCoreUia.cpp.o": "d759b23260d47ca80aaa33a5b1336184cc154f0129cba035a5632b5c16d63c4e",
+    "RanvierWebCoreD3D11.cpp.o": "5bdffff305d16831e44f1365d27d832a4d0e1e4749cbb03aa3b7c2b022442571",
+    "RanvierWebCoreEGL.cpp.o": "5bdffff305d16831e44f1365d27d832a4d0e1e4749cbb03aa3b7c2b022442571",
+    "RanvierImageEncoding.cpp.o": "547bb004627979b552a16e5c2a31de2510d0f588efef2956f22c5c4e59d7277d",
+    "RanvierMacGpuSpike.mm.o": "4d071c16b114216151745432b71215fae66d07c6c501c0baff02b34f071b8510"
+  },
+  "configurationIdentical": true,
+  "scope": "New strict Host link from source-equivalent SDK4 objects and identical configuration, against retained full206 engines; original packaged Host was not retained and its exact bytes cannot be reproduced or claimed."
+}
