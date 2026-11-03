@@ -39,6 +39,16 @@ class SourceAdmission(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, 'ancestor MSBuild'):
                     subject.source_identity(root, 'f')
 
+    def test_ancestor_msbuild_response_file_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            parent = Path(directory)
+            root = parent / 'source'
+            root.mkdir()
+            (parent / 'MSBuild.rsp').write_text('-property:Injected=true')
+            with patch.object(subject.subprocess, 'check_output', side_effect=['f\n', '', b'', b'']):
+                with self.assertRaisesRegex(ValueError, 'ancestor MSBuild'):
+                    subject.source_identity(root, 'f')
+
     def test_native_family_rejects_unknown_mixed_case_and_duplicate_versions(self):
         with tempfile.TemporaryDirectory() as directory:
             product = Path(directory)
@@ -50,6 +60,23 @@ class SourceAdmission(unittest.TestCase):
                 assets.write_text(json.dumps({'libraries': dict(good, **{extra: {}})}))
                 with self.assertRaisesRegex(ValueError, 'native graph'):
                     subject.verify_restore(product, product, product, {})
+
+    def test_native_cache_entry_must_be_a_package_inside_cache(self):
+        with tempfile.TemporaryDirectory() as directory:
+            product = Path(directory)
+            assets = product / 'packaging/obj/project.assets.json'
+            assets.parent.mkdir(parents=True)
+            cache = product / 'cache'
+            cache.mkdir()
+            good = {f'Ranvier.WebCore.Native.{rid}/{subject.VERSION}': {'type': 'package', 'path': rid}
+                    for rid in subject.RIDS}
+            first = next(iter(good))
+            for row, message in [({'type': 'project', 'path': 'inside'}, 'not a package'),
+                                 ({'type': 'package', 'path': '../outside'}, 'escapes cache'),
+                                 ({'type': 'package', 'path': str(product / 'outside')}, 'escapes cache')]:
+                assets.write_text(json.dumps({'libraries': dict(good, **{first: row})}))
+                with self.assertRaisesRegex(ValueError, message):
+                    subject.verify_restore(product, product, cache, {})
 
 
 if __name__ == '__main__':

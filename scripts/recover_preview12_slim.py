@@ -482,7 +482,8 @@ def source_identity(root, expected, allow_generated=False):
         require(all(not path or (allow_generated and path.startswith(allowed)) for path in paths),
                 'Unexpected untracked or ignored source input')
     for parent in root.resolve().parents:
-        require(not any(p.name.casefold() in {'directory.build.props', 'directory.build.targets', 'directory.packages.props'}
+        require(not any(p.name.casefold() in {'directory.build.props', 'directory.build.targets', 'directory.packages.props',
+                                              'directory.build.rsp', 'msbuild.rsp'}
                         for p in parent.iterdir()), 'Unexpected ancestor MSBuild import')
 
 
@@ -620,7 +621,10 @@ def verify_restore(product, packages, cache, manifests):
     result = {}
     for rid in RIDS:
         name = f'Ranvier.WebCore.Native.{rid}'
-        folder = cache / resolved[(name + '/' + VERSION).casefold()]['path']
+        row = resolved[(name + '/' + VERSION).casefold()]
+        require(row.get('type') == 'package', 'Native restore library is not a package')
+        folder = (cache / row['path']).resolve()
+        require(folder.is_relative_to(cache.resolve()) and folder != cache.resolve(), 'Native restore cache path escapes cache')
         package = folder / f'{name}.{VERSION}.nupkg'.lower()
         metadata = json.loads((folder / '.nupkg.metadata').read_text())
         require(Path(metadata['source']).resolve() == packages.resolve() and sha(package) == sha(packages / f'{name}.{VERSION}.nupkg'),
