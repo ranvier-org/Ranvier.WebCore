@@ -14,6 +14,46 @@ import sys
 import time
 
 
+def select_theme_entry(entries):
+    candidates = []
+    for row in entries:
+        argv = row.get('arguments') or shlex.split(row['command'])
+        if '-o' not in argv:
+            continue
+        object_path = argv[argv.index('-o') + 1]
+        if not re.search(r'(?:^|/)Source/WebCore/CMakeFiles/(?:WebCore|WebCoreDOMAndRendering)\.dir/', object_path):
+            continue
+        path = Path(row['file'])
+        if path.name == 'RenderThemeCocoa.mm':
+            candidates.append(row)
+        elif path.name.startswith('UnifiedSource') and path.suffix == '.mm':
+            includes = re.findall(r'^\s*#\s*include\s+["<]([^">]+)[">]', path.read_text(), re.M)
+            if any(name == 'rendering/cocoa/RenderThemeCocoa.mm' or name.endswith('/rendering/cocoa/RenderThemeCocoa.mm') for name in includes):
+                candidates.append(row)
+    assert len(candidates) == 1, 'Require exactly one actual engine translation unit containing RenderThemeCocoa.mm'
+    return candidates[0]
+
+
+def textual_prefix_command(argv):
+    original = list(argv)
+    if '-include-pch' not in original:
+        assert not any('include-pch' in value or value.endswith('.pch') for value in original), 'Unknown PCH operand shape'
+        return original, None
+    index = original.index('-include-pch')
+    assert original.count('-include-pch') == 1 and index > 0
+    assert original[index - 1:index + 2] == ['-Xclang', '-include-pch', '-Xclang']
+    pch = original[index + 2]
+    assert pch.endswith('.hxx.pch'), 'Unknown PCH operand shape'
+    header = pch.removesuffix('.pch')
+    prefix = ['-Xclang', '-include', '-Xclang', header]
+    assert any(original[offset:offset + 4] == prefix for offset in range(len(original) - 3)), 'Original textual prefix include is required'
+    removed = original[index - 1:index + 3]
+    result = original[:index - 1] + original[index + 3:]
+    assert '-include-pch' not in result and pch not in result
+    return result, {'removed': removed, 'retainedTextualHeader': header,
+                    'scope': 'No-PCH compile-only validation using the original textual prefix; no matching engine object or link claim'}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--work', type=Path, required=True)
@@ -86,13 +126,10 @@ def main():
         run('headers', ['ninja', '-j1', *targets], build)
         entries = json.loads((build / 'compile_commands.json').read_text())
         if args.theme_only:
-            hosts = [row for row in entries if Path(row['file']).name == 'RenderThemeCocoa.mm']
-            if not hosts:
-                hosts = [row for row in entries if 'CMakeFiles/WebCore.dir/' in row.get('command', '')
-                         and Path(row['file']).name.startswith('UnifiedSource')
-                         and Path(row['file']).suffix == '.mm'
-                         and 'RenderThemeCocoa.mm' in Path(row['file']).read_text()]
-            assert len(hosts) == 1, 'Require exactly one actual engine translation unit containing RenderThemeCocoa.mm'
+            hosts = [select_theme_entry(entries)]
+            receipt['themeSelection'] = {'translationUnit': hosts[0]['file'],
+                                         'translationUnitSha256': sha(Path(hosts[0]['file']))}
+            shutil.copy2(hosts[0]['file'], output / 'theme-translation-unit.mm')
         else:
             hosts = [row for row in entries if 'CMakeFiles/RanvierWebCoreHost.dir/' in row.get('command', '')]
             assert len(hosts) == len({row['file'] for row in hosts}) == 7
@@ -101,13 +138,20 @@ def main():
         receipt['objects'] = []
         dependencies = set()
         for number, entry in enumerate(hosts):
-            argv = shlex.split(entry['command'])
+            argv = list(entry.get('arguments') or shlex.split(entry['command']))
             assert not any(x.startswith('@') for x in argv), 'Unproven compile response-file shape'
             if not args.theme_only:
                 assert '-DRANVIER_COMPOSITING=1' in argv
                 assert '-I' + str(source / 'Source/WebCore/platform/graphics') in argv
             else:
-                assert '-include-pch' not in argv, 'Explicit PCH inputs require separately retained matching objects'
+                receipt['themeOriginalArgv'] = list(argv)
+                argv, adaptation = textual_prefix_command(argv)
+                receipt['themeCommandAdaptation'] = adaptation
+                if adaptation:
+                    header = Path(adaptation['retainedTextualHeader'])
+                    assert header.is_file()
+                    receipt['themeTextualPrefixSha256'] = sha(header)
+                    shutil.copy2(header, output / 'theme-textual-prefix.hxx')
             obj = output / (Path(entry['file']).name + '.o')
             dep = obj.with_suffix('.d')
             argv[argv.index('-o') + 1] = str(obj)
