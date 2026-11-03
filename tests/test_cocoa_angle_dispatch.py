@@ -45,6 +45,10 @@ class CocoaANGLEDispatch(unittest.TestCase):
         self.assertIn('+#elif USE(LIBEPOXY)', self.patch)
         self.assertIn('+        platform/graphics/texmap/TextureMapperANGLEDispatch.h', self.patch)
 
+    def test_spike_stages_internal_angle_headers_without_enabling_webgl(self):
+        self.assertEqual(self.patch.count('+if (ENABLE_WEBGL OR RANVIER_MAC_GPU_SPIKE)'), 2)
+        self.assertNotIn('SET_AND_EXPOSE_TO_BUILD(ENABLE_WEBGL', self.patch)
+
 
 if __name__ == '__main__':
     unittest.main()

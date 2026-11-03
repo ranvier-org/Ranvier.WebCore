@@ -169,3 +169,27 @@ diff --git a/Source/WebCore/PlatformMac.cmake b/Source/WebCore/PlatformMac.cmake
          platform/graphics/PlatformDisplay.h
          platform/graphics/egl/GLContext.h
          platform/graphics/egl/GLContextWrapper.h
+diff --git a/Source/ThirdParty/ANGLE/CMakeLists.txt b/Source/ThirdParty/ANGLE/CMakeLists.txt
+--- a/Source/ThirdParty/ANGLE/CMakeLists.txt
++++ b/Source/ThirdParty/ANGLE/CMakeLists.txt
+@@ -237,7 +237,7 @@
+ 
+ WEBKIT_ADD_PREFIX_HEADER(ANGLE ANGLEPrefix.h PREFIX_LANGUAGES CXX OBJCXX)
+ 
+-if (ENABLE_WEBGL)
++if (ENABLE_WEBGL OR RANVIER_MAC_GPU_SPIKE)
+     set(libglesv2_entry_points_headers
+         src/libGLESv2/entry_points_egl_autogen.h
+         src/libGLESv2/entry_points_egl_ext_autogen.h
+diff --git a/Source/ThirdParty/ANGLE/include/CMakeLists.txt b/Source/ThirdParty/ANGLE/include/CMakeLists.txt
+--- a/Source/ThirdParty/ANGLE/include/CMakeLists.txt
++++ b/Source/ThirdParty/ANGLE/include/CMakeLists.txt
+@@ -31,7 +31,7 @@
+     )
+ endif ()
+ 
+-if (ENABLE_WEBGL)
++if (ENABLE_WEBGL OR RANVIER_MAC_GPU_SPIKE)
+     set(ANGLE_WEBGL_HEADERS
+         export.h
+         ${khr_headers}
