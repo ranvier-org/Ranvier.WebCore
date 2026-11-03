@@ -28,12 +28,14 @@ class RecipeTests(unittest.TestCase):
                 'target_link_libraries(${target} PRIVATE ${${target}_LIBRARIES} ${${target}_PRIVATE_LIBRARIES})\n'
                 'set_target_properties(${target} PROPERTIES LINKER_LANGUAGE CXX)\nendmacro()\n'
                 'set(ENABLE_WEBCORE ON)\nset(RANVIER_MAC_GPU_SPIKE ON)\nset(USE_GPU_STUB ON)\n'
+                f'set(WEBCORE_DIR "{macros.parents[1].as_posix()}/WebCore")\n'
                 'add_library(ANGLE::GLES INTERFACE IMPORTED)\nadd_library(ANGLE::EGL INTERFACE IMPORTED)\n'
                 'file(WRITE "${CMAKE_BINARY_DIR}/cmakeconfig.h" "")\n'
                 f'set(CMAKE_PREFIX_PATH "{(fixture / "sdk").as_posix()}")\n'
                 f'include("{(root / "host/RanvierWebCoreHost.cmake").as_posix()}")\n'
                 'get_target_property(libraries RanvierWebCoreHost LINK_LIBRARIES)\n'
-                'file(WRITE "${CMAKE_BINARY_DIR}/libraries.txt" "${libraries}")\n')
+                'file(WRITE "${CMAKE_BINARY_DIR}/libraries.txt" "${libraries}")\n'
+                'file(WRITE "${CMAKE_BINARY_DIR}/private-includes.txt" "${RanvierWebCoreHost_PRIVATE_INCLUDE_DIRECTORIES}")\n')
             build = fixture / 'build'
             result = subprocess.run(['cmake', '-S', str(fixture), '-B', str(build)],
                                     capture_output=True, text=True)
@@ -42,6 +44,8 @@ class RecipeTests(unittest.TestCase):
             for framework in ['Foundation', 'IOSurface', 'Metal']:
                 self.assertIn((libraries / ('lib' + framework + '.a')).as_posix(), linked)
                 self.assertNotIn('WebKit::' + framework, linked)
+            self.assertIn((macros.parents[1] / 'WebCore/platform/graphics').as_posix(),
+                          (build / 'private-includes.txt').read_text())
 
     def load(self):
         path = Path(__file__).with_name('run.py')
