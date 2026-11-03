@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "armed": true,
+  "armed": false,
   "proofKind": "local-qualified-relayed",
   "testsExecutedByRelay": false,
   "rid": "linux-x64",

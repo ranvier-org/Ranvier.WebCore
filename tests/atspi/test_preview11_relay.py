@@ -41,7 +41,7 @@ class RelayControls(unittest.TestCase):
             with self.subTest(event=event, ref=ref), patch.dict(relay.os.environ,
                     dict(GITHUB_EVENT_NAME=event,GITHUB_REF=ref,GITHUB_SHA='a'*40)), patch.object(relay.subprocess,'check_output') as network:
                 with self.assertRaisesRegex(ValueError,'receiver identity'):
-                    relay.receive(self.policy,Path('not-created'))
+                    relay.receive(dict(self.policy,armed=True),Path('not-created'))
                 network.assert_not_called()
 
     def test_release_target_author_and_asset_metadata_are_bound(self):
@@ -92,6 +92,7 @@ class RelayControls(unittest.TestCase):
         job = text.split('  relay-atspi-preview11-x64:',1)[1].split('  prepare-atspi-preview11:',1)[0]
         self.assertIn("github.event_name == 'workflow_dispatch'",job)
         self.assertIn("inputs.atspi_preview11 == 'relay-x64'",job)
+        self.assertIn('if: ${{ false &&',job)
         self.assertIn("github.ref == 'refs/heads/main'",job)
         self.assertIn('contents: write',job)
         self.assertIn('persist-credentials: false',job)

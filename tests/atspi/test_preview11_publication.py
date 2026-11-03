@@ -18,16 +18,18 @@ spec.loader.exec_module(workflow)
 
 
 class Preview11Preparation(unittest.TestCase):
-    def test_allocated_identity_keeps_actual_inputs_and_candidate_pending(self):
+    def test_allocated_identity_binds_actual_inputs_and_keeps_candidate_pending(self):
         policy = json.loads((release.PROVIDER / 'public-preview11.json').read_text())
-        self.assertIs(policy['armed'], False)
+        self.assertIs(policy['armed'], True)
         self.assertEqual(policy['id'], 'Ranvier.WebCore.Accessibility.Atspi')
         self.assertEqual(policy['version'], '0.1.1-preview.11')
         self.assertEqual(policy['nativeSource'], '8b8db298eba294876c27bd9a3200881f872684df')
         self.assertEqual(policy['abi'], 63)
         self.assertEqual(set(policy['rids']), {'linux-x64', 'linux-arm64'})
-        self.assertEqual(policy['rids']['linux-x64'],dict(packageSha256=None, receiptSha256=None,proofKind='local-qualified-relayed'))
-        self.assertEqual(release.QUALIFICATIONS['linux-x64'],(None,None,None,None,None))
+        self.assertEqual(policy['rids']['linux-x64'],dict(packageSha256='84c3da7dcb0bc0ad7d420bd135c6cd8234296d05c42a329d0c137812280ae6bd',
+                         receiptSha256='1d69946f2073fc0cf128c835a698ba244de86c111cd65bc5fffbc61f581a830c',proofKind='local-qualified-relayed'))
+        self.assertEqual(release.QUALIFICATIONS['linux-x64'],(41640893465,'0ac88abef20548c662877991987898c1e9aa9f0d',
+                         'atspi-preview11-local-x64-qualified','workflow_dispatch','.github/workflows/build.yml'))
         self.assertEqual(policy['rids']['linux-arm64'],dict(proofKind='runner-executed',
                          packageSha256='964e03576b31720e438a1c6c92a73a9c18c56b32687d2136b9a46bf941b9e279',
                          receiptSha256='4e85ebf15f6b410ceecc4af609246ff346343896aa6d2c94b0dac29ca1ade7df'))
@@ -42,7 +44,7 @@ class Preview11Preparation(unittest.TestCase):
         policy = json.loads((release.PROVIDER / 'public-preview11.json').read_text())
         with tempfile.TemporaryDirectory() as directory, patch.object(release.subprocess, 'check_output') as network:
             with self.assertRaisesRegex(ValueError, 'unarmed'):
-                release.qualify_inputs(Path(directory), policy)
+                release.qualify_inputs(Path(directory), dict(policy,armed=False))
             with self.assertRaises(ValueError):
                 release.verify(Path(directory))
             network.assert_not_called()
@@ -94,16 +96,17 @@ class Preview11Preparation(unittest.TestCase):
         for mode in ['prepare', 'publish', 'relay-x64']:
             for job in jobs:
                 with self.subTest(mode=mode, job=job):
-                    self.assertEqual(workflow.permitted(job, atspi11=mode), mode=='relay-x64' and job=='relay-atspi-preview11-x64')
+                    self.assertEqual(workflow.permitted(job, atspi11=mode), mode=='prepare' and job=='prepare-atspi-preview11')
                     self.assertFalse(workflow.permitted(job, atspi='prepare', atspi11=mode))
         for options in [dict(event='push'),dict(ref='refs/heads/other'),dict(recovery=True),dict(recovery4=True),dict(recovery7=True),dict(recovery7windows=True)]:
             with self.subTest(options=options):
-                self.assertFalse(workflow.permitted('relay-atspi-preview11-x64',atspi11='relay-x64',**options))
+                self.assertFalse(workflow.permitted('prepare-atspi-preview11',atspi11='prepare',**options))
 
-    def test_existing_trusted_subject_verifies_before_login_and_remains_disabled(self):
+    def test_main_prepare_keeps_publisher_disabled_and_verifies_before_login(self):
         prepare = workflow.job('prepare-atspi-preview11')
         publish = workflow.job('publish-atspi-preview11')
-        self.assertIn('if: ${{ false &&', prepare)
+        self.assertNotIn('if: ${{ false &&', prepare)
+        self.assertIn("github.ref == 'refs/heads/main'",prepare)
         self.assertIn('if: ${{ false &&', publish)
         self.assertNotIn('id-token: write', prepare)
         self.assertNotIn('NuGet/login', prepare)
