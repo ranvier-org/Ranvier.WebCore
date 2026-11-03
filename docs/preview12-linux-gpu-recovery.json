@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "armed": false,
+  "publicationEnabled": false,
+  "version": "0.1.1-preview.12",
+  "productSource": "d31c3631ed4bbe6520f7f5f7c7e7d34499c38122",
+  "testSource": "f2d5b2b4c0b0404586097696907dc36e83dc87b9",
+  "controllerSource": null,
+  "producerRun": null,
+  "rids": {
+    "linux-x64": {
+      "packageArtifact": { "id": null, "name": "package-linux-x64-gpu", "sha256": null },
+      "probeArtifact": { "id": null, "name": "probe-logs-linux-x64-gpu", "sha256": null },
+      "packageSha256": null,
+      "summarySha256": null,
+      "failureLogSha256": null
+    },
+    "linux-arm64": {
+      "packageArtifact": { "id": null, "name": "package-linux-arm64-gpu", "sha256": null },
+      "probeArtifact": { "id": null, "name": "probe-logs-linux-arm64-gpu", "sha256": null },
+      "packageSha256": null,
+      "summarySha256": null,
+      "failureLogSha256": null
+    }
+  },
+  "qualification": null
+}
