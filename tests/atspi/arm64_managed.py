@@ -1,4 +1,4 @@
-"""Qualify the optional ARM64 provider in an ordinary strict NativeAOT View consumer."""
+"""Qualify an optional Linux provider in an ordinary strict NativeAOT View consumer."""
 import argparse
 import hashlib
 import json
@@ -30,9 +30,16 @@ def validate_publish_log(text):
         raise ValueError('NativeAOT publish contains a trimming/AOT or always-throw diagnostic')
 
 
-def validate_elf(text):
-    if 'ELF64' not in text or 'AArch64' not in text or 'libcoreclr' in text.lower():
-        raise ValueError('Consumer is not an ARM64 ELF without a dynamic CoreCLR dependency')
+def validate_architecture(rid, machine):
+    machines = {'linux-arm64': ('aarch64', 'arm64'), 'linux-x64': ('x86_64', 'amd64')}
+    if machine.lower() not in machines.get(rid, ()):
+        raise ValueError('The runner architecture does not match the selected RID')
+
+
+def validate_elf(text, rid=RID):
+    machine = {'linux-arm64': 'AArch64', 'linux-x64': 'Advanced Micro Devices X86-64'}.get(rid)
+    if not machine or 'ELF64' not in text or machine not in text or 'libcoreclr' in text.lower():
+        raise ValueError('Consumer ELF architecture or dynamic CoreCLR dependency differs')
 
 
 def validate_source_claim(manifest, source_revision):
@@ -40,14 +47,15 @@ def validate_source_claim(manifest, source_revision):
         raise ValueError('Provider source claim does not match the selected producer revision')
 
 
-def validate_assets(libraries, mode, interop_version, provider_version):
+def validate_assets(libraries, mode, interop_version, provider_version, provider_id=PROVIDER_ID):
     if mode not in ('normal', 'traced'):
         raise ValueError('Unknown managed trace mode')
     dom = 'Ranvier.Dom' + ('.Traced' if mode == 'traced' else '') + '/0.1.0-alpha.57'
-    expected = (dom, 'Ranvier.WebCore/' + interop_version, PROVIDER_ID + '/' + provider_version)
+    runtime = 'Ranvier' + ('.Traced' if mode == 'traced' else '') + '/0.1.1-preview.1'
+    expected = (dom, runtime, 'Ranvier.WebCore/' + interop_version, provider_id + '/' + provider_version)
     if not all(name in libraries for name in expected):
         raise ValueError('Published consumer resolved the wrong Core, interop or provider package')
-    ids = ('ranvier.dom', 'ranvier.dom.traced', 'ranvier.webcore', PROVIDER_ID.lower())
+    ids = ('ranvier', 'ranvier.traced', 'ranvier.dom', 'ranvier.dom.traced', 'ranvier.webcore', provider_id.lower())
     selected = [name for name in libraries if name.split('/', 1)[0].lower() in ids]
     if sorted(selected) != sorted(expected):
         raise ValueError('Published consumer contains conflicting Core, interop or provider packages')
@@ -74,7 +82,7 @@ def run_checked(command, log, cwd=None, env=None, timeout=600):
     return text
 
 
-def config_file(path, feed):
+def config_file(path, feed, provider_id=PROVIDER_ID):
     root = ET.Element('configuration')
     sources = ET.SubElement(root, 'packageSources')
     ET.SubElement(sources, 'clear')
@@ -82,7 +90,7 @@ def config_file(path, feed):
     ET.SubElement(sources, 'add', key='nuget', value='https://api.nuget.org/v3/index.json')
     mappings = ET.SubElement(root, 'packageSourceMapping')
     private = ET.SubElement(mappings, 'packageSource', key='private')
-    for pattern in ('Ranvier.WebCore', PROVIDER_ID):
+    for pattern in ('Ranvier.WebCore', provider_id):
         ET.SubElement(private, 'package', pattern=pattern)
     public = ET.SubElement(mappings, 'packageSource', key='nuget')
     ET.SubElement(public, 'package', pattern='*')
@@ -97,10 +105,12 @@ def main():
     parser.add_argument('--package', type=Path, required=True)
     parser.add_argument('--source-revision', required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--rid', choices=('linux-arm64', 'linux-x64'), default=RID)
     parser.add_argument('--display', help='Existing X display for a local harness control; CI omits this option')
     args = parser.parse_args()
-    if platform.machine().lower() not in ('aarch64', 'arm64'):
-        raise RuntimeError('This qualification must execute on an ARM64 runner')
+    rid = args.rid
+    validate_architecture(rid, platform.machine())
+    provider_id = PROVIDER_ID if rid == 'linux-arm64' else 'Ranvier.Private.Accessibility.Atspi.X64Qualification'
     args.output.mkdir(parents=True, exist_ok=False)
     work = args.output.resolve()
     native = args.native.resolve()
@@ -108,8 +118,8 @@ def main():
     with zipfile.ZipFile(package) as archive:
         manifest = json.loads(archive.read('provider-manifest.json'))
         validate_source_claim(manifest, args.source_revision)
-        if manifest['rid'] != RID or manifest['id'] != PROVIDER_ID or manifest['hostSha256'] != sha(native):
-            raise ValueError('The private provider package does not match this ARM64 host')
+        if manifest['rid'] != rid or manifest['id'] != provider_id or manifest['hostSha256'] != sha(native):
+            raise ValueError('The private provider package does not match this host and RID')
         for name, expected in manifest['payloads'].items():
             if hashlib.sha256(archive.read(name)).hexdigest() != expected:
                 raise ValueError('Provider package payload hash mismatch: ' + name)
@@ -118,7 +128,7 @@ def main():
     if not re.fullmatch(r'[A-Za-z0-9_.-]+', manifest['id']) or not re.fullmatch(r'[A-Za-z0-9_.-]+', manifest['version']):
         raise ValueError('Invalid provider package identity')
     shutil.copy2(package, feed / (manifest['id'] + '.' + manifest['version'] + '.nupkg'))
-    interop_version = '0.0.0-arm64.' + os.environ.get('GITHUB_RUN_ID', '1')
+    interop_version = '0.0.0-' + rid.removeprefix('linux-') + '.' + os.environ.get('GITHUB_RUN_ID', '1')
     run_checked(['dotnet', 'pack', str(args.native_source / 'src/Ranvier.WebCore/Ranvier.WebCore.fsproj'),
                  '-c', 'Release', '-m:1', '/nr:false', '-p:Version=' + interop_version,
                  '-p:NuGetAudit=false', '-o', str(feed)], work / 'interop-pack.log', timeout=300)
@@ -126,8 +136,8 @@ def main():
     if not interop.is_file():
         raise RuntimeError('The exact-source managed interop package was not produced')
     config = work / 'NuGet.Config'
-    config_file(config, feed)
-    stage = work / 'native-stage/runtimes' / RID / 'native'
+    config_file(config, feed, provider_id)
+    stage = work / 'native-stage/runtimes' / rid / 'native'
     stage.mkdir(parents=True)
     shutil.copy2(native, stage / native.name)
     if sha(stage / native.name) != manifest['hostSha256']:
@@ -138,13 +148,13 @@ def main():
     for mode in ('normal', 'traced'):
         output = work / ('publish-' + mode)
         command = ['dotnet', 'publish', str(args.view / 'tests/AccessibilityAot/AccessibilityAot.fsproj'),
-                   '-c', 'Release', '-r', RID, '-m:1', '/nr:false', '-v:minimal',
+                   '-c', 'Release', '-r', rid, '-m:1', '/nr:false', '-v:minimal',
                    '-p:RanvierTrace=' + str(mode == 'traced').lower(), '-p:AccessibilityStyleTrial=true',
-                   '-p:AccessibilityAtspiPackageId=' + PROVIDER_ID,
+                   '-p:AccessibilityAtspiPackageId=' + provider_id,
                    '-p:AccessibilityAtspiPackageVersion=' + manifest['version'],
                    '-p:RanvierWebCoreNativeVersion=' + interop_version,
                    '-p:RanvierWebCoreNativeDir=' + str(work / 'native-stage'),
-                   '-p:RanvierWebCoreNativeRid=' + RID, '-p:RestoreConfigFile=' + str(config),
+                   '-p:RanvierWebCoreNativeRid=' + rid, '-p:RestoreConfigFile=' + str(config),
                    '-p:RestorePackagesPath=' + str(cache), '-p:NuGetAudit=false',
                    '-p:UseSharedCompilation=false', '-p:IlcTreatWarningsAsErrors=true',
                    '-p:ILLinkTreatWarningsAsErrors=true', '-p:TrimmerSingleWarn=false',
@@ -153,10 +163,10 @@ def main():
         validate_publish_log(log)
         assets = work / ('artifacts-' + mode) / 'obj/AccessibilityAot/project.assets.json'
         graph = json.loads(assets.read_text())['libraries']
-        validate_assets(graph, mode, interop_version, manifest['version'])
+        validate_assets(graph, mode, interop_version, manifest['version'], provider_id)
         asset_graphs[mode] = {'path': str(assets), 'sha256': sha(assets)}
         binary = output / 'AccessibilityAot'
-        validate_elf(subprocess.check_output(['readelf', '-h', '-d', str(binary)], text=True))
+        validate_elf(subprocess.check_output(['readelf', '-h', '-d', str(binary)], text=True), rid)
         for name, expected in [('libRanvierWebCoreHost.so', manifest['hostSha256']),
                                ('libRanvierWebCoreAtspi.so', manifest['providerSha256'])]:
             if sha(output / name) != expected:
@@ -165,7 +175,7 @@ def main():
 
     children = []
     streams = []
-    receipt = {'architecture': platform.machine(), 'rid': RID, 'sourceRevision': args.source_revision,
+    receipt = {'architecture': platform.machine(), 'rid': rid, 'sourceRevision': args.source_revision,
                'sourceProvenance': manifest['sourceProvenance'], 'hostSha256': sha(native),
                'providerSha256': manifest['providerSha256'], 'packageSha256': sha(package),
                'interopSha256': sha(interop), 'interopVersion': interop_version,
@@ -293,8 +303,8 @@ def main():
                 raise RuntimeError('The existing display socket changed during the control')
         (work / 'managed-aot-receipt.json').write_text(json.dumps(receipt, indent=2))
     if not receipt['allOwnedProcessesExited']:
-        raise RuntimeError('Owned ARM64 test processes remain alive')
-    print('PASS ARM64 managed strict AOT provider profiles')
+        raise RuntimeError('Owned test processes remain alive')
+    print('PASS ' + rid + ' managed strict AOT provider profiles')
 
 
 if __name__ == '__main__':

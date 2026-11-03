@@ -44,6 +44,19 @@ class QualificationReceipt(unittest.TestCase):
         with self.assertRaises(ValueError):
             module.build_summary(*evidence)
 
+    def test_x64_summary_requires_every_rid_to_match(self):
+        evidence = self.evidence()
+        for index in (0, 1, 10):
+            evidence[index]['rid'] = 'linux-x64'
+        self.assertEqual(module.build_summary(*evidence, rid='linux-x64')['rid'], 'linux-x64')
+        for index in (0, 1, 10):
+            evidence[index]['rid'] = 'linux-arm64'
+            with self.assertRaises(ValueError):
+                module.build_summary(*evidence, rid='linux-x64')
+            evidence[index]['rid'] = 'linux-x64'
+        with self.assertRaises(ValueError):
+            module.build_summary(*evidence, rid='linux-riscv64')
+
     def test_changed_runtime_cannot_be_promoted(self):
         evidence = self.evidence()
         evidence[-1]['runs'][0]['nativeAfter']['libRanvierWebCoreHost.so'] = 'e' * 64
