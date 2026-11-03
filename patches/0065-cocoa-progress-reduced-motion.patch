@@ -1,0 +1,122 @@
+diff --git a/Source/WebCore/rendering/RenderTheme.h b/Source/WebCore/rendering/RenderTheme.h
+--- a/Source/WebCore/rendering/RenderTheme.h
++++ b/Source/WebCore/rendering/RenderTheme.h
+@@ -460,6 +460,8 @@
+     bool hasListButtonPressed(const RenderElement&) const;
+ 
+ protected:
++    static bool prefersReducedMotionForRenderer(const RenderElement&);
++
+     struct ColorCache {
+         HashMap<int, Color> systemStyleColors;
+ 
+diff --git a/Source/WebCore/rendering/RenderTheme.cpp b/Source/WebCore/rendering/RenderTheme.cpp
+--- a/Source/WebCore/rendering/RenderTheme.cpp
++++ b/Source/WebCore/rendering/RenderTheme.cpp
+@@ -39,6 +39,7 @@
+ #include "FloatConversion.h"
+ #include "FloatRoundedRect.h"
+ #include "FocusController.h"
+ #include "FontSelector.h"
++#include "ForcedAccessibilityValue.h"
+ #include "FrameSelection.h"
+ #include "GraphicsContext.h"
+@@ -75,6 +76,7 @@
+ #include "SearchFieldPart.h"
+ #include "SearchFieldResultsPart.h"
+ #include "SelectPopoverElement.h"
++#include "Settings.h"
+ #include "SliderThumbElement.h"
+ #include "SliderThumbPart.h"
+ #include "SliderTrackPart.h"
+@@ -753,6 +755,19 @@
+ #endif
+ }
+ 
++bool RenderTheme::prefersReducedMotionForRenderer(const RenderElement& renderer)
++{
++    switch (renderer.settings().forcedPrefersReducedMotionAccessibilityValue()) {
++    case ForcedAccessibilityValue::On:
++        return true;
++    case ForcedAccessibilityValue::Off:
++        return false;
++    case ForcedAccessibilityValue::System:
++        return Theme::singleton().userPrefersReducedMotion();
++    }
++    return false;
++}
++
+ OptionSet<ControlStyle::State> RenderTheme::extractControlStyleStatesForRendererInternal(const RenderElement& renderer) const
+ {
+     OptionSet<ControlStyle::State> states;
+@@ -797,6 +812,10 @@
+     }
+     if (!renderer.writingMode().isHorizontal())
+         states.add(ControlStyle::State::VerticalWritingMode);
++#if PLATFORM(MAC)
++    if (renderer.style().usedAppearance() == StyleAppearance::ProgressBar && prefersReducedMotionForRenderer(renderer))
++        states.add(ControlStyle::State::ReducedMotion);
++#endif
+     return states;
+ }
+ 
+diff --git a/Source/WebCore/rendering/cocoa/RenderThemeCocoa.mm b/Source/WebCore/rendering/cocoa/RenderThemeCocoa.mm
+--- a/Source/WebCore/rendering/cocoa/RenderThemeCocoa.mm
++++ b/Source/WebCore/rendering/cocoa/RenderThemeCocoa.mm
+@@ -3811,7 +3811,7 @@
+         float progress = fmodf(elapsed.value(), 1.0f);
+         bool reverseDirection = static_cast<int>(elapsed.value()) % 2;
+ 
+-        if (Theme::singleton().userPrefersReducedMotion()) {
++        if (prefersReducedMotionForRenderer(renderer)) {
+             barInlineSize = trackInlineSize;
+ 
+             float difference = progress * (reducedMotionProgressAnimationMaxOpacity - reducedMotionProgressAnimationMinOpacity);
+diff --git a/Source/WebCore/platform/graphics/controls/ControlStyle.h b/Source/WebCore/platform/graphics/controls/ControlStyle.h
+--- a/Source/WebCore/platform/graphics/controls/ControlStyle.h
++++ b/Source/WebCore/platform/graphics/controls/ControlStyle.h
+@@ -54,6 +54,7 @@
+         ListButton               = 1 << 15,
+         ListButtonPressed        = 1 << 16,
+         VerticalWritingMode      = 1 << 17,
++        ReducedMotion            = 1 << 18,
+     };
+     OptionSet<State> states;
+     float fontSize { 12 };
+diff --git a/Source/WebCore/platform/graphics/controls/ControlStyle.cpp b/Source/WebCore/platform/graphics/controls/ControlStyle.cpp
+--- a/Source/WebCore/platform/graphics/controls/ControlStyle.cpp
++++ b/Source/WebCore/platform/graphics/controls/ControlStyle.cpp
+@@ -87,6 +87,9 @@
+     case ControlStyle::State::VerticalWritingMode:
+         ts << "vertical-writing-mode"_s;
+         break;
++    case ControlStyle::State::ReducedMotion:
++        ts << "reduced-motion"_s;
++        break;
+     }
+     return ts;
+ }
+diff --git a/Source/WebCore/platform/graphics/mac/controls/ProgressBarMac.mm b/Source/WebCore/platform/graphics/mac/controls/ProgressBarMac.mm
+--- a/Source/WebCore/platform/graphics/mac/controls/ProgressBarMac.mm
++++ b/Source/WebCore/platform/graphics/mac/controls/ProgressBarMac.mm
+@@ -120,6 +120,11 @@
+     bool isIndeterminate = progressBarPart->position() < 0;
+     bool isActive = style.states.contains(ControlStyle::State::WindowActive);
+ 
++    constexpr double reducedMotionPhaseSeconds = 0.5;
++    double animationTime = isIndeterminate && style.states.contains(ControlStyle::State::ReducedMotion)
++        ? progressBarPart->animationStartTime().seconds() + reducedMotionPhaseSeconds
++        : MonotonicTime::now().secondsSinceEpoch().seconds();
++
+     auto coreUISizeForProgressBarSize = [](NSControlSize size) -> CFStringRef {
+         switch (size) {
+         case NSControlSizeMini:
+@@ -144,7 +149,7 @@
+         (__bridge NSString *)kCUIPresentationStateKey: (__bridge NSString *)(isActive ? kCUIPresentationStateActiveKey : kCUIPresentationStateInactive),
+         (__bridge NSString *)kCUIOrientationKey: (__bridge NSString *)kCUIOrientHorizontal,
+         (__bridge NSString *)kCUIAnimationStartTimeKey: @(progressBarPart->animationStartTime().seconds()),
+-        (__bridge NSString *)kCUIAnimationTimeKey: @(MonotonicTime::now().secondsSinceEpoch().seconds())
++        (__bridge NSString *)kCUIAnimationTimeKey: @(animationTime)
+     }];
+ 
+     GraphicsContextStateSaver stateSaver(context);

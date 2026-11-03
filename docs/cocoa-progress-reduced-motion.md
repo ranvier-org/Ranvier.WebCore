@@ -1,0 +1,9 @@
+# Cocoa progress reduced-motion policy
+
+The page policy follows the existing media-feature resolver: On selects reduced motion, Off selects ordinary motion, and System queries the platform theme. One shared resolver supplies the vector painter and the internal native progress-control style bit. No public ABI, provider or dependency is added.
+
+For the default legacy Cocoa painter, an indeterminate reduced-motion control supplies `animationStartTime + 0.5` to the existing CoreUI animation-time key. Ordinary motion keeps the monotonic clock; determinate controls retain their original clock. The existing native appearance, widget, size and value keys are unchanged. The explicitly selected vector path retains its reduced/full-width versus ordinary/quarter-width geometry. FormControlRefresh is not enabled globally.
+
+The host's default preference remains Off. System delegation is exercised by a private, matching-source Host test seam; it is not a new public preference mapping. The DOM fixture verifies the untouched default legacy style and a separate per-host vector selection, On/Off/System with both controlled system values, repeated fixed reduced pixels, advancing ordinary frames, and a visible reduced indicator distinct from an actual empty track.
+
+The source policy/clock test compiles six policy combinations and 144 clock cases from the patched source. A separate actual macOS26 CoreUI clock diagnostic proved fixed-clock repeatability, advancing indeterminate frames and a visible fixed phase. Its process-local system getter was not invoked by CoreUI, so that diagnostic does not prove control of every internal OS accessibility path. Actual patched-engine DOM/runtime qualification remains pending the matching Mac source/configuration build. Historical vector-only expectations on the legacy painter remain archived as a failed baseline and are not the current DOM fixture.
