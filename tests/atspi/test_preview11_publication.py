@@ -28,7 +28,7 @@ class Preview11Preparation(unittest.TestCase):
         self.assertEqual(set(policy['rids']), {'linux-x64', 'linux-arm64'})
         for rid, pins in policy['rids'].items():
             self.assertEqual(pins, dict(packageSha256=None, receiptSha256=None))
-            self.assertEqual(release.QUALIFICATIONS[rid], (None, None, None))
+            self.assertEqual(release.QUALIFICATIONS[rid], (None, None, None, None, None))
         pins = json.loads((release.PROVIDER / 'preview11-publication.json').read_text())
         for name in ['candidateRun', 'candidateHead', 'packageSha256', 'candidateReceiptSha256']:
             self.assertIsNone(pins[name])
@@ -46,7 +46,24 @@ class Preview11Preparation(unittest.TestCase):
         with patch.object(release.subprocess, 'check_output') as network:
             for run, head in [(None, None), (True, 'a' * 40), (0, 'a' * 40), (1, 'A' * 40), (1, 'a' * 39)]:
                 with self.subTest(run=run, head=head), self.assertRaises(ValueError):
-                    release.check_run(run, head)
+                    release.check_run(run, head, 'push', '.github/workflows/atspi-arm64-qualification.yml')
+            network.assert_not_called()
+
+    def test_actual_run_event_workflow_head_and_outcome_are_independently_bound(self):
+        path = '.github/workflows/atspi-arm64-qualification.yml'
+        for event in ['push', 'workflow_dispatch']:
+            expected = dict(head_sha='a' * 40, event=event, path=path, conclusion='success')
+            with patch.object(release.subprocess, 'check_output', return_value=json.dumps(expected)):
+                release.check_run(1, 'a' * 40, event, path)
+            for key, value in [('event', 'pull_request'), ('path', '.github/workflows/build.yml'),
+                               ('head_sha', 'b' * 40), ('conclusion', 'failure')]:
+                with self.subTest(event=event, key=key), patch.object(release.subprocess, 'check_output', return_value=json.dumps(dict(expected, **{key:value}))):
+                    with self.assertRaises(ValueError):
+                        release.check_run(1, 'a' * 40, event, path)
+        with patch.object(release.subprocess, 'check_output') as network:
+            for event, workflow in [(None, None), ('pull_request', path), ('push', None), ('push', '../workflow.yml')]:
+                with self.assertRaises(ValueError):
+                    release.check_run(1, 'a' * 40, event, workflow)
             network.assert_not_called()
 
     def test_publication_requires_exact_p11_candidate(self):

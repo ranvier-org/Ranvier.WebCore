@@ -18,8 +18,8 @@ IDENTITY = 'Ranvier.WebCore.Accessibility.Atspi'
 VERSION = '0.1.1-preview.11'
 ARTIFACT = 'atspi-preview11-candidate'
 QUALIFICATIONS = {
-    'linux-x64': (None, None, None),
-    'linux-arm64': (None, None, None),
+    'linux-x64': (None, None, None, None, None),
+    'linux-arm64': (None, None, None, None, None),
 }
 
 
@@ -42,13 +42,15 @@ def command(arguments, **kwargs):
     return subprocess.run(arguments, check=True, timeout=240, **kwargs)
 
 
-def check_run(run, head):
+def check_run(run, head, event, workflow):
     if type(run) is not int or run <= 0 or not isinstance(head, str) or not re.fullmatch('[0-9a-f]{40}', head):
         raise ValueError('An accepted exact P11 qualification run and head are required.')
+    if event not in ('push', 'workflow_dispatch') or not isinstance(workflow, str) or not re.fullmatch(r'\.github/workflows/[A-Za-z0-9_.-]+\.yml', workflow):
+        raise ValueError('The exact reviewed run event and workflow path are required.')
     result = subprocess.check_output(['gh', 'api', 'repos/ranvier-org/Ranvier.WebCore/actions/runs/' + str(run)],
                                      text=True, timeout=30)
     record = json.loads(result)
-    if record['head_sha'] != head or record['conclusion'] != 'success' or record['event'] != 'workflow_dispatch':
+    if record['head_sha'] != head or record['conclusion'] != 'success' or record['event'] != event or record['path'] != workflow:
         raise ValueError('The selected retained workflow run differs from its reviewed identity.')
     return record
 
@@ -76,8 +78,8 @@ def absent_public_version():
 def qualify_inputs(work, policy):
     aggregate.validate_policy(policy)
     inputs, receipts = {}, {}
-    for rid, (run, head, artifact) in QUALIFICATIONS.items():
-        check_run(run, head)
+    for rid, (run, head, artifact, event, workflow) in QUALIFICATIONS.items():
+        check_run(run, head, event, workflow)
         directory = work / rid
         if not isinstance(artifact, str) or not re.fullmatch('[A-Za-z0-9_.-]+', artifact):
             raise ValueError('An exact reviewed qualification artifact name is required.')
@@ -124,7 +126,7 @@ def validate_publication_pins(pins):
 def verify(work):
     pins = json.loads((PROVIDER / 'preview11-publication.json').read_text())
     validate_publication_pins(pins)
-    run = check_run(pins['candidateRun'], pins['candidateHead'])
+    run = check_run(pins['candidateRun'], pins['candidateHead'], 'workflow_dispatch', '.github/workflows/build.yml')
     if run['path'] != '.github/workflows/build.yml':
         raise ValueError('The reviewed candidate must come from the existing build workflow.')
     bundle = work / 'candidate'
