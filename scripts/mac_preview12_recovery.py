@@ -18,6 +18,14 @@ VERSION = '0.1.1-preview.12'
 CONTROL = Path(__file__).resolve().parents[1]
 SLIM_RUN = 41719479076
 PREWARM_RUN = 41720640443
+INDEPENDENT_GPU_RUN = 41734171619
+INDEPENDENT_GPU_PLAN = 126258941516
+INDEPENDENT_GPU_PREBUILT = 126259020929
+INDEPENDENT_GPU_NATIVE = {
+    'linux-x64': 126259024160,
+    'win-x64': 126259024306,
+    'linux-arm64': 126259024307,
+}
 HELPER_SOURCE = '3f187c76e404ace64791d8996591ca8bd97183bf'
 HELPER_BLOBS = {
     'tests/controls/build_cocoa_sidecars.py': 'd2ff164b0ce774ed5c129e95046028083d411425',
@@ -91,6 +99,38 @@ def recoverable_mac_job(jobs):
     raise ValueError('Require a failed Mac job or an explicitly unacquired cancellation')
 
 
+def independent_gpu_expansion(run, jobs):
+    require_run(run, 'v' + VERSION, 'workflow_dispatch')
+    if (run.get('id') != INDEPENDENT_GPU_RUN or type(run.get('run_attempt')) is not int
+            or run['run_attempt'] != 1):
+        raise ValueError('Only the exact independently dispatched GPU run/attempt is eligible')
+    plan = [job for job in jobs if job.get('name') == 'plan']
+    native = [job for job in jobs if job.get('name', '').startswith('native')]
+    prebuilt = [job for job in jobs if job.get('name', '').startswith('prebuilt')]
+    if (len(plan) != 1 or plan[0].get('id') != INDEPENDENT_GPU_PLAN
+            or plan[0].get('status') != 'completed' or plan[0].get('conclusion') != 'success'):
+        raise ValueError('The exact GPU plan must be completed successfully before excluding its run')
+    if (len(prebuilt) != 1 or prebuilt[0].get('id') != INDEPENDENT_GPU_PREBUILT
+            or prebuilt[0].get('name') != 'prebuilt' or prebuilt[0].get('status') != 'completed'
+            or prebuilt[0].get('conclusion') != 'skipped'):
+        raise ValueError('An active, ambiguous or Mac prebuilt route cannot be excluded')
+    actual = {}
+    for job in native:
+        match = re.match(r'^native \(([^,]+),', job.get('name', ''))
+        if (not match or match[1] in actual or type(job.get('id')) is not int
+                or job.get('status') not in ['queued', 'in_progress', 'completed']):
+            raise ValueError('Require the fully expanded, unambiguous three-RID GPU job set')
+        actual[match[1]] = job['id']
+    if actual != INDEPENDENT_GPU_NATIVE:
+        raise ValueError('GPU expansion contains a Mac/unknown RID or differs from the exact three native jobs')
+    for job in [*plan, *prebuilt, *native]:
+        if (job.get('head_sha') != PRODUCT_SOURCE or job.get('run_id') != INDEPENDENT_GPU_RUN
+                or type(job.get('run_attempt')) is not int or job['run_attempt'] != 1):
+            raise ValueError('The expanded GPU job source/run/attempt differs')
+    return dict(run=run['id'], attempt=1, classification='independent-three-rid-no-mac',
+                completedPlan=plan[0], skippedPrebuilt=prebuilt[0], nativeJobs=native)
+
+
 def recovery_boundary(flavor):
     def api(route):
         return json.loads(subprocess.check_output(['gh', 'api', 'repos/ranvier-org/Ranvier.WebCore/' + route], text=True, timeout=30))
@@ -113,10 +153,14 @@ def recovery_boundary(flavor):
     if listing['total_count'] != len(candidates):
         raise ValueError('The complete immutable-tag dispatch list is required')
     checked = []
+    independent = []
     for run in candidates:
         if run.get('head_sha') != PRODUCT_SOURCE:
             continue
         require_run(run, 'v' + VERSION, 'workflow_dispatch')
+        if run['id'] == INDEPENDENT_GPU_RUN:
+            independent.append(independent_gpu_expansion(run, jobs(run['id'])))
+            continue
         if run['status'] != 'completed':
             raise ValueError('An immutable-F GPU dispatch is still active; no overlapping recovery')
         run_jobs = jobs(run['id'])
@@ -124,7 +168,8 @@ def recovery_boundary(flavor):
             checked.append(dict(run=run['id'], macJob=recoverable_mac_job(run_jobs)))
     if slim.get('conclusion') == 'success' and not checked:
         raise ValueError('Wait for the automatically dispatched tag GPU Mac job; no absent-list shortcut')
-    return dict(slimRun=SLIM_RUN, prewarmRun=PREWARM_RUN, prewarmMacJob=prewarm_job, tagGpuRuns=checked)
+    return dict(slimRun=SLIM_RUN, prewarmRun=PREWARM_RUN, prewarmMacJob=prewarm_job,
+                tagGpuRuns=checked, independentNonMacGpuRuns=independent)
 
 
 def main():

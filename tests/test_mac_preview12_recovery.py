@@ -1,4 +1,5 @@
 import importlib.util
+import copy
 import json
 from pathlib import Path
 import re
@@ -144,6 +145,72 @@ class WorkflowTests(unittest.TestCase):
         self.assertIn('if: always()', text)
         self.assertNotIn('id-token:', text)
         self.assertNotIn('contents: write', text)
+
+
+class IndependentGpuTests(unittest.TestCase):
+    def setUp(self):
+        self.run = dict(id=recovery.INDEPENDENT_GPU_RUN, run_attempt=1, head_sha=recovery.PRODUCT_SOURCE,
+            head_branch='v' + recovery.VERSION, event='workflow_dispatch', path='.github/workflows/build.yml', status='in_progress')
+        common = dict(run_id=self.run['id'], run_attempt=1, head_sha=recovery.PRODUCT_SOURCE)
+        self.jobs = [common | dict(id=recovery.INDEPENDENT_GPU_PLAN, name='plan', status='completed', conclusion='success'),
+                     common | dict(id=recovery.INDEPENDENT_GPU_PREBUILT, name='prebuilt', status='completed', conclusion='skipped')]
+        self.jobs.extend(common | dict(id=identity, name='native (' + rid + ', runner, work)', status='in_progress', conclusion=None)
+                         for rid, identity in recovery.INDEPENDENT_GPU_NATIVE.items())
+
+    def test_exact_expanded_non_mac_run_can_be_live(self):
+        result = recovery.independent_gpu_expansion(self.run, self.jobs)
+        self.assertEqual(result['classification'], 'independent-three-rid-no-mac')
+        self.assertEqual(len(result['nativeJobs']), 3)
+
+    def test_boundary_excludes_only_known_non_mac_run_while_live(self):
+        slim = self.run | dict(id=recovery.SLIM_RUN, event='push', status='completed', conclusion='failure')
+        prewarm = self.run | dict(id=recovery.PREWARM_RUN, head_branch='main', status='completed', conclusion='failure')
+        prewarm_jobs = dict(total_count=1, jobs=[dict(name='native (osx-arm64, macos-26, work)', status='completed', conclusion='failure')])
+        for identity, allowed in [(recovery.INDEPENDENT_GPU_RUN, True), (99, False)]:
+            listing = dict(total_count=1, workflow_runs=[self.run | dict(id=identity)])
+            replies = [slim, prewarm, prewarm_jobs, listing, dict(total_count=len(self.jobs), jobs=self.jobs)]
+            with self.subTest(run=identity), patch.object(recovery.subprocess, 'check_output', side_effect=[json.dumps(x) for x in replies]):
+                if allowed:
+                    value = recovery.recovery_boundary('gpu')
+                    self.assertEqual(len(value['independentNonMacGpuRuns']), 1)
+                    self.assertEqual(value['tagGpuRuns'], [])
+                else:
+                    with self.assertRaises(ValueError):
+                        recovery.recovery_boundary('gpu')
+
+    def test_run_source_branch_path_event_attempt_and_id_are_fixed(self):
+        for field, value in [('id', 1), ('run_attempt', 2), ('head_sha', 'a' * 40), ('head_branch', 'main'),
+                             ('event', 'push'), ('path', '.github/workflows/other.yml')]:
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                recovery.independent_gpu_expansion(self.run | {field: value}, self.jobs)
+
+    def test_plan_must_be_the_exact_completed_successful_job(self):
+        for change in [dict(status='in_progress'), dict(conclusion='failure'), dict(id=1)]:
+            jobs = copy.deepcopy(self.jobs)
+            jobs[0].update(change)
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                recovery.independent_gpu_expansion(self.run, jobs)
+
+    def test_missing_duplicate_or_mac_native_expansion_rejects(self):
+        cases = [self.jobs[:-1], self.jobs + [self.jobs[-1]], self.jobs + [self.jobs[-1] | dict(name='native (osx-arm64, macos-26, work)', id=99)]]
+        for jobs in cases:
+            with self.subTest(count=len(jobs)), self.assertRaises(ValueError):
+                recovery.independent_gpu_expansion(self.run, jobs)
+
+    def test_prebuilt_must_be_the_single_skipped_route(self):
+        for change in [dict(name='prebuilt (osx-arm64)'), dict(status='in_progress'), dict(conclusion='success')]:
+            jobs = copy.deepcopy(self.jobs)
+            jobs[1].update(change)
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                recovery.independent_gpu_expansion(self.run, jobs)
+
+    def test_job_identities_and_expansion_state_reject_changes(self):
+        for index, change in [(2, dict(id=1)), (2, dict(run_id=1)), (2, dict(run_attempt=2)),
+                              (2, dict(head_sha='a' * 40)), (2, dict(status='unknown'))]:
+            jobs = copy.deepcopy(self.jobs)
+            jobs[index].update(change)
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                recovery.independent_gpu_expansion(self.run, jobs)
 
 
 if __name__ == '__main__':
