@@ -259,7 +259,8 @@ def main():
                         reference_exit, reference_output = -999, repr(error)
                     reference = {'platform': sys.platform, 'argv': reference_command, 'exit': reference_exit,
                         'output': reference_output, 'helperBefore': helper_before,
-                        'helperAfter': hashlib.sha256(helper.read_bytes()).hexdigest()}
+                        'helperAfter': hashlib.sha256(helper.read_bytes()).hexdigest(),
+                        'interpretation': 'Contextually supported by reviewed identical-runtime branch proof and same-helper reference; each new SIGKILL cause is not directly observed.'}
                     try:
                         reference['runtimeBranchProof'] = verified_owner_branch(args.owner_assertion_proof,
                             args.owner_assertion_proof_sha256, args.native_directory)
@@ -274,6 +275,7 @@ def main():
             else:
                 expected_failure, verdict = False, int(code != 0)
             report['results'].append({'mode': mode, 'exit': code, 'expectedOwnerAssertionTermination': expected_failure,
+                                      'ownerAssertionEvidence': 'contextual same-runtime branch and live same-helper reference' if expected_failure and code == -9 else None,
                                       'verdict': verdict, 'report': target.name, 'log': log.name})
             args.output.write_text(json.dumps(report, indent=2))
             print(mode, code, flush=True)
