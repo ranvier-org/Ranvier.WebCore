@@ -11,7 +11,7 @@ does not qualify ARM. `qualification-receipt.example.json` is the unqualified su
 Fill it only from actual raw reports and retain those reports for independent review.
 
 `public-cohort.example.json` is unarmed and has no initial provider version or expected input hashes. The allocated
-Native P9 version/source is recorded, but matching producer artifacts, actual runtime receipts and initial public
+Native P10 version/source (`233c8045`) is recorded, but matching producer artifacts, actual runtime receipts and initial public
 version coordination remain necessary. P8's immutable failed producer remains historical evidence.
 Supply a cohort spec with the matching allocated version, exact Native/provider source claims, and each private
 package/independently supplied receipt SHA256. An input map names each RID's package and receipt files:
@@ -48,3 +48,16 @@ remain separate.
 Hermetic tests exercise metadata and malformed inputs without loading synthetic ELF headers. An isolated private
 SDK layout control may prove that NuGet selects the x64/ARM64 asset by RID; it is not ARM or renderer execution proof.
 Actual per-RID qualification remains required before the public aggregate can be produced from the armed spec.
+
+The disabled artifact workflow also restores/publishes the resulting package through the ordinary SDK for each RID.
+Both selection checks are explicitly `--layout-only`; the x64 runner does not execute ARM64 code. Actual per-RID
+renderer/protocol and six-profile NativeAOT receipts remain separate prerequisites. The workflow retains the exact
+selected cohort file, both SDK receipts and `release-candidate.json`, binding their hashes to the package bytes.
+That record always has `publicationEnabled=false` and preserves unverified source-claim metadata.
+
+For initial distribution, Root coordinates the reserved public ID's matching version before assembly; independent
+acceptance then reviews the exact candidate bytes and uses the organization's configured NuGet trusted-publishing route. Existing Native publishing
+uses the `build.yml` policy and `NUGET_USER`; this optional artifact workflow does not assume that policy authorizes
+it, request a token, or push a package. Its job remains statically disabled and its example version/hashes remain
+null until the matching actual inputs are supplied. Historical private P9 x64/ARM qualification is retained and is
+not relabeled as P10 or a final public View46 consumer graph.
