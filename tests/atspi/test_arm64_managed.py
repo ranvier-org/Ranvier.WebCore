@@ -83,6 +83,18 @@ class ManagedArm64Qualification(unittest.TestCase):
             with self.subTest(extra=extra), self.assertRaises(ValueError):
                 module.validate_assets(dict(libraries, **{extra: {}}), 'traced', '0.0.0-arm64.1', '0.0.0-ci.5')
 
+    def test_explicit_successor_dom_version_rejects_old_or_mixed_graphs(self):
+        for mode, suffix in [('normal', ''), ('traced', '.Traced')]:
+            libraries = {'Ranvier.Dom' + suffix + '/0.1.0-alpha.58': {},
+                         'Ranvier' + suffix + '/0.1.1-preview.1': {},
+                         'Ranvier.WebCore/private': {}, module.PROVIDER_ID + '/1': {}}
+            module.validate_assets(libraries, mode, 'private', '1', dom_version='0.1.0-alpha.58')
+            with self.assertRaises(ValueError):
+                module.validate_assets(libraries, mode, 'private', '1')
+            with self.assertRaises(ValueError):
+                module.validate_assets(dict(libraries, **{'Ranvier.Dom' + suffix + '/0.1.0-alpha.57': {}}),
+                                       mode, 'private', '1', dom_version='0.1.0-alpha.58')
+
 
     def test_registry_dependency_is_explicit_for_both_runner_images(self):
         for name in ('atspi-arm64-qualification.yml', 'atspi-x64-qualification.yml'):

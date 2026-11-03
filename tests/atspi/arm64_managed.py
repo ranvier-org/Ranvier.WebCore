@@ -47,10 +47,11 @@ def validate_source_claim(manifest, source_revision):
         raise ValueError('Provider source claim does not match the selected producer revision')
 
 
-def validate_assets(libraries, mode, interop_version, provider_version, provider_id=PROVIDER_ID):
+def validate_assets(libraries, mode, interop_version, provider_version, provider_id=PROVIDER_ID,
+                    dom_version='0.1.0-alpha.57'):
     if mode not in ('normal', 'traced'):
         raise ValueError('Unknown managed trace mode')
-    dom = 'Ranvier.Dom' + ('.Traced' if mode == 'traced' else '') + '/0.1.0-alpha.57'
+    dom = 'Ranvier.Dom' + ('.Traced' if mode == 'traced' else '') + '/' + dom_version
     runtime = 'Ranvier' + ('.Traced' if mode == 'traced' else '') + '/0.1.1-preview.1'
     expected = (dom, runtime, 'Ranvier.WebCore/' + interop_version, provider_id + '/' + provider_version)
     if not all(name in libraries for name in expected):
@@ -106,6 +107,7 @@ def main():
     parser.add_argument('--source-revision', required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--rid', choices=('linux-arm64', 'linux-x64'), default=RID)
+    parser.add_argument('--dom-version', default='0.1.0-alpha.57')
     parser.add_argument('--display', help='Existing X display for a local harness control; CI omits this option')
     args = parser.parse_args()
     rid = args.rid
@@ -153,6 +155,7 @@ def main():
                    '-p:AccessibilityAtspiPackageId=' + provider_id,
                    '-p:AccessibilityAtspiPackageVersion=' + manifest['version'],
                    '-p:RanvierWebCoreNativeVersion=' + interop_version,
+                   '-p:RanvierDomVersion=' + args.dom_version,
                    '-p:RanvierWebCoreNativeDir=' + str(work / 'native-stage'),
                    '-p:RanvierWebCoreNativeRid=' + rid, '-p:RestoreConfigFile=' + str(config),
                    '-p:RestorePackagesPath=' + str(cache), '-p:NuGetAudit=false',
@@ -163,7 +166,7 @@ def main():
         validate_publish_log(log)
         assets = work / ('artifacts-' + mode) / 'obj/AccessibilityAot/project.assets.json'
         graph = json.loads(assets.read_text())['libraries']
-        validate_assets(graph, mode, interop_version, manifest['version'], provider_id)
+        validate_assets(graph, mode, interop_version, manifest['version'], provider_id, args.dom_version)
         asset_graphs[mode] = {'path': str(assets), 'sha256': sha(assets)}
         binary = output / 'AccessibilityAot'
         validate_elf(subprocess.check_output(['readelf', '-h', '-d', str(binary)], text=True), rid)
@@ -178,7 +181,7 @@ def main():
     receipt = {'architecture': platform.machine(), 'rid': rid, 'sourceRevision': args.source_revision,
                'sourceProvenance': manifest['sourceProvenance'], 'hostSha256': sha(native),
                'providerSha256': manifest['providerSha256'], 'packageSha256': sha(package),
-               'interopSha256': sha(interop), 'interopVersion': interop_version,
+               'interopSha256': sha(interop), 'interopVersion': interop_version, 'domVersion': args.dom_version,
                'assetGraphs': asset_graphs, 'runs': []}
     environment = dict(os.environ, SDL_VIDEODRIVER='x11', EGL_PLATFORM='surfaceless', LIBGL_ALWAYS_SOFTWARE='1')
     environment.pop('LD_LIBRARY_PATH', None)
