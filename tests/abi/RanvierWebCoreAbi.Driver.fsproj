@@ -26,6 +26,7 @@
         <Compile Include="AccessibilityText.fs" />
         <Compile Include="Dom.fs" />
         <Compile Include="TraversalProbe.fs" />
+        <Compile Include="AbiCohort.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 

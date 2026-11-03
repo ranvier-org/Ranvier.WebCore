@@ -18,6 +18,34 @@ class DriverReached(Exception):
 
 
 class AbiDriverWorkspace(unittest.TestCase):
+    def test_manifest_selected_abi_reaches_the_actual_driver_argv_environment(self):
+        with tempfile.TemporaryDirectory() as folder:
+            stage = Path(folder) / 'stage'
+            native = stage / 'runtimes/osx-arm64/native'
+            native.mkdir(parents=True)
+            (native / 'not-a-runtime.fixture').write_text('never loaded')
+            (stage / 'manifest.json').write_text(json.dumps(dict(abi=64, rid='osx-arm64')))
+            observed = []
+
+            def command(args, **kwargs):
+                if args[0] == 'dotnet' and args[1] == 'build':
+                    output = Path(args[args.index('-o') + 1])
+                    output.mkdir(parents=True)
+                    (output / 'RanvierWebCoreAbi.Driver.dll').write_text('never executed')
+                elif args[0] == 'dotnet':
+                    observed.append((args, kwargs['env']))
+                    raise DriverReached()
+                return subprocess.CompletedProcess(args, 0)
+
+            argv = ['abi_tests.py', '--stage', str(stage), '--source', str(Path(folder) / 'webkit'), '--expected-abi', '64']
+            with patch.object(sys, 'argv', argv), patch('subprocess.run', side_effect=command), contextlib.redirect_stdout(io.StringIO()):
+                with self.assertRaises(DriverReached):
+                    runpy.run_path(str(ROOT / 'scripts/abi_tests.py'), run_name='__main__')
+            self.assertEqual(len(observed), 1)
+            args, environment = observed[0]
+            self.assertEqual(Path(args[1]).name, 'RanvierWebCoreAbi.Driver.dll')
+            self.assertEqual(environment['RANVIER_ABI_TEST_EXPECTED'], '64')
+
     def invoke(self, retained):
         with tempfile.TemporaryDirectory() as folder:
             base = Path(folder)
