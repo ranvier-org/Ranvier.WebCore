@@ -20,12 +20,24 @@ namespace {
 int assertions;
 uint64_t presented;
 std::string outputDirectory;
+bool counterDiagnostics;
 
 void require(bool value, const char* message)
 {
     if (!value)
         throw std::runtime_error(std::string(message) + ": " + SDL_GetError());
     ++assertions;
+}
+
+void dirtyProbe(RvHost* host, int index, float scale, const char* phase)
+{
+    if (!counterDiagnostics)
+        return;
+    int32_t x = 0, y = 0, width = 0, height = 0;
+    auto status = rv_host_dirty_rect(host, &x, &y, &width, &height);
+    std::printf("MAC_GPU_DIRTY cycle=%d scale=%g phase=%s status=%d rect=%d,%d,%d,%d\n", index, scale, phase, status, x, y, width, height);
+    std::fflush(stdout);
+    require(status >= 0, "diagnostic dirty-rectangle query");
 }
 
 struct Frame {
@@ -229,11 +241,16 @@ void cycle(int index, float scale)
     require(rv_host_animations(host.get(), &rawAnimation, 1, &animationCount) == RV_OK
             && animationCount == 1 && rawAnimation, "actual WebCore transform and opacity animation");
     Animation animation(rawAnimation, rv_animation_release);
+    dirtyProbe(host.get(), index, scale, "before-pause");
     require(rv_animation_control(animation.get(), RV_ANIMATION_PAUSE) == RV_OK, "pause deterministic animation");
+    dirtyProbe(host.get(), index, scale, "after-pause");
     for (int milliseconds : { 1000, 0 }) {
         require(rv_animation_seek(animation.get(), milliseconds) == RV_OK, "seek compositor animation");
+        dirtyProbe(host.get(), index, scale, "after-seek");
         require(rv_host_update(host.get()) == RV_OK, "update animation state");
+        dirtyProbe(host.get(), index, scale, "after-update");
         rv_run_loop_cycle(0);
+        dirtyProbe(host.get(), index, scale, "after-cycle");
         Frame animated;
         require(rv_mac_spike_acquire_frame(host.get(), &animated.value) == RV_OK && animated.value, "animated GPU frame");
         validate(present(renderer.get(), animated.value).get(), milliseconds ? 60 : 0, scale, milliseconds ? 64 : 128);
@@ -300,6 +317,7 @@ int main(int argc, char** argv)
             require(rv_mac_spike_acquire_frame(nullptr, &invalid.value) == RV_ERR_NULL_ARGUMENT && !invalid.value, "null host guard");
             std::vector<float> scales { 1.0f, 1.5f, 2.0f };
             bool diagnostic = argc == 3 && std::strcmp(argv[1], "--diagnostic-scales") == 0;
+            counterDiagnostics = diagnostic;
             if (diagnostic) {
                 scales.clear();
                 std::string selected = argv[2];
