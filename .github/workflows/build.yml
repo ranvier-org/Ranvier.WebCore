@@ -107,6 +107,8 @@ jobs:
       - run: dotnet tool restore
       - name: Compile the full shared contracts on .NET
         run: dotnet build tests/generator/Contracts.fsproj -c Release
+      - name: Verify the managed catalogue ABI cohort admission
+        run: dotnet run --project tests/abi/cohort/Checks.fsproj -c Release
       - name: Compile and execute inherited DOM member implementations
         run: |
           python -I tests/generator/write_inherited_fixture.py artifacts/inherited-fixture
