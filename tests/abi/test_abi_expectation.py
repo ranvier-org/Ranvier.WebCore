@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import sys
 import unittest
 from unittest.mock import patch
 
@@ -13,6 +14,11 @@ spec=importlib.util.spec_from_file_location('expectation',HERE/'abi_expectation.
 expectation=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(expectation)
 BASE=json.loads((HERE.parent/'fixtures/abi63-probe-assertion-asts.json').read_text())
+
+
+def canonical_ast(tree):
+    options = {'show_empty': True} if sys.version_info >= (3, 13) else {}
+    return ast.dump(tree, **options)
 
 
 class NormalizeExpectation(ast.NodeTransformer):
@@ -26,6 +32,11 @@ class NormalizeExpectation(ast.NodeTransformer):
 
 
 class ExpectedAbiControls(unittest.TestCase):
+    def test_canonical_ast_retains_empty_fields_and_significant_assertion_values(self):
+        self.assertEqual(canonical_ast(ast.parse('pass')), 'Module(body=[Pass()], type_ignores=[])')
+        self.assertNotEqual(canonical_ast(ast.parse('assert value == 63')),
+                            canonical_ast(ast.parse('assert value == 64')))
+
     def test_standalone_default_and_explicit_versions_are_exact(self):
         with patch.dict(os.environ,{},clear=True):
             self.assertEqual(expectation.expected_abi(),63)
@@ -60,7 +71,7 @@ class ExpectedAbiControls(unittest.TestCase):
                     isinstance(node,ast.Expr) and isinstance(node.value,ast.Call)
                     and isinstance(node.value.func,ast.Attribute) and node.value.func.attr=='insert'
                     and ast.unparse(node.value.func.value)=='sys.path')]
-            self.assertEqual(hashlib.sha256(ast.dump(normalized).encode()).hexdigest(),old['astSha256'],path.name)
+            self.assertEqual(hashlib.sha256(canonical_ast(normalized).encode()).hexdigest(),old['astSha256'],path.name)
             changed.append(path.name)
         self.assertEqual(len(changed),39)
 
