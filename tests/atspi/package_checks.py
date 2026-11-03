@@ -37,7 +37,7 @@ def main():
     with tempfile.TemporaryDirectory(prefix='ranvier-atspi-package-') as temporary:
         output = Path(temporary)
         rejected('package path injection', lambda: module.pack(args.provider, args.native, 'linux-x64', '../escape', '0.0.0-privatecontrol', output, args.source_revision))
-        destination, manifest = module.pack(args.provider, args.native, 'linux-x64', 'Ranvier.Private.Atspi.Control', '0.0.0-privatecontrol', output, args.source_revision)
+        destination, manifest = module.pack(args.provider, args.native, 'linux-x64', 'Ranvier.Private.Atspi.Control', '0.0.0-privatecontrol', output, args.source_revision, cohort_label='private-da11-abi347')
         with zipfile.ZipFile(destination) as archive:
             names = archive.namelist()
             assert names.count('runtimes/linux-x64/native/libRanvierWebCoreAtspi.so') == 1
@@ -45,6 +45,9 @@ def main():
             assert json.loads(archive.read('provider-manifest.json')) == manifest
             assert manifest['callerClaimedProviderSourceRevision'] == args.source_revision
             assert manifest['sourceProvenance'] == 'unverified-caller-claim'
+            assert manifest['qualificationScope'] == 'private-ABI63-provider-only'
+            assert manifest['callerClaimedCohortLabel'] == 'private-da11-abi347'
+            assert manifest['cohortLabelProvenance'] == 'unverified-caller-claim'
             assert 'providerSourceRevision' not in manifest
             assert 'original-project-license-unspecified' in manifest['licenseMetadataStatus']
             assert 'Embedded protocol declarations' in archive.read('THIRD-PARTY.md').decode()
@@ -55,6 +58,7 @@ def main():
         before = module.sha(destination)
         rejected('existing artifact is not overwritten', lambda: module.pack(args.provider, args.native, 'linux-x64', 'Ranvier.Private.Atspi.Control', '0.0.0-privatecontrol', output, args.source_revision), FileExistsError)
         assert before == module.sha(destination)
+        rejected('final cohort label cannot imply acceptance', lambda: module.pack(args.provider, args.native, 'linux-x64', 'Ranvier.Private.Atspi.Control', '0.0.0-privatefinal', output, args.source_revision, cohort_label='final-abi347'))
     args.report.write_text(json.dumps(rows, indent=2))
     print(json.dumps(dict(checks=len(rows), failures=[row for row in rows if not row['passed']])))
     return int(any(not row['passed'] for row in rows))
