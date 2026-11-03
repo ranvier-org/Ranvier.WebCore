@@ -103,12 +103,12 @@ class Preview11Preparation(unittest.TestCase):
             with self.subTest(options=options):
                 self.assertFalse(workflow.permitted('publish-atspi-preview11',atspi11='publish',**options))
 
-    def test_p12_mode_launches_only_p12_publisher(self):
+    def test_disabled_p12_mode_launches_no_job(self):
         text = (ROOT / '.github/workflows/build.yml').read_text()
         jobs = re.findall(r'^  ([a-z][a-z0-9-]*):$', text.split('jobs:', 1)[1], re.M)
         for job in jobs:
             with self.subTest(job=job):
-                self.assertEqual(workflow.permitted(job, atspi11='publish-p12'), job == 'publish-atspi-preview12')
+                self.assertFalse(workflow.permitted(job, atspi11='publish-p12'))
                 self.assertFalse(workflow.permitted(job, atspi='prepare', atspi11='publish-p12'))
         for options in [dict(event='push'),dict(ref='refs/heads/other'),dict(recovery=True),dict(recovery4=True),dict(recovery7=True),dict(recovery7windows=True),dict(user='')]:
             with self.subTest(options=options):
