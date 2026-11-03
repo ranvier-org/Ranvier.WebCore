@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IsAotCompatible>true</IsAotCompatible>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <WarnOn>$(WarnOn);3390</WarnOn>
+    <RanvierViewWebCoreVersion Condition="'$(RanvierViewWebCoreVersion)' == ''">0.1.0-alpha.45</RanvierViewWebCoreVersion>
+    <RanvierViewWebCorePackageId Condition="'$(RanvierViewWebCorePackageId)' == '' and '$(RanvierTrace)' == 'true'">Ranvier.View.WebCore.Traced</RanvierViewWebCorePackageId>
+    <RanvierViewWebCorePackageId Condition="'$(RanvierViewWebCorePackageId)' == ''">Ranvier.View.WebCore</RanvierViewWebCorePackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Native.fs" />
+    <Compile Include="Playback.fs" />
+    <PackageReference Update="FSharp.Core" Version="10.1.401" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(RanvierViewRoot)' == ''">
+    <PackageReference Include="$(RanvierViewWebCorePackageId)" Version="$(RanvierViewWebCoreVersion)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(RanvierViewRoot)' != ''">
+    <ProjectReference Include="$(RanvierViewRoot)/src/Ranvier.View.WebCore/Ranvier.View.WebCore.fsproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NativeMediaDllPath)' != ''">
+    <None Include="$(NativeMediaDllPath)" Link="RanvierNativeMedia.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>
