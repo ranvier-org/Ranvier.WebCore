@@ -1,0 +1,47 @@
+name: Private coherent2a invalidation stacks
+
+on:
+  push:
+    branches: [codex/project2-macos-public-transport]
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: coherent2a-dirty-stack-stack
+  cancel-in-progress: false
+
+jobs:
+  replay:
+    if: ${{ false && github.event_name == 'push' && github.ref == 'refs/heads/codex/project2-macos-public-transport' }}
+    runs-on: macos-26
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.403'
+      - name: Select matching Mac SDK
+        shell: bash
+        run: |
+          xcode=$(find /Applications -maxdepth 1 -name 'Xcode_26*.app' ! -iname '*beta*' | sort -V | tail -1)
+          test -n "$xcode"
+          echo "DEVELOPER_DIR=$xcode/Contents/Developer" >> "$GITHUB_ENV"
+      - name: Read invalidation stacks on retained consumer and native libraries
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -I tests/gpu/mac/dirty220_stack.py --work "$RUNNER_TEMP/coherent2a-dirty-stack"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coherent2a-dirty-stack-${{ github.sha }}
+          path: ${{ runner.temp }}/coherent2a-dirty-stack/results/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 7
