@@ -50,6 +50,7 @@ class Preview12CandidateTests(unittest.TestCase):
     def test_candidate_workflow_is_manual_main_only_and_never_publishes(self):
         text=(ROOT/'.github/workflows/atspi-preview12-candidate.yml').read_text()
         self.assertIn("github.event_name == 'workflow_dispatch'",text);self.assertIn("github.ref == 'refs/heads/main'",text)
+        self.assertIn('if: ${{ false &&',text)
         self.assertNotIn('id-token:',text.lower());self.assertNotIn('nuget push',text.lower());self.assertNotIn('cmake',text.lower())
 
 
