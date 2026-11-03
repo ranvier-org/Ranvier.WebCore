@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import cocoa_wtf_timer_probe as baseline
 
 
-def run(directory, helper_path, captured=None, checkpoint=None, mode='baseline'):
+def run(directory, helper_path, captured=None, checkpoint=None, mode='baseline', repeat_milliseconds=0.01):
     if sys.platform != 'darwin':
         raise RuntimeError('Actual macOS is required.')
     helper = C.CDLL(str(Path(helper_path).resolve()))
@@ -113,9 +113,11 @@ def run(directory, helper_path, captured=None, checkpoint=None, mode='baseline')
         if mode == '72-fast-repeat-fairness':
             handles = [create() for _ in range(72)]
             stage('72-fast-repeat-fairness')
+            assert math.isfinite(repeat_milliseconds) and repeat_milliseconds > 0
+            report['repeatMilliseconds'] = repeat_milliseconds
             try:
                 for handle in handles:
-                    assert arm(handle, 0.000001, 1, 0) == 0
+                    assert arm(handle, repeat_milliseconds, 1, 0) == 0
                 time.sleep(0.003)
                 for _ in range(8):
                     assert dispatch() == 0
@@ -188,6 +190,8 @@ def main():
     parser.add_argument('--helper', required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--mode', choices=MODES)
+    parser.add_argument('--repeat-milliseconds', type=float, default=0.01,
+                        help='Fairness interval; original 0.000001 ms subquantum case remains explicitly replayable')
     args = parser.parse_args()
     args.output.parent.mkdir(parents=True, exist_ok=True)
     if not args.mode:
@@ -196,6 +200,7 @@ def main():
             target = args.output.with_name(args.output.stem + '-' + mode + '.json')
             command = [sys.executable, '-I', str(Path(__file__).resolve()), '--native-directory', args.native_directory,
                        '--helper', args.helper, '--output', str(target), '--mode', mode]
+            command += ['--repeat-milliseconds', str(args.repeat_milliseconds)]
             try:
                 child = subprocess.run(command, capture_output=True, text=True, timeout=120)
                 code, output = child.returncode, child.stdout + child.stderr
@@ -217,7 +222,7 @@ def main():
     args.output.write_text(json.dumps(report, indent=2))
     try:
         run(args.native_directory, args.helper, report,
-            lambda data: args.output.write_text(json.dumps(data, indent=2)), args.mode)
+            lambda data: args.output.write_text(json.dumps(data, indent=2)), args.mode, args.repeat_milliseconds)
     except Exception as error:
         report.setdefault('failures', []).append(repr(error))
     finally:
