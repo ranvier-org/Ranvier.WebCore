@@ -38,7 +38,7 @@ class ManagedArm64Qualification(unittest.TestCase):
 
     def test_x64_provider_graph_cannot_select_arm_package(self):
         provider = 'Ranvier.Private.Accessibility.Atspi.X64Qualification'
-        libraries = {'Ranvier.Dom/0.1.0-alpha.57': {}, 'Ranvier.WebCore/private': {}, provider + '/1': {}}
+        libraries = {'Ranvier.Dom/0.1.0-alpha.57': {}, 'Ranvier/0.1.1-preview.1': {}, 'Ranvier.WebCore/private': {}, provider + '/1': {}}
         module.validate_assets(libraries, 'normal', 'private', '1', provider)
         del libraries[provider + '/1']
         libraries[module.PROVIDER_ID + '/1'] = {}
@@ -73,12 +73,12 @@ class ManagedArm64Qualification(unittest.TestCase):
             module.validate_source_claim({'callerClaimedProviderSourceRevision': 'b' * 40}, 'a' * 40)
 
     def test_package_graph_requires_matching_mode_core_interop_and_provider(self):
-        libraries = {'Ranvier.Dom.Traced/0.1.0-alpha.57': {}, 'Ranvier.WebCore/0.0.0-arm64.1': {},
+        libraries = {'Ranvier.Dom.Traced/0.1.0-alpha.57': {}, 'Ranvier.Traced/0.1.1-preview.1': {}, 'Ranvier.WebCore/0.0.0-arm64.1': {},
                      module.PROVIDER_ID + '/0.0.0-ci.5': {}}
         module.validate_assets(libraries, 'traced', '0.0.0-arm64.1', '0.0.0-ci.5')
         with self.assertRaises(ValueError):
             module.validate_assets(libraries, 'normal', '0.0.0-arm64.1', '0.0.0-ci.5')
-        for extra in ('Ranvier.Dom/0.1.0-alpha.57', 'Ranvier.Dom.Traced/0.1.0-alpha.56', 'Ranvier.WebCore/0.1.1-preview.7',
+        for extra in ('Ranvier/0.1.1-preview.1', 'Ranvier.Traced/0.1.1-preview.2', 'Ranvier.Dom/0.1.0-alpha.57', 'Ranvier.Dom.Traced/0.1.0-alpha.56', 'Ranvier.WebCore/0.1.1-preview.7',
                       module.PROVIDER_ID + '/0.0.0-ci.6'):
             with self.subTest(extra=extra), self.assertRaises(ValueError):
                 module.validate_assets(dict(libraries, **{extra: {}}), 'traced', '0.0.0-arm64.1', '0.0.0-ci.5')

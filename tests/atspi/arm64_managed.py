@@ -51,10 +51,11 @@ def validate_assets(libraries, mode, interop_version, provider_version, provider
     if mode not in ('normal', 'traced'):
         raise ValueError('Unknown managed trace mode')
     dom = 'Ranvier.Dom' + ('.Traced' if mode == 'traced' else '') + '/0.1.0-alpha.57'
-    expected = (dom, 'Ranvier.WebCore/' + interop_version, provider_id + '/' + provider_version)
+    runtime = 'Ranvier' + ('.Traced' if mode == 'traced' else '') + '/0.1.1-preview.1'
+    expected = (dom, runtime, 'Ranvier.WebCore/' + interop_version, provider_id + '/' + provider_version)
     if not all(name in libraries for name in expected):
         raise ValueError('Published consumer resolved the wrong Core, interop or provider package')
-    ids = ('ranvier.dom', 'ranvier.dom.traced', 'ranvier.webcore', provider_id.lower())
+    ids = ('ranvier', 'ranvier.traced', 'ranvier.dom', 'ranvier.dom.traced', 'ranvier.webcore', provider_id.lower())
     selected = [name for name in libraries if name.split('/', 1)[0].lower() in ids]
     if sorted(selected) != sorted(expected):
         raise ValueError('Published consumer contains conflicting Core, interop or provider packages')
