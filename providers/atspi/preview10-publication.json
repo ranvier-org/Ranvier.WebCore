@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "id": "Ranvier.WebCore.Accessibility.Atspi",
   "version": "0.1.1-preview.10",
-  "candidateRun": null,
-  "candidateHead": null,
-  "packageSha256": null,
-  "candidateReceiptSha256": null,
-  "scope": "Publication refuses incomplete pins. Fill only after independent review of the actual candidate artifact."
+  "candidateRun": 41607423382,
+  "candidateHead": "bdbc5d2230af9ce5d88fbffd605b5614fa9b2795",
+  "packageSha256": "e1e98992c3116de099b2452115711e2b97abed896f18d5c0dc082d5558d4cdfd",
+  "candidateReceiptSha256": "75db9ccd2fe2eb4f6b72f55e8235672ef67f4b7e05c39302582f251f484098d1",
+  "scope": "Exact initial candidate independently audited against both accepted per-RID inputs and ordinary SDK layouts. Publisher verifies unchanged bytes before authentication. Source claims remain unverified."
 }
