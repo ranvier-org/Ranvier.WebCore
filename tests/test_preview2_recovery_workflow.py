@@ -14,10 +14,10 @@ def job(name):
     return re.split(r'(?m)^  [a-z][\w-]*:\s*$', text.split(marker, 1)[1], maxsplit=1)[0]
 
 
-def evaluate(expression, recovery=False, recovery4=False, recovery7=False, recovery7windows=False, result='success', event='workflow_dispatch', ref='refs/heads/main', user='owner', cancelled=False):
+def evaluate(expression, recovery=False, recovery4=False, recovery7=False, recovery7windows=False, result='success', event='workflow_dispatch', ref='refs/heads/main', user='owner', cancelled=False, atspi='off'):
     values = {'inputs.recover_preview2_gpu': recovery, 'inputs.recover_preview4_gpu': recovery4, 'inputs.recover_preview7_linux': recovery7, 'inputs.recover_preview7_windows': recovery7windows, 'github.event_name': event, 'github.ref': ref,
               'github.workflow': 'build', 'github.run_id': 123, 'inputs.flavor': 'gpu', 'vars.NUGET_USER': user,
-              'inputs.rids': '', 'github.head_ref': 'codex/batch-fixture',
+              'inputs.rids': '', 'inputs.atspi_preview10': atspi, 'github.head_ref': 'codex/batch-fixture',
               'github.event.pull_request.labels.*.name': [],
               'needs.plan.outputs.matrix': 'selected', 'needs.plan.outputs.prebuilt': 'attached',
               'needs.recover-preview2-gpu.result': result, 'needs.verify-preview4-gpu-recovery.result': result, 'needs.verify-preview7-linux-recovery.result': result, 'needs.verify-preview7-windows-recovery.result': result, 'needs.native.result': 'success',
@@ -49,6 +49,22 @@ def permitted(name, **options):
 
 
 class RecoveryWorkflowControls(unittest.TestCase):
+    def test_provider_modes_are_exclusive_and_publisher_requires_main(self):
+        ordinary = ['plan', 'package-contract', 'native', 'prebuilt', 'managed', 'publish', 'windows-gpu-cohort',
+                    'recover-preview2-gpu', 'publish-preview2-recovery', 'verify-preview4-gpu-recovery',
+                    'publish-preview4-gpu-recovery', 'verify-preview7-linux-recovery', 'publish-preview7-linux-recovery',
+                    'verify-preview7-windows-recovery', 'publish-preview7-windows-recovery']
+        for mode in ('prepare', 'publish'):
+            for name in ordinary:
+                with self.subTest(mode=mode, job=name):
+                    self.assertFalse(permitted(name, atspi=mode))
+        self.assertTrue(permitted('prepare-atspi-preview10', atspi='prepare'))
+        self.assertFalse(permitted('prepare-atspi-preview10', atspi='prepare', recovery=True))
+        self.assertTrue(permitted('publish-atspi-preview10', atspi='publish'))
+        self.assertFalse(permitted('publish-atspi-preview10', atspi='publish', ref='refs/heads/other'))
+        self.assertFalse(permitted('publish-atspi-preview10', atspi='publish', user=''))
+        self.assertFalse(permitted('publish-atspi-preview10', atspi='publish', recovery7=True))
+
     def test_preview7_isolated_and_main_only(self):
         for name in ['plan', 'package-contract', 'native', 'prebuilt', 'managed', 'publish', 'windows-gpu-cohort',
                      'recover-preview2-gpu', 'publish-preview2-recovery', 'verify-preview4-gpu-recovery', 'publish-preview4-gpu-recovery']:
