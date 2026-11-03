@@ -19,6 +19,10 @@ on:
         description: Exact clean final171+182 union commit declared by the selected package
         required: true
         type: string
+      view_source:
+        description: Exact reviewed View commit containing the managed accessibility fixture
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -32,7 +36,7 @@ jobs:
   qualify:
     if: ${{ false }}
     runs-on: ubuntu-24.04-arm
-    timeout-minutes: 25
+    timeout-minutes: 45
     env:
       EGL_PLATFORM: surfaceless
       LIBGL_ALWAYS_SOFTWARE: '1'
@@ -40,9 +44,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          repository: ranvier-org/Ranvier.View
+          ref: ${{ inputs.view_source }}
+          path: view
+          persist-credentials: false
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: '10.0.403'
       - name: Initialize owned output paths
         run: |
           echo "ATSPI_WORK=$RUNNER_TEMP/ranvier-atspi-arm64" >> "$GITHUB_ENV"
@@ -50,7 +61,7 @@ jobs:
       - name: Install standalone provider and independent client prerequisites
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build pkg-config binutils libglib2.0-dev libatspi2.0-dev python3-gi gir1.2-atspi-2.0 dbus-x11 fonts-dejavu-core
+          sudo apt-get install -y cmake ninja-build pkg-config binutils clang zlib1g-dev xvfb libglib2.0-dev libatspi2.0-dev python3-gi gir1.2-atspi-2.0 dbus-x11 fonts-dejavu-core
           sudo apt-get install -y libharfbuzz-icu0 libicu74 libjpeg-turbo8 libepoxy0 libgcrypt20 libsoup-3.0-0 libtasn1-6 libxkbcommon0 libxml2 libpng16-16t64 libsqlite3-0 libwebp7 libwebpdemux2 libwebpmux3 zlib1g libfreetype6 libfontconfig1 libwoff1 libdrm2 libegl1 libgles2 liblcms2-2 libatomic1
       - name: Require the exact final ARM64 host before building a provider
         env:
@@ -59,13 +70,18 @@ jobs:
           NATIVE_ARTIFACT: ${{ inputs.native_artifact }}
           NATIVE_SHA256: ${{ inputs.native_sha256 }}
           FINAL_SOURCE: ${{ inputs.final_source }}
+          VIEW_SOURCE: ${{ inputs.view_source }}
         run: |
+          [[ "$FINAL_SOURCE" =~ ^[0-9a-f]{40}$ && "$VIEW_SOURCE" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git -C view rev-parse HEAD)" = "$VIEW_SOURCE"
+          git diff --quiet "$FINAL_SOURCE" HEAD -- providers/atspi src/Ranvier.WebCore tests/abi/Native.fs tests/abi/NativeDom.fs tests/abi/Traversal.fs host/RanvierWebCoreAbi.h host/RanvierWebCoreDom.h gen/dom-api.json NOTICE.md packaging/README.md
           gh run download "$NATIVE_RUN" --repo "$GITHUB_REPOSITORY" --name "$NATIVE_ARTIFACT" --dir "$ATSPI_WORK/artifact"
           python3 -I tests/atspi/stage_native.py --artifacts "$ATSPI_WORK/artifact" --rid linux-arm64 --expected-sha256 "$NATIVE_SHA256" --expected-source "$FINAL_SOURCE" --require-abi63-union --output "$ATSPI_WORK/native"
           ldd "$ATSPI_WORK/native/libRanvierWebCoreHost.so" | tee "$ATSPI_WORK/dependencies.txt"
           if grep -q 'not found' "$ATSPI_WORK/dependencies.txt"; then exit 1; fi
       - name: Build and install standalone ARM64 provider at j1
         run: |
+          python3 -I tests/abi/generate_native.py check
           python3 -I -m unittest discover -s tests/atspi -p 'test_*.py'
           cmake -S providers/atspi -B "$ATSPI_WORK/build" -G Ninja -DRANVIER_WEBCORE_LIBRARY:FILEPATH="$ATSPI_WORK/native/libRanvierWebCoreHost.so"
           cmake --build "$ATSPI_WORK/build" --parallel 1
@@ -78,9 +94,21 @@ jobs:
           python3 -I tests/atspi/run.py run --native "$ATSPI_WORK/native/libRanvierWebCoreHost.so" --provider "$ATSPI_WORK/install/lib/libRanvierWebCoreAtspi.so" --output "$ATSPI_WORK/protocol-queued" --registry --extended-text --queued-set
           python3 -I tests/atspi/run.py run --native "$ATSPI_WORK/native/libRanvierWebCoreHost.so" --provider "$ATSPI_WORK/install/lib/libRanvierWebCoreAtspi.so" --output "$ATSPI_WORK/protocol-session" --registry --extended-text --discovery session
       - name: Pack an explicitly unqualified private ARM64 SDK test artifact
+        env:
+          FINAL_SOURCE: ${{ inputs.final_source }}
         run: |
-          python3 -I providers/atspi/package.py --provider "$ATSPI_WORK/install/lib/libRanvierWebCoreAtspi.so" --native "$ATSPI_WORK/native/libRanvierWebCoreHost.so" --rid linux-arm64 --test-only-arm64 --id Ranvier.Private.Accessibility.Atspi.ArmQualification --version "0.0.0-ci.$GITHUB_RUN_ID" --source-revision "$GITHUB_SHA" --output "$ATSPI_WORK/package"
+          python3 -I providers/atspi/package.py --provider "$ATSPI_WORK/install/lib/libRanvierWebCoreAtspi.so" --native "$ATSPI_WORK/native/libRanvierWebCoreHost.so" --rid linux-arm64 --test-only-arm64 --id Ranvier.Private.Accessibility.Atspi.ArmQualification --version "0.0.0-ci.$GITHUB_RUN_ID" --source-revision "$FINAL_SOURCE" --output "$ATSPI_WORK/package"
           python3 -I tests/atspi/consumer.py --package "$ATSPI_WORK/package/Ranvier.Private.Accessibility.Atspi.ArmQualification.0.0.0-ci.$GITHUB_RUN_ID.nupkg" --native "$ATSPI_WORK/native/libRanvierWebCoreHost.so" --output "$ATSPI_WORK/consumer"
+      - name: Run normal and traced strict ARM64 NativeAOT provider profiles
+        env:
+          FINAL_SOURCE: ${{ inputs.final_source }}
+        run: |
+          python3 -I tests/atspi/arm64_managed.py --view "$GITHUB_WORKSPACE/view" --native-source "$GITHUB_WORKSPACE" --native "$ATSPI_WORK/native/libRanvierWebCoreHost.so" --package "$ATSPI_WORK/package/Ranvier.Private.Accessibility.Atspi.ArmQualification.0.0.0-ci.$GITHUB_RUN_ID.nupkg" --source-revision "$FINAL_SOURCE" --output "$ATSPI_WORK/managed-aot"
+      - name: Validate and summarize the ARM64 qualification evidence
+        env:
+          FINAL_SOURCE: ${{ inputs.final_source }}
+        run: |
+          python3 -I tests/atspi/qualification_receipt.py --work "$ATSPI_WORK" --source "$FINAL_SOURCE" --native-artifacts "$ATSPI_WORK/artifact" --package "$ATSPI_WORK/package/Ranvier.Private.Accessibility.Atspi.ArmQualification.0.0.0-ci.$GITHUB_RUN_ID.nupkg"
       - name: Retain test-only receipts and first failure
         if: always()
         uses: actions/upload-artifact@v4
@@ -93,6 +121,13 @@ jobs:
             ${{ env.ATSPI_WORK }}/protocol*/
             ${{ env.ATSPI_WORK }}/package/
             ${{ env.ATSPI_WORK }}/consumer/consumer-receipt.json
+            ${{ env.ATSPI_WORK }}/managed-aot/*.json
+            ${{ env.ATSPI_WORK }}/managed-aot/*.log
+            ${{ env.ATSPI_WORK }}/managed-aot/feed/*.nupkg
+            ${{ env.ATSPI_WORK }}/managed-aot/artifacts-*/obj/AccessibilityAot/project.assets.json
+            ${{ env.ATSPI_WORK }}/managed-aot/publish-normal/AccessibilityAot
+            ${{ env.ATSPI_WORK }}/managed-aot/publish-traced/AccessibilityAot
+            ${{ env.ATSPI_WORK }}/qualification-receipt.json
             ${{ env.ATSPI_WORK }}/build/CMakeFiles/CMakeConfigureLog.yaml
           if-no-files-found: warn
           retention-days: 7
