@@ -2875,9 +2875,9 @@ RV_EXPORT int32_t rv_ax_text_style_run(RvAxNode*, int32_t offset, const char* pr
  * Unsupported builds return RV_ERR_UNSUPPORTED. Writes NULL to *frame on failure, including deferred host
  * destruction during acquisition. The returned IOSurface contains premultiplied BGRA8 sRGB bytes. */
 RV_EXPORT int32_t rv_host_acquire_iosurface_frame(RvHost*, RvGpuFrame** frame);
-/* "iosurface-input": retains a nonplanar BGRA8 IOSurfaceRef until replacement, NULL unbind, target removal,
- * or document/host teardown. Complete producer GPU writes before binding/notifying, and do not write
- * during synchronous acquisition. flipY is 0 or 1. Failed replacement preserves the prior binding.
+/* "iosurface-input": retains a nonplanar BGRA8 IOSurfaceRef until replacement, NULL unbind, document/host
+ * teardown, or the next frame after target removal. Complete producer GPU writes before binding/notifying.
+ * Do not write during synchronous acquisition. flipY is 0 or 1. Failed replacement preserves the prior binding.
  * The connected target needs a composited RenderBox; DOM geometry follows the D3D11 input contract. */
 RV_EXPORT int32_t rv_host_bind_iosurface(RvHost*, RvNode* target, void* surface, int32_t flipY);
 

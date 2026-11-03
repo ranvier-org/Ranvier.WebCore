@@ -1,8 +1,10 @@
 # Private macOS compositor experiment (#220)
 
-This is source for a bounded, opt-in experiment. The Mac SDK compile, Metal execution, SDL presentation and Mac texture-input path have not been qualified. It adds no production transport enum, public ABI allocation or package cohort.
+The compositor uses Cocoa/CoreGraphics painting with WebCore's TextureMapper and ANGLE's Metal backend. The ordinary osx-arm64 GPU profile enables this path; the private experiment recipe remains available for isolated qualification. The seven Host objects have compiled on the actual Mac SDK. Full compositor execution, SDL presentation, texture input and official GPU package acceptance remain pending.
 
-The experiment keeps Cocoa/CoreGraphics painting and uses WebCore's existing TextureMapper with ANGLE's Metal backend. A private GraphicsLayer factory chooses TextureMapper without replacing Cocoa's global factory. The narrow engine patch supplies its CoreGraphics image upload and required display exports. Other presets leave this path disabled.
+ABI64 appends `rv_host_acquire_iosurface_frame` and `rv_host_bind_iosurface`, preserving the existing347 signatures and their order. Acquired frames use `rv_gpu_frame_info` and `rv_gpu_frame_release`; the borrowed IOSurfaceRef contains premultiplied BGRA8 bytes. The input endpoint retains the producer's surface through replacement/unbind or target/document/host teardown. `tests/gpu/mac/qualify_package.py` compiles both native fixtures against these public endpoints and executes them on the extracted GPU package. Its receipts bind the unchanged native payload to the output/input and software-rejection controls.
+
+A host-specific GraphicsLayer factory chooses TextureMapper without replacing Cocoa's global factory. The engine patches supply CoreGraphics image upload, required display exports and typed ANGLE GL dispatch. Other platform presets preserve their current transports; the Mac Slim preset keeps this path disabled.
 
 Each private frame retains an IOSurface-backed GL target. The producer completes before handing it to SDL's Metal renderer; the consumer drains its reported Metal queue before releasing the frame. Frames can outlive resize, document replacement and their host. The display/context has process lifetime. External CALayer contents are unsupported by this experiment; this is not a general Mac media/canvas compositor.
 
@@ -34,4 +36,4 @@ Three independent cycles use odd CSS viewport dimensions at explicit backing sca
 
 The final SDL backbuffer readback is an oracle, not the presentation transport. Physical Retina behavior remains separate from explicit host device-scale tests. The current source preparation tests and Linux header checks do not prove that any Metal frame has run.
 
-After the output path runs on Mac, the renderer-input step will bind an IOSurface-backed native Metal producer through a compatible TextureMapper attachment seam and qualify clipping, scrolling, transforms, opacity, stacking, synchronization and loss. The current Windows/Linux input implementations do not establish that Mac path.
+The renderer-input fixture binds an IOSurface-backed native Metal producer through the TextureMapper attachment seam and checks clipping, scrolling, transforms, opacity, stacking, synchronization and loss. Its Mac runtime qualification remains separate from the existing Windows/Linux input proof.
