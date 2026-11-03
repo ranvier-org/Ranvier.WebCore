@@ -72,7 +72,7 @@ def pack(provider, native, rid, package_id, version, output, source_revision, te
     ET.SubElement(fields, 'license', type='file').text = 'NOTICE.md'
     payload = {
         'runtimes/' + rid + '/native/libRanvierWebCoreAtspi.so': provider.read_bytes(),
-        'include/RanvierAtspi.h': (root / 'RanvierAtspi.h').read_bytes(),
+        'include/RanvierAtspi.h': (root / 'RanvierAtspi.h').read_text(encoding='utf-8').encode('utf-8'),
         'include/RanvierWebCoreAbi.h': (root.parents[1] / 'host/RanvierWebCoreAbi.h').read_bytes(),
         'README.md': (root / 'README.md').read_bytes(),
         'NOTICE.md': (root / 'NOTICE.md').read_bytes(),
