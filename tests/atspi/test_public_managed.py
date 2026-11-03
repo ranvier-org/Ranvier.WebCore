@@ -1,11 +1,13 @@
 """Fail-closed public managed graph controls; no native code is executed."""
 import hashlib
+import io
 import importlib.util
 import json
 from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
+import zipfile
 
 path=Path(__file__).with_name('public_managed.py')
 spec=importlib.util.spec_from_file_location('public_managed',path)
@@ -78,6 +80,19 @@ class PublicManagedTests(unittest.TestCase):
             path.write_bytes(data.replace(b'\n',b'\r\n'));self.assertEqual(subject.program_bytes(path),data)
             path.write_bytes(data+b'changed')
             with self.assertRaisesRegex(ValueError,'program differs'): subject.program_bytes(path)
+
+    def test_provider_claim_and_module_are_not_promoted_or_substituted(self):
+        data=b'provider module';member='runtimes/linux-x64/native/libRanvierWebCoreAtspi.so';digest=hashlib.sha256(data).hexdigest()
+        manifest=dict(id=self.provider,rid='linux-x64',hostSha256=subject.HOST['linux-x64'],
+                      callerClaimedProviderSourceRevision=subject.PROVIDER_SOURCE,sourceProvenance='unverified-caller-claim',
+                      hostBundled=False,providerSha256=digest,payloads={member:digest})
+        buffer=io.BytesIO()
+        with zipfile.ZipFile(buffer,'w') as z: z.writestr(member,data)
+        with zipfile.ZipFile(buffer) as z:
+            subject.validate_provider(z,manifest,'linux-x64')
+            for field,value in [('sourceProvenance','verified'),('hostBundled',True),('providerSha256','0'*64)]:
+                altered=dict(manifest);altered[field]=value
+                with self.subTest(field=field),self.assertRaises(ValueError): subject.validate_provider(z,altered,'linux-x64')
 
 
 if __name__=='__main__': unittest.main()

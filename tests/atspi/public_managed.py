@@ -88,6 +88,18 @@ def config_file(path,feed,provider_id):
     path.write_bytes(ET.tostring(root))
 
 
+def validate_provider(z,manifest,rid):
+    managed.validate_source_claim(manifest,PROVIDER_SOURCE)
+    provider_id=managed.PROVIDER_ID if rid=='linux-arm64' else 'Ranvier.Private.Accessibility.Atspi.X64Qualification'
+    if (manifest['id']!=provider_id or manifest['rid']!=rid or manifest['hostSha256']!=HOST[rid]
+            or manifest.get('sourceProvenance')!='unverified-caller-claim' or manifest.get('hostBundled') is not False):
+        raise ValueError('Provider identity/Host/RID/provenance differs')
+    member='runtimes/'+rid+'/native/libRanvierWebCoreAtspi.so'
+    if hashlib.sha256(z.read(member)).hexdigest()!=manifest['providerSha256']: raise ValueError('Provider module hash differs')
+    for name,digest in manifest['payloads'].items():
+        if hashlib.sha256(z.read(name)).hexdigest()!=digest: raise ValueError('Provider payload differs')
+
+
 def project_file(path,mode,rid,provider_id,provider_version):
     root=ET.Element('Project',Sdk='Microsoft.NET.Sdk');props=ET.SubElement(root,'PropertyGroup')
     for name,value in [('OutputType','Exe'),('TargetFramework','net10.0'),('AssemblyName','AccessibilityAot'),('FSharpCoreImplicitPackageVersion','10.1.403'),('DefineConstants','ATSPI_STYLE_TRIAL'),('PublishAot','true'),('TrimmerSingleWarn','false'),('TreatWarningsAsErrors','true'),('IlcTreatWarningsAsErrors','true'),('ILLinkTreatWarningsAsErrors','true')]: ET.SubElement(props,name).text=value
@@ -109,11 +121,7 @@ def main():
     package_sha=managed.sha(args.package)
     if package_sha!=args.package_sha256: raise ValueError('Provider package hash differs')
     with zipfile.ZipFile(args.package) as z:
-        manifest=json.loads(z.read('provider-manifest.json'));managed.validate_source_claim(manifest,PROVIDER_SOURCE)
-        provider_id=managed.PROVIDER_ID if args.rid=='linux-arm64' else 'Ranvier.Private.Accessibility.Atspi.X64Qualification'
-        if manifest['id']!=provider_id or manifest['rid']!=args.rid or manifest['hostSha256']!=HOST[args.rid]: raise ValueError('Provider identity/Host/RID differs')
-        for name,digest in manifest['payloads'].items():
-            if hashlib.sha256(z.read(name)).hexdigest()!=digest: raise ValueError('Provider payload differs')
+        manifest=json.loads(z.read('provider-manifest.json'));validate_provider(z,manifest,args.rid)
     work=args.output.resolve();work.mkdir(parents=True,exist_ok=False);feed=work/'feed';feed.mkdir()
     provider_id=manifest['id'];provider_version=manifest['version']
     shutil.copy2(args.package,feed/(provider_id+'.'+provider_version+'.nupkg'))
