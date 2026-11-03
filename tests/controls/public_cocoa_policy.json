@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "armed": false,
+  "scope": "Future signed native cohort CPU contracts only; no GPU or publication claim",
+  "native": {
+    "id": "Ranvier.WebCore.Native.Gpu.osx-arm64",
+    "version": null,
+    "source": null,
+    "packageSha256": null,
+    "auditSha256": null,
+    "abi": 64,
+    "declarations": 349
+  },
+  "interopPackageSha256": null,
+  "headerSha256": null,
+  "sidecarManifestSha256": null,
+  "controllerSource": null,
+  "reviewedOwnerProofSha256": null
+}

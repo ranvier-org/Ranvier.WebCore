@@ -1,0 +1,27 @@
+{
+  "scope": "Library-name fixture only; no ABI64/public GPU runtime qualification",
+  "publicSlim": {
+    "id": "Ranvier.WebCore.Native.osx-arm64",
+    "version": "0.1.1-preview.11",
+    "source": "8b8db298eba294876c27bd9a3200881f872684df",
+    "packageSha256": "010be9d6d02c3ff9473f1eeb1e18957604ccbfc9979a3d3d9091ac5bd5fb8085",
+    "libraries": [
+      "libJavaScriptCore.dylib",
+      "libRanvierWebCoreHost.dylib",
+      "libWebCore.dylib",
+      "libWebGPU.dylib"
+    ]
+  },
+  "privateGpu": {
+    "source": "2a15536b89aa6a72164762803dac76291973d0a0",
+    "artifactArchiveSha256": "2ece47757b0a002fc4122f0f8fc181b879ed95cda29b29224e4d7e88732031e7",
+    "libraries": [
+      "libEGL.dylib",
+      "libGLESv2.dylib",
+      "libJavaScriptCore.dylib",
+      "libRanvierWebCoreHost.dylib",
+      "libWebCore.dylib",
+      "libWebGPU.dylib"
+    ]
+  }
+}

@@ -43,6 +43,7 @@ def main():
     parser.add_argument('--native-directory', type=Path, required=True)
     parser.add_argument('--abi-source', type=Path, required=True)
     parser.add_argument('--system-helper', type=Path, required=True)
+    parser.add_argument('--page-helper', type=Path)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     assert sys.platform == 'darwin', 'actual Cocoa runtime required'
@@ -58,7 +59,7 @@ def main():
     system = C.CDLL(str(args.system_helper.resolve()))
     system.project2_cocoa_motion_set.argtypes, system.project2_cocoa_motion_set.restype = [C.c_int], C.c_int
     system.project2_cocoa_motion_restore.argtypes, system.project2_cocoa_motion_restore.restype = [], None
-    image = C.CDLL(str(native / 'libRanvierWebCoreHost.dylib'))
+    image = C.CDLL(str(args.page_helper.resolve() if args.page_helper else native / 'libRanvierWebCoreHost.dylib'))
     setting = image.project2_progress_form_control_profile
     setting.argtypes, setting.restype = [C.c_void_p, C.c_int32, C.POINTER(C.c_int32)], C.c_int32
     system_motion = image.project2_progress_system_motion
@@ -83,6 +84,7 @@ def main():
             check(system.project2_cocoa_motion_set(int(system_reduced)) == 0, 'process-local system control')
             for vector in [False, True]:
                 with SvgProbe(native, 300, 70) as probe:
+                    probe.call('rv_host_set_accelerated_compositing', [C.c_void_p, C.c_int32], probe.host, 0)
                     default_profile = profile(probe.host, -1)
                     check(default_profile == 0, 'untouched host retains default legacy styling')
                     probe.load('<!doctype html><style>body{margin:0;background:white}progress{position:absolute;left:20px;top:20px;width:240px;height:20px;accent-color:#007aff}</style><progress id="p"></progress>', standalone=False)
@@ -90,6 +92,7 @@ def main():
                     progress = probe.node('p')
                     if vector:
                         with SvgProbe(native, 20, 20) as untouched:
+                            untouched.call('rv_host_set_accelerated_compositing', [C.c_void_p, C.c_int32], untouched.host, 0)
                             check(profile(untouched.host, -1) == 0, 'another host is unaffected')
                     probe.bind('rv_host_set_focused', C.c_int32, [C.c_void_p, C.c_int32])(probe.host, 1)
                     cycle = probe.bind('rv_run_loop_cycle', C.c_int32, [C.c_int32])
