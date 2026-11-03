@@ -75,7 +75,7 @@ def main():
         configured = (build / 'cmakeconfig.h').read_text()
         for key in ['RANVIER_MAC_GPU_SPIKE', 'USE_TEXTURE_MAPPER', 'USE_GRAPHICS_LAYER_TEXTURE_MAPPER']:
             assert re.search(r'^#define\s+' + key + r'\s+1\s*$', configured, re.M), key
-        targets = ['bmalloc_CopyHeaders', 'bmalloc_CopyPrivateHeaders', 'WTF_CopyHeaders', 'WTF_CopyPreferences',
+        targets = ['ANGLEHeaders', 'GLSLANGHeaders', 'bmalloc_CopyHeaders', 'bmalloc_CopyPrivateHeaders', 'WTF_CopyHeaders', 'WTF_CopyPreferences',
                    'JavaScriptCore_CopyHeaders', 'JavaScriptCore_CopyPrivateHeaders', 'PAL_CopyHeaders',
                    'WebCore_CopyPrivateHeaders', 'WebCoreGeneratedSources']
         plan = run('header-plan', ['ninja', '-n', '-v', *targets], build)
