@@ -26,10 +26,14 @@ class Preview11Preparation(unittest.TestCase):
         self.assertEqual(policy['nativeSource'], '8b8db298eba294876c27bd9a3200881f872684df')
         self.assertEqual(policy['abi'], 63)
         self.assertEqual(set(policy['rids']), {'linux-x64', 'linux-arm64'})
-        for rid, pins in policy['rids'].items():
-            self.assertEqual(pins, dict(packageSha256=None, receiptSha256=None,
-                                       proofKind='local-qualified-relayed' if rid=='linux-x64' else 'runner-executed'))
-            self.assertEqual(release.QUALIFICATIONS[rid], (None, None, None, None, None))
+        self.assertEqual(policy['rids']['linux-x64'],dict(packageSha256=None, receiptSha256=None,proofKind='local-qualified-relayed'))
+        self.assertEqual(release.QUALIFICATIONS['linux-x64'],(None,None,None,None,None))
+        self.assertEqual(policy['rids']['linux-arm64'],dict(proofKind='runner-executed',
+                         packageSha256='964e03576b31720e438a1c6c92a73a9c18c56b32687d2136b9a46bf941b9e279',
+                         receiptSha256='4e85ebf15f6b410ceecc4af609246ff346343896aa6d2c94b0dac29ca1ade7df'))
+        self.assertEqual(release.QUALIFICATIONS['linux-arm64'],(41627017174,'5b5ef82a0af3011fc6615d442e9d2618147b08a8',
+                         'unqualified-atspi-arm64-5b5ef82a0af3011fc6615d442e9d2618147b08a8','push',
+                         '.github/workflows/atspi-p11-arm64-qualification.yml'))
         pins = json.loads((release.PROVIDER / 'preview11-publication.json').read_text())
         for name in ['candidateRun', 'candidateHead', 'packageSha256', 'candidateReceiptSha256']:
             self.assertIsNone(pins[name])
