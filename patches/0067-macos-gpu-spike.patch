@@ -75,6 +75,20 @@ diff --git a/Source/ThirdParty/ANGLE/PlatformMac.cmake b/Source/ThirdParty/ANGLE
 +    set(GLESv2_LIBRARY_TYPE SHARED)
 +    set(EGL_LIBRARY_TYPE SHARED)
 +endif ()
+diff --git a/Source/ThirdParty/ANGLE/CMakeLists.txt b/Source/ThirdParty/ANGLE/CMakeLists.txt
+--- a/Source/ThirdParty/ANGLE/CMakeLists.txt
++++ b/Source/ThirdParty/ANGLE/CMakeLists.txt
+@@ -213,6 +213,10 @@
+             EGLAPI=
+         )
+ 
++        if (RANVIER_MAC_GPU_SPIKE)
++            target_compile_options(EGL PRIVATE -fvisibility=default)
++        endif ()
++
+         target_link_libraries(EGL PRIVATE GLESv2 ${CMAKE_DL_LIBS})
+ 
+         set_target_properties(EGL PROPERTIES LINKER_LANGUAGE CXX)
 diff --git a/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp b/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp
 --- a/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp
 +++ b/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp
