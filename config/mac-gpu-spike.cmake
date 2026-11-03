@@ -1,0 +1,2 @@
+set(RANVIER_MAC_GPU_SPIKE ON CACHE BOOL "")
+include("${CMAKE_CURRENT_LIST_DIR}/gpu.cmake")
