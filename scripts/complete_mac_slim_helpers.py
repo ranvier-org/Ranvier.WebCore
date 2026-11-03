@@ -33,6 +33,10 @@ def sha(path):
         return hashlib.file_digest(stream, 'sha256').hexdigest()
 
 
+def child_environment():
+    return {key: value for key, value in os.environ.items() if key not in {'GH_TOKEN', 'GITHUB_TOKEN'}}
+
+
 def members(archive):
     names = archive.namelist()
     if len(names) != len(set(names)):
@@ -133,7 +137,8 @@ def main():
         row = dict(name=name, argv=[str(value) for value in command])
         receipt['commands'].append(row)
         with (output / (name + '.log')).open('wb') as stream:
-            child = subprocess.Popen(row['argv'], stdout=stream, stderr=subprocess.STDOUT, start_new_session=True)
+            child = subprocess.Popen(row['argv'], stdout=stream, stderr=subprocess.STDOUT, start_new_session=True,
+                                     env=child_environment())
             row['pid'] = child.pid
             try:
                 row['exit'] = child.wait(timeout=180)
@@ -166,6 +171,9 @@ def main():
                     or metadata['digest'] != 'sha256:' + pin['sha256']):
                 raise ValueError('Original artifact metadata mismatch')
             api('actions/artifacts/' + str(pin['id']) + '/zip', output / (name + '.zip'))
+        for key in ['GH_TOKEN', 'GITHUB_TOKEN']:
+            os.environ.pop(key, None)
+        receipt['acquisitionCredentialsRemoved'] = True
         recovery, prior = admit_original(contract, output / 'proof.zip', output / 'package.zip')
         header = product / 'host/RanvierWebCoreAbi.h'
         declarations = re.findall(rb'RV_EXPORT\s+[^;]*?\b(rv_\w+)\s*\([^;]*?\)\s*;', header.read_bytes(), re.S)

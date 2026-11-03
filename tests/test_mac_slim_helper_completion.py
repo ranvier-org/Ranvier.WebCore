@@ -1,8 +1,10 @@
 import importlib.util
 import json
+import os
 from pathlib import Path
 import tempfile
 import unittest
+from unittest import mock
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -12,6 +14,14 @@ spec.loader.exec_module(completion)
 
 
 class HelperCompletionTests(unittest.TestCase):
+    def test_children_exclude_both_acquisition_credentials(self):
+        with mock.patch.dict(os.environ, {'GH_TOKEN': 'test-only-gh', 'GITHUB_TOKEN': 'test-only-github',
+                                         'COMPLETION_CONTROL': 'retained'}):
+            environment = completion.child_environment()
+            self.assertNotIn('GH_TOKEN', environment)
+            self.assertNotIn('GITHUB_TOKEN', environment)
+            self.assertEqual(environment['COMPLETION_CONTROL'], 'retained')
+
     def test_exact_original_archive_admission(self):
         root = Path('C:/wk/project2/mac-d31-recovery/slim-41733425197')
         if not (root / 'package.zip').exists():
