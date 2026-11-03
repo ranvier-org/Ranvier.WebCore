@@ -244,15 +244,16 @@ Creating the release pushes its tag, and the tag's run of this workflow:
 A tag pushed without a release builds every runtime in CI, as before. A package built on a workstation
 records `"builder": "local"` in the `source` field of its `manifest.json`; CI's record `"ci"`.
 
-#### Coordinated Windows GPU package
+#### Coordinated GPU packages
 
 `release.py --flavor gpu` builds and checks `Ranvier.WebCore.Native.Gpu.<rid>`; `slim`, `gpu` and `lean`
 retain the same clean-source, remote-commit and immutable-version-tag checks. Creating a release always
 starts the default **slim** tag run. After it publishes the five slim runtimes, managed interop and native
-aggregate, the `windows-gpu-cohort` job automatically dispatches Windows x64 GPU on the **same immutable tag**.
-This pairs each new native preview with its Windows GPU runtime. An owner's attached GPU asset is checked
-on a clean runner; otherwise that run builds it. Both paths run the native shared D3D11 frame and lifetime
-acceptance with the SHA-256-pinned SDL package in `scripts/sdl_runtime.py`.
+aggregate, the `gpu-cohort` job dispatches Windows x64, Linux x64/ARM64 and macOS ARM64 GPU on the
+**same immutable tag**. An owner's attached GPU asset is checked on its matching runner; otherwise that
+run builds it. Each runtime must pass its native transport and lifetime checks before publication.
+Windows runs shared D3D11 acceptance with the pinned SDL package in `scripts/sdl_runtime.py`;
+macOS runs the public IOSurface frame/input checks. Windows ARM64 GPU is not part of this cohort.
 
 To retry only the GPU cohort of an existing tag, dispatch explicitly:
 
@@ -260,8 +261,8 @@ To retry only the GPU cohort of an existing tag, dispatch explicitly:
 gh workflow run build.yml --repo ranvier-org/Ranvier.WebCore --ref v<VERSION> --field flavor=gpu --field rids=win-x64
 ```
 
-The dispatch builds or checks the GPU package against that tag's commit, flavor and version and publishes
-`Ranvier.WebCore.Native.Gpu.win-x64` through the existing NuGet OIDC job. The owner's attached-package
+The dispatch builds or checks each selected GPU package against that tag's commit, flavor and version and
+publishes `Ranvier.WebCore.Native.Gpu.<rid>` through the existing NuGet OIDC job. The owner's attached-package
 check remains in effect; an asset that does not qualify is rebuilt in CI. Concurrency is keyed by tag and
 flavor, so a GPU dispatch cannot cancel its slim cohort. Check the GPU run's publication separately:
 a successful slim run establishes only slim availability. The managed interop and GPU runtime must use
@@ -278,7 +279,8 @@ The `webcore-gpu` lane verifies the exact package identity, version, flavor and 
 the counter with JIT and NativeAOT. Its GPU counts, visible SDL backbuffer and independent OS UIA checks
 must succeed without CPU fallback before the accelerated release is complete.
 
-Linux GPU packages use an explicit same-tag `flavor=gpu` dispatch with `rids=linux-x64,linux-arm64`.
+Linux GPU packages are included in the automatic cohort; a targeted retry can use a same-tag
+`flavor=gpu` dispatch with `rids=linux-x64,linux-arm64`.
 Their native job runs `tests/gpu/linux_egl.py` through the probe runner with
 `EGL_PLATFORM=surfaceless` and `LIBGL_ALWAYS_SOFTWARE=1`, scoped to that child process. This checks
 EGLImage content and retained-frame lifetimes even though Linux skips the F# ABI smoke driver.

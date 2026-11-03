@@ -17,6 +17,9 @@ EVENT_EVENT, EVENT_UI, EVENT_MOUSE, EVENT_KEYBOARD, EVENT_FOCUS, EVENT_CUSTOM = 
 SHIFT, CONTROL, ALT, META = 1, 2, 4, 8
 
 
+from abi_expectation import expected_abi
+
+
 class EventInit(ctypes.Structure):
     _fields_ = [('size', ctypes.c_int32), ('bubbles', ctypes.c_int32), ('cancelable', ctypes.c_int32),
                 ('composed', ctypes.c_int32), ('detail', ctypes.c_int32), ('modifiers', ctypes.c_int32),
@@ -57,7 +60,7 @@ def verify(directory, evidence):
     def bind(name, returns, arguments):
         return bind_utf8(library, name, returns, arguments)
 
-    expect(bind('rv_abi_version', i32, [])() == 63, 'ABI version 63')
+    expect(bind('rv_abi_version', i32, [])() == expected_abi(), 'ABI version 63')
     has = bind('rv_abi_has', i32, [ctypes.c_char_p])
     expect(has(b'event-construction') == 1, 'event-construction advertised')
     host_create = bind('rv_host_create', p, [i32, i32])

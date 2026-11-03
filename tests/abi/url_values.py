@@ -14,7 +14,9 @@ import sys
 import threading
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
-ABI = 63
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from abi_expectation import expected_abi
+ABI = expected_abi()
 COMPONENTS = ['protocol', 'username', 'password', 'hostname', 'port', 'pathname', 'search', 'hash']
 FIELDS = ['href', 'origin', 'protocol', 'username', 'password', 'host', 'hostname', 'port', 'pathname', 'search', 'hash']
 

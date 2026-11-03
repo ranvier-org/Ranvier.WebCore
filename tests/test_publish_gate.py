@@ -22,10 +22,10 @@ def permits_publish(native='success', prebuilt='skipped', managed='success', con
     return eval(' '.join(expression.split()), {'__builtins__': {}}, {'startsWith': lambda value, prefix: value.startswith(prefix)})
 
 
-def permits_windows_gpu_cohort(native='success', prebuilt='skipped', publish='success', cancelled=False,
+def permits_gpu_cohort(native='success', prebuilt='skipped', publish='success', cancelled=False,
                                event='push', ref='refs/tags/v0.1.1-preview.2', recovery='', atspi='off', atspi11='off'):
     workflow = (ROOT / '.github/workflows/build.yml').read_text()
-    job = workflow.split('\n  windows-gpu-cohort:\n', 1)[1]
+    job = workflow.split('\n  gpu-cohort:\n', 1)[1]
     expression = job.split('if:', 1)[1].split('${{', 1)[1].split('}}', 1)[0]
     success = all(status == 'success' for status in [native, prebuilt, publish])
     # GitHub implicitly adds success() unless a status-check function is present in the actual condition.
@@ -45,12 +45,12 @@ class PublishGateTests(unittest.TestCase):
     def test_provider_modes_suppress_native_publication_and_child(self):
         for mode in ('prepare', 'publish'):
             self.assertFalse(permits_publish(atspi=mode))
-            self.assertFalse(permits_windows_gpu_cohort(atspi=mode))
+            self.assertFalse(permits_gpu_cohort(atspi=mode))
 
     def test_recovery_inputs_suppress_ordinary_publication_and_child(self):
         for flag in ('preview2_gpu', 'preview4_gpu', 'preview7_linux', 'preview7_windows'):
             self.assertFalse(permits_publish(recovery=flag))
-            self.assertFalse(permits_windows_gpu_cohort(recovery=flag))
+            self.assertFalse(permits_gpu_cohort(recovery=flag))
 
     def test_a_failed_runtime_cannot_publish_an_uploaded_package(self):
         self.assertFalse(permits_publish(native='failure', managed='skipped'))
@@ -90,27 +90,27 @@ class GpuCohortTests(unittest.TestCase):
     def test_successful_tag_publication_survives_the_skipped_optional_ancestor(self):
         for native, prebuilt in [('success', 'skipped'), ('skipped', 'success')]:
             with self.subTest(native=native, prebuilt=prebuilt):
-                self.assertTrue(permits_windows_gpu_cohort(native=native, prebuilt=prebuilt))
+                self.assertTrue(permits_gpu_cohort(native=native, prebuilt=prebuilt))
 
     def test_gpu_recovery_dispatch_does_not_recurse_or_run_after_failed_publication(self):
-        self.assertFalse(permits_windows_gpu_cohort(event='workflow_dispatch'))
-        self.assertFalse(permits_windows_gpu_cohort(ref='refs/heads/main'))
-        self.assertFalse(permits_windows_gpu_cohort(cancelled=True))
+        self.assertFalse(permits_gpu_cohort(event='workflow_dispatch'))
+        self.assertFalse(permits_gpu_cohort(ref='refs/heads/main'))
+        self.assertFalse(permits_gpu_cohort(cancelled=True))
         for publish in ['failure', 'cancelled', 'skipped']:
             with self.subTest(publish=publish):
-                self.assertFalse(permits_windows_gpu_cohort(publish=publish))
+                self.assertFalse(permits_gpu_cohort(publish=publish))
 
-    def test_successful_version_tag_dispatches_only_the_matching_windows_gpu_cohort(self):
+    def test_successful_version_tag_dispatches_the_matching_supported_gpu_cohort(self):
         workflow = (ROOT / '.github/workflows/build.yml').read_text()
-        self.assertIn('\n  windows-gpu-cohort:\n', workflow)
-        job = workflow.split('\n  windows-gpu-cohort:\n', 1)[1]
+        self.assertIn('\n  gpu-cohort:\n', workflow)
+        job = workflow.split('\n  gpu-cohort:\n', 1)[1]
         self.assertIn('needs: publish', job)
         self.assertIn("github.event_name == 'push'", job)
         self.assertIn("startsWith(github.ref, 'refs/tags/v')", job)
         self.assertIn("needs.publish.result == 'success'", job)
         self.assertIn('actions: write', job)
         self.assertIn('--ref "$GITHUB_REF_NAME"', job)
-        self.assertIn('--field flavor=gpu --field rids=win-x64', job)
+        self.assertIn('--field flavor=gpu --field rids=win-x64,linux-x64,linux-arm64,osx-arm64', job)
         self.assertIn('GH_TOKEN: ${{ github.token }}', job)
 
     def test_flavor_runs_do_not_cancel_the_matching_slim_tag_run(self):

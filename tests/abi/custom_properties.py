@@ -9,6 +9,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from utf8_inputs import Utf8, bind as bind_utf8
 
 
+from abi_expectation import expected_abi
+
+
 def verify(native_directory):
     directory = Path(native_directory).resolve()
     filename = {'win32': 'RanvierWebCoreHost.dll', 'darwin': 'libRanvierWebCoreHost.dylib'}.get(sys.platform, 'libRanvierWebCoreHost.so')
@@ -51,7 +54,7 @@ def verify(native_directory):
     host = bind('rv_host_create', pointer, [integer, integer])(320, 240)
     expect(bool(host), 'host creation')
     try:
-        expect(bind('rv_abi_version', unsigned, [])() == 63, 'Native ABI63 registration transport')
+        expect(bind('rv_abi_version', unsigned, [])() == expected_abi(), 'Native ABI63 registration transport')
         expect(bind('rv_abi_has', integer, [string])(b'dom-css-register-property') == 1, 'registration capability')
         body = bind('rv_document_body', pointer, [pointer])(host)
         retained.append(('rv_node_release', body))

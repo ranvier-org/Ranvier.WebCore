@@ -34,14 +34,25 @@ class PackagedGpuTests(unittest.TestCase):
         self.assertIn('gpu', inspect.signature(probe.verify).parameters,
                       'Packaged GPU payloads need a shared-frame acceptance mode')
 
-    def package(self, directory, flavor='gpu', rid='win-x64'):
+    def package(self, directory, flavor='gpu', rid='win-x64', abi=63):
         archive = directory / 'runtime.nupkg'
         with zipfile.ZipFile(archive, 'w') as package:
-            package.writestr('manifest.json', json.dumps({'rid': rid, 'flavor': flavor}))
+            package.writestr('manifest.json', json.dumps({'rid': rid, 'flavor': flavor, 'abi': abi}))
             library = ('libRanvierWebCoreHost.so' if rid.startswith('linux') else
                        'libRanvierWebCoreHost.dylib' if rid.startswith('osx') else 'RanvierWebCoreHost.dll')
             package.writestr(f'runtimes/{rid}/native/{library}', b'packaged host')
         return archive
+
+    def test_explicit64_scopes_child_environment_and_rejects_mismatched_package(self):
+        with tempfile.TemporaryDirectory() as directory:
+            calls = []
+            with patch('subprocess.run', side_effect=lambda command, **kw: calls.append(kw)):
+                probe.verify(self.package(Path(directory), abi=64), gpu=True, expected_abi=64)
+            self.assertTrue(calls)
+            self.assertTrue(all(row['env']['RANVIER_ABI_TEST_EXPECTED'] == '64' for row in calls))
+            with patch('subprocess.run') as execute, self.assertRaises(ValueError):
+                probe.verify(self.package(Path(directory), abi=63), gpu=True, expected_abi=64)
+            execute.assert_not_called()
 
     def test_gpu_package_runs_shared_frame_lifetime_checks_on_the_extracted_payload(self):
         with tempfile.TemporaryDirectory() as directory:

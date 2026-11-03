@@ -16,7 +16,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from form_collections import Native, Case, I, P
 
 WRONG_THREAD, UNSUPPORTED = -2, -9
-ABI = 63
+from abi_expectation import expected_abi
+ABI = expected_abi()
 SAMPLES = 21
 # A pass with nothing pending takes microseconds; the Cocoa RunLoop::cycle() wait is 50 ms.
 ZERO_CYCLE_LIMIT_MS = 10.0

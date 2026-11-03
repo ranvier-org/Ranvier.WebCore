@@ -20,7 +20,8 @@ from utf8_inputs import Utf8, bind as bind_utf8
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, UNSUPPORTED = 0, -1, -9
-ABI = 63
+from abi_expectation import expected_abi
+ABI = expected_abi()
 NUL = chr(0)
 C = ctypes.c_char_p
 CALLBACK = ctypes.CFUNCTYPE(I, P, P)

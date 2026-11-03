@@ -50,7 +50,7 @@ def permitted(name, **options):
 
 class RecoveryWorkflowControls(unittest.TestCase):
     def test_provider_modes_are_exclusive_and_publisher_requires_main(self):
-        ordinary = ['plan', 'package-contract', 'native', 'prebuilt', 'managed', 'publish', 'windows-gpu-cohort',
+        ordinary = ['plan', 'package-contract', 'native', 'prebuilt', 'managed', 'publish', 'gpu-cohort',
                     'recover-preview2-gpu', 'publish-preview2-recovery', 'verify-preview4-gpu-recovery',
                     'publish-preview4-gpu-recovery', 'verify-preview7-linux-recovery', 'publish-preview7-linux-recovery',
                     'verify-preview7-windows-recovery', 'publish-preview7-windows-recovery']
@@ -66,7 +66,7 @@ class RecoveryWorkflowControls(unittest.TestCase):
         self.assertFalse(permitted('publish-atspi-preview10', atspi='publish', recovery7=True))
 
     def test_preview7_isolated_and_main_only(self):
-        for name in ['plan', 'package-contract', 'native', 'prebuilt', 'managed', 'publish', 'windows-gpu-cohort',
+        for name in ['plan', 'package-contract', 'native', 'prebuilt', 'managed', 'publish', 'gpu-cohort',
                      'recover-preview2-gpu', 'publish-preview2-recovery', 'verify-preview4-gpu-recovery', 'publish-preview4-gpu-recovery']:
             with self.subTest(job=name): self.assertFalse(permitted(name, recovery7=True))
         self.assertTrue(permitted('verify-preview7-linux-recovery', recovery7=True))
@@ -91,7 +91,7 @@ class RecoveryWorkflowControls(unittest.TestCase):
 
     def test_preview4_skips_all_other_jobs_and_requires_main(self):
         for name in ['plan', 'package-contract', 'native', 'prebuilt', 'managed', 'publish',
-                     'windows-gpu-cohort', 'recover-preview2-gpu', 'publish-preview2-recovery']:
+                     'gpu-cohort', 'recover-preview2-gpu', 'publish-preview2-recovery']:
             with self.subTest(job=name):
                 self.assertFalse(permitted(name, recovery4=True))
         self.assertTrue(permitted('verify-preview4-gpu-recovery', recovery4=True))
@@ -118,7 +118,7 @@ class RecoveryWorkflowControls(unittest.TestCase):
         self.assertIn('needs: [verify-preview4-gpu-recovery]', publication)
 
     def test_recovery_skips_every_ordinary_job(self):
-        for name in ['plan', 'package-contract', 'native', 'prebuilt', 'managed', 'publish', 'windows-gpu-cohort']:
+        for name in ['plan', 'package-contract', 'native', 'prebuilt', 'managed', 'publish', 'gpu-cohort']:
             with self.subTest(job=name):
                 self.assertFalse(permitted(name, recovery=True, event='push', ref='refs/tags/v0.1.1-preview.2'))
 

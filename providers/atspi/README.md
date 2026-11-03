@@ -94,3 +94,22 @@ SDK publish/load must then run on ARM64. `--test-only-arm64` allows only private
 
 Even a green ARM64 distribution job leaves real managed Window normal/traced NativeAOT lifecycle and optional-module/
 missing-bus checks, complete matching final cohort acceptance and public version allocation outstanding.
+
+## ABI64 delivery candidates
+
+The provider source admits exactly ABI63 or ABI64 when the host advertises
+`accessibility-text-style`; it does not accept later unknown ABIs. The private
+packager retains default ABI63 admission. An ABI64 candidate must select
+`--expected-host-abi 64`, match the loaded host version/capability and retain the
+independent provider source revision and both native hashes. The resulting
+private ABI64 scope is explicitly unqualified. Packaging alone does not prove an
+older provider binary can start on ABI64.
+
+The public P12 provider/P11 host receipts remain ABI63 evidence. Before claiming
+ABI64 compatibility, qualify each Linux RID against the exact new host/provider:
+87 protocol assertions in each of three processes, 23 style controls, installed
+SDK consumer and six strict managed profiles. Verify the full previous 347 C ABI
+signature prefix plus the canonical 349-declaration ABI64 header. ARM64 requires
+its own matching native/runtime evidence. No host or GIO dependency is added to
+the renderer or bundled in this optional provider package; public versions remain
+separately coordinated rather than inferred equal to the native host version.

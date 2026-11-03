@@ -15,7 +15,8 @@ import zlib
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
 
-ABI = 63
+from abi_expectation import expected_abi
+ABI = expected_abi()
 OK, NULL_ARGUMENT, DOM_EXCEPTION, BUFFER_TOO_SMALL, UNSUPPORTED, WRONG_INTERFACE = 0, -1, -3, -6, -9, -11
 TWO_D = 1
 RGBA8, PNG, JPEG, WEBP = 0, 1, 2, 3
