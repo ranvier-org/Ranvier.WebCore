@@ -331,6 +331,7 @@ def client(args):
         visit(root)
         check('Dynamic' in found and added(), 'adding a native control exposes its child-addition event and accessible object')
         check(any(event['signal'] == 'AddAccessible' and event['parameters'][0][0] == (ready['bus'], found['Dynamic']) for event in cache_events), 'new native control updates the AT-SPI cache')
+        check(call(field, component, 'GrabFocus')[0], 'editable can be focused before removal')
         request('remove-field')
         deadline = time.monotonic() + 2
         removed = lambda: any(event['signal'] == 'ChildrenChanged' and event['parameters'][0] == 'remove'
@@ -340,6 +341,7 @@ def client(args):
             time.sleep(0.005)
         check(removed(), 'removing a native control delivers its exact accessible child-removal identity')
         check(any(event['signal'] == 'RemoveAccessible' and event['parameters'][0] == (ready['bus'], field) for event in cache_events), 'detached native control is retired from the AT-SPI cache')
+        check(call(found['Dynamic'], component, 'GrabFocus')[0], 'another control accepts focus after focused node removal')
         request('remove-last')
         deadline = time.monotonic() + 2
         last_removed = lambda: any(event['signal'] == 'ChildrenChanged' and event['path'] == found['Group']
@@ -360,6 +362,7 @@ def client(args):
         found.clear()
         visit(root)
         check('Replacement' in found and 'Name' not in found, 'replacement document is exposed without old controls')
+        check(call(found['Replacement'], component, 'GrabFocus')[0], 'replacement document accepts focus after node retirement')
         if args.queued_set:
             request('pause')
             completion = []

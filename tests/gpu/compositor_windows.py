@@ -21,7 +21,7 @@ def main():
     try:
         library = build_helper(consumer, args.compiler_environment, texture_input=True)
         failures = []
-        for name in ['compositor_dpi_windows', 'compositor_input_windows']:
+        for name in ['compositor_dpi_windows', 'compositor_input_windows', 'compositor_fractional_edges']:
             result = subprocess.run([
                 sys.executable, '-I', str(Path(__file__).with_name(name + '.py')),
                 '--native-directory', str(args.native_directory.resolve()),

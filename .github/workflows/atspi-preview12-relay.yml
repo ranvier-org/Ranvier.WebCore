@@ -1,0 +1,32 @@
+name: Unarmed P12 local x64 proof relay
+
+on:
+  workflow_dispatch:
+
+jobs:
+  relay:
+    if: ${{ false && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Check relay guards
+        run: python3 -I tests/atspi/test_preview12_relay.py
+      - name: Verify accepted local evidence without executing qualification
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -I scripts/relay_atspi_preview12_x64.py receive --work "$RUNNER_TEMP/atspi-preview12-relay"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: atspi-preview12-local-x64-qualified
+          path: ${{ runner.temp }}/atspi-preview12-relay/validated/
+          if-no-files-found: error
+          retention-days: 30

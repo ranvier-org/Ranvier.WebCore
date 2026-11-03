@@ -79,6 +79,38 @@ class AggregatePolicyTests(unittest.TestCase):
         policy=json.loads((ROOT/'providers/atspi/public-cohort.example.json').read_text())
         with self.assertRaisesRegex(ValueError,'unarmed'): aggregate.prepare(policy,self.inputs,self.receipts)
 
+    def test_explicit_reviewed_provider12_host11_pair_is_closed(self):
+        unarmed=dict(json.loads((ROOT/'providers/atspi/public-preview12.json').read_text()),armed=False)
+        with self.assertRaisesRegex(ValueError,'unarmed'): aggregate.validate_policy(unarmed)
+        policy=deepcopy(self.policy)
+        policy.update(schemaVersion=2,version='0.1.1-preview.12',nativeVersion='0.1.1-preview.11',
+                      nativeSource='8b8db298eba294876c27bd9a3200881f872684df',
+                      providerSourceClaim='05adae5c9829472306e85b6b3b4aac068e79a5ec')
+        aggregate.validate_policy(policy)
+        for field,value in [('version','0.1.1-preview.13'),('nativeVersion','0.1.1-preview.10'),
+                            ('nativeSource','9'*40),('providerSourceClaim','8'*40),('abi',64)]:
+            altered=deepcopy(policy); altered[field]=value
+            with self.subTest(field=field), self.assertRaises(ValueError): aggregate.validate_policy(altered)
+        altered=deepcopy(policy); altered['rids']['linux-riscv64']={}
+        with self.assertRaises(ValueError): aggregate.validate_policy(altered)
+        altered=deepcopy(policy); altered['schemaVersion']=1
+        with self.assertRaises(ValueError): aggregate.validate_policy(altered)
+        altered=deepcopy(policy); altered['schemaVersion']=True
+        with self.assertRaises(ValueError): aggregate.validate_policy(altered)
+
+    def test_reviewed_pair_still_requires_matching_per_rid_receipt(self):
+        policy=deepcopy(self.policy)
+        policy.update(schemaVersion=2,version='0.1.1-preview.12',nativeVersion='0.1.1-preview.11',
+                      nativeSource='8b8db298eba294876c27bd9a3200881f872684df',
+                      providerSourceClaim='05adae5c9829472306e85b6b3b4aac068e79a5ec')
+        path=self.receipts['linux-x64']; receipt=json.loads(path.read_text())
+        receipt.update(nativeVersion=policy['nativeVersion'],nativeSource=policy['nativeSource'],providerSourceClaim=policy['providerSourceClaim'])
+        for field in ['nativeVersion','nativeSource','providerSourceClaim']:
+            altered=deepcopy(receipt); altered[field]='wrong'; path.write_text(json.dumps(altered))
+            policy['rids']['linux-x64']['receiptSha256']=hashlib.sha256(path.read_bytes()).hexdigest()
+            with self.subTest(field=field), self.assertRaisesRegex(ValueError,'identity'):
+                aggregate.checked_receipt(path,policy['rids']['linux-x64'],policy,'linux-x64')
+
     def test_one_manifest_selects_two_distinct_native_payloads_without_a_host(self):
         payload,manifest=aggregate.prepare(self.policy,self.inputs,self.receipts)
         self.assertEqual(set(manifest['runtimes']),{'linux-x64','linux-arm64'})
@@ -95,6 +127,18 @@ class AggregatePolicyTests(unittest.TestCase):
                 self.mutate_package('linux-arm64',lambda _manifest,payload:payload.update({name:original+b'changed'}))
                 with self.assertRaises(ValueError): aggregate.prepare(self.policy,self.inputs,self.receipts)
                 self.mutate_package('linux-arm64',lambda _manifest,payload:payload.update({name:original}))
+
+    def test_optional_proof_transport_label_does_not_claim_relay_execution(self):
+        _, original=aggregate.prepare(self.policy,self.inputs,self.receipts)
+        self.assertNotIn('qualificationProofKind',original['runtimes']['linux-x64'])
+        for rid,kind in [('linux-x64','local-qualified-relayed'),('linux-arm64','runner-executed')]:
+            self.policy['rids'][rid]['proofKind']=kind
+        _, manifest=aggregate.prepare(self.policy,self.inputs,self.receipts)
+        self.assertEqual(manifest['runtimes']['linux-x64']['qualificationProofKind'],'local-qualified-relayed')
+        self.assertEqual(manifest['runtimes']['linux-arm64']['qualificationProofKind'],'runner-executed')
+        self.policy['rids']['linux-x64']['proofKind']='relay-executed-tests'
+        with self.assertRaisesRegex(ValueError,'transport kind'):
+            aggregate.prepare(self.policy,self.inputs,self.receipts)
 
     def test_mixed_abi_source_claim_capability_or_architecture_is_rejected(self):
         for name,value in [('abi',62),('abi',63.0),('callerClaimedProviderSourceRevision','9'*40),('sourceProvenance','verified'),('requiredCapability','old-style')]:

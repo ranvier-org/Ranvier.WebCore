@@ -37,10 +37,16 @@ def relative(name):
 
 
 def validate_policy(policy):
-    if policy.get('schemaVersion')!=1 or policy.get('armed') is not True:
+    if type(policy.get('schemaVersion')) is not int or policy['schemaVersion'] not in (1,2) or policy.get('armed') is not True:
         raise ValueError('The public aggregate is unarmed.')
-    if policy.get('id')!=IDENTITY or policy.get('version')!=policy.get('nativeVersion'):
+    if policy.get('id')!=IDENTITY:
         raise ValueError('Use the reserved public ID and coordinated Native version.')
+    if policy['schemaVersion']==1 and policy.get('version')!=policy.get('nativeVersion'):
+        raise ValueError('Use the reserved public ID and coordinated Native version.')
+    if policy['schemaVersion']==2 and tuple(policy.get(field) for field in ('version','nativeVersion','nativeSource','providerSourceClaim'))!=(
+            '0.1.1-preview.12','0.1.1-preview.11','8b8db298eba294876c27bd9a3200881f872684df',
+            '05adae5c9829472306e85b6b3b4aac068e79a5ec'):
+        raise ValueError('The provider and Native versions or source claims do not match the reviewed compatibility pair.')
     if not isinstance(policy.get('version'),str) or not re.fullmatch(r'\d+\.\d+\.\d+(?:-[A-Za-z0-9]+(?:[.-][A-Za-z0-9]+)*)?',policy['version']):
         raise ValueError('An allocated public cohort version is required.')
     if re.search(r'(?:^|[.-])(?:private\w*|local\w*|ci)(?:[.-]|$)',policy['version'],re.I):
@@ -50,6 +56,8 @@ def validate_policy(policy):
     for field in ['nativeSource','providerSourceClaim']: full_hash(policy.get(field),40,field)
     for rid,pins in policy['rids'].items():
         for field in ['packageSha256','receiptSha256']: full_hash(pins.get(field),64,rid+' '+field)
+        if 'proofKind' in pins and pins['proofKind'] not in ('local-qualified-relayed','runner-executed'):
+            raise ValueError('Unknown qualification transport kind.')
 
 
 def checked_receipt(path,pins,policy,rid):
@@ -126,6 +134,8 @@ def prepare(policy,inputs,receipts):
         if license_status is not None and license_status!=manifest.get('licenseMetadataStatus'): raise ValueError('Input notice metadata contracts differ.')
         common=current; license_status=manifest.get('licenseMetadataStatus'); payload[asset]=module
         runtimes[rid]=dict(rid=rid,abi=63,callerClaimedProviderSourceRevision=policy['providerSourceClaim'],hostSha256=receipt['hostSha256'],providerSha256=receipt['providerSha256'],inputPackageSha256=policy['rids'][rid]['packageSha256'],qualificationReceiptSha256=policy['rids'][rid]['receiptSha256'])
+        if 'proofKind' in policy['rids'][rid]:
+            runtimes[rid]['qualificationProofKind']=policy['rids'][rid]['proofKind']
     payload.update(common)
     folded={name.casefold() for name in payload}
     for name in ['PUBLIC-README.md','PUBLIC-NOTICE.md','qualification-input/NOTICE.md','qualification-input/README.md']:

@@ -1,0 +1,47 @@
+name: Unarmed P12 provider candidate
+
+on:
+  workflow_dispatch:
+
+jobs:
+  candidate:
+    if: ${{ false && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.403'
+      - name: Check candidate input guards
+        run: |
+          python3 -I tests/atspi/test_preview12_candidate.py
+          python3 -I tests/atspi/test_public_aggregate.py
+          python3 -I tests/atspi/test_release_candidate.py
+      - name: Prepare accepted RID inputs and ordinary SDK layouts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -I scripts/prepare_atspi_preview12.py prepare --work "$RUNNER_TEMP/atspi-preview12"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: atspi-preview12-candidate
+          path: ${{ runner.temp }}/atspi-preview12/candidate/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Retain preparation logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: atspi-preview12-preparation-proof
+          path: |
+            ${{ runner.temp }}/atspi-preview12/sdk-work/*.log
+            ${{ runner.temp }}/atspi-preview12/sdk-linux-*/consumer-receipt.json
+          if-no-files-found: warn

@@ -41,6 +41,26 @@ class ReleaseCandidateTests(unittest.TestCase):
         self.assertEqual(record['sourceProvenance'],'unverified-caller-claim')
         self.assertIn('not renderer',record['scope'])
 
+    def test_reviewed_provider12_host11_remains_distinct_in_release_record(self):
+        self.cohort.update(schemaVersion=2,version='0.1.1-preview.12',nativeVersion='0.1.1-preview.11',
+                           nativeSource='8b8db298eba294876c27bd9a3200881f872684df',
+                           providerSourceClaim='05adae5c9829472306e85b6b3b4aac068e79a5ec')
+        self.manifest.update(version=self.cohort['version'],nativeVersion=self.cohort['nativeVersion'],
+                             callerClaimedNativeSourceRevision=self.cohort['nativeSource'],
+                             callerClaimedProviderSourceRevision=self.cohort['providerSourceClaim'])
+        with zipfile.ZipFile(self.package,'w') as archive: archive.writestr('provider-manifest.json',json.dumps(self.manifest))
+        self.packageSha=hashlib.sha256(self.package.read_bytes()).hexdigest()
+        self.record.update(sha256=self.packageSha,manifest=self.manifest)
+        self.recordPath.write_text(json.dumps(self.record)); self.cohortPath.write_text(json.dumps(self.cohort))
+        for path in self.layouts.values():
+            value=json.loads(path.read_text()); value['packageSha256']=self.packageSha; path.write_text(json.dumps(value))
+        record=candidate.record_candidate(self.recordPath,self.cohortPath,self.layouts)
+        self.assertEqual(record['package']['version'],'0.1.1-preview.12')
+        self.assertEqual(record['nativeVersion'],'0.1.1-preview.11')
+        self.assertEqual(record['sourceProvenance'],'unverified-caller-claim')
+        self.cohort['providerSourceClaim']='9'*40; self.cohortPath.write_text(json.dumps(self.cohort))
+        with self.assertRaises(ValueError): candidate.record_candidate(self.recordPath,self.cohortPath,self.layouts)
+
     def test_missing_or_opposing_rid_and_execution_claim_are_rejected(self):
         with self.assertRaises(ValueError):candidate.record_candidate(self.recordPath,self.cohortPath,{'linux-x64':self.layouts['linux-x64']})
         for key,bad in [('selectedRid','linux-arm64'),('executed',True),('packageSha256','0'*64),('selectedRuntime',{})]:

@@ -68,3 +68,4 @@
 0070-cocoa-texture-mapper-angle-dispatch.patch
 0071-view-transition-context-stop.patch
 0072-cocoa-page-contrast.patch
+0073-texture-mapper-fractional-paint-bounds.patch
