@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   replay:
-    if: ${{ false && github.event_name == 'push' && github.ref == 'refs/heads/codex/project2-macos-public-transport' }}
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/codex/project2-macos-public-transport' }}
     runs-on: macos-26
     timeout-minutes: 20
     steps:
