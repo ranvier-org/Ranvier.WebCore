@@ -171,7 +171,7 @@ timeout, 600 s unless the entry sets one.
 ### GPU clipping qualification
 
 The Windows and Linux x64 GPU producers run `scripts/qualify_producer_gpu_clipping.py` on their own staged
-runtime. Admission checks the current manifest, native hashes, generated ABI and reviewed WebKit source pin;
+runtime. Admission checks the current manifest, native hashes, generated ABI, exact clean checkout HEAD and reviewed WebKit source pin;
 it does not select an oracle by a package version or a previous producer's binary hash.
 
 `background-content-clipping-regression.json` retains the original 54 comparisons and every raw RGBA image.
@@ -190,7 +190,8 @@ GPU error theorem. Neither ARM nor macOS is admitted by this gate.
 
 The GPU x64 jobs install NumPy 2.4.3 for these test tools. The producer stage stays read-only; shader caches,
 the query-only Linux interposer and reports stay in the qualification output. Each child is bounded within a
-540-second aggregate run and an 8 GiB sampled process-tree guard. The evidence is uploaded even on failure.
+540-second aggregate run and an 8 GiB sampled process-tree guard. Windows child bodies wait for assignment to
+an owned kill-on-close job; a real descendant-timeout control runs in the GPU job. The evidence is uploaded even on failure.
 
 ## Local runs
 

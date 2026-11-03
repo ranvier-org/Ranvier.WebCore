@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+import os
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -73,9 +74,10 @@ class ProducerGpuClippingTests(unittest.TestCase):
                         'source':{'commit':'a'*40,'dirty':False,'builder':'ci'},
                         'files':[{'name':'current.so','bytes':len(payload.read_bytes()),
                                   'sha256':hashlib.sha256(payload.read_bytes()).hexdigest()}]}
-            self.assertEqual(gate.check_stage(native,manifest,'linux-x64',63)['current.so'],manifest['files'][0]['sha256'])
+            self.assertEqual(gate.check_stage(native,manifest,'linux-x64',63,'a'*40)['current.so'],manifest['files'][0]['sha256'])
+            with self.assertRaises(AssertionError): gate.check_stage(native,manifest,'linux-x64',63,'b'*40)
             payload.write_bytes(b'changed')
-            with self.assertRaises(AssertionError): gate.check_stage(native,manifest,'linux-x64',63)
+            with self.assertRaises(AssertionError): gate.check_stage(native,manifest,'linux-x64',63,'a'*40)
 
     def test_manifest_unknown_webkit_abi_or_path_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -84,7 +86,7 @@ class ProducerGpuClippingTests(unittest.TestCase):
                 manifest = {'abi':63,'rid':'linux-x64','flavor':'gpu','webkit':gate.WEBKIT,
                             'source':{'commit':'a'*40,'dirty':False,'builder':'ci'},'files':[]}
                 manifest[field] = value
-                with self.assertRaises(AssertionError): gate.check_stage(native,manifest,'linux-x64',63)
+                with self.assertRaises(AssertionError): gate.check_stage(native,manifest,'linux-x64',63,'a'*40)
 
     def test_owned_process_memory_census_includes_a_live_child(self):
         import subprocess
@@ -98,6 +100,59 @@ class ProducerGpuClippingTests(unittest.TestCase):
             self.assertGreater(gate.aggregate_memory(),before+8*1024*1024)
         finally:
             child.terminate(); child.wait(timeout=5); child.stdout.close()
+
+    @unittest.skipUnless(os.name == 'nt', 'Windows job-object ownership')
+    def test_timeout_closes_the_owned_child_and_its_spawned_descendant(self):
+        import ctypes
+        from ctypes import wintypes as W
+        import subprocess
+        import sys
+        with tempfile.TemporaryDirectory() as directory:
+            script = Path(directory)/'descendant.py'
+            script.write_text('import subprocess,sys,time\nchild=subprocess.Popen([sys.executable,"-c","import time;time.sleep(30)"])\nprint(child.pid,flush=True)\ntime.sleep(30)\n',encoding='utf-8')
+            owner = gate.OwnedChild([sys.executable,'-I',str(script)],subprocess.PIPE,os.environ.copy(),ROOT)
+            kernel = ctypes.WinDLL('kernel32',use_last_error=True)
+            kernel.OpenProcess.argtypes,kernel.OpenProcess.restype = [W.DWORD,W.BOOL,W.DWORD],W.HANDLE
+            kernel.WaitForSingleObject.argtypes,kernel.WaitForSingleObject.restype = [W.HANDLE,W.DWORD],W.DWORD
+            kernel.CloseHandle.argtypes = [W.HANDLE]
+            descendant_handle = None
+            try:
+                descendant_pid = int(owner.process.stdout.readline().strip())
+                descendant_handle = kernel.OpenProcess(0x00100000|0x1000,False,descendant_pid)
+                self.assertTrue(descendant_handle)
+                self.assertEqual(kernel.WaitForSingleObject(descendant_handle,0),258)
+                with self.assertRaises(subprocess.TimeoutExpired): owner.process.wait(timeout=.15)
+                owner.close()
+                self.assertIsNotNone(owner.process.returncode)
+                self.assertEqual(kernel.WaitForSingleObject(descendant_handle,5000),0)
+                if os.environ.get('RANVIER_GPU_JOB_TEST_RECEIPT'):
+                    receipt = Path(os.environ['RANVIER_GPU_JOB_TEST_RECEIPT'])
+                    receipt.parent.mkdir(parents=True,exist_ok=True)
+                    temporary = receipt.with_suffix('.tmp')
+                    temporary.write_text(json.dumps({'mainPid':owner.process.pid,'descendantPid':descendant_pid,
+                                                     'timeoutObserved':True,'mainExit':owner.process.returncode,
+                                                     'descendantHandleSignalled':True,'ownedJobClosed':True},indent=2)+'\n',encoding='utf-8')
+                    temporary.replace(receipt)
+            finally:
+                owner.close()
+                owner.process.stdout.close()
+                if descendant_handle: kernel.CloseHandle(descendant_handle)
+
+    @unittest.skipUnless(os.name == 'nt', 'Windows isolated bootstrap')
+    def test_job_bootstrap_restores_the_normal_isolated_global_site(self):
+        import subprocess
+        import sys
+        with tempfile.TemporaryDirectory() as directory:
+            script = Path(directory)/'site_probe.py'
+            script.write_text('import json,sys,pip\nprint(json.dumps({"path":sys.path,"isolated":sys.flags.isolated,"pip":pip.__version__}))\n',encoding='utf-8')
+            expected = json.loads(subprocess.check_output([sys.executable,'-I',str(script)],text=True))
+            owner = gate.OwnedChild([sys.executable,'-I',str(script)],subprocess.PIPE,os.environ.copy(),ROOT)
+            try:
+                actual = json.loads(owner.process.stdout.read())
+                self.assertEqual(owner.process.wait(timeout=5),0)
+                self.assertEqual(actual,expected)
+            finally:
+                owner.close(); owner.process.stdout.close()
 
 
 if __name__ == '__main__': unittest.main()

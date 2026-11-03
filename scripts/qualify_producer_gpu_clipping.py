@@ -29,11 +29,12 @@ def save(path, value):
     temporary.replace(path)
 
 
-def check_stage(native, manifest, rid, expected_abi):
+def check_stage(native, manifest, rid, expected_abi, expected_source):
     assert (manifest['rid'],manifest['flavor'],manifest['abi']) == (rid,'gpu',expected_abi)
     assert manifest['webkit'] == WEBKIT, 'Unqualified WebKit source contract'
     assert manifest['source']['dirty'] is False
     assert len(manifest['source']['commit']) == 40 and all(c in '0123456789abcdef' for c in manifest['source']['commit'])
+    assert manifest['source']['commit'] == expected_source, 'Native stage does not match producer checkout HEAD'
     assert manifest['files'], 'Empty native manifest'
     hashes = {}
     for row in manifest['files']:
@@ -80,6 +81,98 @@ def check_original(report, rid):
     assert {(row['name'],row['scale']) for row in report['failures']} == actual_failures
     assert report['result'] == ('FAIL' if actual_failures else 'PASS')
     return {'strictPass':12,'otherPass':52,'originalFailureCount':len(actual_failures),'dpr1ExistingPolicy':half_rows}
+
+
+class WindowsJob:
+    def __init__(self):
+        from ctypes import wintypes as W
+        class Limits(ctypes.Structure):
+            _fields_ = [('processTime',ctypes.c_longlong),('jobTime',ctypes.c_longlong),('flags',W.DWORD),
+                        ('minimumWorking',ctypes.c_size_t),('maximumWorking',ctypes.c_size_t),
+                        ('activeLimit',W.DWORD),('affinity',ctypes.c_size_t),('priority',W.DWORD),('scheduling',W.DWORD)]
+        class Io(ctypes.Structure):
+            _fields_ = [(name,ctypes.c_ulonglong) for name in ['readOps','writeOps','otherOps','readBytes','writeBytes','otherBytes']]
+        class Extended(ctypes.Structure):
+            _fields_ = [('basic',Limits),('io',Io),('processMemory',ctypes.c_size_t),('jobMemory',ctypes.c_size_t),
+                        ('peakProcessMemory',ctypes.c_size_t),('peakJobMemory',ctypes.c_size_t)]
+        class Accounting(ctypes.Structure):
+            _fields_ = [(name,ctypes.c_longlong) for name in ['user','kernel','periodUser','periodKernel']]+[
+                (name,W.DWORD) for name in ['faults','total','active','terminated']]
+        self.accounting = Accounting
+        self.kernel = ctypes.WinDLL('kernel32',use_last_error=True)
+        self.kernel.CreateJobObjectW.argtypes,self.kernel.CreateJobObjectW.restype = [ctypes.c_void_p,W.LPCWSTR],W.HANDLE
+        self.kernel.SetInformationJobObject.argtypes,self.kernel.SetInformationJobObject.restype = [W.HANDLE,ctypes.c_int,ctypes.c_void_p,W.DWORD],W.BOOL
+        self.kernel.AssignProcessToJobObject.argtypes,self.kernel.AssignProcessToJobObject.restype = [W.HANDLE,W.HANDLE],W.BOOL
+        self.kernel.TerminateJobObject.argtypes,self.kernel.TerminateJobObject.restype = [W.HANDLE,W.UINT],W.BOOL
+        self.kernel.QueryInformationJobObject.argtypes,self.kernel.QueryInformationJobObject.restype = [W.HANDLE,ctypes.c_int,ctypes.c_void_p,W.DWORD,ctypes.c_void_p],W.BOOL
+        self.kernel.CloseHandle.argtypes = [W.HANDLE]
+        self.handle = self.kernel.CreateJobObjectW(None,None)
+        if not self.handle: raise ctypes.WinError(ctypes.get_last_error())
+        limits = Extended()
+        limits.basic.flags = 0x2000|0x200
+        limits.jobMemory = 8*1024**3
+        if not self.kernel.SetInformationJobObject(self.handle,9,ctypes.byref(limits),ctypes.sizeof(limits)):
+            error = ctypes.get_last_error(); self.kernel.CloseHandle(self.handle); self.handle = None
+            raise ctypes.WinError(error)
+
+    def attach(self,process):
+        # The live Popen handle avoids assigning a reused PID.
+        if not self.kernel.AssignProcessToJobObject(self.handle,int(process._handle)):
+            raise ctypes.WinError(ctypes.get_last_error())
+
+    def close(self):
+        if not self.handle: return
+        try:
+            if not self.kernel.TerminateJobObject(self.handle,1): raise ctypes.WinError(ctypes.get_last_error())
+            deadline = time.monotonic()+5
+            while True:
+                info = self.accounting()
+                if not self.kernel.QueryInformationJobObject(self.handle,1,ctypes.byref(info),ctypes.sizeof(info),None):
+                    raise ctypes.WinError(ctypes.get_last_error())
+                if not info.active: break
+                assert time.monotonic() < deadline, 'Owned Windows job did not empty after termination'
+                time.sleep(.01)
+        finally:
+            self.kernel.CloseHandle(self.handle)
+            self.handle = None
+
+
+class OwnedChild:
+    def __init__(self,command,log,environment,cwd):
+        self.process = None
+        self.job = None
+        self.launch_command = command
+        if os.name == 'nt':
+            assert command[:2] == [sys.executable,'-I'], 'Windows probe must use the isolated Python entry point'
+            self.job = WindowsJob()
+            bootstrap = ('import sys; '
+                         'assert sys.stdin.buffer.read(1)==b"G", "Missing parent job admission"; '
+                         'import site; site.main(); import runpy; '
+                         'sys.argv=sys.argv[1:]; runpy.run_path(sys.argv[0],run_name="__main__")')
+            self.launch_command = [sys.executable,'-I','-S','-c',bootstrap,*command[2:]]
+        try:
+            options = {'creationflags':subprocess.CREATE_NEW_PROCESS_GROUP} if self.job else {'start_new_session':True}
+            self.process = subprocess.Popen(self.launch_command,stdout=log,stderr=subprocess.STDOUT,
+                                            stdin=subprocess.PIPE if self.job else subprocess.DEVNULL,
+                                            env=environment,cwd=cwd,**options)
+            if self.job:
+                self.job.attach(self.process)
+                self.process.stdin.write(b'G'); self.process.stdin.flush(); self.process.stdin.close()
+        except BaseException:
+            self.close()
+            raise
+
+    def close(self):
+        try:
+            if self.job: self.job.close()
+            elif self.process:
+                try: os.killpg(self.process.pid,signal.SIGKILL)
+                except ProcessLookupError: pass
+        finally:
+            if self.process:
+                if self.process.poll() is None: self.process.kill()
+                self.process.wait(timeout=5)
+                if self.process.stdin and not self.process.stdin.closed: self.process.stdin.close()
 
 
 def aggregate_memory():
@@ -150,9 +243,12 @@ def main():
     manifest = json.loads(manifest_path.read_text())
     sys.path.insert(0,str(ROOT/'tests/abi'))
     from form_collections import ABI
-    before = check_stage(native,manifest,args.rid,ABI)
+    source_command = ['git','-C',str(ROOT),'rev-parse','HEAD']
+    expected_source = subprocess.check_output(source_command,text=True).strip()
+    assert not subprocess.check_output(['git','-C',str(ROOT),'status','--porcelain','--untracked-files=no'],text=True).strip(), 'Producer tracked checkout is dirty'
+    before = check_stage(native,manifest,args.rid,ABI,expected_source)
     receipt = {'result':'RUNNING','rid':args.rid,'manifest':manifest,'manifestSha256':sha(manifest_path),
-               'nativeBefore':before,'commands':[],'sourceInputs':{},
+               'nativeBefore':before,'commands':[],'sourceInputs':{},'producerCheckoutHead':expected_source,
                'guard':{'aggregateBytes':8*1024**3,'seconds':540,'sampleSeconds':.05,
                         'memoryMetric':'private commit' if os.name == 'nt' else 'RSS'}}
     receipt['historicalCrossDraw'] = json.loads((ROOT/'tests/p7_gpu_qualification/sampler-format-premises.json').read_text())['historical']
@@ -182,10 +278,11 @@ def main():
         peak = 0
         at = time.monotonic()
         with (output/(name+'.log')).open('wb') as log:
-            options = {'creationflags':subprocess.CREATE_NEW_PROCESS_GROUP} if os.name == 'nt' else {'start_new_session':True}
-            process = subprocess.Popen(command,stdout=log,stderr=subprocess.STDOUT,stdin=subprocess.DEVNULL,
-                                       env=selected_env,cwd=ROOT,**options)
+            owner = OwnedChild(command,log,selected_env,ROOT)
+            process = owner.process
             record['pid'] = process.pid
+            record['actualLaunchArgv'] = owner.launch_command
+            record['cleanup'] = 'owned Windows job kill-on-close; probe body admitted after assignment' if owner.job else 'owned POSIX process group'
             try:
                 while process.poll() is None:
                     peak = max(peak,aggregate_memory())
@@ -193,10 +290,9 @@ def main():
                     assert time.monotonic()-started <= 540 and time.monotonic()-at <= timeout, 'GPU probe timeout'
                     time.sleep(.05)
             finally:
-                if process.poll() is None:
-                    if os.name == 'nt': process.kill()
-                    else: os.killpg(process.pid,signal.SIGKILL)
-                    process.wait()
+                failure = sys.exc_info()[1]
+                if failure is not None: record.update(failureType=type(failure).__name__,failure=str(failure))
+                owner.close()
                 record.update(exit=process.returncode,peakAggregateBytes=peak,seconds=time.monotonic()-at)
                 save(output/'receipt.json',receipt)
         assert process.returncode == expected, (name,process.returncode,expected)
@@ -291,7 +387,9 @@ def main():
         receipt['nativeUnchanged'] = receipt['nativeAfter'] == before
         receipt['manifestAfterSha256'] = sha(manifest_path)
         receipt['sourceInputsAfter'] = {p.relative_to(ROOT).as_posix():sha(p) for p in paths}
-        stable = receipt['nativeUnchanged'] and receipt['manifestAfterSha256'] == receipt['manifestSha256'] and receipt['sourceInputsAfter'] == receipt['sourceInputs']
+        receipt['producerCheckoutHeadAfter'] = subprocess.check_output(source_command,text=True).strip()
+        receipt['producerTrackedChangesAfter'] = subprocess.check_output(['git','-C',str(ROOT),'status','--porcelain','--untracked-files=no'],text=True).strip()
+        stable = receipt['nativeUnchanged'] and receipt['manifestAfterSha256'] == receipt['manifestSha256'] and receipt['sourceInputsAfter'] == receipt['sourceInputs'] and receipt['producerCheckoutHeadAfter'] == expected_source and not receipt['producerTrackedChangesAfter']
         if receipt['result'] != 'PASS' or not stable: receipt['result'] = 'FAIL'
         receipt['totalSeconds'] = time.monotonic()-started
         save(output/'receipt.json',receipt)

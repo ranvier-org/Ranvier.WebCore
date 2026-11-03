@@ -12,6 +12,12 @@ import background_content_clip_regression as gate
 from form_collections import ABI
 
 
+def save(path, value):
+    temporary = path.with_suffix('.tmp')
+    temporary.write_text(json.dumps(value,indent=2)+'\n',encoding='utf-8')
+    temporary.replace(path)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--native-directory',type=Path,required=True)
@@ -20,7 +26,7 @@ def main():
     parser.add_argument('--profile',type=Path,required=True)
     args = parser.parse_args()
     report = gate.verify(args.native_directory,args.rid,expected_abi=ABI,retain_all_raw=True)
-    args.report.write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
+    save(args.report,report)
     gl = ctypes.WinDLL(str(args.native_directory/'libGLESv2.dll')) if args.rid == 'win-x64' else ctypes.CDLL('libGLESv2.so.2')
     gl.glGetString.argtypes,gl.glGetString.restype = [ctypes.c_uint],ctypes.c_char_p
     values = {}
@@ -28,7 +34,7 @@ def main():
         value = gl.glGetString(token)
         assert value, 'No current host GPU context: '+name
         values[name] = value.decode()
-    args.profile.write_text(json.dumps(values,indent=2)+'\n',encoding='utf-8')
+    save(args.profile,values)
     print(json.dumps({'originalResult':report['result'],'cases':len(report['results']),
                       'strictMasks':report['strictContentMaskKeys'],'originalFailures':len(report['failures'])}))
 

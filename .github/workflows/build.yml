@@ -636,6 +636,12 @@ jobs:
         if: env.FLAVOR == 'gpu' && (matrix.rid == 'win-x64' || matrix.rid == 'linux-x64')
         run: python -I tests/test_p7_sampler_format_policy.py
 
+      - name: Check producer stage and child-tree ownership
+        if: env.FLAVOR == 'gpu' && (matrix.rid == 'win-x64' || matrix.rid == 'linux-x64')
+        env:
+          RANVIER_GPU_JOB_TEST_RECEIPT: ${{ env.RANVIER_WORK }}/gpu-child-cleanup-control.json
+        run: python -I tests/test_producer_gpu_clipping.py
+
       - name: Run the probes
         run: python -I scripts/probes.py run --rid ${{ matrix.rid }} --flavor ${{ env.FLAVOR }} --work "${{ env.RANVIER_WORK }}"
 
@@ -665,6 +671,7 @@ jobs:
           path: |
             ${{ env.RANVIER_WORK }}/background-content-clipping-regression.json
             ${{ env.RANVIER_WORK }}/gpu-clipping-qualification
+            ${{ env.RANVIER_WORK }}/gpu-child-cleanup-control.json
           if-no-files-found: ignore
 
       - name: Retain IME mutation and reentry results
