@@ -306,6 +306,8 @@ struct Bridge : std::enable_shared_from_this<Bridge> {
     bool closed { false };
     bool ownsAccessibility { false };
     int applicationId { 0 };
+    int64_t focusOwner { -1 };
+    int64_t pendingFocusEcho { -1 };
     unsigned registryWatch { 0 };
     bool embedding { false };
     std::string desktopBus;
@@ -607,6 +609,8 @@ struct Bridge : std::enable_shared_from_this<Bridge> {
         if (bridge.closed)
             return;
         if (type == RV_AX_EVENT_LOAD_COMPLETE) {
+            bridge.focusOwner = -1;
+            bridge.pendingFocusEcho = -1;
             for (auto& entry : bridge.nodes) {
                 bridge.event(*entry.second, "StateChanged", "defunct", 1, 0, g_variant_new_string(""));
                 bridge.unregister(*entry.second);
@@ -632,14 +636,21 @@ struct Bridge : std::enable_shared_from_this<Bridge> {
                 }
             for (auto entry = bridge.nodes.begin(); entry != bridge.nodes.end();) {
                 if (rv_ax_id(entry->second->native) >= 0) { ++entry; continue; }
+                if (bridge.focusOwner == entry->first) bridge.focusOwner = -1;
+                if (bridge.pendingFocusEcho == entry->first) bridge.pendingFocusEcho = -1;
                 bridge.event(*entry->second, "StateChanged", "defunct", 1, 0, g_variant_new_string(""));
                 g_dbus_connection_emit_signal(bridge.connection, nullptr, cachePath, cache, "RemoveAccessible",
                     g_variant_new("(@(so))", bridge.reference(entry->second.get())), nullptr);
                 bridge.unregister(*entry->second);
                 entry = bridge.nodes.erase(entry);
             }
-        } else if (type == RV_AX_EVENT_FOCUS)
-            bridge.event(*node, "StateChanged", "focused", 1, 0, g_variant_new_string(""));
+        } else if (type == RV_AX_EVENT_FOCUS) {
+            if (bridge.pendingFocusEcho != rv_ax_id(native))
+                bridge.event(*node, "StateChanged", "focused", 1, 0, g_variant_new_string(""));
+            bridge.focusOwner = rv_ax_id(native);
+            bridge.pendingFocusEcho = -1;
+            node->states |= RV_AX_FOCUSED;
+        }
         else if (type == RV_AX_EVENT_NAME || type == RV_AX_EVENT_DESCRIPTION)
             bridge.event(*node, "PropertyChange", type == RV_AX_EVENT_NAME ? "accessible-name" : "accessible-description", 0, 0,
                 g_variant_new_string(nativeString(native, type == RV_AX_EVENT_NAME ? RV_AX_NAME : RV_AX_DESCRIPTION).c_str()));
@@ -649,6 +660,14 @@ struct Bridge : std::enable_shared_from_this<Bridge> {
                 bridge.event(*node, "PropertyChange", "accessible-value", 0, 0, g_variant_new_double(number));
         } else if (type == RV_AX_EVENT_STATE) {
             auto current = rv_ax_states(native);
+            auto id = rv_ax_id(native);
+            if (current >= 0 && (current & RV_AX_FOCUSED) && !(node->states & RV_AX_FOCUSED)) {
+                bridge.focusOwner = id;
+                if (bridge.pendingFocusEcho != id) bridge.pendingFocusEcho = -1;
+            } else if (current >= 0 && !(current & RV_AX_FOCUSED)) {
+                if (bridge.focusOwner == id) bridge.focusOwner = -1;
+                if (bridge.pendingFocusEcho == id) bridge.pendingFocusEcho = -1;
+            }
             for (auto mapping : stateMapping)
                 if ((node->states ^ current) & mapping.native)
                     bridge.event(*node, "StateChanged", mapping.name, !!(current & mapping.native), 0, g_variant_new_string(""));
@@ -667,6 +686,14 @@ struct Bridge : std::enable_shared_from_this<Bridge> {
                 bridge.event(*node, "TextChanged", "insert", prefix, inserted, g_variant_new_string(current.slice(prefix, current.size() - suffix).c_str()));
             node->previousText = std::move(current.bytes);
         } else if (type == RV_AX_EVENT_TEXT_SELECTION) {
+            auto current = rv_ax_states(native);
+            auto id = rv_ax_id(native);
+            if (current >= 0 && (current & RV_AX_FOCUSED) && bridge.focusOwner != id) {
+                bridge.event(*node, "StateChanged", "focused", 1, 0, g_variant_new_string(""));
+                node->states |= RV_AX_FOCUSED;
+                bridge.focusOwner = id;
+                bridge.pendingFocusEcho = id;
+            }
             bridge.event(*node, "TextSelectionChanged", "", 0, 0, g_variant_new_string(""));
             bridge.event(*node, "TextCaretMoved", "", TextSnapshot(native).fromNative(rv_ax_text_caret(native)), 0, g_variant_new_string(""));
         }
