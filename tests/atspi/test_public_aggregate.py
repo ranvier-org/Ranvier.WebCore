@@ -6,6 +6,8 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
+import xml.etree.ElementTree as ET
 import zipfile
 
 ROOT=Path(__file__).resolve().parents[2]
@@ -159,6 +161,19 @@ class AggregatePolicyTests(unittest.TestCase):
         self.assertIn('receiptSha256',text)
         self.assertNotIn('NuGet/login',text)
         self.assertNotIn('nuget push',text)
+
+    def test_unverified_caller_claim_never_becomes_standard_repository_commit(self):
+        payload,manifest=aggregate.prepare(self.policy,self.inputs,self.receipts)
+        work=self.root/'metadata-control'
+        with patch.object(aggregate,'_sdk_command',side_effect=RuntimeError('stop after metadata')):
+            with self.assertRaisesRegex(RuntimeError,'stop after metadata'):
+                aggregate._emit_sdk_package(payload,manifest,self.root/'output',work)
+        repository=ET.parse(work/'provider.nuspec').getroot().find('metadata/repository')
+        self.assertNotIn('commit',repository.attrib)
+        claim=json.loads((work/'payload/provider-manifest.json').read_text())
+        self.assertEqual(claim['callerClaimedProviderSourceRevision'],self.policy['providerSourceClaim'])
+        self.assertEqual(claim['sourceProvenance'],'unverified-caller-claim')
+        self.assertFalse((self.root/'output').exists())
 
 
 if __name__=='__main__': unittest.main()

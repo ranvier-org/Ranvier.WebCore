@@ -170,7 +170,7 @@ def _emit_sdk_package(payload,manifest,output,work,dotnet='dotnet'):
             ('description','Optional native AT-SPI modules for application-selected matching WebCore hosts.'),('readme','PUBLIC-README.md')]
     for name,value in fields: ET.SubElement(metadata,name).text=value
     ET.SubElement(metadata,'license',type='file').text='NOTICE.md'
-    ET.SubElement(metadata,'repository',type='git',url='https://github.com/ranvier-org/Ranvier.WebCore',commit=manifest['callerClaimedProviderSourceRevision'])
+    ET.SubElement(metadata,'repository',type='git',url='https://github.com/ranvier-org/Ranvier.WebCore')
     entries=ET.SubElement(package,'files')
     for name,data in payload.items():
         relative(name); target=files/name; target.parent.mkdir(parents=True,exist_ok=True); target.write_bytes(data)
@@ -193,7 +193,10 @@ def _emit_sdk_package(payload,manifest,output,work,dotnet='dotnet'):
         if any(archive.read(name)!=data for name,data in payload.items()): raise ValueError('SDK packaging changed aggregate payload bytes.')
         nuspecs=[name for name in archive.namelist() if name.endswith('.nuspec')]
         if len(nuspecs)!=1: raise ValueError('SDK emitted an ambiguous package identity.')
-        if any(node.tag.rsplit('}',1)[-1]=='dependency' for node in ET.fromstring(archive.read(nuspecs[0])).iter()):
+        emitted=ET.fromstring(archive.read(nuspecs[0]))
+        if any(node.tag.rsplit('}',1)[-1]=='repository' and node.get('commit') is not None for node in emitted.iter()):
+            raise ValueError('SDK metadata must not upgrade an unverified source claim into a repository commit.')
+        if any(node.tag.rsplit('}',1)[-1]=='dependency' for node in emitted.iter()):
             raise ValueError('The optional aggregate must not add renderer/managed dependencies.')
     output.mkdir(parents=True,exist_ok=True)
     with destination.open('xb') as stream: stream.write(packed.read_bytes())
