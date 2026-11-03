@@ -24,10 +24,52 @@ def snapshot(native, host):
     return snapshot_with_token(native, host)[0]
 
 
+def empty_editable_cases(native):
+    for tag, markup, property_kind in (
+        ('input', '<input id="empty">', 6),
+        ('textarea', '<textarea id="empty"></textarea>', 6),
+        ('rich', '<div id="empty" contenteditable></div>', 1),
+    ):
+        for text in ('abc', 'a\0b'):
+            page = Case(native, markup)
+            try:
+                target = page.node('empty')
+                native.ok('rv_dom_html_element_focus', [P, P], target, None)
+                native.expect(snapshot(native, page.host) == ('', 0, 0), f'{tag} empty snapshot')
+                data, length, cursor, anchor, state, token = C.create_string_buffer(1), I(-2), I(-2), I(-2), I(-2), C.c_uint64()
+                arguments = [P, P, I, C.POINTER(I), C.POINTER(I), C.POINTER(I), C.POINTER(I), C.POINTER(C.c_uint64)]
+                status = native.call('rv_host_ime_surrounding', arguments, page.host, None, 0,
+                    C.byref(length), C.byref(cursor), C.byref(anchor), C.byref(state), C.byref(token))
+                native.expect(status == -6 and length.value == 0 and state.value == 1 and token.value == 0,
+                              f'{tag} empty size query is buffer-too-small, not nullable text')
+                native.ok('rv_host_ime_surrounding', arguments, page.host, data, 0,
+                    C.byref(length), C.byref(cursor), C.byref(anchor), C.byref(state), C.byref(token))
+                native.expect(length.value == 0 and state.value == 1 and token.value != 0,
+                              f'{tag} empty zero-capacity nonnull buffer receives a token')
+                native.ok('rv_host_ime_set_composition', [P, Utf8, I, I], page.host, text, 3, 3)
+                native.expect(native.text('rv_node_get_string', [P, I], target, property_kind) == text,
+                              f'{tag} preedit preserves all text including U+0000')
+                native.expect(snapshot(native, page.host) == ('', 0, 0), f'{tag} active committed snapshot remains empty')
+                native.ok('rv_host_ime_cancel', [P], page.host)
+                native.expect(snapshot(native, page.host) == ('', 0, 0), f'{tag} cancel restores empty snapshot')
+                native.ok('rv_host_ime_set_composition', [P, Utf8, I, I], page.host, text, 3, 3)
+                native.ok('rv_host_ime_commit', [P, Utf8], page.host, text)
+                native.expect(native.text('rv_node_get_string', [P, I], target, property_kind) == text,
+                              f'{tag} commit preserves the complete string')
+                native.expect(native.call('rv_host_edit', [P, I], page.host, 6) == 1, f'{tag} undo empty-origin commit')
+                native.expect(snapshot(native, page.host) == ('', 0, 0), f'{tag} undo restores empty context')
+                native.expect(native.call('rv_host_edit', [P, I], page.host, 7) == 1, f'{tag} redo empty-origin commit')
+                native.expect(native.text('rv_node_get_string', [P, I], target, property_kind) == text,
+                              f'{tag} redo preserves the complete string')
+            finally:
+                page.close()
+
+
 def run(directory):
     native = Native(directory)
     native.expect(native.bind('rv_abi_version', I, [])() == 63, 'snapshot ABI version')
     native.expect(native.call('rv_abi_has', [C.c_char_p], b'ime-surrounding') == 1, 'snapshot capability')
+    empty_editable_cases(native)
     page = Case(native, '<input id="text" value="前😀中後"><input id="secret" type="password" value="private">'
                         '<input id="readonly" readonly value="static"><textarea id="area">A😀B</textarea><button id="button">go</button>'
                         '<div id="rich" contenteditable>前<br><span id="middle">😀中</span><div>後</div>'

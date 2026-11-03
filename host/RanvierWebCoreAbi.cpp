@@ -5863,7 +5863,7 @@ static int32_t imeSurroundingSnapshot(RvHost* host, char* buffer, int32_t capaci
         *anchor = static_cast<int32_t>(anchorLength);
         *cursor = static_cast<int32_t>(cursorLength);
         *state = 1;
-        return copyString(text, buffer, capacity, length);
+        return copyString(text.isNull() ? emptyString() : text, buffer, capacity, length);
     }
     if (text.length() > static_cast<unsigned>(std::numeric_limits<int32_t>::max()) || first > last || last > text.length())
         return RV_OK;
@@ -5872,7 +5872,7 @@ static int32_t imeSurroundingSnapshot(RvHost* host, char* buffer, int32_t capaci
     *cursor = static_cast<int32_t>(backward ? first : last);
     *anchor = static_cast<int32_t>(backward ? last : first);
     *state = 1;
-    return copyString(text, buffer, capacity, length);
+    return copyString(text.isNull() ? emptyString() : text, buffer, capacity, length);
 }
 
 int32_t rv_host_ime_surrounding(RvHost* host, char* buffer, int32_t capacity, int32_t* length,
@@ -5898,6 +5898,14 @@ int32_t rv_host_ime_surrounding(RvHost* host, char* buffer, int32_t capacity, in
         host->imeServed.reset();
         *state = 0;
         return RV_OK;
+    }
+    if (*length < 0 || !buffer) {
+        host->imeServed.reset();
+        *length = -1;
+        *cursor = 0;
+        *anchor = 0;
+        *state = 0;
+        return RV_ERR_UNSUPPORTED;
     }
     auto text = String::fromUTF8(std::span<const char8_t> { reinterpret_cast<const char8_t*>(buffer), static_cast<size_t>(*length) });
     auto current = imeSurroundingCurrentText(*target, *editable);
