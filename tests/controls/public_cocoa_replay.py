@@ -80,6 +80,57 @@ def run_controller(command, stream, environment):
         child.wait(timeout=10)
 
 
+def default_reference(report):
+    rows = [row for row in report.get('rows', []) if 'label' in row]
+    if (report.get('assertions') != 59 or report.get('failures') or len(rows) != 6
+            or len({row['label'] for row in rows}) != 6
+            or any(row.get('vectorProfile') is not False for row in rows)):
+        raise ValueError('Require the complete scoped legacy appearance reference')
+    return dict(scope='Default legacy appearance references; no page-contrast isolation claim',
+                assertions=59, images={row['label']: row['sha256'] for row in rows})
+
+
+def run_default_references(source, output, inputs, environment):
+    native = output / 'contracts/baseline-native'
+    helpers = output / 'sidecars'
+    records = inputs['sidecarManifest']['helpers']
+    common = [sys.executable, '-B', '-I', str(source / 'tests/controls/cocoa_contrast_paths.py'),
+              '--native-directory', str(native), '--abi-source', str(source / 'tests/abi'),
+              '--page-helper', str(helpers / records['page']['path']),
+              '--system-helper', str(helpers / records['contrast']['path']), '--scoped-helper', '--legacy-only']
+    rows = [('legacy-default-59', [*common, '--output', str(output / 'legacy-default')]),
+            ('legacy-reverse-59', [*common, '--first-system-more', '--output', str(output / 'legacy-reverse')])]
+    worker = ('import importlib.util,json,os,sys; from pathlib import Path; '
+              'spec=importlib.util.spec_from_file_location("canonical",sys.argv[1]); '
+              'm=importlib.util.module_from_spec(spec); spec.loader.exec_module(m); '
+              'rows=m.run_groups(json.loads(sys.argv[2]),Path(sys.argv[3]),dict(os.environ)); '
+              'Path(sys.argv[3],"legacy-groups.json").write_text(json.dumps(rows,indent=2),encoding="utf-8"); '
+              'sys.exit(any(r.get("exit")!=0 or r.get("failure") for r in rows))')
+    command = [sys.executable, '-B', '-I', '-c', worker, str(source / 'tests/controls/public_cocoa_contracts.py'),
+               json.dumps(rows), str(output)]
+    environment = dict(environment, RANVIER_ABI_TEST_EXPECTED='64', DYLD_LIBRARY_PATH=str(native))
+    environment.pop('DYLD_INSERT_LIBRARIES', None)
+    environment.pop('DYLD_FRAMEWORK_PATH', None)
+    before = {p.relative_to(native).as_posix(): sha(p) for p in native.rglob('*') if p.is_file()}
+    helpers_before = {name: sha(helpers / record['path']) for name, record in records.items()}
+    with (output / 'legacy-controller.log').open('wb') as stream:
+        code = run_controller(command, stream, environment)
+    after = {p.relative_to(native).as_posix(): sha(p) for p in native.rglob('*') if p.is_file()}
+    helpers_after = {name: sha(helpers / record['path']) for name, record in records.items()}
+    result = dict(exit=code, nativeUnchanged=before == after,
+                  helpersUnchanged=helpers_before == helpers_after, references={})
+    for order in ['default', 'reverse']:
+        directory = output / ('legacy-' + order)
+        report = default_reference(json.loads((directory / 'contrast-paths.json').read_text()))
+        for label, digest in report['images'].items():
+            if sha(directory / (label + '.rgba')) != digest:
+                raise ValueError('Legacy reference image bytes differ')
+        result['references'][order] = report
+    result['freshOrderImagesEqual'] = result['references']['default']['images'] == result['references']['reverse']['images']
+    result['acceptedAsReferences'] = code == 0 and result['nativeUnchanged'] and result['helpersUnchanged']
+    return result
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ['inputs', 'source', 'output']:
@@ -148,7 +199,13 @@ def main():
         with (output / 'controller.log').open('wb') as stream:
             receipt['controllerExit'] = run_controller(command, stream, environment)
         contract = output / 'contracts/receipt.json'
-        receipt['accepted'] = receipt['controllerExit'] == 0 and contract.is_file() and json.loads(contract.read_text())['accepted'] is True
+        data = json.loads(contract.read_text()) if contract.is_file() else {}
+        admission = {row['name']: row for row in data.get('groups', [])}
+        if data.get('inputsUnchanged') is True and all(name in admission and admission[name].get('exit') == 0 and not admission[name].get('failure')
+               for name in ['verify-public-signature', 'verify-interop-signature', 'loaded-abi64-349']):
+            receipt['defaultAppearance'] = run_default_references(source, output, inputs, environment)
+        receipt['accepted'] = (receipt['controllerExit'] == 0 and data.get('accepted') is True
+                               and receipt.get('defaultAppearance', {}).get('acceptedAsReferences') is True)
     except Exception as error:
         receipt['failure'] = repr(error)
         raise

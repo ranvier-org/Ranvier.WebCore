@@ -12,6 +12,17 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class PublicReplayBundle(unittest.TestCase):
+    def test_default_reference_cannot_be_labeled_as_vector_qualification(self):
+        spec = importlib.util.spec_from_file_location('public_cocoa_replay', ROOT / 'tests/controls/public_cocoa_replay.py')
+        subject = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(subject)
+        self.assertTrue(hasattr(subject, 'default_reference'), 'The default appearance reference must be checked separately')
+        report = dict(assertions=59, failures=[], rows=[dict(label=str(i), vectorProfile=False, sha256='a' * 64) for i in range(6)])
+        self.assertEqual(len(subject.default_reference(report)['images']), 6)
+        report['rows'][0]['vectorProfile'] = True
+        with self.assertRaisesRegex(ValueError, 'legacy'):
+            subject.default_reference(report)
+
     @unittest.skipIf(os.name == 'nt', 'The macOS runner uses POSIX process groups')
     def test_controller_exit_reaps_a_reparented_separate_process_group(self):
         spec = importlib.util.spec_from_file_location('public_cocoa_replay', ROOT / 'tests/controls/public_cocoa_replay.py')
