@@ -94,7 +94,8 @@ def main():
             '-Wl,-install_name,@rpath/libTestWebCore.dylib', '-Wl,-undefined,error', '-Wl,-rpath,@loader_path',
             '-o', host, *retained_objects, *[native / name for name in libraries], '-licucore',
             '-framework', 'AppKit', '-framework', 'Foundation', '-framework', 'CoreFoundation',
-            '-framework', 'CoreGraphics', '-framework', 'ImageIO', '-framework', 'IOSurface', '-framework', 'Metal'])
+            '-framework', 'CoreGraphics', '-framework', 'ImageIO', '-framework', 'IOSurface', '-framework', 'Metal',
+            '-framework', 'OpenGL'])
         run('host-id', ['xcrun', 'install_name_tool', '-id', '@rpath/libRanvierWebCoreHost.dylib', host])
         run('host-sign', ['codesign', '--force', '--sign', '-', host])
         record['derivativeNative'] = {p.name: sha(p) for p in native.iterdir()}
