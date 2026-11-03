@@ -1,4 +1,4 @@
-name: Private P10 ARM64 optional provider qualification
+name: Unarmed ARM64 optional provider qualification
 
 on:
   workflow_dispatch:
@@ -34,7 +34,7 @@ concurrency:
 
 jobs:
   qualify:
-    if: ${{ github.ref == 'refs/heads/codex/project2-atspi-p10-arm-qualification' && inputs.final_source == '233c8045c9384e5eb97e8688ca0ed0caa11a8f17' && inputs.view_source == '14fb1c85704d85b1fea09fe0cea6f6bc013f13cc' && inputs.native_run == '41595071090' && inputs.native_artifact == 'package-linux-arm64-slim' && inputs.native_sha256 == 'f587572f081ffcc82589bbaec983432ef7a241053caffc08ffec97d5fc615cff' }}
+    if: ${{ false }}
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 45
     env:

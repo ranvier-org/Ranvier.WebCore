@@ -9,6 +9,11 @@ spec.loader.exec_module(module)
 
 
 class ManagedArm64Qualification(unittest.TestCase):
+    def test_reusable_workflow_remains_unarmed(self):
+        workflow = (path.parents[2] / '.github/workflows/atspi-arm64-qualification.yml').read_text()
+        self.assertIn('if: ${{ false }}', workflow)
+        self.assertIn("dotnet-version: '10.0.403'", workflow)
+
     def test_all_three_provider_profiles_are_required(self):
         self.assertEqual(module.PROFILES, ('present', 'absent', 'no-bus'))
 
