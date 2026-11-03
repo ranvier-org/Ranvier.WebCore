@@ -114,7 +114,7 @@ diff --git a/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp b/Source/
  #define GL_UNSIGNED_INT_8_8_8_8_REV 0x8367
  static const GLenum s_pixelDataType = GL_UNSIGNED_INT_8_8_8_8_REV;
  #else
-@@ -384,7 +390,25 @@
+@@ -384,7 +390,23 @@
      if (!frameImage)
          return;
  
@@ -132,8 +132,6 @@ diff --git a/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp b/Source/
 +    auto context = adoptCF(CGBitmapContextCreate(pixels.mutableSpan().data(), width, height, 8, width * 4,
 +        colorSpace.get(), static_cast<uint32_t>(kCGImageAlphaPremultipliedFirst) | static_cast<uint32_t>(kCGBitmapByteOrder32Little)));
 +    RELEASE_ASSERT(context);
-+    CGContextTranslateCTM(context.get(), 0, height);
-+    CGContextScaleCTM(context.get(), 1, -1);
 +    CGContextSetBlendMode(context.get(), kCGBlendModeCopy);
 +    CGContextDrawImage(context.get(), CGRectMake(0, 0, width, height), image.get());
 +    updateContents(pixels.span().data(), targetRect, offset, width * 4, PixelFormat::BGRA8);
