@@ -16,14 +16,7 @@ def transform(original):
         ('for (int milliseconds : { 1000, 0 })', 'for (int milliseconds : { '+', '.join(['1000','0']*16)+' })'),
         ('        require(rv_animation_seek(animation.get(), milliseconds) == RV_OK, "seek compositor animation");',
          '        if (forceSteadyRepaint && animationStep == 1) {\n'
-         '            using Node = std::unique_ptr<RvNode, decltype(&rv_node_release)>;\n'
-         '            Node document(rv_host_document(host.get()), rv_node_release);\n'
-         '            require(document != nullptr, "negative control document");\n'
-         '            int32_t status = 0;\n'
-         '            Node html(rv_node_query_selector(document.get(), "html", &status), rv_node_release);\n'
-         '            require(status == RV_OK && html != nullptr, "negative control root element");\n'
-         '            const char style[] = "background:rgb(254,254,254)";\n'
-         '            require(rv_element_set_attribute(html.get(), "style", reinterpret_cast<const uint8_t*>(style), sizeof(style) - 1) == RV_OK, "negative control base damage");\n'
+         '            require(rv_host_resize(host.get(), cssWidth, cssHeight) == RV_OK, "negative control explicit base invalidation");\n'
          '        }\n'
          '        require(rv_animation_seek(animation.get(), milliseconds) == RV_OK, "seek compositor animation");'),
         ('        require(counterResult == RV_OK && basePaints == stablePaints && readback == 0, "transform and opacity animation reuse base backing");',
