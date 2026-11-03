@@ -145,6 +145,17 @@ with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
     probe([sys.executable, '-I', tests / 'focus_input.py', '--native-directory', out])
     probe([sys.executable, '-I', tests / 'touch_input.py', '--native-directory', out])
     probe([sys.executable, '-I', tests / 'editing_undo.py', '--native-directory', out])
+    for test in ('ime_selected_cancel', 'ime_cancel_focus', 'ime_cancel_reentrant_value', 'ime_cancel_repeat', 'ime_cancel_rich', 'ime_cancel_blur', 'ime_cancel_reentrant_start', 'ime_cancel_reentrant_dom'):
+        probe([sys.executable, '-I', '-X', 'utf8', tests / f'{test}.py', '--native-directory', out])
+    probe([sys.executable, '-I', '-X', 'utf8', tests / 'ime_selected_cancel.py', '--native-directory', out, '--clear'])
+    probe([sys.executable, '-I', '-X', 'utf8', tests / 'ime_selected_cancel.py', '--native-directory', out, '--synthetic'])
+    probe([sys.executable, '-I', '-X', 'utf8', tests / 'ime_surrounding.py', '--native-directory', out])
+    probe([sys.executable, '-I', '-X', 'utf8', tests / 'ime_surrounding_delete.py', '--native-directory', out])
+    probe([sys.executable, '-I', '-X', 'utf8', tests / 'ime_surrounding_history.py', '--native-directory', out])
+    probe([sys.executable, '-I', '-X', 'utf8', tests / 'ime_surrounding_observation.py', '--native-directory', out,
+           '--report', pathlib.Path(temp) / 'ime-surrounding-observation.json'])
+    for action in ('replace', 'destroy'):
+        probe([sys.executable, '-I', '-X', 'utf8', tests / 'ime_cancel_lifecycle.py', '--native-directory', out, '--action', action])
     probe([sys.executable, '-I', '-X', 'utf8', tests / 'spelling_replacement.py', '--native-directory', out])
     probe([sys.executable, '-I', tests / 'pen_input.py', '--native-directory', out])
     probe([sys.executable, '-I', tests / 'pointer_lock.py', '--native-directory', out])

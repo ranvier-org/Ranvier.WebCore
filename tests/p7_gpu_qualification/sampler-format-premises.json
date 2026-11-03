@@ -1,0 +1,52 @@
+{
+  "scope": "P7 Windows exact-artifact, actual ANGLE/D3D tested-profile diagnostic; no renderer code or model-budget changes",
+  "historical": {
+    "originalQualificationRun": 41536260876,
+    "numericDiagnosticRun": 41538664200,
+    "status": "FAIL retained",
+    "independentAnalysisSha256": "e81f99d2a721cbbc4519f86f993d6c875a153806c150e833d83a75c48d2d1107",
+    "finding": "Separate fixed-source FLOAT32 and UNORM8 draws are not an exact supplied-value store control. All pattern1 bytes equal floor(separateFloat*255); constant-uniform and FLOAT-source controls behave differently. This correlation is not proof of closed WARP implementation details."
+  },
+  "production": {
+    "sourcePin": "b95c91b1c0ee43cc86d25ff7af73038f67a88e04",
+    "byteSource": "BitmapTexture.cpp:61,89,166: GL_UNSIGNED_BYTE RGBA/BGRA texture allocation",
+    "blend": "TextureMapper.cpp:498,894: nonopaque texture enables ONE / ONE_MINUS_SRC_ALPHA",
+    "sampler": "TextureMapperShaderProgram.cpp:231,334: mediump ordinary float and unqualified sampler2D",
+    "priorGeometryTelemetry": "Local metadata-only image was byte-identical to all54 P7 controls; promoted backing opaque=0 at175x89 and233x119. This is not WARP shader telemetry."
+  },
+  "primary": [
+    {
+      "url": "https://microsoft.github.io/DirectX-Specs/d3d/archive/D3D11_3_FunctionalSpec.htm",
+      "sections": ["3.2.3.6", "7.18.16.2", "7.18.16.3", "17.5"],
+      "interpretation": "Fixed-source filtering and fixed-destination blend permit format-dependent precision. These sections do not prove equal results across separate destination-format draws or a universal one-quantum filter-error theorem."
+    },
+    {
+      "url": "https://registry.khronos.org/OpenGL/specs/es/3.0/GLSL_ES_Specification_3.00.pdf",
+      "sections": ["4.5.4", "8"],
+      "pdfPageIndexes": [62, 90],
+      "interpretation": "sampler2D defaults to lowp; texture return precision follows sampler. A highp float default does not promote an unqualified sampler. The actual sample shader stays byte-identical to the historical diagnostic; known-float texelFetch store control explicitly uses highp sampler."
+    }
+  ],
+  "gates": {
+    "completeCoverage": "16 binary2x2 patterns x256x256 samples in each required destination path",
+    "floatDestination": "Independent bilinear ideal, existing one-UNORM8-quantum filter policy",
+    "unormDestination": "Independent bilinear ideal, existing one-quantum filter plus0.6-unit final-store complete-path policy",
+    "whiteDestination": "Independent ideal source-over-white expression, same existing complete-path budget; channels/opaquealpha exact",
+    "constantSource": "All-zero and all-one source footprints exact",
+    "knownFloatStore": "Upload captured FLOAT32 values to a FLOAT32 texture; highp texelFetch supplies exact texels to UNORM8. Retain0.6-unit store bound without a filtering allowance.",
+    "causalControls": "Perpattern NEAREST exact, repeatedbytes exact, selected constant-uniformstore, FLOAT-source linear positive; missing required capability is unavailable and final nonzero",
+    "negatives": "shift, erase, recolor, one byte beyond pre-existing allowed interval; unchanged9scene mutations plusoldCPUpath",
+    "historicalCrossDraw": "All16 old0.6 comparison failures recorded with coordinates/rawarrays and explicit separateFAIL status; not rewritten as successes",
+    "qualificationMeaning": "Performat actual-profile policy validation. No claim of universal D3D numerical theorem, no inferred internal WARP algorithm."
+  },
+  "unchanged": {
+    "originalSamplerProbe": true,
+    "gpu_pixel_gate_v3.py": "e13e7889839688b4a0e87c809489fcf7ba0d6bd91749173741ede93d863634c3",
+    "precision_budget.py": "bd4f2fd1295cb56d89ebb9bd0f66668e3bcf3a4106113c046dabd69c5b18946d",
+    "gpu-model-inputs-v2.json": "f9035136f2d16140027379f6927299b6fa4d4afeeac6adf2cce717314c51b4c5",
+    "strictMasks": 12,
+    "otherControlComparisons": 52,
+    "newNativeBuild": false,
+    "newDependencies": false
+  }
+}

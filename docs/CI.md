@@ -168,6 +168,31 @@ timeout, 600 s unless the entry sets one.
 - In WSL, run with `--no-dump`: each probe's interpreter makes itself non-dumpable, because WSL writes the
   core dump of every crash to the Windows temp folder whatever `ulimit -c` says.
 
+### GPU clipping qualification
+
+The Windows and Linux x64 GPU producers run `scripts/qualify_producer_gpu_clipping.py` on their own staged
+runtime. Admission checks the current manifest, native hashes, generated ABI, exact clean checkout HEAD and reviewed WebKit source pin;
+it does not select an oracle by a package version or a previous producer's binary hash.
+
+`background-content-clipping-regression.json` retains the original 54 comparisons and every raw RGBA image.
+The 12 strict content masks and 52 other controls keep their existing rules, including the separately recorded
+Windows DPR1 half-coverage rule. Only the promoted 1.5× and 2× cases can use the source-derived GPU model.
+The original comparison can still report those two failures while the separate qualification passes.
+
+`gpu-clipping-qualification` retains the actual renderer profile, model inputs, complete per-pixel result,
+ten negative controls, source/native hashes and child logs. Windows checks all 16 binary sampling patterns in
+FLOAT32, UNORM8 and source-over-white paths against independent ideals with the reviewed numerical policy.
+The failed historical FLOAT32-to-UNORM cross-draw comparison remains explicit; the supplied-value store check
+has its own 0.6-unit bound. Linux requires the reviewed Mesa profile and shader-capture fingerprint and
+byte-identical plain, instrumented and canonical captures. Unknown drivers, precision profiles or shader
+fingerprints fail pending independent qualification. These are tested-profile contracts, not a universal
+GPU error theorem. Neither ARM nor macOS is admitted by this gate.
+
+The GPU x64 jobs install NumPy 2.4.3 for these test tools. The producer stage stays read-only; shader caches,
+the query-only Linux interposer and reports stay in the qualification output. Each child is bounded within a
+540-second aggregate run and an 8 GiB sampled process-tree guard. Windows child bodies wait for assignment to
+an owned kill-on-close job; a real descendant-timeout control runs in the GPU job. The evidence is uploaded even on failure.
+
 ## Local runs
 
 The same steps run on a workstation, ending with the same check CI runs:

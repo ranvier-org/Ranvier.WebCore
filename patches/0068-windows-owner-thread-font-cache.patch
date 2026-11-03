@@ -1,0 +1,114 @@
+diff --git a/Source/WebCore/platform/graphics/FontCache.cpp b/Source/WebCore/platform/graphics/FontCache.cpp
+--- a/Source/WebCore/platform/graphics/FontCache.cpp
++++ b/Source/WebCore/platform/graphics/FontCache.cpp
+@@ -133,7 +133,15 @@
+ 
+ FontCache* FontCache::forCurrentThreadIfExists()
+ {
++#if OS(WINDOWS)
++    auto* thread = Thread::currentMayBeNull();
++    if (!thread)
++        return nullptr;
++    auto* data = dynamicDowncast<ThreadGlobalData>(thread->m_clientData.get());
++    return data ? data->fontCacheIfExists() : nullptr;
++#else
+     return threadGlobalDataSingleton().fontCacheIfExists();
++#endif
+ }
+ 
+ FontCache* FontCache::forCurrentThreadIfNotDestroyed()
+diff --git a/Source/WebCore/platform/graphics/skia/SkiaHarfBuzzFont.cpp b/Source/WebCore/platform/graphics/skia/SkiaHarfBuzzFont.cpp
+--- a/Source/WebCore/platform/graphics/skia/SkiaHarfBuzzFont.cpp
++++ b/Source/WebCore/platform/graphics/skia/SkiaHarfBuzzFont.cpp
+@@ -144,7 +144,12 @@
+ 
+ SkiaHarfBuzzFont::~SkiaHarfBuzzFont()
+ {
++#if OS(WINDOWS)
++    if (auto* cache = FontCache::forCurrentThreadIfExists())
++        cache->harfBuzzFontCache().remove(m_uniqueID);
++#else
+     FontCache::forCurrentThread().harfBuzzFontCache().remove(m_uniqueID);
++#endif
+ }
+ 
+ static inline hb_position_t skScalarToHarfBuzzPosition(SkScalar value)
+diff --git a/Source/WebCore/platform/ThreadTimers.h b/Source/WebCore/platform/ThreadTimers.h
+--- a/Source/WebCore/platform/ThreadTimers.h
++++ b/Source/WebCore/platform/ThreadTimers.h
+@@ -88,6 +88,9 @@
+     void clearTimer();
+ 
+     ThreadTimerHeap& timerHeap() const;
++#if OS(WINDOWS)
++    ThreadTimers& threadTimers() const LIFETIME_BOUND { return m_threadTimers; }
++#endif
+ 
+     unsigned heapIndex() const;
+     void setHeapIndex(unsigned newIndex);
+diff --git a/Source/WebCore/platform/Timer.cpp b/Source/WebCore/platform/Timer.cpp
+--- a/Source/WebCore/platform/Timer.cpp
++++ b/Source/WebCore/platform/Timer.cpp
+@@ -60,10 +60,21 @@
+ //
+ // When a timer's "next fire time" changes, we need to move it around in the priority queue.
+ #if ASSERT_ENABLED
++#if OS(WINDOWS)
++static ThreadTimerHeap* threadGlobalTimerHeap()
++{
++    auto* thread = Thread::currentMayBeNull();
++    if (!thread)
++        return nullptr;
++    auto* data = dynamicDowncast<ThreadGlobalData>(thread->m_clientData.get());
++    return data ? &data->threadTimers().timerHeap() : nullptr;
++}
++#else
+ static ThreadTimerHeap& threadGlobalTimerHeap()
+ {
+     return threadGlobalDataSingleton().threadTimers().timerHeap();
+ }
++#endif
+ #endif
+ 
+ WTF_MAKE_COMPACT_TZONE_ALLOCATED_IMPL(ThreadTimerHeapItem);
+@@ -332,7 +343,12 @@
+     RefPtr item = m_heapItemWithBitfields.pointer();
+     ASSERT(item);
+     auto& heap = item->timerHeap();
++#if OS(WINDOWS)
++    if (auto* currentHeap = threadGlobalTimerHeap())
++        ASSERT(&heap == currentHeap);
++#else
+     ASSERT(&heap == &threadGlobalTimerHeap());
++#endif
+     ASSERT(!heap.isEmpty());
+     ASSERT(item->isInHeap());
+     ASSERT(item->heapIndex() < heap.size());
+@@ -520,9 +536,15 @@
+         newTime = alignment->alignedFireTime(hasReachedMaxNestingLevel(), newTime);
+ 
+     if (oldTime != newTime) {
++#if OS(WINDOWS)
++        RefPtr item = m_heapItemWithBitfields.pointer();
++        auto& threadTimers = item ? item->threadTimers() : threadGlobalDataSingleton().threadTimers();
++        auto newOrder = threadTimers.nextHeapInsertionCount();
++#else
+         auto newOrder = threadGlobalDataSingleton().threadTimers().nextHeapInsertionCount();
+ 
+         RefPtr item = m_heapItemWithBitfields.pointer();
++#endif
+         if (!item) {
+             m_heapItemWithBitfields.setPointer(ThreadTimerHeapItem::create(*this, newTime, 0));
+             item = m_heapItemWithBitfields.pointer();
+@@ -537,7 +559,11 @@
+         bool isFirstTimerInHeap = item->isFirstInHeap();
+ 
+         if (wasFirstTimerInHeap || isFirstTimerInHeap)
++#if OS(WINDOWS)
++            threadTimers.updateSharedTimer();
++#else
+             threadGlobalDataSingleton().threadTimers().updateSharedTimer();
++#endif
+     }
+ 
+     checkConsistency();

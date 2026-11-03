@@ -26,6 +26,19 @@ def probe(name, *commands, rid=None, flavor=('slim', 'gpu'), timeout=TIMEOUT, en
 
 
 PROBES = [
+    probe('Verify Windows native owner-thread exit and font timer teardown',
+          'python -I tests/abi/owner_thread_exit.py --native-directory {native} --report {work}/owner-thread-exit.json',
+          rid='win-x64', flavor=None, timeout=180),
+    *[probe('Verify committed IME surrounding text and cancellation',
+            'python -I tests/abi/ime_surrounding.py --native-directory {native}',
+            'python -I tests/abi/ime_surrounding_delete.py --native-directory {native}', rid=rid, flavor=None)
+      for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],
+    *[probe('Verify surrounding deletion undo and redo preserve selected composition',
+            'python -I tests/abi/ime_surrounding_history.py --native-directory {native}', rid=rid, flavor=None)
+      for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],
+    *[probe('Verify IME mutation observation and callback reentry',
+            'python -I tests/abi/ime_surrounding_observation.py --native-directory {native} --report {work}/ime-surrounding-observation.json', rid=rid, flavor=None)
+      for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],
     *[probe('Verify host file picker ownership and invalidation',
             'python -I tests/abi/file_picker.py --native-directory {native}', rid=rid, flavor=None)
       for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],
@@ -42,8 +55,8 @@ PROBES = [
           'python -I tests/gpu/compositor_windows.py --native-directory {native} --output {work}/gpu-compositor-input',
           rid='win-x64', flavor='gpu'),
     *[probe('Verify fixed content clipping masks and complete pointwise paint stability',
-            f'python -I tests/abi/background_content_clip_regression.py --native-directory {{native}} --rid {rid} --report {{work}}/background-content-clipping-regression.json',
-            rid=rid, flavor='gpu',
+            f'python -I scripts/qualify_producer_gpu_clipping.py --native-directory {{native}} --rid {rid} --report {{work}}/background-content-clipping-regression.json --output {{work}}/gpu-clipping-qualification',
+            rid=rid, flavor='gpu', timeout=600,
             env={'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1',
                  'FONTCONFIG_FILE': str(root / 'tests/fixtures/background-content-clip-baselines/linux-fonts.conf')}
             if rid.startswith('linux') else None)

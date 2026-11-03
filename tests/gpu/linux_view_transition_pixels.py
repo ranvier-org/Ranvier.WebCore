@@ -101,7 +101,7 @@ def animations(n, document):
 
 def run(directory, consumer_type=Consumer):
     n = Native(directory)
-    assert n.bind('rv_abi_version', I, [])() == 62
+    assert n.bind('rv_abi_version', I, [])() == 63
     assert n.call('rv_abi_has', [C.c_char_p], b'view-transitions')
     consumer = consumer_type(n)
     page = Case(n, PAGE)

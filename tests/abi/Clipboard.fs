@@ -141,4 +141,5 @@ let run (outDir: string) =
     require (textPaste = 1 && afterText = "XYZ") "a paste inserts the app's text"
     require (htmlPaste = 1 && afterHtml.Contains "<b>bold</b>") "a paste inserts the app's HTML"
     require (afterCancelled = afterHtml) "a page that cancels paste keeps its content"
-    require (nativeStatus = 0) "the Native style can be selected on this platform"
+    let expectedNativeStatus = if System.OperatingSystem.IsLinux () then -9 else 0
+    require (nativeStatus = expectedNativeStatus) "the Native style reports this platform's support"

@@ -4,6 +4,7 @@
 #include "RanvierSvgViewGlue.h"
 #include "RanvierImageEncoding.h"
 #include <wtf/text/Base64.h>
+#include <wtf/Scope.h>
 #include "RanvierResourceGlue.h"
 #include "RanvierEventGlue.h"
 #include "RanvierMutationGlue.h"
@@ -21,6 +22,7 @@
 #include <array>
 #include <atomic>
 #include <chrono>
+#include <limits>
 #include <memory>
 #include <string>
 #include <vector>
@@ -399,7 +401,32 @@ class RvEditorClient final : public EditorClient {
 public:
     RvEditorClient() = default;
     ~RvEditorClient() final { clearUndoRedoOperations(); }
-    bool isReplayingHistory() const { return m_replaying != Replay::None; }
+    bool isReplayingHistory() const { return m_replaying != Replay::None || m_compositionSuspended; }
+    void setCompositionSuspended(bool value) { m_compositionSuspended = value; }
+    void discardUnsafeCompositionHistory() { clearUndoRedoOperations(); }
+    uint64_t historyGeneration() const { return m_historyGeneration; }
+    UndoStep* lastUndoStep() const { return m_undo.isEmpty() ? nullptr : m_undo.last().ptr(); }
+    void undoOwnedComposition(UndoStep* step, uint64_t generation)
+    {
+        if (!step || generation != m_historyGeneration || lastUndoStep() != step)
+            return;
+        replay(Replay::Undo);
+        if (generation == m_historyGeneration && !m_redo.isEmpty() && m_redo.last().ptr() == step) {
+            Ref removed = m_redo.takeLast();
+            removed->didRemoveFromUndoManager();
+        }
+    }
+    void discardOwnedUndoStep(UndoStep* step)
+    {
+        if (m_replaying != Replay::None)
+            return;
+        auto index = m_undo.findIf([&](auto& candidate) { return candidate.ptr() == step; });
+        if (index != notFound) {
+            Ref removed = m_undo[index];
+            m_undo.removeAt(index);
+            removed->didRemoveFromUndoManager();
+        }
+    }
     std::optional<uint64_t> beginEditingDocument()
     {
         return std::exchange(m_editDocumentGeneration, m_documentGeneration);
@@ -483,6 +510,7 @@ private:
     Vector<Ref<UndoStep>> m_undo;
     Vector<Ref<UndoStep>> m_redo;
     Replay m_replaying { Replay::None };
+    bool m_compositionSuspended { false };
     uint64_t m_historyGeneration { 0 };
     uint64_t m_replayGeneration { 0 };
     uint64_t m_documentGeneration { 0 };
@@ -984,6 +1012,57 @@ struct RvHost {
     DocumentTransaction documentTransaction { DocumentTransaction::Idle };
     bool destroyAfterDocumentTransaction { false };
     unsigned editingDepth { 0 };
+    uint64_t editingSequence { 0 };
+    struct ImeUndo {
+        UndoStep* step { nullptr };
+        uint64_t generation { 0 };
+        uint64_t endSerial { 0 };
+        WeakPtr<Document, WeakPtrImplWithEventTargetData> document;
+        WeakPtr<Node, WeakPtrImplWithEventTargetData> target;
+        WeakPtr<Node, WeakPtrImplWithEventTargetData> editable;
+        WeakPtr<Node, WeakPtrImplWithEventTargetData> startNode;
+        WeakPtr<Node, WeakPtrImplWithEventTargetData> endNode;
+        unsigned startOffset { 0 };
+        unsigned endOffset { 0 };
+        String contents;
+    };
+    std::optional<ImeUndo> imeUndo;
+    struct ImeSurrounding {
+        WeakPtr<Document, WeakPtrImplWithEventTargetData> document;
+        WeakPtr<Node, WeakPtrImplWithEventTargetData> target;
+        WeakPtr<Node, WeakPtrImplWithEventTargetData> editable;
+        WeakPtr<Node, WeakPtrImplWithEventTargetData> startNode;
+        WeakPtr<Node, WeakPtrImplWithEventTargetData> endNode;
+        WeakPtr<Node, WeakPtrImplWithEventTargetData> selectionAnchorNode;
+        WeakPtr<Node, WeakPtrImplWithEventTargetData> selectionFocusNode;
+        unsigned startOffset { 0 };
+        unsigned endOffset { 0 };
+        unsigned selectionAnchorOffset { 0 };
+        unsigned selectionFocusOffset { 0 };
+        String original;
+        String expected;
+        String contents;
+        int32_t cursor { 0 };
+        int32_t anchor { 0 };
+    };
+    std::optional<ImeSurrounding> imeSurrounding;
+    struct ImeServed {
+        uint64_t token { 0 };
+        WeakPtr<Document, WeakPtrImplWithEventTargetData> document;
+        WeakPtr<Node, WeakPtrImplWithEventTargetData> target;
+        WeakPtr<Node, WeakPtrImplWithEventTargetData> editable;
+        WeakPtr<Node, WeakPtrImplWithEventTargetData> selectionAnchorNode;
+        WeakPtr<Node, WeakPtrImplWithEventTargetData> selectionFocusNode;
+        unsigned selectionAnchorOffset { 0 };
+        unsigned selectionFocusOffset { 0 };
+        String text;
+        String current;
+        String contents;
+        int32_t cursor { 0 };
+        int32_t anchor { 0 };
+        bool composing { false };
+    };
+    std::optional<ImeServed> imeServed;
     bool destroyAfterEditing { false };
     bool updateWanted { false };
     std::shared_ptr<RvHostTraceBuffer> traceBuffer;
@@ -1073,6 +1152,7 @@ public:
         : m_host(host)
         , m_previousDocumentGeneration(static_cast<RvEditorClient&>(host.page->editorClient()).beginEditingDocument())
     {
+        ++m_host.editingSequence;
         ++m_host.editingDepth;
     }
     ~RvEditingScope()
@@ -1223,6 +1303,7 @@ static bool sleepDisablerCallbackSet;
 
 // The hosts alive on the owning thread, for routing a page's loads to its host.
 static Vector<RvHost*> liveHosts;
+static uint64_t imeServedSequence;
 
 static RvHost* hostForPage(const Page* page)
 {
@@ -1793,7 +1874,7 @@ static_assert(sizeof(RvMediaVideoConfiguration) == 64 && offsetof(RvMediaVideoCo
 static_assert(sizeof(RvSnapshotOptions) == 64 && offsetof(RvSnapshotOptions, scale) == 8 && offsetof(RvSnapshotOptions, x) == 24 && offsetof(RvSnapshotOptions, quality) == 64 - 8);
 static_assert(sizeof(RvMediaAudioConfiguration) == 64 && offsetof(RvMediaAudioConfiguration, bitrate) == 40 && offsetof(RvMediaAudioConfiguration, spatial_rendering) == 56);
 
-int32_t rv_abi_version(void) { return 62; }
+int32_t rv_abi_version(void) { return 63; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -1895,7 +1976,7 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "accessibility-uia"))
         return 1;
 #endif
-    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop", "drag-out", "clipboard-files", "range-replacement", "accessibility", "accessibility-text", "svg-document", "resize-entries", "resize-device-pixel-content-box", "intersection-entries" }) {
+    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "ime-surrounding", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop", "drag-out", "clipboard-files", "range-replacement", "accessibility", "accessibility-text", "accessibility-text-style", "svg-document", "resize-entries", "resize-device-pixel-content-box", "intersection-entries" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -5462,6 +5543,51 @@ template<typename Edit> static int32_t compose(RvHost& host, Edit&& edit)
     return status < 0 ? status : RV_OK;
 }
 
+static RefPtr<Element> imeEditable(Element* target)
+{
+    if (!target)
+        return nullptr;
+    if (RefPtr control = dynamicDowncast<HTMLTextFormControlElement>(*target))
+        return control->innerTextElement();
+    return target;
+}
+
+static bool imeUndoMatches(const RvHost::ImeUndo& transaction, Editor& editor, Element* target)
+{
+    RefPtr editable = imeEditable(target);
+    auto range = editor.compositionRange();
+    return editable && range && transaction.editable.get() == editable.get()
+        && transaction.startNode.get() == range->start.container.ptr() && transaction.startOffset == range->start.offset
+        && transaction.endNode.get() == range->end.container.ptr() && transaction.endOffset == range->end.offset
+        && transaction.contents == editable->innerHTML();
+}
+
+static String imeSurroundingCurrentText(Element& target, Element& editable)
+{
+    if (auto* input = dynamicDowncast<HTMLInputElement>(target))
+        return input->value();
+    if (auto* area = dynamicDowncast<HTMLTextAreaElement>(target))
+        return area->value();
+    return plainText(makeRangeSelectingNodeContents(editable));
+}
+
+static bool imeSurroundingMatches(const RvHost::ImeSurrounding& snapshot, Document& document, Editor& editor, Element* target)
+{
+    RefPtr editable = imeEditable(target);
+    auto range = editor.compositionRange();
+    auto selectionAnchor = makeBoundaryPoint(document.selection().selection().anchor());
+    auto selectionFocus = makeBoundaryPoint(document.selection().selection().focus());
+    return target && snapshot.document.get() == &document && snapshot.target.get() == target
+        && document.focusedElement() == target && target->isConnected() && &target->document() == &document
+        && editable && editable == snapshot.editable.get() && range
+        && snapshot.startNode.get() == range->start.container.ptr() && snapshot.startOffset == range->start.offset
+        && snapshot.endNode.get() == range->end.container.ptr() && snapshot.endOffset == range->end.offset
+        && selectionAnchor && selectionFocus
+        && snapshot.selectionAnchorNode.get() == selectionAnchor->container.ptr() && snapshot.selectionAnchorOffset == selectionAnchor->offset
+        && snapshot.selectionFocusNode.get() == selectionFocus->container.ptr() && snapshot.selectionFocusOffset == selectionFocus->offset
+        && snapshot.contents == editable->innerHTML() && snapshot.expected == imeSurroundingCurrentText(*target, *editable);
+}
+
 int32_t rv_host_ime_set_composition(RvHost* host, const uint8_t* text, int32_t text_length, int32_t selectionStart, int32_t selectionEnd)
 {
     auto input = requiredUtf8(text, text_length);
@@ -5472,11 +5598,112 @@ int32_t rv_host_ime_set_composition(RvHost* host, const uint8_t* text, int32_t t
     auto composition = WTF::move(*input);
     if (selectionStart < 0 || selectionEnd < selectionStart || static_cast<unsigned>(selectionEnd) > composition.length())
         return RV_ERR_UNSUPPORTED;
+    if (composition.isEmpty())
+        return rv_host_ime_cancel(host);
     Vector<CompositionUnderline> underlines;
     if (!composition.isEmpty())
         underlines.append({ 0, composition.length(), CompositionUnderlineColor::TextColor, Color::black, false });
     return compose(*host, [&](Editor& editor) {
+        Ref document = host->document();
+        RefPtr target = document->focusedElement();
+        auto& client = static_cast<RvEditorClient&>(host->page->editorClient());
+        bool starting = !editor.hasComposition() && !composition.isEmpty();
+        bool ownsComposition = starting && target;
+        auto generation = client.historyGeneration();
+        auto sequence = host->editingSequence;
+        if (starting) {
+            host->imeSurrounding.reset();
+            int32_t length = 0, cursor = 0, anchor = 0, state = 0;
+            uint64_t token = 0;
+            int32_t result = rv_host_ime_surrounding(host, nullptr, 0, &length, &cursor, &anchor, &state, &token);
+            if (result == RV_ERR_BUFFER_TOO_SMALL && state == 1 && length >= 0) {
+                Vector<char> bytes;
+                bytes.grow(static_cast<size_t>(length) + 1);
+                result = rv_host_ime_surrounding(host, bytes.mutableSpan().data(), length, &length, &cursor, &anchor, &state, &token);
+                if (result == RV_OK && state == 1 && host->page->localTopDocument() == document.ptr()
+                    && document->focusedElement() == target.get() && host->editingSequence == sequence) {
+                    host->imeSurrounding.emplace();
+                    host->imeSurrounding->document = document.ptr();
+                    host->imeSurrounding->target = target.get();
+                    host->imeSurrounding->original = String::fromUTF8(std::span<const char8_t> { reinterpret_cast<const char8_t*>(bytes.span().data()), static_cast<size_t>(length) });
+                    host->imeSurrounding->cursor = cursor;
+                    host->imeSurrounding->anchor = anchor;
+                }
+            }
+            host->imeUndo.reset();
+            if (ownsComposition) {
+                editor.closeTyping();
+                host->imeUndo.emplace();
+                host->imeUndo->document = document.ptr();
+                host->imeUndo->target = target.get();
+                host->imeUndo->endSerial = editor.compositionEndSerial();
+            }
+        }
+        bool continuing = !starting && host->imeUndo && host->imeUndo->document.get() == document.ptr()
+            && host->imeUndo->target.get() == target.get()
+            && imeUndoMatches(*host->imeUndo, editor, target.get()) && host->imeUndo->generation == generation
+            && host->imeUndo->step == client.lastUndoStep();
+        bool surroundingContinuing = !starting && host->imeSurrounding
+            && imeSurroundingMatches(*host->imeSurrounding, document.get(), editor, target.get());
+        if (!starting && !surroundingContinuing)
+            host->imeSurrounding.reset();
         editor.setComposition(composition, underlines, { }, { }, selectionStart, selectionEnd);
+        if (host->imeSurrounding && !host->destroyAfterEditing && host->editingSequence == sequence
+            && host->page->localTopDocument() == document.ptr() && document->focusedElement() == target.get()
+            && editor.hasComposition()) {
+            auto& snapshot = *host->imeSurrounding;
+            RefPtr editable = imeEditable(target.get());
+            auto range = editor.compositionRange();
+            auto selectionAnchor = makeBoundaryPoint(document->selection().selection().anchor());
+            auto selectionFocus = makeBoundaryPoint(document->selection().selection().focus());
+            auto first = std::min(snapshot.cursor, snapshot.anchor);
+            auto last = std::max(snapshot.cursor, snapshot.anchor);
+            if (editable && range && selectionAnchor && selectionFocus && first >= 0 && last >= first && static_cast<unsigned>(last) <= snapshot.original.length()
+                && (range->start.container.ptr() == editable.get() || range->start.container->isDescendantOf(*editable))
+                && (range->end.container.ptr() == editable.get() || range->end.container->isDescendantOf(*editable))) {
+                auto expected = makeString(snapshot.original.substring(0, first), composition, snapshot.original.substring(last));
+                auto scope = makeRangeSelectingNodeContents(*editable);
+                if (plainText(*range) == composition && plainText(SimpleRange { scope.start, range->start }).length() == static_cast<unsigned>(first)
+                    && imeSurroundingCurrentText(*target, *editable) == expected) {
+                    snapshot.editable = editable.get();
+                    snapshot.startNode = range->start.container.ptr();
+                    snapshot.endNode = range->end.container.ptr();
+                    snapshot.startOffset = range->start.offset;
+                    snapshot.endOffset = range->end.offset;
+                    snapshot.selectionAnchorNode = selectionAnchor->container.ptr();
+                    snapshot.selectionAnchorOffset = selectionAnchor->offset;
+                    snapshot.selectionFocusNode = selectionFocus->container.ptr();
+                    snapshot.selectionFocusOffset = selectionFocus->offset;
+                    snapshot.expected = WTF::move(expected);
+                    snapshot.contents = editable->innerHTML();
+                } else
+                    host->imeSurrounding.reset();
+            } else
+                host->imeSurrounding.reset();
+        } else if (host->editingSequence == sequence)
+            host->imeSurrounding.reset();
+        if (!host->imeUndo || host->destroyAfterEditing)
+            return;
+        bool same = host->page->localTopDocument() == document.ptr() && document->focusedElement() == target.get()
+            && host->editingSequence == sequence && editor.hasComposition();
+        RefPtr editable = imeEditable(target.get());
+        auto range = editor.compositionRange();
+        bool validRange = editable && range && plainText(*range) == composition;
+        if (starting && ownsComposition && same && validRange && client.historyGeneration() == generation + 1 && client.lastUndoStep()) {
+            host->imeUndo->step = client.lastUndoStep();
+            host->imeUndo->generation = client.historyGeneration();
+            host->imeUndo->document = document.ptr();
+            host->imeUndo->target = target.get();
+        } else if (!(continuing && same && validRange && client.historyGeneration() == generation && client.lastUndoStep() == host->imeUndo->step))
+            host->imeUndo->step = nullptr;
+        if (validRange) {
+            host->imeUndo->editable = editable.get();
+            host->imeUndo->startNode = range->start.container.ptr();
+            host->imeUndo->endNode = range->end.container.ptr();
+            host->imeUndo->startOffset = range->start.offset;
+            host->imeUndo->endOffset = range->end.offset;
+            host->imeUndo->contents = editable->innerHTML();
+        }
     });
 }
 
@@ -5488,7 +5715,11 @@ int32_t rv_host_ime_commit(RvHost* host, const uint8_t* text, int32_t text_lengt
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     auto committed = WTF::move(*input);
-    return compose(*host, [&](Editor& editor) { editor.confirmComposition(committed); });
+    return compose(*host, [&](Editor& editor) {
+        host->imeSurrounding.reset();
+        host->imeUndo.reset();
+        editor.confirmComposition(committed);
+    });
 }
 
 int32_t rv_host_ime_cancel(RvHost* host)
@@ -5497,11 +5728,25 @@ int32_t rv_host_ime_cancel(RvHost* host)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
-    // Editor::cancelComposition leaves the composition's text when the selection is a caret inside it; an
-    // empty composition selects the composition, deletes it and fires compositionend.
-    return compose(*host, [](Editor& editor) {
-        if (editor.hasComposition())
-            editor.setComposition(emptyString(), { }, { }, { }, 0, 0);
+    return compose(*host, [&](Editor& editor) {
+        host->imeSurrounding.reset();
+        auto transaction = std::exchange(host->imeUndo, std::nullopt);
+        if (!transaction) {
+            if (editor.hasComposition())
+                editor.setComposition(emptyString(), { }, { }, { }, 0, 0);
+            return;
+        }
+        Ref document = host->document();
+        auto& client = static_cast<RvEditorClient&>(host->page->editorClient());
+        if (editor.hasComposition() && transaction->step && transaction->document.get() == document.ptr()
+            && transaction->target.get() == document->focusedElement()
+            && imeUndoMatches(*transaction, editor, document->focusedElement()))
+            client.undoOwnedComposition(transaction->step, transaction->generation);
+        RefPtr target = dynamicDowncast<Element>(transaction->target.get());
+        if (!host->destroyAfterEditing && host->page->localTopDocument() == document.ptr()
+            && transaction->document.get() == document.ptr() && target && target->isConnected()
+            && &target->document() == document.ptr())
+            editor.cancelCompositionForTarget(*target, transaction->endSerial);
     });
 }
 
@@ -5528,6 +5773,393 @@ int32_t rv_host_ime_rect(RvHost* host, int32_t* x, int32_t* y, int32_t* width, i
     *width = rect.width();
     *height = rect.height();
     return rect.isEmpty() ? 0 : 1;
+}
+
+static bool imeSurroundingUtf8LengthFits(size_t length)
+{
+    return length <= static_cast<size_t>(std::numeric_limits<int32_t>::max());
+}
+
+static int32_t imeSurroundingSnapshot(RvHost* host, char* buffer, int32_t capacity, int32_t* length,
+    int32_t* cursor, int32_t* anchor, int32_t* state)
+{
+    if (!host || !length || !cursor || !anchor || !state || capacity < 0)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    *length = -1;
+    *cursor = 0;
+    *anchor = 0;
+    *state = 0;
+    auto copySnapshot = [&](const String& value) -> int32_t {
+        auto bytes = (value.isNull() ? emptyString() : value).utf8();
+        if (!imeSurroundingUtf8LengthFits(bytes.length())) {
+            *length = -1;
+            *cursor = 0;
+            *anchor = 0;
+            *state = 0;
+            return RV_ERR_UNSUPPORTED;
+        }
+        *length = static_cast<int32_t>(bytes.length());
+        if (!buffer || capacity < *length)
+            return RV_ERR_BUFFER_TOO_SMALL;
+        std::memcpy(buffer, bytes.data(), bytes.length());
+        return RV_OK;
+    };
+    Ref document = host->document();
+    RefPtr target = document->focusedElement();
+    if (!target)
+        return RV_OK;
+    if (auto* input = dynamicDowncast<HTMLInputElement>(*target); input && input->isSecureField()) {
+        *state = 3;
+        return RV_OK;
+    }
+    if (host->frame().editor().hasComposition()) {
+        if (host->imeSurrounding && imeSurroundingMatches(*host->imeSurrounding, document.get(), host->frame().editor(), target.get())) {
+            *cursor = host->imeSurrounding->cursor;
+            *anchor = host->imeSurrounding->anchor;
+            *state = 1;
+            return copySnapshot(host->imeSurrounding->original);
+        }
+        host->imeSurrounding.reset();
+        *state = 2;
+        return RV_OK;
+    }
+    String text;
+    unsigned first = 0, last = 0;
+    bool backward = false;
+    if (auto* input = dynamicDowncast<HTMLInputElement>(*target)) {
+        if (!input->isTextField() || input->isDisabledFormControl() || input->hasAttribute(HTMLNames::readonlyAttr))
+            return RV_OK;
+        text = input->value();
+        first = input->selectionStart();
+        last = input->selectionEnd();
+        backward = input->selectionDirection() == "backward"_s;
+    } else if (auto* area = dynamicDowncast<HTMLTextAreaElement>(*target)) {
+        if (area->isDisabledFormControl() || area->hasAttribute(HTMLNames::readonlyAttr))
+            return RV_OK;
+        text = area->value();
+        first = area->selectionStart();
+        last = area->selectionEnd();
+        backward = area->selectionDirection() == "backward"_s;
+    } else {
+        auto& selection = document->selection().selection();
+        RefPtr root = selection.rootEditableElement();
+        if (!root || !root->isConnected() || (target != root && !target->isDescendantOf(*root)))
+            return RV_OK;
+        auto anchorPoint = makeBoundaryPoint(selection.anchor());
+        auto focusPoint = makeBoundaryPoint(selection.focus());
+        if (!anchorPoint || !focusPoint)
+            return RV_OK;
+        auto inRoot = [&](const BoundaryPoint& point) {
+            return &point.container.get() == root.get() || point.container->isDescendantOf(*root);
+        };
+        if (!inRoot(*anchorPoint) || !inRoot(*focusPoint))
+            return RV_OK;
+        document->updateLayoutIgnorePendingStylesheets();
+        if (!liveHosts.contains(host))
+            return RV_ERR_UNSUPPORTED;
+        auto& currentSelection = document->selection().selection();
+        if (host->page->localTopDocument() != document.ptr() || document->focusedElement() != target.get()
+            || !root->isConnected() || currentSelection.rootEditableElement() != root.get()
+            || makeBoundaryPoint(currentSelection.anchor()) != anchorPoint
+            || makeBoundaryPoint(currentSelection.focus()) != focusPoint)
+            return RV_OK;
+        if (host->frame().editor().hasComposition()) {
+            *state = 2;
+            return RV_OK;
+        }
+        auto scope = makeRangeSelectingNodeContents(*root);
+        text = plainText(scope);
+        auto anchorLength = plainText(SimpleRange { scope.start, *anchorPoint }).length();
+        auto cursorLength = plainText(SimpleRange { scope.start, *focusPoint }).length();
+        if (text.length() > static_cast<unsigned>(std::numeric_limits<int32_t>::max())
+            || anchorLength > text.length() || cursorLength > text.length())
+            return RV_ERR_UNSUPPORTED;
+        if (text.contains('\0') || text.utf8(StrictConversion).isNull())
+            return RV_OK;
+        *anchor = static_cast<int32_t>(anchorLength);
+        *cursor = static_cast<int32_t>(cursorLength);
+        *state = 1;
+        return copySnapshot(text);
+    }
+    if (text.length() > static_cast<unsigned>(std::numeric_limits<int32_t>::max()) || first > last || last > text.length())
+        return RV_OK;
+    if (text.contains('\0') || text.utf8(StrictConversion).isNull())
+        return RV_OK;
+    *cursor = static_cast<int32_t>(backward ? first : last);
+    *anchor = static_cast<int32_t>(backward ? last : first);
+    *state = 1;
+    return copySnapshot(text);
+}
+
+int32_t rv_host_ime_surrounding(RvHost* host, char* buffer, int32_t capacity, int32_t* length,
+    int32_t* cursor, int32_t* anchor, int32_t* state, uint64_t* token)
+{
+    if (!token)
+        return RV_ERR_NULL_ARGUMENT;
+    *token = 0;
+    auto result = imeSurroundingSnapshot(host, buffer, capacity, length, cursor, anchor, state);
+    if (result != RV_OK || *state != 1) {
+        if (host && onOwningThread() && liveHosts.contains(host))
+            host->imeServed.reset();
+        return result;
+    }
+    Ref document = host->document();
+    RefPtr target = document->focusedElement();
+    RefPtr editable = imeEditable(target.get());
+    auto selectionAnchor = makeBoundaryPoint(document->selection().selection().anchor());
+    auto selectionFocus = makeBoundaryPoint(document->selection().selection().focus());
+    auto& editor = host->frame().editor();
+    if (!target || !target->isConnected() || !editable || !selectionAnchor || !selectionFocus
+        || (editor.hasComposition() && (!host->imeSurrounding || !imeSurroundingMatches(*host->imeSurrounding, document.get(), editor, target.get())))) {
+        host->imeServed.reset();
+        *state = 0;
+        return RV_OK;
+    }
+    if (*length < 0 || !buffer) {
+        host->imeServed.reset();
+        *length = -1;
+        *cursor = 0;
+        *anchor = 0;
+        *state = 0;
+        return RV_ERR_UNSUPPORTED;
+    }
+    auto text = String::fromUTF8(std::span<const char8_t> { reinterpret_cast<const char8_t*>(buffer), static_cast<size_t>(*length) });
+    auto current = imeSurroundingCurrentText(*target, *editable);
+    auto contents = editable->innerHTML();
+    bool same = host->imeServed && host->imeServed->document.get() == document.ptr()
+        && host->imeServed->target.get() == target.get() && host->imeServed->editable.get() == editable.get()
+        && host->imeServed->selectionAnchorNode.get() == selectionAnchor->container.ptr()
+        && host->imeServed->selectionAnchorOffset == selectionAnchor->offset
+        && host->imeServed->selectionFocusNode.get() == selectionFocus->container.ptr()
+        && host->imeServed->selectionFocusOffset == selectionFocus->offset
+        && host->imeServed->text == text && host->imeServed->current == current && host->imeServed->contents == contents
+        && host->imeServed->cursor == *cursor && host->imeServed->anchor == *anchor
+        && host->imeServed->composing == editor.hasComposition();
+    if (!same) {
+        if (!++imeServedSequence)
+            ++imeServedSequence;
+        host->imeServed.emplace();
+        auto& served = *host->imeServed;
+        served.token = imeServedSequence;
+        served.document = document.ptr();
+        served.target = target.get();
+        served.editable = editable.get();
+        served.selectionAnchorNode = selectionAnchor->container.ptr();
+        served.selectionAnchorOffset = selectionAnchor->offset;
+        served.selectionFocusNode = selectionFocus->container.ptr();
+        served.selectionFocusOffset = selectionFocus->offset;
+        served.text = WTF::move(text);
+        served.current = WTF::move(current);
+        served.contents = WTF::move(contents);
+        served.cursor = *cursor;
+        served.anchor = *anchor;
+        served.composing = editor.hasComposition();
+    }
+    *token = host->imeServed->token;
+    return RV_OK;
+}
+
+int32_t rv_host_ime_delete_surrounding(RvHost* host, uint64_t token, int32_t start, int32_t end)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host) || !token || !host->imeServed || host->imeServed->token != token)
+        return RV_ERR_DETACHED;
+    auto& served = *host->imeServed;
+    Ref document = host->document();
+    RefPtr target = document->focusedElement();
+    RefPtr editable = imeEditable(target.get());
+    auto anchorPoint = makeBoundaryPoint(document->selection().selection().anchor());
+    auto focusPoint = makeBoundaryPoint(document->selection().selection().focus());
+    auto& editor = host->frame().editor();
+    if (!target || !target->isConnected() || served.document.get() != document.ptr() || served.target.get() != target.get()
+        || !editable || served.editable.get() != editable.get() || !anchorPoint || !focusPoint
+        || served.selectionAnchorNode.get() != anchorPoint->container.ptr() || served.selectionAnchorOffset != anchorPoint->offset
+        || served.selectionFocusNode.get() != focusPoint->container.ptr() || served.selectionFocusOffset != focusPoint->offset
+        || served.contents != editable->innerHTML() || served.current != imeSurroundingCurrentText(*target, *editable)
+        || served.composing != editor.hasComposition()
+        || (served.composing && (!host->imeSurrounding || !imeSurroundingMatches(*host->imeSurrounding, document.get(), editor, target.get())))) {
+        host->imeServed.reset();
+        return RV_ERR_DETACHED;
+    }
+    if (start < 0 || end < start || static_cast<unsigned>(end) > served.text.length())
+        return RV_ERR_UNSUPPORTED;
+    auto splitsPair = [&](int32_t offset) {
+        return offset > 0 && static_cast<unsigned>(offset) < served.text.length()
+            && U16_IS_LEAD(served.text[offset - 1]) && U16_IS_TRAIL(served.text[offset]);
+    };
+    if (splitsPair(start) || splitsPair(end))
+        return RV_ERR_UNSUPPORTED;
+    if (start == end)
+        return 0;
+    int64_t mappedStart = start, mappedEnd = end;
+    if (served.composing) {
+        auto first = std::min(served.cursor, served.anchor);
+        auto last = std::max(served.cursor, served.anchor);
+        if (start >= last && end > first) {
+            auto difference = static_cast<int64_t>(served.current.length()) - static_cast<int64_t>(served.text.length());
+            mappedStart += difference;
+            mappedEnd += difference;
+        } else if (end > first)
+            return RV_ERR_UNSUPPORTED;
+    }
+    if (mappedStart < 0 || mappedEnd < mappedStart || static_cast<uint64_t>(mappedEnd) > served.current.length())
+        return RV_ERR_UNSUPPORTED;
+    auto scope = makeRangeSelectingNodeContents(*editable);
+    auto range = resolveCharacterRange(scope, { static_cast<uint64_t>(mappedStart), static_cast<uint64_t>(mappedEnd - mappedStart) });
+    if (plainText(range) != served.current.substring(static_cast<unsigned>(mappedStart), static_cast<unsigned>(mappedEnd - mappedStart)))
+        return RV_ERR_UNSUPPORTED;
+    auto expected = makeString(served.current.substring(0, static_cast<unsigned>(mappedStart)), served.current.substring(static_cast<unsigned>(mappedEnd)));
+    auto originalCurrent = served.current;
+    auto originalCommitted = served.text;
+    auto originalSurrounding = host->imeSurrounding;
+    auto oldCompositionStep = host->imeUndo ? host->imeUndo->step : nullptr;
+    Ref frame = host->frame();
+    RefPtr<WebCore::Range> trackedComposition;
+    RefPtr<WebCore::Range> trackedSelection = WebCore::Range::create(document);
+    RefPtr<Text> originalCompositionNode;
+    String originalCompositionText;
+    uint64_t endSerial = 0;
+    auto originalSelection = document->selection().selection();
+    auto selectionRange = originalSelection.firstRange();
+    if (!selectionRange
+        || trackedSelection->setStart(selectionRange->start.container.copyRef(), selectionRange->start.offset).hasException()
+        || trackedSelection->setEnd(selectionRange->end.container.copyRef(), selectionRange->end.offset).hasException())
+        return RV_ERR_UNSUPPORTED;
+    if (served.composing) {
+        auto compositionRange = editor.compositionRange();
+        originalCompositionNode = editor.compositionNode();
+        if (!compositionRange || !originalCompositionNode)
+            return RV_ERR_UNSUPPORTED;
+        trackedComposition = WebCore::Range::create(document);
+        if (trackedComposition->setStart(compositionRange->start.container.copyRef(), compositionRange->start.offset).hasException()
+            || trackedComposition->setEnd(compositionRange->end.container.copyRef(), compositionRange->end.offset).hasException())
+            return RV_ERR_UNSUPPORTED;
+        originalCompositionText = plainText(*compositionRange);
+        endSerial = editor.compositionEndSerial();
+    }
+    host->imeServed.reset();
+    host->imeSurrounding.reset();
+    bool endedComposition = false;
+    bool failedCompositionTransaction = false;
+    auto result = handleInput(*host, [&] {
+        auto restoreSelection = [&] {
+            auto tracked = makeSimpleRange(*trackedSelection);
+            const auto& base = originalSelection.isBaseFirst() ? tracked.start : tracked.end;
+            const auto& extent = originalSelection.isBaseFirst() ? tracked.end : tracked.start;
+            frame->selection().setSelection(VisibleSelection {
+                VisiblePosition { makeContainerOffsetPosition(base), originalSelection.affinity() },
+                VisiblePosition { makeContainerOffsetPosition(extent), originalSelection.affinity() }, originalSelection.directionality() });
+        };
+        auto sequence = host->editingSequence;
+        editor.setIgnoreSelectionChanges(true);
+        frame->selection().setSelection(VisibleSelection { range });
+        bool rebuilt = false;
+        if (trackedComposition && originalSurrounding && oldCompositionStep) {
+            Function<bool()> validContext = [&] {
+                return !host->destroyAfterEditing && host->page->localTopDocument() == document.ptr()
+                    && document->focusedElement() == target.get() && host->editingSequence == sequence
+                    && target->isConnected() && &target->document() == document.ptr();
+            };
+            auto& client = static_cast<RvEditorClient&>(host->page->editorClient());
+            auto finishClientScope = makeScopeExit([&] { client.setCompositionSuspended(false); });
+            Function<void(SurroundingCompositionState)> stateChanged = [&](SurroundingCompositionState state) {
+                if (state == SurroundingCompositionState::Suspending) {
+                    host->imeUndo.reset();
+                    client.setCompositionSuspended(true);
+                    return;
+                }
+                if (state == SurroundingCompositionState::Unapplied) {
+                    client.discardOwnedUndoStep(oldCompositionStep);
+                    return;
+                }
+                client.setCompositionSuspended(false);
+                if (state == SurroundingCompositionState::AbortedChanged || state == SurroundingCompositionState::AbortedUnchanged)
+                    failedCompositionTransaction = true;
+                if (state == SurroundingCompositionState::AbortedChanged)
+                    client.discardUnsafeCompositionHistory();
+                if (state != SurroundingCompositionState::Rebuilt || !validContext())
+                    return;
+                auto range = editor.compositionRange();
+                auto anchor = makeBoundaryPoint(document->selection().selection().anchor());
+                auto focus = makeBoundaryPoint(document->selection().selection().focus());
+                if (!range || !anchor || !focus)
+                    return;
+                host->imeSurrounding = originalSurrounding;
+                auto& snapshot = *host->imeSurrounding;
+                snapshot.original = makeString(originalCommitted.substring(0, start), originalCommitted.substring(end));
+                auto shift = [&](int32_t offset) { return offset >= end ? offset - (end - start) : offset; };
+                snapshot.cursor = shift(snapshot.cursor);
+                snapshot.anchor = shift(snapshot.anchor);
+                snapshot.startNode = range->start.container.ptr();
+                snapshot.endNode = range->end.container.ptr();
+                snapshot.startOffset = range->start.offset;
+                snapshot.endOffset = range->end.offset;
+                snapshot.selectionAnchorNode = anchor->container.ptr();
+                snapshot.selectionAnchorOffset = anchor->offset;
+                snapshot.selectionFocusNode = focus->container.ptr();
+                snapshot.selectionFocusOffset = focus->offset;
+                snapshot.expected = imeSurroundingCurrentText(*target, *editable);
+                snapshot.contents = editable->innerHTML();
+                host->imeUndo.emplace();
+                auto& undo = *host->imeUndo;
+                undo.step = client.lastUndoStep();
+                undo.generation = client.historyGeneration();
+                undo.endSerial = endSerial;
+                undo.document = document.ptr();
+                undo.target = target.get();
+                undo.editable = editable.get();
+                undo.startNode = range->start.container.ptr();
+                undo.endNode = range->end.container.ptr();
+                undo.startOffset = range->start.offset;
+                undo.endOffset = range->end.offset;
+                undo.contents = editable->innerHTML();
+                rebuilt = true;
+            };
+            editor.deleteSurroundingComposition(*editable, { static_cast<uint64_t>(start), static_cast<uint64_t>(end - start) },
+                originalCommitted, originalSelection, validContext, stateChanged);
+            if (!host->destroyAfterEditing && host->page->localTopDocument() == document.ptr())
+                endedComposition = editor.compositionEndSerial() != endSerial;
+        } else
+            editor.deleteSelectionWithSmartDelete(false);
+        editor.setIgnoreSelectionChanges(false);
+        bool applied = !host->destroyAfterEditing && host->page->localTopDocument() == document.ptr()
+            && document->focusedElement() == target.get() && host->editingSequence == sequence
+            && imeSurroundingCurrentText(*target, *editable) == expected;
+        if (!applied) {
+            if (!host->destroyAfterEditing && host->page->localTopDocument() == document.ptr()
+                && document->focusedElement() == target.get() && host->editingSequence == sequence
+                && imeSurroundingCurrentText(*target, *editable) == originalCurrent
+                && document->selection().selection().firstRange() == range)
+                restoreSelection();
+            if (trackedComposition && !host->destroyAfterEditing && host->page->localTopDocument() == document.ptr()
+                && target->isConnected() && &target->document() == document.ptr() && host->editingSequence == sequence
+                && editor.compositionNode() == originalCompositionNode.get() && editor.compositionEndSerial() == endSerial) {
+                if (host->imeUndo)
+                    rv_host_ime_cancel(host);
+                else
+                    editor.cancelCompositionForTarget(*target, endSerial);
+                if (!host->destroyAfterEditing)
+                    endedComposition = editor.compositionEndSerial() != endSerial;
+            }
+            return false;
+        }
+        if (!trackedComposition || rebuilt)
+            return applied;
+        if (!editor.relocateCompositionAfterDeletion(makeSimpleRange(*trackedComposition), *originalCompositionNode, endSerial, originalCompositionText)) {
+            editor.cancelCompositionForTarget(*target, endSerial);
+            return false;
+        }
+        restoreSelection();
+        return true;
+    });
+    return failedCompositionTransaction ? RV_ERR_UNSUPPORTED : result >= 0 && endedComposition ? 2 : result;
 }
 
 static Element* elementOf(RvNode* handle) { return handle ? dynamicDowncast<Element>(*node(handle)) : nullptr; }
@@ -8105,6 +8737,76 @@ static int32_t textStatus(RvAxNode* handle, std::optional<SimpleRange>& scope)
         return status;
     scope = textScope(*axObject(handle));
     return scope ? RV_OK : RV_ERR_UNSUPPORTED;
+}
+
+int32_t rv_ax_text_style_run(RvAxNode* handle, int32_t offset, const char* property,
+    int32_t* start, int32_t* end, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (start) *start = 0;
+    if (end) *end = 0;
+    if (length) *length = 0;
+    if (!property || !start || !end || !length || (capacity > 0 && !buffer))
+        return RV_ERR_NULL_ARGUMENT;
+    if (auto status = axStatus(handle))
+        return status;
+    if (capacity < 0)
+        return RV_ERR_UNSUPPORTED;
+    bool supported = false;
+    for (auto* name : { "color", "background-color", "font-family", "font-size", "font-weight", "font-style",
+             "text-decoration-line", "visibility", "direction" })
+        supported |= !std::strcmp(property, name);
+    if (!supported)
+        return RV_ERR_UNSUPPORTED;
+    Ref object = *axObject(handle);
+    auto scope = textScope(object);
+    if (isGone(object))
+        return RV_ERR_DETACHED;
+    if (!scope)
+        return RV_ERR_UNSUPPORTED;
+    auto count = static_cast<int32_t>(characterCount(*scope));
+    if (offset < 0 || offset > count)
+        return RV_ERR_UNSUPPORTED;
+    struct StyleRun { int32_t start; int32_t end; String value; };
+    Vector<StyleRun> runs;
+    auto computed = [&](Node* node) -> String {
+        RefPtr<Element> element = dynamicDowncast<Element>(node);
+        if (!element && node) element = node->parentElement();
+        if (!element) element = dynamicDowncast<Element>(scope->start.container.get());
+        if (!element) element = scope->start.container->document().documentElement();
+        if (!element) return { };
+        Ref<CSSStyleDeclaration> style = CSSComputedStyleDeclaration::create(*element, CSSComputedStyleDeclaration::AllowVisited::No);
+        return style->getPropertyValue(utf8(property));
+    };
+    int32_t cursor = 0;
+    for (TextIterator iterator(*scope); !iterator.atEnd(); iterator.advance()) {
+        auto size = static_cast<int32_t>(iterator.text().length());
+        if (!size) continue;
+        auto value = computed(iterator.node());
+        if (value.isEmpty()) return RV_ERR_UNSUPPORTED;
+        if (!runs.isEmpty() && runs.last().value == value)
+            runs.last().end += size;
+        else runs.append(StyleRun { cursor, cursor + size, WTF::move(value) });
+        cursor += size;
+    }
+    if (cursor != count)
+        return RV_ERR_UNSUPPORTED;
+    if (runs.isEmpty()) {
+        auto value = computed(object->node());
+        if (value.isEmpty()) return RV_ERR_UNSUPPORTED;
+        runs.append(StyleRun { 0, 0, WTF::move(value) });
+    }
+    auto position = count && offset == count ? offset - 1 : offset;
+    for (auto& run : runs) {
+        if (position < run.start || (position >= run.end && count)) continue;
+        if (isGone(object)) return RV_ERR_DETACHED;
+        auto status = copyString(run.value, buffer, capacity, length);
+        if (status == RV_OK || status == RV_ERR_BUFFER_TOO_SMALL) {
+            *start = run.start;
+            *end = run.end;
+        }
+        return status;
+    }
+    return RV_ERR_UNSUPPORTED;
 }
 
 int32_t rv_ax_text_child_range(RvAxNode* ancestor, RvAxNode* child, int32_t* start, int32_t* end)

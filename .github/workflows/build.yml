@@ -61,6 +61,7 @@ jobs:
       - run: python -I tests/test_preview7_recovery.py
       - run: python -I tests/test_probes.py
       - run: python -I tests/test_background_clip_policy.py
+      - run: python -I tests/test_producer_gpu_clipping.py
       - run: python -I tests/test_sdl_runtime.py
       - run: python -I tests/test_package_gpu.py
       - run: python -I tests/test_sccache_cache_policy.py
@@ -632,6 +633,20 @@ jobs:
 
       # Every probe in scripts/probes.py that applies to the runtime, each with its own condition and timeout. The
       # step runs them all and fails at the end when any failed, so one run reports every failing probe.
+      - name: Install the bounded GPU qualification dependency
+        if: env.FLAVOR == 'gpu' && (matrix.rid == 'win-x64' || matrix.rid == 'linux-x64')
+        run: python -m pip install numpy==2.4.3
+
+      - name: Check the GPU format qualification policy
+        if: env.FLAVOR == 'gpu' && (matrix.rid == 'win-x64' || matrix.rid == 'linux-x64')
+        run: python -I tests/test_p7_sampler_format_policy.py
+
+      - name: Check producer stage and child-tree ownership
+        if: env.FLAVOR == 'gpu' && (matrix.rid == 'win-x64' || matrix.rid == 'linux-x64')
+        env:
+          RANVIER_GPU_JOB_TEST_RECEIPT: ${{ env.RANVIER_WORK }}/gpu-child-cleanup-control.json
+        run: python -I tests/test_producer_gpu_clipping.py
+
       - name: Run the probes
         run: python -I scripts/probes.py run --rid ${{ matrix.rid }} --flavor ${{ env.FLAVOR }} --work "${{ env.RANVIER_WORK }}"
 
@@ -658,7 +673,26 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: clipping-report-${{ matrix.rid }}-${{ env.FLAVOR }}
-          path: ${{ env.RANVIER_WORK }}/background-content-clipping-regression.json
+          path: |
+            ${{ env.RANVIER_WORK }}/background-content-clipping-regression.json
+            ${{ env.RANVIER_WORK }}/gpu-clipping-qualification
+            ${{ env.RANVIER_WORK }}/gpu-child-cleanup-control.json
+          if-no-files-found: ignore
+
+      - name: Retain Windows owner-thread exit results
+        if: always() && matrix.rid == 'win-x64'
+        uses: actions/upload-artifact@v4
+        with:
+          name: owner-thread-exit-report-${{ matrix.rid }}-${{ env.FLAVOR }}
+          path: ${{ env.RANVIER_WORK }}/owner-thread-exit.json
+          if-no-files-found: ignore
+
+      - name: Retain IME mutation and reentry results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ime-surrounding-report-${{ matrix.rid }}-${{ env.FLAVOR }}
+          path: ${{ env.RANVIER_WORK }}/ime-surrounding-observation*.json
           if-no-files-found: ignore
 
       - name: Upload the CMake logs on failure

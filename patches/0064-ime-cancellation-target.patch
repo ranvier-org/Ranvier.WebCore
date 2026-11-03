@@ -1,0 +1,487 @@
+diff --git a/Source/WebCore/editing/Editor.h b/Source/WebCore/editing/Editor.h
+--- a/Source/WebCore/editing/Editor.h
++++ b/Source/WebCore/editing/Editor.h
+@@ -43,6 +43,7 @@
+ #include <WebCore/WritingDirection.h>
+ #include <memory>
+ #include <wtf/Platform.h>
++#include <wtf/Function.h>
+ #include <wtf/RobinHoodHashSet.h>
+ #include <wtf/TZoneMallocInlines.h>
+ #include <wtf/WeakPtr.h>
+@@ -133,6 +134,10 @@
+ 
+ enum class AllowTextReplacement : bool { No, Yes };
+ 
++enum class SurroundingCompositionState : uint8_t {
++    Suspending, Unapplied, Rebuilt, AbortedUnchanged, AbortedChanged
++};
++
+ #if ENABLE(ATTACHMENT_ELEMENT)
+ class AttachmentAssociatedElement;
+ class HTMLAttachmentElement;
+@@ -298,6 +303,8 @@
+ 
+     WEBCORE_EXPORT bool deleteWithDirection(SelectionDirection, TextGranularity, bool killRing, bool isTypingAction);
+     WEBCORE_EXPORT void deleteSelectionWithSmartDelete(bool smartDelete, EditAction = EditAction::Delete);
++    WEBCORE_EXPORT bool deleteSurroundingComposition(ContainerNode&, CharacterRange, const String& originalText,
++        const VisibleSelection& compositionSelection, const Function<bool()>& validContext, const Function<void(SurroundingCompositionState)>& stateChanged);
+     void clearText();
+ #if PLATFORM(IOS_FAMILY)
+     WEBCORE_EXPORT void removeUnchangeableStyles();
+@@ -440,6 +447,9 @@
+     WEBCORE_EXPORT void confirmComposition(const String&); // if no existing composition, replaces selection
+     void confirmOrCancelCompositionAndNotifyClient();
+     WEBCORE_EXPORT void cancelComposition();
++    WEBCORE_EXPORT uint64_t compositionEndSerial() const;
++    WEBCORE_EXPORT void cancelCompositionForTarget(Element&, uint64_t expectedEndSerial);
++    WEBCORE_EXPORT bool relocateCompositionAfterDeletion(const SimpleRange&, Text&, uint64_t expectedEndSerial, const String& expectedText);
+     WEBCORE_EXPORT bool cancelCompositionIfSelectionIsInvalid();
+     WEBCORE_EXPORT std::optional<SimpleRange> compositionRange() const;
+     WEBCORE_EXPORT bool getCompositionSelection(unsigned& selectionStart, unsigned& selectionEnd) const;
+@@ -700,7 +710,9 @@
+ 
+     void selectComposition();
+     enum SetCompositionMode { ConfirmComposition, CancelComposition };
++    void cancelCompositionWithTarget(Element*);
+     void setComposition(const String&, SetCompositionMode);
++    void setComposition(const String&, SetCompositionMode, Element*);
+     String compositionText() const;
+ 
+     void changeSelectionAfterCommand(const VisibleSelection& newSelection, OptionSet<FrameSelection::SetSelectionOption>);
+diff --git a/Source/WebCore/editing/Editor.cpp b/Source/WebCore/editing/Editor.cpp
+--- a/Source/WebCore/editing/Editor.cpp
++++ b/Source/WebCore/editing/Editor.cpp
+@@ -151,9 +151,11 @@
+ #include "markup.h"
+ #include <pal/FileSizeFormatter.h>
+ #include <pal/text/KillRing.h>
++#include <wtf/NeverDestroyed.h>
+ #include <wtf/Scope.h>
+ #include <wtf/SetForScope.h>
+ #include <wtf/TZoneMallocInlines.h>
++#include <wtf/Threading.h>
+ #include <wtf/text/CharacterProperties.h>
+ #include <wtf/text/MakeString.h>
+ #include <wtf/text/ParsingUtilities.h>
+@@ -662,6 +664,7 @@
+     DeleteSelectionCommand::create(WTF::move(document), smartDelete, true, false, false, true, editingAction)->apply();
+ }
+ 
++
+ void Editor::clearText()
+ {
+     ClearTextCommand::CreateAndApply(protect(document()));
+@@ -1366,6 +1369,177 @@
+     respondToChangedContents(newSelection);
+ }
+ 
++class AcceptedSurroundingDeleteCommand final : public DeleteSelectionCommand {
++public:
++    static Ref<AcceptedSurroundingDeleteCommand> create(Document& document)
++    {
++        return adoptRef(*new AcceptedSurroundingDeleteCommand(document));
++    }
++
++private:
++    explicit AcceptedSurroundingDeleteCommand(Document& document)
++        : DeleteSelectionCommand(document, false, true, false, false, true, EditAction::Delete)
++    {
++    }
++
++    bool willApplyCommand() final { return true; }
++    bool shouldDispatchInputEvents() const final { return false; }
++};
++
++bool Editor::deleteSurroundingComposition(ContainerNode& editable, CharacterRange deletion, const String& originalText,
++    const VisibleSelection& compositionSelection, const Function<bool()>& validContext, const Function<void(SurroundingCompositionState)>& stateChanged)
++{
++    Ref document = this->document();
++    RefPtr oldCommand = m_lastEditCommand;
++    auto range = compositionRange();
++    if (!range || !oldCommand || !oldCommand->isTypingCommand() || !oldCommand->composition()
++        || deletion.location > originalText.length() || deletion.length > originalText.length() - deletion.location)
++        return false;
++    Ref oldComposition = *oldCommand->composition();
++    RefPtr originalNode = m_compositionNode;
++    auto serial = compositionEndSerial();
++    auto preedit = plainText(*range);
++    auto base = makeBoundaryPoint(compositionSelection.base());
++    auto extent = makeBoundaryPoint(compositionSelection.extent());
++    if (!base || !extent || base->container.ptr() != originalNode.get() || extent->container.ptr() != originalNode.get()
++        || base->offset < m_compositionStart || base->offset > m_compositionEnd
++        || extent->offset < m_compositionStart || extent->offset > m_compositionEnd)
++        return false;
++    auto baseOffset = base->offset - m_compositionStart;
++    auto extentOffset = extent->offset - m_compositionStart;
++    auto underlines = m_customCompositionUnderlines;
++    for (auto& underline : underlines) {
++        underline.startOffset -= m_compositionStart;
++        underline.endOffset -= m_compositionStart;
++    }
++    auto highlights = m_customCompositionHighlights;
++    for (auto& highlight : highlights) {
++        highlight.startOffset -= m_compositionStart;
++        highlight.endOffset -= m_compositionStart;
++    }
++    auto annotations = m_customCompositionAnnotations;
++    for (auto& entry : annotations) {
++        for (auto& annotation : entry.value)
++            annotation.location -= m_compositionStart;
++    }
++
++    auto currentText = plainText(makeRangeSelectingNodeContents(editable));
++    auto originalNodeData = originalNode->data();
++    RefPtr editableElement = dynamicDowncast<Element>(editable);
++    auto currentMarkup = editableElement ? editableElement->innerHTML() : String { };
++    Ref admission = DeleteSelectionCommand::create(document.copyRef());
++    admission->ensureComposition();
++    if (!willApplyEditing(admission, admission->targetRangesForBindings()) || !validContext()
++        || m_compositionNode != originalNode || compositionEndSerial() != serial || compositionRange() != range
++        || m_lastEditCommand != oldCommand || !originalNode->isConnected()
++        || plainText(makeRangeSelectingNodeContents(editable)) != currentText)
++        return false;
++
++    RefPtr target = document->focusedElement();
++    if (!target)
++        return false;
++    bool resumed = false;
++    bool unapplied = false;
++    stateChanged(SurroundingCompositionState::Suspending);
++    auto finishSuspension = makeScopeExit([&] {
++        if (resumed)
++            return;
++        TypingCommand::closeTyping(document);
++        m_lastEditCommand = nullptr;
++        bool unchanged = !unapplied && originalNode->isConnected() && originalNode->data() == originalNodeData
++            && editableElement && editableElement->innerHTML() == currentMarkup;
++        stateChanged(unchanged ? SurroundingCompositionState::AbortedUnchanged : SurroundingCompositionState::AbortedChanged);
++        if (compositionEndSerial() != serial || hasComposition()
++            || !target->isConnected() || &target->document() != document.ptr())
++            return;
++        notifyTextFromControls(oldComposition->startingRootEditableElement(), oldComposition->endingRootEditableElement());
++        m_customCompositionUnderlines.clear();
++        m_customCompositionHighlights.clear();
++        m_customCompositionAnnotations.clear();
++        if (CheckedPtr cache = document->existingAXObjectCache(); cache && originalNode->isConnected())
++            cache->onTextCompositionChange(*originalNode, CompositionState::Ended, false, emptyString(), m_compositionStart, m_isHandlingAcceptedCandidate);
++        cancelCompositionForTarget(*target, serial);
++    });
++    TypingCommand::closeTyping(document);
++    m_compositionNode = nullptr;
++    m_lastEditCommand = nullptr;
++    if (!oldComposition->unapplyForCompositionSuspension(validContext))
++        return false;
++    if (!validContext() || compositionEndSerial() != serial || hasComposition())
++        return false;
++    notifyTextFromControls(oldComposition->startingRootEditableElement(), oldComposition->endingRootEditableElement());
++    if (plainText(makeRangeSelectingNodeContents(editable)) != originalText)
++        return false;
++    unapplied = true;
++    stateChanged(SurroundingCompositionState::Unapplied);
++    auto selectedOriginal = oldComposition->startingSelection();
++    auto selectedRange = selectedOriginal.firstRange();
++    if (!selectedRange)
++        return false;
++    Ref trackedSelection = Range::create(document);
++    if (trackedSelection->setStart(selectedRange->start.container.copyRef(), selectedRange->start.offset).hasException()
++        || trackedSelection->setEnd(selectedRange->end.container.copyRef(), selectedRange->end.offset).hasException())
++        return false;
++
++    auto deletionRange = resolveCharacterRange(makeRangeSelectingNodeContents(editable), deletion);
++    document->selection().setSelection(VisibleSelection { deletionRange });
++    Ref acceptedDeletion = AcceptedSurroundingDeleteCommand::create(document);
++    acceptedDeletion->apply();
++    if (!validContext() || compositionEndSerial() != serial || hasComposition())
++        return false;
++    auto expected = makeString(originalText.substring(0, deletion.location), originalText.substring(deletion.location + deletion.length));
++    if (plainText(makeRangeSelectingNodeContents(editable)) != expected)
++        return false;
++
++    auto originalRange = makeSimpleRange(trackedSelection);
++    auto& anchor = selectedOriginal.isBaseFirst() ? originalRange.start : originalRange.end;
++    auto& focus = selectedOriginal.isBaseFirst() ? originalRange.end : originalRange.start;
++    document->selection().setSelection(VisibleSelection {
++        VisiblePosition { makeContainerOffsetPosition(anchor), selectedOriginal.affinity() },
++        VisiblePosition { makeContainerOffsetPosition(focus), selectedOriginal.affinity() }, selectedOriginal.directionality() });
++    TypingCommand::rebuildComposition(document, preedit);
++    if (!validContext() || compositionEndSerial() != serial || hasComposition())
++        return false;
++    auto inserted = document->selection().selection().firstRange();
++    if (!inserted || inserted->start.container.ptr() != inserted->end.container.ptr() || plainText(*inserted) != preedit)
++        return false;
++    RefPtr node = dynamicDowncast<Text>(inserted->start.container.get());
++    if (!node)
++        return false;
++    m_compositionNode = node;
++    m_compositionStart = inserted->start.offset;
++    m_compositionEnd = inserted->end.offset;
++    for (auto& underline : underlines) {
++        underline.startOffset += m_compositionStart;
++        underline.endOffset += m_compositionStart;
++    }
++    m_customCompositionUnderlines = WTF::move(underlines);
++    for (auto& highlight : highlights) {
++        highlight.startOffset += m_compositionStart;
++        highlight.endOffset += m_compositionStart;
++    }
++    m_customCompositionHighlights = WTF::move(highlights);
++    for (auto& entry : annotations) {
++        for (auto& annotation : entry.value)
++            annotation.location += m_compositionStart;
++    }
++    m_customCompositionAnnotations = WTF::move(annotations);
++    document->selection().setSelection(VisibleSelection {
++        VisiblePosition { makeContainerOffsetPosition({ *node, m_compositionStart + baseOffset }), compositionSelection.affinity() },
++        VisiblePosition { makeContainerOffsetPosition({ *node, m_compositionStart + extentOffset }), compositionSelection.affinity() }, compositionSelection.directionality() }, { });
++    if (CheckedPtr renderer = node->renderer())
++        renderer->repaint();
++    if (CheckedPtr cache = document->existingAXObjectCache())
++        cache->onTextCompositionChange(*node, CompositionState::InProgress, true, preedit, m_compositionStart, m_isHandlingAcceptedCandidate);
++    resumed = true;
++    stateChanged(SurroundingCompositionState::Rebuilt);
++    if (!validContext())
++        return true;
++    dispatchInputEvents(acceptedDeletion->composition()->startingRootEditableElement(), acceptedDeletion->composition()->endingRootEditableElement(),
++        acceptedDeletion->inputEventTypeName(), IsInputMethodComposing::No, acceptedDeletion->inputEventData(), acceptedDeletion->inputEventDataTransfer());
++    return true;
++}
++
+ Editor::Editor(Document& document)
+     : m_client(document.page() ? &document.page()->editorClient() : nullptr)
+     , m_document(document)
+@@ -1379,7 +1553,36 @@
+ {
+ }
+ 
+-Editor::~Editor() = default;
++struct ImeEndSerial {
++    uint64_t value { 0 };
++    WTF::ThreadIdentifier owner;
++};
++
++static HashMap<const Editor*, ImeEndSerial>& compositionEndSerials()
++{
++    static NeverDestroyed<HashMap<const Editor*, ImeEndSerial>> serials;
++    return serials;
++}
++
++static void noteCompositionEnd(const Editor& editor)
++{
++    auto& serials = compositionEndSerials();
++    auto found = serials.find(&editor);
++    if (found != serials.end()) {
++        ASSERT(found->value.owner == WTF::Thread::currentID());
++        ++found->value.value;
++    }
++}
++
++Editor::~Editor()
++{
++    auto& serials = compositionEndSerials();
++    auto found = serials.find(this);
++    if (found != serials.end()) {
++        ASSERT(found->value.owner == WTF::Thread::currentID());
++        serials.remove(found);
++    }
++}
+ 
+ void Editor::ref() const
+ {
+@@ -2398,6 +2601,46 @@
+ 
+ void Editor::cancelComposition()
+ {
++    cancelCompositionWithTarget(nullptr);
++}
++
++uint64_t Editor::compositionEndSerial() const
++{
++    auto result = compositionEndSerials().add(this, ImeEndSerial { 0, WTF::Thread::currentID() });
++    ASSERT(result.iterator->value.owner == WTF::Thread::currentID());
++    return result.iterator->value.value;
++}
++
++bool Editor::relocateCompositionAfterDeletion(const SimpleRange& range, Text& originalNode, uint64_t expectedEndSerial, const String& expectedText)
++{
++    if (compositionEndSerial() != expectedEndSerial || m_compositionNode.get() != &originalNode)
++        return false;
++    RefPtr text = dynamicDowncast<Text>(range.start.container.get());
++    if (!text || range.end.container.ptr() != text.get() || !text->isConnected()
++        || range.end.offset < range.start.offset || range.end.offset > text->length()
++        || text->data().substring(range.start.offset, range.end.offset - range.start.offset) != expectedText)
++        return false;
++    m_compositionNode = text;
++    m_compositionStart = range.start.offset;
++    m_compositionEnd = range.end.offset;
++    return true;
++}
++
++void Editor::cancelCompositionForTarget(Element& target, uint64_t expectedEndSerial)
++{
++    if (compositionEndSerial() != expectedEndSerial)
++        return;
++    if (m_compositionNode) {
++        cancelCompositionWithTarget(&target);
++        return;
++    }
++    Ref document = this->document();
++    noteCompositionEnd(*this);
++    target.dispatchEvent(CompositionEvent::create(eventNames().compositionendEvent, document->windowProxy(), emptyString()));
++}
++
++void Editor::cancelCompositionWithTarget(Element* target)
++{
+ #if PLATFORM(MAC)
+     if (m_isHandlingAcceptedCandidate) {
+         removeWritingSuggestionIfNeeded();
+@@ -2407,7 +2650,7 @@
+ 
+     if (!m_compositionNode)
+         return;
+-    setComposition(emptyString(), CancelComposition);
++    setComposition(emptyString(), CancelComposition, target);
+ }
+ 
+ bool Editor::cancelCompositionIfSelectionIsInvalid()
+@@ -2448,8 +2691,14 @@
+ 
+ void Editor::setComposition(const String& text, SetCompositionMode mode)
+ {
++    setComposition(text, mode, nullptr);
++}
++
++void Editor::setComposition(const String& text, SetCompositionMode mode, Element* explicitTarget)
++{
+     ASSERT(mode == ConfirmComposition || mode == CancelComposition);
+     Ref document = this->document();
++    RefPtr retainedTarget = explicitTarget;
+     SetCompositionScope setCompositionScope(document.copyRef());
+ 
+     if (mode == CancelComposition)
+@@ -2477,8 +2726,10 @@
+ 
+     insertTextForConfirmedComposition(text);
+ 
+-    if (RefPtr target = document->focusedElement())
++    if (RefPtr target = retainedTarget ? retainedTarget.get() : document->focusedElement()) {
++        noteCompositionEnd(*this);
+         target->dispatchEvent(CompositionEvent::create(eventNames().compositionendEvent, document->windowProxy(), text));
++    }
+ 
+     if (mode == CancelComposition) {
+         // An open typing command that disagrees about current selection would cause issues with typing later on.
+@@ -2635,8 +2886,10 @@
+         m_isHandlingAcceptedCandidate = false;
+ 
+         TypingCommand::deleteSelection(document.copyRef(), TypingCommand::Option::PreventSpellChecking, TypingCommand::TextCompositionType::Pending);
+-        if (target)
++        if (target) {
++            noteCompositionEnd(*this);
+             target->dispatchEvent(CompositionEvent::create(eventNames().compositionendEvent, document->windowProxy(), text));
++        }
+     }
+ 
+     RefPtr previousCompositionNode = m_compositionNode;
+diff --git a/Source/WebCore/editing/TypingCommand.h b/Source/WebCore/editing/TypingCommand.h
+--- a/Source/WebCore/editing/TypingCommand.h
++++ b/Source/WebCore/editing/TypingCommand.h
+@@ -68,6 +68,8 @@
+     static void insertParagraphSeparator(Ref<Document>&&, OptionSet<Option>);
+     static void insertParagraphSeparatorInQuotedContent(Ref<Document>&&);
+     static void closeTyping(Document&);
++    static void rebuildComposition(Document&, const String&);
++    bool shouldDispatchInputEvents() const final;
+ #if PLATFORM(IOS_FAMILY)
+     static void ensureLastEditCommandHasCurrentSelectionIfOpenForMoreTyping(Document&, const VisibleSelection&);
+ #endif
+diff --git a/Source/WebCore/editing/TypingCommand.cpp b/Source/WebCore/editing/TypingCommand.cpp
+--- a/Source/WebCore/editing/TypingCommand.cpp
++++ b/Source/WebCore/editing/TypingCommand.cpp
+@@ -57,6 +57,21 @@
+ 
+ using namespace HTMLNames;
+ 
++static thread_local const TypingCommand* rebuildingCompositionCommand;
++
++void TypingCommand::rebuildComposition(Document& document, const String& text)
++{
++    Ref command = create(document, Type::InsertText, text,
++        { Option::SelectInsertedText, Option::PreventSpellChecking }, TextCompositionType::Pending);
++    SetForScope rebuilding(rebuildingCompositionCommand, command.ptr());
++    command->apply();
++}
++
++bool TypingCommand::shouldDispatchInputEvents() const
++{
++    return rebuildingCompositionCommand != this;
++}
++
+ class TypingCommandLineOperation
+ {
+ public:
+@@ -355,6 +370,8 @@
+ 
+ bool TypingCommand::willApplyCommand()
+ {
++    if (rebuildingCompositionCommand == this)
++        return true;
+     if (shouldDeferWillApplyCommandUntilAddingTypingCommand()) {
+         // The TypingCommand will handle the willApplyCommand logic separately in TypingCommand::willAddTypingToOpenCommand.
+         return true;
+@@ -505,6 +522,8 @@
+ 
+     m_smartListUndoData = std::nullopt;
+ 
++    if (rebuildingCompositionCommand == this)
++        return true;
+     if (!shouldDeferWillApplyCommandUntilAddingTypingCommand())
+         return true;
+ 
+diff --git a/Source/WebCore/editing/CompositeEditCommand.h b/Source/WebCore/editing/CompositeEditCommand.h
+--- a/Source/WebCore/editing/CompositeEditCommand.h
++++ b/Source/WebCore/editing/CompositeEditCommand.h
+@@ -30,6 +30,7 @@
+ #include "EditCommand.h"
+ #include "CSSPropertyNames.h"
+ #include "UndoStep.h"
++#include <wtf/Function.h>
+ #include <wtf/TZoneMalloc.h>
+ #include <wtf/Vector.h>
+ #include <wtf/WeakPtr.h>
+@@ -80,6 +81,7 @@
+ 
+     void unapply() override;
+     void unapply(AddToUndoStack);
++    bool unapplyForCompositionSuspension(const Function<bool()>&);
+     void reapply() override;
+     EditAction editingAction() const override { return m_editAction; }
+     void append(SimpleEditCommand&);
+diff --git a/Source/WebCore/editing/CompositeEditCommand.cpp b/Source/WebCore/editing/CompositeEditCommand.cpp
+--- a/Source/WebCore/editing/CompositeEditCommand.cpp
++++ b/Source/WebCore/editing/CompositeEditCommand.cpp
+@@ -281,6 +281,24 @@
+     RELEASE_ASSERT_WITH_SECURITY_IMPLICATION(m_document->selection().isNone() || m_document->selection().isConnectedToDocument());
+ }
+ 
++bool EditCommandComposition::unapplyForCompositionSuspension(const Function<bool()>& validContext)
++{
++    RefPtr frame = m_document->frame();
++    if (!frame || !areRootEditabledElementsConnected())
++        return false;
++    Ref document = m_document.get();
++    document->updateLayoutIgnorePendingStylesheets();
++    if (!validContext())
++        return false;
++    auto prohibitScrollingForScope = document->view() ? document->view()->prohibitScrollingWhenChangingContentSizeForScope() : nullptr;
++    for (size_t i = m_commands.size(); i; --i) {
++        m_commands[i - 1]->doUnapply();
++        if (!validContext())
++            return false;
++    }
++    return true;
++}
++
+ void EditCommandComposition::unapply()
+ {
+     this->unapply(AddToUndoStack::Yes);
