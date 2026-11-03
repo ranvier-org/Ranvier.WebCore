@@ -50,6 +50,30 @@ class QualificationReceipt(unittest.TestCase):
         with self.assertRaises(ValueError):
             module.build_summary(*evidence)
 
+    def test_failed_protocol_cannot_be_promoted(self):
+        evidence = self.evidence()
+        evidence[8]['queued'][0]['rows'][0]['passed'] = False
+        with self.assertRaises(ValueError):
+            module.build_summary(*evidence)
+
+    def test_wrong_source_claim_cannot_be_promoted(self):
+        evidence = self.evidence()
+        evidence[1]['callerClaimedProviderSourceRevision'] = 'e' * 40
+        with self.assertRaises(ValueError):
+            module.build_summary(*evidence)
+
+    def test_wrong_abi_tail_cannot_be_promoted(self):
+        evidence = self.evidence()
+        evidence[5][-2:] = reversed(evidence[5][-2:])
+        with self.assertRaises(ValueError):
+            module.build_summary(*evidence)
+
+    def test_failed_sdk_load_cannot_be_promoted(self):
+        evidence = self.evidence()
+        evidence[9]['consumer']['loaded'] = False
+        with self.assertRaises(ValueError):
+            module.build_summary(*evidence)
+
 
 if __name__ == '__main__':
     unittest.main()
