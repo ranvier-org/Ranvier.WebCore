@@ -205,6 +205,14 @@ def main():
             if sha(program)!='4c1aaa98754817bc5b6bc2de49fee400ef1476119a3b33531a282ddfd68f89f6':
                 raise ValueError('The actual retained counter executable differs.')
             record['counterFixtureSha256']=sha(program)
+            proof_path=ROOT/'tests/gpu/mac/proof.json'
+            if sha(proof_path)!='9d84254a05739449b732faf85f22becf4044bc0b3603e3bd5be23363c44ffb3f':
+                raise ValueError('The reviewed raw-symbol proof changed.')
+            proof=json.loads(proof_path.read_text())
+            if proof['counter']['sha256']!=sha(program) or any(
+                    proof['pairs'][name]['before']['packaged']!=sha(native/name) for name in NATIVE):
+                raise ValueError('The raw-symbol proof does not match staged executable bytes.')
+            record['rawSymbolProofSha256']=sha(proof_path)
             run('counter-imports',['xcrun','otool','-L',program])
             run('host-symbols',['xcrun','nm','-a',native/'libRanvierWebCoreHost.dylib'])
             symbol_commands=[]
@@ -229,9 +237,10 @@ def main():
                 'settings set target.env-vars DYLD_LIBRARY_PATH='+str(native)+':'+str(sdl/'lib')+'\n'
                 'command script import '+str(ROOT/'tests/gpu/mac/dirty220_lldb.py')+'\n'
                 +'\n'.join(symbol_commands)+'\n'
-                'breakpoint set -r RvChromeClient::invalidate\n'
-                'breakpoint command add -F dirty220_lldb.on_invalidate 1\n'
+                'breakpoint set -n main\n'
                 'run --diagnostic-scales 1,1\n'
+                'script dirty220_lldb.install(lldb.debugger)\n'
+                'continue\n'
                 'script p=lldb.debugger.GetSelectedTarget().GetProcess(); print("MAC_LLDB_FINAL exited="+str(p.GetState()==lldb.eStateExited)+" exit="+str(p.GetExitStatus()))\n')
             row,text=run('invalidation-stacks',['xcrun','lldb','--batch','--source',commands,str(program)],
                          timeout=240,allow_failure=True,env=counter_environment)
@@ -241,7 +250,8 @@ def main():
                     stacks.append(json.loads(line[len('MAC_INVALIDATE_STACK '):]))
             (output/'invalidation-stacks.json').write_text(json.dumps(stacks,indent=2))
             record['groups'].append(dict(group='readonly-invalidation-stacks',exit=row['exit'],
-                completed=any(item['rect']==[40,130,92,23] for item in stacks) and 'MAC_LLDB_FINAL exited=True' in text,
+                completed=text.count('MAC_ADDRESS_BREAKPOINT ')==4 and any(item['rect']==[40,130,92,23] for item in stacks) and 'MAC_LLDB_FINAL exited=True' in text,
+                addressBreakpointsInstalled=text.count('MAC_ADDRESS_BREAKPOINT ')==4,
                 textRectStackCount=sum(item['rect']==[40,130,92,23] for item in stacks),
                 strictCounterFailureRetained='transform and opacity animation reuse base backing' in text,
                 scope='Diagnostic stacks only; a debugger exit code does not establish native product acceptance'))
