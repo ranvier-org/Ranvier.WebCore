@@ -26,9 +26,9 @@ INDEPENDENT_GPU_NATIVE = {
     'win-x64': 126259024306,
     'linux-arm64': 126259024307,
 }
-HELPER_SOURCE = '3f187c76e404ace64791d8996591ca8bd97183bf'
+HELPER_SOURCE = '2203d5ff61928074363d8917691edc11995cc603'
 HELPER_BLOBS = {
-    'tests/controls/build_cocoa_sidecars.py': 'd2ff164b0ce774ed5c129e95046028083d411425',
+    'tests/controls/build_cocoa_sidecars.py': 'f626b86e23f8e78e5b08adcf17b58c7ec1efbf67',
     'tests/abi/build_cocoa_timer_contract.py': '55fd1261c444226578383efbb91accc9696cd1d6',
 }
 

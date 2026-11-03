@@ -71,6 +71,7 @@ class HelperCompletionTests(unittest.TestCase):
         self.assertNotIn('build.py', text)
         self.assertNotIn('actions/cache', text)
         self.assertIn('path: ${{ env.EVIDENCE }}', text)
+        self.assertIn('include-hidden-files: true', text)
 
 
 if __name__ == '__main__':
