@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def permits_publish(native='success', prebuilt='skipped', managed='success', contract='success', flavor='', cancelled=False,
-                    ref='refs/tags/v0.1.0-preview.14', owner='owner', recovery=False, recovery4=False, recovery7=False):
+                    ref='refs/tags/v0.1.0-preview.14', owner='owner', recovery=''):
     workflow = (ROOT / '.github/workflows/build.yml').read_text()
     job = workflow.split('\n  publish:\n', 1)[1]
     expression = job.split('if:', 1)[1].split('${{', 1)[1].split('}}', 1)[0]
@@ -16,15 +16,14 @@ def permits_publish(native='success', prebuilt='skipped', managed='success', con
     expression = re.sub(r'needs\.([a-z-]+)\.result', lambda match: repr(results[match[1]]), expression)
     for name, value in [('github.ref', ref), ('vars.NUGET_USER', owner), ('inputs.flavor', flavor)]:
         expression = expression.replace(name, repr(value))
-    for name, value in [('recover_preview2_gpu', recovery), ('recover_preview4_gpu', recovery4),
-                        ('recover_preview7_linux', recovery7)]:
-        expression = expression.replace('!inputs.' + name, repr(not value))
+    for flag in ('preview2_gpu', 'preview4_gpu', 'preview7_linux', 'preview7_windows'):
+        expression = expression.replace('!inputs.recover_' + flag, repr(recovery != flag))
     expression = expression.replace('!cancelled()', repr(not cancelled)).replace('&&', ' and ').replace('||', ' or ')
     return eval(' '.join(expression.split()), {'__builtins__': {}}, {'startsWith': lambda value, prefix: value.startswith(prefix)})
 
 
 def permits_windows_gpu_cohort(native='success', prebuilt='skipped', publish='success', cancelled=False,
-                               event='push', ref='refs/tags/v0.1.1-preview.2', recovery=False, recovery4=False, recovery7=False):
+                               event='push', ref='refs/tags/v0.1.1-preview.2', recovery=''):
     workflow = (ROOT / '.github/workflows/build.yml').read_text()
     job = workflow.split('\n  windows-gpu-cohort:\n', 1)[1]
     expression = job.split('if:', 1)[1].split('${{', 1)[1].split('}}', 1)[0]
@@ -34,9 +33,8 @@ def permits_windows_gpu_cohort(native='success', prebuilt='skipped', publish='su
         expression = 'success() && (' + expression + ')'
     for name, value in [('github.event_name', event), ('github.ref', ref), ('needs.publish.result', publish)]:
         expression = expression.replace(name, repr(value))
-    for name, value in [('recover_preview2_gpu', recovery), ('recover_preview4_gpu', recovery4),
-                        ('recover_preview7_linux', recovery7)]:
-        expression = expression.replace('!inputs.' + name, repr(not value))
+    for flag in ('preview2_gpu', 'preview4_gpu', 'preview7_linux', 'preview7_windows'):
+        expression = expression.replace('!inputs.recover_' + flag, repr(recovery != flag))
     expression = expression.replace('!cancelled()', repr(not cancelled)).replace('success()', repr(success))
     expression = expression.replace('&&', ' and ').replace('||', ' or ')
     return eval(' '.join(expression.split()), {'__builtins__': {}},
@@ -44,11 +42,10 @@ def permits_windows_gpu_cohort(native='success', prebuilt='skipped', publish='su
 
 
 class PublishGateTests(unittest.TestCase):
-    def test_each_recovery_mode_skips_ordinary_publication_and_windows_child(self):
-        for name in ['recovery', 'recovery4', 'recovery7']:
-            with self.subTest(recovery=name):
-                self.assertFalse(permits_publish(**{name: True}))
-                self.assertFalse(permits_windows_gpu_cohort(**{name: True}))
+    def test_recovery_inputs_suppress_ordinary_publication_and_child(self):
+        for flag in ('preview2_gpu', 'preview4_gpu', 'preview7_linux', 'preview7_windows'):
+            self.assertFalse(permits_publish(recovery=flag))
+            self.assertFalse(permits_windows_gpu_cohort(recovery=flag))
 
     def test_a_failed_runtime_cannot_publish_an_uploaded_package(self):
         self.assertFalse(permits_publish(native='failure', managed='skipped'))
