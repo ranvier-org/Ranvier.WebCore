@@ -14,10 +14,10 @@ def job(name):
     return re.split(r'(?m)^  [a-z][\w-]*:\s*$', text.split(marker, 1)[1], maxsplit=1)[0]
 
 
-def evaluate(expression, recovery=False, recovery4=False, recovery7=False, recovery7windows=False, result='success', event='workflow_dispatch', ref='refs/heads/main', user='owner', cancelled=False, atspi='off'):
+def evaluate(expression, recovery=False, recovery4=False, recovery7=False, recovery7windows=False, result='success', event='workflow_dispatch', ref='refs/heads/main', user='owner', cancelled=False, atspi='off', atspi11='off'):
     values = {'inputs.recover_preview2_gpu': recovery, 'inputs.recover_preview4_gpu': recovery4, 'inputs.recover_preview7_linux': recovery7, 'inputs.recover_preview7_windows': recovery7windows, 'github.event_name': event, 'github.ref': ref,
               'github.workflow': 'build', 'github.run_id': 123, 'inputs.flavor': 'gpu', 'vars.NUGET_USER': user,
-              'inputs.rids': '', 'inputs.atspi_preview10': atspi, 'github.head_ref': 'codex/batch-fixture',
+              'inputs.rids': '', 'inputs.atspi_preview10': atspi, 'inputs.atspi_preview11': atspi11, 'github.head_ref': 'codex/batch-fixture',
               'github.event.pull_request.labels.*.name': [],
               'needs.plan.outputs.matrix': 'selected', 'needs.plan.outputs.prebuilt': 'attached',
               'needs.recover-preview2-gpu.result': result, 'needs.verify-preview4-gpu-recovery.result': result, 'needs.verify-preview7-linux-recovery.result': result, 'needs.verify-preview7-windows-recovery.result': result, 'needs.native.result': 'success',
@@ -27,7 +27,7 @@ def evaluate(expression, recovery=False, recovery4=False, recovery7=False, recov
         expression = expression.replace(key, repr(values[key]))
     expression = expression.replace('!cancelled()', repr(not cancelled))
     expression = re.sub(r'!(?!=)', 'not ', expression)
-    expression = expression.replace('&&', ' and ').replace('||', ' or ')
+    expression = expression.replace('&&', ' and ').replace('||', ' or ').replace('false', 'False')
     return eval(' '.join(expression.split()), {'__builtins__': {}},
                 {'startsWith': lambda a, b: a.startswith(b), 'format': lambda text, *args: text.format(*args),
                  'contains': lambda items, value: value in items})

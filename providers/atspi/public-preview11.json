@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "armed": false,
+  "id": "Ranvier.WebCore.Accessibility.Atspi",
+  "version": "0.1.1-preview.11",
+  "nativeVersion": "0.1.1-preview.11",
+  "nativeSource": "8b8db298eba294876c27bd9a3200881f872684df",
+  "providerSourceClaim": "8b8db298eba294876c27bd9a3200881f872684df",
+  "abi": 63,
+  "rids": {
+    "linux-x64": {
+      "proofKind": "local-qualified-relayed",
+      "packageSha256": null,
+      "receiptSha256": null
+    },
+    "linux-arm64": {
+      "proofKind": "runner-executed",
+      "packageSha256": null,
+      "receiptSha256": null
+    }
+  },
+  "scope": "Allocated P11 preparation only. Actual matching per-RID ordinary SDK and six-profile qualification receipts are required; P10 proof is not relabeled. Source fields remain unverified caller claims."
+}

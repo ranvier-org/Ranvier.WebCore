@@ -6,8 +6,11 @@ import os
 import platform
 import re
 import select
+import secrets
 import shutil
 import signal
+import socket as socket_module
+import tempfile
 import subprocess
 import time
 import xml.etree.ElementTree as ET
@@ -47,10 +50,11 @@ def validate_source_claim(manifest, source_revision):
         raise ValueError('Provider source claim does not match the selected producer revision')
 
 
-def validate_assets(libraries, mode, interop_version, provider_version, provider_id=PROVIDER_ID):
+def validate_assets(libraries, mode, interop_version, provider_version, provider_id=PROVIDER_ID,
+                    dom_version='0.1.0-alpha.57'):
     if mode not in ('normal', 'traced'):
         raise ValueError('Unknown managed trace mode')
-    dom = 'Ranvier.Dom' + ('.Traced' if mode == 'traced' else '') + '/0.1.0-alpha.57'
+    dom = 'Ranvier.Dom' + ('.Traced' if mode == 'traced' else '') + '/' + dom_version
     runtime = 'Ranvier' + ('.Traced' if mode == 'traced' else '') + '/0.1.1-preview.1'
     expected = (dom, runtime, 'Ranvier.WebCore/' + interop_version, provider_id + '/' + provider_version)
     if not all(name in libraries for name in expected):
@@ -97,91 +101,41 @@ def config_file(path, feed, provider_id=PROVIDER_ID):
     path.write_bytes(ET.tostring(root))
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--view', type=Path, required=True)
-    parser.add_argument('--native-source', type=Path, required=True)
-    parser.add_argument('--native', type=Path, required=True)
-    parser.add_argument('--package', type=Path, required=True)
-    parser.add_argument('--source-revision', required=True)
-    parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--rid', choices=('linux-arm64', 'linux-x64'), default=RID)
-    parser.add_argument('--display', help='Existing X display for a local harness control; CI omits this option')
-    args = parser.parse_args()
-    rid = args.rid
-    validate_architecture(rid, platform.machine())
-    provider_id = PROVIDER_ID if rid == 'linux-arm64' else 'Ranvier.Private.Accessibility.Atspi.X64Qualification'
-    args.output.mkdir(parents=True, exist_ok=False)
-    work = args.output.resolve()
-    native = args.native.resolve()
-    package = args.package.resolve()
-    with zipfile.ZipFile(package) as archive:
-        manifest = json.loads(archive.read('provider-manifest.json'))
-        validate_source_claim(manifest, args.source_revision)
-        if manifest['rid'] != rid or manifest['id'] != provider_id or manifest['hostSha256'] != sha(native):
-            raise ValueError('The private provider package does not match this host and RID')
-        for name, expected in manifest['payloads'].items():
-            if hashlib.sha256(archive.read(name)).hexdigest() != expected:
-                raise ValueError('Provider package payload hash mismatch: ' + name)
-    feed = work / 'feed'
-    feed.mkdir()
-    if not re.fullmatch(r'[A-Za-z0-9_.-]+', manifest['id']) or not re.fullmatch(r'[A-Za-z0-9_.-]+', manifest['version']):
-        raise ValueError('Invalid provider package identity')
-    shutil.copy2(package, feed / (manifest['id'] + '.' + manifest['version'] + '.nupkg'))
-    interop_version = '0.0.0-' + rid.removeprefix('linux-') + '.' + os.environ.get('GITHUB_RUN_ID', '1')
-    run_checked(['dotnet', 'pack', str(args.native_source / 'src/Ranvier.WebCore/Ranvier.WebCore.fsproj'),
-                 '-c', 'Release', '-m:1', '/nr:false', '-p:Version=' + interop_version,
-                 '-p:NuGetAudit=false', '-o', str(feed)], work / 'interop-pack.log', timeout=300)
-    interop = feed / ('Ranvier.WebCore.' + interop_version + '.nupkg')
-    if not interop.is_file():
-        raise RuntimeError('The exact-source managed interop package was not produced')
-    config = work / 'NuGet.Config'
-    config_file(config, feed, provider_id)
-    stage = work / 'native-stage/runtimes' / rid / 'native'
-    stage.mkdir(parents=True)
-    shutil.copy2(native, stage / native.name)
-    if sha(stage / native.name) != manifest['hostSha256']:
-        raise ValueError('Staged native host hash changed')
-    cache = work / 'cache'
-    projects = {}
-    asset_graphs = {}
-    for mode in ('normal', 'traced'):
-        output = work / ('publish-' + mode)
-        command = ['dotnet', 'publish', str(args.view / 'tests/AccessibilityAot/AccessibilityAot.fsproj'),
-                   '-c', 'Release', '-r', rid, '-m:1', '/nr:false', '-v:minimal',
-                   '-p:RanvierTrace=' + str(mode == 'traced').lower(), '-p:AccessibilityStyleTrial=true',
-                   '-p:AccessibilityAtspiPackageId=' + provider_id,
-                   '-p:AccessibilityAtspiPackageVersion=' + manifest['version'],
-                   '-p:RanvierWebCoreNativeVersion=' + interop_version,
-                   '-p:RanvierWebCoreNativeDir=' + str(work / 'native-stage'),
-                   '-p:RanvierWebCoreNativeRid=' + rid, '-p:RestoreConfigFile=' + str(config),
-                   '-p:RestorePackagesPath=' + str(cache), '-p:NuGetAudit=false',
-                   '-p:UseSharedCompilation=false', '-p:IlcTreatWarningsAsErrors=true',
-                   '-p:ILLinkTreatWarningsAsErrors=true', '-p:TrimmerSingleWarn=false',
-                   '-p:PublishAot=true', '--artifacts-path', str(work / ('artifacts-' + mode)), '-o', str(output)]
-        log = run_checked(command, work / ('publish-' + mode + '.log'), cwd=args.view)
-        validate_publish_log(log)
-        assets = work / ('artifacts-' + mode) / 'obj/AccessibilityAot/project.assets.json'
-        graph = json.loads(assets.read_text())['libraries']
-        validate_assets(graph, mode, interop_version, manifest['version'], provider_id)
-        asset_graphs[mode] = {'path': str(assets), 'sha256': sha(assets)}
-        binary = output / 'AccessibilityAot'
-        validate_elf(subprocess.check_output(['readelf', '-h', '-d', str(binary)], text=True), rid)
-        for name, expected in [('libRanvierWebCoreHost.so', manifest['hostSha256']),
-                               ('libRanvierWebCoreAtspi.so', manifest['providerSha256'])]:
-            if sha(output / name) != expected:
-                raise ValueError('Published native asset mismatch: ' + name)
-        projects[mode] = output
+def await_runtime_admission(path, work, files, timeout=900):
+    """Synchronize a local lease handoff; the caller acquires and releases the actual leases."""
+    path, work = path.resolve(), work.resolve()
+    ready = path.with_suffix(path.suffix + '.ready')
+    if not path.is_relative_to(work) or path.exists() or ready.exists():
+        raise ValueError('Runtime admission must use a fresh path inside the owned output.')
+    expected = {str(file.resolve()):sha(file) for file in files}
+    token = secrets.token_hex(24)
+    data = dict(token=token, pid=os.getpid(), files=expected,
+                processStat=Path('/proc/self/stat').read_text() if Path('/proc/self/stat').exists() else None)
+    temporary = ready.with_suffix(ready.suffix + '.tmp')
+    temporary.write_text(json.dumps(data, indent=2))
+    temporary.replace(ready)
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        if path.exists():
+            permit = json.loads(path.read_text())
+            if permit.get('token') != token or permit.get('kind') != 'run-app' or not isinstance(permit.get('leaseId'), str) or not permit['leaseId']:
+                raise ValueError('Runtime admission differs from the fresh prepared lease handoff.')
+            if {name:sha(Path(name)) for name in expected} != expected:
+                raise ValueError('Prepared consumer inputs changed during the lease handoff.')
+            return dict(kind=permit['kind'], permitSha256=sha(path), readySha256=sha(ready))
+        time.sleep(0.05)
+    raise TimeoutError('The local runtime lease handoff was not admitted before its deadline.')
 
+
+def run_profiles(work, projects, receipt, existing_display=None, tcp_display=False):
+    if existing_display and tcp_display:
+        raise ValueError('Existing display and owned TCP display are mutually exclusive')
     children = []
     streams = []
-    receipt = {'architecture': platform.machine(), 'rid': rid, 'sourceRevision': args.source_revision,
-               'sourceProvenance': manifest['sourceProvenance'], 'hostSha256': sha(native),
-               'providerSha256': manifest['providerSha256'], 'packageSha256': sha(package),
-               'interopSha256': sha(interop), 'interopVersion': interop_version,
-               'assetGraphs': asset_graphs, 'runs': []}
     environment = dict(os.environ, SDL_VIDEODRIVER='x11', EGL_PLATFORM='surfaceless', LIBGL_ALWAYS_SOFTWARE='1')
     environment.pop('LD_LIBRARY_PATH', None)
+    owned_display = None
+    display = None
 
     def spawn(command, log, env=None, pass_fds=(), cwd=None):
         output = log.open('wb')
@@ -194,16 +148,29 @@ def main():
         return child
 
     try:
-        if args.display:
-            if not re.fullmatch(r':[0-9]+', args.display):
+        if existing_display:
+            if not re.fullmatch(r':[0-9]+', existing_display):
                 raise ValueError('An existing local display must have the form :N')
-            display = args.display[1:]
+            display = existing_display[1:]
             socket = Path('/tmp/.X11-unix/X' + display)
             before = socket.stat()
             receipt['existingDisplaySocketBefore'] = [before.st_ino, before.st_mode, before.st_mtime_ns]
         else:
+            options = ['-nolisten', 'tcp']
+            if tcp_display:
+                environment.pop('WAYLAND_DISPLAY', None)
+                owned_display = Path(tempfile.mkdtemp(prefix='atspi-p11-x11-'))
+                authority = owned_display / 'Xauthority'
+                authority.touch(mode=0o600)
+                cookie = secrets.token_hex(16)
+                environment.update(HOME=str(owned_display), XDG_CONFIG_HOME=str(owned_display / 'config'),
+                                   XDG_CACHE_HOME=str(owned_display / 'cache'), XDG_RUNTIME_DIR=str(owned_display),
+                                   XAUTHORITY=str(authority))
+                subprocess.run(['xauth', '-f', str(authority), 'add', '127.0.0.1:0', '.', cookie],
+                               check=True, stdout=subprocess.DEVNULL, timeout=10)
+                options = ['-nolisten', 'unix', '-listen', 'tcp', '-auth', str(authority)]
             display_read, display_write = os.pipe()
-            spawn(['Xvfb', '-displayfd', str(display_write), '-screen', '0', '1024x768x24', '-nolisten', 'tcp'],
+            spawn(['Xvfb', '-displayfd', str(display_write), '-screen', '0', '1024x768x24', *options],
                   work / 'xvfb.log', pass_fds=(display_write,))
             os.close(display_write)
             if not select.select([display_read], [], [], 10)[0]:
@@ -212,7 +179,13 @@ def main():
             os.close(display_read)
             if not display.isdigit():
                 raise RuntimeError('Invalid private Xvfb display')
-        environment['DISPLAY'] = ':' + display
+        if tcp_display:
+            subprocess.run(['xauth', '-f', str(authority), 'add', '127.0.0.1:' + display, '.', cookie],
+                           check=True, stdout=subprocess.DEVNULL, timeout=10)
+            environment['DISPLAY'] = '127.0.0.1:' + display
+            receipt['privateX11Transport'] = 'authenticated-loopback-tcp'
+        else:
+            environment['DISPLAY'] = ':' + display
         bus = subprocess.Popen(['dbus-daemon', '--session', '--nofork', '--print-address=1'],
                                stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, start_new_session=True)
         children.append(bus)
@@ -296,7 +269,17 @@ def main():
         if 'bus' in locals():
             bus.stdout.close()
         receipt['allOwnedProcessesExited'] = all(child.poll() is not None for child in children)
-        if args.display:
+        if tcp_display:
+            tcp_closed = True
+            if display is not None:
+                with socket_module.socket() as probe:
+                    probe.settimeout(1)
+                    tcp_closed = probe.connect_ex(('127.0.0.1', 6000 + int(display))) != 0
+            receipt['tcpClosed'] = tcp_closed
+            if owned_display is not None and receipt['allOwnedProcessesExited'] and tcp_closed:
+                shutil.rmtree(owned_display)
+            receipt['privateDisplayDirectoryRemoved'] = owned_display is None or not owned_display.exists()
+        if existing_display:
             after = socket.stat()
             receipt['existingDisplaySocketAfter'] = [after.st_ino, after.st_mode, after.st_mtime_ns]
             if receipt['existingDisplaySocketBefore'] != receipt['existingDisplaySocketAfter']:
@@ -304,7 +287,104 @@ def main():
         (work / 'managed-aot-receipt.json').write_text(json.dumps(receipt, indent=2))
     if not receipt['allOwnedProcessesExited']:
         raise RuntimeError('Owned test processes remain alive')
-    print('PASS ' + rid + ' managed strict AOT provider profiles')
+    if tcp_display and (not receipt['tcpClosed'] or not receipt['privateDisplayDirectoryRemoved']):
+        raise RuntimeError('Private TCP display resources remain live')
+    print('PASS ' + receipt['rid'] + ' managed strict AOT provider profiles')
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--view', type=Path, required=True)
+    parser.add_argument('--native-source', type=Path, required=True)
+    parser.add_argument('--native', type=Path, required=True)
+    parser.add_argument('--package', type=Path, required=True)
+    parser.add_argument('--source-revision', required=True)
+    parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--rid', choices=('linux-arm64', 'linux-x64'), default=RID)
+    parser.add_argument('--dom-version', default='0.1.0-alpha.57')
+    parser.add_argument('--runtime-admission', type=Path, help='Optional fresh owned checkpoint after publish and before any runtime process.')
+    parser.add_argument('--xvfb-tcp', action='store_true', help='Use an owned authenticated TCP Xvfb without changing shared Unix sockets.')
+    parser.add_argument('--display', help='Existing X display for a local harness control; CI omits this option')
+    args = parser.parse_args()
+    if args.display and args.xvfb_tcp:
+        parser.error('--display and --xvfb-tcp are mutually exclusive')
+    rid = args.rid
+    validate_architecture(rid, platform.machine())
+    provider_id = PROVIDER_ID if rid == 'linux-arm64' else 'Ranvier.Private.Accessibility.Atspi.X64Qualification'
+    args.output.mkdir(parents=True, exist_ok=False)
+    work = args.output.resolve()
+    native = args.native.resolve()
+    package = args.package.resolve()
+    with zipfile.ZipFile(package) as archive:
+        manifest = json.loads(archive.read('provider-manifest.json'))
+        validate_source_claim(manifest, args.source_revision)
+        if manifest['rid'] != rid or manifest['id'] != provider_id or manifest['hostSha256'] != sha(native):
+            raise ValueError('The private provider package does not match this host and RID')
+        for name, expected in manifest['payloads'].items():
+            if hashlib.sha256(archive.read(name)).hexdigest() != expected:
+                raise ValueError('Provider package payload hash mismatch: ' + name)
+    feed = work / 'feed'
+    feed.mkdir()
+    if not re.fullmatch(r'[A-Za-z0-9_.-]+', manifest['id']) or not re.fullmatch(r'[A-Za-z0-9_.-]+', manifest['version']):
+        raise ValueError('Invalid provider package identity')
+    shutil.copy2(package, feed / (manifest['id'] + '.' + manifest['version'] + '.nupkg'))
+    interop_version = '0.0.0-' + rid.removeprefix('linux-') + '.' + os.environ.get('GITHUB_RUN_ID', '1')
+    run_checked(['dotnet', 'pack', str(args.native_source / 'src/Ranvier.WebCore/Ranvier.WebCore.fsproj'),
+                 '-c', 'Release', '-m:1', '/nr:false', '-p:Version=' + interop_version,
+                 '-p:NuGetAudit=false', '-o', str(feed)], work / 'interop-pack.log', timeout=300)
+    interop = feed / ('Ranvier.WebCore.' + interop_version + '.nupkg')
+    if not interop.is_file():
+        raise RuntimeError('The exact-source managed interop package was not produced')
+    config = work / 'NuGet.Config'
+    config_file(config, feed, provider_id)
+    stage = work / 'native-stage/runtimes' / rid / 'native'
+    stage.mkdir(parents=True)
+    shutil.copy2(native, stage / native.name)
+    if sha(stage / native.name) != manifest['hostSha256']:
+        raise ValueError('Staged native host hash changed')
+    cache = work / 'cache'
+    projects = {}
+    asset_graphs = {}
+    for mode in ('normal', 'traced'):
+        output = work / ('publish-' + mode)
+        command = ['dotnet', 'publish', str(args.view / 'tests/AccessibilityAot/AccessibilityAot.fsproj'),
+                   '-c', 'Release', '-r', rid, '-m:1', '/nr:false', '-v:minimal',
+                   '-p:RanvierTrace=' + str(mode == 'traced').lower(), '-p:AccessibilityStyleTrial=true',
+                   '-p:AccessibilityAtspiPackageId=' + provider_id,
+                   '-p:AccessibilityAtspiPackageVersion=' + manifest['version'],
+                   '-p:RanvierWebCoreNativeVersion=' + interop_version,
+                   '-p:RanvierDomVersion=' + args.dom_version,
+                   '-p:RanvierWebCoreNativeDir=' + str(work / 'native-stage'),
+                   '-p:RanvierWebCoreNativeRid=' + rid, '-p:RestoreConfigFile=' + str(config),
+                   '-p:RestorePackagesPath=' + str(cache), '-p:NuGetAudit=false',
+                   '-p:UseSharedCompilation=false', '-p:IlcTreatWarningsAsErrors=true',
+                   '-p:ILLinkTreatWarningsAsErrors=true', '-p:TrimmerSingleWarn=false',
+                   '-p:PublishAot=true', '--artifacts-path', str(work / ('artifacts-' + mode)), '-o', str(output)]
+        log = run_checked(command, work / ('publish-' + mode + '.log'), cwd=args.view)
+        validate_publish_log(log)
+        assets = work / ('artifacts-' + mode) / 'obj/AccessibilityAot/project.assets.json'
+        graph = json.loads(assets.read_text())['libraries']
+        validate_assets(graph, mode, interop_version, manifest['version'], provider_id, args.dom_version)
+        asset_graphs[mode] = {'path': str(assets), 'sha256': sha(assets)}
+        binary = output / 'AccessibilityAot'
+        validate_elf(subprocess.check_output(['readelf', '-h', '-d', str(binary)], text=True), rid)
+        for name, expected in [('libRanvierWebCoreHost.so', manifest['hostSha256']),
+                               ('libRanvierWebCoreAtspi.so', manifest['providerSha256'])]:
+            if sha(output / name) != expected:
+                raise ValueError('Published native asset mismatch: ' + name)
+        projects[mode] = output
+
+    receipt = {'architecture': platform.machine(), 'rid': rid, 'sourceRevision': args.source_revision,
+               'sourceProvenance': manifest['sourceProvenance'], 'hostSha256': sha(native),
+               'providerSha256': manifest['providerSha256'], 'packageSha256': sha(package),
+               'interopSha256': sha(interop), 'interopVersion': interop_version, 'domVersion': args.dom_version,
+               'assetGraphs': asset_graphs, 'runs': []}
+    if args.runtime_admission:
+        files = [native, package, interop, *[Path(record['path']) for record in asset_graphs.values()]]
+        for published in projects.values():
+            files.extend(published / name for name in ['AccessibilityAot', 'libRanvierWebCoreHost.so', 'libRanvierWebCoreAtspi.so', 'libSDL3.so'])
+        receipt['runtimeAdmission'] = await_runtime_admission(args.runtime_admission, work, files)
+    run_profiles(work, projects, receipt, args.display, args.xvfb_tcp)
 
 
 if __name__ == '__main__':
