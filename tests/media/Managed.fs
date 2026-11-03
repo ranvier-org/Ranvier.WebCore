@@ -252,6 +252,8 @@ let main arguments =
             use frame = frame
             render false frame
         let pausedPosition = player.Snapshot().PositionSeconds
+        let pausedCue, pausedPresentationTicks = lastCue, lastPresentationTicks
+        Console.WriteLine("MEDIA_RETAINED_BEFORE_RESIZE=pts=" + pausedPresentationTicks.ToString() + ";cue=" + pausedCue + ";clock=" + pausedPosition.ToString("R", Globalization.CultureInfo.InvariantCulture))
         let displayScale = Support.sdl_get_window_display_scale window.SdlWindow
         check (Single.IsFinite displayScale && displayScale > 0.0f) "actual owned window display scale"
         let retained present =
@@ -264,7 +266,7 @@ let main arguments =
             retained true
             retained false
             check (lastPhysicalSize = expectedPhysical) "resize/DPI output dimensions are exact"
-            check (lastCue = "red cue" && lastPresentationTicks < 6666666L) "resized frame and caption retain the paused timestamp phase"
+            check (lastCue = pausedCue && lastPresentationTicks = pausedPresentationTicks) "resized frame and caption retain the exact paused frame timestamp"
             check (abs (player.Snapshot().PositionSeconds - pausedPosition) < 0.03) "resize/DPI does not advance the paused native clock"
             surfaceCases <- surfaceCases + 1
             let struct (width, height) = lastPhysicalSize
@@ -285,7 +287,8 @@ let main arguments =
                     | ValueNone -> invalidOp "SDL resize lost retained video"
                     | ValueSome frame ->
                         use frame = frame
-                        caption.textContent <- [| "red cue"; "green cue"; "blue cue" |][phaseOf frame]
+                        check (frame.PresentationTime.Ticks = pausedPresentationTicks) "SDL resize retains the input frame timestamp"
+                        caption.textContent <- pausedCue
                         check (window.Step(0)) "owned window stays open during resize"
                         windowSteps <- windowSteps + 1
                 let mutable actualWidth, actualHeight = 0, 0
