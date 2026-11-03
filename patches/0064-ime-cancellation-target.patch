@@ -257,7 +257,7 @@ diff --git a/Source/WebCore/editing/Editor.cpp b/Source/WebCore/editing/Editor.c
 -Editor::~Editor() = default;
 +struct ImeEndSerial {
 +    uint64_t value { 0 };
-+    WTF::ThreadIdentifier owner;
++    WTF::Thread* owner;
 +};
 +
 +static HashMap<const Editor*, ImeEndSerial>& compositionEndSerials()
@@ -271,7 +271,7 @@ diff --git a/Source/WebCore/editing/Editor.cpp b/Source/WebCore/editing/Editor.c
 +    auto& serials = compositionEndSerials();
 +    auto found = serials.find(&editor);
 +    if (found != serials.end()) {
-+        ASSERT(found->value.owner == WTF::Thread::currentID());
++        ASSERT(found->value.owner == &WTF::Thread::currentSingleton());
 +        ++found->value.value;
 +    }
 +}
@@ -281,7 +281,7 @@ diff --git a/Source/WebCore/editing/Editor.cpp b/Source/WebCore/editing/Editor.c
 +    auto& serials = compositionEndSerials();
 +    auto found = serials.find(this);
 +    if (found != serials.end()) {
-+        ASSERT(found->value.owner == WTF::Thread::currentID());
++        ASSERT(found->value.owner == &WTF::Thread::currentSingleton());
 +        serials.remove(found);
 +    }
 +}
@@ -297,8 +297,8 @@ diff --git a/Source/WebCore/editing/Editor.cpp b/Source/WebCore/editing/Editor.c
 +
 +uint64_t Editor::compositionEndSerial() const
 +{
-+    auto result = compositionEndSerials().add(this, ImeEndSerial { 0, WTF::Thread::currentID() });
-+    ASSERT(result.iterator->value.owner == WTF::Thread::currentID());
++    auto result = compositionEndSerials().add(this, ImeEndSerial { 0, &WTF::Thread::currentSingleton() });
++    ASSERT(result.iterator->value.owner == &WTF::Thread::currentSingleton());
 +    return result.iterator->value.value;
 +}
 +

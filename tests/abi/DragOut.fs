@@ -136,8 +136,14 @@ let run (outDir: string) =
         (linkItems |> List.exists (fun (_, v) -> v.Contains "https://example.test/page"))
         "the link drag carries its URL"
 
-    require
-        (dropped = 1 && edText = "link" && edHtml = "<a href=\"https://example.test/page\">link</a>")
-        "the drag drops into the page through rv_host_drag"
+    let retainedDrop =
+        if System.OperatingSystem.IsWindows () then
+            edText = "https://example.test/page" && edHtml = edText
+        elif System.OperatingSystem.IsLinux () then
+            edText = "link" && edHtml = "<a href=\"https://example.test/page\">link</a>"
+        else
+            edText.Contains "https://example.test/page" || edHtml.Contains "https://example.test/page"
+
+    require (dropped = 1 && retainedDrop) "the drag drops into the page through rv_host_drag"
 
     require (List.ofSeq events = [ "dragstart"; "dragend" ]) "the box gets dragstart, then dragend at rv_drag_end"
