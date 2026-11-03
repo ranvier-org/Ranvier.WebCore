@@ -5775,6 +5775,11 @@ int32_t rv_host_ime_rect(RvHost* host, int32_t* x, int32_t* y, int32_t* width, i
     return rect.isEmpty() ? 0 : 1;
 }
 
+static bool imeSurroundingUtf8LengthFits(size_t length)
+{
+    return length <= static_cast<size_t>(std::numeric_limits<int32_t>::max());
+}
+
 static int32_t imeSurroundingSnapshot(RvHost* host, char* buffer, int32_t capacity, int32_t* length,
     int32_t* cursor, int32_t* anchor, int32_t* state)
 {
@@ -5788,6 +5793,21 @@ static int32_t imeSurroundingSnapshot(RvHost* host, char* buffer, int32_t capaci
     *cursor = 0;
     *anchor = 0;
     *state = 0;
+    auto copySnapshot = [&](const String& value) -> int32_t {
+        auto bytes = (value.isNull() ? emptyString() : value).utf8();
+        if (!imeSurroundingUtf8LengthFits(bytes.length())) {
+            *length = -1;
+            *cursor = 0;
+            *anchor = 0;
+            *state = 0;
+            return RV_ERR_UNSUPPORTED;
+        }
+        *length = static_cast<int32_t>(bytes.length());
+        if (!buffer || capacity < *length)
+            return RV_ERR_BUFFER_TOO_SMALL;
+        std::memcpy(buffer, bytes.data(), bytes.length());
+        return RV_OK;
+    };
     Ref document = host->document();
     RefPtr target = document->focusedElement();
     if (!target)
@@ -5801,7 +5821,7 @@ static int32_t imeSurroundingSnapshot(RvHost* host, char* buffer, int32_t capaci
             *cursor = host->imeSurrounding->cursor;
             *anchor = host->imeSurrounding->anchor;
             *state = 1;
-            return copyString(host->imeSurrounding->original, buffer, capacity, length);
+            return copySnapshot(host->imeSurrounding->original);
         }
         host->imeSurrounding.reset();
         *state = 2;
@@ -5863,7 +5883,7 @@ static int32_t imeSurroundingSnapshot(RvHost* host, char* buffer, int32_t capaci
         *anchor = static_cast<int32_t>(anchorLength);
         *cursor = static_cast<int32_t>(cursorLength);
         *state = 1;
-        return copyString(text.isNull() ? emptyString() : text, buffer, capacity, length);
+        return copySnapshot(text);
     }
     if (text.length() > static_cast<unsigned>(std::numeric_limits<int32_t>::max()) || first > last || last > text.length())
         return RV_OK;
@@ -5872,7 +5892,7 @@ static int32_t imeSurroundingSnapshot(RvHost* host, char* buffer, int32_t capaci
     *cursor = static_cast<int32_t>(backward ? first : last);
     *anchor = static_cast<int32_t>(backward ? last : first);
     *state = 1;
-    return copyString(text.isNull() ? emptyString() : text, buffer, capacity, length);
+    return copySnapshot(text);
 }
 
 int32_t rv_host_ime_surrounding(RvHost* host, char* buffer, int32_t capacity, int32_t* length,
