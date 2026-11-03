@@ -2,15 +2,23 @@
 
 `public-preview11.json` reserves `Ranvier.WebCore.Accessibility.Atspi` version
 `0.1.1-preview.11` for the matching Native ABI63 cohort. The accepted two-RID
-qualification inputs are pinned, and only main-branch candidate preparation is
-enabled in the existing `build.yml`. Publication remains disabled with null
-candidate pins. P10 qualification is retained under its original identity.
+qualification inputs and independently audited candidate are pinned. Only the
+main-branch publisher is enabled in the existing `build.yml`; completed preparation
+and relay routes are disabled. P10 qualification is retained under its original identity.
 No Host or renderer dependency is added to the provider.
 
 The future publisher re-downloads and verifies the exact accepted two-RID inputs
 and candidate before using the existing main-ref trusted publishing subject.
 Source revision fields remain unverified caller claims. RID layout selection does
 not replace actual provider, protocol, SDK and normal/traced AOT execution.
+
+Candidate run 41642147423 at `708058bcd9ff83575cda85238d586dc31d03231b`
+produced the independently accepted unsigned package SHA-256
+`bd2b2d0d760d33efedac1aef0381b4019b495812152f3685d4f3520f3a33e1bb`
+and candidate binding SHA-256
+`9791aedf253c5307e114d50e8ca6f717a8337fd80e70ae1a37845ec40b3f937e`.
+The publisher verifies those exact bytes and rebinds both SDK layout receipts
+before authentication. This source preparation does not claim publication.
 
 The completed `relay-x64` dispatch accepted the exact reviewed local evidence bundle
 from a pinned asset on a draft proof-only release. It validates every manifest

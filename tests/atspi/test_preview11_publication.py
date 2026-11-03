@@ -18,7 +18,7 @@ spec.loader.exec_module(workflow)
 
 
 class Preview11Preparation(unittest.TestCase):
-    def test_allocated_identity_binds_actual_inputs_and_keeps_candidate_pending(self):
+    def test_allocated_identity_binds_actual_inputs_and_audited_candidate(self):
         policy = json.loads((release.PROVIDER / 'public-preview11.json').read_text())
         self.assertIs(policy['armed'], True)
         self.assertEqual(policy['id'], 'Ranvier.WebCore.Accessibility.Atspi')
@@ -37,16 +37,17 @@ class Preview11Preparation(unittest.TestCase):
                          'unqualified-atspi-arm64-5b5ef82a0af3011fc6615d442e9d2618147b08a8','push',
                          '.github/workflows/atspi-p11-arm64-qualification.yml'))
         pins = json.loads((release.PROVIDER / 'preview11-publication.json').read_text())
-        for name in ['candidateRun', 'candidateHead', 'packageSha256', 'candidateReceiptSha256']:
-            self.assertIsNone(pins[name])
+        self.assertEqual(pins['candidateRun'],41642147423)
+        self.assertEqual(pins['candidateHead'],'708058bcd9ff83575cda85238d586dc31d03231b')
+        self.assertEqual(pins['packageSha256'],'bd2b2d0d760d33efedac1aef0381b4019b495812152f3685d4f3520f3a33e1bb')
+        self.assertEqual(pins['candidateReceiptSha256'],'9791aedf253c5307e114d50e8ca6f717a8337fd80e70ae1a37845ec40b3f937e')
+        release.validate_publication_pins(pins)
 
-    def test_unarmed_prepare_and_verify_stop_before_network_or_authentication(self):
+    def test_unarmed_aggregate_stops_before_network_or_authentication(self):
         policy = json.loads((release.PROVIDER / 'public-preview11.json').read_text())
         with tempfile.TemporaryDirectory() as directory, patch.object(release.subprocess, 'check_output') as network:
             with self.assertRaisesRegex(ValueError, 'unarmed'):
                 release.qualify_inputs(Path(directory), dict(policy,armed=False))
-            with self.assertRaises(ValueError):
-                release.verify(Path(directory))
             network.assert_not_called()
 
     def test_pending_or_malformed_qualification_run_fails_before_network(self):
@@ -96,18 +97,18 @@ class Preview11Preparation(unittest.TestCase):
         for mode in ['prepare', 'publish', 'relay-x64']:
             for job in jobs:
                 with self.subTest(mode=mode, job=job):
-                    self.assertEqual(workflow.permitted(job, atspi11=mode), mode=='prepare' and job=='prepare-atspi-preview11')
+                    self.assertEqual(workflow.permitted(job, atspi11=mode), mode=='publish' and job=='publish-atspi-preview11')
                     self.assertFalse(workflow.permitted(job, atspi='prepare', atspi11=mode))
-        for options in [dict(event='push'),dict(ref='refs/heads/other'),dict(recovery=True),dict(recovery4=True),dict(recovery7=True),dict(recovery7windows=True)]:
+        for options in [dict(event='push'),dict(ref='refs/heads/other'),dict(recovery=True),dict(recovery4=True),dict(recovery7=True),dict(recovery7windows=True),dict(user='')]:
             with self.subTest(options=options):
-                self.assertFalse(workflow.permitted('prepare-atspi-preview11',atspi11='prepare',**options))
+                self.assertFalse(workflow.permitted('publish-atspi-preview11',atspi11='publish',**options))
 
-    def test_main_prepare_keeps_publisher_disabled_and_verifies_before_login(self):
+    def test_main_publisher_verifies_before_login_and_completed_routes_are_disabled(self):
         prepare = workflow.job('prepare-atspi-preview11')
         publish = workflow.job('publish-atspi-preview11')
-        self.assertNotIn('if: ${{ false &&', prepare)
+        self.assertIn('if: ${{ false &&', prepare)
         self.assertIn("github.ref == 'refs/heads/main'",prepare)
-        self.assertIn('if: ${{ false &&', publish)
+        self.assertNotIn('if: ${{ false &&', publish)
         self.assertNotIn('id-token: write', prepare)
         self.assertNotIn('NuGet/login', prepare)
         self.assertIn("github.ref == 'refs/heads/main'", publish)
