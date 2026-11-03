@@ -26,6 +26,10 @@ foreach (var handle in reader.MethodDefinitions)
     if (!names.Contains(name))
         continue;
     var signature = method.DecodeSignature(types, (object?)null);
+    var returnParameter = method.GetParameters().Select(reader.GetParameter)
+        .Where(parameter => parameter.SequenceNumber == 0).Select(parameter => (Parameter?)parameter).SingleOrDefault();
+    var returnAttributes = returnParameter?.Attributes ?? ParameterAttributes.None;
+    var returnDescriptor = returnParameter?.GetMarshallingDescriptor() ?? default;
     var metadata = method.GetParameters().Select(reader.GetParameter)
         .Where(parameter => parameter.SequenceNumber > 0).ToDictionary(parameter => parameter.SequenceNumber);
     var parameters = signature.ParameterTypes.Select((kind, index) =>
@@ -43,7 +47,17 @@ foreach (var handle in reader.MethodDefinitions)
     }).ToArray();
     if (!functions.TryAdd(name, new
     {
-        signature = new { returns = signature.ReturnType, parameters },
+        signature = new
+        {
+            returns = signature.ReturnType,
+            returnMetadata = new
+            {
+                input = (returnAttributes & ParameterAttributes.In) != 0,
+                output = (returnAttributes & ParameterAttributes.Out) != 0,
+                marshal = returnDescriptor.IsNil ? "" : Convert.ToHexString(reader.GetBlobBytes(returnDescriptor)).ToLowerInvariant()
+            },
+            parameters
+        },
         library = reader.GetString(reader.GetModuleReference(import.Module).Name),
         convention = (int)import.Attributes & 0x700
     }))
@@ -73,8 +87,8 @@ sealed class SignatureTypes : ISignatureTypeProvider<string, object?>
     public string GetByReferenceType(string elementType) => elementType + "&";
     public string GetPointerType(string elementType) => elementType + "*";
     public string GetArrayType(string elementType, ArrayShape shape) => throw new InvalidDataException("Non-vector array signature");
-    public string GetTypeFromDefinition(MetadataReader reader, TypeDefinitionHandle handle, byte kind) => reader.GetString(reader.GetTypeDefinition(handle).Name);
-    public string GetTypeFromReference(MetadataReader reader, TypeReferenceHandle handle, byte kind) => reader.GetString(reader.GetTypeReference(handle).Name);
+    public string GetTypeFromDefinition(MetadataReader reader, TypeDefinitionHandle handle, byte kind) => TypeKind(kind) + DefinitionName(reader, handle);
+    public string GetTypeFromReference(MetadataReader reader, TypeReferenceHandle handle, byte kind) => TypeKind(kind) + ReferenceName(reader, handle);
     public string GetTypeFromSpecification(MetadataReader reader, object? context, TypeSpecificationHandle handle, byte kind) => reader.GetTypeSpecification(handle).DecodeSignature(this, context);
     public string GetModifiedType(string modifier, string unmodified, bool required) => throw new InvalidDataException("Modified P/Invoke signature: " + modifier);
     public string GetPinnedType(string elementType) => throw new InvalidDataException("Pinned P/Invoke signature");
@@ -82,4 +96,29 @@ sealed class SignatureTypes : ISignatureTypeProvider<string, object?>
     public string GetGenericMethodParameter(object? context, int index) => throw new InvalidDataException("Generic method signature");
     public string GetGenericTypeParameter(object? context, int index) => throw new InvalidDataException("Generic type signature");
     public string GetFunctionPointerType(MethodSignature<string> signature) => throw new InvalidDataException("Unexpected direct function-pointer signature");
+
+    static string TypeKind(byte kind) => kind switch
+    {
+        0x11 => "valuetype:", 0x12 => "class:",
+        _ => throw new InvalidDataException("Unqualified type kind: " + kind)
+    };
+
+    static string DefinitionName(MetadataReader reader, TypeDefinitionHandle handle)
+    {
+        var definition = reader.GetTypeDefinition(handle);
+        var declaring = definition.GetDeclaringType();
+        var name = reader.GetString(definition.Name);
+        var space = reader.GetString(definition.Namespace);
+        return !declaring.IsNil ? DefinitionName(reader, declaring) + "+" + name : space.Length == 0 ? name : space + "." + name;
+    }
+
+    static string ReferenceName(MetadataReader reader, TypeReferenceHandle handle)
+    {
+        var reference = reader.GetTypeReference(handle);
+        var name = reader.GetString(reference.Name);
+        var space = reader.GetString(reference.Namespace);
+        return reference.ResolutionScope.Kind == HandleKind.TypeReference
+            ? ReferenceName(reader, (TypeReferenceHandle)reference.ResolutionScope) + "+" + name
+            : space.Length == 0 ? name : space + "." + name;
+    }
 }

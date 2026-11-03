@@ -507,9 +507,12 @@ def signature_manifest(product):
         for ctype, pname in parameters:
             kind, attributes = generator.parameter(ctype, pname)
             kind = {'double': 'float', 'double&': 'float&'}.get(kind, kind)
+            if kind in {'MutationObserverOptions&', 'PrintOptions&', 'MutationRecordView&', 'EventInit&', 'NotificationOptions&', 'TextSegments&'}:
+                kind = 'valuetype:RanvierWebCoreAbi.Native+' + kind
             values.append(dict(type=kind, input='In' in attributes, output='Out' in attributes,
                                marshal='30' if 'LPUTF8Str' in attributes else ''))
-        expected[name] = dict(returns=generator.return_type(returns), parameters=values)
+        expected[name] = dict(returns=generator.return_type(returns),
+                             returnMetadata=dict(input=False, output=False, marshal=''), parameters=values)
     require(len(expected) == 349, 'Require all 349 canonical signatures')
     return expected
 

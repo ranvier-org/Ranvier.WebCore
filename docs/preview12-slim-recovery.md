@@ -44,11 +44,17 @@ The outer working directory pins SDK10.0.403; an isolated NuGet cache, local nat
 package hashes prevent a public native fallback. The source and native inputs are rechecked after.
 
 The small H-owned metadata reader uses `System.Reflection.Metadata`; it never loads native code.
-It decodes all 349 actual P/Invoke return/parameter types, In/Out flags, marshalling descriptors,
-library names and calling convention. The expected table comes from F's canonical header generator,
+It decodes all 349 actual P/Invoke return/parameter types, return and parameter In/Out flags and
+marshalling descriptors, library names and F's default/Winapi import convention. Named types retain
+their namespace, declaring types and raw class/value-type identity. The expected table comes from F's canonical header generator,
 including its exact array/byref rules. Only the equivalent F# `double`/`float` System.Double aliases
 are normalized; float32 remains distinct. Packaged headers/model must equal F bytes. Interop and
 aggregate nuspec identities/dependencies are checked, with exactly five bracketed native dependencies.
+
+The compiled metadata regression controls use `tests/recovery/build_metadata_fixtures.py` with explicit
+installed SDK and net10.0 reference directories; they perform no restore. Set
+`RANVIER_INTEROP_METADATA_TEST_ROOT` to that output when running the Python suite to exercise the
+valid 349-entry control and malformed return, type identity and import-convention variants.
 
 This yields exactly seven packages: five RID packages, `Ranvier.WebCore`, and `Ranvier.WebCore.Native`.
 Qualification receipts retain actual child commands/outcomes, managed metadata, original native
