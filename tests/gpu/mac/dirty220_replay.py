@@ -21,7 +21,7 @@ SOURCE_TREES = {'host':'d407cbe31b8bf47809b9f66412faf1fd8468b17d',
                 'gen':'847bf7bcfbaca4a8303643eeefcd6c7affb6b417',
                 'src':'0037b66b3e42cfedfb8361537ab2af580ae51a4b',
                 'tests/abi':'9fac47b7fd05d4d848a44e7c87fa5c5dd1b7deb0'}
-COUNTER_SOURCE_SHA = 'c74aecfcf64bb97782d39f843ebe7b53ad38684fbc06851c5787d237515f030a'
+COUNTER_SOURCE_SHA = '1b03f8b0dddb42d2f040a72660974700178a0d0ec2febed11483f0e0bb5aa0a9'
 SCALES = ('1','1,1')
 NATIVE = {
     'libJavaScriptCore.dylib':'9f401b62e5c68fd62895728133f2b3ac823bd07c775afa52e4585bcf46afa8ab',
