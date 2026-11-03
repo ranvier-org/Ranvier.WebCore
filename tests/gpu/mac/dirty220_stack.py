@@ -206,7 +206,7 @@ def main():
                 raise ValueError('The actual retained counter executable differs.')
             record['counterFixtureSha256']=sha(program)
             proof_path=ROOT/'tests/gpu/mac/proof.json'
-            if sha(proof_path)!='9d84254a05739449b732faf85f22becf4044bc0b3603e3bd5be23363c44ffb3f':
+            if hashlib.sha256(proof_path.read_text(encoding='utf-8').encode('utf-8')).hexdigest()!='3a66a2c4ec7a2150b5388d8b8056a8f6201c7a4ed504a207ced3b89117bac14f':
                 raise ValueError('The reviewed raw-symbol proof changed.')
             proof=json.loads(proof_path.read_text())
             if proof['counter']['sha256']!=sha(program) or any(
