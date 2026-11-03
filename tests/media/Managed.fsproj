@@ -7,6 +7,8 @@
     <TrimmerSingleWarn>false</TrimmerSingleWarn>
     <ILLinkTreatWarningsAsErrors>true</ILLinkTreatWarningsAsErrors>
     <IlcTreatWarningsAsErrors>true</IlcTreatWarningsAsErrors>
+    <RanvierViewWebCoreSdlPackageId Condition="'$(RanvierViewWebCoreSdlPackageId)' == '' and '$(RanvierTrace)' == 'true'">Ranvier.View.WebCore.Sdl.Traced</RanvierViewWebCoreSdlPackageId>
+    <RanvierViewWebCoreSdlPackageId Condition="'$(RanvierViewWebCoreSdlPackageId)' == ''">Ranvier.View.WebCore.Sdl</RanvierViewWebCoreSdlPackageId>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../examples/NativeMedia/Managed/NativeMedia.fsproj" />
@@ -14,7 +16,7 @@
     <PackageReference Update="FSharp.Core" Version="10.1.401" />
   </ItemGroup>
   <ItemGroup Condition="'$(RanvierViewRoot)' == ''">
-    <PackageReference Include="Ranvier.View.WebCore.Sdl" Version="0.1.0-alpha.45" />
+    <PackageReference Include="$(RanvierViewWebCoreSdlPackageId)" Version="0.1.0-alpha.45" />
   </ItemGroup>
   <ItemGroup Condition="'$(RanvierViewRoot)' != ''">
     <ProjectReference Include="$(RanvierViewRoot)/src/Ranvier.View.WebCore.Sdl/Ranvier.View.WebCore.Sdl.fsproj" />

@@ -14,7 +14,10 @@ import tempfile
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--native-stage', type=Path, required=True)
-    parser.add_argument('--view-root', type=Path, required=True)
+    graph = parser.add_mutually_exclusive_group(required=True)
+    graph.add_argument('--view-root', type=Path)
+    graph.add_argument('--package-only', action='store_true')
+    parser.add_argument('--traced', action='store_true')
     parser.add_argument('--nuget-config', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--dotnet-sdk-driver', type=Path)
@@ -43,19 +46,34 @@ def main():
     native_before = {path.relative_to(native).as_posix(): sha(path) for path in native.rglob('*') if path.is_file()}
     assert native_before, 'Missing explicit native stage'
     report = previous or {'sourceBefore': before, 'nativeBefore': native_before, 'commands': [],
-              'viewRoot': str(args.view_root.resolve()), 'nugetConfigSha256': sha(args.nuget_config.resolve()),
+              'viewRoot': str(args.view_root.resolve()) if args.view_root else None,
+              'packageOnly': args.package_only, 'traced': args.traced,
+              'nugetConfigSha256': sha(args.nuget_config.resolve()),
               'scope': 'Optional app-owned Windows provider; no renderer ABI changes'}
     if previous:
         assert previous['buildReady'] and previous['sourceBefore'] == before and previous['nativeBefore'] == native_before
+        assert previous.get('packageOnly', False) == args.package_only and previous.get('traced', False) == args.traced
     report['workDirectory'] = str(work)
+    if args.dotnet_sdk_driver:
+        sdk = args.dotnet_sdk_driver.resolve()
+        assert (sdk.parent / 'Sdks').is_dir() and (sdk.parent / 'FSharp/fsc.dll').is_file(), sdk
+        selection = work / 'global.json'
+        contents = json.dumps({'sdk': {'version': sdk.parent.name, 'rollForward': 'disable'}}, indent=2) + '\n'
+        if previous:
+            assert selection.read_text(encoding='utf-8') == contents
+        else:
+            selection.write_text(contents, encoding='utf-8')
+        report['sdkSelection'] = {'driver': str(sdk), 'driverSha256': sha(sdk),
+                                  'globalJson': str(selection), 'contents': contents, 'sha256': sha(selection)}
     environment = dict(os.environ)
     environment.update(OS='Windows_NT', PROCESSOR_ARCHITECTURE='AMD64',
-                       NUGET_PACKAGES=str(work / 'nuget'), DOTNET_CLI_TELEMETRY_OPTOUT='1')
+                       NUGET_PACKAGES=str(work / 'nuget'), NUGET_HTTP_CACHE_PATH=str(work / 'http-cache'),
+                       DOTNET_CLI_HOME=str(work / 'dotnet-home'), DOTNET_CLI_TELEMETRY_OPTOUT='1')
     environment['PATH'] = str(native) + os.pathsep + environment.get('PATH', '')
 
     def run(name, command, timeout=120):
         with (output / (name + '.log')).open('wb') as stream:
-            result = subprocess.run(command, cwd=root, env=environment, stdout=stream,
+            result = subprocess.run(command, cwd=work, env=environment, stdout=stream,
                                     stderr=subprocess.STDOUT, timeout=timeout)
         record = {'name': name, 'argv': command, 'exit': result.returncode,
                   'logSha256': sha(output / (name + '.log'))}
@@ -91,13 +109,18 @@ def main():
                 'ole32.lib', 'oleaut32.lib', 'uuid.lib', 'd3d11.lib', 'dxgi.lib', 'runtimeobject.lib',
                 'windowsapp.lib', 'shell32.lib', 'user32.lib'])
             dotnet = ['dotnet'] + ([str(args.dotnet_sdk_driver.resolve())] if args.dotnet_sdk_driver else [])
-            common = ['tests/media/Managed.fsproj', '-c', 'Release', '-r', 'win-x64', '-m:1', '/nr:false',
+            common = [str(root / 'tests/media/Managed.fsproj'), '-c', 'Release', '-r', 'win-x64', '-m:1', '/nr:false',
+                '-v:normal',
                 '-p:UseSharedCompilation=false', '--configfile', str(args.nuget_config.resolve()),
-                '-p:RanvierViewRoot=' + str(args.view_root.resolve()), '-p:UseLocalRanvier=false',
-                '-p:UseLocalRanvierWebCore=true', '-p:RanvierWebCoreRoot=' + str(root),
+                '-p:UseLocalRanvier=false',
                 '-p:RanvierWebCoreNativeDir=' + str(args.native_stage.resolve()), '-p:RanvierWebCoreNativeRid=win-x64',
                 '-p:NativeMediaDllPath=' + str(provider / 'RanvierNativeMedia.dll'),
-                '-p:NativeMediaTestDllPath=' + str(support), '-p:RanvierTrace=false']
+                '-p:NativeMediaTestDllPath=' + str(support), '-p:RanvierTrace=' + str(args.traced).lower()]
+            if args.view_root:
+                common += ['-p:RanvierViewRoot=' + str(args.view_root.resolve()),
+                           '-p:UseLocalRanvierWebCore=true', '-p:RanvierWebCoreRoot=' + str(root)]
+            else:
+                common += ['-p:UseLocalRanvierWebCore=false']
         fixture = str(root / 'tests/fixtures/native-media-colors-tone.mp4')
         for mode in ['jit', 'aot']:
             artifacts = work / mode
@@ -107,6 +130,22 @@ def main():
                     command += ['-p:PublishAot=true', '-p:TrimmerSingleWarn=false',
                                 '-p:ILLinkTreatWarningsAsErrors=true', '-p:IlcTreatWarningsAsErrors=true']
                 run(mode + '-build', command, timeout=540)
+                if args.package_only:
+                    suffix = '.Traced' if args.traced else ''
+                    expected = {f'Ranvier.View.WebCore{suffix}/0.1.0-alpha.45',
+                                f'Ranvier.View.WebCore.Sdl{suffix}/0.1.0-alpha.45'}
+                    graphs = []
+                    for path in artifacts.rglob('project.assets.json'):
+                        assets = json.loads(path.read_text(encoding='utf-8'))
+                        libraries = assets['libraries']
+                        references = {name for name, value in libraries.items() if value['type'] == 'project'}
+                        assert references <= {'NativeMedia/1.0.0'}, references
+                        graphs.append({'path': str(path), 'sha256': sha(path),
+                                       'projectReferences': sorted(references),
+                                       'packageLibraries': sorted(name for name, value in libraries.items()
+                                                                  if value['type'] == 'package')})
+                    assert graphs and any(expected <= set(graph['packageLibraries']) for graph in graphs), expected
+                    report[mode + 'PackageGraphs'] = graphs
             directory = artifacts / ('publish' if mode == 'aot' else 'bin') / 'Managed/release_win-x64'
             if args.phase == 'build':
                 continue

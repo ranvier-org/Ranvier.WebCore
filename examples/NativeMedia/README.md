@@ -17,10 +17,10 @@ python examples/NativeMedia/build_windows.py --output media-provider
 
 Reference `Managed/NativeMedia.fsproj` from the application and set
 `NativeMediaDllPath` to the resulting absolute `RanvierNativeMedia.dll` path.
-The project targets the matching `Ranvier.View.WebCore` alpha.45 cohort.
-Until that planned cohort is published, `RanvierViewRoot` must name its exact
-owned View source checkout; private source qualification does not prove a public
-package consumer. The matching package-only consumer remains a release gate.
+The project references the public `Ranvier.View.WebCore` alpha.45 package.
+Set `RanvierTrace=true` for its matching traced package. `RanvierViewRoot` is an
+explicit source override for prerelease qualification; leave it unset for an
+ordinary package consumer.
 This example is not a new renderer package or automatically loaded dependency.
 
 Create `Ranvier.Examples.NativeMedia.WindowsPlayback` on the View host thread,
@@ -126,13 +126,18 @@ The managed consumer also runs actual JIT and strict NativeAOT, each followed
 by a copied application with the optional DLL physically absent:
 
 ```powershell
-python -I -X utf8 tests/media/managed.py --native-stage PATH_TO_STAGE --view-root PATH_TO_VIEW --nuget-config PATH_TO_NUGET_CONFIG --output managed-media-proof
+python -I -X utf8 tests/media/managed.py --package-only --native-stage PATH_TO_STAGE --nuget-config PATH_TO_NUGET_CONFIG --output managed-media-proof
 ```
 
-The stage is the parent of `runtimes/win-x64/native`. The explicit View source
-graph supports qualification before the matching View package is published;
-use a clean owned checkout and configuration retaining its feed mappings.
-`--dotnet-sdk-driver` can select the exact installed SDK's `dotnet.dll`.
+The stage is the parent of `runtimes/win-x64/native`; use an extracted public
+GPU runtime package for a public native proof. `--package-only` checks the
+restored graph for the matching normal or `--traced` View packages and rejects
+renderer/Core/View project references. The only source project reference is
+this optional application adapter. A controlled prerelease graph can instead
+use `--view-root PATH_TO_VIEW` with a clean owned checkout and configuration
+retaining its feed mappings.
+`--dotnet-sdk-driver` selects the exact installed SDK's `dotnet.dll` and pins
+that SDK in an owned working directory, including child CLI resolution.
 The runner builds only the optional SDK DLL and application, checks all source
 and renderer hashes, retains command/log receipts, and removes disposable build
 outputs. Its inspection-only SDK helper reads the composed GPU frame and the
