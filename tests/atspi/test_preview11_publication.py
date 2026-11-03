@@ -103,6 +103,13 @@ class Preview11Preparation(unittest.TestCase):
             with self.subTest(options=options):
                 self.assertFalse(workflow.permitted('publish-atspi-preview11',atspi11='publish',**options))
 
+    def test_disabled_p12_mode_launches_no_job(self):
+        text = (ROOT / '.github/workflows/build.yml').read_text()
+        jobs = re.findall(r'^  ([a-z][a-z0-9-]*):$', text.split('jobs:', 1)[1], re.M)
+        for job in jobs:
+            with self.subTest(job=job):
+                self.assertFalse(workflow.permitted(job, atspi11='publish-p12'))
+
     def test_main_publisher_verifies_before_login_and_completed_routes_are_disabled(self):
         prepare = workflow.job('prepare-atspi-preview11')
         publish = workflow.job('publish-atspi-preview11')

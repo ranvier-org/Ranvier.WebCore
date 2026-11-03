@@ -36,7 +36,8 @@ class Preview12CandidateTests(unittest.TestCase):
 
     def test_pending_publication_pins_reject_before_network(self):
         pins=json.loads((release.PROVIDER/'preview12-publication.json').read_text())
-        with self.assertRaises(ValueError):release.validate_publication_pins(pins)
+        release.validate_publication_pins(pins)
+        with self.assertRaises(ValueError):release.validate_publication_pins(dict(pins,candidateRun=None))
         valid=dict(schemaVersion=1,id=release.IDENTITY,version=release.VERSION,candidateRun=1,candidateHead='a'*40,packageSha256='b'*64,candidateReceiptSha256='c'*64)
         release.validate_publication_pins(valid)
         for key,value in [('version','0.1.1-preview.11'),('candidateRun',True),('candidateHead','A'*40),('packageSha256',None)]:
@@ -52,6 +53,15 @@ class Preview12CandidateTests(unittest.TestCase):
         self.assertIn("github.event_name == 'workflow_dispatch'",text);self.assertIn("github.ref == 'refs/heads/main'",text)
         self.assertIn('if: ${{ false &&',text)
         self.assertNotIn('id-token:',text.lower());self.assertNotIn('nuget push',text.lower());self.assertNotIn('cmake',text.lower())
+
+    def test_publisher_is_disabled_and_verifies_before_authentication(self):
+        text=(ROOT/'.github/workflows/build.yml').read_text().split('  publish-atspi-preview12:',1)[1]
+        self.assertIn("if: ${{ false &&",text)
+        self.assertIn("inputs.atspi_preview11 == 'publish-p12'",text)
+        self.assertIn("github.event_name == 'workflow_dispatch'",text)
+        self.assertIn("github.ref == 'refs/heads/main'",text)
+        self.assertLess(text.index('scripts/prepare_atspi_preview12.py verify'),text.index('NuGet/login@v1'))
+        self.assertLess(text.index('NuGet/login@v1'),text.index('dotnet nuget push'))
 
 
 if __name__=='__main__':unittest.main()
