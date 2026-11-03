@@ -43,7 +43,7 @@ def validate_source_claim(manifest, source_revision):
 def validate_assets(libraries, mode, interop_version, provider_version):
     if mode not in ('normal', 'traced'):
         raise ValueError('Unknown managed trace mode')
-    dom = 'Ranvier.Dom' + ('.Traced' if mode == 'traced' else '') + '/0.1.0-alpha.56'
+    dom = 'Ranvier.Dom' + ('.Traced' if mode == 'traced' else '') + '/0.1.0-alpha.57'
     expected = (dom, 'Ranvier.WebCore/' + interop_version, PROVIDER_ID + '/' + provider_version)
     if not all(name in libraries for name in expected):
         raise ValueError('Published consumer resolved the wrong Core, interop or provider package')
