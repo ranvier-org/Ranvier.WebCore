@@ -1,0 +1,8 @@
+{
+  "armed": false,
+  "artifact": { "id": null, "sha256": null },
+  "policy": null,
+  "sidecarManifest": null,
+  "auditText": null,
+  "ownerProofText": null
+}
