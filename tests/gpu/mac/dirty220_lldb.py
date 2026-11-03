@@ -11,6 +11,7 @@ import lldb_raw_symbols
 hits=0
 proof=None
 maps=None
+layout_hits=0
 
 def install(debugger):
     global proof,maps
@@ -24,7 +25,35 @@ def install(debugger):
     for name,bp in entries.items():
         bp.SetScriptCallbackFunction('dirty220_lldb.on_invalidate')
         print('MAC_ADDRESS_BREAKPOINT '+json.dumps({'symbol':name,'locations':bp.GetNumLocations(),'id':bp.GetID()}),flush=True)
+    engine=lldb_raw_symbols.loaded_module(target,proof['pairs']['libWebCore.dylib']['uuid'])
+    for symbol in ('__ZN7WebCore10RenderView21accumulateRepaintRectENS_7IntRectES1_',
+                   '__ZN7WebCore12RenderObject14setNeedsLayoutENS_15MarkingBehaviorE'):
+        rows=[address for address,name in maps['libWebCore.dylib']['symbols'] if name==symbol]
+        if len(rows)!=1:
+            raise ValueError('Ambiguous layout entry: '+symbol)
+        address=engine.ResolveFileAddress(rows[0])
+        if not address.IsValid() or address.GetLoadAddress(target)==lldb.LLDB_INVALID_ADDRESS:
+            raise ValueError('Unloaded layout entry: '+symbol)
+        bp=target.BreakpointCreateByAddress(address.GetLoadAddress(target))
+        if not bp.IsValid() or bp.GetNumLocations()!=1:
+            raise ValueError('Unresolved layout breakpoint: '+symbol)
+        bp.SetScriptCallbackFunction('dirty220_lldb.on_layout')
+        print('MAC_LAYOUT_BREAKPOINT '+json.dumps({'symbol':symbol,'fileAddress':rows[0],'id':bp.GetID()}),flush=True)
     target.FindBreakpointByID(1).SetEnabled(False)
+
+def stack_frames(frame):
+    target=frame.GetThread().GetProcess().GetTarget()
+    return [{'function':item.GetDisplayFunctionName(),'pc':item.GetPCAddress().GetLoadAddress(target),
+             'module':item.GetModule().GetFileSpec().GetFilename(),
+             'rawSymbolHint':lldb_raw_symbols.annotate_frame(item,proof,maps)} for item in list(frame.GetThread())[:18]]
+
+def on_layout(frame,location,internal_dict):
+    global layout_hits
+    layout_hits+=1
+    print('MAC_LAYOUT_STACK '+json.dumps({'hit':layout_hits,'breakpointId':location.GetBreakpoint().GetID(),
+          'registers':{name:frame.FindRegister(name).GetValueAsUnsigned() for name in ('x0','x1','x2','x3','x4')},
+          'frames':stack_frames(frame)}),flush=True)
+    return False
 
 def on_invalidate(frame,location,internal_dict):
     global hits
@@ -35,14 +64,7 @@ def on_invalidate(frame,location,internal_dict):
     error=lldb.SBError()
     data=process.ReadMemory(pointer,16,error)
     rect=list(struct.unpack('<4i',data)) if error.Success() and len(data)==16 else None
-    frames=[]
-    for item in thread:
-        address=item.GetPCAddress()
-        frames.append({'function':item.GetDisplayFunctionName(),'pc':address.GetLoadAddress(frame.GetThread().GetProcess().GetTarget()),
-                       'module':item.GetModule().GetFileSpec().GetFilename(),
-                       'rawSymbolHint':lldb_raw_symbols.annotate_frame(item,proof,maps)})
-        if len(frames)>=18:
-            break
+    frames=stack_frames(frame)
     print('MAC_INVALIDATE_STACK '+json.dumps({'hit':hits,'breakpointId':location.GetBreakpoint().GetID(),'symbol':frame.GetDisplayFunctionName(),
           'x0':frame.FindRegister('x0').GetValueAsUnsigned(),'x1':pointer,'rect':rect,'frames':frames}),flush=True)
     return False
