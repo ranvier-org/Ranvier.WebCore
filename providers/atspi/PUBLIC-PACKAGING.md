@@ -61,3 +61,9 @@ uses the `build.yml` policy and `NUGET_USER`; this optional artifact workflow do
 it, request a token, or push a package. Its job remains statically disabled and its example version/hashes remain
 null until the matching actual inputs are supplied. Historical private P9 x64/ARM qualification is retained and is
 not relabeled as P10 or a final public View46 consumer graph.
+# Initial preview10 candidate route
+
+`public-preview10.json` contains the allocated initial ID/version and the independently reviewed P10 per-RID package and receipt hashes. It permits candidate assembly, with source revisions still recorded as unverified caller/artifact claims. It does not enable publication.
+
+The existing `build.yml` workflow accepts `atspi_preview10=prepare` to download those exact qualification runs, assemble the ordinary SDK package and check both RID layouts without building an engine. `atspi_preview10=publish` is restricted to the actual main ref and verifies the unchanged reviewed candidate before using the existing `NuGet/login` policy. `preview10-publication.json` must first contain the independently reviewed candidate run, source head, package hash and candidate-receipt hash; incomplete pins fail before authentication. The publisher refuses an already existing package version and pushes only that exact provider nupkg.
+
