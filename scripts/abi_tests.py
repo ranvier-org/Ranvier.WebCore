@@ -6,6 +6,7 @@
 #   abi_tests.py --stage DIR --source DIR    a directory build.py package staged, and the WebKit checkout
 #                                            (the resources test serves its Ahem font)
 import argparse, glob, json, os, pathlib, shutil, subprocess, sys, tempfile, time
+from contextlib import nullcontext
 
 root = pathlib.Path(__file__).resolve().parents[1]
 tests = root / 'tests' / 'abi'
