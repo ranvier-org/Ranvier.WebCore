@@ -1,3 +1,4 @@
+diff --git a/Source/WebCore/platform/graphics/FontCache.cpp b/Source/WebCore/platform/graphics/FontCache.cpp
 --- a/Source/WebCore/platform/graphics/FontCache.cpp
 +++ b/Source/WebCore/platform/graphics/FontCache.cpp
 @@ -133,7 +133,15 @@
@@ -16,6 +17,7 @@
  }
  
  FontCache* FontCache::forCurrentThreadIfNotDestroyed()
+diff --git a/Source/WebCore/platform/graphics/skia/SkiaHarfBuzzFont.cpp b/Source/WebCore/platform/graphics/skia/SkiaHarfBuzzFont.cpp
 --- a/Source/WebCore/platform/graphics/skia/SkiaHarfBuzzFont.cpp
 +++ b/Source/WebCore/platform/graphics/skia/SkiaHarfBuzzFont.cpp
 @@ -144,7 +144,12 @@
@@ -31,6 +33,7 @@
  }
  
  static inline hb_position_t skScalarToHarfBuzzPosition(SkScalar value)
+diff --git a/Source/WebCore/platform/ThreadTimers.h b/Source/WebCore/platform/ThreadTimers.h
 --- a/Source/WebCore/platform/ThreadTimers.h
 +++ b/Source/WebCore/platform/ThreadTimers.h
 @@ -88,6 +88,9 @@
@@ -43,6 +46,7 @@
  
      unsigned heapIndex() const;
      void setHeapIndex(unsigned newIndex);
+diff --git a/Source/WebCore/platform/Timer.cpp b/Source/WebCore/platform/Timer.cpp
 --- a/Source/WebCore/platform/Timer.cpp
 +++ b/Source/WebCore/platform/Timer.cpp
 @@ -60,10 +60,21 @@
