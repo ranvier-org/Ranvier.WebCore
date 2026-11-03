@@ -34,7 +34,7 @@ def main():
                'nativeBefore': before, 'steps': [], 'passed': False}
     environment = dict(os.environ)
 
-    def run(name, command, timeout=180):
+    def run(name, command, timeout=180, expected_failure=None):
         log = output / (name + '.log')
         row = {'name': name, 'command': [str(value) for value in command]}
         receipt['steps'].append(row)
@@ -50,9 +50,14 @@ def main():
                 child.wait()
                 raise
         row['logSha256'] = hashlib.sha256(log.read_bytes()).hexdigest()
-        if row['exit']:
+        text = log.read_text(errors='replace')
+        if expected_failure is not None:
+            row['expectedFailure'] = expected_failure
+            if row['exit'] != 1 or expected_failure not in text:
+                raise RuntimeError('The explicit base-repaint negative control was not rejected')
+        elif row['exit']:
             raise subprocess.CalledProcessError(row['exit'], row['command'])
-        return log.read_text(errors='replace')
+        return text
 
     try:
         sdk = output / 'presenter-sdk'
@@ -70,6 +75,8 @@ def main():
                 '-framework', 'Metal', '-framework', 'IOSurface', '-framework', 'Foundation', *flags])
             run('public-' + name, [binary, '--output', output])
         run('reject-software', [output / 'spike', '--reject-software'])
+        run('reject-steady-base-repaint', [output / 'spike', '--force-steady-repaint'],
+            expected_failure='MAC_GPU_SPIKE FAIL transform and opacity animation reuse base backing')
         receipt['nativeAfter'] = hashes(native)
         if receipt['nativeAfter'] != before:
             raise RuntimeError('The extracted native payload changed')

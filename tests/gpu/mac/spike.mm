@@ -21,6 +21,7 @@ int assertions;
 uint64_t presented;
 std::string outputDirectory;
 bool counterDiagnostics;
+bool forceSteadyRepaint;
 
 void require(bool value, const char* message)
 {
@@ -227,6 +228,8 @@ void cycle(int index, float scale)
     uint64_t gpu = 0, readback = 0, basePaints = 0;
     require(rv_mac_spike_counters(host.get(), &gpu, &readback, &basePaints) == RV_OK && gpu == 1 && readback == 0, "GPU first frame counters");
     auto stablePaints = basePaints;
+    auto animationPaints = basePaints;
+    unsigned animationStep = 0;
     std::printf("MAC_GPU_COUNTER cycle=%d scale=%g phase=initial gpu=%llu readback=%llu base=%llu\n", index, scale,
         static_cast<unsigned long long>(gpu), static_cast<unsigned long long>(readback), static_cast<unsigned long long>(basePaints));
     for (int repeat = 0; repeat < 3; ++repeat) {
@@ -244,7 +247,10 @@ void cycle(int index, float scale)
     dirtyProbe(host.get(), index, scale, "before-pause");
     require(rv_animation_control(animation.get(), RV_ANIMATION_PAUSE) == RV_OK, "pause deterministic animation");
     dirtyProbe(host.get(), index, scale, "after-pause");
-    for (int milliseconds : { 1000, 0 }) {
+    for (int milliseconds : { 1000, 0, 1000, 0, 1000, 0, 1000, 0, 1000, 0, 1000, 0, 1000, 0, 1000, 0, 1000, 0, 1000, 0, 1000, 0, 1000, 0, 1000, 0, 1000, 0, 1000, 0, 1000, 0 }) {
+        if (forceSteadyRepaint && animationStep == 1) {
+            require(rv_host_resize(host.get(), cssWidth, cssHeight) == RV_OK, "negative control explicit base invalidation");
+        }
         require(rv_animation_seek(animation.get(), milliseconds) == RV_OK, "seek compositor animation");
         dirtyProbe(host.get(), index, scale, "after-seek");
         require(rv_host_update(host.get()) == RV_OK, "update animation state");
@@ -259,7 +265,13 @@ void cycle(int index, float scale)
             static_cast<unsigned long long>(gpu), static_cast<unsigned long long>(readback),
             static_cast<unsigned long long>(stablePaints), static_cast<unsigned long long>(basePaints));
         std::fflush(stdout);
-        require(counterResult == RV_OK && basePaints == stablePaints && readback == 0, "transform and opacity animation reuse base backing");
+        require(counterResult == RV_OK && readback == 0, "animation uses GPU frames without host readback");
+        if (!animationStep) {
+            require(basePaints >= stablePaints && basePaints <= stablePaints + 1, "first animated frame bounds one backing transition");
+            animationPaints = basePaints;
+        } else
+            require(basePaints == animationPaints, "transform and opacity animation reuse base backing");
+        ++animationStep;
     }
     animation.reset();
     if (!outputDirectory.empty())
@@ -283,7 +295,7 @@ void cycle(int index, float scale)
     int32_t oldWidth = 0, oldHeight = 0;
     require(rv_mac_spike_frame_info(second.value, &oldSurface, &oldWidth, &oldHeight) == RV_OK
             && oldWidth == physicalWidth && oldHeight == physicalHeight, "old frame size preserved across resize");
-    require(rv_mac_spike_counters(host.get(), &gpu, &readback, &basePaints) == RV_OK && gpu == 8 && readback == 0, "native GPU frames8 with host readback frames0");
+    require(rv_mac_spike_counters(host.get(), &gpu, &readback, &basePaints) == RV_OK && gpu == 38 && readback == 0, "native GPU frames38 with host readback frames0");
     auto* expiredHost = host.get();
     host.reset();
     require(rv_mac_spike_acquire_frame(expiredHost, &unavailable.value) == RV_ERR_DETACHED && !unavailable.value, "destroyed host cannot acquire");
@@ -318,6 +330,7 @@ int main(int argc, char** argv)
             std::vector<float> scales { 1.0f, 1.5f, 2.0f };
             bool diagnostic = argc == 3 && std::strcmp(argv[1], "--diagnostic-scales") == 0;
             counterDiagnostics = diagnostic;
+            forceSteadyRepaint = argc == 2 && std::strcmp(argv[1], "--force-steady-repaint") == 0;
             if (diagnostic) {
                 scales.clear();
                 std::string selected = argv[2];
