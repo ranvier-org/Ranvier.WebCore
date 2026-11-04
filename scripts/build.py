@@ -271,6 +271,8 @@ def configure(env):
     command = ['cmake', '-S', source, '-B', build, '-G', 'Ninja', f'-DRANVIER_RID={args.rid}',
                '-C', root / 'config' / ('mac-gpu-spike.cmake' if getattr(args, 'mac_gpu_spike', False) else f'{args.flavor}.cmake'), *stable_interpreters(env)]
     command.append('-DRANVIER_ENABLE_PDF=' + ('ON' if getattr(args, 'enable_pdf', True) else 'OFF'))
+    if args.rid.startswith('osx-'):
+        command.append('-DCMAKE_EXPORT_COMPILE_COMMANDS=ON')
     if windows:
         clang = (llvm / 'clang-cl.exe').as_posix()
         command += [f'-DCMAKE_C_COMPILER={clang}', f'-DCMAKE_CXX_COMPILER={clang}',
@@ -283,6 +285,14 @@ def configure(env):
         # VCPKG_KEEP_ENV_VARS passes it to the port builds. ARM64 images are always relocatable: the base is a preference.
         env = dict(env, _LINK_='/BASE:0x180000000', VCPKG_KEEP_ENV_VARS='_LINK_')
     run(command, env=env, cwd=source)
+    if args.rid.startswith('osx-'):
+        try:
+            entries = json.loads((build / 'compile_commands.json').read_text(encoding='utf-8'))
+            hosts = [entry for entry in entries if pathlib.Path(entry.get('file', '')).name == 'RanvierWebCoreAbi.cpp']
+            if len(hosts) != 1 or not (hosts[0].get('arguments') or hosts[0].get('command')):
+                raise ValueError('Require exactly one Host compiler stanza')
+        except (OSError, ValueError, TypeError, AttributeError) as error:
+            raise RuntimeError('Cocoa sidecars require a generated Host compiler database before the native build') from error
 
 
 def icu_data(env):

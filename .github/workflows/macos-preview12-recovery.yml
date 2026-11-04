@@ -1,0 +1,146 @@
+name: immutable preview12 Mac recovery
+
+on:
+  workflow_dispatch:
+    inputs:
+      flavor:
+        type: choice
+        options: [slim, gpu]
+        required: true
+        description: Recover one failed or unacquired-cancelled immutable-d31 Mac flavor
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  recover:
+    if: ${{ false && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
+    runs-on: macos-26
+    timeout-minutes: 180
+    concurrency:
+      group: immutable-d31-mac-${{ inputs.flavor }}
+      cancel-in-progress: false
+    env:
+      FLAVOR: ${{ inputs.flavor }}
+      RANVIER_WORK: /Users/runner/rw
+      BUILD_DIR: /Users/runner/rw/build-${{ inputs.flavor }}
+    steps:
+      - name: Check out immutable product F at the original producer root
+        uses: actions/checkout@v4
+        with:
+          ref: d31c3631ed4bbe6520f7f5f7c7e7d34499c38122
+          persist-credentials: false
+
+      - name: Acquire builder H outside the product checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "$FLAVOR" in slim|gpu) ;; *) exit 2 ;; esac
+          control="$RUNNER_TEMP/immutable-d31-builder"
+          test ! -e "$control"
+          git init "$control"
+          git -C "$control" remote add origin https://github.com/ranvier-org/Ranvier.WebCore.git
+          git -C "$control" fetch --depth 1 origin "$GITHUB_SHA"
+          git -C "$control" checkout --detach FETCH_HEAD
+          test "$(git -C "$control" rev-parse HEAD)" = "$GITHUB_SHA"
+          echo "CONTROL_ROOT=$control" >> "$GITHUB_ENV"
+          echo "EVIDENCE=$RUNNER_TEMP/immutable-d31-$FLAVOR" >> "$GITHUB_ENV"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Select the canonical macOS tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          xcode=$(ls -d /Applications/Xcode_26*.app | grep -v -i beta | sort -V | tail -1)
+          sudo xcode-select -s "$xcode/Contents/Developer"
+          xcodebuild -version
+          export HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1
+          for tool in gperf ninja cmake pkg-config; do
+            command -v "$tool" >/dev/null || brew install "$tool"
+          done
+          mkdir -p "$RANVIER_WORK"
+
+      - name: Compute immutable product cache keys
+        id: keys
+        run: python -I scripts/build_cache.py keys --rid osx-arm64 --flavor "$FLAVOR"
+
+      - name: Fetch the actual product WebKit pin
+        run: python -B scripts/build.py fetch --rid osx-arm64 --flavor "$FLAVOR" --work "$RANVIER_WORK"
+
+      - name: Prepare actual product sources
+        run: python -B scripts/build.py prepare --rid osx-arm64 --flavor "$FLAVOR" --work "$RANVIER_WORK"
+
+      - name: Restore the original-root producer tree
+        id: tree
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.BUILD_DIR }}
+          key: ${{ steps.keys.outputs.tree }}
+          restore-keys: ${{ steps.keys.outputs.tree-restore }}
+
+      - name: Recover the warm immutable product
+        id: product
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RANVIER_RESTORED_CACHE_KEY: ${{ steps.tree.outputs.cache-matched-key }}
+        run: >-
+          python -B -I "$CONTROL_ROOT/scripts/mac_preview12_recovery.py"
+          --phase build --producer-root "$GITHUB_WORKSPACE" --control-source "$GITHUB_SHA"
+          --flavor "$FLAVOR" --output "$EVIDENCE"
+
+      - name: Retain immutable product package
+        id: package
+        if: steps.product.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-osx-arm64-${{ inputs.flavor }}
+          path: ${{ steps.product.outputs.package }}
+          if-no-files-found: error
+
+      - name: Retain immutable product manifest
+        id: manifest
+        if: steps.product.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: manifest-osx-arm64-${{ inputs.flavor }}
+          path: ${{ steps.product.outputs.manifest }}
+          if-no-files-found: error
+
+      - name: Build matching helpers
+        if: ${{ always() && steps.product.outcome == 'success' && steps.package.outcome == 'success' && steps.manifest.outcome == 'success' }}
+        timeout-minutes: 20
+        run: >-
+          python -B -I "$CONTROL_ROOT/scripts/mac_preview12_recovery.py"
+          --phase helpers --producer-root "$GITHUB_WORKSPACE" --control-source "$GITHUB_SHA"
+          --flavor "$FLAVOR" --output "$EVIDENCE"
+
+      - name: Collect the independent immutable product gates
+        if: ${{ always() && steps.product.outcome == 'success' }}
+        timeout-minutes: 90
+        run: >-
+          python -B -I "$CONTROL_ROOT/scripts/mac_preview12_recovery.py"
+          --phase qualify --producer-root "$GITHUB_WORKSPACE" --control-source "$GITHUB_SHA"
+          --flavor "$FLAVOR" --output "$EVIDENCE"
+
+      - name: Consolidate the explicit owned proof root
+        if: ${{ always() && env.EVIDENCE != '' }}
+        run: >-
+          python -B -I "$CONTROL_ROOT/scripts/collect_mac_recovery_proof.py"
+          --evidence "$EVIDENCE" --work "$RANVIER_WORK" --flavor "$FLAVOR"
+
+      - name: Always retain original SDK and helper proof
+        if: ${{ always() && env.EVIDENCE != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: immutable-d31-mac-${{ inputs.flavor }}-recovery-proof
+          path: ${{ env.EVIDENCE }}
+          include-hidden-files: true
+          if-no-files-found: warn

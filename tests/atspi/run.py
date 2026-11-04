@@ -11,6 +11,9 @@ import sys
 import threading
 import time
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from protocol_errors import released_connection_rejected
+
 
 def publish_response(directory, command):
     temporary = directory / 'response.tmp'
@@ -136,6 +139,8 @@ body{margin:0}button,input{position:absolute}#activate{left:10px;top:20px;width:
                     paused = False
                 elif command['action'] == 'pause':
                     paused = True
+                elif command['action'] == 'resume':
+                    paused = False
                 elif command['action'] in ['remove-field', 'remove-last']:
                     identifier = b'name' if command['action'] == 'remove-field' else b'last'
                     element = element_by_id(host, identifier, len(identifier))
@@ -352,13 +357,32 @@ def client(args):
         check(last_removed(), 'removing the final child reports its original parent and identity')
         check(call(found['Group'], accessible, 'GetChildren')[0] == [], 'empty native child lists do not retain the old cache snapshot')
         old_field = field
+        request('pause')
+        stale_completion = []
+        stale_errors = []
+        def completed_stale(connection, result):
+            try:
+                connection.call_finish(result)
+                stale_completion.append('success')
+            except GLib.Error as error:
+                stale_completion.append(Gio.DBusError.get_remote_error(error))
+                stale_errors.append(dict(domain=error.domain, code=error.code, message=error.message))
+        connection.call(ready['bus'], old_field, accessible, 'GetRole', None,
+                        None, Gio.DBusCallFlags.NONE, 3000, None, completed_stale)
+        connection.flush_sync(None)
         request('reload')
+        request('resume')
+        deadline = time.monotonic() + 4
+        while not stale_completion and time.monotonic() < deadline:
+            while context.pending(): context.iteration(False)
+            time.sleep(0.005)
+        (args.output / 'live-stale-diagnostic.json').write_text(json.dumps(dict(completion=stale_completion, errors=stale_errors), indent=2))
         rejected = False
         try:
             prop(old_field, accessible, 'Name')
         except GLib.Error:
             rejected = True
-        check(rejected, 'old document objects are unavailable after replacement')
+        check(rejected and stale_completion == ['org.freedesktop.DBus.Error.UnknownMethod'], 'queued old document objects are rejected while the bridge remains live')
         found.clear()
         visit(root)
         check('Replacement' in found and 'Name' not in found, 'replacement document is exposed without old controls')
@@ -366,6 +390,15 @@ def client(args):
         if args.queued_set:
             request('pause')
             completion = []
+            errors = []
+            replies = []
+            def observe_reply(connection, message, incoming, data):
+                if incoming and message.get_message_type() == Gio.DBusMessageType.ERROR:
+                    body = message.get_body()
+                    replies.append(dict(sender=message.get_sender(), error=message.get_error_name(),
+                                        body=list(body.unpack()) if body else []))
+                return message
+            error_filter = connection.add_filter(observe_reply, None)
 
             def completed(connection, result):
                 try:
@@ -373,6 +406,7 @@ def client(args):
                     completion.append('success')
                 except GLib.Error as error:
                     completion.append(Gio.DBusError.get_remote_error(error))
+                    errors.append(dict(domain=error.domain, code=error.code, message=error.message))
 
             connection.call(ready['bus'], root, 'org.freedesktop.DBus.Properties', 'Set',
                 GLib.Variant('(ssv)', ('org.a11y.atspi.Application', 'Id', GLib.Variant('i', 42))),
@@ -383,7 +417,13 @@ def client(args):
             while not completion and time.monotonic() < deadline:
                 while context.pending(): context.iteration(False)
                 time.sleep(0.005)
-            check(completion == ['org.freedesktop.DBus.Error.UnknownMethod'], 'queued property setter rejects an unregistered application without invoking stale state')
+            connection.remove_filter(error_filter)
+            name_owned = connection.call_sync('org.freedesktop.DBus', '/org/freedesktop/DBus',
+                'org.freedesktop.DBus', 'NameHasOwner', GLib.Variant('(s)', (ready['bus'],)), None,
+                Gio.DBusCallFlags.NONE, 3000, None).unpack()[0]
+            (args.output / 'released-connection-report.json').write_text(json.dumps(dict(
+                completion=completion, errors=errors, replies=replies, recipientStillOwnsBusName=name_owned), indent=2))
+            check(released_connection_rejected(completion, errors, replies, name_owned), 'queued property setter rejects an unregistered application without invoking stale state')
         else:
             request('arm-release')
             check(call(found['Replacement'], action, 'DoAction', '(i)', (0,))[0], 'native action completes while its application releases the provider reentrantly')

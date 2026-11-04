@@ -77,7 +77,7 @@ class ExpectedAbiControls(unittest.TestCase):
 
     def test_no_python_version_query_still_compares_to_literal63(self):
         checked=[]
-        for path in HERE.glob('*.py'):
+        for path in [*HERE.glob('*.py'), HERE.parent/'gpu/linux_view_transition_pixels.py']:
             if path.name.startswith('test_'):
                 continue
             for node in ast.walk(ast.parse(path.read_text(encoding='utf-8'))):
@@ -86,6 +86,7 @@ class ExpectedAbiControls(unittest.TestCase):
                 self.assertFalse(any(isinstance(item,ast.Constant) and item.value==63 for item in node.comparators),path.name)
                 checked.append(path.name)
         self.assertGreaterEqual(len(checked),40)
+        self.assertIn('linux_view_transition_pixels.py',checked)
 
 
 if __name__=='__main__':
