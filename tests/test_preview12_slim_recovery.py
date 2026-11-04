@@ -77,14 +77,19 @@ class SlimRecovery(unittest.TestCase):
             with self.assertRaises(ValueError):
                 subject.admit_qualification_run(dict(run, **{key:value}), jobs, expected)
 
-    def test_qualification_workflow_is_readonly_and_unarmed(self):
+    def test_qualification_workflow_is_readonly_default_off_and_policy_gated(self):
         workflow = (ROOT / '.github/workflows/preview12-slim-recovery.yml').read_text()
         self.assertIn('permissions:\n  contents: read\n  actions: read\n', workflow)
         self.assertNotIn('id-token:', workflow)
         policy = json.loads((ROOT / 'docs/preview12-slim-recovery.json').read_text())
-        self.assertFalse(policy['armed'])
-        self.assertFalse(policy['publicationEnabled'])
-        self.assertIsNone(policy['controllerSource'])
+        self.assertIn('default: off', workflow)
+        self.assertIn("os.environ['PHASE'] == 'qualify'", workflow)
+        subject = self.subject()
+        with self.assertRaisesRegex(ValueError, 'unarmed'):
+            subject.admit_policy(dict(policy, armed=False), 'qualify')
+        if policy['armed']:
+            subject.admit_policy(policy, 'qualify')
+        self.assertTrue(policy['controllerSource'] is None or subject.revision(policy['controllerSource']))
         self.assertIn("github.ref == 'refs/heads/main'", workflow)
 
     def test_unallocated_policy_cannot_qualify_or_export(self):
