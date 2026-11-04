@@ -78,9 +78,10 @@ class GpuCohort(unittest.TestCase):
 
     def test_policy_is_unarmed_and_incomplete_never_admits(self):
         policy = json.loads((ROOT / 'docs/preview12-gpu-cohort.json').read_text())
+        policy.update(armed=False, publicationEnabled=False)
         with self.assertRaises(ValueError):
             self.subject.admit_policy(policy)
-        policy['armed'] = policy['publicationEnabled'] = True
+        policy.update(armed=True, publicationEnabled=True, controllerSource=None)
         with self.assertRaises(ValueError):
             self.subject.admit_policy(policy)
 
