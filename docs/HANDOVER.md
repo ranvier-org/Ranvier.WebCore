@@ -1,10 +1,15 @@
 # Handover
 
-State of the project at Native `0.1.1-preview.12`. Every item below comes from a release, an issue or a CI run;
+State of the project at Native `0.1.1-rc.2`. Every item below comes from a release, an issue or a CI run;
 re-check the live source (`pins.json`, `patches/series`, the header) before relying on a number.
 
 ## Released and verified
 
+- Native `0.1.1-rc.2` (tag on 6c66723, run 41785462391): `Ranvier.WebCore`, `Ranvier.WebCore.Native`, the five
+  runtime packages and `Ranvier.WebCore.Accessibility.Atspi` are public on nuget.org. The GPU cohort is published
+  by the `gpu-cohort` dispatch of the same tag (run 41790389124).
+- Tag `v0.1.1-rc.1` failed in `atspi` and published nothing. It stays in place: release tags are never moved, and a
+  failed release is retried under the next rc number.
 - Native `0.1.1-preview.12`: the Slim cohort (seven packages: five runtimes, `Ranvier.WebCore`,
   `Ranvier.WebCore.Native`) and the GPU cohort are public on nuget.org. Product source
   `d31c3631ed4bbe6520f7f5f7c7e7d34499c38122`; ABI 64 with 349 declarations in `RanvierWebCoreAbi.h`.
@@ -28,6 +33,11 @@ PRs #329, #335, #336 and #337.
 PR #338 removed every completed per-release route: 22 workflows, 20 `build.yml` jobs with their inputs, and the
 scripts and tests that only those routes used. Four workflows remain (`build.yml`, `triage.yml`,
 `public-cocoa-contracts.yml`, `atspi-provider.yml`); `docs/CI.md` describes them.
+
+PR #340 added the `atspi` and `atspi-package` release jobs (`providers/atspi/release.py`). PR #342 made CI
+version-agnostic: the ABI comes from `rv_abi_version` in `host/RanvierWebCoreAbi.cpp` and the package version
+from `pins.json` or the tag, so a release or ABI bump needs no workflow or test edit. A new hard-coded version
+or ABI number in CI is a regression.
 
 ## Open
 
