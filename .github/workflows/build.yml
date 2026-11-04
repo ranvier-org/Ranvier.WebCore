@@ -60,6 +60,7 @@ jobs:
       - run: python -I tests/test_sccache_cache_policy.py
       - run: python -I tests/test_build_sccache_launcher.py
       - run: python -I tests/test_sccache_workflow.py
+      - run: python -I tests/test_cache_scope.py
       - run: python -I tests/test_host_prepare.py
       - run: python -I tests/test_mutation_contract.py
       - run: python -I tests/test_mutation_routing.py
@@ -319,7 +320,7 @@ jobs:
           Copy-Item C:\ProgramData\chocolatey\lib\gperf\tools\* C:\rw\tools\gperf -Recurse -Exclude *.zip
 
       - name: Save gperf
-        if: runner.os == 'Windows' && steps.gperf.outputs.cache-hit != 'true'
+        if: ${{ !startsWith(github.ref, 'refs/tags/') && runner.os == 'Windows' && steps.gperf.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@v4
         with:
           path: C:\rw\tools\gperf
@@ -399,7 +400,7 @@ jobs:
         run: python scripts/build.py fetch --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
 
       - name: Save LLVM
-        if: runner.os == 'Windows' && steps.llvm.outputs.cache-hit != 'true'
+        if: ${{ !startsWith(github.ref, 'refs/tags/') && runner.os == 'Windows' && steps.llvm.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@v4
         with:
           path: C:\rw\tools\llvm
@@ -494,14 +495,14 @@ jobs:
 
       # Only after a successful install: an entry saved under a key is never replaced.
       - name: Save vcpkg archives
-        if: steps.vcpkg.outcome == 'success' && steps.vcpkg.outputs.cache-hit != 'true'
+        if: ${{ !startsWith(github.ref, 'refs/tags/') && steps.vcpkg.outcome == 'success' && steps.vcpkg.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@v4
         with:
           path: C:\rw\vcpkg-archives
           key: ${{ steps.keys.outputs.vcpkg }}
 
       - name: Save vcpkg downloads
-        if: steps.downloads.outcome == 'success' && steps.downloads.outputs.cache-hit != 'true'
+        if: ${{ !startsWith(github.ref, 'refs/tags/') && steps.downloads.outcome == 'success' && steps.downloads.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@v4
         with:
           path: C:\rw\vcpkg-downloads
