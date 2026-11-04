@@ -42,6 +42,10 @@ class PublicCocoaWorkflow(unittest.TestCase):
             (dict(armed=True, ownerProofText=None), 'replay', None, None),
             (dict(armed=True, ownerProofText=None, source='C' * 40), 'collect-owner', None, None),
             (dict(armed=True, ownerProofText=None, source='main'), 'collect-owner', None, None),
+            (dict(armed=True, ownerProofText=None, source='c' * 39), 'collect-owner', None, None),
+            (dict(armed=True, ownerProofText=None, source='c' * 41), 'collect-owner', None, None),
+            (dict(armed=True, ownerProofText=None, source='x' + 'c' * 40), 'collect-owner', None, None),
+            (dict(armed=False, ownerProofText='{}'), 'replay', 'false', ''),
         ]
         for data, phase, armed, expected_source in cases:
             with self.subTest(data=data, phase=phase), tempfile.TemporaryDirectory() as directory:

@@ -66,7 +66,6 @@ class PublicReplayBundle(unittest.TestCase):
                 subject.extract_artifact(archive, root / 'output')
             self.assertFalse((root / 'escaped').exists())
 
-
     def test_symlink_member_in_reviewed_artifact_is_rejected(self):
         subject = load_subject()
         with tempfile.TemporaryDirectory() as directory:
@@ -87,6 +86,8 @@ class PublicReplayBundle(unittest.TestCase):
         self.assertTrue(subject.final_acceptance(0, passing, references, main))
         self.assertFalse(subject.final_acceptance(1, passing, references, main))
         self.assertFalse(subject.final_acceptance(0, dict(accepted=False), references, main))
+        self.assertFalse(subject.final_acceptance(0, dict(accepted='true'), references, main))
+        self.assertFalse(subject.final_acceptance(0, passing, dict(acceptedAsReferences=1), main))
         self.assertFalse(subject.final_acceptance(0, passing, {}, main))
         self.assertFalse(subject.final_acceptance(0, passing, references, dict(main, ref='refs/heads/feature')))
         self.assertFalse(subject.final_acceptance(0, passing, references, dict(main, repository='fork/Ranvier.WebCore')))
@@ -129,7 +130,8 @@ class PublicReplayBundle(unittest.TestCase):
             inputs = root / 'inputs.json'
             inputs.write_text(json.dumps(dict(armed=True, artifact=dict(id=7, sha256='a' * 64),
                                               policy=dict(controllerSource=head))))
-            with mock.patch.object(subject.subprocess, 'run', fake_run),                     self.assertRaisesRegex(ValueError, 'Producer artifact bytes differ'):
+            with (mock.patch.object(subject.subprocess, 'run', fake_run),
+                  self.assertRaisesRegex(ValueError, 'Producer artifact bytes differ')):
                 run_main(subject, inputs, source, root / 'out')
             receipt = json.loads((root / 'out/replay-receipt.json').read_text())
             self.assertIs(receipt['accepted'], False)
