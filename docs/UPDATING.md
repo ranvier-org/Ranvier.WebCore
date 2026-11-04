@@ -33,8 +33,7 @@
    python -I scripts/build.py all --flavor slim
    ```
 
-4. **Check the host.** Run Ranvier's F# driver and conformance run against the packaged DLLs (Ranvier's
-   `evidence/webcore-host`), then bump `package.version` in `pins.json`.
+4. **Check the host.** Run `scripts/smoke.py` and the probes of `tests/` against the staged package (`docs/CI.md`, "Probes"), then bump `package.version` in `pins.json`.
 
 Also re-pin when WebKit moves its dependencies: vcpkg's port versions come from WebKit's own
 `vcpkg-configuration.json`, so a new ICU version changes `pins.json`'s `icu` entry and the `icudt77`

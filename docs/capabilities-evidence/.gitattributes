@@ -1,3 +1,0 @@
-*.log text -diff
-*.rsp text -diff
-*.png binary

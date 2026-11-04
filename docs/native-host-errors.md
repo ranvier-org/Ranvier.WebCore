@@ -1,7 +1,0 @@
-# Native host error records
-
-Use `rv_abi_has("host-errors")` to detect the optional host error record API. Records are disabled by default. After `rv_host_error_enable(host, 1)`, a failed native presentation acquisition records the operation, D3D11 or EGL source, and the same status returned by the call. On D3D11, `native_code` is the consumer device's `GetDeviceRemovedReason` HRESULT; zero means no removal reason was reported. EGL records currently use zero for the native code, so a record alone does not assert context loss. Argument, thread and preflight failures are reported by the direct return value.
-
-Each host retains only the latest record. `rv_host_error_take` copies it into caller-owned storage and clears it; `present` says whether a record was available. A later failure can overwrite an unread record. Changing the enabled state clears it, and host destruction releases it with the host. Calls follow the host's owning-thread and lifetime rules. No callbacks are made by this facility.
-
-Existing operation-specific error paths remain authoritative. For example, image decode completion distinguishes decode failure, load failure, cancellation and invalidation, while DOM exceptions use the existing status and `rv_last_exception`. An expected cancellation does not create a presentation error record. Applications can route these results through their existing exception and logging providers.
