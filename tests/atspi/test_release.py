@@ -76,6 +76,14 @@ class ReleaseTests(unittest.TestCase):
         job = workflow.split('\n  atspi-package:\n', 1)[1].split('\n  publish:\n', 1)[0]
         self.assertIn('providers/atspi/release.py', job)
         self.assertIn('name: package-atspi', job)
+        build = workflow.split('
+  atspi:
+', 1)[1].split('
+  atspi-package:
+', 1)[0]
+        # tests/atspi/run.py starts /usr/libexec/at-spi2-registryd, which at-spi2-core installs.
+        self.assertIn('at-spi2-core', build)
+        self.assertIn('fail-fast: false', build)
         publish = workflow.split('\n  publish:\n', 1)[1]
         self.assertIn('atspi-package', publish.split('needs:', 1)[1].split('\n', 1)[0])
 
