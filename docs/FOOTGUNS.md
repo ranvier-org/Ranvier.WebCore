@@ -54,6 +54,14 @@ Each entry: what happens, why, and what to do instead.
 - **Do instead:** re-check `main` before each dispatch. `collect-owner` always ends red by design; read its output
   rather than its status.
 
+### A cleanup misses files loaded by a computed path
+
+- **What happens:** a file looks unreferenced and is deleted, then a release job fails to open it.
+- **Why:** `Path(__file__).parent / 'cases.json'` never contains the file's repository path, so a search for the
+  path finds nothing. `tests/p7_gpu_qualification/cases.json` survived the CI cleanup (#338) only through review.
+- **Do instead:** before deleting a data file, search for its bare filename as well as its path, and run every
+  `build.yml` job that could load it.
+
 ## Hashes and packages
 
 ### Hash-pinned JSON depends on exact bytes
@@ -99,3 +107,9 @@ Each entry: what happens, why, and what to do instead.
 - **Why:** the shell layers rewrite the text between you and the program.
 - **Do instead:** write scripts and commit messages to files and pass the file path (`python -I script.py`,
   `git commit -F message.txt`).
+
+### Git Bash rewrites `rev:path` arguments
+
+- **What happens:** `git show origin/main:path/to/file` fails or reads the wrong file.
+- **Why:** MSYS converts arguments that look like POSIX paths into Windows paths.
+- **Do instead:** `export MSYS_NO_PATHCONV=1` before the command.

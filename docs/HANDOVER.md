@@ -23,6 +23,12 @@ re-check the live source (`pins.json`, `patches/series`, the header) before rely
 The Cocoa evidence (#211, #224, #275) is replay run 41774985234 of `public-cocoa-contracts.yml`, merged through
 PRs #329, #335, #336 and #337.
 
+## CI
+
+PR #338 removed every completed per-release route: 22 workflows, 20 `build.yml` jobs with their inputs, and the
+scripts and tests that only those routes used. Four workflows remain (`build.yml`, `triage.yml`,
+`public-cocoa-contracts.yml`, `atspi-provider.yml`); `docs/CI.md` describes them.
+
 ## Open
 
 - **#176 compositor and presentation.**
