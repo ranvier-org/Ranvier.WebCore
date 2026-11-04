@@ -784,6 +784,7 @@ jobs:
     if: >-
       ${{ !cancelled() && inputs.rids == '' && (inputs.flavor == '' || inputs.flavor == 'slim') && !(github.event_name == 'pull_request' && !startsWith(github.head_ref, 'codex/batch-') && !contains(github.event.pull_request.labels.*.name, 'full-matrix')) && (needs.native.result == 'success' || needs.native.result == 'skipped') && (needs.prebuilt.result == 'success' || needs.prebuilt.result == 'skipped') && needs.package-contract.result == 'success' }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           - rid: linux-x64
@@ -812,7 +813,7 @@ jobs:
       - name: Install the provider build and protocol client prerequisites
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build pkg-config libglib2.0-dev libatspi2.0-dev python3-gi gir1.2-atspi-2.0 dbus-x11 fonts-dejavu-core unzip
+          sudo apt-get install -y cmake ninja-build pkg-config libglib2.0-dev libatspi2.0-dev python3-gi gir1.2-atspi-2.0 at-spi2-core dbus-x11 fonts-dejavu-core unzip
           sudo apt-get install -y libharfbuzz-icu0 libicu74 libjpeg-turbo8 libepoxy0 libgcrypt20 libsoup-3.0-0 libtasn1-6 libxkbcommon0 libxml2 libpng16-16t64 libsqlite3-0 libwebp7 libwebpdemux2 libwebpmux3 zlib1g libfreetype6 libfontconfig1 libwoff1 libdrm2 libegl1 libgles2 liblcms2-2 libatomic1
       - name: Stage this run's host
         run: |
