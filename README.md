@@ -7,6 +7,7 @@ NuGet packages for `win-x64`, `win-arm64`, `linux-x64`, `linux-arm64` and `osx-a
 |---|---|
 | `Ranvier.WebCore` | Managed interop for the C ABI (`include/RanvierWebCoreAbi.h` in the native packages). |
 | `Ranvier.WebCore.Native` | Aggregate of the five Slim runtime packages. |
+| `Ranvier.WebCore.Native.Gpu` | Aggregate of the four GPU runtime packages, with the Slim host for `win-arm64`. |
 | `Ranvier.WebCore.Native.<rid>` | Slim flavor: presentation-focused WebKit, CPU painting. |
 | `Ranvier.WebCore.Native.Gpu.<rid>` | GPU flavor: Slim plus accelerated compositing and native GPU frames. |
 | `Ranvier.WebCore.Accessibility.Atspi` | Optional Linux AT-SPI accessibility provider. |

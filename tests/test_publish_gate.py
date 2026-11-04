@@ -20,21 +20,39 @@ def permits_publish(native='success', prebuilt='skipped', managed='success', con
     return eval(' '.join(expression.split()), {'__builtins__': {}}, {'startsWith': lambda value, prefix: value.startswith(prefix)})
 
 
-def permits_gpu_cohort(native='success', prebuilt='skipped', publish='success', cancelled=False,
-                               event='push', ref='refs/tags/v0.1.1-preview.2'):
+def plan_cells(event='push', ref='refs/tags/v0.1.2-rc.1', flavor='slim', rids='', release=None):
+    """The matrix and prebuilt cells the plan job writes for one event, with the release API answering `release`."""
+    import io, json, os, tempfile, urllib.error
+    from unittest import mock
     workflow = (ROOT / '.github/workflows/build.yml').read_text()
-    job = workflow.split('\n  gpu-cohort:\n', 1)[1]
-    expression = job.split('if:', 1)[1].split('${{', 1)[1].split('}}', 1)[0]
-    success = all(status == 'success' for status in [native, prebuilt, publish])
-    # GitHub implicitly adds success() unless a status-check function is present in the actual condition.
-    if not re.search(r'\b(?:success|failure|cancelled|always)\s*\(', expression):
-        expression = 'success() && (' + expression + ')'
-    for name, value in [('github.event_name', event), ('github.ref', ref), ('needs.publish.result', publish)]:
-        expression = expression.replace(name, repr(value))
-    expression = expression.replace('!cancelled()', repr(not cancelled)).replace('success()', repr(success))
-    expression = expression.replace('&&', ' and ').replace('||', ' or ')
-    return eval(' '.join(expression.split()), {'__builtins__': {}},
-                {'startsWith': lambda value, prefix: value.startswith(prefix)})
+    job = workflow.split('\n  plan:\n', 1)[1].split('\n  prebuilt:\n', 1)[0]
+    script = job.split('        run: |\n', 1)[1]
+    script = '\n'.join(line[10:] for line in script.splitlines())
+
+    def answer(request, timeout):
+        if release is None:
+            raise urllib.error.HTTPError(request.full_url, 404, 'Not Found', {}, None)
+        return io.BytesIO(json.dumps(release).encode())
+
+    with tempfile.TemporaryDirectory() as directory:
+        output = Path(directory) / 'output'
+        env = dict(RIDS=rids, HEAD_REF='', FULL_LABEL='false', FLAVOR=flavor, GH_TOKEN='token', GITHUB_EVENT_NAME=event,
+                   GITHUB_REF=ref, GITHUB_REPOSITORY_OWNER='owner', GITHUB_REPOSITORY='owner/repo',
+                   GITHUB_API_URL='https://api.example', GITHUB_OUTPUT=str(output))
+        cwd = os.getcwd()
+        os.chdir(ROOT)
+        try:
+            with mock.patch.dict(os.environ, env), mock.patch('urllib.request.urlopen', answer), \
+                    mock.patch('builtins.print'):
+                exec(compile(script, 'plan', 'exec'), {'__name__': 'plan'})
+        finally:
+            os.chdir(cwd)
+        values = dict(line.split('=', 1) for line in output.read_text().splitlines())
+
+    def cells(key):
+        return [(c['rid'], c['flavor']) for c in json.loads(values[key])['include']] if values[key] else []
+
+    return cells('matrix'), cells('prebuilt')
 
 
 class PublishGateTests(unittest.TestCase):
@@ -78,38 +96,46 @@ class PublishGateTests(unittest.TestCase):
         self.assertIn('python -I tests/test_publish_gate.py', workflow)
 
 
-class GpuCohortTests(unittest.TestCase):
-    def test_successful_tag_publication_survives_the_skipped_optional_ancestor(self):
-        for native, prebuilt in [('success', 'skipped'), ('skipped', 'success')]:
-            with self.subTest(native=native, prebuilt=prebuilt):
-                self.assertTrue(permits_gpu_cohort(native=native, prebuilt=prebuilt))
+class FlavorMatrixTests(unittest.TestCase):
+    SLIM = [(rid, 'slim') for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64', 'osx-arm64']]
+    GPU = [(rid, 'gpu') for rid in ['win-x64', 'linux-x64', 'linux-arm64', 'osx-arm64']]
 
-    def test_gpu_recovery_dispatch_does_not_recurse_or_run_after_failed_publication(self):
-        self.assertFalse(permits_gpu_cohort(event='workflow_dispatch'))
-        self.assertFalse(permits_gpu_cohort(ref='refs/heads/main'))
-        self.assertFalse(permits_gpu_cohort(cancelled=True))
-        for publish in ['failure', 'cancelled', 'skipped']:
-            with self.subTest(publish=publish):
-                self.assertFalse(permits_gpu_cohort(publish=publish))
+    def test_a_version_tag_builds_both_flavors_in_one_run(self):
+        self.assertEqual(plan_cells(), (self.SLIM + self.GPU, []))
 
-    def test_successful_version_tag_dispatches_the_matching_supported_gpu_cohort(self):
+    def test_branches_and_pull_requests_build_slim_only(self):
+        self.assertEqual(plan_cells(ref='refs/heads/main')[0], self.SLIM)
+        self.assertEqual(plan_cells(event='pull_request', ref='refs/pull/1/merge')[0], [('win-x64', 'slim')])
+
+    def test_a_manual_run_builds_its_selected_flavor_and_runtimes(self):
+        self.assertEqual(plan_cells(event='workflow_dispatch', flavor='gpu', rids='win-x64,osx-arm64')[0],
+                         [('win-x64', 'gpu'), ('osx-arm64', 'gpu')])
+
+    def test_an_owner_attached_package_moves_only_its_own_cell_to_prebuilt(self):
+        release = {'author': {'login': 'owner'},
+                   'assets': [{'name': 'Ranvier.WebCore.Native.Gpu.linux-x64.0.1.2-rc.1.nupkg', 'uploader': {'login': 'owner'}}]}
+        matrix, prebuilt = plan_cells(release=release)
+        self.assertEqual(prebuilt, [('linux-x64', 'gpu')])
+        self.assertIn(('linux-x64', 'slim'), matrix)
+        self.assertNotIn(('linux-x64', 'gpu'), matrix)
+
+    def test_cells_read_their_flavor_and_do_not_queue_behind_each_other(self):
         workflow = (ROOT / '.github/workflows/build.yml').read_text()
-        self.assertIn('\n  gpu-cohort:\n', workflow)
-        job = workflow.split('\n  gpu-cohort:\n', 1)[1]
-        self.assertIn('needs: publish', job)
-        self.assertIn("github.event_name == 'push'", job)
-        self.assertIn("startsWith(github.ref, 'refs/tags/v')", job)
-        self.assertIn("needs.publish.result == 'success'", job)
-        self.assertIn('actions: write', job)
-        self.assertIn('--ref "$GITHUB_REF_NAME"', job)
-        self.assertIn('--field flavor=gpu --field rids=win-x64,linux-x64,linux-arm64,osx-arm64', job)
-        self.assertIn('GH_TOKEN: ${{ github.token }}', job)
+        self.assertNotIn('\n  gpu-cohort:\n', workflow)
+        for name in ['prebuilt', 'native']:
+            job = workflow.split(f'\n  {name}:\n', 1)[1].split('\n    steps:\n', 1)[0]
+            with self.subTest(job=name):
+                self.assertIn('FLAVOR: ${{ matrix.flavor }}', job)
+                self.assertNotIn('inputs.flavor', job)
+        native = workflow.split('\n  native:\n', 1)[1]
+        self.assertIn("format('native-{0}-{1}-{2}', github.run_id, matrix.rid, matrix.flavor)", native)
+        self.assertIn('BUILD_DIR: ${{ matrix.work }}/build-${{ matrix.flavor }}', native)
 
-    def test_flavor_runs_do_not_cancel_the_matching_slim_tag_run(self):
+    def test_managed_packs_the_gpu_aggregate_from_the_tag_run(self):
         workflow = (ROOT / '.github/workflows/build.yml').read_text()
-        group = re.search(r'^  group: (.+)$', workflow, re.MULTILINE)[1]
-        self.assertIn("inputs.flavor || 'slim'", group)
-        self.assertIn('github.ref', group)
+        job = workflow.split('\n  managed:\n', 1)[1].split('\n  atspi:\n', 1)[0]
+        self.assertIn('pattern: package-*-gpu', job)
+        self.assertIn('packages/Ranvier.WebCore.Native.Gpu.[0-9]*.nupkg', job)
 
 
 if __name__ == '__main__':

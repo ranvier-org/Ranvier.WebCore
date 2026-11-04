@@ -11,7 +11,7 @@ consumer-facing model (tree, events, actions, text) is in `docs/ACCESSIBILITY.md
   generated from eight XML files of the pinned WebKit source; `THIRD-PARTY.md` records those inputs and the
   system dependencies.
 - No WebCore, JavaScriptCore, GLib, GIO, GObject or libatspi binary. The application selects a matching
-  `Ranvier.WebCore.Native` (Slim) or `Ranvier.WebCore.Native.Gpu` host separately. GLib, GIO and GObject come
+  `Ranvier.WebCore.Native` (Slim) or `Ranvier.WebCore.Native.Gpu` (GPU) aggregate separately. GLib, GIO and GObject come
   from the operating system; libatspi serves build headers and independent test clients only.
 
 ## Behaviour

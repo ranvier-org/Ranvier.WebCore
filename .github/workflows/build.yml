@@ -108,8 +108,10 @@ jobs:
           if-no-files-found: ignore
 
   plan:
-    # The matrix, filtered by the manual run's rids input. On a version tag whose release holds a runtime's
-    # package, attached by scripts/release.py as the repository owner, that runtime goes to prebuilt instead.
+    # The matrix of runtime and flavor cells, filtered by the manual run's rids input. A version tag push builds
+    # the Slim runtimes and the GPU runtimes side by side, so one publish releases both flavors. On a version tag
+    # whose release holds a cell's package, attached by scripts/release.py as the repository owner, that cell goes
+    # to prebuilt instead.
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.plan.outputs.matrix }}
@@ -149,6 +151,11 @@ jobs:
           include = [r for r in runtimes if not wanted or r['rid'] in wanted]
           if not include:
               raise SystemExit(f'no runtime matches {wanted}')
+          # Windows ARM64 has no GPU build; the GPU aggregate takes its Slim package (scripts/package_managed.py).
+          gpu_rids = ('win-x64', 'linux-x64', 'linux-arm64', 'osx-arm64')
+          cells = [dict(r, flavor=os.environ['FLAVOR']) for r in include]
+          if os.environ['GITHUB_EVENT_NAME'] == 'push' and os.environ['GITHUB_REF'].startswith('refs/tags/v'):
+              cells += [dict(r, flavor='gpu') for r in include if r['rid'] in gpu_rids]
           prebuilt = []
           ref, owner = os.environ['GITHUB_REF'], os.environ['GITHUB_REPOSITORY_OWNER']
           if ref.startswith('refs/tags/v'):
@@ -165,13 +172,14 @@ jobs:
               # Only the owner's: anyone who can push a tag could otherwise attach a package to be published.
               assets = {a['name'] for a in release['assets'] if a['uploader']['login'] == owner} \
                   if release and release['author']['login'] == owner else set()
-              package = json.load(open('pins.json'))['package']['id'] + {'slim': '', 'gpu': '.Gpu', 'lean': '.Lean'}[os.environ['FLAVOR']]
-              for runtime in include:
-                  name = f"{package}.{runtime['rid']}.{tag[1:]}.nupkg"
+              base = json.load(open('pins.json'))['package']['id']
+              for cell in cells:
+                  name = f"{base}{ {'slim': '', 'gpu': '.Gpu', 'lean': '.Lean'}[cell['flavor']] }.{cell['rid']}.{tag[1:]}.nupkg"
                   if name in assets:
-                      prebuilt.append(dict(runtime, asset=name))
-          build = [r for r in include if r['rid'] not in {p['rid'] for p in prebuilt}]
-          print('build:', *(r['rid'] for r in build), '- prebuilt:', *(p['rid'] for p in prebuilt))
+                      prebuilt.append(dict(cell, asset=name))
+          done = {(p['rid'], p['flavor']) for p in prebuilt}
+          build = [c for c in cells if (c['rid'], c['flavor']) not in done]
+          print('build:', *(f"{c['rid']}/{c['flavor']}" for c in build), '- prebuilt:', *(f"{p['rid']}/{p['flavor']}" for p in prebuilt))
           with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
               # An empty string for an empty list, which the jobs' conditions test.
               out.write('matrix=' + (json.dumps(dict(include=build)) if build else '') + '\n')
@@ -187,7 +195,7 @@ jobs:
       matrix: ${{ fromJSON(needs.plan.outputs.prebuilt) }}
     runs-on: ${{ matrix.runner }}
     env:
-      FLAVOR: ${{ inputs.flavor || 'slim' }}
+      FLAVOR: ${{ matrix.flavor }}
     steps:
       - uses: actions/checkout@v4
 
@@ -250,16 +258,16 @@ jobs:
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 360
     concurrency:
-      group: ${{ github.ref == 'refs/heads/main' && matrix.rid == 'win-x64' && 'build-sccache-main-writer' || format('native-{0}-{1}', github.run_id, matrix.rid) }}
+      group: ${{ github.ref == 'refs/heads/main' && matrix.rid == 'win-x64' && 'build-sccache-main-writer' || format('native-{0}-{1}-{2}', github.run_id, matrix.rid, matrix.flavor) }}
       cancel-in-progress: false
     permissions:
       contents: read
       # Deleting the build tree a run has superseded (docs/CI.md, "Build tree").
       actions: write
     env:
-      FLAVOR: ${{ inputs.flavor || 'slim' }}
+      FLAVOR: ${{ matrix.flavor }}
       RANVIER_WORK: ${{ matrix.work }}
-      BUILD_DIR: ${{ matrix.work }}/build-${{ inputs.flavor || 'slim' }}
+      BUILD_DIR: ${{ matrix.work }}/build-${{ matrix.flavor }}
       # The build tree is restored on every run but a clean one, and saved where later runs can restore it: a
       # branch's runs see its own entries and the default branch's, a pull request's its own and its base's, a tag
       # only the default branch's.
@@ -758,12 +766,19 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
+      # The Slim runtimes, and on a version tag the GPU runtimes, for the two native aggregates.
       - uses: actions/download-artifact@v4
         with:
           pattern: package-*-slim
           merge-multiple: true
           path: packages
-      - name: Pack the ABI-matched managed interop and native aggregate
+      - uses: actions/download-artifact@v4
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          pattern: package-*-gpu
+          merge-multiple: true
+          path: packages
+      - name: Pack the ABI-matched managed interop and native aggregates
         shell: bash
         run: |
           version=$(python -c "import json; print(json.load(open('pins.json'))['package']['version'])")
@@ -775,6 +790,7 @@ jobs:
           path: |
             packages/Ranvier.WebCore.[0-9]*.nupkg
             packages/Ranvier.WebCore.Native.[0-9]*.nupkg
+            packages/Ranvier.WebCore.Native.Gpu.[0-9]*.nupkg
           # The native RID packages are already retained by their platform jobs.
 
   atspi:
@@ -934,20 +950,4 @@ jobs:
         env:
           NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
         run: dotnet nuget push "**/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY" --skip-duplicate
-
-  gpu-cohort:
-    needs: publish
-    if: >-
-      ${{ !cancelled() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && needs.publish.result == 'success' }}
-    runs-on: ubuntu-latest
-    permissions:
-      actions: write
-      contents: read
-    steps:
-      - name: Build and publish the matching supported GPU packages
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: >-
-          gh workflow run build.yml --repo "$GITHUB_REPOSITORY" --ref "$GITHUB_REF_NAME"
-          --field flavor=gpu --field rids=win-x64,linux-x64,linux-arm64,osx-arm64
 
