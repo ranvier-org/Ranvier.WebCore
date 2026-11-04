@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "armed": false,
+  "armed": true,
   "publicationEnabled": false,
   "version": "0.1.1-preview.12",
   "productSource": "d31c3631ed4bbe6520f7f5f7c7e7d34499c38122",
