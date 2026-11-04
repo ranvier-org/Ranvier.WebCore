@@ -1,8 +1,7 @@
-# Passive capability observations
+# Capability queries
 
-H07 adds six read-only host exports in ABI28/Native20. The existing host ABI and
-all generated DOM contracts remain available. Native19/ABI27 is the integration
-parent; managed surface versions are allocated independently.
+Six read-only host exports report what the loaded host exports, implements and enables. The queries
+change no state.
 
 Each query returns independent Exported, Implemented, Enabled, Permitted and
 Available facts, using -1 for unknown,0 for no and1 for yes. ABI feature names
@@ -39,21 +38,18 @@ are exactly0/1. String lengths and capacities count UTF-8 bytes without any copi
 NUL terminator. A size query/undersized buffer reports the length and leaves the
 buffer untouched. Wrong-kind getters leave every output untouched.
 
-The normal prepare path installs both capability .inc files alongside the host.
-The catalogue checker covers current profile switches and canonical ABI/model
-names without changing the DOM generator. Non-Windows/official-package proof is
-reported separately from private Windows source/runtime proof.
+The prepare step installs both capability `.inc` files (`host/RanvierCapabilities.inc`,
+`host/RanvierCapabilityCatalogue.inc`) alongside the host. `scripts/capability_catalogue.py --check` verifies
+the catalogue against the profile switches and the canonical ABI names. Capability discovery never selects an
+SVG view or changes SVG state.
 
-S06 view selection is a separately scoped host operation in the same producer
-cohort. Capability discovery never invokes it or changes SVG state.
-
-B06 adds three facilities. "media-capabilities" is implemented when rv_abi_has reports the
+Media capabilities add three facilities. "media-capabilities" is implemented when rv_abi_has reports the
 rv_media_decoding_info family. "media-decoding-provider" and "media-encoding-provider" are implemented
-and available when a media engine configuration provider answers MediaCapabilities queries. No current
-flavor has one (the engine's providers are Cocoa and GStreamer only), so every valid query answers
+and available when a media engine configuration provider answers MediaCapabilities queries. No
+flavor provides one (the engine's providers are Cocoa and GStreamer only), so every valid query answers
 unsupported, not smooth and not power efficient. Neither facility enables playback, a codec or a setting.
 
-R12 adds "snapshot-options" (implemented when rv_abi_has reports rv_host_snapshot), "snapshot-display-p3"
+Snapshots add "snapshot-options" (implemented when rv_abi_has reports rv_host_snapshot), "snapshot-display-p3"
 (implemented and available when the engine compiles the DisplayP3 destination color space, which slim does not)
 and "image-encoding-png", "image-encoding-jpeg" and "image-encoding-webp" (the engine's encoders for
 MIMETypeRegistry::isSupportedImageMIMETypeForEncoding). A snapshot never substitutes another color space or

@@ -5,7 +5,7 @@ The ABI supports three styles of clipboard and drag and drop. An app picks one p
 | Style | Who moves the data | What the app does | Platforms |
 |---|---|---|---|
 | **App** | The app, through ABI callbacks | Maps the host's text, HTML and custom types to the OS clipboard or drag session, or keeps them in-process | All |
-| **Native** | WebCore's own platform code | Nothing | Windows (OLE) and macOS (NSPasteboard). Linux has no display connection, so there it is the App style |
+| **Native** | WebCore's own platform code | Nothing | Clipboard only: Windows (OLE) and macOS (NSPasteboard). Linux has no display connection, so there it is the App style. Drag and drop has no Native style |
 | **DOM** | The page | Nothing: the page handles `copy`, `cut` and `paste` events, and does its own dragging with pointer events | All |
 
 In every style the page sees the standard DOM events. `copy`, `cut` and `paste` fire with a
@@ -82,28 +82,24 @@ int32_t rv_host_set_drag(RvHost*, int32_t style);
      through `rv_host_drag`.
   4. The app ends it with `rv_drag_end(drag, x, y, operation)`, which fires `dragend` with the operation
      the target accepted, or none when cancelled.
-- **Native:** the host hands WebCore's platform drag to the OS: OLE `DoDragDrop` on Windows, an
-  `NSDraggingSession` on macOS.
+- **Native:** `rv_host_set_drag(host, RV_DRAG_NATIVE)` returns `RV_ERR_UNSUPPORTED`. Drags use the App or DOM style.
 - **DOM:** no drag starts. `draggable` has no effect beyond the attribute, and the page drags with pointer
   events.
 
-## Order of work
+## Status
 
-1. **Done:** clipboard in the App, DOM and Native styles (ABI 18). The Native clipboard style calls
-   WebCore's own commands.
-2. **Done:** drags into the page in the App and DOM styles (ABI 19).
-3. **Done:** drags out of the page in the App style, through a host `DragClient` (ABI 20).
-4. **Done:** the DataTransfer object model (generated `rv_dom_data_transfer_*`, `DragEvent.dataTransfer`,
-   `ClipboardEvent.clipboardData`, `InputEvent.dataTransfer`), file payloads both ways, and `rv_host_replace_range`
-   for `insertReplacementText` edits with target ranges (I07, T09, T04; source patch 0041). A range of another
-   document returns `RV_ERR_WRONG_HOST`, as anchors of another host do since G14 (batch 3).
-5. **Next:** the Native drag style. Windows first, where WebCore's code already talks to OLE, then macOS,
-   which needs a pasteboard strategy that calls NSPasteboard.
+- Clipboard: App, DOM and Native styles (ABI 18). The Native style calls WebCore's own commands.
+- Drags into the page: App and DOM styles (ABI 19).
+- Drags out of the page: App style, through a host `DragClient` (ABI 20).
+- DataTransfer object model (generated `rv_dom_data_transfer_*`, `DragEvent.dataTransfer`,
+  `ClipboardEvent.clipboardData`, `InputEvent.dataTransfer`), file payloads both ways, and `rv_host_replace_range`
+  for `insertReplacementText` edits with target ranges (source patch 0041). A range of another document returns
+  `RV_ERR_WRONG_HOST`.
+- Native drag style: unsupported.
 
 ## Source patch 0041
 
 `DataTransfer::allowsFileAccess` returned false on every port but Cocoa (and GTK/WPE in-memory pastes), so no
 `dataTransfer.files`, file item or `Files` type reached a page on Windows or Linux. On the remaining ports the patch
 allows file access when the pasteboard holds in-memory file contents, which the host's transfer pasteboard reports for
-app File payloads. WebCore's own pasteboards report file paths and stay hidden. `docs/data-transfer-evidence/red`
-holds the RED measurement on Native46, and `tests/abi/data_transfer.py` the files read in drops and pastes.
+app File payloads. WebCore's own pasteboards report file paths and stay hidden. `tests/abi/data_transfer.py` exercises the files read in drops and pastes.

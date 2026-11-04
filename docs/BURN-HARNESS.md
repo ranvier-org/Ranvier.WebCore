@@ -17,6 +17,3 @@ normal shell status.
 Load generators are capped at six. Each burner exits after 1,500 seconds, and `start_burners`
 registers `stop_burners` for exit and signal cleanup. Diagnostics should still call
 `stop_burners` after each run so they do not rely on the timeout.
-
-The original flake diagnostic copies were kept read-only. Their source hashes and consumer paths
-are recorded in [`issue213-source-provenance.json`](issue213-source-provenance.json).

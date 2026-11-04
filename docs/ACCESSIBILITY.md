@@ -4,7 +4,12 @@ The host exposes the accessibility tree WebCore builds for a page, so that an ap
 offscreen can present it to screen readers through the platform's own API: UI Automation on Windows,
 NSAccessibility on macOS, AT-SPI on Linux. The app owns the platform objects; the ABI gives it the tree to
 mirror, the events that say when to read it again, and the actions an assistive technology performs.
-`rv_abi_has("accessibility")` reports the group.
+`rv_abi_has("accessibility")` reports the group; `accessibility-events`, `accessibility-text`, `accessibility-relations`
+and `accessibility-text-style` report its parts.
+
+WebCore's accessibility mode, the 71 folded `RV_ROLE_*` values (with `RV_AX_ROLE_NAME` for the finer ARIA role)
+and asynchronous event delivery on the next run loop cycle are described in the sections below. The lean flavor keeps
+patch 0011 off, so it has the tree and no events.
 
 ## Windows UI Automation bridge
 
@@ -61,10 +66,10 @@ port is the platform layer that turns the tree into the platform API:
 | Port | Platform layer in WebCore | How it reaches assistive technology | Relevance to the host |
 |---|---|---|---|
 | Windows (`PORT=Win`) | `accessibility/win`: 4 files. MSAA event posting with `NotifyWinEvent`, and an abstract `AccessibilityObjectWrapper` (an `IUnknown`) with no implementation in WebCore | WebKitLegacy implemented the MSAA objects; it is gone from WebKit. Events need the page's `HWND` (`ChromeClient::platformPageClient`), which an offscreen host has none of | The app writes the UI Automation provider; the ABI is the only path. |
-| macOS (`PORT=Mac`) | `accessibility/mac` and `cocoa`: `WebAccessibilityObjectWrapperMac`, an `NSAccessibility` element per object, posting notifications itself. The isolated tree (`ENABLE_ACCESSIBILITY_ISOLATED_TREE`) answers queries off the main thread | Through the wrappers, which an `NSView` returns as its accessibility children (`AXCoreObject::platformElement()` is exported) | The app mirrors the ABI's tree, as on Windows (see Decisions); the wrappers stay unused. |
-| Linux (`PORT=WPE`) | `accessibility/atspi`: a complete AT-SPI implementation over D-Bus (`USE_ATSPI` is always on for WPE; `USE_ATK`, which `config/wpe.cmake` turns off, only adds the ATK bridge) | `AccessibilityAtspi::connect(busAddress)` registers the page on the accessibility bus; WPE's UI process normally does this | The app mirrors the ABI's tree, as on Windows (see Decisions); WebCore's AT-SPI objects stay unconnected. |
+| macOS (`PORT=Mac`) | `accessibility/mac` and `cocoa`: `WebAccessibilityObjectWrapperMac`, an `NSAccessibility` element per object, posting notifications itself. The isolated tree (`ENABLE_ACCESSIBILITY_ISOLATED_TREE`) answers queries off the main thread | Through the wrappers, which an `NSView` returns as its accessibility children (`AXCoreObject::platformElement()` is exported) | The app mirrors the ABI's tree, as on Windows; the wrappers stay unused. |
+| Linux (`PORT=WPE`) | `accessibility/atspi`: a complete AT-SPI implementation over D-Bus (`USE_ATSPI` is always on for WPE; `USE_ATK`, which `config/wpe.cmake` turns off, only adds the ATK bridge) | `AccessibilityAtspi::connect(busAddress)` registers the page on the accessibility bus; WPE's UI process normally does this | The app mirrors the ABI's tree, as on Windows; WebCore's AT-SPI objects stay unconnected. |
 
-So the tree is present, built and correct on every port; an offscreen host lacks only a way to read it and
+So the tree is present and built on every port; an offscreen host lacks only a way to read it and
 to hear its changes. The ABI adds both, on every port alike.
 
 ## Turning it on
@@ -227,36 +232,6 @@ The host computes these from WebCore's editing primitives (`TextIterator`, `Visi
 selection), which WebCore already exports, rather than from `AXTextMarker`, whose members are not exported
 and differ between the Cocoa and other ports. So the text functions add no export to patch 0010.
 
-## Decisions
-
-Settled by the user on 2026-10-27:
-
-- **Version.** Part of `rv_abi_version` 20, with the `rv_abi_has` groups `accessibility`,
-  `accessibility-events` and `accessibility-text`.
-- **Lifecycle.** WebCore's accessibility mode is per process: on while any host has accessibility on, and
-  back off when the last host turns it off.
-- **Lean flavor.** Patch 0011 stays off in the lean flavor, which therefore has the tree and no events.
-- **One bridge.** macOS and Linux use the same ABI tree as Windows, not WebCore's own NSAccessibility
-  wrappers or AT-SPI objects.
-- **Text ranges** are in scope (the section above).
-- **Roles.** The 71 folded `RV_ROLE_*` values stay; `RV_AX_ROLE_NAME` gives the finer ARIA role.
-- **Events** are delivered asynchronously on the next run loop cycle, with no flush call.
-
-## Size
-
-Measured on Windows x64, slim flavor, against the same build without these changes (2026-10-27):
-
-| File | Before | After | Change |
-|---|---|---|---|
-| `WebCore.dll` | 45,457,920 | 45,460,480 | +2,560 bytes: patch 0011's hooks and three exports |
-| `RanvierWebCoreHost.dll` | 160,256 | 189,440 | +29,184 bytes: the ABI's accessibility and text functions |
-| Package (24 files) | 77,688,017 | 77,719,761 | +31,744 bytes |
-
-The tree itself costs nothing in the package: WebCore compiles it on every port whether or not anything
-reads it. At run time a host with accessibility on keeps an accessibility object per exposed node and
-updates the tree as the page changes, which costs memory and time in proportion to the page (E); a host
-with it off costs nothing.
-
 ## Relations
 
 `rv_ax_relations` (`accessibility-relations`, ABI49) writes a node's ARIA relationship targets for one of eight kinds:
@@ -284,22 +259,16 @@ is gone returns `RV_ERR_DETACHED`. `ariaActionsElements` reports `RV_ERR_UNSUPPO
   to the host thread, as every call of the ABI requires. WebCore's isolated tree, which answers off the
   main thread on macOS, is not used.
 
-## Platform bridges: help wanted
+## Platform bridges
 
-The ABI above is complete for a first bridge, but no bridge exists yet: nothing turns the tree into UI
-Automation, NSAccessibility or AT-SPI objects, so a page rendered through the host is invisible to screen
-readers today. Each bridge is self-contained work against this document, and a good place to contribute. The
-native path's window layer is SDL3, which gives a bridge the platform window it attaches to
-(`SDL_PROP_WINDOW_WIN32_HWND_POINTER`, `SDL_PROP_WINDOW_COCOA_WINDOW_POINTER`, the X11 or Wayland handles).
-Where the bridges live (one package per platform, or one with three back ends) is open: propose it in an issue.
+| Platform | Bridge |
+|---|---|
+| Windows | The host's UI Automation bridge (above). |
+| Linux | The optional `Ranvier.WebCore.Accessibility.Atspi` provider, which mirrors the tree onto the AT-SPI bus through GDBus. It requires a host with `accessibility-text-style` and is packaged for `linux-x64` only. See `providers/atspi/README.md`. |
+| macOS | None ships. The app mirrors the ABI's tree into `NSAccessibilityElement` objects, using the Events and Actions tables. |
 
-| Platform | The bridge | Notes |
-|---|---|---|
-| Windows | A UI Automation provider: `IRawElementProviderFragmentRoot` for the window, `IRawElementProviderFragment` per `RvAxNode`, returned from `WM_GETOBJECT` with `UiaReturnRawElementProvider`, and the patterns in the Actions and Text sections | SDL3 owns the window procedure, so `WM_GETOBJECT` is caught with `SDL_SetWindowsMessageHook` or a window subclass. From .NET, `[GeneratedComInterface]` keeps the COM interop AOT-compatible. UI Automation calls arrive on its own threads and are marshalled to the host thread |
-| macOS | An `NSAccessibilityElement` per node, returned from the content view's `accessibilityChildren`, posting the notifications in the Events table | From .NET through the Objective-C runtime (`objc_msgSend`, `class_addMethod`), which stays AOT-compatible without a binding library |
-| Linux | AT-SPI over D-Bus: find the accessibility bus with `org.a11y.Bus.GetAddress`, register the root, and implement `org.a11y.atspi.Accessible`, `Component`, `Action`, `Value` and `Text` | AT-SPI offsets count characters, not UTF-16 code units (see Text). Tmds.DBus is a managed D-Bus client |
-
-Each bridge maps roles with the Roles table, events with the Events table, and actions with the Actions table;
-detached nodes answer as the Lifetime section says. Check a bridge with the platform's inspector and a screen
-reader: Accessibility Insights and Narrator or NVDA on Windows, Accessibility Inspector and VoiceOver on macOS,
-Accerciser and Orca on Linux. `tests/abi/Accessibility.fs` shows the calls in order on a real page.
+An app-written bridge maps roles with the Roles table, events with the Events table and actions with the
+Actions table; detached nodes answer as the Lifetime section says. AT-SPI offsets count characters, not UTF-16
+code units. Check a bridge with the platform's inspector and a screen reader: Accessibility Insights and Narrator
+or NVDA on Windows, Accessibility Inspector and VoiceOver on macOS, Accerciser and Orca on Linux.
+`tests/abi/Accessibility.fs` shows the calls in order on a real page.

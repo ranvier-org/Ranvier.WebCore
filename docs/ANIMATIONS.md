@@ -1,11 +1,56 @@
-# Animation timelines (A06 document timelines; A07 scroll timelines; A08 view timelines and ranges)
+# Web Animations
 
-These groups extend the Web Animations surface of `docs/WEB-ANIMATIONS-PLAN.md`. Timeline handles are
+## Surface
+
+The DOM generator produces the Web Animations interfaces from WebKit's IDL (`docs/GENERATOR.md`, "JavaScript object
+arguments and custom constructors"):
+
+| Interface | Handle | Members |
+|---|---|---|
+| `Animation` (IDL `WebAnimation`) | `RvEventTarget` | id, effect, timeline, startTime, currentTime, playbackRate, overallProgress, playState, replaceState, pending; play, pause, finish, cancel, reverse, updatePlaybackRate, persist, commitStyles; `rv_dom_web_animation_create` |
+| `AnimationEffect`, `KeyframeEffect` | `RvAnimationEffect` | target, pseudoElement, composite, iterationComposite, setKeyframes; `rv_dom_keyframe_effect_create_3` and `_create_1` (copy); runtime type query |
+| `AnimationTimeline`, `DocumentTimeline` | `RvAnimationTimeline` | currentTime, duration; `rv_dom_document_timeline_create`; runtime type query |
+| `Element` | `RvNode` | animate, getAnimations; `Document.timeline` and `getAnimations` |
+
+The Promises `ready` and `finished` are not mapped. The `finish`, `cancel` and `remove` events reach
+`rv_event_target_add_listener`. `rv_animation_as_event_target` maps a CSS-animation `RvAnimation` to its `RvEventTarget`.
+
+Effect timing adds getTiming and getComputedTiming (owned `RvDomEffectTiming` and `RvDomComputedEffectTiming` results), updateTiming
+(with a checked context Document) and getKeyframes (an owned `RvDomSequenceComputedKeyframe`); `tests/abi/web_animation_effects.py`
+replays its oracle. Discovery adds CSSAnimation.animationName, CSSTransition.transitionProperty and the Animation runtime type
+query; `tests/abi/web_animation_discovery.py` correlates document, element and subtree getAnimations, the effect, target
+and timeline links and handle identity (also through `rv_animation_as_event_target`). `tests/abi/web_animation_commit.py`
+verifies commitStyles; `tests/fixtures/web-animation-commit-qualified.json` records two engine differences.
+
+## Test oracle
+
+`tests/abi/web_animations.py` replays `tests/fixtures/web-animations-cases.json` (23 cases and 17 error cases) against
+the Chromium oracle `tests/fixtures/web-animations-oracle.json`. Each case pauses and seeks; the probe compares play
+state, current time, computed values and rendered pixels, with a tolerance of 2 per channel for alpha rounding. 
+
+## Qualifications
+
+- **Refused microtask drain.** Element.animate, the KeyframeEffect constructor and setKeyframes build their keyframes
+  under the JavaScript lock. Releasing the lock at depth 0 drains JSC's microtask queue, and the queue is not empty
+  (load and window-proxy creation fill it). The drain attempts a VM entry, which the host's DisallowVMEntry refuses.
+  No script runs, and the page's canary script stays unrun. Three rounds of 1000 calls keep the private memory flat.
+  Calls that take no JavaScript lock run with JSC's crash on a disallowed VM entry armed: Animation construction and
+  control, the effect and timeline members, and the timeline constructor. A child process proves the crash is armed.
+  Painting is outside the armed scope, because the rendering update attempts its own VM entry.
+- **Keyframe input form.** The native transport is the keyframe-sequence form. Property-indexed keyframes
+  (`{ opacity: [0, 1] }`) are a browser-only input shape.
+- **Absent and null timeline.** In the shared F# contract, an omitted timeline and `Some null` are both the document
+  timeline. `AnimationService.CreateAnimationWithoutTimeline` creates an animation with no timeline.
+
+# Timelines
+
+Timeline handles are `RvAnimationTimeline` references; `rv_dom_animation_timeline_get_interface_name` names the runtime type.
+Timeline handles are
 `RvAnimationTimeline` references; `rv_dom_animation_timeline_get_interface_name` names the runtime type.
 
-## A06: document timelines
+## Document timelines
 
-A06 adds no export. The A01 surface covers it: `Document.timeline` (`rv_dom_document_get_timeline`), the
+Document timelines need no export beyond the surface above: `Document.timeline` (`rv_dom_document_get_timeline`), the
 `DocumentTimeline` constructor with `originTime` (`rv_dom_document_timeline_create`), and `AnimationTimeline.currentTime`
 and `duration`.
 
@@ -13,15 +58,14 @@ and `duration`.
 |---|---|
 | `Document.timeline`, `AnimationTimeline.currentTime`, `AnimationTimeline.duration`, `new DocumentTimeline(options)` | Supported |
 | `DocumentTimeline.maximumFrameRate`, `Animation.frameRate` | Unsupported: `[EnabledBySetting=WebAnimationsCustomFrameRateEnabled]`, a testable WebKit setting that is off; Chromium has neither member. No export. |
-| `DocumentTimeline.animate(CustomEffectCallback)` | Covered by A09 |
+| `DocumentTimeline.animate(CustomEffectCallback)` | Custom effects (`tests/abi/custom_effects.py`) |
 
 `tests/abi/animation_timelines.py` compares with the Chromium oracle `tests/fixtures/animation-timelines-oracle.json`:
 the current time of a timeline with origins 100, 0, -50 and 1e9 against `document.timeline` (to within a microsecond),
 the null duration, the inactive timeline of a document without a browsing context and an animation played on it, start
 times shared by animations started before one rendering update, and timelines held past `rv_host_destroy`, which read a
 null current time. Teardown kind "document timeline" proves a held timeline and an animation on it keep no document alive.
-The timeline calls run with JSC's crash on a disallowed VM entry armed. The evidence files are in
-`docs/animation-timelines-evidence/`.
+The timeline calls run with JSC's crash on a disallowed VM entry armed.
 
 ### Qualifications
 
@@ -29,10 +73,10 @@ The timeline calls run with JSC's crash on a disallowed VM entry armed. The evid
   the document timeline time as its start time (`AnimationTimelinesController::processPendingAnimations`). An animation
   on `new DocumentTimeline({originTime})` starts at the document time, not at the document time minus `originTime`,
   as Chromium and the specification give. `tests/fixtures/animation-timelines-qualified.json` records both values.
-- **Cancel with a pending pause task.** Cancelling rejects the ready promise, which attempts a VM entry (A03). The
+- **Cancel with a pending pause task.** Cancelling rejects the ready promise, which attempts a VM entry. The
   armed scope settles the pause with `finish` first.
 
-## A07: scroll timelines
+## Scroll timelines
 
 The DOM generator produces `ScrollTimeline` from WebKit's IDL; the pinned WebKit enables it without a setting.
 
@@ -63,7 +107,7 @@ removed source. Teardown kind "scroll timeline" proves a held timeline and an an
   the last effect value until the target's style is next invalidated; Chromium drops it at once. The probe asserts both
   values and that a restyle matches Chromium.
 
-## A08: view timelines and animation ranges
+## View timelines and animation ranges
 
 | Function | Contract |
 |---|---|
