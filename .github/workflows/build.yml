@@ -61,6 +61,7 @@ jobs:
       - run: python -I tests/test_build_sccache_launcher.py
       - run: python -I tests/test_sccache_workflow.py
       - run: python -I tests/test_cache_scope.py
+      - run: python -I tests/test_tree_artifacts.py
       - run: python -I tests/test_host_prepare.py
       - run: python -I tests/test_mutation_contract.py
       - run: python -I tests/test_mutation_routing.py
@@ -464,10 +465,22 @@ jobs:
           key: ${{ steps.keys.outputs.tree }}
           restore-keys: ${{ steps.keys.outputs.tree-restore }}
 
+      # The cache holds no GPU tree; a GPU cell restores the tree an earlier release tag's run left as an artifact, by
+      # the cache's own key order (docs/CI.md, "GPU build trees"). A failed restore builds without a tree.
+      - name: Restore the GPU build tree of an earlier release
+        id: gpu-tree
+        if: env.TREE_RESTORE == 'true' && matrix.flavor == 'gpu' && steps.tree.outputs.cache-matched-key == ''
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXACT: ${{ steps.keys.outputs.tree }}
+          PREFIXES: ${{ steps.keys.outputs.tree-restore }}
+        run: python -I scripts/tree_artifacts.py restore --build "$BUILD_DIR" --exact "$EXACT" --prefixes "$PREFIXES"
+
       # A restored tree holds vcpkg_installed under the same vcpkg key, so vcpkg installs nothing and needs no archives.
       - name: Restore vcpkg archives
         id: vcpkg
-        if: runner.os == 'Windows' && steps.tree.outputs.cache-matched-key == ''
+        if: runner.os == 'Windows' && steps.tree.outputs.cache-matched-key == '' && steps.gpu-tree.outputs.matched-key == ''
         uses: actions/cache/restore@v4
         with:
           path: C:\rw\vcpkg-archives
@@ -617,6 +630,34 @@ jobs:
         run: |
           gh api --method DELETE "repos/$GITHUB_REPOSITORY/actions/caches?key=$STALE&ref=$GITHUB_REF" \
             || echo "no entry $STALE under $GITHUB_REF"
+
+      # For the next release tag's GPU cell; an exact restore has nothing new. A failure here costs that cell a cold
+      # build, never this release.
+      - name: Pack the GPU build tree for the next release
+        id: pack-gpu-tree
+        if: >-
+          matrix.flavor == 'gpu' && startsWith(github.ref, 'refs/tags/v') &&
+          steps.gpu-tree.outputs.matched-key != steps.keys.outputs.tree
+        continue-on-error: true
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/gpu-tree"
+          python -I scripts/tree_artifacts.py pack --build "$BUILD_DIR" --output "$RUNNER_TEMP/gpu-tree/tree.tar.gz"
+
+      - name: Upload the GPU build tree
+        if: steps.pack-gpu-tree.outcome == 'success'
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.keys.outputs.tree }}
+          path: ${{ runner.temp }}/gpu-tree/tree.tar.gz
+          retention-days: 90
+          compression-level: 0
+
+      - name: Delete the packed GPU build tree
+        if: steps.pack-gpu-tree.outcome != 'skipped'
+        shell: bash
+        run: rm -rf "$RUNNER_TEMP/gpu-tree"
 
       - name: Package
         run: python scripts/build.py package --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
