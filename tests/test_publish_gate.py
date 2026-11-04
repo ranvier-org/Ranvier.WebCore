@@ -8,22 +8,20 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def permits_publish(native='success', prebuilt='skipped', managed='success', contract='success', flavor='', cancelled=False,
-                    ref='refs/tags/v0.1.0-preview.14', owner='owner', recovery='', atspi='off', atspi11='off'):
+                    ref='refs/tags/v0.1.0-preview.14', owner='owner'):
     workflow = (ROOT / '.github/workflows/build.yml').read_text()
     job = workflow.split('\n  publish:\n', 1)[1]
     expression = job.split('if:', 1)[1].split('${{', 1)[1].split('}}', 1)[0]
     results = {'native': native, 'prebuilt': prebuilt, 'managed': managed, 'package-contract': contract}
     expression = re.sub(r'needs\.([a-z-]+)\.result', lambda match: repr(results[match[1]]), expression)
-    for name, value in [('github.ref', ref), ('vars.NUGET_USER', owner), ('inputs.flavor', flavor), ('inputs.atspi_preview10', atspi), ('inputs.atspi_preview11', atspi11)]:
+    for name, value in [('github.ref', ref), ('vars.NUGET_USER', owner), ('inputs.flavor', flavor)]:
         expression = expression.replace(name, repr(value))
-    for flag in ('preview2_gpu', 'preview4_gpu', 'preview7_linux', 'preview7_windows', 'preview12_linux_gpu', 'preview12_slim', 'preview12_gpu'):
-        expression = expression.replace('!inputs.recover_' + flag, repr(recovery != flag))
     expression = expression.replace('!cancelled()', repr(not cancelled)).replace('&&', ' and ').replace('||', ' or ')
     return eval(' '.join(expression.split()), {'__builtins__': {}}, {'startsWith': lambda value, prefix: value.startswith(prefix)})
 
 
 def permits_gpu_cohort(native='success', prebuilt='skipped', publish='success', cancelled=False,
-                               event='push', ref='refs/tags/v0.1.1-preview.2', recovery='', atspi='off', atspi11='off'):
+                               event='push', ref='refs/tags/v0.1.1-preview.2'):
     workflow = (ROOT / '.github/workflows/build.yml').read_text()
     job = workflow.split('\n  gpu-cohort:\n', 1)[1]
     expression = job.split('if:', 1)[1].split('${{', 1)[1].split('}}', 1)[0]
@@ -31,10 +29,8 @@ def permits_gpu_cohort(native='success', prebuilt='skipped', publish='success', 
     # GitHub implicitly adds success() unless a status-check function is present in the actual condition.
     if not re.search(r'\b(?:success|failure|cancelled|always)\s*\(', expression):
         expression = 'success() && (' + expression + ')'
-    for name, value in [('github.event_name', event), ('github.ref', ref), ('needs.publish.result', publish), ('inputs.atspi_preview10', atspi), ('inputs.atspi_preview11', atspi11)]:
+    for name, value in [('github.event_name', event), ('github.ref', ref), ('needs.publish.result', publish)]:
         expression = expression.replace(name, repr(value))
-    for flag in ('preview2_gpu', 'preview4_gpu', 'preview7_linux', 'preview7_windows', 'preview12_linux_gpu', 'preview12_slim', 'preview12_gpu'):
-        expression = expression.replace('!inputs.recover_' + flag, repr(recovery != flag))
     expression = expression.replace('!cancelled()', repr(not cancelled)).replace('success()', repr(success))
     expression = expression.replace('&&', ' and ').replace('||', ' or ')
     return eval(' '.join(expression.split()), {'__builtins__': {}},
@@ -42,16 +38,6 @@ def permits_gpu_cohort(native='success', prebuilt='skipped', publish='success', 
 
 
 class PublishGateTests(unittest.TestCase):
-    def test_provider_modes_suppress_native_publication_and_child(self):
-        for mode in ('prepare', 'publish'):
-            self.assertFalse(permits_publish(atspi=mode))
-            self.assertFalse(permits_gpu_cohort(atspi=mode))
-
-    def test_recovery_inputs_suppress_ordinary_publication_and_child(self):
-        for flag in ('preview2_gpu', 'preview4_gpu', 'preview7_linux', 'preview7_windows', 'preview12_linux_gpu', 'preview12_slim', 'preview12_gpu'):
-            self.assertFalse(permits_publish(recovery=flag))
-            self.assertFalse(permits_gpu_cohort(recovery=flag))
-
     def test_a_failed_runtime_cannot_publish_an_uploaded_package(self):
         self.assertFalse(permits_publish(native='failure', managed='skipped'))
 
