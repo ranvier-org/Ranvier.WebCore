@@ -416,6 +416,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.14'
+      - run: python -I tests/test_public_cocoa_replay.py
+      - run: python -I tests/test_public_cocoa_replay_workflow.py
       - run: python -I tests/atspi/test_preview11_publication.py
       - run: python -I tests/atspi/test_preview11_relay.py
       - run: python -I tests/atspi/test_arm64_managed.py

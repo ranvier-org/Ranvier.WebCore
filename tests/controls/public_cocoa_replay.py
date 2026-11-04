@@ -131,6 +131,18 @@ def run_default_references(source, output, inputs, environment):
     return result
 
 
+def run_identity(environment):
+    return {key: environment.get('GITHUB_' + key.upper()) for key in ['repository', 'ref', 'sha', 'run_id', 'run_attempt']}
+
+
+def final_acceptance(controller_exit, contract, default_appearance, run):
+    """Whether the replay qualifies the signed cohort: the controller and the default references passed,
+    in a run of the WebCore main branch."""
+    return (controller_exit == 0 and contract.get('accepted') is True
+            and default_appearance.get('acceptedAsReferences') is True
+            and run.get('repository') == 'ranvier-org/Ranvier.WebCore' and run.get('ref') == 'refs/heads/main')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ['inputs', 'source', 'output']:
@@ -148,7 +160,8 @@ def main():
     if output.exists() or output.is_relative_to(source):
         raise ValueError('Require a fresh owned replay directory')
     output.mkdir(parents=True)
-    receipt = dict(accepted=False, controllerSource=head, inputsSha256=sha(args.inputs), packages={})
+    receipt = dict(accepted=False, controllerSource=head, inputsSha256=sha(args.inputs),
+                   run=run_identity(os.environ), packages={})
     try:
         artifact = inputs['artifact']
         if type(artifact['id']) is not int or artifact['id'] <= 0 or not re.fullmatch('[a-f0-9]{64}', artifact['sha256']):
@@ -204,8 +217,8 @@ def main():
         if data.get('inputsUnchanged') is True and all(name in admission and admission[name].get('exit') == 0 and not admission[name].get('failure')
                for name in ['verify-public-signature', 'verify-interop-signature', 'loaded-abi64-349']):
             receipt['defaultAppearance'] = run_default_references(source, output, inputs, environment)
-        receipt['accepted'] = (receipt['controllerExit'] == 0 and data.get('accepted') is True
-                               and receipt.get('defaultAppearance', {}).get('acceptedAsReferences') is True)
+        receipt['accepted'] = final_acceptance(receipt['controllerExit'], data,
+                                               receipt.get('defaultAppearance', {}), receipt['run'])
     except Exception as error:
         receipt['failure'] = repr(error)
         raise
