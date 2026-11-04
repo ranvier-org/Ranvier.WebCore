@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "armed": true,
-  "publicationEnabled": true,
+  "armed": false,
+  "publicationEnabled": false,
   "productSource": "d31c3631ed4bbe6520f7f5f7c7e7d34499c38122",
   "version": "0.1.1-preview.12",
   "controllerSource": "9f544fb67a4205cf3fb41c24db7545ca8f8d4651",
