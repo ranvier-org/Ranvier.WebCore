@@ -109,9 +109,9 @@ tree's key names the toolchain.
 - A tag run saves none of these entries. A later run cannot restore an entry saved under a tag, so it would
   only take space from the default branch's entries: until 2026-11-04 every release tag saved its own copy
   of the 140 MB `vcpkg-win-x64-gpu-*` archives.
-- The GPU flavor's build trees are not cached. They would be restorable only if saved by `main`, which builds
-  Slim only, and the four of them (about 2.7 GB) do not fit beside the Slim trees, LLVM and vcpkg within the
-  repository's 10 GB, so GPU cells build cold in every tag run.
+- The GPU flavor's build trees are not in the cache. They would be restorable only if saved by `main`, which
+  builds Slim only, and the four of them (about 2.7 GB) do not fit beside the Slim trees, LLVM and vcpkg within
+  the repository's 10 GB. They travel as artifacts instead ([GPU build trees](#gpu-build-trees)).
 - A config edit changes neither vcpkg key unless it changes the manifest features. Until 2026-11-01 the key
   ended in a hash of all of `config/`: each config edit saved a new 272 to 412 MB entry, the repository
   reached its 10 GB limit, and GitHub evicted the entries a run then missed (19 minutes of vcpkg builds on
@@ -153,6 +153,21 @@ tree-<rid>-<flavor>-<WebKit pin>-<toolchain>-<core>-<host>
   that `main`'s push saved. Pushes to `codex/batch-*` do not start this workflow; their pull request's runs
   save under the pull request's ref.
 - A manual run with `clean` builds from an empty tree.
+
+### GPU build trees
+
+A tag run's GPU cell packs its tree with `scripts/tree_artifacts.py pack` and uploads it as an artifact named by
+the tree's cache key, kept for 90 days. A GPU cell whose cache restore found nothing, in any later run, restores
+with `tree_artifacts.py restore`. The order is the cache's: the exact key, else the newest artifact under the first
+matching restore prefix, so a tree crosses releases only within one WebKit pin and toolchain. A restored tree goes
+through `normalise` like a cached one.
+
+- Artifacts have their own storage, free for this public repository, and any later run can download them, which
+  the cache does not offer a tag. About 2.7 GB per release, expiring after 90 days.
+- Pack and upload are `continue-on-error`: a failure costs the next release's GPU cell a cold build, never this
+  release. A failed restore deletes any partial tree and builds without one.
+- The restore streams the tarball out of the downloaded zip into `tar`, so the tarball and the tree are never both
+  on the macOS runner's single volume. On Windows it uses GNU tar from Git for Windows, as the tree's paths need.
 
 Checkout and the WebKit fetch give every source a new modification time, which ninja reads as a change to every
 file. The tree therefore carries `ranvier-sources.json`: the git blob id and modification time, in seconds, of
