@@ -4,6 +4,7 @@ import hashlib
 import importlib.util
 import json
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
@@ -28,6 +29,9 @@ ORIGINAL_MAC_CONTROL = '131a73e1a1189afecf83a40ee50226da7a04e2c3'
 CAPTURE_PREFIX = 'product-gates/mac-gpu-public-qualification/'
 CAPTURES = ({f'cycle{index}-{phase}.bmp' for index in range(3) for phase in ('before', 'after')}
             | {f'input-{scale}-{phase}.bmp' for scale in (10, 15, 20) for phase in ('first', 'flipped', 'scrolled')})
+# The immutable test at PRODUCT asserts ABI63 before any pixel work; corrected test G changes only that assertion.
+WINDOWS_GUARD = 'Verify Windows same-document transition snapshot pixels'
+WINDOWS_PROBE_STEP = 'Run the probes'
 PUBLIC_STEPS = {'presenter-sdk', 'presenter-flags', 'compile-spike', 'public-spike',
                 'compile-texture_input', 'public-texture_input', 'reject-software', 'reject-steady-base-repaint'}
 
@@ -41,6 +45,10 @@ def admit_policy(policy):
             and all(digest(value) for value in policy['packageHashes'].values()), 'All four package hashes are required')
     require(type(policy.get('producerRun')) is int and policy['producerRun'] > 0, 'Original producer run is required')
     slim.admit_artifact_record(policy['windowsArtifact'], 'package-win-x64-gpu')
+    probes = policy.get('windowsProbes', {})
+    slim.admit_artifact_record(probes.get('artifact', {}), 'probe-logs-win-x64-gpu')
+    require(digest(probes.get('summarySha256')) and digest(probes.get('failureLogSha256')),
+            'Windows probe summary and ABI guard log hashes are required')
     mac = policy['mac']
     require(mac.get('originalRun') == ORIGINAL_MAC_RUN and mac.get('originalController') == ORIGINAL_MAC_CONTROL,
             'Original Mac recovery identity differs')
@@ -86,6 +94,7 @@ def verify_package(package, rid, expected):
 
 
 def admit_windows_run(run, jobs):
+    """Admits the producer's Windows job when packaging succeeded and the probe step is its only failure."""
     slim.repo_run(run)
     require(run.get('head_sha') == PRODUCT and run.get('head_branch') == 'v' + VERSION
             and run.get('event') == 'workflow_dispatch' and run.get('path') == '.github/workflows/build.yml'
@@ -93,7 +102,38 @@ def admit_windows_run(run, jobs):
             'Original GPU producer identity/outcome differs')
     require(jobs.get('total_count') == len(jobs.get('jobs', [])), 'Producer jobs are incomplete')
     selected = [job for job in jobs['jobs'] if job['name'].startswith('native (win-x64,')]
-    require(len(selected) == 1 and selected[0].get('conclusion') == 'success', 'Actual Windows native job did not pass')
+    require(len(selected) == 1 and selected[0].get('conclusion') == 'failure', 'Actual Windows native job outcome differs')
+    steps = selected[0].get('steps', [])
+    package = [step for step in steps if step.get('name') == 'Package']
+    failures = [step.get('name') for step in steps if step.get('conclusion') not in ('success', 'skipped')]
+    require(len(package) == 1 and package[0].get('conclusion') == 'success' and failures == [WINDOWS_PROBE_STEP],
+            'Windows producer failure was not solely the probe step after packaging')
+
+
+def verify_windows_probes(archive_path, record, expected):
+    """Requires every Windows probe to pass except the pinned ABI63 transition guard."""
+    with zipfile.ZipFile(archive_path) as archive:
+        slim.safe_names(archive)
+        summary = archive.read('summary.txt')
+        require(hashlib.sha256(summary).hexdigest() == record['summarySha256'], 'Windows probe summary hash differs')
+        lines = summary.decode('utf-8').splitlines()
+        require(len(lines) == len(expected), 'Windows probe inventory is incomplete')
+        failed = []
+        for line, entry in zip(lines, expected):
+            match = re.fullmatch(r'(PASS|FAIL)\s+[0-9.]+ s\s+(.+)', line)
+            require(match is not None, 'Unrecognized Windows summary row')
+            outcome, rest = match.groups()
+            if outcome == 'PASS':
+                require(rest == entry['name'], 'Windows probe name/order differs')
+                continue
+            require(entry['name'] == WINDOWS_GUARD and rest.startswith(WINDOWS_GUARD + '  '), 'Unexpected Windows producer failure')
+            log_name = rest.rsplit(', ', 1)[-1]
+            require(re.fullmatch('[a-zA-Z0-9.-]+\\.log', log_name) is not None, 'Windows failure log path differs')
+            data = archive.read(log_name)
+            require(hashlib.sha256(data).hexdigest() == record['failureLogSha256'] and b'windows_view_transition_pixels.py' in data
+                    and b'== 63' in data and b'AssertionError' in data, 'Windows failure is not the retained ABI guard RED')
+            failed.append(entry['name'])
+        require(failed == [WINDOWS_GUARD], 'Exactly the known Windows ABI guard failure is required')
 
 
 def one_package(archive_path, output):
@@ -276,6 +316,10 @@ def export(args, policy):
     windows_zip = slim.artifact(policy['windowsArtifact'], policy['producerRun'], PRODUCT, windows_dir)
     windows = one_package(windows_zip, windows_dir)
     verify_package(windows, 'win-x64', policy['packageHashes']['win-x64'])
+    probe_zip = slim.artifact(policy['windowsProbes']['artifact'], policy['producerRun'], PRODUCT, windows_dir)
+    plan = load(args.test_source.resolve(strict=True) / 'scripts/probes.py', 'windows_probe_plan')
+    verify_windows_probes(probe_zip, policy['windowsProbes'],
+                          [entry for entry in plan.PROBES if plan.applies(entry, 'win-x64', 'gpu')])
     mac_dir = output / 'mac'
     mac_dir.mkdir()
     mac = mac_inputs(policy, mac_dir)
