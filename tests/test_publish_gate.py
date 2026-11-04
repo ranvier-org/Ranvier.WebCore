@@ -7,12 +7,12 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def permits_publish(native='success', prebuilt='skipped', managed='success', contract='success', flavor='', cancelled=False,
+def permits_publish(native='success', prebuilt='skipped', managed='success', contract='success', flavor='', cancelled=False, atspi='success',
                     ref='refs/tags/v0.1.0-preview.14', owner='owner'):
     workflow = (ROOT / '.github/workflows/build.yml').read_text()
     job = workflow.split('\n  publish:\n', 1)[1]
     expression = job.split('if:', 1)[1].split('${{', 1)[1].split('}}', 1)[0]
-    results = {'native': native, 'prebuilt': prebuilt, 'managed': managed, 'package-contract': contract}
+    results = {'native': native, 'prebuilt': prebuilt, 'managed': managed, 'package-contract': contract, 'atspi-package': atspi}
     expression = re.sub(r'needs\.([a-z-]+)\.result', lambda match: repr(results[match[1]]), expression)
     for name, value in [('github.ref', ref), ('vars.NUGET_USER', owner), ('inputs.flavor', flavor)]:
         expression = expression.replace(name, repr(value))
@@ -59,6 +59,12 @@ class PublishGateTests(unittest.TestCase):
         for flavor in ['', 'slim']:
             self.assertFalse(permits_publish(managed='skipped', flavor=flavor))
 
+    def test_full_slim_release_requires_the_atspi_provider_package(self):
+        for status in ['failure', 'skipped', 'cancelled']:
+            with self.subTest(status=status):
+                self.assertFalse(permits_publish(atspi=status))
+        self.assertTrue(permits_publish(managed='skipped', atspi='skipped', flavor='gpu'))
+
     def test_manual_gpu_and_lean_keep_the_selected_runtime_gate(self):
         for flavor in ['gpu', 'lean']:
             self.assertTrue(permits_publish(managed='skipped', flavor=flavor))
@@ -68,7 +74,7 @@ class PublishGateTests(unittest.TestCase):
         workflow = (ROOT / '.github/workflows/build.yml').read_text()
         job = workflow.split('\n  publish:\n', 1)[1]
         needs = re.search(r'^    needs: \[([^]]+)\]', job, re.MULTILINE)[1]
-        self.assertEqual({name.strip() for name in needs.split(',')}, {'native', 'prebuilt', 'managed', 'package-contract'})
+        self.assertEqual({name.strip() for name in needs.split(',')}, {'native', 'prebuilt', 'managed', 'atspi-package', 'package-contract'})
         self.assertIn('python -I tests/test_publish_gate.py', workflow)
 
 
