@@ -8,13 +8,15 @@ import shutil
 import subprocess
 import zipfile
 
+SUPPORTED_ABIS = (63, 64)
+
 
 def select_runtime(manifest, rid):
     schema = manifest.get('schemaVersion', 1)
     if type(schema) is not int or schema not in [1, 2]:
         raise ValueError('Unsupported provider manifest schema.')
-    if type(manifest.get('abi')) is not int or manifest['abi'] != 63 or manifest.get('hostBundled') is not False:
-        raise ValueError('Require the ABI63 optional provider without a bundled Host.')
+    if type(manifest.get('abi')) is not int or manifest['abi'] not in SUPPORTED_ABIS or manifest.get('hostBundled') is not False:
+        raise ValueError('Require an ABI63 or ABI64 optional provider without a bundled Host.')
     if schema == 2:
         runtimes = manifest.get('runtimes')
         if not rid or not isinstance(runtimes, dict) or rid not in runtimes:
@@ -26,7 +28,7 @@ def select_runtime(manifest, rid):
         rid = manifest.get('rid')
         selected = manifest
     if (rid not in ['linux-x64', 'linux-arm64'] or not isinstance(selected, dict)
-            or selected.get('rid') != rid or type(selected.get('abi')) is not int or selected['abi'] != 63):
+            or selected.get('rid') != rid or type(selected.get('abi')) is not int or selected['abi'] != manifest['abi']):
         raise ValueError('Selected runtime RID/ABI record is malformed.')
     for field in ['hostSha256', 'providerSha256']:
         if not isinstance(selected.get(field), str) or not re.fullmatch('[0-9a-f]{64}', selected[field]):

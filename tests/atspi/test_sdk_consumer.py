@@ -36,6 +36,13 @@ class SdkConsumerTests(unittest.TestCase):
             value=aggregate();value[key]=bad
             with self.subTest(key=key,bad=bad),self.assertRaises(ValueError):consumer.select_runtime(value,'linux-x64')
 
+    def test_abi64_aggregate_is_selected_and_mixed_abis_are_rejected(self):
+        value=aggregate();value['abi']=64
+        for record in value['runtimes'].values():record['abi']=64
+        self.assertEqual(consumer.select_runtime(value,'linux-arm64'),value['runtimes']['linux-arm64'])
+        value['runtimes']['linux-x64']['abi']=63
+        with self.assertRaises(ValueError):consumer.select_runtime(value,'linux-x64')
+
     def test_output_requires_exact_selected_hash_and_architecture_without_host(self):
         import hashlib
         data=bytearray(64);data[:6]=b'\x7fELF\x02\x01';data[18:20]=(62).to_bytes(2,'little')

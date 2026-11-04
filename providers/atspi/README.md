@@ -52,11 +52,22 @@ identities (`Ranvier.Private.*`, version `0.0.0-private*` or `0.0.0-ci.<run>`). 
 the caller-supplied source revision and cohort label as unverified claims, the host and provider hashes and the
 payload hashes. Compare those hashes with the producer's receipts.
 
+## Release package
+
+Every Slim release run of `.github/workflows/build.yml` builds the public `Ranvier.WebCore.Accessibility.Atspi`
+package at the release version:
+
+1. The `atspi` job builds the provider on `linux-x64` and `linux-arm64` against the run's own Slim host and runs
+   the same checks as `atspi-provider.yml` (the ABI is 64). It records each build in `build-receipt.json`.
+2. The `atspi-package` job packs both builds with `providers/atspi/release.py`, then checks the SDK's RID
+   selection with `tests/atspi/consumer.py --layout-only`.
+3. `publish` pushes it with the rest of the release; a full Slim release requires it.
+
 ## Using the package
 
-Reference the package beside the application's chosen host package. The SDK copies
-`runtimes/linux-x64/native/libRanvierWebCoreAtspi.so` into the RID-specific publish output, next to
+Reference the package beside a `Ranvier.WebCore.Native` package of the same version. The SDK copies
+`runtimes/<rid>/native/libRanvierWebCoreAtspi.so` into the RID-specific publish output, next to
 `libRanvierWebCoreHost.so`. Native consumers `#include "RanvierAtspi.h"`.
 
-Only `linux-x64` is packaged. `linux-arm64` is source-only (`package.py` admits it only as a test-only artifact); Windows uses
-the UI Automation bridge in the host; macOS has no adapter.
+The package covers `linux-x64` and `linux-arm64`. Windows uses the UI Automation bridge in the host, and macOS has
+no adapter.

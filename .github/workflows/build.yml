@@ -49,6 +49,8 @@ jobs:
       - run: python -I tests/abi/test_abi_expectation.py
       - run: python -I tests/gpu/test_linux_transition_abi.py
       - run: python -I tests/atspi/test_distribution.py
+      - run: python -I tests/atspi/test_release.py
+      - run: python -I tests/atspi/test_sdk_consumer.py
       - run: python -I tests/test_native_media.py
       - run: python -I tests/test_background_clip_policy.py
       - run: python -I tests/test_producer_gpu_clipping.py
@@ -775,15 +777,144 @@ jobs:
             packages/Ranvier.WebCore.Native.[0-9]*.nupkg
           # The native RID packages are already retained by their platform jobs.
 
+  atspi:
+    # Builds the AT-SPI provider against this run's Linux Slim hosts and qualifies it on the runtime's own runner,
+    # for every release that packs the managed cohort.
+    needs: [native, prebuilt, package-contract]
+    if: >-
+      ${{ !cancelled() && inputs.rids == '' && (inputs.flavor == '' || inputs.flavor == 'slim') && !(github.event_name == 'pull_request' && !startsWith(github.head_ref, 'codex/batch-') && !contains(github.event.pull_request.labels.*.name, 'full-matrix')) && (needs.native.result == 'success' || needs.native.result == 'skipped') && (needs.prebuilt.result == 'success' || needs.prebuilt.result == 'skipped') && needs.package-contract.result == 'success' }}
+    strategy:
+      matrix:
+        include:
+          - rid: linux-x64
+            runner: ubuntu-24.04
+            pack: ''
+          - rid: linux-arm64
+            runner: ubuntu-24.04-arm
+            pack: --test-only-arm64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    env:
+      EGL_PLATFORM: surfaceless
+      LIBGL_ALWAYS_SOFTWARE: '1'
+      RID: ${{ matrix.rid }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/download-artifact@v4
+        with:
+          name: package-${{ matrix.rid }}-slim
+          path: ${{ runner.temp }}/atspi/artifact
+      - name: Install the provider build and protocol client prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build pkg-config libglib2.0-dev libatspi2.0-dev python3-gi gir1.2-atspi-2.0 dbus-x11 fonts-dejavu-core unzip
+          sudo apt-get install -y libharfbuzz-icu0 libicu74 libjpeg-turbo8 libepoxy0 libgcrypt20 libsoup-3.0-0 libtasn1-6 libxkbcommon0 libxml2 libpng16-16t64 libsqlite3-0 libwebp7 libwebpdemux2 libwebpmux3 zlib1g libfreetype6 libfontconfig1 libwoff1 libdrm2 libegl1 libgles2 liblcms2-2 libatomic1
+      - name: Stage this run's host
+        run: |
+          W="$RUNNER_TEMP/atspi"; echo "W=$W" >> "$GITHUB_ENV"
+          version=$(python3 -c "import json; print(json.load(open('pins.json'))['package']['version'])")
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then version="${GITHUB_REF_NAME#v}"; fi
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+          package=$(ls "$W"/artifact/Ranvier.WebCore.Native.$RID.*.nupkg)
+          sha=$(unzip -p "$package" "runtimes/$RID/native/libRanvierWebCoreHost.so" | sha256sum | cut -d' ' -f1)
+          python3 -I tests/atspi/stage_native.py --artifacts "$W/artifact" --rid "$RID" --expected-sha256 "$sha" --output "$W/native"
+          ldd "$W/native/libRanvierWebCoreHost.so" | tee "$W/native/runtime-dependencies.txt"
+          if grep -q 'not found' "$W/native/runtime-dependencies.txt"; then exit 1; fi
+      - name: Build and install the provider
+        run: |
+          python3 -I -m unittest discover -s tests/atspi -p 'test_*.py'
+          cmake -S providers/atspi -B "$W/build" -G Ninja -DRANVIER_WEBCORE_LIBRARY:FILEPATH="$W/native/libRanvierWebCoreHost.so"
+          cmake --build "$W/build" --parallel 2
+          ctest --test-dir "$W/build" --output-on-failure
+          cmake --install "$W/build" --prefix "$W/install"
+      - name: Direct style and AT-SPI protocol runs
+        run: |
+          provider="$W/install/lib/libRanvierWebCoreAtspi.so"; host="$W/native/libRanvierWebCoreHost.so"
+          python3 -I tests/abi/accessibility_text_styles.py --native-directory "$W/native" --report "$W/direct-style-report.json"
+          python3 -I tests/atspi/run.py run --native "$host" --provider "$provider" --output "$W/protocol" --registry --extended-text
+          python3 -I tests/atspi/run.py run --native "$host" --provider "$provider" --output "$W/protocol-queued" --registry --extended-text --queued-set
+          python3 -I tests/atspi/run.py run --native "$host" --provider "$provider" --output "$W/protocol-session" --registry --extended-text --discovery session
+      - name: SDK consumer load
+        run: |
+          python3 -I providers/atspi/package.py --provider "$W/install/lib/libRanvierWebCoreAtspi.so" --native "$W/native/libRanvierWebCoreHost.so" --rid "$RID" ${{ matrix.pack }} --expected-host-abi 64 --id Ranvier.Private.Accessibility.Atspi.Qualification --version "0.0.0-ci.$GITHUB_RUN_ID" --source-revision "$GITHUB_SHA" --output "$W/package"
+          python3 -I tests/atspi/consumer.py --package "$W/package/Ranvier.Private.Accessibility.Atspi.Qualification.0.0.0-ci.$GITHUB_RUN_ID.nupkg" --native "$W/native/libRanvierWebCoreHost.so" --output "$W/consumer"
+      - name: Record the qualified build
+        run: |
+          mkdir "$W/release"
+          cp "$W/install/lib/libRanvierWebCoreAtspi.so" "$W/release/"
+          python3 -I - "$W" <<'EOF'
+          import hashlib, json, os, sys
+          from pathlib import Path
+          work = Path(sys.argv[1])
+          provider = (work / 'release/libRanvierWebCoreAtspi.so').read_bytes()
+          host = (work / 'native/libRanvierWebCoreHost.so').read_bytes()
+          receipt = json.loads((work / 'consumer/consumer-receipt.json').read_text())
+          (work / 'release/build-receipt.json').write_text(json.dumps(dict(
+              rid=os.environ['RID'], version=os.environ['VERSION'], abi=receipt['selectedRuntime']['abi'],
+              providerSha256=hashlib.sha256(provider).hexdigest(), hostSha256=hashlib.sha256(host).hexdigest(),
+              protocolPassed=True, consumerPassed=receipt['executed'], directStylePassed=True,
+              sourceCommit=os.environ['GITHUB_SHA'], run=os.environ['GITHUB_RUN_ID']), indent=2) + '\n')
+          EOF
+      - uses: actions/upload-artifact@v4
+        with:
+          name: atspi-build-${{ matrix.rid }}
+          path: ${{ env.W }}/release/
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: atspi-reports-${{ matrix.rid }}
+          path: |
+            ${{ env.W }}/native/producer-receipt.json
+            ${{ env.W }}/direct-style-report.json
+            ${{ env.W }}/protocol*/
+            ${{ env.W }}/consumer/consumer-receipt.json
+          if-no-files-found: warn
+          retention-days: 14
+
+  atspi-package:
+    # Packs the public Ranvier.WebCore.Accessibility.Atspi package at the release version from both qualified builds.
+    needs: atspi
+    if: ${{ !cancelled() && needs.atspi.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: atspi-build-*
+          path: ${{ runner.temp }}/builds
+      - name: Pack and check RID selection
+        run: |
+          version=$(python3 -c "import json; print(json.load(open('pins.json'))['package']['version'])")
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then version="${GITHUB_REF_NAME#v}"; fi
+          B="$RUNNER_TEMP/builds"
+          python3 -I providers/atspi/release.py --version "$version" --build "linux-x64=$B/atspi-build-linux-x64" --build "linux-arm64=$B/atspi-build-linux-arm64" --output packages --work "$RUNNER_TEMP/atspi-pack"
+          for rid in linux-x64 linux-arm64; do
+            python3 -I tests/atspi/consumer.py --package "packages/Ranvier.WebCore.Accessibility.Atspi.$version.nupkg" --rid "$rid" --layout-only --output "$RUNNER_TEMP/layout-$rid"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: package-atspi
+          path: packages/Ranvier.WebCore.Accessibility.Atspi.*.nupkg
+
   publish:
     # On a version tag, pushes the packages to nuget.org through trusted publishing: the job exchanges
     # GitHub's OIDC token for a one-hour API key under the nuget.org account in the repository variable
     # NUGET_USER, whose trusted publishing policy names this file. Without NUGET_USER, the packages stay
     # as workflow artifacts. Every selected runtime and the contract gate must pass before any push;
-    # a full slim release also requires the paired managed cohort.
+    # a full slim release also requires the paired managed cohort and the AT-SPI provider package.
     if: >-
-      ${{ !cancelled() && startsWith(github.ref, 'refs/tags/v') && vars.NUGET_USER != '' && needs.package-contract.result == 'success' && (needs.native.result == 'success' || needs.native.result == 'skipped') && (needs.prebuilt.result == 'success' || needs.prebuilt.result == 'skipped') && (needs.native.result == 'success' || needs.prebuilt.result == 'success') && (needs.managed.result == 'success' || (needs.managed.result == 'skipped' && (inputs.flavor == 'gpu' || inputs.flavor == 'lean'))) }}
-    needs: [native, prebuilt, managed, package-contract]
+      ${{ !cancelled() && startsWith(github.ref, 'refs/tags/v') && vars.NUGET_USER != '' && needs.package-contract.result == 'success' && (needs.native.result == 'success' || needs.native.result == 'skipped') && (needs.prebuilt.result == 'success' || needs.prebuilt.result == 'skipped') && (needs.native.result == 'success' || needs.prebuilt.result == 'success') && ((needs.managed.result == 'success' && needs.atspi-package.result == 'success') || (needs.managed.result == 'skipped' && (inputs.flavor == 'gpu' || inputs.flavor == 'lean'))) }}
+    needs: [native, prebuilt, managed, atspi-package, package-contract]
     runs-on: ubuntu-latest
     permissions:
       id-token: write
