@@ -55,6 +55,27 @@ class GpuCohort(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.package_check()
 
+    def resource_check(self, name):
+        resource = b'png'
+        self.manifest['files'].append(dict(name=name, bytes=len(resource), sha256=hashlib.sha256(resource).hexdigest()))
+        self.manifest['total_bytes'] += len(resource)
+        with zipfile.ZipFile(self.package, 'w') as archive:
+            archive.writestr('fixture.nuspec', '<package><metadata><id>Ranvier.WebCore.Native.Gpu.linux-x64</id><version>' + self.subject.VERSION + '</version></metadata></package>')
+            archive.writestr('manifest.json', json.dumps(self.manifest))
+            archive.writestr('runtimes/linux-x64/native/libRanvierWebCoreHost.so', self.data)
+            archive.writestr('runtimes/linux-x64/native/' + name, resource)
+        return self.subject.verify_package(self.package, 'linux-x64', self.subject.sha(self.package))
+
+    def test_nested_resource_payload_passes(self):
+        self.assertEqual(self.resource_check('WebKit.resources/icons/missingImage.png'), self.manifest)
+
+    def test_unsafe_manifest_names_reject(self):
+        for name in ['../escape.png', 'WebKit.resources/../../escape.png', 'WebKit.resources\\icon.png',
+                     '/abs.png', 'C:x.png', 'WebKit.resources/./icon.png']:
+            self.setUp()
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                self.resource_check(name)
+
     def test_policy_is_unarmed_and_incomplete_never_admits(self):
         policy = json.loads((ROOT / 'docs/preview12-gpu-cohort.json').read_text())
         with self.assertRaises(ValueError):
@@ -63,19 +84,56 @@ class GpuCohort(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.subject.admit_policy(policy)
 
-    def test_windows_requires_actual_success_and_complete_jobs(self):
+    def test_windows_admits_only_a_probe_step_failure_after_packaging(self):
         run = dict(status='completed', conclusion='failure', head_sha=self.subject.PRODUCT,
             head_branch='v' + self.subject.VERSION, event='workflow_dispatch', run_attempt=1,
             path='.github/workflows/build.yml', repository={'full_name': self.subject.REPO}, head_repository={'full_name': self.subject.REPO})
-        jobs = dict(total_count=1, jobs=[dict(name='native (win-x64, gpu)', conclusion='success')])
-        self.subject.admit_windows_run(run, jobs)
-        jobs['jobs'][0]['conclusion'] = 'failure'
+
+        def job(conclusion, steps):
+            return dict(total_count=1, jobs=[dict(name='native (win-x64, gpu)', conclusion=conclusion,
+                steps=[dict(name=name, conclusion=value) for name, value in steps])])
+
+        packaged = [('Package', 'success'), ('Run the probes', 'failure'), ('Upload the probe logs', 'success')]
+        self.subject.admit_windows_run(run, job('failure', packaged))
+        for conclusion, steps in [('success', packaged),
+                                  ('failure', [('Package', 'failure'), ('Run the probes', 'failure')]),
+                                  ('failure', [('Package', 'success'), ('Run the probes', 'failure'), ('Build', 'failure')]),
+                                  ('failure', [('Package', 'success'), ('Run the probes', 'success')]),
+                                  ('failure', [('Package', 'success'), ('Run the probes', 'cancelled')]),
+                                  ('failure', [('Package', 'success'), ('Run the probes', 'timed_out')]),
+                                  ('failure', [('Package', 'success'), ('Run the probes', None)])]:
+            with self.subTest(conclusion=conclusion, steps=steps), self.assertRaises(ValueError):
+                self.subject.admit_windows_run(run, job(conclusion, steps))
+        incomplete = job('failure', packaged)
+        incomplete['total_count'] = 2
         with self.assertRaises(ValueError):
-            self.subject.admit_windows_run(run, jobs)
-        jobs['jobs'][0]['conclusion'] = 'success'
-        jobs['total_count'] = 2
-        with self.assertRaises(ValueError):
-            self.subject.admit_windows_run(run, jobs)
+            self.subject.admit_windows_run(run, incomplete)
+
+    def windows_probes(self, first, log=b'tests/gpu/windows_view_transition_pixels.py\nassert ... == 63\nAssertionError\n'):
+        path = Path(self.temp.name) / 'probes.zip'
+        summary = (first + '\nFAIL 3.0 s  ' + self.subject.WINDOWS_GUARD + '  (exit code 1), 02-guard.log\n').encode()
+        with zipfile.ZipFile(path, 'w') as archive:
+            archive.writestr('summary.txt', summary)
+            archive.writestr('02-guard.log', log)
+        record = dict(summarySha256=hashlib.sha256(summary).hexdigest(), failureLogSha256=hashlib.sha256(log).hexdigest())
+        return path, record
+
+    def test_windows_probes_retain_only_the_pinned_abi_guard(self):
+        expected = [dict(name='Other native contract'), dict(name=self.subject.WINDOWS_GUARD)]
+        path, record = self.windows_probes('PASS 0.1 s  Other native contract')
+        self.subject.verify_windows_probes(path, record, expected)
+        path, record = self.windows_probes('FAIL 0.1 s  Other native contract  (exit code 1), 01-other.log')
+        with self.assertRaisesRegex(ValueError, 'Unexpected'):
+            self.subject.verify_windows_probes(path, record, expected)
+        path, record = self.windows_probes('PASS 0.1 s  Other native contract', log=b'pixel mismatch\nAssertionError\n')
+        with self.assertRaisesRegex(ValueError, 'guard'):
+            self.subject.verify_windows_probes(path, record, expected)
+        path, record = self.windows_probes('PASS 0.1 s  Other native contract')
+        with self.assertRaisesRegex(ValueError, 'inventory'):
+            self.subject.verify_windows_probes(path, record, expected[1:])
+        record['failureLogSha256'] = 'f' * 64
+        with self.assertRaisesRegex(ValueError, 'guard'):
+            self.subject.verify_windows_probes(path, record, expected)
 
     def replay_fixture(self, change=None, omit=None):
         s = self.subject
