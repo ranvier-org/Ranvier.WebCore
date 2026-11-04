@@ -26,6 +26,21 @@ Each entry: what happens, why, and what to do instead.
 - **Why:** the test matches serialization, not meaning.
 - **Do instead:** evaluate the condition for each input combination in the test.
 
+### The AT-SPI tests need `at-spi2-core` on the runner
+
+- **What happens:** `atspi (linux-x64)` fails before any assertion; the `v0.1.1-rc.1` tag run published nothing.
+- **Why:** `tests/atspi/run.py` starts `/usr/libexec/at-spi2-registryd`, which the GitHub Ubuntu images omit.
+- **Do instead:** install `at-spi2-core` in every job that runs the AT-SPI tests. `test_release.py` checks
+  `build.yml` and `atspi-provider.yml` for it.
+
+### Pinned versions in CI break on the next release
+
+- **What happens:** a workflow or test carrying `63`, `0.1.1-preview.12` or a source commit fails or silently
+  checks the old release after a bump.
+- **Why:** the number is a copy of a value with a source of truth elsewhere.
+- **Do instead:** read the ABI from `host/RanvierWebCoreAbi.cpp`, the version from `pins.json` or the tag, and a
+  dependency's commit from its published nuspec. Verify a pinned value by its published hash, never by a literal.
+
 ### A failing step skips every later step in a job
 
 - **What happens:** a new test placed after a known-red step never runs, and the job looks the same as before.
