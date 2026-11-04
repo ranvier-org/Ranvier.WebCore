@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "armed": false,
-  "publicationEnabled": false,
+  "armed": true,
+  "publicationEnabled": true,
   "version": "0.1.1-preview.12",
   "productSource": "d31c3631ed4bbe6520f7f5f7c7e7d34499c38122",
   "controllerSource": "d8c1e6442a2f1db8e1febf07a7678267c5a9069c",
@@ -69,5 +69,29 @@
       "inputsContractSha256": "dfe3b55fc23eb96615ca0829ce9e0c7b3c1f27de8d45ef19a528b5c6581e5ed5"
     }
   },
-  "qualification": null
+  "qualification": {
+    "run": 41743833879,
+    "workflowSource": "45f96cbac1ba5445f4a5a966227c403dde7ac523",
+    "policySha256": "05fbb6a50f60d56599531de446a7748ada830608954af63826c86b8a7419f526",
+    "receiptSha256": "b5dce51a8717d5ee098cc5752bdf64a47ce270d5f29a28409fa2d4659e8aaabf",
+    "proofArtifact": {
+      "id": 13282023484,
+      "name": "qualified-preview12-slim",
+      "sha256": "cf19f54031ea7b1b18e3208bc411980a6fe7820af1abe086d4216ff28c8368e2"
+    },
+    "packagesArtifact": {
+      "id": 13282753289,
+      "name": "package-preview12-slim-recovered",
+      "sha256": "cad2beb70245952e7515e47d3d5de2d0d3c777ab32aa86c9097f323a57f187a9"
+    },
+    "packageHashes": {
+      "Ranvier.WebCore": "cd27c15cee0da83fb295d24b2ef41eaafb076ca6e6af4fb7cff6ca4dd8c211c7",
+      "Ranvier.WebCore.Native": "aa2b9ca7ec8216aaeb51b262c03a537b8798d0c7c4d939f2b14bb4ac6fc0fe85",
+      "Ranvier.WebCore.Native.win-arm64": "0ee4c5bf16cc5b73be63f75ab0c068354faa4c93d9b2c3c44efa538ff2da9c4c",
+      "Ranvier.WebCore.Native.win-x64": "992ecd175196919ed7da4b232779e0edf3c141db28aa33fbbbac023841df2a02",
+      "Ranvier.WebCore.Native.osx-arm64": "5d4173fda8cf47097d7f3f2b3e8d30ede05a55ce1127bc41f330468d92905169",
+      "Ranvier.WebCore.Native.linux-arm64": "8b3ee47733f0d23b6cb1059648325d7e0062c20f3b9d9db7f6649c8ccd160051",
+      "Ranvier.WebCore.Native.linux-x64": "561ffe613020c11bd6b9c1ff780cc7960d5054c2bd168d1b8f6f415d12e655bf"
+    }
+  }
 }
