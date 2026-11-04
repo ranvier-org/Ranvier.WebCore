@@ -24,6 +24,45 @@ class PackageContract(unittest.TestCase):
         self.assertEqual(project.findtext('.//PackageId'), 'Ranvier.WebCore.Native')
         self.assertEqual(project.findtext('.//IncludeBuildOutput'), 'false')
 
+    def test_gpu_meta_depends_on_the_gpu_runtimes_and_the_slim_fallback_at_one_version(self):
+        project = ET.parse(ROOT / 'packaging/gpu/Ranvier.WebCore.Native.Gpu.Meta.csproj')
+        references = project.findall('.//PackageReference')
+        gpu = {'Ranvier.WebCore.Native.Gpu.' + rid for rid in PACKAGING.GPU_RIDS}
+        fallback = {'Ranvier.WebCore.Native.' + rid for rid in RIDS - set(PACKAGING.GPU_RIDS)}
+        self.assertEqual(fallback, {'Ranvier.WebCore.Native.win-arm64'})
+        self.assertEqual({r.get('Include') for r in references}, gpu | fallback)
+        self.assertEqual({r.get('Version') for r in references}, {'[$(Version)]'})
+        self.assertEqual(project.findtext('.//PackageId'), 'Ranvier.WebCore.Native.Gpu')
+        self.assertEqual(project.findtext('.//IncludeBuildOutput'), 'false')
+
+    def test_gpu_aggregate_needs_every_gpu_runtime_from_the_slim_identity(self):
+        version, identity = '0.1.0-preview.6', (21, 'pinned', 'same')
+
+        def write(packages, package_flavor, rid, **change):
+            manifest = dict(rid=rid, version=version, flavor=package_flavor, abi=21, webkit='pinned',
+                            source=dict(commit='same', dirty=False))
+            manifest.update(change)
+            with zipfile.ZipFile(PACKAGING.runtime_package(packages, package_flavor, rid, version), 'w') as archive:
+                archive.writestr('manifest.json', json.dumps(manifest))
+
+        with tempfile.TemporaryDirectory() as temporary:
+            packages = pathlib.Path(temporary)
+            for rid in RIDS:
+                write(packages, 'slim', rid)
+            self.assertFalse(PACKAGING.has_gpu_runtimes(packages, version, identity))
+            write(packages, 'gpu', 'win-x64')
+            with self.assertRaisesRegex(ValueError, 'missing'):
+                PACKAGING.has_gpu_runtimes(packages, version, identity)
+            for rid in PACKAGING.GPU_RIDS:
+                write(packages, 'gpu', rid)
+            self.assertTrue(PACKAGING.has_gpu_runtimes(packages, version, identity))
+            write(packages, 'gpu', 'osx-arm64', abi=22)
+            with self.assertRaisesRegex(ValueError, 'one ABI'):
+                PACKAGING.has_gpu_runtimes(packages, version, identity)
+            write(packages, 'gpu', 'osx-arm64', flavor='slim')
+            with self.assertRaisesRegex(ValueError, 'flavor differs'):
+                PACKAGING.has_gpu_runtimes(packages, version, identity)
+
     def test_managed_package_compiles_the_canonical_interop(self):
         path = ROOT / 'src/Ranvier.WebCore/Ranvier.WebCore.fsproj'
         project = ET.parse(path)

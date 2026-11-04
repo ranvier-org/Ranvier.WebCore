@@ -24,12 +24,11 @@ Jobs, in dependency order:
 | Job | Runs | Does |
 |---|---|---|
 | `package-contract` | always, on `ubuntu-latest` | The unit tests of packaging, release, probe and generator contracts (the explicit list of `python -I tests/...` steps in the job), `capability_catalogue.py --check`, `generate_native.py check`, the managed contract builds, Fantomas, Fable and Chromium proofs of the generated DOM. A new test file runs in CI only when it is added to this list. |
-| `plan` | always | Computes the runtime matrix (filtered by `rids`). On a tag whose release holds a package the repository owner attached for a runtime, that runtime goes to `prebuilt` instead of `native`. |
+| `plan` | always | Computes the matrix of runtime and flavor cells (filtered by `rids`): the selected flavor's runtimes, plus the four GPU runtimes on a `v*` tag push. On a tag whose release holds a package the repository owner attached for a cell, that cell goes to `prebuilt` instead of `native`. |
 | `prebuilt` | when `plan` lists attached packages | Downloads the package on a clean runner of its platform and runs `smoke.py`. The manifest must name the tag's commit, a clean tree and the tag's version. |
-| `native` | one job per runtime | Builds with `scripts/build.py` step by step, runs `smoke.py`, the F# ABI tests (Windows, macOS) and `scripts/probes.py`, packs the `.nupkg`, and uploads `package-*` artifacts. The five runtimes are `win-x64`, `win-arm64`, `linux-x64`, `linux-arm64`, `osx-arm64`. |
-| `managed` | after `native`, `prebuilt`, `package-contract` | Packs `Ranvier.WebCore` and the `Ranvier.WebCore.Native` aggregate from the five Slim packages with `scripts/package_managed.py`. Skipped for a pull request that is neither from a `codex/batch-*` branch nor labelled `full-matrix`. |
+| `native` | one job per runtime and flavor | Builds with `scripts/build.py` step by step, runs `smoke.py`, the F# ABI tests (Windows, macOS) and `scripts/probes.py`, packs the `.nupkg`, and uploads `package-*` artifacts. The five runtimes are `win-x64`, `win-arm64`, `linux-x64`, `linux-arm64`, `osx-arm64`. |
+| `managed` | after `native`, `prebuilt`, `package-contract` | Packs `Ranvier.WebCore` and the `Ranvier.WebCore.Native` aggregate from the five Slim packages with `scripts/package_managed.py`. On a tag it also packs the `Ranvier.WebCore.Native.Gpu` aggregate from the four GPU packages and the Slim `win-arm64` package; a partial GPU set fails the job. Skipped for a pull request that is neither from a `codex/batch-*` branch nor labelled `full-matrix`. |
 | `publish` | on a `v*` tag, when the repository variable `NUGET_USER` is set | Pushes every `package-*` artifact to nuget.org by trusted publishing. Requires `package-contract`, every selected runtime and, for a Slim release, `managed` to succeed. |
-| `gpu-cohort` | after `publish`, on a tag push | Dispatches `build.yml` with `flavor=gpu` and `rids=win-x64,linux-x64,linux-arm64,osx-arm64` on the same tag. |
 
 A pull request builds `win-x64` only. A pull request from a `codex/batch-*` branch, or one labelled `full-matrix`,
 builds every runtime; adding the label starts that run. Pushes to `main` and `v*` tags build every runtime.
@@ -42,22 +41,22 @@ workflow artifacts.
 ## Releasing
 
 1. Set `package.version` in `pins.json` and merge to `main`.
-2. Tag the merged commit `v<version>` and push the tag. `build.yml` builds the five Slim runtimes, packs the managed
-   cohort and publishes seven packages (five runtimes, `Ranvier.WebCore`, `Ranvier.WebCore.Native`), then
-   `gpu-cohort` dispatches the GPU runtimes on the same tag. Each GPU runtime must pass its native transport and
-   lifetime checks before publication: Windows runs shared D3D11 acceptance with the pinned SDL package in
+2. Tag the merged commit `v<version>` and push the tag. One `build.yml` run builds the five Slim runtimes and the
+   four GPU runtimes side by side, packs the managed package and both aggregates, and publishes every package in one
+   push: five Slim runtimes, four GPU runtimes, `Ranvier.WebCore`, `Ranvier.WebCore.Native`,
+   `Ranvier.WebCore.Native.Gpu` and the AT-SPI provider. A failed cell of either flavor blocks the whole
+   publication. Each GPU runtime must pass its native transport and lifetime checks: Windows runs shared D3D11 acceptance with the pinned SDL package in
    `scripts/sdl_runtime.py`; macOS runs the public IOSurface frame and input checks; Linux runs
    `tests/gpu/linux_egl.py` under `EGL_PLATFORM=surfaceless` and `LIBGL_ALWAYS_SOFTWARE=1`.
-3. A successful Slim run establishes only Slim availability. Check the GPU run's publication separately.
-
-To retry a GPU runtime of an existing tag:
+To build or retry GPU runtimes alone, for example on a tag that predates the combined run:
 
 ```
 gh workflow run build.yml --repo ranvier-org/Ranvier.WebCore --ref v<VERSION> --field flavor=gpu --field rids=win-x64
 ```
 
-Concurrency is keyed by tag and flavor, so a GPU dispatch cannot cancel its Slim run. Windows ARM64 GPU is not part
-of the cohort.
+A manual GPU run publishes its runtime packages only, not the GPU aggregate. Concurrency is keyed by tag and the
+selected flavor, so a GPU dispatch cannot cancel the tag's own run. Windows ARM64 has no GPU build; the GPU
+aggregate takes its Slim package.
 
 To build some packages on a workstation and the rest in CI, run `python -I scripts/release.py --rid win-x64 --work C:/rw`.
 It refuses a working tree with changes, a commit on no remote branch and a version whose tag exists; builds with

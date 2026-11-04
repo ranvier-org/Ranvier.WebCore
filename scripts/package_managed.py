@@ -1,4 +1,4 @@
-"""Build the ABI-matched managed and five-runtime aggregate packages from checked native artifacts."""
+"""Build the ABI-matched managed package and the Slim and GPU native aggregates from checked native artifacts."""
 
 import argparse
 import json
@@ -12,17 +12,27 @@ import zipfile
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 RIDS = ('win-x64', 'win-arm64', 'linux-x64', 'linux-arm64', 'osx-arm64')
+GPU_RIDS = ('win-x64', 'linux-x64', 'linux-arm64', 'osx-arm64')
+PACKAGE_PREFIX = {'slim': 'Ranvier.WebCore.Native', 'gpu': 'Ranvier.WebCore.Native.Gpu'}
 
 
-def validate_runtimes(packages, version, expected_identity):
+def runtime_package(packages, flavor, rid, version):
+    return packages / f'{PACKAGE_PREFIX[flavor]}.{rid}.{version}.nupkg'
+
+
+def read_manifests(packages, version, flavor, rids):
     manifests = []
-    for rid in RIDS:
-        path = packages / f'Ranvier.WebCore.Native.{rid}.{version}.nupkg'
+    for rid in rids:
+        path = runtime_package(packages, flavor, rid, version)
         with zipfile.ZipFile(path) as archive:
             manifest = json.loads(archive.read('manifest.json'))
-        if (manifest['rid'], manifest['version'], manifest['flavor']) != (rid, version, 'slim'):
+        if (manifest['rid'], manifest['version'], manifest['flavor']) != (rid, version, flavor):
             raise ValueError(f'{path.name}: runtime, version or flavor differs')
         manifests.append(manifest)
+    return manifests
+
+
+def validate_identity(manifests, expected_identity):
     identities = {(m['abi'], m['webkit'], m['source']['commit']) for m in manifests}
     if len(identities) != 1:
         raise ValueError('native artifacts must come from one ABI, WebKit pin and source commit')
@@ -31,6 +41,24 @@ def validate_runtimes(packages, version, expected_identity):
     if any(m['source']['dirty'] for m in manifests):
         raise ValueError('native artifacts must come from clean source trees')
     return manifests[0]['abi']
+
+
+def validate_runtimes(packages, version, expected_identity):
+    return validate_identity(read_manifests(packages, version, 'slim', RIDS), expected_identity)
+
+
+def has_gpu_runtimes(packages, version, expected_identity):
+    """True when the GPU runtimes are present and agree with the Slim runtimes; a partial GPU set raises."""
+    present = [rid for rid in GPU_RIDS if runtime_package(packages, 'gpu', rid, version).exists()]
+    if not present:
+        return False
+    if len(present) != len(GPU_RIDS):
+        missing = sorted(set(GPU_RIDS) - set(present))
+        raise ValueError(f'GPU aggregate needs every GPU runtime; missing {missing}')
+    # The Slim runtimes outside GPU_RIDS serve those runtimes in the GPU aggregate.
+    fallback = read_manifests(packages, version, 'slim', [rid for rid in RIDS if rid not in GPU_RIDS])
+    validate_identity(read_manifests(packages, version, 'gpu', GPU_RIDS) + fallback, expected_identity)
+    return True
 
 
 def checkout_identity():
@@ -43,7 +71,12 @@ def checkout_identity():
 
 
 def build(packages, version):
-    abi = validate_runtimes(packages, version, checkout_identity())
+    identity = checkout_identity()
+    abi = validate_runtimes(packages, version, identity)
+    projects = ['packaging/Ranvier.WebCore.Native.Meta.csproj', 'src/Ranvier.WebCore/Ranvier.WebCore.fsproj']
+    gpu = has_gpu_runtimes(packages, version, identity)
+    if gpu:
+        projects.append('packaging/gpu/Ranvier.WebCore.Native.Gpu.Meta.csproj')
     packages = packages.resolve()
     with tempfile.TemporaryDirectory(prefix='ranvier-pack-') as temporary:
         config = pathlib.Path(temporary) / 'NuGet.Config'
@@ -53,13 +86,13 @@ def build(packages, version):
         ET.SubElement(sources, 'add', key='checked-native', value=str(packages))
         ET.SubElement(sources, 'add', key='nuget.org', value='https://api.nuget.org/v3/index.json')
         ET.ElementTree(document).write(config, encoding='utf-8', xml_declaration=True)
-        for project in ('packaging/Ranvier.WebCore.Native.Meta.csproj',
-                        'src/Ranvier.WebCore/Ranvier.WebCore.fsproj'):
+        for project in projects:
             subprocess.run(['dotnet', 'restore', str(ROOT / project), '--configfile', str(config),
                             f'-p:Version={version}'], check=True)
             subprocess.run(['dotnet', 'pack', str(ROOT / project), '--no-restore', '-c', 'Release',
                             '-o', str(packages), f'-p:Version={version}'], check=True)
-    print(f'Packed managed interop and native aggregate version {version}, ABI {abi}, all {len(RIDS)} RIDs')
+    print(f'Packed managed interop and native aggregate version {version}, ABI {abi}, all {len(RIDS)} RIDs'
+          + (f'; GPU aggregate over {len(GPU_RIDS)} GPU RIDs with the Slim fallback' if gpu else ''))
 
 
 if __name__ == '__main__':
