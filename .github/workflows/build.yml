@@ -842,7 +842,7 @@ jobs:
           python3 -I tests/atspi/run.py run --native "$host" --provider "$provider" --output "$W/protocol-session" --registry --extended-text --discovery session
       - name: SDK consumer load
         run: |
-          python3 -I providers/atspi/package.py --provider "$W/install/lib/libRanvierWebCoreAtspi.so" --native "$W/native/libRanvierWebCoreHost.so" --rid "$RID" ${{ matrix.pack }} --expected-host-abi 64 --id Ranvier.Private.Accessibility.Atspi.Qualification --version "0.0.0-ci.$GITHUB_RUN_ID" --source-revision "$GITHUB_SHA" --output "$W/package"
+          python3 -I providers/atspi/package.py --provider "$W/install/lib/libRanvierWebCoreAtspi.so" --native "$W/native/libRanvierWebCoreHost.so" --rid "$RID" ${{ matrix.pack }} --id Ranvier.Private.Accessibility.Atspi.Qualification --version "0.0.0-ci.$GITHUB_RUN_ID" --source-revision "$GITHUB_SHA" --output "$W/package"
           python3 -I tests/atspi/consumer.py --package "$W/package/Ranvier.Private.Accessibility.Atspi.Qualification.0.0.0-ci.$GITHUB_RUN_ID.nupkg" --native "$W/native/libRanvierWebCoreHost.so" --output "$W/consumer"
       - name: Record the qualified build
         run: |

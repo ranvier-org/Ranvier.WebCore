@@ -8,15 +8,14 @@ import shutil
 import subprocess
 import zipfile
 
-SUPPORTED_ABIS = (63, 64)
-
 
 def select_runtime(manifest, rid):
     schema = manifest.get('schemaVersion', 1)
     if type(schema) is not int or schema not in [1, 2]:
         raise ValueError('Unsupported provider manifest schema.')
-    if type(manifest.get('abi')) is not int or manifest['abi'] not in SUPPORTED_ABIS or manifest.get('hostBundled') is not False:
-        raise ValueError('Require an ABI63 or ABI64 optional provider without a bundled Host.')
+    abi = manifest.get('abi')
+    if type(abi) is not int or abi <= 0 or manifest.get('hostBundled') is not False:
+        raise ValueError('Require an optional provider with a positive host ABI and no bundled Host.')
     if schema == 2:
         runtimes = manifest.get('runtimes')
         if not rid or not isinstance(runtimes, dict) or rid not in runtimes:

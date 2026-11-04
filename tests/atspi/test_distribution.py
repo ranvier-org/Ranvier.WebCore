@@ -14,7 +14,8 @@ spec.loader.exec_module(package)
 
 
 class DistributionPolicyTests(unittest.TestCase):
-    def test_runtime64_requires_explicit_selection_instead_of_default63(self):
+    def test_runtime_defaults_to_the_checkout_abi_and_rejects_another(self):
+        current = package.current_abi()
         with tempfile.TemporaryDirectory() as temporary:
             paths = [Path(temporary) / name for name in ['provider.so', 'host.so']]
             image = bytearray(64)
@@ -22,20 +23,20 @@ class DistributionPolicyTests(unittest.TestCase):
             image[18:20] = (62).to_bytes(2, 'little')
             for path in paths:
                 path.write_bytes(image)
-            host = SimpleNamespace(rv_abi_version=lambda: 64, rv_abi_has=lambda name: 1)
+            host = SimpleNamespace(rv_abi_version=lambda: current, rv_abi_has=lambda name: 1)
             with patch.object(package.subprocess, 'check_output', return_value='(RUNPATH) [$ORIGIN]'), \
                     patch.object(package.ctypes, 'CDLL', return_value=host):
+                self.assertEqual(package.validate_runtime(*paths, 'linux-x64'), current)
+                with self.assertRaises(ValueError):
+                    package.validate_runtime(*paths, 'linux-x64', expected_host_abi=current + 1)
+                host.rv_abi_version = lambda: current + 1
                 with self.assertRaises(ValueError):
                     package.validate_runtime(*paths, 'linux-x64')
-                self.assertEqual(package.validate_runtime(*paths, 'linux-x64', expected_host_abi=64), 64)
-                host.rv_abi_version = lambda: 65
-                with self.assertRaises(ValueError):
-                    package.validate_runtime(*paths, 'linux-x64', expected_host_abi=64)
 
     def test_host_abi_is_exact_and_style_capability_remains_required(self):
-        for abi in [63, 64]:
+        for abi in [63, 64, 65]:
             self.assertEqual(package.validate_host_abi(abi, abi, 1), abi)
-        for actual, expected, capability in [(64, 63, 1), (63, 64, 1), (65, 65, 1), (64, 64, 0), (True, 63, 1)]:
+        for actual, expected, capability in [(64, 63, 1), (63, 64, 1), (0, 0, 1), (64, 64, 0), (True, 63, 1), (1, True, 1)]:
             with self.subTest(actual=actual, expected=expected, capability=capability), self.assertRaises(ValueError):
                 package.validate_host_abi(actual, expected, capability)
 

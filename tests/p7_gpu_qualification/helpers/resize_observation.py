@@ -20,7 +20,7 @@ from form_collections import Native, P, I, Utf8
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, WRONG_THREAD, NOT_ELEMENT, UNSUPPORTED = 0, -1, -2, -4, -9
-ABI = 62
+ABI = int(__import__('re').search(r'rv_abi_version\(void\)\s*\{\s*return\s+(\d+);', (__import__('pathlib').Path(__file__).resolve().parents[3] / 'host/RanvierWebCoreAbi.cpp').read_text(encoding='utf-8')).group(1))
 BOXES = {None: None, 'content-box': 0, 'border-box': 1, 'device-pixel-content-box': 2}
 LEGACY_CSS_SCENARIOS = frozenset(['contentBox', 'borderBox', 'defaultBox', 'boxChanges', 'verticalChange', 'reobserve',
                                 'order', 'observerOrder', 'beforeIntersection', 'depth', 'stop', 'lifecycle'])
