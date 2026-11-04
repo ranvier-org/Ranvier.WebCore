@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('check_package_api', ROOT / 'scripts/check_package_api.py')
 probe = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(probe)
+CHECKOUT_ABI = probe.current_abi()
 
 
 class PackagedGpuTests(unittest.TestCase):
@@ -34,7 +35,7 @@ class PackagedGpuTests(unittest.TestCase):
         self.assertIn('gpu', inspect.signature(probe.verify).parameters,
                       'Packaged GPU payloads need a shared-frame acceptance mode')
 
-    def package(self, directory, flavor='gpu', rid='win-x64', abi=63):
+    def package(self, directory, flavor='gpu', rid='win-x64', abi=CHECKOUT_ABI):
         archive = directory / 'runtime.nupkg'
         with zipfile.ZipFile(archive, 'w') as package:
             package.writestr('manifest.json', json.dumps({'rid': rid, 'flavor': flavor, 'abi': abi}))
@@ -43,15 +44,15 @@ class PackagedGpuTests(unittest.TestCase):
             package.writestr(f'runtimes/{rid}/native/{library}', b'packaged host')
         return archive
 
-    def test_explicit64_scopes_child_environment_and_rejects_mismatched_package(self):
+    def test_explicit_abi_scopes_child_environment_and_rejects_mismatched_package(self):
         with tempfile.TemporaryDirectory() as directory:
             calls = []
             with patch('subprocess.run', side_effect=lambda command, **kw: calls.append(kw)):
-                probe.verify(self.package(Path(directory), abi=64), gpu=True, expected_abi=64)
+                probe.verify(self.package(Path(directory), abi=CHECKOUT_ABI + 1), gpu=True, expected_abi=CHECKOUT_ABI + 1)
             self.assertTrue(calls)
-            self.assertTrue(all(row['env']['RANVIER_ABI_TEST_EXPECTED'] == '64' for row in calls))
+            self.assertTrue(all(row['env']['RANVIER_ABI_TEST_EXPECTED'] == str(CHECKOUT_ABI + 1) for row in calls))
             with patch('subprocess.run') as execute, self.assertRaises(ValueError):
-                probe.verify(self.package(Path(directory), abi=63), gpu=True, expected_abi=64)
+                probe.verify(self.package(Path(directory)), gpu=True, expected_abi=CHECKOUT_ABI + 1)
             execute.assert_not_called()
 
     def test_gpu_package_runs_shared_frame_lifetime_checks_on_the_extracted_payload(self):

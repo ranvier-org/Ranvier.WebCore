@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('probes', ROOT / 'scripts/probes.py')
 probes = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(probes)
+CHECKOUT_ABI = sys.modules['abi_expectation'].current_abi()
 
 
 def run(entries, *options):
@@ -27,7 +28,7 @@ def run(entries, *options):
     stage = logs / 'out/slim'
     stage.mkdir(parents=True)
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
-    abi = int(options[options.index('--expected-abi') + 1]) if '--expected-abi' in options else 63
+    abi = int(options[options.index('--expected-abi') + 1]) if '--expected-abi' in options else CHECKOUT_ABI
     (stage / 'manifest.json').write_text(json.dumps(dict(rid='linux-x64', flavor='slim', abi=abi,
                                                        source=dict(commit=revision, dirty=False))))
     try:

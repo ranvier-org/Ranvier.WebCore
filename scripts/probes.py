@@ -494,7 +494,7 @@ def main(argv=None):
     r.add_argument('--rid', required=True)
     r.add_argument('--flavor', required=True)
     r.add_argument('--work', required=True, help='the work directory: the staged runtime is <work>/out/<flavor>')
-    r.add_argument('--expected-abi', type=int, choices=[63, 64], help='Explicitly admit the matching staged ABI; standalone default remains 63.')
+    r.add_argument('--expected-abi', type=int, help='Admit the matching staged ABI; defaults to the ABI declared by the checkout.')
     r.add_argument('--logs', help='the directory for the probe logs (default: <work>/probe-logs)')
     r.add_argument('--only', help='run only the probes whose name or commands contain the text')
     r.add_argument('--timeout', type=float, help='seconds each probe may take, in place of its own limit')
