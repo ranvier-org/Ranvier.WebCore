@@ -17,6 +17,11 @@ The controller source and policy/workflow source are independently pinned, so a 
 does not silently change the code that qualified the packages. No engine target is configured or
 built by qualification; fetching the pinned upstream checkout supplies font and SVG test fixtures.
 
+The linux-x64 producer also failed `Verify Web Animations creation against the Chromium oracle`: its third
+growth round exceeded the 16 MiB bound by 132 KiB (`memory flat across rounds`). A per-RID
+`growthFailureLogSha256` pins that exact log as a second retained RED. Qualification then reruns
+`web_animations.py` inside the complete catalogue against the unchanged package bytes, and that rerun must pass.
+
 Publication requires a separately reviewed policy that pins the successful two-architecture
 qualification run and both receipt artifacts. Pre-authentication export repeats origin, original
 failure, package and qualification verification and copies the exact producer nupkg bytes. The

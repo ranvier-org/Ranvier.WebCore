@@ -70,6 +70,44 @@ class Preview12Recovery(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'Unexpected'):
                 subject.verify_summary(path, record, expected)
 
+    def test_pinned_growth_failure_is_retained_only_with_its_exact_log(self):
+        subject = self.subject()
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'logs.zip'
+            guard = b'linux_view_transition_pixels.py\nassert value == 63\nAssertionError\n'
+            growth = b'tests/abi/web_animations.py\nAssertionError: memory flat across rounds: [1, 1, 2]\n'
+            expected = [dict(name=subject.GROWTH_GROUP), dict(name=subject.FAILED_GROUP)]
+            summary = ('FAIL 0.6 s  ' + subject.GROWTH_GROUP + '  (exit code 1), 01-growth.log\n'
+                       'FAIL 0.1 s  ' + subject.FAILED_GROUP + '  (exit code 1), 02-failed.log\n').encode()
+
+            def save(log):
+                with zipfile.ZipFile(path, 'w') as archive:
+                    archive.writestr('summary.txt', summary)
+                    archive.writestr('01-growth.log', log)
+                    archive.writestr('02-failed.log', guard)
+
+            record = dict(failureLogSha256=hashlib.sha256(guard).hexdigest(),
+                          summarySha256=hashlib.sha256(summary).hexdigest())
+            save(growth)
+            with self.assertRaisesRegex(ValueError, 'Unexpected'):
+                subject.verify_summary(path, record, expected)
+            record['growthFailureLogSha256'] = hashlib.sha256(growth).hexdigest()
+            self.assertEqual(subject.verify_summary(path, record, expected), [subject.GROWTH_GROUP])
+            other = b'tests/abi/web_animations.py\nAssertionError: rendered pixel mismatch\n'
+            record['growthFailureLogSha256'] = hashlib.sha256(other).hexdigest()
+            save(other)
+            with self.assertRaisesRegex(ValueError, 'growth'):
+                subject.verify_summary(path, record, expected)
+
+    def test_growth_failure_pin_is_optional_but_exact(self):
+        subject = self.subject()
+        policy = self.allocated_metadata(subject)
+        policy['rids']['linux-x64']['growthFailureLogSha256'] = 'not-a-digest'
+        with self.assertRaisesRegex(ValueError, 'growth'):
+            subject.admit_policy(policy, 'qualify')
+        policy['rids']['linux-x64']['growthFailureLogSha256'] = 'e' * 64
+        subject.admit_policy(policy, 'qualify')
+
     def test_artifact_parent_traversal_is_rejected_before_any_extraction(self):
         subject = self.subject()
         with tempfile.TemporaryDirectory() as directory:
