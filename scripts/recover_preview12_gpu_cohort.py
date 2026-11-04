@@ -107,6 +107,8 @@ def admit_windows_run(run, jobs):
     require(len(selected) == 1 and selected[0].get('conclusion') == 'failure', 'Actual Windows native job outcome differs')
     steps = selected[0].get('steps', [])
     package = [step for step in steps if step.get('name') == 'Package']
+    probes = [step for step in steps if step.get('name') == WINDOWS_PROBE_STEP]
+    require(len(probes) == 1 and probes[0].get('conclusion') == 'failure', 'Windows probe step did not complete with a failure')
     failures = [step.get('name') for step in steps if step.get('conclusion') not in ('success', 'skipped')]
     require(len(package) == 1 and package[0].get('conclusion') == 'success' and failures == [WINDOWS_PROBE_STEP],
             'Windows producer failure was not solely the probe step after packaging')

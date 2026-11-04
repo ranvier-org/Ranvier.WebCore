@@ -70,7 +70,8 @@ class GpuCohort(unittest.TestCase):
         self.assertEqual(self.resource_check('WebKit.resources/icons/missingImage.png'), self.manifest)
 
     def test_unsafe_manifest_names_reject(self):
-        for name in ['../escape.png', 'WebKit.resources/../../escape.png', 'WebKit.resources\\icon.png']:
+        for name in ['../escape.png', 'WebKit.resources/../../escape.png', 'WebKit.resources\\icon.png',
+                     '/abs.png', 'C:x.png', 'WebKit.resources/./icon.png']:
             self.setUp()
             with self.subTest(name=name), self.assertRaises(ValueError):
                 self.resource_check(name)
@@ -97,7 +98,10 @@ class GpuCohort(unittest.TestCase):
         for conclusion, steps in [('success', packaged),
                                   ('failure', [('Package', 'failure'), ('Run the probes', 'failure')]),
                                   ('failure', [('Package', 'success'), ('Run the probes', 'failure'), ('Build', 'failure')]),
-                                  ('failure', [('Package', 'success'), ('Run the probes', 'success')])]:
+                                  ('failure', [('Package', 'success'), ('Run the probes', 'success')]),
+                                  ('failure', [('Package', 'success'), ('Run the probes', 'cancelled')]),
+                                  ('failure', [('Package', 'success'), ('Run the probes', 'timed_out')]),
+                                  ('failure', [('Package', 'success'), ('Run the probes', None)])]:
             with self.subTest(conclusion=conclusion, steps=steps), self.assertRaises(ValueError):
                 self.subject.admit_windows_run(run, job(conclusion, steps))
         incomplete = job('failure', packaged)
