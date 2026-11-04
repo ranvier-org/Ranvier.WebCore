@@ -3,7 +3,7 @@ import argparse
 import hashlib
 import importlib.util
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 import shutil
 import subprocess
@@ -85,7 +85,9 @@ def verify_package(package, rid, expected):
         host = 'RanvierWebCoreHost.dll' if rid.startswith('win-') else 'libRanvierWebCoreHost.' + ('dylib' if rid == 'osx-arm64' else 'so')
         require(host in records, 'GPU Host is missing')
         for name, row in records.items():
-            require('/' not in name and '\\' not in name and name not in ('.', '..'), 'Unsafe GPU payload name')
+            parts = PurePosixPath(name).parts
+            require('\\' not in name and PurePosixPath(name).as_posix() == name and not name.startswith('/')
+                    and parts and not any(part in ('.', '..') or ':' in part for part in parts), 'Unsafe GPU payload name')
             data = archive.read(prefix + name)
             require(len(data) == row['bytes'] and hashlib.sha256(data).hexdigest() == row['sha256'], 'GPU payload bytes differ')
             if name.endswith(('.dll', '.so', '.dylib')):

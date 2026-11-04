@@ -55,6 +55,26 @@ class GpuCohort(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.package_check()
 
+    def resource_check(self, name):
+        resource = b'png'
+        self.manifest['files'].append(dict(name=name, bytes=len(resource), sha256=hashlib.sha256(resource).hexdigest()))
+        self.manifest['total_bytes'] += len(resource)
+        with zipfile.ZipFile(self.package, 'w') as archive:
+            archive.writestr('fixture.nuspec', '<package><metadata><id>Ranvier.WebCore.Native.Gpu.linux-x64</id><version>' + self.subject.VERSION + '</version></metadata></package>')
+            archive.writestr('manifest.json', json.dumps(self.manifest))
+            archive.writestr('runtimes/linux-x64/native/libRanvierWebCoreHost.so', self.data)
+            archive.writestr('runtimes/linux-x64/native/' + name, resource)
+        return self.subject.verify_package(self.package, 'linux-x64', self.subject.sha(self.package))
+
+    def test_nested_resource_payload_passes(self):
+        self.assertEqual(self.resource_check('WebKit.resources/icons/missingImage.png'), self.manifest)
+
+    def test_unsafe_manifest_names_reject(self):
+        for name in ['../escape.png', 'WebKit.resources/../../escape.png', 'WebKit.resources\\icon.png']:
+            self.setUp()
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                self.resource_check(name)
+
     def test_policy_is_unarmed_and_incomplete_never_admits(self):
         policy = json.loads((ROOT / 'docs/preview12-gpu-cohort.json').read_text())
         with self.assertRaises(ValueError):
