@@ -1,5 +1,5 @@
 {
-  "armed": true,
+  "armed": false,
   "artifact": {
     "id": 13279324076,
     "sha256": "f9df9780e848a4c05fa7141febb545e4557d871db835919c4c7f666eed0a9c5b"
