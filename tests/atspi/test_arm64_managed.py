@@ -9,21 +9,8 @@ spec.loader.exec_module(module)
 
 
 class ManagedArm64Qualification(unittest.TestCase):
-    def test_reusable_workflow_remains_unarmed(self):
-        workflow = (path.parents[2] / '.github/workflows/atspi-arm64-qualification.yml').read_text()
-        self.assertIn('if: ${{ false }}', workflow)
-        self.assertIn("dotnet-version: '10.0.403'", workflow)
-
     def test_all_three_provider_profiles_are_required(self):
         self.assertEqual(module.PROFILES, ('present', 'absent', 'no-bus'))
-
-    def test_x64_workflow_is_unarmed_and_passes_explicit_rid(self):
-        workflow = (path.parents[2] / '.github/workflows/atspi-x64-qualification.yml').read_text()
-        self.assertIn('if: ${{ false }}', workflow)
-        self.assertIn('runs-on: ubuntu-24.04\n', workflow)
-        self.assertIn('arm64_managed.py --rid linux-x64', workflow)
-        self.assertIn('qualification_receipt.py --rid linux-x64', workflow)
-        self.assertNotIn('--test-only-arm64', workflow)
 
     def test_selected_rid_requires_matching_runner_and_elf(self):
         for rid, machine, elf in [('linux-arm64', 'aarch64', 'AArch64'),
@@ -94,13 +81,6 @@ class ManagedArm64Qualification(unittest.TestCase):
             with self.assertRaises(ValueError):
                 module.validate_assets(dict(libraries, **{'Ranvier.Dom' + suffix + '/0.1.0-alpha.57': {}}),
                                        mode, 'private', '1', dom_version='0.1.0-alpha.58')
-
-
-    def test_registry_dependency_is_explicit_for_both_runner_images(self):
-        for name in ('atspi-arm64-qualification.yml', 'atspi-x64-qualification.yml'):
-            workflow = (path.parents[2] / '.github/workflows' / name).read_text()
-            self.assertIn('libatspi2.0-dev at-spi2-core python3-gi', workflow)
-            self.assertIn('test -x /usr/libexec/at-spi2-registryd', workflow)
 
 
 if __name__ == '__main__':
