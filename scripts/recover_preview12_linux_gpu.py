@@ -21,6 +21,9 @@ TEST_SOURCE = 'f2d5b2b4c0b0404586097696907dc36e83dc87b9'
 VERSION = '0.1.1-preview.12'
 RIDS = ('linux-x64', 'linux-arm64')
 FAILED_GROUP = 'Verify Linux same-document transition snapshot pixels'
+# The linux-x64 producer also exceeded the 16 MiB third-round growth bound by 132 KiB. The exact log is pinned
+# per RID, and the qualification catalogue reruns web_animations.py against the unchanged package bytes.
+GROWTH_GROUP = 'Verify Web Animations creation against the Chromium oracle'
 TEST_CHANGES = {'.github/workflows/build.yml', 'tests/abi/test_abi_expectation.py',
                 'tests/atspi/protocol_errors.py', 'tests/atspi/run.py', 'tests/atspi/test_protocol_errors.py',
                 'tests/gpu/linux_view_transition_pixels.py', 'tests/gpu/test_linux_transition_abi.py'}
@@ -53,6 +56,8 @@ def admit_policy(policy, phase):
     for rid, record in policy['rids'].items():
         require(digest(record.get('packageSha256')) and digest(record.get('summarySha256'))
                 and digest(record.get('failureLogSha256')), 'Original package and failure evidence hashes are required')
+        require('growthFailureLogSha256' not in record or rid == 'linux-x64' and digest(record['growthFailureLogSha256']),
+                'Retained growth failure log hash is malformed')
         for key, name in [('packageArtifact', f'package-{rid}-gpu'), ('probeArtifact', f'probe-logs-{rid}-gpu')]:
             artifact = record.get(key, {})
             require(type(artifact.get('id')) is int and artifact['id'] > 0 and artifact.get('name') == name
@@ -153,13 +158,22 @@ def verify_summary(archive, record, expected):
         require(hashlib.sha256(summary).hexdigest() == record['summarySha256'], 'Original summary hash differs')
         lines = summary.decode('utf-8').splitlines()
         require(len(lines) == len(expected), 'Original probe inventory is incomplete')
-        failed = []
+        failed, retained = [], []
         for line, entry in zip(lines, expected):
             match = re.fullmatch(r'(PASS|FAIL)\s+[0-9.]+ s\s+(.+)', line)
             require(match is not None, 'Unrecognized original summary row')
             outcome, rest = match.groups()
             if outcome == 'PASS':
                 require(rest == entry['name'], 'Original probe name/order differs')
+            elif entry['name'] == GROWTH_GROUP and 'growthFailureLogSha256' in record:
+                require(rest.startswith(GROWTH_GROUP + '  '), 'Unexpected original producer failure')
+                log_name = rest.rsplit(', ', 1)[-1]
+                require(re.fullmatch('[a-zA-Z0-9.-]+\\.log', log_name) is not None, 'Original failure log path differs')
+                data = stream.read(log_name)
+                require(hashlib.sha256(data).hexdigest() == record['growthFailureLogSha256']
+                        and b'web_animations.py' in data and b'AssertionError: memory flat across rounds' in data,
+                        'Original failure is not the retained pinned growth RED')
+                retained.append(entry['name'])
             else:
                 require(entry['name'] == FAILED_GROUP and rest.startswith(FAILED_GROUP + '  '), 'Unexpected original producer failure')
                 log_name = rest.rsplit(', ', 1)[-1]
@@ -169,6 +183,7 @@ def verify_summary(archive, record, expected):
                         and b'== 63' in data and b'AssertionError' in data, 'Original failure is not the retained ABI guard RED')
                 failed.append(entry['name'])
         require(failed == [FAILED_GROUP], 'Exactly the known original ABI guard failure is required')
+        return retained
 
 
 def snapshot(directory):

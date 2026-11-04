@@ -5,23 +5,58 @@
   "version": "0.1.1-preview.12",
   "productSource": "d31c3631ed4bbe6520f7f5f7c7e7d34499c38122",
   "testSource": "f2d5b2b4c0b0404586097696907dc36e83dc87b9",
-  "controllerSource": null,
-  "producerRun": null,
+  "controllerSource": "f8cb27e562ecaffdb9bc24bdcf61f8850aadc27a",
+  "producerRun": 41734171619,
   "rids": {
     "linux-x64": {
-      "packageArtifact": { "id": null, "name": "package-linux-x64-gpu", "sha256": null },
-      "probeArtifact": { "id": null, "name": "probe-logs-linux-x64-gpu", "sha256": null },
-      "packageSha256": null,
-      "summarySha256": null,
-      "failureLogSha256": null
+      "packageArtifact": {
+        "id": 13282794766,
+        "name": "package-linux-x64-gpu",
+        "sha256": "c5075bc20b8d9cf7919851133c0d54c383acc471dd699a9d7acce2aa5ba353ae"
+      },
+      "probeArtifact": {
+        "id": 13283762077,
+        "name": "probe-logs-linux-x64-gpu",
+        "sha256": "17dda1a4260a7e6172eb2bc41080bf62ee32965e35b9da9f0888d0a1260cf90d"
+      },
+      "packageSha256": "30430edb012ea41a877e17cf785c3fdaea8ca3b08e428190ed9f628c1cd0ff88",
+      "summarySha256": "11c65228a0057cd09a782d5f4102b0e42f13edf47bd51125d89ec43c74ff9a2e",
+      "failureLogSha256": "434f4713a751d69689d51c9d75ad7119722cd258181ca45142a584bfe6e6292a",
+      "growthFailureLogSha256": "4cfc8eaff26f6b8ef05ac50f8acac7db0f1a02eafa26c7c344d2aea9d8b13ee7"
     },
     "linux-arm64": {
-      "packageArtifact": { "id": null, "name": "package-linux-arm64-gpu", "sha256": null },
-      "probeArtifact": { "id": null, "name": "probe-logs-linux-arm64-gpu", "sha256": null },
-      "packageSha256": null,
-      "summarySha256": null,
-      "failureLogSha256": null
+      "packageArtifact": {
+        "id": 13282045656,
+        "name": "package-linux-arm64-gpu",
+        "sha256": "7b35f7b7674b40f97d6f7c6ff80a385fcc4c51d9352655f9ce84b6cfa8f633f5"
+      },
+      "probeArtifact": {
+        "id": 13282645485,
+        "name": "probe-logs-linux-arm64-gpu",
+        "sha256": "aa53ac06c91cd8d95d0bacc2312694146160414526748ac5095604af4004fde6"
+      },
+      "packageSha256": "c8719af62df977bea48601bca120932f940775df12d1141d944e6b7bf30d2aaa",
+      "summarySha256": "4b3ab409cabfee051fbda153a2cae435e0eb01d32b4a6a2940ce060a37530eba",
+      "failureLogSha256": "4dd5cee341495593c19b0e2a4b5306ebfe91935f1f148a0d06d4b9153b5592f1"
     }
   },
-  "qualification": null
+  "qualification": {
+    "run": 41756438973,
+    "workflowSource": "f35d7166ca1edda68d54a2ebf0a8717bb2a695d8",
+    "policySha256": "dabdde2d5d1553f345bf671d5a3ade002d412c8e4a8acf74affd9b0688760688",
+    "rids": {
+      "linux-x64": {
+        "id": 13287994140,
+        "name": "qualified-preview12-linux-x64",
+        "sha256": "a184982f247f4fa8556fce33ef466397d0b1aa39933a52371c55e0f0f2212d62",
+        "receiptSha256": "fe16e025ec22b54b211b67997af9cd0217da40138de2bfbf51125078c6e490a5"
+      },
+      "linux-arm64": {
+        "id": 13288901923,
+        "name": "qualified-preview12-linux-arm64",
+        "sha256": "15394eb6025f5733f4aa80cd92c7d3ae6ef225be365cd07c8658aec8771ee679",
+        "receiptSha256": "f6c6591d9ed4b3f7807f70137d07bded39bac7baeb9287fe73624ee183a0853b"
+      }
+    }
+  }
 }
