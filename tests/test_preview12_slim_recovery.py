@@ -22,7 +22,7 @@ class SlimRecovery(unittest.TestCase):
 
     def policy(self, subject):
         policy = json.loads((ROOT / 'docs/preview12-slim-recovery.json').read_text())
-        policy.update(armed=True, controllerSource='a' * 40)
+        policy.update(armed=True, controllerSource='a' * 40, publicationEnabled=False, qualification=None)
         for index, record in enumerate(policy['original'].values(), 1):
             record['artifact'].update(id=index, sha256='b' * 64)
             record['packageSha256'] = 'c' * 64
