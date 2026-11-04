@@ -1,18 +1,16 @@
-# Optional Ranvier AT-SPI provider
+# Ranvier.WebCore.Accessibility.Atspi
 
-This package supplies optional native accessibility modules for the Linux RIDs listed in `provider-manifest.json`.
-The application selects its matching ABI63 WebCore host separately. The SDK selects the provider for the target RID;
-the module loads its sibling host using `$ORIGIN`. No renderer or system GIO/GObject/GLib binary is bundled, and
-no renderer dependency is added. A missing module or accessibility bus leaves ordinary rendering available.
+Optional AT-SPI accessibility modules for the Ranvier WebCore host on `linux-x64` and `linux-arm64`.
 
-The portable interfaces cover Accessible, Application, Component, Action, Value and modern Text operations. Native
-work stays on the Host thread, text offsets preserve UTF-16 boundaries, and the application releases provider/window
-ownership before destroying a Host. Deprecated TextBefore/At/AfterOffset methods remain explicitly unsupported.
+Install this package beside the `Ranvier.WebCore.Native` package of the same version. Each module loads its sibling
+host through `$ORIGIN`; `provider-manifest.json` records the host ABI and the sha256 of every module and of the host
+it was built against. The package adds no package dependencies and bundles no GLib, GIO, GObject, libatspi or WebCore
+binary: GIO/GObject/GLib come from the operating system. A missing module or accessibility bus leaves rendering
+unaffected.
 
-`NOTICE.md`, `THIRD-PARTY.md` and `licenses/LGPL-2.1.txt` preserve component/source notices without assigning an
-unspecified project license or inventing an SPDX grant. The original private qualification README and notice remain
-under `qualification-input/` as historical input records.
+The provider implements the Accessible, Application, Component, Action, Value and Text interfaces. Native work runs on
+the host thread, text offsets keep UTF-16 boundaries, and the application releases the provider and window before it
+destroys a host. The deprecated `TextBefore/At/AfterOffset` methods are unsupported.
 
-The aggregate manifest records exact input, module, SDK and supplied qualification-receipt hashes. Source strings
-remain unverified caller claims. Matching a supplied reviewed receipt hash does not authenticate who reviewed it or
-which source produced an arbitrary binary; independent producer/qualification evidence remains separate.
+The C API is `include/RanvierAtspi.h`; the host ABI it binds is `include/RanvierWebCoreAbi.h`. `NOTICE.md`,
+`THIRD-PARTY.md` and `licenses/LGPL-2.1.txt` carry the component notices.

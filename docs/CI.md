@@ -1,34 +1,86 @@
 # CI
 
-Preview2 artifact recovery is retired. Its actual CI proof exposed a product defect: a cached D3D11
-surface could return a frame after the consumer device was removed. The `qualify` and `publication`
-commands now refuse before reading their inputs or creating output. The historical
-`recover_preview2_gpu` dispatch cannot reach publication. The original tag, package and identity
-contract in `docs/preview2-gpu-recovery.json` remain unchanged as evidence.
+## Workflows
 
-The minimal successor uses Native `0.1.1-preview.3`, ABI60 and the device-health fix. It requires a fresh
-noncrypto source/configuration build and the full cohort proof; private DB/CD9 trial bytes cannot be
-published as that cohort. The next tag must also prove automatic Windows GPU dispatch. The separate
-product batch uses preview4 and is excluded from this successor.
+| Workflow | Trigger | Purpose |
+|---|---|---|
+| `build.yml` | push to `main`, `v*` tags, pull requests, manual | Builds, tests, packages and publishes the native packages. |
+| `triage.yml` | new or reopened issue, manual | Calls the shared issue-triage workflow of `ranvier-org/.github`. A manual run defaults to a dry run. |
+| `public-cocoa-contracts.yml` | manual | Disarmed signed-cohort Cocoa CPU replay, re-armed for each cohort. See [Cocoa replay](#cocoa-replay). |
+| `atspi-provider.yml` | manual | Builds, tests and packs the optional AT-SPI provider against a reviewed native producer artifact (`providers/atspi/README.md`). |
 
-`.github/workflows/build.yml` runs `scripts/build.py` step by step for each runtime in its matrix, then
-uploads the `.nupkg` with `manifest.json`, and the PDBs as a separate artifact. On a `v*` tag it sets the
-package version from the tag and, when the repository variable `NUGET_USER` is set, pushes the packages
-to nuget.org by trusted publishing: no API key is stored. The nuget.org account `NUGET_USER` needs a
-trusted publishing policy for owner `ranvier-org`, repository `Ranvier.WebCore`, workflow file `build.yml`
-and no environment.
+## build.yml
 
-A pull request builds `win-x64` only. A pull request from a `codex/batch-*` branch, or one labelled
-`full-matrix`, builds every runtime; adding the label starts that run. The five-runtime managed aggregate is
-packed only when every runtime is built, so a `win-x64`-only pull request skips it. Pushes to `main` and `v*` tags always
-build every runtime.
+Manual dispatch inputs:
+
+| Input | Values | Meaning |
+|---|---|---|
+| `flavor` | `slim` (default), `gpu`, `lean` | The build flavor. |
+| `rids` | comma-separated runtime identifiers, empty for all | The runtimes to build. |
+| `clean` | boolean | Builds from an empty build tree. |
+
+Jobs, in dependency order:
+
+| Job | Runs | Does |
+|---|---|---|
+| `package-contract` | always, on `ubuntu-latest` | The unit tests of packaging, release, probe and generator contracts (the explicit list of `python -I tests/...` steps in the job), `capability_catalogue.py --check`, `generate_native.py check`, the managed contract builds, Fantomas, Fable and Chromium proofs of the generated DOM. A new test file runs in CI only when it is added to this list. |
+| `plan` | always | Computes the runtime matrix (filtered by `rids`). On a tag whose release holds a package the repository owner attached for a runtime, that runtime goes to `prebuilt` instead of `native`. |
+| `prebuilt` | when `plan` lists attached packages | Downloads the package on a clean runner of its platform and runs `smoke.py`. The manifest must name the tag's commit, a clean tree and the tag's version. |
+| `native` | one job per runtime | Builds with `scripts/build.py` step by step, runs `smoke.py`, the F# ABI tests (Windows, macOS) and `scripts/probes.py`, packs the `.nupkg`, and uploads `package-*` artifacts. The five runtimes are `win-x64`, `win-arm64`, `linux-x64`, `linux-arm64`, `osx-arm64`. |
+| `managed` | after `native`, `prebuilt`, `package-contract` | Packs `Ranvier.WebCore` and the `Ranvier.WebCore.Native` aggregate from the five Slim packages with `scripts/package_managed.py`. Skipped for a pull request that is neither from a `codex/batch-*` branch nor labelled `full-matrix`. |
+| `publish` | on a `v*` tag, when the repository variable `NUGET_USER` is set | Pushes every `package-*` artifact to nuget.org by trusted publishing. Requires `package-contract`, every selected runtime and, for a Slim release, `managed` to succeed. |
+| `gpu-cohort` | after `publish`, on a tag push | Dispatches `build.yml` with `flavor=gpu` and `rids=win-x64,linux-x64,linux-arm64,osx-arm64` on the same tag. |
+
+A pull request builds `win-x64` only. A pull request from a `codex/batch-*` branch, or one labelled `full-matrix`,
+builds every runtime; adding the label starts that run. Pushes to `main` and `v*` tags build every runtime.
+
+Trusted publishing exchanges GitHub's OIDC token for a one-hour API key under the nuget.org account named by
+`NUGET_USER`; no API key is stored. That account needs a trusted publishing policy for owner `ranvier-org`,
+repository `Ranvier.WebCore`, workflow file `build.yml` and no environment. Without `NUGET_USER` the packages stay
+workflow artifacts.
+
+## Releasing
+
+1. Set `package.version` in `pins.json` and merge to `main`.
+2. Tag the merged commit `v<version>` and push the tag. `build.yml` builds the five Slim runtimes, packs the managed
+   cohort and publishes seven packages (five runtimes, `Ranvier.WebCore`, `Ranvier.WebCore.Native`), then
+   `gpu-cohort` dispatches the GPU runtimes on the same tag. Each GPU runtime must pass its native transport and
+   lifetime checks before publication: Windows runs shared D3D11 acceptance with the pinned SDL package in
+   `scripts/sdl_runtime.py`; macOS runs the public IOSurface frame and input checks; Linux runs
+   `tests/gpu/linux_egl.py` under `EGL_PLATFORM=surfaceless` and `LIBGL_ALWAYS_SOFTWARE=1`.
+3. A successful Slim run establishes only Slim availability. Check the GPU run's publication separately.
+
+To retry a GPU runtime of an existing tag:
+
+```
+gh workflow run build.yml --repo ranvier-org/Ranvier.WebCore --ref v<VERSION> --field flavor=gpu --field rids=win-x64
+```
+
+Concurrency is keyed by tag and flavor, so a GPU dispatch cannot cancel its Slim run. Windows ARM64 GPU is not part
+of the cohort.
+
+To build some packages on a workstation and the rest in CI, run `python -I scripts/release.py --rid win-x64 --work C:/rw`.
+It refuses a working tree with changes, a commit on no remote branch and a version whose tag exists; builds with
+`build.py --strict`; checks the package with `smoke.py`; then creates the GitHub release `v<version>` with the
+packages attached. Creating the release pushes the tag, whose run takes the attached runtime through `prebuilt`.
+`--flavor gpu` builds `Ranvier.WebCore.Native.Gpu.<rid>`; `--dry-run` stops before the release. The attached
+package must come from the repository owner; anyone who can push a tag could otherwise get a package of their own
+published. A workstation package records `"builder": "local"` in `manifest.json`; CI records `"ci"`.
+
+## Cocoa replay
+
+`public-cocoa-contracts.yml` replays the Cocoa CPU contracts (timer modes, reduced motion, per-page contrast)
+against a signed public cohort on `macos-26`. It is disarmed: `tests/controls/public_cocoa_replay_inputs.json` holds
+`"armed": false`, and a dispatch with phase `off`, or with the file disarmed, does nothing. Each cohort re-arms it
+by editing that file. The phases are `collect-owner` and `replay`; `docs/HANDOVER.md` has the procedure and
+`tests/controls/README-public-cocoa.md` describes the controller, the sidecars and the contracts.
 
 ## Runner
 
 | Need | Value | Note |
 |---|---|---|
 | Image | `windows-2025` by default; repository variable `RANVIER_WINDOWS_RUNNER` overrides | |
-| Visual Studio | x64 C++ build tools, found with `vswhere` | Measured with MSVC 14.50.35717 (VS 18) locally. `windows-2025` had 14.51.36231 on 2026-10-26, and its package passed the F# driver (`docs/VERIFICATION.md`). An older toolset is untested. |
+| Visual Studio | x64 C++ build tools, found with `vswhere` | Measured with MSVC 14.50.35717 (VS 18) locally. `windows-2025` had 14.51.36231 on 2026-10-26. An older toolset is untested. |
 | Disk | about 12 GB (E): source 3.3 GB, build 5.0 GB, vcpkg packages and LLVM | |
 | Time | 6-hour job limit | Locally, 20 jobs on 24 threads: vcpkg about 6 minutes, a full compile about 9 minutes. On `windows-2025` on 2026-10-26, with empty caches: the job took 1 h 41 min, of which fetch 11 min, configure (vcpkg) 20 min and the compile 65 min. |
 | Tools | Python 3.12+, Perl, Ruby, gperf, CMake, Ninja, .NET SDK | The hosted Windows image has Perl, Ruby, CMake and .NET; Ninja comes with Visual Studio's CMake; the workflow installs Python and gperf. |
@@ -212,82 +264,6 @@ Python. `RANVIER_WORK` sets `--work`. `--flavor lean` builds the reference flavo
 and packs it as `Ranvier.WebCore.Native.Lean.<rid>`. A 24-thread workstation compiles WebKit in about
 9 minutes, against 65 on `windows-2025`.
 
-### Releasing from a workstation
-
-A release can take some packages from the owner's machine and build the rest in CI:
-
-```
-python -I scripts/release.py --rid win-x64 --work C:/rw
-```
-
-`release.py` refuses a working tree with changes, a commit that is on no remote branch, and a version
-(`pins.json` `package.version`) whose tag exists. It builds each `--rid` with `build.py --strict`, whose
-prepare step fails when the WebKit checkout has edits the patch series does not make (`patches.py verify`).
-It checks the packed `.nupkg` with `smoke.py` against the commit, version and flavor, then creates the
-GitHub release `v<version>` with `gh`, attaching the packages. `--dry-run` stops before the release.
-Options it does not know go to `build.py`.
-
-Creating the release pushes its tag, and the tag's run of this workflow:
-
-- `plan` reads the release. A runtime whose package is attached goes to `prebuilt` instead of `native`, if
-  the repository owner created the release and uploaded that package. Anyone who can push a tag could
-  otherwise get a package of their own published.
-- `prebuilt` downloads the package on a clean runner of its platform and runs `smoke.py` on it. The
-  manifest must name the tag's commit, from a clean tree, and the tag's version. Loading on clean
-  runners also catches a library the package lacks that the workstation happened to have.
-- `native` builds the other runtimes as usual. `publish` requires every selected runtime and the
-  package-contract gate to pass before pushing any package. A full slim release also requires the paired
-  managed interop and aggregate packages; a manual slim subset can build artifacts but cannot publish a
-  partial cohort. Explicit GPU and lean runs retain their selected-runtime gate without rebuilding the
-  managed cohort.
-
-A tag pushed without a release builds every runtime in CI, as before. A package built on a workstation
-records `"builder": "local"` in the `source` field of its `manifest.json`; CI's record `"ci"`.
-
-#### Coordinated GPU packages
-
-`release.py --flavor gpu` builds and checks `Ranvier.WebCore.Native.Gpu.<rid>`; `slim`, `gpu` and `lean`
-retain the same clean-source, remote-commit and immutable-version-tag checks. Creating a release always
-starts the default **slim** tag run. After it publishes the five slim runtimes, managed interop and native
-aggregate, the `gpu-cohort` job dispatches Windows x64, Linux x64/ARM64 and macOS ARM64 GPU on the
-**same immutable tag**. An owner's attached GPU asset is checked on its matching runner; otherwise that
-run builds it. Each runtime must pass its native transport and lifetime checks before publication.
-Windows runs shared D3D11 acceptance with the pinned SDL package in `scripts/sdl_runtime.py`;
-macOS runs the public IOSurface frame/input checks. Windows ARM64 GPU is not part of this cohort.
-
-To retry only the GPU cohort of an existing tag, dispatch explicitly:
-
-```
-gh workflow run build.yml --repo ranvier-org/Ranvier.WebCore --ref v<VERSION> --field flavor=gpu --field rids=win-x64
-```
-
-The dispatch builds or checks each selected GPU package against that tag's commit, flavor and version and
-publishes `Ranvier.WebCore.Native.Gpu.<rid>` through the existing NuGet OIDC job. The owner's attached-package
-check remains in effect; an asset that does not qualify is rebuilt in CI. Concurrency is keyed by tag and
-flavor, so a GPU dispatch cannot cancel its slim cohort. Check the GPU run's publication separately:
-a successful slim run establishes only slim availability. The managed interop and GPU runtime must use
-the same version and ABI.
-
-After the GPU version is available from the public v3 feed, run the Views workflow at a ref containing its
-strict GPU lane and the matching backend. This example uses the coordinated preview version:
-
-```
-gh workflow run ci.yml --repo ranvier-org/Ranvier.View --ref <validated-view-ref> --field gpu_runtime_version=<VERSION> --field gpu_runtime_source=https://api.nuget.org/v3/index.json --field gpu_runtime_package=Ranvier.WebCore.Native.Gpu.win-x64
-```
-
-The `webcore-gpu` lane verifies the exact package identity, version, flavor and staged hashes, then runs
-the counter with JIT and NativeAOT. Its GPU counts, visible SDL backbuffer and independent OS UIA checks
-must succeed without CPU fallback before the accelerated release is complete.
-
-Linux GPU packages are included in the automatic cohort; a targeted retry can use a same-tag
-`flavor=gpu` dispatch with `rids=linux-x64,linux-arm64`.
-Their native job runs `tests/gpu/linux_egl.py` through the probe runner with
-`EGL_PLATFORM=surfaceless` and `LIBGL_ALWAYS_SOFTWARE=1`, scoped to that child process. This checks
-EGLImage content and retained-frame lifetimes even though Linux skips the F# ABI smoke driver.
-Locally attached Linux GPU packages run the same check on their extracted payload before publication;
-`release.py --flavor gpu` also runs it before attaching a Linux package. This Mesa software-driver proof
-is distinct from the View SDL presenter and visible-window acceptance.
-
 An incremental rebuild after vcpkg reinstalls packages can fail with clang rejecting a precompiled header:
 the reinstalled headers keep older modification times. Delete `cmake_pch.cxx.obj` under
 `<build>/Source` and build again. CI does not hit this: it reuses a build tree only under the same vcpkg key.
@@ -304,8 +280,7 @@ release and WebKit's `arm64-windows-webkit` triplet. Two differences from `win-x
 
 On 2026-10-26, with empty caches, the job took 1 h 3 min: fetch 4 min, configure (vcpkg) 16 min and the
 compile 38 min. The slim package holds 18 DLLs, every one `IMAGE_FILE_MACHINE_ARM64`, 74.73 MB against
-`win-x64`'s 77.59 MB. Nobody has loaded these DLLs on an ARM64 machine yet: the package is unverified at
-runtime.
+`win-x64`'s 77.59 MB. 
 
 ## macOS (osx-arm64)
 
@@ -330,17 +305,3 @@ symbols with `strip -x` and signs each library again ad hoc, since arm64 macOS l
 The workflow's last macOS step loads `libRanvierWebCoreHost.dylib` from the staged package with Python's
 `ctypes`, checks that no staged library names the build tree, compares `rv_abi_version()` with the manifest,
 and paints a 32 by 32 page with a blue square on red, checking one pixel of each.
-
-## Other runtimes
-
-The patches change `OptionsWin.cmake` and the Windows platform CMake files, and `build.py` drives
-`vcvars64`, clang-cl and lld-link, so only `win-x64` builds today. Each further runtime identifier needs:
-
-- the same options added to its port's `Options*.cmake` and platform files (`OptionsGTK.cmake` or
-  `OptionsWPE.cmake` for Linux, `OptionsMac.cmake` for macOS), behind the same `USE_*_STUB` names;
-- a toolchain branch in `build.py` (`toolchain_env`, `closure` for ELF or Mach-O imports, `icu_data` for
-  the platform's data library format);
-- a matrix entry in `build.yml`.
-
-The package is per runtime identifier (`Ranvier.WebCore.Native.<rid>`), so each runtime ships on its own;
-a meta-package that depends on all of them can follow once more than one exists.

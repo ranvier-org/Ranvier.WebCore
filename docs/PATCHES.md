@@ -1,31 +1,18 @@
 # The patch series
 
-`patches/series` lists twenty-three patches, applied in order over the WebKit commit in `pins.json` by
-`scripts/patches.py apply`. Each patch carries one concern and, except 0000, 0010, 0012 and 0014 through 0022, changes nothing unless
-its CMake option is ON. Every option defaults to OFF, so the lean flavor, which sets none of them, compiles
-WebKit's feature implementations. 0010 changes which symbols WebCore exports and which members the host may override,
-and no behavior. 0012 adds the sources an embedder names to WebCore. 0013's option is set for macOS in every
-flavor, because the package always loads WebCore outside its framework bundle (`config/mac.cmake`).
-0014 through 0022 correct stylesheet mutation, typed lists, retained-object behavior and typed transform conversion in every flavor.
+`patches/series` is the authoritative list of patches, applied in order over the WebKit commit in `pins.json` by
+`scripts/patches.py apply`. This file documents the patches whose rationale is not obvious from their names;
+the others are described by their patch headers. Each patch carries one concern. Every CMake option a patch adds
+defaults to OFF, so the lean flavor, which sets none of them, compiles WebKit's feature implementations. A patch
+whose row names no option applies in every flavor. 0010 changes which symbols WebCore exports and which members the host may override, and no
+behavior. 0012 adds the sources an embedder names to WebCore. 0013's option is set for macOS in every flavor,
+because the package always loads WebCore outside its framework bundle (`config/mac.cmake`).
 
-The patches add new files (under a `stub/` directory next to the code they stand in for) and CMake hunks.
-They edit upstream C++ in these places: 0003 changes `CryptoDigestWin.cpp`, `CryptoKeyEC.h` and
-`CryptoKeyRSA.h`; 0010 changes `EmptyClients.h`, `ChromeClient.h`, `WebAnimation.h`, `CSSTransition.h`, `Element.h`,
-`Document.h` and `AXCoreObject.h`, and exports from `ResizeObserver.h`, `IntersectionObserver.h` and `Pasteboard.h`,
-and also changes `PlatformCocoa.cmake`; 0011 changes `AXObjectCache.h`, `AXObjectCache.cpp`, `FrameSelection.h`,
-`FrameSelection.cpp`, `ChromeClient.h` and `OptionsCommon.cmake`. 0012 adds a CMake hook to `Source/WebCore/CMakeLists.txt`. 0013 changes `LocalizedStrings.cpp` and
-`OptionsMac.cmake`. 0014 changes `CSSStyleSheet.cpp`; 0015 changes `CSSKeyframeRule.h`, `CSSKeyframeRule.cpp`,
-`CSSKeyframesRule.cpp` and `CSSStyleSheet.cpp`. 0016 changes `CSSCounterStyleRule.cpp` and
-`CSSCounterStyleRule.h`. 0017 changes `CSSRule.h`, `CSSRule.cpp`, `CSSFontFaceRule.h`,
-`PropertySetCSSDescriptors.h`, `PropertySetCSSDescriptors.cpp` and `CSSPositionTryDescriptors.cpp`.
-0018 changes `css/parser/CSSParser.cpp` so an explicit custom-property CSSOM assignment can remove importance.
-0019 changes `css/typedom/DeclaredStylePropertyMap.cpp`. 0020 changes `css/CSSProperties.json`.
-0021 changes `css/typedom/DeclaredStylePropertyMap.cpp` and `dom/StyledElement.cpp`.
-0022 changes `css/typedom/transform/CSSMatrixComponent.cpp` and `CSSPerspective.cpp`.
-The patches touch 93 files in all.
+The patches add new files (under a `stub/` directory next to the code they stand in for) and CMake hunks. Each
+patch section below names the upstream files it edits.
 
-The sizes are the reduction each patch measured when it was added, on Windows x64, in the slim flavor at
-`/O2` (Ranvier's `evidence/ABI-EXPERIMENT.md`, gates 37 to 43).
+The sizes below are the reduction each stub patch measured when it was added, on Windows x64, in the slim flavor
+at `/O2`. They are historical measurements, not a current package size (see `docs/SETTINGS.md`).
 
 | Patch | Option | Requires | Size removed |
 |---|---|---|---|
@@ -346,7 +333,7 @@ ImageLoader keeps native decode waiters beside its decode promises and settles b
 
 Removing `requiredExtensions` or `systemLanguage` empties the element's SVGStringList: both setters clear the list and return for a null attribute value, so the list reports `numberOfItems` 0, keeps its identity, and the element passes SVGTests conditional processing again, inside and outside `<switch>`, as in SVG 2 and Chromium. A present empty attribute keeps WebKit's single empty item.
 
-`tests/abi/svg_tests_lists.py` compares removal, empty, restore, clear and append steps with the Chromium 156 oracle `tests/fixtures/svg-tests-lists-oracle.json` (`tests/abi/svg_tests_lists_browser.mjs`). Measured differences that remain: `clear()` leaves the attribute `""` where Chromium removes it, `systemLanguage` serialises with `", "`, and `requiredExtensions=""` holds one empty item. Evidence: `docs/mathml-evidence/source-0034/evidence.json`.
+`tests/abi/svg_tests_lists.py` compares removal, empty, restore, clear and append steps with the Chromium 156 oracle `tests/fixtures/svg-tests-lists-oracle.json` (`tests/abi/svg_tests_lists_browser.mjs`). Measured differences that remain: `clear()` leaves the attribute `""` where Chromium removes it, `systemLanguage` serialises with `", "`, and `requiredExtensions=""` holds one empty item.
 
 ## 0035-caret-position-text-control-shadow-roots
 
@@ -378,7 +365,7 @@ existing per-source crop overloads, which stay private. The promise path is unch
 member function, so the eight unified sources that include `ImageBitmap.h` recompile with unchanged layouts.
 
 `tests/abi/canvas_export.py` creates cropped bitmaps through `rv_image_bitmap_create`. Without the patch the host glue
-has no public crop entry point: `docs/canvas-export-evidence/red-patch-0049-compile.log`.
+has no public crop entry point.
 
 ## 0050-image-bitmap-unaccelerated-buffers
 
@@ -388,7 +375,8 @@ The GTK and WPE `hardwareAccelerationEnabled` check stays. Cocoa enables the set
 bitmaps. The change is inside `ImageBitmap.cpp` and recompiles one unified source.
 
 Without the patch every `createImageBitmap` on the slim Windows build creates an accelerated Skia buffer, whose
-Ganesh stub aborts the process: `docs/canvas-export-evidence/red-patch-0050.log` (`red_bitmap_buffer.py`).
+Ganesh stub aborts the process.
+
 ## 0051-web-animation-promise-observer
 
 `WebAnimationPromiseObserver.h` declares `setWebAnimationPromiseObserver`, a process-wide function pointer that
@@ -399,7 +387,7 @@ scheduled. The pointer is a file static: no class layout changes, `WebAnimation.
 leaves the engine's behaviour unchanged. `Headers.cmake` lists the header among the private framework headers.
 
 `tests/abi/animation_lifecycle.py` checks `rv_animation_ready` and `rv_animation_finished` against the Chromium 156
-oracle `tests/fixtures/animation-lifecycle-oracle.json`. Evidence: `docs/animation-lifecycle-evidence/native-evidence.json`.
+oracle `tests/fixtures/animation-lifecycle-oracle.json`.
 
 ## 0052-eventloop-checkpoint-microtasks
 
@@ -419,8 +407,7 @@ fire times are past, so every task queued afterwards waited milliseconds for tha
 reproduces it (a denied pointer-lock request delivered after thousands of turns) and passes with this revision.
 
 Without the patch, `cancel()` of an animation with a pending pause queues its rejection as a JavaScript microtask, and
-the armed VM-entry crash (`crashOnDisallowedVMEntry`) aborts the host at the next checkpoint. Evidence:
-`docs/batch-6-evidence/` (first revision) and `docs/vm2-evidence/`.
+the armed VM-entry crash (`crashOnDisallowedVMEntry`) aborts the host at the next checkpoint.
 
 ## Working on the series
 

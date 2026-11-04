@@ -4,8 +4,10 @@ The CMake settings live in `config/` as `cmake -C` cache scripts: `common.cmake`
 `slim.cmake` or `lean.cmake`. `scripts/build.py` adds only machine paths (compilers, the vcpkg toolchain
 file, `VCPKG_INSTALLED_DIR`) and the two non-CMake steps listed at the end.
 
-Sizes are measured on Windows x64 (Ranvier's `evidence/ABI-EXPERIMENT.md`, gates 35 to 43). The lean
-flavor's package is 125.84 MB in 31 files; the slim flavor's is 77.59 MB in 18 files.
+Sizes in this file were measured on Windows x64 and macOS arm64 when each setting was chosen; they show the
+effect of a setting, not the size of a current package. Each package's `manifest.json` lists its files and sizes.
+The first Windows x64 measurement was 125.84 MB in 31 files for the lean flavor and 77.59 MB in 18 files for the
+slim flavor. The GPU flavor (`config/gpu.cmake`) is the slim flavor with the GPU code kept.
 
 ## Toolchain
 

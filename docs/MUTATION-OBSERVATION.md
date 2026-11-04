@@ -41,9 +41,7 @@ thin forwards and lifecycle hooks. The DOM generator and vendor WebKit series ar
 canonical P/Invoke generator preserves six structs, two delegates and nine functions. Observer and
 batch tokens use provider ownership rather than generated object-kind IDs.
 
-The lane uses its inherited ABI/package values until coordinator integration assigns a new cohort.
-This source addition does not change the frozen preview.3/preview.4 packages or claim production
-runtime qualification. The source tests compile C11/C++20 sizes and every field offset for supported
+The source tests compile C11/C++20 sizes and every field offset for supported
 64-bit layouts. The public runtime probe exercises delivery, draining, options, foreign documents,
 adoption, reentrancy, host replacement/destruction, context ownership and output-size/thread errors.
 It is selected by the catalogue, extracted-package checks and an explicit native workflow step.
