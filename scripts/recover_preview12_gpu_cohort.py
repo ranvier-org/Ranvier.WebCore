@@ -5,6 +5,8 @@ import importlib.util
 import json
 from pathlib import Path
 import shutil
+import subprocess
+import sys
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -48,7 +50,8 @@ def admit_policy(policy):
         require(type(record.get('id')) is int and record['id'] > 0 and digest(record.get('sha256'))
                 and record.get('name') == name, 'Exact Mac artifact identity is required')
     require(type(mac.get('replayRun')) is int and mac['replayRun'] > 0 and revision(mac.get('replayController'))
-            and digest(mac.get('replayReceiptSha256')) and digest(mac.get('originalReceiptSha256')),
+            and digest(mac.get('replayReceiptSha256')) and digest(mac.get('originalReceiptSha256'))
+            and digest(mac.get('originalGlyphReceiptSha256')),
             'Actual Mac capture replay is required')
     linux = policy['linux']
     require(linux.get('producerRun') == policy['producerRun'] and linux.get('productSource') == PRODUCT
@@ -121,6 +124,45 @@ def admit_mac_original(receipt, manifest):
             and qualification['gpuGlyph'].get('source') == PRODUCT, 'Original Mac glyph gate did not pass')
 
 
+def admit_mac_job(response):
+    require(response.get('total_count') == len(response.get('jobs', [])), 'Original Mac job inventory is incomplete')
+    selected = [job for job in response['jobs'] if job.get('name') == 'recover']
+    require(len(selected) == 1 and selected[0].get('conclusion') == 'failure', 'Original Mac recovery job differs')
+    steps = selected[0]['steps']
+    expected = {'Recover the warm immutable product', 'Retain immutable product package',
+                'Retain immutable product manifest', 'Build matching helpers',
+                'Collect the independent immutable product gates', 'Always retain original SDK and helper proof'}
+    for name in expected:
+        matches = [step for step in steps if step.get('name') == name]
+        require(len(matches) == 1 and matches[0].get('conclusion') == 'success', 'Original Mac product/proof step failed')
+    failures = [step.get('name') for step in steps if step.get('conclusion') not in ('success', 'skipped')]
+    require(failures == ['Consolidate the explicit owned proof root'], 'Original Mac failure was not solely proof consolidation')
+
+
+def verify_glyph(archive, record, output):
+    raw = archive.read('glyph-proof/orientation.json')
+    require(hashlib.sha256(raw).hexdigest() == record['originalGlyphReceiptSha256'], 'Original glyph receipt digest differs')
+    oracle = ROOT / 'tests/gpu/mac/glyph_orientation.py'
+    require(sha(oracle) == 'cf246c50c7d000f0fa6f149fe5e65061eb46d6cbdfdd489267ebb7dae7d7299b', 'Canonical F glyph oracle differs')
+    output.mkdir()
+    labels = ('original-1', 'asymmetric-10', 'asymmetric-15', 'asymmetric-20')
+    names = [f'{label}-{kind}.bmp' for label in labels for kind in ('cpu', 'gpu')]
+    names += ['cg-copy-identity.bgra', 'cg-copy-flipped.bgra']
+    for name in names:
+        (output / name).write_bytes(archive.read('glyph-proof/' + name))
+    replay = output / 'recomputed.json'
+    with (output / 'oracle.log').open('wb') as stream:
+        result = subprocess.run([sys.executable, '-B', '-I', str(oracle), '--captures', str(output), '--output', str(replay)],
+                                stdout=stream, stderr=subprocess.STDOUT, timeout=60)
+    require(result.returncode == 0, 'Canonical F glyph oracle rejected original captures')
+    report = json.loads(raw)
+    require(json.loads(replay.read_text(encoding='utf-8')) == report
+            and [row['label'] for row in report['rows']] == list(labels)
+            and all(row['sameDimensions'] is True and row['uprightMaskIoU'] == 1.0
+                    and row['cpuBounds'] == row['gpuBounds'] and row['cpuInk'] == row['gpuInk'] > 0
+                    for row in report['rows']), 'Original glyph receipt/pixels differ from recomputed oracle')
+
+
 def mac_inputs(policy, output):
     record = policy['mac']
     original = slim.api(f'actions/runs/{ORIGINAL_MAC_RUN}')
@@ -129,6 +171,7 @@ def mac_inputs(policy, output):
             and original.get('head_sha') == ORIGINAL_MAC_CONTROL and original.get('event') == 'workflow_dispatch'
             and original.get('path') == '.github/workflows/macos-preview12-recovery.yml' and original.get('run_attempt') == 1,
             'Original Mac transport failure identity differs')
+    admit_mac_job(slim.jobs(ORIGINAL_MAC_RUN))
     package_zip = slim.artifact(record['packageArtifact'], ORIGINAL_MAC_RUN, ORIGINAL_MAC_CONTROL, output)
     package = one_package(package_zip, output)
     manifest = verify_package(package, 'osx-arm64', policy['packageHashes']['osx-arm64'])
@@ -138,6 +181,7 @@ def mac_inputs(policy, output):
         raw = archive.read('recovery-receipt.json')
         require(hashlib.sha256(raw).hexdigest() == record['originalReceiptSha256'], 'Original Mac receipt hash differs')
         admit_mac_original(json.loads(raw), manifest)
+        verify_glyph(archive, record, output / 'glyph-oracle')
     run = slim.api(f"actions/runs/{record['replayRun']}")
     slim.repo_run(run)
     require(run.get('status') == 'completed' and run.get('conclusion') == 'success'
@@ -162,6 +206,7 @@ def verify_mac_replay(path, record, manifest, package_sha):
                 and receipt.get('originalController') == ORIGINAL_MAC_CONTROL
                 and receipt.get('originalProofArtifact') == record['proofArtifact']['id']
                 and receipt.get('originalProofSha256') == record['proofArtifact']['sha256']
+                and receipt.get('originalGlyphReceiptSha256') == record['originalGlyphReceiptSha256']
                 and receipt.get('packageArtifact') == record['packageArtifact']['id']
                 and receipt.get('packageArchiveSha256') == record['packageArtifact']['sha256']
                 and receipt.get('packageSha256') == package_sha, 'Mac replay lineage differs')

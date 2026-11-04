@@ -81,6 +81,7 @@ class GpuCohort(unittest.TestCase):
         s = self.subject
         original = b'original immutable proof fixture'
         record = dict(replayController='a' * 40, replayRun=123,
+            originalGlyphReceiptSha256='e' * 64,
             proofArtifact=dict(id=13282342479, sha256=hashlib.sha256(original).hexdigest()),
             packageArtifact=dict(id=13281332839, sha256='b' * 64))
         native = {row['name']: row['sha256'] for row in self.manifest['files']}
@@ -101,6 +102,7 @@ class GpuCohort(unittest.TestCase):
             productSource=s.PRODUCT, controlSource=record['replayController'], run=123,
             originalRun=s.ORIGINAL_MAC_RUN, originalController=s.ORIGINAL_MAC_CONTROL,
             originalProofArtifact=record['proofArtifact']['id'], originalProofSha256=record['proofArtifact']['sha256'],
+            originalGlyphReceiptSha256=record['originalGlyphReceiptSha256'],
             packageArtifact=record['packageArtifact']['id'], packageArchiveSha256=record['packageArtifact']['sha256'],
             packageSha256='c' * 64, nativeBefore=native, nativeAfter=native, nativeUnchanged=True,
             productClean=True, controlClean=True, originalAccepted=True, originalGlyphPinned=True,
@@ -138,6 +140,25 @@ class GpuCohort(unittest.TestCase):
                            ('originalPhases', {}), ('ownedProcessesExited', False), ('rawCaptureMembers', {})]:
             with self.subTest(key=key), self.assertRaises(ValueError):
                 self.replay_fixture(change=lambda receipt: receipt.update({key: value}))
+
+    def test_original_mac_only_named_transport_step_may_fail(self):
+        expected = ['Recover the warm immutable product', 'Retain immutable product package',
+            'Retain immutable product manifest', 'Build matching helpers',
+            'Collect the independent immutable product gates', 'Always retain original SDK and helper proof']
+        rows = [dict(name=name, conclusion='success') for name in expected]
+        rows.append(dict(name='Consolidate the explicit owned proof root', conclusion='failure'))
+        jobs = dict(total_count=1, jobs=[dict(name='recover', conclusion='failure', steps=rows)])
+        self.subject.admit_mac_job(jobs)
+        rows[3]['conclusion'] = 'failure'
+        with self.assertRaises(ValueError):
+            self.subject.admit_mac_job(jobs)
+
+    def test_changed_glyph_receipt_rejects_before_oracle(self):
+        path = Path(self.temp.name) / 'glyph.zip'
+        with zipfile.ZipFile(path, 'w') as archive:
+            archive.writestr('glyph-proof/orientation.json', '{}')
+        with zipfile.ZipFile(path) as archive, self.assertRaises(ValueError):
+            self.subject.verify_glyph(archive, {'originalGlyphReceiptSha256': 'a' * 64}, Path(self.temp.name) / 'glyph')
 
 
 if __name__ == '__main__':

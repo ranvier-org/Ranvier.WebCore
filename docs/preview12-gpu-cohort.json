@@ -15,6 +15,7 @@
     "packageArtifact": {"id": null, "name": "package-osx-arm64-gpu", "sha256": null},
     "proofArtifact": {"id": null, "name": "immutable-d31-mac-gpu-recovery-proof", "sha256": null},
     "originalReceiptSha256": null,
+    "originalGlyphReceiptSha256": null,
     "replayRun": null,
     "replayController": null,
     "replayArtifact": {"id": null, "name": "immutable-d31-mac-gpu-capture-replay", "sha256": null},
