@@ -106,6 +106,12 @@ tree's key names the toolchain.
 - A miss restores the newest entry with the same prefix (`vcpkg-<rid>-<flavor>-`, `vcpkg-downloads-<rid>-`):
   archives are named by their ABI hash, so the packages that did not change are not rebuilt. An entry is
   saved only on a miss, because a saved key is never replaced.
+- A tag run saves none of these entries. A later run cannot restore an entry saved under a tag, so it would
+  only take space from the default branch's entries: until 2026-11-04 every release tag saved its own copy
+  of the 140 MB `vcpkg-win-x64-gpu-*` archives.
+- The GPU flavor's build trees are not cached. They would be restorable only if saved by `main`, which builds
+  Slim only, and the four of them (about 2.7 GB) do not fit beside the Slim trees, LLVM and vcpkg within the
+  repository's 10 GB, so GPU cells build cold in every tag run.
 - A config edit changes neither vcpkg key unless it changes the manifest features. Until 2026-11-01 the key
   ended in a hash of all of `config/`: each config edit saved a new 272 to 412 MB entry, the repository
   reached its 10 GB limit, and GitHub evicted the entries a run then missed (19 minutes of vcpkg builds on
