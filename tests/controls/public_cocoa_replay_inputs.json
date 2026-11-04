@@ -19,7 +19,7 @@
     },
     "interopPackageSha256": "bce15422226aa5a19850575ef0335957dfe37c08eb7701e64598bdc3bc88fa51",
     "headerSha256": "dc1195fe9d6cb00d6db94931a0a3a1c0ad1c338576494014f42c0dab8e7f893d",
-    "sidecarManifestSha256": "237ac7124fb258c9ba53b13a7673bcc1831a5e2761ff5dd5b26964fef65f02e9",
+    "sidecarManifestSha256": "6127aeea17e57a9d6adba0615aacbe1b2350c231abd5f26c86d2b79a9aa46441",
     "reviewedOwnerProofSha256": null
   },
   "sidecarManifest": {
@@ -77,7 +77,7 @@
         "auditSha256": "e3b461c40fd7f2d0c64b7180e84b6f409e8ea61bf9af5aa6ae2091c35d2586d4",
         "publisherRun": 41745929967,
         "payloadEqualToUnsignedStage": true,
-        "signedOnlyMembers": [
+        "membersOutsideStage": [
           ".signature.p7s",
           "_rels/.rels"
         ]
