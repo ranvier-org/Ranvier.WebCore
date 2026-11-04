@@ -107,6 +107,9 @@ class Preview12Recovery(unittest.TestCase):
             subject.admit_policy(policy, 'qualify')
         policy['rids']['linux-x64']['growthFailureLogSha256'] = 'e' * 64
         subject.admit_policy(policy, 'qualify')
+        policy['rids']['linux-arm64']['growthFailureLogSha256'] = 'e' * 64
+        with self.assertRaisesRegex(ValueError, 'growth'):
+            subject.admit_policy(policy, 'qualify')
 
     def test_artifact_parent_traversal_is_rejected_before_any_extraction(self):
         subject = self.subject()

@@ -56,7 +56,7 @@ def admit_policy(policy, phase):
     for rid, record in policy['rids'].items():
         require(digest(record.get('packageSha256')) and digest(record.get('summarySha256'))
                 and digest(record.get('failureLogSha256')), 'Original package and failure evidence hashes are required')
-        require('growthFailureLogSha256' not in record or digest(record['growthFailureLogSha256']),
+        require('growthFailureLogSha256' not in record or rid == 'linux-x64' and digest(record['growthFailureLogSha256']),
                 'Retained growth failure log hash is malformed')
         for key, name in [('packageArtifact', f'package-{rid}-gpu'), ('probeArtifact', f'probe-logs-{rid}-gpu')]:
             artifact = record.get(key, {})
