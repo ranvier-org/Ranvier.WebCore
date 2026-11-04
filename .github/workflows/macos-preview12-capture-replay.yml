@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   replay:
-    if: ${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
+    if: ${{ false && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
     runs-on: macos-26
     timeout-minutes: 40
     concurrency:
