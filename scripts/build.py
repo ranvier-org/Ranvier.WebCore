@@ -457,7 +457,7 @@ for step in selected:
         run([sys.executable, '-I', root / 'scripts/smoke.py', '--stage', out, '--build-dir', build]
             + (['--no-load'] if system == 'linux' else []))
         if system != 'linux':
-            run([sys.executable, '-I', root / 'scripts/abi_tests.py', '--stage', out, '--source', source, '--expected-abi', '64'])
+            run([sys.executable, '-I', root / 'scripts/abi_tests.py', '--stage', out, '--source', source])
         continue
     env = env or toolchain_env()
     {'configure': configure, 'build': build_step, 'package': package}[step](env)

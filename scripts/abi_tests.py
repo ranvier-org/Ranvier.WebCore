@@ -11,7 +11,7 @@ from contextlib import nullcontext
 root = pathlib.Path(__file__).resolve().parents[1]
 tests = root / 'tests' / 'abi'
 sys.path.insert(0, str(tests))
-from abi_expectation import expected_environment
+from abi_expectation import current_abi, expected_environment
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--stage', required=True)
@@ -92,7 +92,7 @@ stage = pathlib.Path(args.stage)
 manifest = json.loads((stage / 'manifest.json').read_text())
 rid = manifest['rid']
 try:
-    probe_env = expected_environment(manifest, args.expected_abi, os.environ)
+    probe_env = expected_environment(manifest, current_abi() if args.expected_abi is None else args.expected_abi, os.environ)
 except ValueError as error:
     parser.error(str(error))
 run([sys.executable, '-I', tests / 'generate_native.py', 'check'])

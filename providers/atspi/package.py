@@ -35,14 +35,21 @@ def validate_cohort_label(cohort_label):
         raise ValueError('The caller cohort label must be a private-* lowercase token; it does not establish qualification.')
 
 
+def current_abi():
+    """The value returned by rv_abi_version in the checkout's host source."""
+    source = (Path(__file__).resolve().parents[2] / 'host/RanvierWebCoreAbi.cpp').read_text(encoding='utf-8')
+    return int(re.search(r'rv_abi_version\(void\)\s*\{\s*return\s+(\d+);', source).group(1))
+
+
 def validate_host_abi(actual, expected, style_capability):
-    if (type(expected) is not int or expected not in (63, 64)
+    if (type(expected) is not int or type(expected) is bool or expected <= 0
             or type(actual) is not int or actual != expected or style_capability != 1):
-        raise ValueError('The provider candidate requires the explicitly selected ABI63/64 style-run host.')
+        raise ValueError('The provider requires a host of exactly the selected ABI with the accessibility-text-style capability.')
     return actual
 
 
-def validate_runtime(provider, native, rid, expected_host_abi=63):
+def validate_runtime(provider, native, rid, expected_host_abi=None):
+    expected_host_abi = current_abi() if expected_host_abi is None else expected_host_abi
     validate_host_abi(expected_host_abi, expected_host_abi, 1)
     machine = {'linux-x64': 62, 'linux-arm64': 183}[rid]
     for path in [provider, native]:
@@ -63,7 +70,7 @@ def validate_runtime(provider, native, rid, expected_host_abi=63):
     return validate_host_abi(abi, expected_host_abi, host.rv_abi_has(b'accessibility-text-style'))
 
 
-def pack(provider, native, rid, package_id, version, output, source_revision, test_only_arm64=False, cohort_label='private-unspecified', expected_host_abi=63):
+def pack(provider, native, rid, package_id, version, output, source_revision, test_only_arm64=False, cohort_label='private-unspecified', expected_host_abi=None):
     validate_distribution(rid, source_revision, test_only_arm64)
     validate_identity(package_id, version)
     validate_cohort_label(cohort_label)
@@ -88,8 +95,8 @@ def pack(provider, native, rid, package_id, version, output, source_revision, te
     manifest = dict(id=package_id, version=version, rid=rid, abi=abi,
         callerClaimedProviderSourceRevision=source_revision, sourceProvenance='unverified-caller-claim',
         qualificationScope=('ARM64-test-only-unqualified' if test_only_arm64 else
-                            'private-ABI63-provider-only' if abi == 63 else 'private-ABI64-provider-only-unqualified'),
-        expectedHostAbi=expected_host_abi,
+                            f'private-ABI{abi}-provider-only'),
+        expectedHostAbi=abi,
         hostAbiAdmission='Exact host version and style capability; provider behavior requires separate runtime qualification.',
         callerClaimedCohortLabel=cohort_label, cohortLabelProvenance='unverified-caller-claim',
         licenseMetadataStatus='original-project-license-unspecified; embedded-XML-license-not-marked',
@@ -120,8 +127,8 @@ if __name__ == '__main__':
     parser.add_argument('--source-revision', required=True, help='Caller-claimed provider commit; syntax checked, provenance unverified.')
     parser.add_argument('--cohort-label', default='private-unspecified', help='Caller-claimed private-* cohort token; establishes no runtime qualification or provenance.')
     parser.add_argument('--test-only-arm64', action='store_true', help='Build a private ARM64 test artifact; confers no runtime qualification or distribution support.')
-    parser.add_argument('--expected-host-abi', type=int, choices=[63, 64], default=63,
-                        help='Exact selected host ABI; ABI64 does not reuse the ABI63 provider runtime receipts.')
+    parser.add_argument('--expected-host-abi', type=int, default=None,
+                        help="Exact host ABI; defaults to rv_abi_version in the checkout's host source.")
     args = parser.parse_args()
     destination, manifest = pack(args.provider, args.native, args.rid, args.id, args.version, args.output, args.source_revision,
                                  args.test_only_arm64, args.cohort_label, args.expected_host_abi)

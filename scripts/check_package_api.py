@@ -9,17 +9,19 @@ import tempfile
 import zipfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tests/abi'))
-from abi_expectation import expected_environment
+from abi_expectation import current_abi, expected_environment
 
 
-def verify(package, gpu=False, evidence=None, expected_abi=63):
+def verify(package, gpu=False, evidence=None, expected_abi=None):
     root = Path(__file__).resolve().parents[1]
     with tempfile.TemporaryDirectory(prefix='ranvier-package-api-') as temporary:
         destination = Path(temporary).resolve() / 'native'
         with zipfile.ZipFile(package) as archive:
             manifest = json.loads(archive.read('manifest.json'))
-            if type(expected_abi) is not int or expected_abi not in (63, 64):
-                raise ValueError('Select supported package ABI63 or ABI64 explicitly.')
+            if expected_abi is None:
+                expected_abi = current_abi()
+            if type(expected_abi) is not int or expected_abi < 1:
+                raise ValueError('Select a positive package ABI version.')
             environment = expected_environment(manifest, expected_abi, os.environ)
             rid = manifest['rid']
             if gpu and (rid not in ['win-x64', 'linux-x64', 'linux-arm64', 'osx-arm64'] or manifest.get('flavor') != 'gpu'):
@@ -79,6 +81,6 @@ if __name__ == '__main__':
     parser.add_argument('--package', type=Path, required=True)
     parser.add_argument('--gpu', action='store_true', help='Verify shared frames and lifetimes (D3D11, EGLImage or IOSurface)')
     parser.add_argument('--evidence', type=Path, help='retain the macOS public transport logs and receipts here')
-    parser.add_argument('--expected-abi', type=int, choices=[63, 64], default=63)
+    parser.add_argument('--expected-abi', type=int, help='Defaults to the ABI declared by the checkout.')
     args = parser.parse_args()
     verify(args.package, gpu=args.gpu, evidence=args.evidence, expected_abi=args.expected_abi)

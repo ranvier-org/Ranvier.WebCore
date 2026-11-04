@@ -39,7 +39,7 @@ class ExpectedAbiControls(unittest.TestCase):
 
     def test_standalone_default_and_explicit_versions_are_exact(self):
         with patch.dict(os.environ,{},clear=True):
-            self.assertEqual(expectation.expected_abi(),63)
+            self.assertEqual(expectation.expected_abi(),expectation.current_abi())
         for value in ['63','64','65']:
             with patch.dict(os.environ,{expectation.ENVIRONMENT:value}):
                 self.assertEqual(expectation.expected_abi(),int(value))

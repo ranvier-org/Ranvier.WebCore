@@ -211,7 +211,7 @@ jobs:
       - name: Verify packaged CSS queries, computed styles and fragment rectangles
         if: env.FLAVOR == 'slim'
         shell: bash
-        run: python -I scripts/check_package_api.py --package 'packages/${{ matrix.asset }}' --expected-abi 64
+        run: python -I scripts/check_package_api.py --package 'packages/${{ matrix.asset }}'
 
       - name: Select macOS packaged GPU consumer tools
         if: env.FLAVOR == 'gpu' && matrix.rid == 'osx-arm64'
@@ -226,7 +226,7 @@ jobs:
       - name: Verify packaged GPU shared frames and lifetimes
         if: env.FLAVOR == 'gpu' && (matrix.rid == 'win-x64' || startsWith(matrix.rid, 'linux-') || matrix.rid == 'osx-arm64')
         shell: bash
-        run: python -I scripts/check_package_api.py --gpu --package 'packages/${{ matrix.asset }}' --expected-abi 64 --evidence '${{ runner.temp }}/mac-gpu-public-qualification'
+        run: python -I scripts/check_package_api.py --gpu --package 'packages/${{ matrix.asset }}' --evidence '${{ runner.temp }}/mac-gpu-public-qualification'
 
       - name: Retain packaged macOS texture qualification
         if: always() && env.FLAVOR == 'gpu' && matrix.rid == 'osx-arm64'
@@ -679,7 +679,7 @@ jobs:
         run: python -I tests/test_producer_gpu_clipping.py
 
       - name: Run the probes
-        run: python -I scripts/probes.py run --rid ${{ matrix.rid }} --flavor ${{ env.FLAVOR }} --work "${{ env.RANVIER_WORK }}" --expected-abi 64
+        run: python -I scripts/probes.py run --rid ${{ matrix.rid }} --flavor ${{ env.FLAVOR }} --work "${{ env.RANVIER_WORK }}"
 
       - name: Upload the probe logs
         if: always()
@@ -842,7 +842,7 @@ jobs:
           python3 -I tests/atspi/run.py run --native "$host" --provider "$provider" --output "$W/protocol-session" --registry --extended-text --discovery session
       - name: SDK consumer load
         run: |
-          python3 -I providers/atspi/package.py --provider "$W/install/lib/libRanvierWebCoreAtspi.so" --native "$W/native/libRanvierWebCoreHost.so" --rid "$RID" ${{ matrix.pack }} --expected-host-abi 64 --id Ranvier.Private.Accessibility.Atspi.Qualification --version "0.0.0-ci.$GITHUB_RUN_ID" --source-revision "$GITHUB_SHA" --output "$W/package"
+          python3 -I providers/atspi/package.py --provider "$W/install/lib/libRanvierWebCoreAtspi.so" --native "$W/native/libRanvierWebCoreHost.so" --rid "$RID" ${{ matrix.pack }} --id Ranvier.Private.Accessibility.Atspi.Qualification --version "0.0.0-ci.$GITHUB_RUN_ID" --source-revision "$GITHUB_SHA" --output "$W/package"
           python3 -I tests/atspi/consumer.py --package "$W/package/Ranvier.Private.Accessibility.Atspi.Qualification.0.0.0-ci.$GITHUB_RUN_ID.nupkg" --native "$W/native/libRanvierWebCoreHost.so" --output "$W/consumer"
       - name: Record the qualified build
         run: |

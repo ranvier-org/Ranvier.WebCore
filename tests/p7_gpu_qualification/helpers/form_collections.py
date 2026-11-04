@@ -18,7 +18,7 @@ FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 P, I, U = ctypes.c_void_p, ctypes.c_int32, ctypes.c_uint32
 CALLBACK = ctypes.CFUNCTYPE(I, P, P)
 OK, NULL_ARGUMENT, WRONG_THREAD, DOM_EXCEPTION, WRONG_INTERFACE = 0, -1, -2, -3, -11
-ABI = 62
+ABI = int(__import__('re').search(r'rv_abi_version\(void\)\s*\{\s*return\s+(\d+);', (__import__('pathlib').Path(__file__).resolve().parents[3] / 'host/RanvierWebCoreAbi.cpp').read_text(encoding='utf-8')).group(1))
 FILE_ARM, STRING_ARM = 1, 2
 
 

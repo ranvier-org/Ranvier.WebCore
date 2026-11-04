@@ -16,6 +16,9 @@ class TransitionAbiAdmission(unittest.TestCase):
         spec = importlib.util.spec_from_file_location('linux_transition_pixels_test', path)
         cls.module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(cls.module)
+        expectation = importlib.util.spec_from_file_location('abi_expectation_test', path.parent.parent / 'abi/abi_expectation.py')
+        cls.abi_expectation = importlib.util.module_from_spec(expectation)
+        expectation.loader.exec_module(cls.abi_expectation)
 
     def invoke(self, host_abi):
         class Native:
@@ -31,9 +34,12 @@ class TransitionAbiAdmission(unittest.TestCase):
         with patch.object(self.module, 'Native', Native):
             self.module.run('unused')
 
-    def test_default_accepts_abi63(self):
+    def test_default_accepts_the_checkout_abi(self):
+        current = self.abi_expectation.current_abi()
         with patch.dict(os.environ, {}, clear=True), self.assertRaises(Accepted):
-            self.invoke(63)
+            self.invoke(current)
+        with patch.dict(os.environ, {}, clear=True), self.assertRaises(AssertionError):
+            self.invoke(current + 1)
 
     def test_explicit_abi64_accepts_matching_host(self):
         with patch.dict(os.environ, {'RANVIER_ABI_TEST_EXPECTED': '64'}, clear=True), self.assertRaises(Accepted):
