@@ -22,11 +22,29 @@ def collect(evidence, work, flavor):
         sources.append(row)
         if not row['present']:
             continue
-        if source.is_symlink() or not source.is_dir() or any(path.is_symlink() for path in source.rglob('*')):
-            raise ValueError('Require real owned gate output directories without external links')
+        if source.is_symlink() or not source.is_dir() or not source.resolve(strict=True).is_relative_to(work):
+            raise ValueError('Require real owned gate output directories: ' + str(source))
+        aliases = []
+        for path in source.rglob('*'):
+            if not path.is_symlink():
+                continue
+            try:
+                target = path.resolve(strict=True)
+            except (OSError, RuntimeError) as error:
+                raise ValueError('Broken or cyclic gate output alias: ' + str(path)) from error
+            if not target.is_file() or not target.is_relative_to(source.resolve(strict=True)):
+                raise ValueError('External or directory gate output alias: ' + str(path) + ' -> ' + str(target))
+            aliases.append(dict(path=path.relative_to(source).as_posix(), target=target.relative_to(source).as_posix(),
+                                sha256=hashlib.sha256(target.read_bytes()).hexdigest(), copiedAs='regular-file-bytes'))
+        row['fileAliases'] = aliases
         destination = evidence / row['destination']
         destination.parent.mkdir(exist_ok=True)
         shutil.copytree(source, destination)
+        for alias in aliases:
+            copied = destination / alias['path']
+            if (copied.is_symlink() or hashlib.sha256(copied.read_bytes()).hexdigest() != alias['sha256']
+                    or hashlib.sha256((source / alias['target']).read_bytes()).hexdigest() != alias['sha256']):
+                raise ValueError('Gate output alias changed while copying: ' + alias['path'])
     members = {}
     for path in sorted(evidence.rglob('*')):
         if path.is_symlink():

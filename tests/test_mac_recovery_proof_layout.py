@@ -51,6 +51,40 @@ class ProofLayoutTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             layout.collect(self.evidence, self.work, 'slim')
 
+    def test_internal_presenter_file_alias_is_recorded_and_copied_as_bytes(self):
+        source = self.work / 'mac-gpu-public-qualification/presenter-sdk/lib'
+        source.mkdir(parents=True)
+        (source / 'libSDL3.dylib').write_bytes(b'pinned presenter')
+        alias = source / 'libSDL3.0.dylib'
+        try:
+            alias.symlink_to('libSDL3.dylib')
+        except OSError:
+            self.skipTest('The platform does not permit test file symlinks')
+        result = layout.collect(self.evidence, self.work, 'gpu')
+        copied = self.evidence / 'product-gates/mac-gpu-public-qualification/presenter-sdk/lib/libSDL3.0.dylib'
+        self.assertFalse(copied.is_symlink())
+        self.assertEqual(copied.read_bytes(), b'pinned presenter')
+        self.assertEqual(result['sources'][1]['fileAliases'][0]['target'], 'presenter-sdk/lib/libSDL3.dylib')
+
+    def test_external_or_directory_alias_cannot_enter_the_proof(self):
+        for directory in [False, True]:
+            with self.subTest(directory=directory), tempfile.TemporaryDirectory() as temporary:
+                work = Path(temporary) / 'work'
+                evidence = Path(temporary) / 'evidence'
+                source = work / 'mac-gpu-public-qualification'
+                source.mkdir(parents=True)
+                target = Path(temporary) / 'outside'
+                if directory:
+                    target.mkdir()
+                else:
+                    target.write_bytes(b'outside')
+                try:
+                    (source / 'unsafe').symlink_to(target, target_is_directory=directory)
+                except OSError:
+                    self.skipTest('The platform does not permit test symlinks')
+                with self.assertRaises(ValueError):
+                    layout.collect(evidence, work, 'gpu')
+
     def test_workflow_uploads_only_the_owned_proof_root(self):
         text = (ROOT / '.github/workflows/macos-preview12-recovery.yml').read_text()
         final = text[text.index('      - name: Always retain original SDK and helper proof'):]
