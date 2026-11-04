@@ -9,6 +9,10 @@ on:
     types: [opened, synchronize, reopened, labeled]
   workflow_dispatch:
     inputs:
+      recover_preview12_slim:
+        description: Publish only the independently qualified immutable preview12 Slim cohort
+        type: boolean
+        default: false
       recover_preview12_linux_gpu:
         description: Publish only the independently qualified immutable preview12 Linux GPU artifacts
         type: boolean
@@ -54,12 +58,123 @@ on:
         default: false
 
 concurrency:
-  group: ${{ inputs.recover_preview12_linux_gpu && format('preview12-linux-recovery-{0}', github.run_id) || inputs.atspi_preview11 != '' && inputs.atspi_preview11 != 'off' && format('atspi-preview11-{0}', github.run_id) || inputs.atspi_preview10 != '' && inputs.atspi_preview10 != 'off' && format('atspi-preview10-{0}', github.run_id) || inputs.recover_preview7_windows && format('preview7-windows-recovery-{0}', github.run_id) || inputs.recover_preview7_linux && format('preview7-linux-recovery-{0}', github.run_id) || inputs.recover_preview4_gpu && format('preview4-artifact-recovery-{0}', github.run_id) || inputs.recover_preview2_gpu && format('preview2-artifact-recovery-{0}', github.run_id) || format('{0}-{1}-{2}', github.workflow, github.ref, inputs.flavor || 'slim') }}
-  cancel-in-progress: ${{ !inputs.recover_preview12_linux_gpu && ((inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows) }}
+  group: ${{ inputs.recover_preview12_slim && format('preview12-slim-recovery-{0}', github.run_id) || inputs.recover_preview12_linux_gpu && format('preview12-linux-recovery-{0}', github.run_id) || inputs.atspi_preview11 != '' && inputs.atspi_preview11 != 'off' && format('atspi-preview11-{0}', github.run_id) || inputs.atspi_preview10 != '' && inputs.atspi_preview10 != 'off' && format('atspi-preview10-{0}', github.run_id) || inputs.recover_preview7_windows && format('preview7-windows-recovery-{0}', github.run_id) || inputs.recover_preview7_linux && format('preview7-linux-recovery-{0}', github.run_id) || inputs.recover_preview4_gpu && format('preview4-artifact-recovery-{0}', github.run_id) || inputs.recover_preview2_gpu && format('preview2-artifact-recovery-{0}', github.run_id) || format('{0}-{1}-{2}', github.workflow, github.ref, inputs.flavor || 'slim') }}
+  cancel-in-progress: ${{ !inputs.recover_preview12_slim && (!inputs.recover_preview12_linux_gpu && ((inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows)) }}
 
 jobs:
+  verify-preview12-slim-recovery:
+    if: ${{ inputs.recover_preview12_slim && !inputs.recover_preview12_linux_gpu && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      controller: ${{ steps.policy.outputs.controller }}
+      product: ${{ steps.policy.outputs.product }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: policy-source
+          persist-credentials: false
+      - id: policy
+        run: |
+          python3 - <<'PY'
+          import json, os, re
+          data = json.load(open('policy-source/docs/preview12-slim-recovery.json'))
+          if data.get('armed') is not True or data.get('publicationEnabled') is not True:
+              raise ValueError('Slim publication is unarmed')
+          controller, product = data['controllerSource'], data['productSource']
+          if not all(re.fullmatch('[0-9a-f]{40}', value or '') for value in [controller, product]):
+              raise ValueError('Exact reviewed controller and immutable product sources are required')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as stream:
+              stream.write(f'controller={controller}\nproduct={product}\n')
+          PY
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.policy.outputs.controller }}
+          path: controller
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.policy.outputs.product }}
+          path: product-source
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.403'
+      - name: Verify exact seven-package Slim cohort and actual qualification
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          python3 -B -I controller/scripts/recover_preview12_slim.py export
+          --policy policy-source/docs/preview12-slim-recovery.json
+          --product-root product-source --output "${{ runner.temp }}/preview12-slim-verification"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: preview12-slim-recovery-verification
+          path: ${{ runner.temp }}/preview12-slim-verification/pre-authentication.json
+          if-no-files-found: error
+
+  publish-preview12-slim-recovery:
+    needs: verify-preview12-slim-recovery
+    if: ${{ !cancelled() && inputs.recover_preview12_slim && !inputs.recover_preview12_linux_gpu && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.verify-preview12-slim-recovery.result == 'success' && vars.NUGET_USER != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: policy-source
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.verify-preview12-slim-recovery.outputs.controller }}
+          path: controller
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.verify-preview12-slim-recovery.outputs.product }}
+          path: product-source
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.403'
+      - name: Revalidate seven unchanged qualified packages before authentication
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          python3 -B -I controller/scripts/recover_preview12_slim.py export
+          --policy policy-source/docs/preview12-slim-recovery.json
+          --product-root product-source --output "${{ runner.temp }}/preview12-slim-publication"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: preview12-slim-recovery-pre-push
+          path: ${{ runner.temp }}/preview12-slim-publication/pre-authentication.json
+          if-no-files-found: error
+      - name: Authenticate after seven-package verification
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ vars.NUGET_USER }}
+      - name: Publish unchanged qualified Slim cohort
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: dotnet nuget push "$RUNNER_TEMP/preview12-slim-publication/export/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY" --skip-duplicate
+
   verify-preview12-linux-recovery:
-    if: ${{ inputs.recover_preview12_linux_gpu && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
+    if: ${{ !inputs.recover_preview12_slim && (inputs.recover_preview12_linux_gpu && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -115,7 +230,7 @@ jobs:
 
   publish-preview12-linux-recovery:
     needs: verify-preview12-linux-recovery
-    if: ${{ !cancelled() && inputs.recover_preview12_linux_gpu && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.verify-preview12-linux-recovery.result == 'success' && vars.NUGET_USER != '' }}
+    if: ${{ !inputs.recover_preview12_slim && (!cancelled() && inputs.recover_preview12_linux_gpu && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.verify-preview12-linux-recovery.result == 'success' && vars.NUGET_USER != '') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -167,7 +282,7 @@ jobs:
         run: dotnet nuget push "$RUNNER_TEMP/preview12-linux-publication/export/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY" --skip-duplicate
 
   package-contract:
-    if: ${{ !inputs.recover_preview12_linux_gpu && ((inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows) }}
+    if: ${{ !inputs.recover_preview12_slim && (!inputs.recover_preview12_linux_gpu && ((inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows)) }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -249,7 +364,7 @@ jobs:
           if-no-files-found: ignore
 
   plan:
-    if: ${{ !inputs.recover_preview12_linux_gpu && ((inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows) }}
+    if: ${{ !inputs.recover_preview12_slim && (!inputs.recover_preview12_linux_gpu && ((inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows)) }}
     # The matrix, filtered by the manual run's rids input. On a version tag whose release holds a runtime's
     # package, attached by scripts/release.py as the repository owner, that runtime goes to prebuilt instead.
     runs-on: ubuntu-latest
@@ -323,7 +438,7 @@ jobs:
     # A runtime whose package was built and checked on the owner's machine by scripts/release.py: checked
     # again here, on a clean runner of its platform, against the tag's commit, then passed to publish.
     needs: plan
-    if: ${{ !inputs.recover_preview12_linux_gpu && ((inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && needs.plan.outputs.prebuilt != '') }}
+    if: ${{ !inputs.recover_preview12_slim && (!inputs.recover_preview12_linux_gpu && ((inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && needs.plan.outputs.prebuilt != '')) }}
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.plan.outputs.prebuilt) }}
@@ -385,7 +500,7 @@ jobs:
 
   native:
     needs: plan
-    if: ${{ !inputs.recover_preview12_linux_gpu && ((inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && needs.plan.outputs.matrix != '') }}
+    if: ${{ !inputs.recover_preview12_slim && (!inputs.recover_preview12_linux_gpu && ((inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && needs.plan.outputs.matrix != '')) }}
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
@@ -890,12 +1005,12 @@ jobs:
   managed:
     needs: [native, prebuilt, package-contract]
     if: >-
-      ${{ !inputs.recover_preview12_linux_gpu && ( (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && !cancelled() && inputs.rids == '' && (inputs.flavor == '' || inputs.flavor == 'slim') &&
+      ${{ !inputs.recover_preview12_slim && ( !inputs.recover_preview12_linux_gpu && ( (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && !cancelled() && inputs.rids == '' && (inputs.flavor == '' || inputs.flavor == 'slim') &&
           !(github.event_name == 'pull_request' && !startsWith(github.head_ref, 'codex/batch-') &&
             !contains(github.event.pull_request.labels.*.name, 'full-matrix')) &&
           (needs.native.result == 'success' || needs.native.result == 'skipped') &&
           (needs.prebuilt.result == 'success' || needs.prebuilt.result == 'skipped') &&
-          needs.package-contract.result == 'success' ) }}
+          needs.package-contract.result == 'success' ) ) }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -931,13 +1046,13 @@ jobs:
     # as workflow artifacts. Every selected runtime and the contract gate must pass before any push;
     # a full slim release also requires the paired managed cohort.
     if: >-
-      ${{ !inputs.recover_preview12_linux_gpu && ( (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && !cancelled() && startsWith(github.ref, 'refs/tags/v') && vars.NUGET_USER != '' &&
+      ${{ !inputs.recover_preview12_slim && ( !inputs.recover_preview12_linux_gpu && ( (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && !cancelled() && startsWith(github.ref, 'refs/tags/v') && vars.NUGET_USER != '' &&
           needs.package-contract.result == 'success' &&
           (needs.native.result == 'success' || needs.native.result == 'skipped') &&
           (needs.prebuilt.result == 'success' || needs.prebuilt.result == 'skipped') &&
           (needs.native.result == 'success' || needs.prebuilt.result == 'success') &&
           (needs.managed.result == 'success' ||
-           (needs.managed.result == 'skipped' && (inputs.flavor == 'gpu' || inputs.flavor == 'lean'))) ) }}
+           (needs.managed.result == 'skipped' && (inputs.flavor == 'gpu' || inputs.flavor == 'lean'))) ) ) }}
     needs: [native, prebuilt, managed, package-contract]
     runs-on: ubuntu-latest
     permissions:
@@ -961,8 +1076,8 @@ jobs:
   gpu-cohort:
     needs: publish
     if: >-
-      ${{ !inputs.recover_preview12_linux_gpu && ( (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && !cancelled() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') &&
-          needs.publish.result == 'success' ) }}
+      ${{ !inputs.recover_preview12_slim && ( !inputs.recover_preview12_linux_gpu && ( (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && !cancelled() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') &&
+          needs.publish.result == 'success' ) ) }}
     runs-on: ubuntu-latest
     permissions:
       actions: write
@@ -976,7 +1091,7 @@ jobs:
           --field flavor=gpu --field rids=win-x64,linux-x64,linux-arm64,osx-arm64
 
   recover-preview2-gpu:
-    if: ${{ !inputs.recover_preview12_linux_gpu && ((inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') }}
+    if: ${{ !inputs.recover_preview12_slim && (!inputs.recover_preview12_linux_gpu && ((inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')) }}
     runs-on: windows-2025
     timeout-minutes: 45
     permissions:
@@ -1034,8 +1149,8 @@ jobs:
   publish-preview2-recovery:
     needs: [recover-preview2-gpu]
     if: >-
-      ${{ !inputs.recover_preview12_linux_gpu && ( (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !cancelled() && inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && github.event_name == 'workflow_dispatch' &&
-          github.ref == 'refs/heads/main' && needs.recover-preview2-gpu.result == 'success' && vars.NUGET_USER != '' ) }}
+      ${{ !inputs.recover_preview12_slim && ( !inputs.recover_preview12_linux_gpu && ( (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !cancelled() && inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && github.event_name == 'workflow_dispatch' &&
+          github.ref == 'refs/heads/main' && needs.recover-preview2-gpu.result == 'success' && vars.NUGET_USER != '' ) ) }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -1073,7 +1188,7 @@ jobs:
         run: dotnet nuget push recovery/export/Ranvier.WebCore.Native.Gpu.win-x64.0.1.1-preview.2.nupkg --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY"
 
   verify-preview4-gpu-recovery:
-    if: ${{ !inputs.recover_preview12_linux_gpu && (inputs.recover_preview4_gpu && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') }}
+    if: ${{ !inputs.recover_preview12_slim && (!inputs.recover_preview12_linux_gpu && (inputs.recover_preview4_gpu && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -1126,9 +1241,9 @@ jobs:
   publish-preview4-gpu-recovery:
     needs: [verify-preview4-gpu-recovery]
     if: >-
-      ${{ !inputs.recover_preview12_linux_gpu && ( !cancelled() && inputs.recover_preview4_gpu && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows &&
+      ${{ !inputs.recover_preview12_slim && ( !inputs.recover_preview12_linux_gpu && ( !cancelled() && inputs.recover_preview4_gpu && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows &&
           github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' &&
-          needs.verify-preview4-gpu-recovery.result == 'success' && vars.NUGET_USER != '' ) }}
+          needs.verify-preview4-gpu-recovery.result == 'success' && vars.NUGET_USER != '' ) ) }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -1192,7 +1307,7 @@ jobs:
         run: dotnet nuget push recovery/export/Ranvier.WebCore.Native.Gpu.win-x64.0.1.1-preview.4.nupkg --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY"
 
   verify-preview7-linux-recovery:
-    if: ${{ !inputs.recover_preview12_linux_gpu && (inputs.recover_preview7_linux && !inputs.recover_preview7_windows && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') }}
+    if: ${{ !inputs.recover_preview12_slim && (!inputs.recover_preview12_linux_gpu && (inputs.recover_preview7_linux && !inputs.recover_preview7_windows && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -1217,7 +1332,7 @@ jobs:
 
   publish-preview7-linux-recovery:
     needs: [verify-preview7-linux-recovery]
-    if: ${{ !inputs.recover_preview12_linux_gpu && (!cancelled() && inputs.recover_preview7_linux && !inputs.recover_preview7_windows && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.verify-preview7-linux-recovery.result == 'success' && vars.NUGET_USER != '') }}
+    if: ${{ !inputs.recover_preview12_slim && (!inputs.recover_preview12_linux_gpu && (!cancelled() && inputs.recover_preview7_linux && !inputs.recover_preview7_windows && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.verify-preview7-linux-recovery.result == 'success' && vars.NUGET_USER != '')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -1252,7 +1367,7 @@ jobs:
         run: dotnet nuget push "$RUNNER_TEMP/p7-linux-publish/export/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY"
 
   verify-preview7-windows-recovery:
-    if: ${{ !inputs.recover_preview12_linux_gpu && (inputs.recover_preview7_windows && !inputs.recover_preview7_linux && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') }}
+    if: ${{ !inputs.recover_preview12_slim && (!inputs.recover_preview12_linux_gpu && (inputs.recover_preview7_windows && !inputs.recover_preview7_linux && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -1279,7 +1394,7 @@ jobs:
 
   publish-preview7-windows-recovery:
     needs: [verify-preview7-windows-recovery]
-    if: ${{ !inputs.recover_preview12_linux_gpu && (!cancelled() && inputs.recover_preview7_windows && !inputs.recover_preview7_linux && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.verify-preview7-windows-recovery.result == 'success' && vars.NUGET_USER != '') }}
+    if: ${{ !inputs.recover_preview12_slim && (!inputs.recover_preview12_linux_gpu && (!cancelled() && inputs.recover_preview7_windows && !inputs.recover_preview7_linux && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && (inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.verify-preview7-windows-recovery.result == 'success' && vars.NUGET_USER != '')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -1314,7 +1429,7 @@ jobs:
         run: dotnet nuget push "$RUNNER_TEMP/p7-windows-publish/export/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY"
 
   prepare-atspi-preview10:
-    if: ${{ !inputs.recover_preview12_linux_gpu && ((inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && github.event_name == 'workflow_dispatch' && inputs.atspi_preview10 == 'prepare' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/codex/project2-atspi-public-preview10') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows) }}
+    if: ${{ !inputs.recover_preview12_slim && (!inputs.recover_preview12_linux_gpu && ((inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && github.event_name == 'workflow_dispatch' && inputs.atspi_preview10 == 'prepare' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/codex/project2-atspi-public-preview10') && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows)) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
@@ -1354,7 +1469,7 @@ jobs:
           if-no-files-found: warn
 
   publish-atspi-preview10:
-    if: ${{ !inputs.recover_preview12_linux_gpu && ((inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && github.event_name == 'workflow_dispatch' && inputs.atspi_preview10 == 'publish' && github.ref == 'refs/heads/main' && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && vars.NUGET_USER != '') }}
+    if: ${{ !inputs.recover_preview12_slim && (!inputs.recover_preview12_linux_gpu && ((inputs.atspi_preview11 == '' || inputs.atspi_preview11 == 'off') && github.event_name == 'workflow_dispatch' && inputs.atspi_preview10 == 'publish' && github.ref == 'refs/heads/main' && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && vars.NUGET_USER != '')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
@@ -1388,7 +1503,7 @@ jobs:
         run: dotnet nuget push "$RUNNER_TEMP/atspi-preview10-publish/export/Ranvier.WebCore.Accessibility.Atspi.0.1.1-preview.10.nupkg" --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY"
 
   relay-atspi-preview11-x64:
-    if: ${{ !inputs.recover_preview12_linux_gpu && (false && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && github.event_name == 'workflow_dispatch' && inputs.atspi_preview11 == 'relay-x64' && github.ref == 'refs/heads/main' && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows) }}
+    if: ${{ !inputs.recover_preview12_slim && (!inputs.recover_preview12_linux_gpu && (false && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && github.event_name == 'workflow_dispatch' && inputs.atspi_preview11 == 'relay-x64' && github.ref == 'refs/heads/main' && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows)) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
@@ -1414,7 +1529,7 @@ jobs:
           retention-days: 30
 
   prepare-atspi-preview11:
-    if: ${{ !inputs.recover_preview12_linux_gpu && (false && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && github.event_name == 'workflow_dispatch' && inputs.atspi_preview11 == 'prepare' && github.ref == 'refs/heads/main' && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows) }}
+    if: ${{ !inputs.recover_preview12_slim && (!inputs.recover_preview12_linux_gpu && (false && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && github.event_name == 'workflow_dispatch' && inputs.atspi_preview11 == 'prepare' && github.ref == 'refs/heads/main' && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows)) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
@@ -1454,7 +1569,7 @@ jobs:
           if-no-files-found: warn
 
   publish-atspi-preview11:
-    if: ${{ !inputs.recover_preview12_linux_gpu && ((inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && github.event_name == 'workflow_dispatch' && inputs.atspi_preview11 == 'publish' && github.ref == 'refs/heads/main' && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && vars.NUGET_USER != '') }}
+    if: ${{ !inputs.recover_preview12_slim && (!inputs.recover_preview12_linux_gpu && ((inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && github.event_name == 'workflow_dispatch' && inputs.atspi_preview11 == 'publish' && github.ref == 'refs/heads/main' && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && vars.NUGET_USER != '')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
@@ -1488,7 +1603,7 @@ jobs:
         run: dotnet nuget push "$RUNNER_TEMP/atspi-preview11-publish/export/Ranvier.WebCore.Accessibility.Atspi.0.1.1-preview.11.nupkg" --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY"
 
   publish-atspi-preview12:
-    if: ${{ !inputs.recover_preview12_linux_gpu && (false && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && github.event_name == 'workflow_dispatch' && inputs.atspi_preview11 == 'publish-p12' && github.ref == 'refs/heads/main' && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && vars.NUGET_USER != '') }}
+    if: ${{ !inputs.recover_preview12_slim && (!inputs.recover_preview12_linux_gpu && (false && (inputs.atspi_preview10 == '' || inputs.atspi_preview10 == 'off') && github.event_name == 'workflow_dispatch' && inputs.atspi_preview11 == 'publish-p12' && github.ref == 'refs/heads/main' && !inputs.recover_preview2_gpu && !inputs.recover_preview4_gpu && !inputs.recover_preview7_linux && !inputs.recover_preview7_windows && vars.NUGET_USER != '')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
