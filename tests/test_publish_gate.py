@@ -16,7 +16,7 @@ def permits_publish(native='success', prebuilt='skipped', managed='success', con
     expression = re.sub(r'needs\.([a-z-]+)\.result', lambda match: repr(results[match[1]]), expression)
     for name, value in [('github.ref', ref), ('vars.NUGET_USER', owner), ('inputs.flavor', flavor), ('inputs.atspi_preview10', atspi), ('inputs.atspi_preview11', atspi11)]:
         expression = expression.replace(name, repr(value))
-    for flag in ('preview2_gpu', 'preview4_gpu', 'preview7_linux', 'preview7_windows', 'preview12_linux_gpu', 'preview12_slim'):
+    for flag in ('preview2_gpu', 'preview4_gpu', 'preview7_linux', 'preview7_windows', 'preview12_linux_gpu', 'preview12_slim', 'preview12_gpu'):
         expression = expression.replace('!inputs.recover_' + flag, repr(recovery != flag))
     expression = expression.replace('!cancelled()', repr(not cancelled)).replace('&&', ' and ').replace('||', ' or ')
     return eval(' '.join(expression.split()), {'__builtins__': {}}, {'startsWith': lambda value, prefix: value.startswith(prefix)})
@@ -33,7 +33,7 @@ def permits_gpu_cohort(native='success', prebuilt='skipped', publish='success', 
         expression = 'success() && (' + expression + ')'
     for name, value in [('github.event_name', event), ('github.ref', ref), ('needs.publish.result', publish), ('inputs.atspi_preview10', atspi), ('inputs.atspi_preview11', atspi11)]:
         expression = expression.replace(name, repr(value))
-    for flag in ('preview2_gpu', 'preview4_gpu', 'preview7_linux', 'preview7_windows', 'preview12_linux_gpu', 'preview12_slim'):
+    for flag in ('preview2_gpu', 'preview4_gpu', 'preview7_linux', 'preview7_windows', 'preview12_linux_gpu', 'preview12_slim', 'preview12_gpu'):
         expression = expression.replace('!inputs.recover_' + flag, repr(recovery != flag))
     expression = expression.replace('!cancelled()', repr(not cancelled)).replace('success()', repr(success))
     expression = expression.replace('&&', ' and ').replace('||', ' or ')
@@ -48,7 +48,7 @@ class PublishGateTests(unittest.TestCase):
             self.assertFalse(permits_gpu_cohort(atspi=mode))
 
     def test_recovery_inputs_suppress_ordinary_publication_and_child(self):
-        for flag in ('preview2_gpu', 'preview4_gpu', 'preview7_linux', 'preview7_windows', 'preview12_linux_gpu', 'preview12_slim'):
+        for flag in ('preview2_gpu', 'preview4_gpu', 'preview7_linux', 'preview7_windows', 'preview12_linux_gpu', 'preview12_slim', 'preview12_gpu'):
             self.assertFalse(permits_publish(recovery=flag))
             self.assertFalse(permits_gpu_cohort(recovery=flag))
 

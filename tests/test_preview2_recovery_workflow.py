@@ -14,10 +14,11 @@ def job(name):
     return re.split(r'(?m)^  [a-z][\w-]*:\s*$', text.split(marker, 1)[1], maxsplit=1)[0]
 
 
-def evaluate(expression, recovery=False, recovery4=False, recovery7=False, recovery7windows=False, recovery12=False, recovery12slim=False, result='success', event='workflow_dispatch', ref='refs/heads/main', user='owner', cancelled=False, atspi='off', atspi11='off'):
+def evaluate(expression, recovery=False, recovery4=False, recovery7=False, recovery7windows=False, recovery12=False, recovery12slim=False, recovery12gpu=False, result='success', event='workflow_dispatch', ref='refs/heads/main', user='owner', cancelled=False, atspi='off', atspi11='off'):
     values = {'inputs.recover_preview2_gpu': recovery, 'inputs.recover_preview4_gpu': recovery4, 'inputs.recover_preview7_linux': recovery7, 'inputs.recover_preview7_windows': recovery7windows, 'github.event_name': event, 'github.ref': ref,
               'inputs.recover_preview12_linux_gpu': recovery12, 'needs.verify-preview12-linux-recovery.result': result,
               'inputs.recover_preview12_slim': recovery12slim, 'needs.verify-preview12-slim-recovery.result': result,
+              'inputs.recover_preview12_gpu': recovery12gpu, 'needs.verify-preview12-gpu-cohort-recovery.result': result,
               'github.workflow': 'build', 'github.run_id': 123, 'inputs.flavor': 'gpu', 'vars.NUGET_USER': user,
               'inputs.rids': '', 'inputs.atspi_preview10': atspi, 'inputs.atspi_preview11': atspi11, 'github.head_ref': 'codex/batch-fixture',
               'github.event.pull_request.labels.*.name': [],
@@ -51,6 +52,21 @@ def permitted(name, **options):
 
 
 class RecoveryWorkflowControls(unittest.TestCase):
+    def test_preview12_gpu_is_isolated_from_all_previous_modes(self):
+        text = WORKFLOW.read_text()
+        own = {'verify-preview12-gpu-cohort-recovery', 'publish-preview12-gpu-cohort-recovery'}
+        names = re.findall(r'^  ([a-z][a-z0-9-]*):$', text.split('\njobs:\n', 1)[1], re.M)
+        for name in names:
+            self.assertEqual(permitted(name, recovery12gpu=True), name in own, name)
+        for name in own:
+            for options in [dict(recovery12slim=True), dict(recovery12=True), dict(recovery7=True),
+                            dict(ref='refs/tags/v0.1.1-preview.12'), dict(event='push')]:
+                self.assertFalse(permitted(name, recovery12gpu=True, **options))
+        for options in [dict(result='failure'), dict(cancelled=True), dict(user='')]:
+            self.assertFalse(permitted('publish-preview12-gpu-cohort-recovery', recovery12gpu=True, **options))
+        publish = job('publish-preview12-gpu-cohort-recovery')
+        self.assertLess(publish.index('recover_preview12_gpu_cohort.py export'), publish.index('NuGet/login@v1'))
+
     def test_preview12_slim_is_isolated_from_every_other_mode(self):
         text = WORKFLOW.read_text()
         own = {'verify-preview12-slim-recovery', 'publish-preview12-slim-recovery'}

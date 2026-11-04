@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "armed": false,
+  "publicationEnabled": false,
+  "productSource": "d31c3631ed4bbe6520f7f5f7c7e7d34499c38122",
+  "version": "0.1.1-preview.12",
+  "controllerSource": null,
+  "producerRun": 41734171619,
+  "packageHashes": {"win-x64": null, "linux-x64": null, "linux-arm64": null, "osx-arm64": null},
+  "windowsArtifact": {"id": null, "name": "package-win-x64-gpu", "sha256": null},
+  "linux": null,
+  "mac": {
+    "originalRun": 41741551521,
+    "originalController": "131a73e1a1189afecf83a40ee50226da7a04e2c3",
+    "packageArtifact": {"id": null, "name": "package-osx-arm64-gpu", "sha256": null},
+    "proofArtifact": {"id": null, "name": "immutable-d31-mac-gpu-recovery-proof", "sha256": null},
+    "originalReceiptSha256": null,
+    "originalGlyphReceiptSha256": null,
+    "replayRun": null,
+    "replayController": null,
+    "replayArtifact": {"id": null, "name": "immutable-d31-mac-gpu-capture-replay", "sha256": null},
+    "replayReceiptSha256": null
+  }
+}
