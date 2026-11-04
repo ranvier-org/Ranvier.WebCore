@@ -1,0 +1,88 @@
+name: Signed public Cocoa CPU contracts
+
+on:
+  workflow_dispatch:
+    inputs:
+      phase:
+        type: choice
+        options: [off, collect-owner, replay]
+        default: off
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: public-cocoa-cpu-contracts
+  cancel-in-progress: false
+
+jobs:
+  admission:
+    runs-on: ubuntu-latest
+    outputs:
+      armed: ${{ steps.inputs.outputs.armed }}
+      source: ${{ steps.inputs.outputs.source }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - id: inputs
+        env:
+          PHASE: ${{ inputs.phase || 'off' }}
+        run: |
+          python3 - <<'PY'
+          import json, os, re
+          data = json.load(open('tests/controls/public_cocoa_replay_inputs.json'))
+          armed = data.get('armed') is True and os.environ['PHASE'] in {'collect-owner', 'replay'}
+          if armed and (data.get('ownerProofText') is None) != (os.environ['PHASE'] == 'collect-owner'):
+              raise ValueError('Owner collection and reviewed replay are separate phases')
+          source = data['policy']['controllerSource'] if armed else ''
+          if armed and not re.fullmatch('[0-9a-f]{40}', source):
+              raise ValueError('Require an immutable reviewed controller source')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as stream:
+              stream.write(f'armed={str(armed).lower()}\nsource={source}\n')
+          PY
+  replay:
+    needs: admission
+    if: ${{ needs.admission.outputs.armed == 'true' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
+    runs-on: macos-26
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: replay-controller
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.admission.outputs.source }}
+          path: immutable-source
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.403'
+      - name: Select Mac SDK
+        run: |
+          xcode=$(find /Applications -maxdepth 1 -name 'Xcode_26*.app' ! -iname '*beta*' | sort -V | tail -1)
+          test -n "$xcode"
+          echo "DEVELOPER_DIR=$xcode/Contents/Developer" >> "$GITHUB_ENV"
+      - name: Run admitted signed public CPU contracts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          python3 -B -I replay-controller/tests/controls/public_cocoa_replay.py
+          --inputs replay-controller/tests/controls/public_cocoa_replay_inputs.json
+          --source immutable-source --output "${{ runner.temp }}/public-cocoa-contracts"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: public-cocoa-contracts-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/public-cocoa-contracts/**/*.json
+            ${{ runner.temp }}/public-cocoa-contracts/**/*.log
+            ${{ runner.temp }}/public-cocoa-contracts/**/*.png
+            ${{ runner.temp }}/public-cocoa-contracts/**/*.rgba
+          if-no-files-found: warn
+          retention-days: 14
