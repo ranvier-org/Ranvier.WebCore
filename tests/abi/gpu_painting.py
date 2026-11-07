@@ -25,6 +25,12 @@ PAGE = ('<body style="margin:0;background:rgb(236,239,244)">' + CARDS +
         f'<div id="m" style="{PANEL.format(0, 0)}"></div>'
         '<div style="position:absolute;left:940px;top:4px;width:8px;height:8px;will-change:transform"></div></body>')
 RED, BLUE = (80, 85), (800, 515)
+# A content box whose right edge falls on a half pixel, in the root layer and in a fractionally translated layer:
+# the GPU painter rounds the clip as the CPU painter (and Chromium) do.
+HALF = ('<style>html,body{margin:0;background:white}.f{box-sizing:content-box;width:100.5px;height:33.25px;'
+        'padding:10px 4px 6px 2px;border:5px solid black;margin:3px;background:red;background-clip:content-box}'
+        '.t{transform:translate3d(7.25px,11.5px,0);will-change:transform}</style>'
+        '<div class="f"></div><div class="f t"></div>')
 
 
 class Event(C.Structure):
@@ -113,6 +119,31 @@ def run(directory):
             p.expect(color(frame, BLUE) == (0, 0, 255), f'{painter}: blue is blue, low on the page')
         difference = sum(abs(a - b) for a, b in zip(gpu_frame, cpu_frame)) / len(gpu_frame)
         p.expect(difference < 1.0, f'GPU and CPU frames agree (mean channel difference {difference:.3f})')
+        # With nothing invalidated, changing the setting repaints every layer with the other painter. A full repaint
+        # differs from that painter's frame of partial repaints only by blur rounding at old dirty-rectangle edges:
+        # on the CPU in a few pixels, on the GPU by a few levels.
+        def differing(a, b):
+            return sum(1 for i in range(0, len(a), 4) if a[i:i + 4] != b[i:i + 4])
+
+        def largest(a, b):
+            return max(abs(x - y) for x, y in zip(a, b))
+        between = differing(gpu_frame, cpu_frame)
+        p.expect(between > 0, 'the painters differ somewhere on this page')
+        for enabled, painter, own, other in [(0, 'CPU', cpu_frame, gpu_frame), (1, 'GPU', gpu_frame, cpu_frame)]:
+            p.expect(set_gpu(p.host, enabled) == 0, f'GPU painting set to {enabled}')
+            repainted = paint()
+            changed, residue, levels = differing(repainted, other), differing(repainted, own), largest(repainted, own)
+            p.expect(changed * 2 > between and (residue * 100 < between or levels <= 3),
+                     f'changing the setting repaints every layer on the {painter} ({changed} of {between} pixels '
+                     f'changed; {residue} differ from its own frame, by up to {levels} levels)')
+
+        p.load(HALF, standalone=False)
+        gpu_half = paint()
+        p.expect(set_gpu(p.host, 0) == 0, 'GPU painting off')
+        cpu_half = paint()
+        p.expect(set_gpu(p.host, 1) == 0, 'GPU painting on')
+        differing = sum(1 for i in range(0, len(gpu_half), 4) if gpu_half[i:i + 4] != cpu_half[i:i + 4])
+        p.expect(differing == 0, f'half-pixel content clips paint alike on both painters ({differing} pixels differ)')
         p.expect(compositing(p.host, 2) == 0, 'compositing returns to when-needed')
         p.release_all()
         print('gpu painting assertions:', p.assertions)

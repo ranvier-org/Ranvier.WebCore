@@ -2584,12 +2584,19 @@ int32_t rv_host_set_gpu_painting(RvHost* host, int32_t enabled)
     if (host->gpuPainting == !!enabled)
         return RV_OK;
     host->gpuPainting = enabled;
-    // A layer's texture holds one painter's pixels and only its invalidated parts repaint: rebuild the layers so
-    // the other painter paints all of them.
+    // A layer's texture holds one painter's pixels and only its invalidated parts repaint: the next composite
+    // repaints every layer with the other painter.
     if (host->compositor) {
-        auto mode = host->compositingMode;
-        rv_host_set_accelerated_compositing(host, RV_COMPOSITING_OFF);
-        rv_host_set_accelerated_compositing(host, mode);
+        Function<void(GraphicsLayer&)> repaint = [&](GraphicsLayer& layer) {
+            layer.setNeedsDisplay();
+            if (RefPtr mask = layer.maskLayer())
+                repaint(*mask);
+            for (auto& child : layer.children())
+                repaint(child.get());
+        };
+        repaint(*host->compositor->root);
+        host->compositor->painted = false;
+        host->requestFrame();
     }
     return RV_OK;
 #else

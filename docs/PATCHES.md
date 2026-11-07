@@ -426,6 +426,11 @@ returns the context the embedder installed, and that context has no `SkExecutor`
 `thread_local` destructor under the loader lock, deadlocks the process's exit. `releaseLayerPaintingContext` destroys
 it. The host turns painting on per composite (`rv_host_set_gpu_painting`, `docs/HOSTING.md`).
 
+`GraphicsContextSkia::clip(FloatRect)` rounds a non-antialiased clip's device edges in a GPU layer paint as Skia's
+raster backend does, `floor(x + 0.5)`, where Ganesh's pixel-centre rule would drop the column a half-pixel edge
+crosses: a `background-clip: content-box` 100.5px wide lost its last column against the CPU paint and Chromium
+(`tests/fixtures/background-content-clip-cases.json`).
+
 ## Working on the series
 
 ```

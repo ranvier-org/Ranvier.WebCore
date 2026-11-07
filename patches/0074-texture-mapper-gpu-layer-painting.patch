@@ -1,3 +1,27 @@
+diff --git a/Source/WebCore/platform/graphics/skia/GraphicsContextSkia.cpp b/Source/WebCore/platform/graphics/skia/GraphicsContextSkia.cpp
+index e4ba236..6c287d2 100644
+--- a/Source/WebCore/platform/graphics/skia/GraphicsContextSkia.cpp
++++ b/Source/WebCore/platform/graphics/skia/GraphicsContextSkia.cpp
+@@ -655,6 +655,19 @@ void GraphicsContextSkia::clip(const FloatRect& rect)
+         .path = { },
+         .shader = { },
+     });
++    // Ranvier: a layer painted on the GPU (BitmapTexture::setPaintsLayersOnGPU) rounds a non-antialiased clip's
++    // device edges as Skia's raster backend does, floor(x + 0.5). Ganesh's pixel-centre rule drops a column whose
++    // centre lies on the edge, so a half-pixel content box would lose a pixel against the CPU paint and other engines.
++    if (m_renderingMode == RenderingMode::Accelerated && m_renderingPurpose == RenderingPurpose::LayerBacking) {
++        auto matrix = m_canvas.getTotalMatrix();
++        if (matrix.rectStaysRect()) {
++            auto deviceRect = matrix.mapRect(SkRect(rect));
++            m_canvas.resetMatrix();
++            m_canvas.clipIRect(deviceRect.round());
++            m_canvas.setMatrix(matrix);
++            return;
++        }
++    }
+     m_canvas.clipRect(rect, SkClipOp::kIntersect, false);
+ }
+ 
 diff --git a/Source/WebCore/platform/graphics/skia/PlatformDisplaySkia.cpp b/Source/WebCore/platform/graphics/skia/PlatformDisplaySkia.cpp
 index 22bcc67..5e056d9 100644
 --- a/Source/WebCore/platform/graphics/skia/PlatformDisplaySkia.cpp
