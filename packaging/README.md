@@ -1,11 +1,17 @@
 # Ranvier.WebCore.Native
 
 `Ranvier.WebCore` provides the managed `RanvierWebCoreAbi.Native` and `NativeDom` modules. Reference it alongside
-the same version of `Ranvier.WebCore.Native`, which brings the five runtime packages into the restore graph:
-Windows x64/ARM64, Linux x64/ARM64 and macOS ARM64. The runtime identifier selects the native assets.
-The aggregate pins exact runtime versions because their ABI must agree. Managed interop keeps the native
-flavor selectable: an accelerated app references the `Ranvier.WebCore.Native.Gpu` aggregate
-(`packaging/gpu/`) instead, never both, avoiding duplicate slim and GPU native assets.
+the same version of `Ranvier.WebCore.Native`, which brings the runtime packages into the restore graph: the GPU
+runtime for Windows x64, Linux x64/ARM64 and macOS ARM64, and the CPU runtime for Windows ARM64, which has no GPU
+build. The runtime identifier selects the native assets. The aggregate pins exact runtime versions because their ABI
+must agree.
+
+The GPU runtime composites accelerated layers and paints them on the GPU (`rv_host_set_gpu_painting`). Where it
+cannot create a GL or Skia context (no usable GPU driver, some virtual machines and remote sessions) it paints on the
+CPU. For a package without the GPU code, or for frames that do not depend on the GPU, such as screenshot tests that
+compare pixels across machines, reference `Ranvier.WebCore.Native.Cpu` (`packaging/cpu/`) instead, never both:
+the restore graph would hold two `RanvierWebCoreHost` binaries for a runtime. `Ranvier.WebCore.Native.Gpu`, the
+GPU aggregate's former name, depends on this package.
 
 The individual runtime packages below can also be referenced directly by native consumers. The aggregate
 and managed packages are built only after all five runtime artifacts have matching ABI, WebKit and source

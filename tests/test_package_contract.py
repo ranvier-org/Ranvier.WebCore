@@ -15,25 +15,40 @@ SPEC.loader.exec_module(PACKAGING)
 
 
 class PackageContract(unittest.TestCase):
-    def test_meta_depends_on_every_runtime_at_one_version(self):
-        project = ET.parse(ROOT / 'packaging/Ranvier.WebCore.Native.Meta.csproj')
+    def test_cpu_meta_depends_on_every_slim_runtime_at_one_version(self):
+        project = ET.parse(ROOT / 'packaging/cpu/Ranvier.WebCore.Native.Cpu.Meta.csproj')
         references = project.findall('.//PackageReference')
         self.assertEqual({r.get('Include') for r in references},
-                         {'Ranvier.WebCore.Native.' + rid for rid in RIDS})
+                         {'Ranvier.WebCore.Native.Cpu.' + rid for rid in RIDS})
+        self.assertEqual({r.get('Version') for r in references}, {'[$(Version)]'})
+        self.assertEqual(project.findtext('.//PackageId'), 'Ranvier.WebCore.Native.Cpu')
+        self.assertEqual(project.findtext('.//IncludeBuildOutput'), 'false')
+
+    def test_default_meta_depends_on_the_gpu_runtimes_and_the_cpu_fallback_at_one_version(self):
+        project = ET.parse(ROOT / 'packaging/Ranvier.WebCore.Native.Meta.csproj')
+        references = project.findall('.//PackageReference')
+        gpu = {'Ranvier.WebCore.Native.' + rid for rid in PACKAGING.GPU_RIDS}
+        fallback = {'Ranvier.WebCore.Native.Cpu.' + rid for rid in RIDS - set(PACKAGING.GPU_RIDS)}
+        self.assertEqual(fallback, {'Ranvier.WebCore.Native.Cpu.win-arm64'})
+        self.assertEqual({r.get('Include') for r in references}, gpu | fallback)
         self.assertEqual({r.get('Version') for r in references}, {'[$(Version)]'})
         self.assertEqual(project.findtext('.//PackageId'), 'Ranvier.WebCore.Native')
         self.assertEqual(project.findtext('.//IncludeBuildOutput'), 'false')
 
-    def test_gpu_meta_depends_on_the_gpu_runtimes_and_the_slim_fallback_at_one_version(self):
+    def test_gpu_alias_depends_only_on_the_default_aggregate(self):
         project = ET.parse(ROOT / 'packaging/gpu/Ranvier.WebCore.Native.Gpu.Meta.csproj')
         references = project.findall('.//PackageReference')
-        gpu = {'Ranvier.WebCore.Native.Gpu.' + rid for rid in PACKAGING.GPU_RIDS}
-        fallback = {'Ranvier.WebCore.Native.' + rid for rid in RIDS - set(PACKAGING.GPU_RIDS)}
-        self.assertEqual(fallback, {'Ranvier.WebCore.Native.win-arm64'})
-        self.assertEqual({r.get('Include') for r in references}, gpu | fallback)
-        self.assertEqual({r.get('Version') for r in references}, {'[$(Version)]'})
+        self.assertEqual([(r.get('Include'), r.get('Version')) for r in references],
+                         [('Ranvier.WebCore.Native', '[$(Version)]')])
         self.assertEqual(project.findtext('.//PackageId'), 'Ranvier.WebCore.Native.Gpu')
         self.assertEqual(project.findtext('.//IncludeBuildOutput'), 'false')
+
+    def test_every_script_names_a_flavor_package_alike(self):
+        names = repr(PACKAGING.FLAVOR_SUFFIX)
+        self.assertEqual(PACKAGING.FLAVOR_SUFFIX, {'slim': '.Cpu', 'gpu': '', 'lean': '.Lean'})
+        for path in ['scripts/build.py', 'scripts/release.py', '.github/workflows/build.yml']:
+            with self.subTest(path=path):
+                self.assertIn(names, (ROOT / path).read_text())
 
     def test_gpu_aggregate_needs_every_gpu_runtime_from_the_slim_identity(self):
         version, identity = '0.1.0-preview.6', (21, 'pinned', 'same')
@@ -73,7 +88,7 @@ class PackageContract(unittest.TestCase):
                                    (ROOT / 'tests/abi/Traversal.fs').resolve()})
         references = project.findall('.//PackageReference')
         native = [r for r in references if r.get('Include') == 'Ranvier.WebCore.Native']
-        self.assertEqual(native, [], 'managed interop must allow selecting the GPU native flavor')
+        self.assertEqual(native, [], 'managed interop must allow selecting the native flavor')
         self.assertFalse(any('Fable' in r.get('Include', '') or 'Xantham' in r.get('Include', '')
                              for r in references))
         self.assertEqual(project.findtext('.//IsAotCompatible'), 'true')
@@ -90,7 +105,7 @@ class PackageContract(unittest.TestCase):
             with self.assertRaises(FileNotFoundError):
                 PACKAGING.validate_runtimes(packages, '0.1.0-preview.6', (21, 'pinned', 'same'))
             for rid in RIDS:
-                path = packages / f'Ranvier.WebCore.Native.{rid}.0.1.0-preview.6.nupkg'
+                path = packages / f'Ranvier.WebCore.Native.Cpu.{rid}.0.1.0-preview.6.nupkg'
                 manifest = dict(rid=rid, version='0.1.0-preview.6', flavor='slim', abi=21,
                                 webkit='pinned', source=dict(commit='same', dirty=False))
                 with zipfile.ZipFile(path, 'w') as archive:

@@ -176,7 +176,7 @@ jobs:
                   if release and release['author']['login'] == owner else set()
               base = json.load(open('pins.json'))['package']['id']
               for cell in cells:
-                  name = f"{base}{ {'slim': '', 'gpu': '.Gpu', 'lean': '.Lean'}[cell['flavor']] }.{cell['rid']}.{tag[1:]}.nupkg"
+                  name = f"{base}{ {'slim': '.Cpu', 'gpu': '', 'lean': '.Lean'}[cell['flavor']] }.{cell['rid']}.{tag[1:]}.nupkg"
                   if name in assets:
                       prebuilt.append(dict(cell, asset=name))
           done = {(p['rid'], p['flavor']) for p in prebuilt}
@@ -832,6 +832,7 @@ jobs:
           path: |
             packages/Ranvier.WebCore.[0-9]*.nupkg
             packages/Ranvier.WebCore.Native.[0-9]*.nupkg
+            packages/Ranvier.WebCore.Native.Cpu.[0-9]*.nupkg
             packages/Ranvier.WebCore.Native.Gpu.[0-9]*.nupkg
           # The native RID packages are already retained by their platform jobs.
 
@@ -879,7 +880,7 @@ jobs:
           version=$(python3 -c "import json; print(json.load(open('pins.json'))['package']['version'])")
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then version="${GITHUB_REF_NAME#v}"; fi
           echo "VERSION=$version" >> "$GITHUB_ENV"
-          package=$(ls "$W"/artifact/Ranvier.WebCore.Native.$RID.*.nupkg)
+          package=$(ls "$W"/artifact/Ranvier.WebCore.Native.Cpu.$RID.*.nupkg)
           sha=$(unzip -p "$package" "runtimes/$RID/native/libRanvierWebCoreHost.so" | sha256sum | cut -d' ' -f1)
           python3 -I tests/atspi/stage_native.py --artifacts "$W/artifact" --rid "$RID" --expected-sha256 "$sha" --output "$W/native"
           ldd "$W/native/libRanvierWebCoreHost.so" | tee "$W/native/runtime-dependencies.txt"

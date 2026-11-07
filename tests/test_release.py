@@ -54,7 +54,7 @@ class ReleaseTests(unittest.TestCase):
         smoke = next(command for command in calls if any(value.endswith('smoke.py') for value in command))
         version = json.loads((ROOT / 'pins.json').read_text())['package']['version']
         self.assertEqual(Path(smoke[smoke.index('--package') + 1]).name,
-                         f'Ranvier.WebCore.Native.Gpu.win-x64.{version}.nupkg')
+                         f'Ranvier.WebCore.Native.win-x64.{version}.nupkg')
         self.assertEqual(smoke[smoke.index('--expect-commit') + 1], HEAD)
         self.assertEqual(smoke[smoke.index('--expect-version') + 1], version)
         self.assertEqual(smoke[smoke.index('--expect-flavor') + 1], 'gpu')
@@ -66,9 +66,9 @@ class ReleaseTests(unittest.TestCase):
                 self.assertEqual(command[command.index('--version') + 1], version)
         self.assertFalse(any(command[0] == 'gh' for command in calls))
 
-    def test_existing_slim_and_lean_package_names_remain_unchanged(self):
+    def test_slim_is_the_cpu_package_and_lean_keeps_its_name(self):
         version = json.loads((ROOT / 'pins.json').read_text())['package']['version']
-        for flavor, suffix in [('slim', ''), ('lean', '.Lean')]:
+        for flavor, suffix in [('slim', '.Cpu'), ('lean', '.Lean')]:
             with self.subTest(flavor=flavor):
                 code, calls = self.invoke(flavor)
                 self.assertIsNone(code)
