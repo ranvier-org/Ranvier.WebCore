@@ -1,10 +1,18 @@
 # Handover
 
-State of the project at Native `0.1.1-rc.2`. Every item below comes from a release, an issue or a CI run;
+State of the project at Native `0.1.1-rc.3`. Every item below comes from a release, an issue or a CI run;
 re-check the live source (`pins.json`, `patches/series`, the header) before relying on a number.
 
 ## Released and verified
 
+- Native `0.1.1-rc.3` (tag on cfe1bcc, run 42330885760): one tag run built the five Slim and four GPU runtimes in
+  parallel and published 13 packages. They are `Ranvier.WebCore`, `Ranvier.WebCore.Native`, the five Slim runtimes,
+  the four GPU runtimes, `Ranvier.WebCore.Accessibility.Atspi`, and the first `Ranvier.WebCore.Native.Gpu` aggregate.
+  The aggregate takes the four GPU runtimes plus Slim `win-arm64`, all at `[0.1.1-rc.3]`.
+  - The run uploaded the four GPU build trees as artifacts (0.7 to 1.2 GB each, kept until 2027-02-05).
+  - The next release tag is the first to restore them.
+- Ranvier.View `0.1.49-rc.2` and View.WebCore `0.1.0-rc.2` build on rc.3, Ranvier `0.1.1-preview.2` (which adds
+  `tryGetOwner`) and Ranvier.Dom `0.1.0-rc.1`.
 - Native `0.1.1-rc.2` (tag on 6c66723, run 41785462391): `Ranvier.WebCore`, `Ranvier.WebCore.Native`, the five
   runtime packages and `Ranvier.WebCore.Accessibility.Atspi` are public on nuget.org. The GPU cohort is published
   by the `gpu-cohort` dispatch of the same tag (run 41790389124).
