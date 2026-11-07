@@ -1,4 +1,6 @@
-"""Build the ABI-matched managed package and the Slim and GPU native aggregates from checked native artifacts."""
+"""Build the ABI-matched managed package and the native aggregates from checked native artifacts: Ranvier.WebCore.Native
+(the GPU runtimes, with the CPU host where a runtime has no GPU build), its Ranvier.WebCore.Native.Gpu alias, and
+Ranvier.WebCore.Native.Cpu (the Slim runtimes)."""
 
 import argparse
 import json
@@ -13,7 +15,10 @@ import zipfile
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 RIDS = ('win-x64', 'win-arm64', 'linux-x64', 'linux-arm64', 'osx-arm64')
 GPU_RIDS = ('win-x64', 'linux-x64', 'linux-arm64', 'osx-arm64')
-PACKAGE_PREFIX = {'slim': 'Ranvier.WebCore.Native', 'gpu': 'Ranvier.WebCore.Native.Gpu'}
+# The runtime package of a flavor is Ranvier.WebCore.Native<suffix>.<rid>; build.py, release.py and the build workflow
+# name them with the same suffixes. The GPU flavor is the default package.
+FLAVOR_SUFFIX = {'slim': '.Cpu', 'gpu': '', 'lean': '.Lean'}
+PACKAGE_PREFIX = {flavor: 'Ranvier.WebCore.Native' + FLAVOR_SUFFIX[flavor] for flavor in ('slim', 'gpu')}
 
 
 def runtime_package(packages, flavor, rid, version):
@@ -73,10 +78,11 @@ def checkout_identity():
 def build(packages, version):
     identity = checkout_identity()
     abi = validate_runtimes(packages, version, identity)
-    projects = ['packaging/Ranvier.WebCore.Native.Meta.csproj', 'src/Ranvier.WebCore/Ranvier.WebCore.fsproj']
+    projects = ['packaging/cpu/Ranvier.WebCore.Native.Cpu.Meta.csproj', 'src/Ranvier.WebCore/Ranvier.WebCore.fsproj']
     gpu = has_gpu_runtimes(packages, version, identity)
     if gpu:
-        projects.append('packaging/gpu/Ranvier.WebCore.Native.Gpu.Meta.csproj')
+        # The default aggregate, then its alias under the GPU aggregate's former name, which depends on it.
+        projects += ['packaging/Ranvier.WebCore.Native.Meta.csproj', 'packaging/gpu/Ranvier.WebCore.Native.Gpu.Meta.csproj']
     packages = packages.resolve()
     with tempfile.TemporaryDirectory(prefix='ranvier-pack-') as temporary:
         config = pathlib.Path(temporary) / 'NuGet.Config'
@@ -91,8 +97,9 @@ def build(packages, version):
                             f'-p:Version={version}'], check=True)
             subprocess.run(['dotnet', 'pack', str(ROOT / project), '--no-restore', '-c', 'Release',
                             '-o', str(packages), f'-p:Version={version}'], check=True)
-    print(f'Packed managed interop and native aggregate version {version}, ABI {abi}, all {len(RIDS)} RIDs'
-          + (f'; GPU aggregate over {len(GPU_RIDS)} GPU RIDs with the Slim fallback' if gpu else ''))
+    print(f'Packed managed interop and the CPU aggregate version {version}, ABI {abi}, all {len(RIDS)} RIDs'
+          + (f'; the default aggregate over {len(GPU_RIDS)} GPU RIDs with the CPU fallback, and its .Gpu alias'
+             if gpu else '; no default aggregate without the GPU runtimes'))
 
 
 if __name__ == '__main__':

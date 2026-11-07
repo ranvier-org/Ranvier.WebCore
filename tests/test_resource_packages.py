@@ -32,7 +32,7 @@ def run(work):
     feed.mkdir()
     target = (ROOT / 'packaging/buildTransitive.targets').read_text()
     for rid in RIDS:
-        name = f'Ranvier.WebCore.Native.{rid}'
+        name = f'Ranvier.WebCore.Native.Cpu.{rid}'
         files = {f'buildTransitive/{name}.targets': target.replace('@RID@', rid),
                  'lib/net10.0/_._': b'', f'runtimes/{rid}/native/fixture.dll': rid.encode()}
         if rid.startswith('win-'):
@@ -40,11 +40,11 @@ def run(work):
                           for icon in ICONS})
             files[f'runtimes/{rid}/native/WebKit.resources/icons/nested/probe.png'] = f'{rid}:nested'.encode()
         package(feed, name, files)
-    meta = ET.parse(ROOT / 'packaging/Ranvier.WebCore.Native.Meta.csproj')
+    meta = ET.parse(ROOT / 'packaging/cpu/Ranvier.WebCore.Native.Cpu.Meta.csproj')
     dependencies = [item.get('Include') for item in meta.findall('.//PackageReference')]
-    assert set(dependencies) == {f'Ranvier.WebCore.Native.{rid}' for rid in RIDS}
+    assert set(dependencies) == {f'Ranvier.WebCore.Native.Cpu.{rid}' for rid in RIDS}
     references = ''.join(f'<dependency id="{name}" version="[{VERSION}]" />' for name in dependencies)
-    package(feed, 'Ranvier.WebCore.Native', {'lib/net10.0/_._': b''},
+    package(feed, 'Ranvier.WebCore.Native.Cpu', {'lib/net10.0/_._': b''},
             f'<dependencies><group targetFramework="net10.0">{references}</group></dependencies>')
     (work / 'NuGet.Config').write_text(f'''<configuration><packageSources><clear />
 <add key="fixture" value="{feed.as_posix()}" /></packageSources></configuration>''')
@@ -53,7 +53,7 @@ def run(work):
 <OutputType>Exe</OutputType><TargetFramework>net10.0</TargetFramework>
 <RuntimeIdentifier>win-x64</RuntimeIdentifier><SelfContained>false</SelfContained><UseAppHost>false</UseAppHost>
 <RestorePackagesPath>{(work / 'cache').as_posix()}</RestorePackagesPath>
-</PropertyGroup><ItemGroup><PackageReference Include="Ranvier.WebCore.Native" Version="{VERSION}" />
+</PropertyGroup><ItemGroup><PackageReference Include="Ranvier.WebCore.Native.Cpu" Version="{VERSION}" />
 </ItemGroup></Project>''')
     (work / 'Program.cs').write_text('System.Console.WriteLine("resource fixture");')
 
@@ -70,7 +70,7 @@ def run(work):
         expected['WebKit.resources/icons/nested/probe.png'] = f'{runtime}:nested'.encode()
         command('restore', project, f'-p:RuntimeIdentifier={runtime}', '--configfile', work / 'NuGet.Config', '--nologo')
         assets = json.loads((work / 'obj/project.assets.json').read_text())
-        assert all(f'Ranvier.WebCore.Native.{rid}/{VERSION}' in assets['libraries'] for rid in RIDS)
+        assert all(f'Ranvier.WebCore.Native.Cpu.{rid}/{VERSION}' in assets['libraries'] for rid in RIDS)
         for action, destination in [('build', 'jit'), ('publish', 'publish')]:
             output = work / runtime / destination
             command(action, project, f'-p:RuntimeIdentifier={runtime}', '--no-restore', '-c', 'Release', '--nologo', '-o', output)

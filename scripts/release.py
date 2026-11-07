@@ -50,7 +50,7 @@ for rid in args.rid:
     common = ['--rid', rid, '--flavor', args.flavor, '--work', work, '--version', version, *build_args]
     for step in ['fetch', 'prepare', 'configure', 'build', 'package']:
         run(sys.executable, '-I', root / 'scripts/build.py', step, *common, *(['--strict'] if step == 'prepare' else []))
-    package_id = pins['package']['id'] + {'slim': '', 'gpu': '.Gpu', 'lean': '.Lean'}[args.flavor] + '.' + rid
+    package_id = pins['package']['id'] + {'slim': '.Cpu', 'gpu': '', 'lean': '.Lean'}[args.flavor] + '.' + rid
     package = work / 'packages' / f'{package_id}.{version}.nupkg'
     # The packed files, not the staged ones: what nuget.org would serve.
     run(sys.executable, '-I', root / 'scripts/smoke.py', '--package', package, '--expect-commit', head,

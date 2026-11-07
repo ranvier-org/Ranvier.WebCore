@@ -113,7 +113,7 @@ class FlavorMatrixTests(unittest.TestCase):
 
     def test_an_owner_attached_package_moves_only_its_own_cell_to_prebuilt(self):
         release = {'author': {'login': 'owner'},
-                   'assets': [{'name': 'Ranvier.WebCore.Native.Gpu.linux-x64.0.1.2-rc.1.nupkg', 'uploader': {'login': 'owner'}}]}
+                   'assets': [{'name': 'Ranvier.WebCore.Native.linux-x64.0.1.2-rc.1.nupkg', 'uploader': {'login': 'owner'}}]}
         matrix, prebuilt = plan_cells(release=release)
         self.assertEqual(prebuilt, [('linux-x64', 'gpu')])
         self.assertIn(('linux-x64', 'slim'), matrix)
@@ -135,6 +135,8 @@ class FlavorMatrixTests(unittest.TestCase):
         workflow = (ROOT / '.github/workflows/build.yml').read_text()
         job = workflow.split('\n  managed:\n', 1)[1].split('\n  atspi:\n', 1)[0]
         self.assertIn('pattern: package-*-gpu', job)
+        self.assertIn('packages/Ranvier.WebCore.Native.[0-9]*.nupkg', job)
+        self.assertIn('packages/Ranvier.WebCore.Native.Cpu.[0-9]*.nupkg', job)
         self.assertIn('packages/Ranvier.WebCore.Native.Gpu.[0-9]*.nupkg', job)
 
 
