@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <PackageId>Ranvier.WebCore.Native.Cpu</PackageId>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IncludeSymbols>false</IncludeSymbols>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+    <Authors>Ranvier</Authors>
+    <Description>CPU-only native WebCore host (the Slim flavor) for Windows x64/ARM64, Linux x64/ARM64 and macOS ARM64, without GPU code. Restore selects the native assets for the application's runtime.</Description>
+    <PackageTags>webkit;webcore;native;cpu;ranvier</PackageTags>
+    <PackageLicenseFile>NOTICE.md</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Ranvier.WebCore.Native.Cpu.win-x64" Version="[$(Version)]" />
+    <PackageReference Include="Ranvier.WebCore.Native.Cpu.win-arm64" Version="[$(Version)]" />
+    <PackageReference Include="Ranvier.WebCore.Native.Cpu.linux-x64" Version="[$(Version)]" />
+    <PackageReference Include="Ranvier.WebCore.Native.Cpu.linux-arm64" Version="[$(Version)]" />
+    <PackageReference Include="Ranvier.WebCore.Native.Cpu.osx-arm64" Version="[$(Version)]" />
+    <None Include="../../NOTICE.md" Pack="true" PackagePath="" />
+    <None Include="README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+</Project>
