@@ -409,6 +409,28 @@ reproduces it (a denied pointer-lock request delivered after thousands of turns)
 Without the patch, `cancel()` of an animation with a pending pause queues its rejection as a JavaScript microtask, and
 the armed VM-entry crash (`crashOnDisallowedVMEntry`) aborts the host at the next checkpoint.
 
+## 0074-texture-mapper-gpu-layer-painting
+
+Upstream, `BitmapTexture::updateContents(GraphicsLayer*)` paints every TextureMapper tile into an unaccelerated
+`ImageBuffer` and uploads it, because no port that uses `GraphicsLayerTextureMapper` respected the accelerated bit:
+WPE and GTK rasterize on the GPU through coordinated graphics instead. The host composites with
+`GraphicsLayerTextureMapper`, so every layer, its root layer included, was rasterized on the CPU, and a blurred
+`box-shadow` (a Skia `DropShadowOnly` image filter) re-blurred on the CPU whenever a dirty rectangle crossed it.
+
+The patch adds `BitmapTexture::setPaintsLayersOnGPU`, off by default. While it is set, a tile is painted straight into
+its GL texture through `SkSurfaces::WrapBackendTexture` in the thread's Skia GL context, and the current context waits
+on a fence for that work. A texture Skia cannot render to (BGRA layout, an external or memory-mapped buffer) and a
+thread without a Skia context take the upstream path. `canPaintLayersOnGPU` creates the context: WPE creates it on
+first use; on Windows, where upstream only WebKit's threaded compositor installs one, `PlatformDisplay::skiaGLContext`
+returns the context the embedder installed, and that context has no `SkExecutor`, whose thread pool, joined from a
+`thread_local` destructor under the loader lock, deadlocks the process's exit. `releaseLayerPaintingContext` destroys
+it. The host turns painting on per composite (`rv_host_set_gpu_painting`, `docs/HOSTING.md`).
+
+`GraphicsContextSkia::clip(FloatRect)` rounds a non-antialiased clip's device edges in a GPU layer paint as Skia's
+raster backend does, `floor(x + 0.5)`, where Ganesh's pixel-centre rule would drop the column a half-pixel edge
+crosses: a `background-clip: content-box` 100.5px wide lost its last column against the CPU paint and Chromium
+(`tests/fixtures/background-content-clip-cases.json`).
+
 ## Working on the series
 
 ```

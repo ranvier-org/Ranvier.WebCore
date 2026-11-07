@@ -174,6 +174,18 @@ enum {
  * create a GL context. RV_COMPOSITING_WHEN_NEEDED creates the context on the first composited frame; if that
  * fails, the host switches to RV_COMPOSITING_OFF and paints that frame on the CPU. */
 RV_EXPORT int32_t rv_host_set_accelerated_compositing(RvHost*, int32_t mode);
+/* v65: "gpu-painting": composited frames rasterize layer contents (text, borders, shadows, filters, images) with Skia's
+ * GPU backend in the compositor's GL share group (ANGLE over D3D11 on Windows, EGL on Linux), instead of on the CPU
+ * and uploading them. A host is created with GPU painting on (1); 0 paints layer contents on the CPU, as the slim
+ * flavor paints its frames. A GPU-painted frame can differ from a CPU-painted one and between GPUs, in antialiasing
+ * and blur. When the library cannot create Skia's GL context, frames are painted on the CPU whatever the setting.
+ * Changing the setting repaints every layer on the next composited frame. Returns RV_ERR_UNSUPPORTED for a value
+ * other than 0 or 1, and for 1 when the library was built without the GPU code. Frames that do not composite
+ * (RV_COMPOSITING_OFF, or RV_COMPOSITING_WHEN_NEEDED without a layer) are painted on the CPU. */
+RV_EXPORT int32_t rv_host_set_gpu_painting(RvHost*, int32_t enabled);
+/* 1 when the host's composited frames paint layer contents on the GPU: the setting is on and Skia's GL context
+ * exists, which this call creates on first use. 0 otherwise. */
+RV_EXPORT int32_t rv_host_gpu_painting(RvHost*);
 
 enum { RV_GPU_RGBA8_PREMULTIPLIED = 1, RV_GPU_BGRA8_PREMULTIPLIED = 2 };
 /* Acquires a Windows D3D11 frame without CPU pixel readback. Call rv_host_update before acquire, as before

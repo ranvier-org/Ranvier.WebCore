@@ -259,6 +259,7 @@
 #include <WebCore/GraphicsLayerFactory.h>
 #include "RanvierMacGpuSpike.h"
 #endif
+#include <WebCore/BitmapTexture.h>
 #include <WebCore/GraphicsLayerTextureMapper.h>
 #include <WebCore/PlatformDisplay.h>
 #include <WebCore/TextureMapper.h>
@@ -872,9 +873,15 @@ static void loadHTML(LocalFrame& frame, const String& html)
 // The GL context every host composites in, created on first use and kept for the process's lifetime. WebKit
 // has one per compositing thread, and BitmapTexturePool, which is process-wide, hands a texture made in one
 // context to whichever context paints next.
+//
+// It is in the display's sharing group, as the Skia GL context that rasterizes layers is
+// (BitmapTexture::canPaintLayersOnGPU), so a texture Skia paints is one the compositor samples.
 static GLContext* compositingContext()
 {
-    static GLContext* context = GLContext::create(PlatformDisplay::sharedDisplay().glDisplay(), GLContext::Target::Default).release();
+    static GLContext* context = [] {
+        auto& display = PlatformDisplay::sharedDisplay();
+        return GLContext::create(display.glDisplay(), GLContext::Target::Default, display.sharingGLContext()).release();
+    }();
     return context;
 }
 
@@ -1046,6 +1053,9 @@ struct RvHost {
     int32_t compositingMode { RV_COMPOSITING_OFF };
     // Created on the first frame that composites, so a page that never needs a layer never creates a GL context.
     std::unique_ptr<RvCompositor> compositor;
+    // rv_host_set_gpu_painting: composited frames rasterize layer contents with Skia's GPU backend when it is
+    // available (BitmapTexture::canPaintLayersOnGPU), and on the CPU otherwise.
+    bool gpuPainting { true };
 #if defined(_WIN32)
     std::shared_ptr<RvD3D11Surface> presentationSurface;
 #elif defined(__linux__)
@@ -1934,7 +1944,7 @@ static_assert(sizeof(RvMediaVideoConfiguration) == 64 && offsetof(RvMediaVideoCo
 static_assert(sizeof(RvSnapshotOptions) == 64 && offsetof(RvSnapshotOptions, scale) == 8 && offsetof(RvSnapshotOptions, x) == 24 && offsetof(RvSnapshotOptions, quality) == 64 - 8);
 static_assert(sizeof(RvMediaAudioConfiguration) == 64 && offsetof(RvMediaAudioConfiguration, bitrate) == 40 && offsetof(RvMediaAudioConfiguration, spatial_rendering) == 56);
 
-int32_t rv_abi_version(void) { return 64; }
+int32_t rv_abi_version(void) { return 65; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -2053,6 +2063,10 @@ int32_t rv_abi_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "compositor-device-scale"))
         return 1;
+#if PLATFORM(WIN) || PLATFORM(WPE)
+    if (!std::strcmp(feature, "gpu-painting"))
+        return 1;
+#endif
 #if defined(_WIN32)
     if (!std::strcmp(feature, "presentation-d3d11"))
         return 1;
@@ -2558,6 +2572,51 @@ int32_t rv_host_set_accelerated_compositing(RvHost* host, int32_t mode)
 #endif
 }
 
+int32_t rv_host_set_gpu_painting(RvHost* host, int32_t enabled)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (enabled != 0 && enabled != 1)
+        return RV_ERR_UNSUPPORTED;
+#if RANVIER_COMPOSITING
+    if (host->gpuPainting == !!enabled)
+        return RV_OK;
+    host->gpuPainting = enabled;
+    // A layer's texture holds one painter's pixels and only its invalidated parts repaint: the next composite
+    // repaints every layer with the other painter.
+    if (host->compositor) {
+        Function<void(GraphicsLayer&)> repaint = [&](GraphicsLayer& layer) {
+            layer.setNeedsDisplay();
+            if (RefPtr mask = layer.maskLayer())
+                repaint(*mask);
+            for (auto& child : layer.children())
+                repaint(child.get());
+        };
+        repaint(*host->compositor->root);
+        host->compositor->painted = false;
+        host->requestFrame();
+    }
+    return RV_OK;
+#else
+    return enabled ? RV_ERR_UNSUPPORTED : RV_OK;
+#endif
+}
+
+int32_t rv_host_gpu_painting(RvHost* host)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+#if RANVIER_COMPOSITING
+    return host->gpuPainting && BitmapTexture::canPaintLayersOnGPU();
+#else
+    return 0;
+#endif
+}
+
 // Denies a pending pointer-lock request and ends a held lock, as a platform window losing focus does.
 static void releasePointerLock(RvHost& host)
 {
@@ -2612,6 +2671,11 @@ void rv_host_destroy(RvHost* host)
     static_cast<RvChromeClient&>(host->page->chrome().client()).host = nullptr;
     liveHosts.removeFirst(host);
     delete host;
+#if RANVIER_COMPOSITING
+    // The Skia GL context is the owner thread's; without a host left, release it before the thread or process ends.
+    if (liveHosts.isEmpty())
+        BitmapTexture::releaseLayerPaintingContext();
+#endif
     publishScreens();
 }
 
@@ -3049,7 +3113,9 @@ static int32_t composite(RvHost& host, RvCompositor& compositor, LocalFrameView&
     }
 #endif
     auto& rootLayer = downcast<GraphicsLayerTextureMapper>(*compositor.root);
+    BitmapTexture::setPaintsLayersOnGPU(host.gpuPainting && BitmapTexture::canPaintLayersOnGPU());
     rootLayer.updateBackingStoreIncludingSubLayers(*compositor.textureMapper);
+    BitmapTexture::setPaintsLayersOnGPU(false);
     compositor.view = nullptr;
 
     auto size = compositor.pixelSize;
