@@ -1,0 +1,15 @@
+diff --git a/Source/WebCore/platform/adwaita/ScrollbarThemeAdwaita.cpp b/Source/WebCore/platform/adwaita/ScrollbarThemeAdwaita.cpp
+index dd44090..20b13c1 100644
+--- a/Source/WebCore/platform/adwaita/ScrollbarThemeAdwaita.cpp
++++ b/Source/WebCore/platform/adwaita/ScrollbarThemeAdwaita.cpp
+@@ -143,7 +143,9 @@ bool ScrollbarThemeAdwaita::paint(Scrollbar& scrollbar, GraphicsContext& graphic
+ 
+ void ScrollbarThemeAdwaita::paintScrollCorner(ScrollableArea& scrollableArea, GraphicsContext& graphicsContext, const IntRect& cornerRect)
+ {
+-    if (graphicsContext.paintingDisabled())
++    // ScrollView::paintScrollbars paints the corner whether or not there is one (scrollCornerRect is empty without
++    // both scrollbars, or with overlay scrollbars); its border would mark the view's origin.
++    if (graphicsContext.paintingDisabled() || cornerRect.isEmpty())
+         return;
+ 
+     Color scrollbarBackgroundColor;
