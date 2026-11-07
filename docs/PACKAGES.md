@@ -23,7 +23,7 @@ records it, with the WebKit commit, the source commit and every file's SHA-256, 
 | Flavor | Use when | Painting |
 |---|---|---|
 | Slim | The app reads CPU pixels (`rv_host_paint_rgba`) or needs the smallest package. | CPU |
-| GPU | The app wants accelerated compositing and a native GPU frame without CPU readback: shared D3D11 texture on Windows, EGLImage on Linux, IOSurface on macOS. | CPU, or GPU per `rv_host_set_accelerated_compositing` |
+| GPU | The app wants accelerated compositing and a native GPU frame without CPU readback: shared D3D11 texture on Windows, EGLImage on Linux, IOSurface on macOS. | Composited frames: GPU raster (`rv_host_set_gpu_painting`), CPU raster where no GPU context exists; other frames CPU |
 | Lean | Comparing against unpatched WebKit. | CPU |
 
 Slim cuts WebKit to what presentation needs: no network stack, crypto library, GPU code, browser storage, service

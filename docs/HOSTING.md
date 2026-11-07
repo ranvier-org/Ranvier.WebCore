@@ -56,6 +56,12 @@ rv_host_destroy(host);                                 /* after releasing every 
   feed an app texture into an element, and `rv_host_native_texture_changed` marks it updated. Where the library
   has no GPU code, or a call does not apply to the platform, the call returns `RV_ERR_UNSUPPORTED` and the app
   paints with `rv_host_paint_rgba`.
+- **GPU painting (GPU flavor, Windows and Linux):** a composited frame rasterizes layer contents (text, borders,
+  blurred shadows, filters) with Skia's GPU backend in the compositor's GL share group, so a repaint over a blurred
+  `box-shadow` costs GPU time, not a CPU blur. It is on for a new host; `rv_host_set_gpu_painting(host, 0)` paints
+  layer contents on the CPU, the same pixels the slim flavor would paint, for screenshot tests that compare frames
+  across machines. When Skia's GL context cannot be created (no usable GPU driver), frames are painted on the CPU
+  whatever the setting; `rv_host_gpu_painting` reports which. Frames that do not composite are painted on the CPU.
 - Check `rv_abi_has` before relying on a group (see `docs/ABI.md`).
 
 ## Input
