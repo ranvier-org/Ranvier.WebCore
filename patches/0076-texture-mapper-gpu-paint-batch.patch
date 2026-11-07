@@ -1,0 +1,66 @@
+diff --git a/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp b/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp
+index ebc6486..b45d23d 100644
+--- a/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp
++++ b/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp
+@@ -678,9 +678,37 @@ sk_sp<SkSurface> BitmapTexture::createSkiaSurface(GrDirectContext* grContext, Gr
+ }
+ 
+ static bool s_paintsLayersOnGPU;
++// Whether layers painted on the GPU since setPaintsLayersOnGPU(true) have work the current context has not waited for.
++static bool s_unfinishedGPUPaints;
++
++// Submits the Skia context's paints and makes the current context wait for them on the GPU: once for all the layers
++// of a composite, rather than a flush, a fence and a wait for each.
++static void finishGPUPaints()
++{
++    s_unfinishedGPUPaints = false;
++    auto* compositingContext = GLContext::current();
++    auto& display = PlatformDisplay::sharedDisplay();
++    auto* skiaContext = display.skiaGLContext();
++    if (!compositingContext || !skiaContext)
++        return;
++    if (!skiaContext->makeContextCurrent()) {
++        compositingContext->makeContextCurrent();
++        return;
++    }
++    auto fence = SkiaUtilities::flushAndSubmitWithFence(display.skiaGrContext());
++    // The fence is waited on from the compositing context, and a wait without EGL_SYNC_FLUSH_COMMANDS_BIT on a fence
++    // its own context never flushed does not return (ANGLE's D3D11 backend spins on it).
++    glFlush();
++    if (!compositingContext->makeContextCurrent())
++        return;
++    if (fence)
++        fence->serverWait();
++}
+ 
+ void BitmapTexture::setPaintsLayersOnGPU(bool enabled)
+ {
++    if (!enabled && s_unfinishedGPUPaints)
++        finishGPUPaints();
+     s_paintsLayersOnGPU = enabled;
+ }
+ 
+@@ -776,18 +804,14 @@ bool BitmapTexture::updateContentsOnGPU(GraphicsLayer* sourceLayer, const IntRec
+     }
+     canvas->restore();
+ 
+-    // Painting can make another context current (an accelerated image buffer's); flush in Skia's.
++    // Painting can make another context current (an accelerated image buffer's): record the GL work in Skia's. The
++    // compositing context waits for it once all layers have painted (setPaintsLayersOnGPU(false)).
+     skiaContext->makeContextCurrent();
+-    auto fence = SkiaUtilities::flushAndSubmitSurfaceWithFence(grContext, surface.get());
++    grContext->flush(surface.get());
+     surface = nullptr;
+-    // The fence is waited on from the compositing context, and a wait without EGL_SYNC_FLUSH_COMMANDS_BIT on a fence
+-    // its own context never flushed does not return (ANGLE's D3D11 backend spins on it).
+-    glFlush();
+-    if (!compositingContext->makeContextCurrent())
+-        return true;
+-    if (fence)
+-        fence->serverWait();
++    s_unfinishedGPUPaints = true;
+     m_pixelFormat = PixelFormat::RGBA8;
++    compositingContext->makeContextCurrent();
+     return true;
+ }
+ #endif

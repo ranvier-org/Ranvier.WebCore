@@ -76,6 +76,7 @@
 #include <WebCore/Page.h>
 #include <WebCore/PixelBuffer.h>
 #include <WebCore/Range.h>
+#include <WebCore/Region.h>
 #include <WebCore/Settings.h>
 #include <WebCore/MIMETypeRegistry.h>
 #include <WebCore/Text.h>
@@ -301,9 +302,12 @@ public:
 #endif
 
 private:
-    void invalidateRootView(const IntRect& rect) final { invalidate(rect); }
-    void invalidateContentsAndRootView(const IntRect& rect) final { invalidate(rect); }
-    void invalidateContentsForSlowScroll(const IntRect& rect) final { invalidate(rect); }
+    // ScrollView::scrollContents presents the scrolled view with invalidateRootView, which repaints nothing: the
+    // scroll moved the pixels it could (scroll), and the content it exposed is invalidated with the others.
+    void invalidateRootView(const IntRect& rect) final { invalidate(rect, false); }
+    void invalidateContentsAndRootView(const IntRect& rect) final { invalidate(rect, true); }
+    void invalidateContentsForSlowScroll(const IntRect& rect) final { invalidate(rect, true); }
+    void scroll(const IntSize& scrollDelta, const IntRect& rectToScroll, const IntRect& clipRect) final;
     void triggerRenderingUpdate() final { wantUpdate(); }
     bool scheduleRenderingUpdate() final
     {
@@ -322,7 +326,7 @@ private:
 #if USE(AX_EMBEDDER_NOTIFICATIONS)
     void postAccessibilityNotification(AccessibilityObject&, AXNotification) final;
 #endif
-    void invalidate(const IntRect&);
+    void invalidate(const IntRect&, bool repaint);
     void wantUpdate();
 #if ENABLE(POINTER_LOCK)
     void requestPointerLock(CompletionHandler<void(PointerLockRequestResult)>&&) final;
@@ -1070,8 +1074,20 @@ struct RvHost {
 #elif defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE && RANVIER_COMPOSITING
     Vector<std::unique_ptr<RvNativeMacTextureInput>> nativeTextures;
 #endif
-    // The viewport area invalidated since the last paint.
+    // The viewport area invalidated since the last paint, which rv_host_dirty_rect reports.
     IntRect dirty;
+    // What the compositor's root layer repaints on its next composite, apart from dirty: a viewport scroll moves the
+    // root layer's pixels by rootScroll inside rootScrollRect (RvChromeClient::scroll), and only what it exposes
+    // repaints. rootRepaintAll repaints the whole layer, as a scroll the compositor cannot move does.
+    Region rootDirty;
+    bool rootRepaintAll { false };
+    IntSize rootScroll;
+    IntRect rootScrollRect;
+    void invalidateAll()
+    {
+        dirty = { { }, size };
+        rootRepaintAll = true;
+    }
     RvFrameCallback frameCallback { nullptr };
     void* frameContext { nullptr };
     // The callback ran and no frame has started since.
@@ -1262,14 +1278,39 @@ void RvChromeClient::runOpenPanel(LocalFrame&, FileChooser& chooser)
     host->filePickerCallback(host->filePickerContext, host->filePickerId, RV_FILE_PICKER_SHOW, flags);
 }
 
-void RvChromeClient::invalidate(const IntRect& rect)
+void RvChromeClient::invalidate(const IntRect& rect, bool repaint)
 {
     if (!host)
         return;
     if (host->traceBuffer)
         host->traceBuffer->record(RV_HOST_TRACE_UPDATE_REQUESTED, traceNow(), 0);
-    host->dirty.unite(intersection(rect, IntRect { { }, host->size }));
+    auto viewportRect = intersection(rect, IntRect { { }, host->size });
+    host->dirty.unite(viewportRect);
+    if (repaint && !viewportRect.isEmpty())
+        host->rootDirty.unite(viewportRect);
     host->requestFrame();
+}
+
+// LocalFrameView::scrollContentsFastPath: the content in rectToScroll moved by scrollDelta. The compositor moves the
+// root layer's pixels to match and repaints what the move exposed; WebCore invalidates fixed-position content itself.
+void RvChromeClient::scroll(const IntSize& scrollDelta, const IntRect& rectToScroll, const IntRect& clipRect)
+{
+    if (!host)
+        return;
+    auto rect = intersection(intersection(rectToScroll, clipRect), IntRect { { }, host->size });
+    if (rect.isEmpty() || scrollDelta.isZero())
+        return;
+    if (!host->rootScroll.isZero() && host->rootScrollRect != rect)
+        host->rootRepaintAll = true;
+    host->rootScrollRect = rect;
+    host->rootScroll += scrollDelta;
+    // Repaints pending from before the scroll are where the content was; they repaint where it moved too.
+    auto moved = host->rootDirty;
+    moved.translate(scrollDelta);
+    host->rootDirty.unite(moved);
+    Region exposed { rect };
+    exposed.subtract(intersection(rect, IntRect { rect.location() + scrollDelta, rect.size() }));
+    host->rootDirty.unite(exposed);
 }
 
 #if ENABLE(POINTER_LOCK)
@@ -3079,24 +3120,36 @@ static int32_t composite(RvHost& host, RvCompositor& compositor, LocalFrameView&
         compositor.root->addChild(*frameRoot);
     }
     compositor.view = &view;
-    // The root layer repaints only what the page invalidated; its layered content repaints within its own layers.
-    // Invalidations made while this frame composites stay in the host's dirty rectangle for the next frame, and a
-    // failed composite returns the rectangle it took.
+    // The root layer repaints only what the page invalidated, after moving its pixels for a viewport scroll; layered
+    // content repaints within its own layers. Invalidations made while this frame composites stay for the next frame.
+    // A failed composite returns the dirty rectangle it took and repaints the whole root layer next time, since its
+    // pixels may already have moved.
     struct TakenDirty {
         RvHost& host;
+        RvCompositor& compositor;
         IntRect rect;
         bool painted { false };
         ~TakenDirty()
         {
-            if (!painted)
+            if (!painted) {
                 host.dirty.unite(rect);
+                compositor.painted = false;
+            }
         }
-    } taken { host, std::exchange(host.dirty, IntRect { }) };
-    if (!compositor.painted) {
+    } taken { host, compositor, std::exchange(host.dirty, IntRect { }) };
+    auto rootDirty = std::exchange(host.rootDirty, Region { });
+    auto rootScroll = std::exchange(host.rootScroll, IntSize { });
+    auto rootScrollRect = std::exchange(host.rootScrollRect, IntRect { });
+    bool repaintAll = std::exchange(host.rootRepaintAll, false) || !compositor.painted;
+    if (!repaintAll && !rootScroll.isZero())
+        repaintAll = !downcast<GraphicsLayerTextureMapper>(*compositor.root).scrollBackingStore(rootScroll, rootScrollRect);
+    compositor.painted = true;
+    if (repaintAll)
         compositor.root->setNeedsDisplay();
-        compositor.painted = true;
-    } else if (!taken.rect.isEmpty())
-        compositor.root->setNeedsDisplayInRect(FloatRect { taken.rect });
+    else {
+        for (auto& rect : rootDirty.rects())
+            compositor.root->setNeedsDisplayInRect(FloatRect { rect });
+    }
     compositor.root->flushCompositingStateForThisLayerOnly();
     view.flushCompositingStateIncludingSubframes();
 #if defined(_WIN32) || defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE)
@@ -4834,7 +4887,7 @@ int32_t rv_host_resize(RvHost* host, int32_t width, int32_t height)
         publishScreens();
         host->page->screenPropertiesDidChange();
     }
-    host->dirty = { { }, host->size };
+    host->invalidateAll();
     host->requestFrame();
     return RV_OK;
 }
@@ -4849,7 +4902,7 @@ int32_t rv_host_set_device_scale(RvHost* host, float scale)
         return RV_ERR_UNSUPPORTED;
     host->deviceScale = scale;
     host->page->setDeviceScaleFactor(scale);
-    host->dirty = { { }, host->size };
+    host->invalidateAll();
     host->requestFrame();
     return RV_OK;
 }
@@ -4863,7 +4916,7 @@ int32_t rv_host_set_page_scale(RvHost* host, double scale, int32_t originX, int3
     if (!std::isfinite(scale) || scale <= 0)
         return RV_ERR_UNSUPPORTED;
     host->page->setPageScaleFactor(static_cast<float>(scale), { originX, originY });
-    host->dirty = { { }, host->size };
+    host->invalidateAll();
     host->requestFrame();
     return RV_OK;
 }
@@ -4889,7 +4942,7 @@ int32_t rv_host_set_obscured_insets(RvHost* host, double top, double right, doub
             return RV_ERR_UNSUPPORTED;
     }
     host->page->setObscuredContentInsets(FloatBoxExtent { static_cast<float>(top), static_cast<float>(right), static_cast<float>(bottom), static_cast<float>(left) });
-    host->dirty = { { }, host->size };
+    host->invalidateAll();
     host->requestFrame();
     return RV_OK;
 }

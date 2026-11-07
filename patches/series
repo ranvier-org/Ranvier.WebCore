@@ -70,3 +70,6 @@
 0072-cocoa-page-contrast.patch
 0073-texture-mapper-fractional-paint-bounds.patch
 0074-texture-mapper-gpu-layer-painting.patch
+0075-texture-mapper-scroll-backing-store.patch
+0076-texture-mapper-gpu-paint-batch.patch
+0077-adwaita-empty-scroll-corner.patch
