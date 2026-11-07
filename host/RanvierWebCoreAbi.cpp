@@ -912,6 +912,8 @@ struct RvCompositor final : GraphicsLayerClient {
     IntSize size;
     IntSize pixelSize;
     float scale { 1 };
+    // A new root layer has no backing store contents, so its first composite paints all of it.
+    bool painted { false };
     GLuint texture { 0 };
     GLuint depthStencil { 0 };
     GLuint framebuffer { 0 };
@@ -3013,8 +3015,24 @@ static int32_t composite(RvHost& host, RvCompositor& compositor, LocalFrameView&
         compositor.root->addChild(*frameRoot);
     }
     compositor.view = &view;
-    if (!host.dirty.isEmpty())
+    // The root layer repaints only what the page invalidated; its layered content repaints within its own layers.
+    // Invalidations made while this frame composites stay in the host's dirty rectangle for the next frame, and a
+    // failed composite returns the rectangle it took.
+    struct TakenDirty {
+        RvHost& host;
+        IntRect rect;
+        bool painted { false };
+        ~TakenDirty()
+        {
+            if (!painted)
+                host.dirty.unite(rect);
+        }
+    } taken { host, std::exchange(host.dirty, IntRect { }) };
+    if (!compositor.painted) {
         compositor.root->setNeedsDisplay();
+        compositor.painted = true;
+    } else if (!taken.rect.isEmpty())
+        compositor.root->setNeedsDisplayInRect(FloatRect { taken.rect });
     compositor.root->flushCompositingStateForThisLayerOnly();
     view.flushCompositingStateIncludingSubframes();
 #if defined(_WIN32) || defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE)
@@ -3056,7 +3074,8 @@ static int32_t composite(RvHost& host, RvCompositor& compositor, LocalFrameView&
 #endif
     if (!rgba) {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        return glGetError() == GL_NO_ERROR ? RV_OK : RV_ERR_PAINT_FAILED;
+        taken.painted = glGetError() == GL_NO_ERROR;
+        return taken.painted ? RV_OK : RV_ERR_PAINT_FAILED;
     }
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
     glReadPixels(0, 0, size.width(), size.height(), GL_RGBA, GL_UNSIGNED_BYTE, rgba);
@@ -3073,6 +3092,7 @@ static int32_t composite(RvHost& host, RvCompositor& compositor, LocalFrameView&
                 pixel[c] = static_cast<uint8_t>(std::min(255, (pixel[c] * 255 + alpha / 2) / alpha));
         }
     }
+    taken.painted = true;
     return RV_OK;
 }
 #endif
@@ -3283,7 +3303,6 @@ int32_t rv_host_acquire_egl_frame(RvHost* host, RvGpuFrame** frame)
             host->presentationSurface = nullptr;
             return RV_ERR_PAINT_FAILED;
         }
-        host->dirty = { };
         *frame = new RvGpuFrame { WTF::move(surface) };
         return RV_OK;
     }();
@@ -3369,10 +3388,8 @@ int32_t rv_host_acquire_d3d11_frame(RvHost* host, void* consumerDevice, RvGpuFra
             surface->cancelProducer();
             if (paintResult != RV_ERR_UNSUPPORTED || !surface->available())
                 host->presentationSurface = nullptr;
-        } else {
-            host->dirty = { };
+        } else
             *frame = new RvGpuFrame { WTF::move(surface) };
-        }
         return transferred ? RV_OK : RV_ERR_PAINT_FAILED;
     }();
     if (result != RV_OK && host->errorRecordsEnabled) {
@@ -3485,7 +3502,6 @@ static int32_t paintArea(RvHost& host, uint8_t* rgba, int32_t length, IntRect ar
                 RvTraceSpan span(host, RV_HOST_TRACE_PAINT);
                 result = composite(host, *host.compositor, *view, rgba);
             }
-            host.dirty = { };
             host.inFrame = false;
             if (host.updateWanted)
                 host.requestFrame();
