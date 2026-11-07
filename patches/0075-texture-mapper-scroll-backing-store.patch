@@ -1,0 +1,256 @@
+diff --git a/Source/WebCore/loader/EmptyClients.h b/Source/WebCore/loader/EmptyClients.h
+index 84af2b6..c08628e 100644
+--- a/Source/WebCore/loader/EmptyClients.h
++++ b/Source/WebCore/loader/EmptyClients.h
+@@ -114,7 +114,7 @@ class WEBCORE_EXPORT EmptyChromeClient : public ChromeClient {
+     void invalidateRootView(const IntRect&) override { }
+     void invalidateContentsAndRootView(const IntRect&) override { }
+     void invalidateContentsForSlowScroll(const IntRect&) override { }
+-    void scroll(const IntSize&, const IntRect&, const IntRect&) final { }
++    void scroll(const IntSize&, const IntRect&, const IntRect&) override { }
+ 
+     IntPoint screenToRootView(const IntPoint& p) const final { return p; }
+     IntPoint rootViewToScreen(const IntPoint& p) const final { return p; }
+diff --git a/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp b/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp
+index c846fca..ebc6486 100644
+--- a/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp
++++ b/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp
+@@ -465,6 +465,47 @@ void BitmapTexture::updateContents(GraphicsLayer* sourceLayer, const IntRect& ta
+     updateContents(image.get(), targetRect, IntPoint());
+ }
+ 
++bool BitmapTexture::shiftContents(const IntSize& delta, const IntRect& rect)
++{
++    if (!m_id || m_renderTarget != GL_TEXTURE_2D || !IntRect({ }, m_size).contains(rect))
++        return false;
++    IntRect destination = rect;
++    destination.intersect(IntRect { rect.location() + delta, rect.size() });
++    if (destination.isEmpty())
++        return false;
++    IntRect source = destination;
++    source.move(-delta);
++
++    GLint boundFramebuffer = 0;
++    GLint boundTexture = 0;
++    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &boundFramebuffer);
++    glGetIntegerv(GL_TEXTURE_BINDING_2D, &boundTexture);
++    // A texture cannot be copied onto itself where the regions overlap: through a scratch texture.
++    GLuint scratch = 0;
++    GLuint framebuffer = 0;
++    glGenTextures(1, &scratch);
++    glBindTexture(GL_TEXTURE_2D, scratch);
++    glTexImage2D(GL_TEXTURE_2D, 0, textureFormat(), source.width(), source.height(), 0, textureFormat(), s_pixelDataType, nullptr);
++    glGenFramebuffers(1, &framebuffer);
++    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
++    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_id, 0);
++    bool complete = glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
++    if (complete) {
++        glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, source.x(), source.y(), source.width(), source.height());
++        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, scratch, 0);
++        complete = glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
++        if (complete) {
++            glBindTexture(GL_TEXTURE_2D, m_id);
++            glCopyTexSubImage2D(GL_TEXTURE_2D, 0, destination.x(), destination.y(), 0, 0, source.width(), source.height());
++        }
++    }
++    glBindFramebuffer(GL_FRAMEBUFFER, boundFramebuffer);
++    glBindTexture(GL_TEXTURE_2D, boundTexture);
++    glDeleteFramebuffers(1, &framebuffer);
++    glDeleteTextures(1, &scratch);
++    return complete;
++}
++
+ void BitmapTexture::initializeStencil()
+ {
+     if (m_flags.contains(Flags::DepthBuffer)) {
+diff --git a/Source/WebCore/platform/graphics/texmap/BitmapTexture.h b/Source/WebCore/platform/graphics/texmap/BitmapTexture.h
+index 293ba94..808fbbc 100644
+--- a/Source/WebCore/platform/graphics/texmap/BitmapTexture.h
++++ b/Source/WebCore/platform/graphics/texmap/BitmapTexture.h
+@@ -104,6 +104,9 @@ public:
+     void updateContents(const void* srcData, const IntRect& targetRect, const IntPoint& sourceOffset, int bytesPerLine, PixelFormat);
+ 
+     void swapTexture(BitmapTexture&);
++    // Ranvier: moves the pixels inside rect by delta, in texels, on the GPU; the part of rect they leave keeps its
++    // old pixels for the caller to repaint. Returns false, unchanged, for a texture it cannot copy from.
++    bool shiftContents(const IntSize& delta, const IntRect&);
+     void reset(const IntSize&, OptionSet<Flags> = { });
+ 
+     RefPtr<const FilterOperation> filterOperation() const { return m_filterOperation; }
+diff --git a/Source/WebCore/platform/graphics/texmap/GraphicsLayerTextureMapper.cpp b/Source/WebCore/platform/graphics/texmap/GraphicsLayerTextureMapper.cpp
+index 2393474..9049449 100644
+--- a/Source/WebCore/platform/graphics/texmap/GraphicsLayerTextureMapper.cpp
++++ b/Source/WebCore/platform/graphics/texmap/GraphicsLayerTextureMapper.cpp
+@@ -92,11 +92,32 @@ void GraphicsLayerTextureMapper::setNeedsDisplayInRect(const FloatRect& rect, Sh
+ 
+     if (m_needsDisplay)
+         return;
+-    m_needsDisplayRect.unite(rect);
++    addNeedsDisplayRect(rect);
+     notifyChange(DisplayChange);
+     addRepaintRect(rect);
+ }
+ 
++// Ranvier: separate invalidations repaint separately, so a scrolled strip and a fixed element at the other end of the
++// layer repaint two small rectangles rather than the rectangle that bounds them. Past a few, they merge.
++void GraphicsLayerTextureMapper::addNeedsDisplayRect(const FloatRect& rect)
++{
++    if (rect.isEmpty())
++        return;
++    for (auto& existing : m_needsDisplayRects) {
++        if (existing.contains(rect))
++            return;
++    }
++    m_needsDisplayRects.removeAllMatching([&](auto& existing) { return rect.contains(existing); });
++    m_needsDisplayRects.append(rect);
++    static constexpr size_t maximumRects = 8;
++    if (m_needsDisplayRects.size() > maximumRects) {
++        FloatRect bounds;
++        for (auto& existing : m_needsDisplayRects)
++            bounds.unite(existing);
++        m_needsDisplayRects = { bounds };
++    }
++}
++
+ bool GraphicsLayerTextureMapper::setChildren(Vector<Ref<GraphicsLayer>>&& children)
+ {
+     if (GraphicsLayer::setChildren(WTF::move(children))) {
+@@ -433,7 +454,7 @@ void GraphicsLayerTextureMapper::updateDebugBorderAndRepaintCount()
+         updateDebugIndicators();
+ 
+     // When this has its own backing store (e.g. Qt WK1), update the repaint count before calling TextureMapperLayer::flushCompositingStateForThisLayerOnly().
+-    bool needsToRepaint = shouldHaveBackingStore() && (m_needsDisplay || !m_needsDisplayRect.isEmpty());
++    bool needsToRepaint = shouldHaveBackingStore() && (m_needsDisplay || !m_needsDisplayRects.isEmpty());
+     if (isShowingRepaintCounter() && needsToRepaint) {
+         incrementRepaintCount();
+         m_changeMask |= RepaintCountChange;
+@@ -602,19 +623,53 @@ void GraphicsLayerTextureMapper::updateBackingStoreIfNeeded(TextureMapper& textu
+     }
+     ASSERT(m_backingStore);
+ 
+-    IntRect dirtyRect = enclosingIntRect(FloatRect(FloatPoint::zero(), m_size));
+-    if (!m_needsDisplay)
+-        dirtyRect.intersect(enclosingIntRect(m_needsDisplayRect));
+-    if (dirtyRect.isEmpty())
++    IntRect layerRect = enclosingIntRect(FloatRect(FloatPoint::zero(), m_size));
++    Vector<IntRect> dirtyRects;
++    if (m_needsDisplay)
++        dirtyRects.append(layerRect);
++    else {
++        for (auto& rect : m_needsDisplayRects) {
++            auto dirtyRect = intersection(layerRect, enclosingIntRect(rect));
++            if (!dirtyRect.isEmpty())
++                dirtyRects.append(dirtyRect);
++        }
++    }
++    m_needsDisplay = false;
++    m_needsDisplayRects.clear();
++    if (dirtyRects.isEmpty())
+         return;
+ 
+     m_backingStore->updateContentsScale(pageScaleFactor() * deviceScaleFactor());
+ 
+-    dirtyRect.scale(pageScaleFactor() * deviceScaleFactor());
+-    m_backingStore->updateContents(textureMapper, this, m_size, dirtyRect);
++    for (auto& dirtyRect : dirtyRects) {
++        dirtyRect.scale(pageScaleFactor() * deviceScaleFactor());
++        m_backingStore->updateContents(textureMapper, this, m_size, dirtyRect);
++    }
++}
+ 
+-    m_needsDisplay = false;
+-    m_needsDisplayRect = IntRect();
++bool GraphicsLayerTextureMapper::scrollBackingStore(const IntSize& delta, const IntRect& rect)
++{
++    if (!m_backingStore || m_needsDisplay || !shouldHaveBackingStore())
++        return false;
++    float scale = pageScaleFactor() * deviceScaleFactor();
++    FloatSize scaledDelta { delta };
++    scaledDelta.scale(scale);
++    FloatRect scaledRect { rect };
++    scaledRect.scale(scale);
++    IntSize deviceDelta { roundedIntSize(scaledDelta) };
++    IntRect deviceRect { enclosingIntRect(scaledRect) };
++    if (FloatSize { deviceDelta } != scaledDelta || FloatRect { deviceRect } != scaledRect)
++        return false;
++    m_backingStore->updateContentsScale(scale);
++    if (!m_backingStore->scrollContents(deviceDelta, deviceRect))
++        return false;
++    // Pending partial repaints are in the old coordinates: they repaint where they were and where they moved.
++    auto pending = m_needsDisplayRects;
++    for (auto rect : pending) {
++        rect.move(delta);
++        addNeedsDisplayRect(rect);
++    }
++    return true;
+ }
+ 
+ bool GraphicsLayerTextureMapper::shouldHaveBackingStore() const
+diff --git a/Source/WebCore/platform/graphics/texmap/GraphicsLayerTextureMapper.h b/Source/WebCore/platform/graphics/texmap/GraphicsLayerTextureMapper.h
+index eb856df..92ee2da 100644
+--- a/Source/WebCore/platform/graphics/texmap/GraphicsLayerTextureMapper.h
++++ b/Source/WebCore/platform/graphics/texmap/GraphicsLayerTextureMapper.h
+@@ -104,6 +104,10 @@ public:
+     void flushCompositingStateForThisLayerOnly() override;
+ 
+     WEBCORE_EXPORT void updateBackingStoreIncludingSubLayers(TextureMapper&);
++    // Ranvier: moves the layer's painted pixels inside rect by delta, both in layer coordinates, so a scroll repaints
++    // only what it exposes. Returns false, with the pixels unchanged, when the layer must repaint instead: the move is
++    // not a whole number of backing store pixels, a repaint of the whole layer is pending, or the store is tiled.
++    WEBCORE_EXPORT bool scrollBackingStore(const IntSize& delta, const IntRect&);
+ 
+     TextureMapperLayer& layer() { return m_layer; }
+ 
+@@ -111,6 +115,7 @@ public:
+     float debugBorderWidth() const { return m_debugBorderWidth; }
+ 
+ private:
++    void addNeedsDisplayRect(const FloatRect&);
+     // GraphicsLayer
+     bool isGraphicsLayerTextureMapper() const override { return true; }
+ 
+@@ -183,7 +188,7 @@ private:
+     float m_debugBorderWidth;
+ 
+     TextureMapperPlatformLayer* m_contentsLayer;
+-    FloatRect m_needsDisplayRect;
++    Vector<FloatRect> m_needsDisplayRects;
+     TextureMapperAnimations m_animations;
+     MonotonicTime m_animationStartTime;
+ };
+diff --git a/Source/WebCore/platform/graphics/texmap/TextureMapperTiledBackingStore.cpp b/Source/WebCore/platform/graphics/texmap/TextureMapperTiledBackingStore.cpp
+index 52ad0c8..8ae83b1 100644
+--- a/Source/WebCore/platform/graphics/texmap/TextureMapperTiledBackingStore.cpp
++++ b/Source/WebCore/platform/graphics/texmap/TextureMapperTiledBackingStore.cpp
+@@ -69,6 +69,17 @@ void TextureMapperTiledBackingStore::drawRepaintCounter(TextureMapper& textureMa
+         textureMapper.drawNumber(repaintCount, borderColor, tile.rect().location(), adjustedTransform);
+ }
+ 
++bool TextureMapperTiledBackingStore::scrollContents(const IntSize& delta, const IntRect& rect)
++{
++    if (m_image || m_isScaleDirty || m_tiles.size() != 1)
++        return false;
++    auto& tile = m_tiles[0];
++    auto texture = tile.texture();
++    if (!texture || tile.rect().location() != FloatPoint { } || texture->size() != enclosingIntRect(tile.rect()).size())
++        return false;
++    return texture->shiftContents(delta, rect);
++}
++
+ void TextureMapperTiledBackingStore::updateContentsScale(float scale)
+ {
+     if (m_contentsScale == scale)
+diff --git a/Source/WebCore/platform/graphics/texmap/TextureMapperTiledBackingStore.h b/Source/WebCore/platform/graphics/texmap/TextureMapperTiledBackingStore.h
+index a6f9440..adb249d 100644
+--- a/Source/WebCore/platform/graphics/texmap/TextureMapperTiledBackingStore.h
++++ b/Source/WebCore/platform/graphics/texmap/TextureMapperTiledBackingStore.h
+@@ -43,6 +43,9 @@ public:
+     void updateContentsScale(float);
+     void updateContents(TextureMapper&, Image*, const FloatSize&, const IntRect&);
+     void updateContents(TextureMapper&, GraphicsLayer*, const FloatSize&, const IntRect&);
++    // Ranvier: moves the painted pixels inside rect by delta, both in backing store pixels. Only a backing store of
++    // one painted tile can.
++    bool scrollContents(const IntSize& delta, const IntRect&);
+ 
+     void setContentsToImage(Image* image) { m_image = image; }
+ 

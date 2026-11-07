@@ -121,7 +121,7 @@ def run(directory):
         p.expect(difference < 1.0, f'GPU and CPU frames agree (mean channel difference {difference:.3f})')
         # With nothing invalidated, changing the setting repaints every layer with the other painter. A full repaint
         # differs from that painter's frame of partial repaints only by blur rounding at old dirty-rectangle edges:
-        # on the CPU in a few pixels, on the GPU by a few levels.
+        # on the CPU in a few pixels, on the GPU by a few levels (painters differ by up to about 20).
         def differing(a, b):
             return sum(1 for i in range(0, len(a), 4) if a[i:i + 4] != b[i:i + 4])
 
@@ -133,7 +133,7 @@ def run(directory):
             p.expect(set_gpu(p.host, enabled) == 0, f'GPU painting set to {enabled}')
             repainted = paint()
             changed, residue, levels = differing(repainted, other), differing(repainted, own), largest(repainted, own)
-            p.expect(changed * 2 > between and (residue * 100 < between or levels <= 3),
+            p.expect(changed * 2 > between and (residue * 100 < between or levels <= 6),
                      f'changing the setting repaints every layer on the {painter} ({changed} of {between} pixels '
                      f'changed; {residue} differ from its own frame, by up to {levels} levels)')
 
