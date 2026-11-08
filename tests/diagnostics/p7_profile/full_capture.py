@@ -26,6 +26,8 @@ for scale in cases['scales']:
                   + test.get('before', '') + f'<{tag} id="f">' + test.get('inside', '') + f'</{tag}>' + test.get('after', '') + '</body>')
         scene = Scene(native, markup, scale)
         try:
+            # The reviewed clipping baselines and shader fingerprint are of CPU-painted layers, composited on the GPU.
+            native.ok('rv_host_set_gpu_painting', [P, I], scene.host, 0)
             if 'compositing' in test:
                 native.ok('rv_host_set_accelerated_compositing', [P, I], scene.host, test['compositing'])
             if 'scroll' in test:
