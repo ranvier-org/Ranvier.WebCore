@@ -1,0 +1,231 @@
+diff --git a/Source/WebCore/platform/graphics/skia/GraphicsContextSkia.cpp b/Source/WebCore/platform/graphics/skia/GraphicsContextSkia.cpp
+index e4ba236..6c287d2 100644
+--- a/Source/WebCore/platform/graphics/skia/GraphicsContextSkia.cpp
++++ b/Source/WebCore/platform/graphics/skia/GraphicsContextSkia.cpp
+@@ -655,6 +655,19 @@ void GraphicsContextSkia::clip(const FloatRect& rect)
+         .path = { },
+         .shader = { },
+     });
++    // Ranvier: a layer painted on the GPU (BitmapTexture::setPaintsLayersOnGPU) rounds a non-antialiased clip's
++    // device edges as Skia's raster backend does, floor(x + 0.5). Ganesh's pixel-centre rule drops a column whose
++    // centre lies on the edge, so a half-pixel content box would lose a pixel against the CPU paint and other engines.
++    if (m_renderingMode == RenderingMode::Accelerated && m_renderingPurpose == RenderingPurpose::LayerBacking) {
++        auto matrix = m_canvas.getTotalMatrix();
++        if (matrix.rectStaysRect()) {
++            auto deviceRect = matrix.mapRect(SkRect(rect));
++            m_canvas.resetMatrix();
++            m_canvas.clipIRect(deviceRect.round());
++            m_canvas.setMatrix(matrix);
++            return;
++        }
++    }
+     m_canvas.clipRect(rect, SkClipOp::kIntersect, false);
+ }
+ 
+diff --git a/Source/WebCore/platform/graphics/skia/PlatformDisplaySkia.cpp b/Source/WebCore/platform/graphics/skia/PlatformDisplaySkia.cpp
+index 22bcc67..5e056d9 100644
+--- a/Source/WebCore/platform/graphics/skia/PlatformDisplaySkia.cpp
++++ b/Source/WebCore/platform/graphics/skia/PlatformDisplaySkia.cpp
+@@ -346,8 +346,10 @@ private:
+         // lookup which is a slow-path in certain tiled GPUs (such as Vivante/etnaviv). Since we
+         // don't use any mipmapping, it's safe to disable that, and avoid performance hits.
+         options.fSharpenMipmappedTextures = false;
++#if !PLATFORM(WIN)
+         thread_local std::unique_ptr<SkExecutor> s_executor = SkExecutor::MakeFIFOThreadPool(2);
+         options.fExecutor = s_executor.get();
++#endif
+         if (auto bytes = glyphCacheTextureMaximumBytes())
+             options.fGlyphCacheTextureMaximumBytes = *bytes;
+ 
+@@ -375,6 +377,11 @@ GLContext* PlatformDisplay::skiaGLContext()
+         m_skiaGLContexts.add(*s_skiaGLContext);
+     }
+     return s_skiaGLContext->skiaGLContext();
++#elif PLATFORM(WIN)
++    // Ranvier: the embedder installs the thread's context with setSkiaGLContextForCurrentThread, and clears it before
++    // the thread ends. A thread_local destroyed during DLL detach runs under the loader lock, so this context has no
++    // executor: joining its pool's threads there deadlocks the process's exit.
++    return s_skiaGLContext ? s_skiaGLContext->skiaGLContext() : nullptr;
+ #else
+     // The PlayStation OpenGL implementation does not dispatch to the context bound to
+     // the current thread so Skia cannot use OpenGL with coordinated graphics.
+diff --git a/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp b/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp
+index 31e67bd..c846fca 100644
+--- a/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp
++++ b/Source/WebCore/platform/graphics/texmap/BitmapTexture.cpp
+@@ -52,8 +52,11 @@
+ 
+ #if USE(SKIA)
+ #include "FontRenderOptions.h"
++#include "GLFence.h"
++#include "GraphicsContextSkia.h"
+ #include "SkiaUtilities.h"
+ WTF_IGNORE_WARNINGS_IN_THIRD_PARTY_CODE_BEGIN // GLib/Win port
++#include <skia/core/SkCanvas.h>
+ #include <skia/core/SkImage.h>
+ #include <skia/core/SkPixmap.h>
+ #include <skia/core/SkSurface.h>
+@@ -426,6 +429,10 @@ void BitmapTexture::updateContents(NativeImage* frameImage, const IntRect& targe
+ 
+ void BitmapTexture::updateContents(GraphicsLayer* sourceLayer, const IntRect& targetRect, const IntPoint& offset, float scale)
+ {
++#if USE(SKIA)
++    if (updateContentsOnGPU(sourceLayer, targetRect, offset, scale))
++        return;
++#endif
+     // Making an unconditionally unaccelerated buffer here is OK because this code
+     // isn't used by any platforms that respect the accelerated bit.
+ #if PLATFORM(WPE) && USE(GRAPHICS_LAYER_TEXTURE_MAPPER) && USE(SKIA)
+@@ -628,6 +635,120 @@ sk_sp<SkSurface> BitmapTexture::createSkiaSurface(GrDirectContext* grContext, Gr
+     auto properties = FontRenderOptions::singleton().createSurfaceProps();
+     return SkiaUtilities::createSurface(grContext, *this, properties, origin, sampleCount);
+ }
++
++static bool s_paintsLayersOnGPU;
++
++void BitmapTexture::setPaintsLayersOnGPU(bool enabled)
++{
++    s_paintsLayersOnGPU = enabled;
++}
++
++bool BitmapTexture::paintsLayersOnGPU()
++{
++    return s_paintsLayersOnGPU;
++}
++
++bool BitmapTexture::canPaintLayersOnGPU()
++{
++#if PLATFORM(WIN) || PLATFORM(WPE)
++    // WPE creates the thread's Skia GL context on first use; the Windows port leaves it to the embedder, as WebKit's
++    // threaded compositor installs one. A context that cannot be created is not tried again.
++    static bool unavailable;
++    if (unavailable)
++        return false;
++    auto& display = PlatformDisplay::sharedDisplay();
++    auto* previous = GLContext::current();
++#if PLATFORM(WIN)
++    if (!display.skiaGLContext())
++        display.setSkiaGLContextForCurrentThread(GLContext::createOffscreen(display));
++#endif
++    bool available = display.skiaGLContext() && display.skiaGrContext();
++    if (previous && GLContext::current() != previous)
++        previous->makeContextCurrent();
++    unavailable = !available;
++    return available;
++#else
++    return false;
++#endif
++}
++
++void BitmapTexture::releaseLayerPaintingContext()
++{
++#if PLATFORM(WIN)
++    if (PlatformDisplay::sharedDisplay().skiaGLContext())
++        PlatformDisplay::sharedDisplay().setSkiaGLContextForCurrentThread(nullptr);
++#endif
++}
++
++// Rasterizes the layer straight into this texture with Ganesh, in the thread's Skia GL context, and makes the
++// current (compositing) context wait for that work on the GPU. Returns false, with the current context unchanged
++// and nothing painted, when the CPU path should paint instead.
++bool BitmapTexture::updateContentsOnGPU(GraphicsLayer* sourceLayer, const IntRect& targetRect, const IntPoint& offset, float scale)
++{
++    if (!s_paintsLayersOnGPU || m_renderTarget != GL_TEXTURE_2D || m_flags.contains(Flags::UseBGRALayout) || !m_id)
++        return false;
++#if USE(GBM)
++    if (m_memoryMappedGPUBuffer)
++        return false;
++#endif
++    auto* compositingContext = GLContext::current();
++    auto& display = PlatformDisplay::sharedDisplay();
++    auto* skiaContext = display.skiaGLContext();
++    if (!compositingContext || !skiaContext || skiaContext == compositingContext)
++        return false;
++    // Skia renders in another context of the same share group: the texture's pending uploads must reach it first.
++    glFlush();
++    if (!skiaContext->makeContextCurrent()) {
++        compositingContext->makeContextCurrent();
++        return false;
++    }
++    auto* grContext = display.skiaGrContext();
++    auto surface = grContext ? createSkiaSurface(grContext) : nullptr;
++    if (!surface) {
++        compositingContext->makeContextCurrent();
++        return false;
++    }
++
++    // Skia writes RGBA. A texture the CPU path filled holds BGRA, which the compositor swizzles as a whole, so its
++    // first GPU paint covers all of it.
++    IntRect paintRect = targetRect;
++    IntPoint paintOffset = offset;
++    if (m_pixelFormat != PixelFormat::RGBA8) {
++        paintRect = IntRect { { }, m_size };
++        paintOffset = offset - toIntSize(targetRect.location());
++    }
++
++    auto* canvas = surface->getCanvas();
++    canvas->save();
++    canvas->clipRect(SkRect::MakeXYWH(paintRect.x(), paintRect.y(), paintRect.width(), paintRect.height()));
++    canvas->clear(SK_ColorTRANSPARENT);
++    {
++        GraphicsContextSkia context(*canvas, RenderingMode::Accelerated, RenderingPurpose::LayerBacking);
++        context.setTextDrawingMode(TextDrawingMode::Fill);
++        FloatRect sourceRect(paintRect);
++        sourceRect.setLocation(paintOffset);
++        sourceRect.scale(1 / scale);
++        context.translate(paintRect.x(), paintRect.y());
++        context.applyDeviceScaleFactor(scale);
++        context.translate(-sourceRect.x(), -sourceRect.y());
++        sourceLayer->paintGraphicsLayerContents(context, sourceRect);
++    }
++    canvas->restore();
++
++    // Painting can make another context current (an accelerated image buffer's); flush in Skia's.
++    skiaContext->makeContextCurrent();
++    auto fence = SkiaUtilities::flushAndSubmitSurfaceWithFence(grContext, surface.get());
++    surface = nullptr;
++    // The fence is waited on from the compositing context, and a wait without EGL_SYNC_FLUSH_COMMANDS_BIT on a fence
++    // its own context never flushed does not return (ANGLE's D3D11 backend spins on it).
++    glFlush();
++    if (!compositingContext->makeContextCurrent())
++        return true;
++    if (fence)
++        fence->serverWait();
++    m_pixelFormat = PixelFormat::RGBA8;
++    return true;
++}
+ #endif
+ 
+ } // namespace WebCore
+diff --git a/Source/WebCore/platform/graphics/texmap/BitmapTexture.h b/Source/WebCore/platform/graphics/texmap/BitmapTexture.h
+index dd4984f..293ba94 100644
+--- a/Source/WebCore/platform/graphics/texmap/BitmapTexture.h
++++ b/Source/WebCore/platform/graphics/texmap/BitmapTexture.h
+@@ -118,6 +118,17 @@ public:
+ #if USE(SKIA)
+     GrBackendTexture createSkiaBackendTexture() const;
+     sk_sp<SkSurface> createSkiaSurface(GrDirectContext*, GrSurfaceOrigin = kTopLeft_GrSurfaceOrigin, unsigned sampleCount = 0) const;
++
++    // Ranvier: while set, updateContents(GraphicsLayer*) rasterizes the layer into this texture with Skia's GPU
++    // backend in the thread's Skia GL context, which must share textures with the current context. Without that
++    // context, or for a texture Skia cannot render to, it paints on the CPU as upstream does.
++    WEBCORE_EXPORT static void setPaintsLayersOnGPU(bool);
++    WEBCORE_EXPORT static bool paintsLayersOnGPU();
++    // Whether this thread has, or could create, a Skia GL context in the display's sharing group.
++    WEBCORE_EXPORT static bool canPaintLayersOnGPU();
++    // Destroys the Skia GL context the embedder installed for this thread (Windows), which canPaintLayersOnGPU
++    // creates again on next use.
++    WEBCORE_EXPORT static void releaseLayerPaintingContext();
+ #endif
+ 
+ #if USE(GBM)
+@@ -129,6 +140,9 @@ public:
+ 
+ private:
+     BitmapTexture(const IntSize&, OptionSet<Flags>);
++#if USE(SKIA)
++    bool updateContentsOnGPU(GraphicsLayer*, const IntRect& target, const IntPoint& offset, float scale);
++#endif
+ #if USE(GBM) || OS(ANDROID)
+     BitmapTexture(EGLImage, const IntSize&, OptionSet<Flags>);
+ #endif

@@ -47,10 +47,11 @@ PROBES = [
     *[probe('Verify host file picker ownership and invalidation',
             'python -I tests/abi/file_picker.py --native-directory {native}', rid=rid, flavor=None)
       for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],
-    *[probe('Verify host tracing, deferred rendering teardown and partial repaints',
+    *[probe('Verify host tracing, deferred rendering teardown, partial repaints and GPU painting',
             'python -I tests/abi/host_tracing.py {native}',
             'python -I tests/abi/host_error_lifetime.py {native}',
-            'python -I tests/abi/partial_repaint.py {native}', rid=rid, flavor=None)
+            'python -I tests/abi/partial_repaint.py {native}',
+            'python -I tests/abi/gpu_painting.py {native}', rid=rid, flavor=None)
       for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],
     *[probe('Verify native EGL texture input and fractional-DPI DOM composition',
             'python -I tests/gpu/compositor_input_linux.py --native-directory {native} --report {work}/gpu-compositor-input-linux.json',

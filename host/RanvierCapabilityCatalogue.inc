@@ -488,6 +488,7 @@ static constexpr const char* capabilityAbiNames[] = {
     "data-transfer-files",
     "compositing",
     "compositor-device-scale",
+    "gpu-painting",
     "presentation-d3d11",
     "texture-input-d3d11",
     "presentation-egl",
