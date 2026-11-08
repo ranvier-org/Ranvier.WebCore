@@ -2,6 +2,7 @@
 no longer pays the CPU blur, and rv_host_set_gpu_painting(0) returns to CPU raster with the same picture."""
 
 import ctypes as C
+import os
 from pathlib import Path
 import statistics
 import sys
@@ -109,8 +110,10 @@ def run(directory):
         gpu_median, cpu_median = statistics.median(gpu_ms), statistics.median(cpu_ms)
         print(f'gpu painting: PAINT median {gpu_median:.2f} ms on the GPU, {cpu_median:.2f} ms on the CPU; '
               f'p95 {p95(gpu_ms):.2f} / {p95(cpu_ms):.2f} ms ({width}x{height} device pixels, read back each frame)')
-        p.expect(gpu_median < cpu_median * 0.6,
-                 f'a GPU-painted frame over blurred shadows pays no CPU blur ({gpu_median:.2f} ms vs {cpu_median:.2f} ms)')
+        # Software GL runs the GPU painter's shaders on the CPU, so the saving needs a real GPU.
+        if os.environ.get('LIBGL_ALWAYS_SOFTWARE') != '1':
+            p.expect(gpu_median < cpu_median * 0.6,
+                     f'a GPU-painted frame over blurred shadows pays no CPU blur ({gpu_median:.2f} ms vs {cpu_median:.2f} ms)')
 
         # Both painters draw the same page: channels in order, rows in order, and the picture agrees but for
         # antialiasing and blur rounding.

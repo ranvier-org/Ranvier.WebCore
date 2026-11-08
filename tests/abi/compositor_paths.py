@@ -52,6 +52,8 @@ def run(directory):
             return
         p.expect(p.bind('rv_host_set_device_scale', I, [P, C.c_float])(p.host, SCALE) == 0, 'device scale')
         set_gpu = p.bind('rv_host_set_gpu_painting', I, [P, I])
+        # macOS composites without Skia, so its layers paint on the CPU alone.
+        gpu_painting = p.bind('rv_abi_has', I, [C.c_char_p])(b'gpu-painting') == 1
         p.expect(p.bind('rv_host_trace_enable', I, [P, I])(p.host, 1) == 0, 'tracing')
         drain = p.bind('rv_host_trace_drain', I, [P, C.POINTER(Event), I, C.POINTER(I), C.POINTER(C.c_uint64)])
         update = p.bind('rv_host_update', I, [P])
@@ -85,7 +87,7 @@ def run(directory):
             p.expect(insets(p.host, 0, 0, 0, 0) == 0, 'invalidate the whole viewport')
 
         report = {}
-        for gpu in (0, 1):
+        for gpu in (0, 1) if gpu_painting else (0,):
             painter = 'GPU' if gpu else 'CPU'
             p.expect(set_gpu(p.host, gpu) == 0, f'{painter} painting')
             p.load(PAGE, standalone=False)
@@ -123,19 +125,21 @@ def run(directory):
                      f'{scrolled:.2f} ms without it)')
         # The CPU painter shows raster cost undiluted by the GPU painter's fixed per-frame costs, so it carries the
         # ratios; on the GPU painter both stay below a full repaint.
-        cpu, gpu = report['CPU'], report['GPU']
+        cpu = report['CPU']
         cpu_raster = cpu['full'] - cpu['idle']
         p.expect(cpu['recolor'] < cpu['idle'] + cpu_raster * 0.1,
                  f'one recolored element repaints itself, not the page ({cpu["recolor"]:.2f} ms)')
         p.expect(cpu['scroll'] < cpu['idle'] + cpu_raster * 0.3,
                  f'a 3px scroll repaints the strip it exposes, not the viewport ({cpu["scroll"]:.2f} ms against '
                  f'{cpu["full"]:.2f} ms for a full repaint)')
-        p.expect(gpu['scroll'] < gpu['full'] and gpu['recolor'] < gpu['full'],
-                 'GPU painting: a scroll and a recolor cost less than a full repaint')
+        if gpu_painting:
+            gpu = report['GPU']
+            p.expect(gpu['scroll'] < gpu['full'] and gpu['recolor'] < gpu['full'],
+                     'GPU painting: a scroll and a recolor cost less than a full repaint')
 
         # A frame built by moving pixels equals a full repaint at the same position, on both painters and at a
         # fractional scale, where a move of a whole number of CSS pixels is not a whole number of device pixels.
-        for gpu, scale in [(0, SCALE), (1, SCALE), (1, 1.5)]:
+        for gpu, scale in [(0, SCALE), (1, SCALE), (1, 1.5)] if gpu_painting else [(0, SCALE), (0, 1.5)]:
             p.expect(set_gpu(p.host, gpu) == 0, 'painter')
             p.expect(p.bind('rv_host_set_device_scale', I, [P, C.c_float])(p.host, scale) == 0, 'scale')
             size = int(WIDTH * scale) * int(HEIGHT * scale) * 4
