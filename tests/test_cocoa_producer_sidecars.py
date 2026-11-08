@@ -147,6 +147,14 @@ class ProducerSidecarAdmission(unittest.TestCase):
         for name in ['package', 'manifest']:
             self.assertLess(text.index('name: ' + name + '-${{ matrix.rid }}-${{ env.FLAVOR }}', start), sidecars)
 
+    def test_only_a_producer_of_the_cohort_abi_builds_sidecars(self):
+        text = (ROOT / '.github/workflows/build.yml').read_text(encoding='utf-8')
+        gate = text.index('        id: cocoa-cohort\n')
+        for name in ['Build matching macOS CPU test sidecars', 'Retain matching macOS CPU test sidecars']:
+            step = text.index('      - name: ' + name, gate)
+            condition = text[step:].splitlines()[1]
+            self.assertIn("steps.cocoa-cohort.outputs.match == 'true'", condition)
+
     def test_package_with_matching_manifest_and_changed_payload_is_rejected(self):
         spec = importlib.util.spec_from_file_location('producer_sidecars', ROOT / 'tests/controls/build_cocoa_sidecars.py')
         module = importlib.util.module_from_spec(spec)

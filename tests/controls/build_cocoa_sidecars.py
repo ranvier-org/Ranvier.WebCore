@@ -12,6 +12,9 @@ import sys
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
+# The reviewed public Cocoa cohort (README-public-cocoa.md). A producer of another ABI builds no sidecars.
+COHORT_ABI = 64
+COHORT_DECLARATIONS = 349
 
 
 def sha(path):
@@ -43,11 +46,11 @@ def cxx_compiler(value):
 def admit_stage(stage):
     stage = stage.resolve(strict=True)
     manifest = json.loads((stage / 'manifest.json').read_text())
-    if (manifest.get('rid') != 'osx-arm64' or manifest.get('abi') != 64
+    if (manifest.get('rid') != 'osx-arm64' or manifest.get('abi') != COHORT_ABI
             or manifest.get('flavor') not in {'slim', 'gpu'}
             or manifest.get('source', {}).get('dirty') is not False
             or not re.fullmatch('[a-f0-9]{40}', manifest['source'].get('commit', ''))):
-        raise ValueError('Require a clean matching ABI64 macOS producer')
+        raise ValueError(f'Require a clean matching ABI{COHORT_ABI} macOS producer')
     native = stage / 'runtimes/osx-arm64/native'
     expected = {item['name']: item['sha256'] for item in manifest['files']}
     required = {'libRanvierWebCoreHost.dylib', 'libWebCore.dylib', 'libJavaScriptCore.dylib', 'libWebGPU.dylib'}
@@ -75,8 +78,8 @@ def main():
         raise ValueError('Helper sources must match the clean producer commit')
     header = (producer_root / 'host/RanvierWebCoreAbi.h').read_bytes()
     declarations = re.findall(rb'RV_EXPORT\s+[^;]*?\b(rv_\w+)\s*\([^;]*?\)\s*;', header, re.S)
-    if len(declarations) != 349 or len(set(declarations)) != 349:
-        raise ValueError('Require the complete canonical 349-declaration header')
+    if len(declarations) != COHORT_DECLARATIONS or len(set(declarations)) != COHORT_DECLARATIONS:
+        raise ValueError(f'Require the complete canonical {COHORT_DECLARATIONS}-declaration header')
     build = args.build.resolve(strict=True)
     source = args.webkit_source.resolve(strict=True)
     output = args.output.resolve()
@@ -87,7 +90,7 @@ def main():
     output.mkdir(parents=True)
     runtime_hashes = output / 'runtime-dylib-hashes.json'
     runtime_hashes.write_text(json.dumps({name: digest for name, digest in before.items() if name.endswith('.dylib')}, indent=2))
-    receipt = dict(schemaVersion=1, boundary='producer-Host-unchanged-sidecars-v1', abi=64, declarations=349,
+    receipt = dict(schemaVersion=1, boundary='producer-Host-unchanged-sidecars-v1', abi=COHORT_ABI, declarations=COHORT_DECLARATIONS,
                    nativeSource=manifest['source']['commit'], unsignedPackageSha256=sha(package),
                    producerRoot=str(producer_root), controllerRoot=str(ROOT),
                    controllerSource=controller_head, controllerTrackedDirty=False,
