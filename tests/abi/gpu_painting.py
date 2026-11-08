@@ -7,7 +7,7 @@ import statistics
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from svg_paint_probe import SvgProbe
+from svg_paint_probe import SvgProbe, software_gl
 from utf8_inputs import Utf8
 
 # A dashboard at a high-DPI scale, with the Motion app's card shadows, and a translucent panel that moves across the
@@ -109,8 +109,10 @@ def run(directory):
         gpu_median, cpu_median = statistics.median(gpu_ms), statistics.median(cpu_ms)
         print(f'gpu painting: PAINT median {gpu_median:.2f} ms on the GPU, {cpu_median:.2f} ms on the CPU; '
               f'p95 {p95(gpu_ms):.2f} / {p95(cpu_ms):.2f} ms ({width}x{height} device pixels, read back each frame)')
-        p.expect(gpu_median < cpu_median * 0.6,
-                 f'a GPU-painted frame over blurred shadows pays no CPU blur ({gpu_median:.2f} ms vs {cpu_median:.2f} ms)')
+        # A software renderer runs the GPU painter's shaders on the CPU, so the saving needs a real GPU.
+        if not software_gl(directory):
+            p.expect(gpu_median < cpu_median * 0.6,
+                     f'a GPU-painted frame over blurred shadows pays no CPU blur ({gpu_median:.2f} ms vs {cpu_median:.2f} ms)')
 
         # Both painters draw the same page: channels in order, rows in order, and the picture agrees but for
         # antialiasing and blur rounding.

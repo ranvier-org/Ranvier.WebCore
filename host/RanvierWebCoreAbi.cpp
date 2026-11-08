@@ -2621,7 +2621,7 @@ int32_t rv_host_set_gpu_painting(RvHost* host, int32_t enabled)
         return RV_ERR_WRONG_THREAD;
     if (enabled != 0 && enabled != 1)
         return RV_ERR_UNSUPPORTED;
-#if RANVIER_COMPOSITING
+#if RANVIER_COMPOSITING && USE(SKIA)
     if (host->gpuPainting == !!enabled)
         return RV_OK;
     host->gpuPainting = enabled;
@@ -2651,7 +2651,7 @@ int32_t rv_host_gpu_painting(RvHost* host)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
-#if RANVIER_COMPOSITING
+#if RANVIER_COMPOSITING && USE(SKIA)
     return host->gpuPainting && BitmapTexture::canPaintLayersOnGPU();
 #else
     return 0;
@@ -2712,7 +2712,7 @@ void rv_host_destroy(RvHost* host)
     static_cast<RvChromeClient&>(host->page->chrome().client()).host = nullptr;
     liveHosts.removeFirst(host);
     delete host;
-#if RANVIER_COMPOSITING
+#if RANVIER_COMPOSITING && USE(SKIA)
     // The Skia GL context is the owner thread's; without a host left, release it before the thread or process ends.
     if (liveHosts.isEmpty())
         BitmapTexture::releaseLayerPaintingContext();
@@ -3166,9 +3166,13 @@ static int32_t composite(RvHost& host, RvCompositor& compositor, LocalFrameView&
     }
 #endif
     auto& rootLayer = downcast<GraphicsLayerTextureMapper>(*compositor.root);
+#if USE(SKIA)
     BitmapTexture::setPaintsLayersOnGPU(host.gpuPainting && BitmapTexture::canPaintLayersOnGPU());
+#endif
     rootLayer.updateBackingStoreIncludingSubLayers(*compositor.textureMapper);
+#if USE(SKIA)
     BitmapTexture::setPaintsLayersOnGPU(false);
+#endif
     compositor.view = nullptr;
 
     auto size = compositor.pixelSize;
