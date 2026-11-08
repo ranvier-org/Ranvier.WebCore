@@ -1,5 +1,6 @@
 import importlib.util
 from pathlib import Path
+import re
 import unittest
 import shutil
 import subprocess
@@ -32,6 +33,11 @@ class DistributionPolicyTests(unittest.TestCase):
                 host.rv_abi_version = lambda: current + 1
                 with self.assertRaises(ValueError):
                     package.validate_runtime(*paths, 'linux-x64')
+
+    def test_provider_admits_the_checkouts_host_abi(self):
+        provider = (source.parents[2] / 'providers/atspi/RanvierAtspi.cpp').read_text(encoding='utf-8')
+        admitted = {int(value) for value in re.findall(r'hostAbi != (\d+)', provider)}
+        self.assertIn(package.current_abi(), admitted)
 
     def test_host_abi_is_exact_and_style_capability_remains_required(self):
         for abi in [63, 64, 65]:
