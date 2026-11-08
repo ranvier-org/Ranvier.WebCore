@@ -2,6 +2,8 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <PackageId>Ranvier.WebCore.Native</PackageId>
+    <!-- This project has no sources, and the default glob would take the generated files in cpu/obj and gpu/obj. -->
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
     <NoWarn>$(NoWarn);NU5128</NoWarn>

@@ -26,6 +26,8 @@ class PackageContract(unittest.TestCase):
 
     def test_default_meta_depends_on_the_gpu_runtimes_and_the_cpu_fallback_at_one_version(self):
         project = ET.parse(ROOT / 'packaging/Ranvier.WebCore.Native.Meta.csproj')
+        self.assertEqual(project.findtext('.//EnableDefaultCompileItems'), 'false',
+                         'the default aggregate sits above the .Cpu and .Gpu projects and must not glob their obj')
         references = project.findall('.//PackageReference')
         gpu = {'Ranvier.WebCore.Native.' + rid for rid in PACKAGING.GPU_RIDS}
         fallback = {'Ranvier.WebCore.Native.Cpu.' + rid for rid in RIDS - set(PACKAGING.GPU_RIDS)}
