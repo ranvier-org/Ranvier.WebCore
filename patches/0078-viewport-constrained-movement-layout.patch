@@ -1,0 +1,52 @@
+diff --git a/Source/WebCore/page/LocalFrameView.cpp b/Source/WebCore/page/LocalFrameView.cpp
+index 816c6d8..517c0cc 100644
+--- a/Source/WebCore/page/LocalFrameView.cpp
++++ b/Source/WebCore/page/LocalFrameView.cpp
+@@ -1937,7 +1937,7 @@ void LocalFrameView::setBaseLayoutViewportOrigin(LayoutPoint origin, TriggerLayo
+ 
+     m_layoutViewportOrigin = origin;
+     if (layoutTriggering == TriggerLayoutOrNot::Yes)
+-        setViewportConstrainedObjectsNeedLayout();
++        setViewportConstrainedObjectsNeedMovementLayout();
+     
+     if (TiledBacking* tiledBacking = this->tiledBacking()) {
+         FloatRect layoutViewport = layoutViewportRect();
+@@ -3756,6 +3756,26 @@ void LocalFrameView::setViewportConstrainedObjectsNeedLayout()
+     }
+ }
+ 
++void LocalFrameView::setViewportConstrainedObjectsNeedMovementLayout()
++{
++    if (!hasViewportConstrainedObjects())
++        return;
++
++    // Moving the layout viewport's origin moves fixed boxes without resizing them. An out-of-flow movement layout
++    // updates their position, and a composited fixed layer keeps its backing store instead of repainting all of it
++    // (RenderLayer::shouldRepaintAfterLayout). A box whose movement changes its size falls back to a full layout.
++    for (CheckedRef renderer : *m_viewportConstrainedObjects) {
++        if (renderer->isOutOfFlowPositioned())
++            renderer->setNeedsOutOfFlowMovementLayout(nullptr);
++        else
++            renderer->setNeedsLayout();
++        if (renderer->hasLayer()) {
++            auto* layer = downcast<RenderBoxModelObject>(renderer).layer();
++            layer->setNeedsCompositingGeometryUpdate();
++        }
++    }
++}
++
+ void LocalFrameView::didChangeScrollOffset()
+ {
+     if (RefPtr page = m_frame->page()) {
+diff --git a/Source/WebCore/page/LocalFrameView.h b/Source/WebCore/page/LocalFrameView.h
+index 12d087f..17d8942 100644
+--- a/Source/WebCore/page/LocalFrameView.h
++++ b/Source/WebCore/page/LocalFrameView.h
+@@ -142,6 +142,7 @@ public:
+     void setDescendantsNeedUpdateBackingAndHierarchyTraversal();
+ 
+     WEBCORE_EXPORT void setViewportConstrainedObjectsNeedLayout();
++    void setViewportConstrainedObjectsNeedMovementLayout();
+ 
+     WEBCORE_EXPORT bool renderedCharactersExceed(unsigned threshold);
+ 
