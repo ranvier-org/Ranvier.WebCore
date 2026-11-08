@@ -1,10 +1,26 @@
 # Handover
 
-State of the project at Native `0.1.1-rc.3`. Every item below comes from a release, an issue or a CI run;
+State of the project at Native `0.1.1-rc.5`. Every item below comes from a release, an issue or a CI run;
 re-check the live source (`pins.json`, `patches/series`, the header) before relying on a number.
 
 ## Released and verified
 
+- Native `0.1.1-rc.5` (tag on c8e69dd, run 42494298139): ABI 65. One tag run built the five CPU and four GPU runtimes
+  and published 14 packages. GPU is now the default, and the runtime package IDs changed:
+  - `Ranvier.WebCore.Native.{win-x64,linux-x64,linux-arm64,osx-arm64}` hold the GPU runtimes.
+  - `Ranvier.WebCore.Native.Cpu.{win-x64,win-arm64,linux-x64,linux-arm64,osx-arm64}` hold the CPU runtimes.
+  - `Ranvier.WebCore.Native.Gpu.<rid>` gets no rc.5. Consumers that name those IDs must move to the IDs above.
+  - The `Ranvier.WebCore.Native` aggregate takes the four GPU runtimes plus CPU `win-arm64`, all at `[0.1.1-rc.5]`.
+  - The `Ranvier.WebCore.Native.Cpu` aggregate takes the five CPU runtimes at `[0.1.1-rc.5]`.
+  - The `Ranvier.WebCore.Native.Gpu` aggregate now only takes `Ranvier.WebCore.Native` at `[0.1.1-rc.5]`.
+  - `Ranvier.WebCore` and `Ranvier.WebCore.Accessibility.Atspi` complete the set.
+  - Earlier `v0.1.1-rc.5` tags failed before publishing and the owner deleted them, an exception to the rule below
+    that tags stay in place. No package was published from them, and rc.1 to rc.4 are untouched.
+  - Native cell times: Linux 5 to 7 minutes, Windows CPU 15 to 16, macOS 49 to 50, Windows x64 GPU 110.
+  - Not covered by this run: CI has no hardware GPU, so timing limits are not exercised. The clipping gate does not
+    cover GPU-painted layers; only the half-pixel comparison in `gpu_painting.py` does. The shader hash was re-pinned
+    without the independent review `docs/CI.md` calls for. These were accepted so the release was not held.
+- Native `0.1.1-rc.4` (tag on b273de6, run 42349356694) is public on nuget.org.
 - Native `0.1.1-rc.3` (tag on cfe1bcc, run 42330885760): one tag run built the five Slim and four GPU runtimes in
   parallel and published 13 packages. They are `Ranvier.WebCore`, `Ranvier.WebCore.Native`, the five Slim runtimes,
   the four GPU runtimes, `Ranvier.WebCore.Accessibility.Atspi`, and the first `Ranvier.WebCore.Native.Gpu` aggregate.
