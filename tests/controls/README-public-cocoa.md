@@ -21,9 +21,11 @@ No private2a package, derivative Host, old owner address or broad contrast hook 
 
 ## Matching sidecars, built once beside the producer
 
-The native producer invokes `build_cocoa_sidecars.py` immediately after staging its package and retains
-a separate `cocoa-sidecars-osx-arm64-<flavor>` artifact. Its immutable `producer-sidecars.json` binds
-the unsigned package, complete native payload, helper binaries and consumed input archives. After
+A native producer of the cohort's ABI (`COHORT_ABI` in `build_cocoa_sidecars.py`) invokes the script
+immediately after staging its package and retains a separate `cocoa-sidecars-osx-arm64-<flavor>` artifact.
+A producer of any other ABI builds no sidecars, and its job records a notice saying so. The artifact's
+immutable `producer-sidecars.json` binds the unsigned package, complete native payload, helper binaries
+and consumed input archives. After
 publication, QA seals a separate consumer manifest against the signed nupkg only after proving its
 native payload identical. Signing the nupkg requires no helper rebuild. The raw producer receipt is
 retained unchanged, and the checked-in consumer policy remains unarmed.

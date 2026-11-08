@@ -32,7 +32,7 @@ consumer-facing model (tree, events, actions, text) is in `docs/ACCESSIBILITY.md
 
 ## Host requirement
 
-The provider admits a host whose `rv_abi_version()` is 63 or 64 and whose `rv_abi_has("accessibility-text-style")`
+The provider admits a host whose `rv_abi_version()` is 63, 64 or 65 and whose `rv_abi_has("accessibility-text-style")`
 is 1. `package.py` refuses any other host.
 
 ## Build and package

@@ -674,8 +674,27 @@ jobs:
           path: ${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/manifest.json
           if-no-files-found: error
 
-      - name: Build matching macOS CPU test sidecars
+      # The sidecars serve the reviewed public Cocoa cohort, whose ABI build_cocoa_sidecars.py names. A producer
+      # of another ABI cannot match that cohort, so it builds none.
+      - name: Match the reviewed Cocoa cohort's ABI
+        id: cocoa-cohort
         if: matrix.rid == 'osx-arm64' && (env.FLAVOR == 'slim' || env.FLAVOR == 'gpu')
+        shell: bash
+        run: |
+          python -B -I - tests/controls/build_cocoa_sidecars.py "$RANVIER_WORK/out/$FLAVOR/manifest.json" >> "$GITHUB_OUTPUT" <<'PY'
+          import importlib.util, json, sys
+          spec = importlib.util.spec_from_file_location('sidecars', sys.argv[1])
+          module = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(module)
+          abi = json.load(open(sys.argv[2]))['abi']
+          if abi != module.COHORT_ABI:
+              print(f'::notice::No Cocoa sidecars: the producer is ABI {abi}, the reviewed cohort ABI {module.COHORT_ABI}.',
+                    file=sys.stderr)
+          print('match=' + str(abi == module.COHORT_ABI).lower())
+          PY
+
+      - name: Build matching macOS CPU test sidecars
+        if: matrix.rid == 'osx-arm64' && (env.FLAVOR == 'slim' || env.FLAVOR == 'gpu') && steps.cocoa-cohort.outputs.match == 'true'
         timeout-minutes: 15
         run: >-
           python -B -I tests/controls/build_cocoa_sidecars.py
@@ -686,7 +705,7 @@ jobs:
           --output "${{ runner.temp }}/cocoa-sidecars-${{ env.FLAVOR }}"
 
       - name: Retain matching macOS CPU test sidecars
-        if: always() && matrix.rid == 'osx-arm64' && (env.FLAVOR == 'slim' || env.FLAVOR == 'gpu')
+        if: always() && matrix.rid == 'osx-arm64' && (env.FLAVOR == 'slim' || env.FLAVOR == 'gpu') && steps.cocoa-cohort.outputs.match == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: cocoa-sidecars-${{ matrix.rid }}-${{ env.FLAVOR }}
