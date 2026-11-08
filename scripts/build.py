@@ -437,7 +437,7 @@ def package(env):
     for f in files:
         print(f"{f['name']:50} {f['bytes']:>12,}")
     print(f"{len(files)} files, {manifest['total_bytes'] / 1e6:.2f} MB", flush=True)
-    package_id = pins['package']['id'] + {'slim': '', 'gpu': '.Gpu', 'lean': '.Lean'}[args.flavor] + '.' + args.rid
+    package_id = pins['package']['id'] + {'slim': '.Cpu', 'gpu': '', 'lean': '.Lean'}[args.flavor] + '.' + args.rid
     run(['dotnet', 'pack', root / 'packaging/Ranvier.WebCore.Native.csproj', '-c', 'Release', '--nologo',
          '-o', work / 'packages', f'-p:PackageId={package_id}', f'-p:PackageVersion={args.version}',
          f'-p:StageDir={out.as_posix()}/', f'-p:RuntimeId={args.rid}', f'-p:WebKitCommit={commit}'], env=env)
