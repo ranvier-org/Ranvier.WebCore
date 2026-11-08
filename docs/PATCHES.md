@@ -458,6 +458,16 @@ and makes the compositing context wait once.
 and `ScrollbarThemeAdwaita::paintScrollCorner` drew its 1px border at the empty rectangle's origin: a grey pixel at the
 top left of every scrollable page, which moved away with the content once scrolling moved pixels.
 
+## 0078-viewport-constrained-movement-layout
+
+A scroll moves the layout viewport (`LocalFrameView::setBaseLayoutViewportOrigin`), which marked every fixed and
+sticky box as needing layout. `setNeedsLayout` also marks the box's layer for a full repaint, so after the layout
+`RenderElement::repaintAfterLayoutIfNeeded` repainted a composited `position: fixed` layer whole on every scroll frame,
+although only its position had changed. Fixed boxes now get an out-of-flow movement layout
+(`setNeedsOutOfFlowMovementLayout`), whose repaint status `RenderLayer::shouldRepaintAfterLayout` skips for a
+composited layer, and their layers a compositing geometry update. Sticky boxes keep the full layout. Safari never
+reaches this path for a scroll, since it scrolls asynchronously.
+
 ## Working on the series
 
 ```

@@ -3,6 +3,7 @@ PAINT), and keep their pixels:
 
 - a viewport scroll moves the root layer's pixels and repaints only the strip it exposes, and the scrolled frame equals
   a full repaint of the same position;
+- a scroll leaves a composited position:fixed layer's pixels alone: it moves with the viewport, not its content;
 - a composited layer that only moves (its transform) is not repainted;
 - recoloring one small element repaints that element, not the text around it;
 - rv_host_update with nothing invalidated runs no style, layout or paint work.
@@ -27,11 +28,15 @@ TEXT = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
 CARDS = ''.join(f'<div style="{CARD}">{TEXT}</div>' for _ in range(60))
 BOX = 'position:absolute;left:10px;top:10px;width:20px;height:20px;background:{}'
 LAYER = f'position:absolute;right:20px;top:60px;width:300px;height:400px;will-change:transform;{CARD}'
+FIXED = f'position:fixed;left:40px;top:80px;width:300px;height:400px;will-change:transform;{CARD}'
 PAGE = (f'<body style="margin:0;background:#eef">{CARDS}<div id="box" style="{BOX.format("red")}"></div>'
-        f'<div id="layer" style="{LAYER}">{TEXT * 4}</div></body>')
+        f'<div id="layer" style="{LAYER}">{TEXT * 4}</div>'
+        f'<div id="fixed" style="{FIXED};display:none">{TEXT * 4}</div></body>')
 # Hard-edged content, so a scrolled frame and a full repaint compare exactly.
 STRIPES = ''.join(f'<div style="height:37px;border-bottom:3px solid rgb({i * 7 % 256},{i * 13 % 256},{i * 29 % 256});'
                   f'font:16px sans-serif">row {i}</div>' for i in range(120))
+STRIPES_FIXED = (f'<div style="position:fixed;left:30px;top:50px;width:200px;height:120px;background:#fff;'
+                 f'border:3px solid #208;will-change:transform;font:16px sans-serif">fixed {"text " * 20}</div>')
 
 
 class Event(C.Structure):
@@ -84,7 +89,7 @@ def run(directory):
             painter = 'GPU' if gpu else 'CPU'
             p.expect(set_gpu(p.host, gpu) == 0, f'{painter} painting')
             p.load(PAGE, standalone=False)
-            box, layer = p.node('box'), p.node('layer')
+            box, layer, fixed = p.node('box'), p.node('layer'), p.node('fixed')
             frame()
             frame()
             idle = median(None, PAINT)
@@ -97,6 +102,11 @@ def run(directory):
                 position[0] += 3
                 scroll_to(p.host, 0, position[0])
             scrolled = median(scroll, PAINT)
+            style(fixed, FIXED)
+            frame()
+            frame()
+            scrolled_fixed = median(scroll, PAINT)
+            style(fixed, FIXED + ';display:none')
             scroll_to(p.host, 0, 0)
             frame()
             colors = iter(['red', 'blue'] * FRAMES * 2)
@@ -105,8 +115,12 @@ def run(directory):
             moved = median(lambda: style(layer, LAYER + f';transform:translateX(-{next(offsets) % 40}px)'), PAINT)
             report[painter] = dict(idle=idle, full=full, scroll=scrolled, recolor=recolored, move=moved)
             print(f'compositor paths, {painter} painting: PAINT median idle {idle:.2f} ms, full repaint {full:.2f} ms, '
-                  f'3px scroll {scrolled:.2f} ms, one element recolored {recolored:.2f} ms, layer moved {moved:.2f} ms')
+                  f'3px scroll {scrolled:.2f} ms, with a fixed layer {scrolled_fixed:.2f} ms, '
+                  f'one element recolored {recolored:.2f} ms, layer moved {moved:.2f} ms')
             p.expect(moved < idle + 0.5, f'{painter}: a layer that only moves is not repainted ({moved:.2f} ms)')
+            p.expect(scrolled_fixed < scrolled + 0.5,
+                     f'{painter}: a scroll does not repaint a composited fixed layer ({scrolled_fixed:.2f} ms against '
+                     f'{scrolled:.2f} ms without it)')
         # The CPU painter shows raster cost undiluted by the GPU painter's fixed per-frame costs, so it carries the
         # ratios; on the GPU painter both stay below a full repaint.
         cpu, gpu = report['CPU'], report['GPU']
@@ -126,7 +140,7 @@ def run(directory):
             p.expect(p.bind('rv_host_set_device_scale', I, [P, C.c_float])(p.host, scale) == 0, 'scale')
             size = int(WIDTH * scale) * int(HEIGHT * scale) * 4
             pixels = (C.c_uint8 * size)()
-            p.load(f'<body style="margin:0;background:white">{STRIPES}</body>', standalone=False)
+            p.load(f'<body style="margin:0;background:white">{STRIPES}{STRIPES_FIXED}</body>', standalone=False)
 
             def take():
                 p.expect(update(p.host) >= 0 and paint_rgba(p.host, pixels, size) == 0, 'paint')
