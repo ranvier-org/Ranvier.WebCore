@@ -9,6 +9,16 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from utf8_inputs import Utf8, bind as bind_utf8
 
 
+def software_gl(directory):
+    """Whether the host's GL context, current on this thread after a composited frame, renders on the CPU."""
+    name = {'win32': 'libGLESv2.dll', 'darwin': 'libGLESv2.dylib'}.get(sys.platform)
+    gl = ctypes.CDLL(str(Path(directory) / name) if name else 'libGLESv2.so.2')
+    gl.glGetString.argtypes, gl.glGetString.restype = [ctypes.c_uint], ctypes.c_char_p
+    renderer = (gl.glGetString(0x1F01) or b'').decode()
+    print('GL renderer:', renderer)
+    return any(software in renderer for software in ('llvmpipe', 'softpipe', 'SwiftShader', 'Microsoft Basic Render Driver'))
+
+
 class SvgProbe:
     pointer = ctypes.c_void_p
     integer = ctypes.c_int32

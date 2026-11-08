@@ -7,7 +7,7 @@ import statistics
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from svg_paint_probe import SvgProbe
+from svg_paint_probe import SvgProbe, software_gl
 from utf8_inputs import Utf8
 
 # A dashboard at a high-DPI scale, with the Motion app's card shadows, and a translucent panel that moves across the
@@ -31,16 +31,6 @@ HALF = ('<style>html,body{margin:0;background:white}.f{box-sizing:content-box;wi
         'padding:10px 4px 6px 2px;border:5px solid black;margin:3px;background:red;background-clip:content-box}'
         '.t{transform:translate3d(7.25px,11.5px,0);will-change:transform}</style>'
         '<div class="f"></div><div class="f t"></div>')
-
-
-SOFTWARE_RENDERERS = ('llvmpipe', 'softpipe', 'SwiftShader', 'Microsoft Basic Render Driver')
-
-
-def gl_renderer(directory):
-    """GL_RENDERER of the host's context, which is current on this thread after a composited frame."""
-    gl = C.WinDLL(str(Path(directory) / 'libGLESv2.dll')) if sys.platform == 'win32' else C.CDLL('libGLESv2.so.2')
-    gl.glGetString.argtypes, gl.glGetString.restype = [C.c_uint], C.c_char_p
-    return (gl.glGetString(0x1F01) or b'').decode()
 
 
 class Event(C.Structure):
@@ -120,9 +110,7 @@ def run(directory):
         print(f'gpu painting: PAINT median {gpu_median:.2f} ms on the GPU, {cpu_median:.2f} ms on the CPU; '
               f'p95 {p95(gpu_ms):.2f} / {p95(cpu_ms):.2f} ms ({width}x{height} device pixels, read back each frame)')
         # A software renderer runs the GPU painter's shaders on the CPU, so the saving needs a real GPU.
-        renderer = gl_renderer(directory)
-        print('gpu painting: renderer', renderer)
-        if not any(name in renderer for name in SOFTWARE_RENDERERS):
+        if not software_gl(directory):
             p.expect(gpu_median < cpu_median * 0.6,
                      f'a GPU-painted frame over blurred shadows pays no CPU blur ({gpu_median:.2f} ms vs {cpu_median:.2f} ms)')
 
