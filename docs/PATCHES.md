@@ -431,6 +431,33 @@ raster backend does, `floor(x + 0.5)`, where Ganesh's pixel-centre rule would dr
 crosses: a `background-clip: content-box` 100.5px wide lost its last column against the CPU paint and Chromium
 (`tests/fixtures/background-content-clip-cases.json`).
 
+## 0075-texture-mapper-scroll-backing-store
+
+A viewport scroll takes WebKit's fast path, `LocalFrameView::scrollContentsFastPath`, which calls
+`ChromeClient::scroll` for the embedder to move its backing store's pixels and then `invalidateRootView`, which asks
+only for the view to be presented again. The host treated both as a repaint of the viewport, so each scroll frame
+re-rasterized all of it. `EmptyChromeClient::scroll` is no longer `final`, so the host can implement it, and
+`GraphicsLayerTextureMapper::scrollBackingStore` moves a one-tile layer's pixels by the scroll on the GPU
+(`BitmapTexture::shiftContents`, two `glCopyTexSubImage2D` through a scratch texture). It returns false, and the host
+repaints the layer, when the move is not a whole number of backing store pixels, a full repaint is pending, or the
+store has several tiles.
+
+`GraphicsLayerTextureMapper` kept a single rectangle to repaint and united every invalidation into it, so the strip a
+scroll exposes at the bottom and a fixed element at the top repainted all the viewport between them. It keeps up to
+eight rectangles now, merged past that.
+
+## 0076-texture-mapper-gpu-paint-batch
+
+0074 flushed, fenced and waited for every tile it painted on the GPU. Paints now only record their GL work in Skia's
+context, and `setPaintsLayersOnGPU(false)`, which the host calls when a composite's layers have painted, submits them
+and makes the compositing context wait once.
+
+## 0077-adwaita-empty-scroll-corner
+
+`ScrollView::paintScrollbars` paints the scroll corner whatever its rectangle, which is empty without both scrollbars,
+and `ScrollbarThemeAdwaita::paintScrollCorner` drew its 1px border at the empty rectangle's origin: a grey pixel at the
+top left of every scrollable page, which moved away with the content once scrolling moved pixels.
+
 ## Working on the series
 
 ```
