@@ -95,6 +95,13 @@ class PublishGateTests(unittest.TestCase):
         self.assertEqual({name.strip() for name in needs.split(',')}, {'native', 'prebuilt', 'managed', 'atspi-package', 'package-contract'})
         self.assertIn('python -I tests/test_publish_gate.py', workflow)
 
+    def test_the_required_check_waits_for_every_job_but_publication(self):
+        workflow = (ROOT / '.github/workflows/build.yml').read_text()
+        jobs = set(re.findall(r'^  ([a-z-]+):$', workflow.split('\njobs:\n', 1)[1], re.MULTILINE))
+        job = workflow.split('\n  result:\n', 1)[1]
+        needs = re.search(r'^    needs: \[([^]]+)\]', job, re.MULTILINE)[1]
+        self.assertEqual({name.strip() for name in needs.split(',')}, jobs - {'result', 'publish'})
+
 
 class FlavorMatrixTests(unittest.TestCase):
     SLIM = [(rid, 'slim') for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64', 'osx-arm64']]
