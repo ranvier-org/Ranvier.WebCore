@@ -985,6 +985,28 @@ jobs:
           name: package-atspi
           path: packages/Ranvier.WebCore.Accessibility.Atspi.*.nupkg
 
+  # The one check branch protection requires. A pull request's cell list is fixed by plan, so native must have run
+  # unless a version tag took every cell from prebuilt; publish is left out because it runs only on a tag.
+  result:
+    name: CI result
+    needs: [package-contract, plan, prebuilt, native, managed, atspi, atspi-package]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+          ALWAYS_RUN: ${{ needs.package-contract.result }} ${{ needs.plan.result }}
+          NATIVE: ${{ needs.native.result }}
+        run: |
+          echo "Job results: $RESULTS"
+          for result in $RESULTS; do
+            case "$result" in success|skipped) ;; *) exit 1 ;; esac
+          done
+          for result in $ALWAYS_RUN; do
+            test "$result" = success
+          done
+          case "$GITHUB_REF" in refs/tags/v*) ;; *) test "$NATIVE" = success ;; esac
+
   publish:
     # On a version tag, pushes the packages to nuget.org through trusted publishing: the job exchanges
     # GitHub's OIDC token for a one-hour API key under the nuget.org account in the repository variable
