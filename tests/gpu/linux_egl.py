@@ -130,7 +130,9 @@ if args.pipeline:
         bind(gl, "glDeleteFramebuffers", None, integer, C.POINTER(uint))(1, C.byref(framebuffer))
         bind(gl, "glDeleteTextures", None, integer, C.POINTER(uint))(1, C.byref(texture))
     assert make_current(display, None, None, context)
-    exercise(runtime, host, context, inspect)
+    def activate():
+        assert make_current(display, None, None, context)
+    exercise(runtime, host, context, inspect, activate)
     raise SystemExit(0)
 element = bind(runtime, "rv_document_get_element_by_id", ptr, ptr, C.c_char_p, integer)(host, b"box", 3)
 style_buffer, style_length = C.create_string_buffer(128), integer()

@@ -4,7 +4,7 @@ import threading
 import time
 
 
-def exercise(runtime, host, consumer, inspect):
+def exercise(runtime, host, consumer, inspect, activate=lambda: None):
     P, I, U = C.c_void_p, C.c_int32, C.c_uint64
     def bind(name, result, *parameters):
         fn = getattr(runtime, name)
@@ -71,5 +71,6 @@ def exercise(runtime, host, consumer, inspect):
     assert submit(host, 6) == 0
     _, held = take()
     destroy(host)
+    activate()
     assert release(held) == 0, 'lease outlives host and releases on owner'
     print('PORTABLE_GPU_PIPELINE=PASS', flush=True)
