@@ -141,10 +141,14 @@ bool RvEGLSurface::releaseConsumer(bool nonblocking)
     if (!state->acquired || eglGetCurrentDisplay() != state->display || eglGetCurrentContext() != state->consumerContext)
         return false;
     if (nonblocking) {
-        state->consumerFence = eglCreateSyncKHR(state->display, EGL_SYNC_FENCE_KHR, nullptr);
+        auto fence = eglCreateSyncKHR(state->display, EGL_SYNC_FENCE_KHR, nullptr);
         glFlush();
-        if (state->consumerFence == EGL_NO_SYNC_KHR || glGetError() != GL_NO_ERROR)
+        if (fence == EGL_NO_SYNC_KHR || glGetError() != GL_NO_ERROR) {
+            if (fence != EGL_NO_SYNC_KHR)
+                eglDestroySyncKHR(state->display, fence);
             return false;
+        }
+        state->consumerFence = fence;
         state->acquired = false;
         return true;
     }
