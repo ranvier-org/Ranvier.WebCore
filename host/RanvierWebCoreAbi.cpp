@@ -2012,7 +2012,7 @@ static_assert(sizeof(RvMediaVideoConfiguration) == 64 && offsetof(RvMediaVideoCo
 static_assert(sizeof(RvSnapshotOptions) == 64 && offsetof(RvSnapshotOptions, scale) == 8 && offsetof(RvSnapshotOptions, x) == 24 && offsetof(RvSnapshotOptions, quality) == 64 - 8);
 static_assert(sizeof(RvMediaAudioConfiguration) == 64 && offsetof(RvMediaAudioConfiguration, bitrate) == 40 && offsetof(RvMediaAudioConfiguration, spatial_rendering) == 56);
 
-int32_t rv_abi_version(void) { return 69; }
+int32_t rv_abi_version(void) { return 70; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -2026,6 +2026,8 @@ int32_t rv_abi_has(const char* feature)
 {
     if (!feature)
         return 0;
+    if (!std::strcmp(feature, "detached-image-encoding-v1"))
+        return 1;
     if (!std::strcmp(feature, "gpu-frame-pipeline-v1")) {
 #if defined(_WIN32) && RANVIER_COMPOSITING
         return 1;
@@ -3715,8 +3717,11 @@ static int32_t paintArea(RvHost& host, uint8_t* rgba, int32_t length, IntRect ar
 #endif
     RefPtr<ImageBuffer> buffer;
     if (!area.isEmpty()) {
-        buffer = ImageBuffer::create(FloatSize { area.size() }, RenderingMode::Unaccelerated,
-            RenderingPurpose::Unspecified, host.deviceScale, DestinationColorSpace::SRGB(), PixelFormat::BGRA8);
+        {
+            RvTraceSpan span(host, RV_HOST_TRACE_BUFFER_CREATE);
+            buffer = ImageBuffer::create(FloatSize { area.size() }, RenderingMode::Unaccelerated,
+                RenderingPurpose::Unspecified, host.deviceScale, DestinationColorSpace::SRGB(), PixelFormat::BGRA8);
+        }
         if (buffer) {
             buffer->context().translate(-area.x(), -area.y());
             auto behavior = view->paintBehavior();
@@ -7451,26 +7456,33 @@ static RefPtr<ImageBuffer> captureSnapshot(RvHost& host, Node* subject, const Rv
         status = RV_ERR_UNSUPPORTED;
         return nullptr;
     }
-    auto buffer = ImageBuffer::create(FloatSize { rect.size() }, RenderingMode::Unaccelerated, RenderingPurpose::Snapshot, scale,
-        colorSpace, PixelFormat::BGRA8);
+    RefPtr<ImageBuffer> buffer;
+    {
+        RvTraceSpan span(host, RV_HOST_TRACE_BUFFER_CREATE);
+        buffer = ImageBuffer::create(FloatSize { rect.size() }, RenderingMode::Unaccelerated, RenderingPurpose::Snapshot, scale,
+            colorSpace, PixelFormat::BGRA8);
+    }
     if (!buffer)
         return nullptr;
     buffer->context().translate(-rect.x(), -rect.y());
     host.inFrame = true;
     auto behavior = view->paintBehavior();
-    if (subject) {
-        // As rv_element_snapshot paints it: the subtree alone, over a transparent base background.
-        auto background = view->baseBackgroundColor();
-        view->setBaseBackgroundColor(Color::transparentBlack);
-        view->paintContentsForSnapshot(buffer->context(), rect, subject, LocalFrameView::IncludeSelection, LocalFrameView::DocumentCoordinates);
-        view->setBaseBackgroundColor(background);
-    } else {
-        // As rv_host_paint_rgba's CPU path paints the viewport.
-        view->setPaintBehavior(behavior | PaintBehavior::FlattenCompositingLayers);
-        view->paint(buffer->context(), rect);
+    {
+        RvTraceSpan span(host, RV_HOST_TRACE_CAPTURE_RASTER);
+        if (subject) {
+            // As rv_element_snapshot paints it: the subtree alone, over a transparent base background.
+            auto background = view->baseBackgroundColor();
+            view->setBaseBackgroundColor(Color::transparentBlack);
+            view->paintContentsForSnapshot(buffer->context(), rect, subject, LocalFrameView::IncludeSelection, LocalFrameView::DocumentCoordinates);
+            view->setBaseBackgroundColor(background);
+        } else {
+            // As rv_host_paint_rgba's CPU path paints the viewport.
+            view->setPaintBehavior(behavior | PaintBehavior::FlattenCompositingLayers);
+            view->paint(buffer->context(), rect);
+        }
+        view->setPaintBehavior(behavior);
+        host.inFrame = false;
     }
-    view->setPaintBehavior(behavior);
-    host.inFrame = false;
     if (host.updateWanted)
         host.requestFrame();
     buffer->flushDrawingContext();
@@ -7517,6 +7529,7 @@ int32_t rv_host_snapshot(RvHost* host, RvNode* element, const RvSnapshotOptions*
     Vector<uint8_t> bytes;
     IntSize pixelSize;
     if (options->encoding == RV_IMAGE_ENCODING_RGBA8) {
+        RvTraceSpan span(*host, RV_HOST_TRACE_PIXEL_COPY);
         PixelBufferFormat format { AlphaPremultiplication::Unpremultiplied, PixelFormat::RGBA8, *colorSpace };
         auto pixels = buffer->getPixelBuffer(format, IntRect { { }, buffer->truncatedLogicalSize() });
         if (!pixels)
@@ -7525,10 +7538,12 @@ int32_t rv_host_snapshot(RvHost* host, RvNode* element, const RvSnapshotOptions*
         bytes.append(pixels->bytes());
     } else {
         pixelSize = buffer->backendSize();
+        RvTraceSpan span(*host, RV_HOST_TRACE_IMAGE_ENCODE);
         bytes = Ranvier::Internal::encodeImage(WTF::move(buffer), options->encoding, options->quality);
         if (bytes.isEmpty())
             return RV_ERR_PAINT_FAILED;
     }
+    RvTraceSpan span(*host, RV_HOST_TRACE_PIXEL_COPY);
     return ranvier_resource_settled_bytes(reinterpret_cast<RvNode*>(&host->document()), bytes.span().data(),
         static_cast<int64_t>(bytes.size()), pixelSize.width(), pixelSize.height(), completion, context, operation);
 }

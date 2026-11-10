@@ -1971,6 +1971,18 @@ RV_EXPORT int32_t rv_host_snapshot(RvHost*, RvNode* element, const RvSnapshotOpt
  * queries the count. RV_ERR_UNSUPPORTED before delivery and for another operation. */
 RV_EXPORT int32_t rv_snapshot_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length);
 
+/* v70: "detached-image-encoding-v1". After host initialization, these three functions may run on any thread.
+ * rgba is immutable unpremultiplied RGBA8 for the call, exactly width * height * 4 bytes; dimensions are 1..8192,
+ * with at most 64 MiB of pixels. Encoding/color space use the snapshot enums. All codec objects are worker-local.
+ * No host is retained. Unsupported formats/sizes return RV_ERR_UNSUPPORTED with a null result. */
+typedef struct RvEncodedImage RvEncodedImage;
+RV_EXPORT int32_t rv_image_encode_rgba(const uint8_t* rgba, int64_t length, int32_t width, int32_t height,
+    int32_t color_space, int32_t encoding, double quality, RvEncodedImage** result);
+/* Immutable bytes, valid until release. Short/null buffers report RV_ERR_BUFFER_TOO_SMALL and required length.
+ * Serialize access to a handle with its release. See tests/abi/detached_encoding.py for cross-thread lifetime. */
+RV_EXPORT int32_t rv_encoded_image_bytes(RvEncodedImage*, uint8_t* buffer, int64_t capacity, int64_t* length);
+RV_EXPORT void rv_encoded_image_release(RvEncodedImage*);
+
 enum {
     RV_FILE_READER_RESULT_NULL = 0,
     RV_FILE_READER_RESULT_STRING = 1,
@@ -2815,6 +2827,10 @@ enum {
     RV_HOST_TRACE_PAINT = 3,
     RV_HOST_TRACE_RENDERING_UPDATE = 4,
     RV_HOST_TRACE_GPU_SUBMIT = 5,
+    RV_HOST_TRACE_BUFFER_CREATE = 6,
+    RV_HOST_TRACE_CAPTURE_RASTER = 7,
+    RV_HOST_TRACE_IMAGE_ENCODE = 8,
+    RV_HOST_TRACE_PIXEL_COPY = 9,
     RV_HOST_TRACE_SOURCE_HOST = 1,
 };
 typedef struct RvHostTraceEvent {

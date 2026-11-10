@@ -1089,7 +1089,7 @@ int32_t rv_atspi_bridge_create(RvHost* host, const char* address, const uint8_t*
     if (!host || !result || nameLength < 0 || (nameLength && !name)) return RV_ERR_NULL_ARGUMENT;
     if (!geometryValid(geometry)) return RV_ERR_UNSUPPORTED;
     auto hostAbi = rv_abi_version();
-    if ((hostAbi != 63 && hostAbi != 64 && hostAbi != 65 && hostAbi != 66 && hostAbi != 67 && hostAbi != 68 && hostAbi != 69) || rv_abi_has("accessibility-text-style") != 1) return RV_ERR_UNSUPPORTED;
+    if ((hostAbi != 63 && hostAbi != 64 && hostAbi != 65 && hostAbi != 66 && hostAbi != 67 && hostAbi != 68 && hostAbi != 69 && hostAbi != 70) || rv_abi_has("accessibility-text-style") != 1) return RV_ERR_UNSUPPORTED;
     for (auto& entry : bridges) if (entry.second->host == host) return RV_ERR_UNSUPPORTED;
     auto bridge = std::make_shared<Bridge>(host, *geometry, protocolText(reinterpret_cast<const char*>(name), nameLength));
     GError* error = nullptr;
