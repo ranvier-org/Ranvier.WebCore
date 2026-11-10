@@ -24,7 +24,7 @@ on:
         default: false
 
 concurrency:
-  group: ${{ format('{0}-{1}-{2}', github.workflow, github.ref, inputs.flavor || 'slim') }}
+  group: ${{ format('{0}-{1}-{2}-{3}', github.workflow, github.ref, inputs.flavor || 'slim', inputs.rids || 'all') }}
   cancel-in-progress: true
 
 jobs:
