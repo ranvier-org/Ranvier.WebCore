@@ -18,7 +18,7 @@ private:
 
 class RvEGLSurface {
 public:
-    static std::shared_ptr<RvEGLSurface> create(int width, int height, bool (*makeCurrent)(), bool bounded = false);
+    static std::shared_ptr<RvEGLSurface> create(int width, int height, bool (*makeCurrent)(), bool bounded = false, bool* exhausted = nullptr);
     static bool supportsPipeline(void* display);
     ~RvEGLSurface();
     bool matches(int width, int height) const;

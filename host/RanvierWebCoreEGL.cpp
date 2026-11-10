@@ -76,8 +76,9 @@ RvEGLSurface::RvEGLSurface(std::unique_ptr<State> state)
     : state(std::move(state)) { }
 RvEGLSurface::~RvEGLSurface() = default;
 
-std::shared_ptr<RvEGLSurface> RvEGLSurface::create(int width, int height, bool (*makeCurrent)(), bool bounded)
+std::shared_ptr<RvEGLSurface> RvEGLSurface::create(int width, int height, bool (*makeCurrent)(), bool bounded, bool* exhausted)
 {
+    if (exhausted) *exhausted = false;
     RvEGLContextScope scope;
     auto state = std::make_unique<State>();
     state->makeCurrent = makeCurrent;
@@ -87,9 +88,13 @@ std::shared_ptr<RvEGLSurface> RvEGLSurface::create(int width, int height, bool (
     state->width = width;
     state->height = height;
     if (bounded) {
-        state->charge = RvGpuMemoryBudget::acquire(width, height, 8);
-        if (!state->charge || !supportsPipeline(state->display))
+        if (!RvGpuMemoryBudget::canFit(width, height, 8) || !supportsPipeline(state->display))
             return nullptr;
+        state->charge = RvGpuMemoryBudget::acquire(width, height, 8);
+        if (!state->charge) {
+            if (exhausted) *exhausted = true;
+            return nullptr;
+        }
     }
     if (!epoxy_has_egl_extension(state->display, "EGL_KHR_image_base")
         || !epoxy_has_egl_extension(state->display, "EGL_KHR_gl_texture_2D_image"))
@@ -151,7 +156,9 @@ bool RvEGLSurface::releaseConsumer(bool nonblocking)
 }
 bool RvEGLSurface::supportsPipeline(void* display)
 {
-    return display && epoxy_has_egl_extension(display, "EGL_KHR_fence_sync");
+    return display && epoxy_has_egl_extension(display, "EGL_KHR_fence_sync")
+        && epoxy_has_egl_extension(display, "EGL_KHR_image_base")
+        && epoxy_has_egl_extension(display, "EGL_KHR_gl_texture_2D_image");
 }
 bool RvEGLSurface::submitProducer(void* consumerContext)
 {

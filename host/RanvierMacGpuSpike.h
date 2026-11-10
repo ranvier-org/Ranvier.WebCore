@@ -35,7 +35,7 @@ const char* rvMacSpikeIdentity();
 
 class RvMacSpikeSurface {
 public:
-    static std::unique_ptr<RvMacSpikeSurface> create(int width, int height, bool (*makeCurrent)(), bool bounded = false);
+    static std::unique_ptr<RvMacSpikeSurface> create(int width, int height, bool (*makeCurrent)(), bool bounded = false, bool* exhausted = nullptr);
     static bool supportsPipeline();
     ~RvMacSpikeSurface();
     unsigned framebuffer() const;

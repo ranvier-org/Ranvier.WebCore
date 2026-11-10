@@ -8,9 +8,14 @@ class RvGpuMemoryBudget {
 public:
     static constexpr size_t limit = 256 * 1024 * 1024;
     static constexpr size_t minimumAllocation = 64 * 1024;
+    static bool canFit(int width, int height, size_t bytesPerPixel)
+    {
+        return width > 0 && height > 0 && bytesPerPixel
+            && static_cast<size_t>(width) <= limit / bytesPerPixel / height;
+    }
     static size_t acquire(int width, int height, size_t bytesPerPixel)
     {
-        if (width <= 0 || height <= 0 || !bytesPerPixel || static_cast<size_t>(width) > limit / bytesPerPixel / height)
+        if (!canFit(width, height, bytesPerPixel))
             return 0;
         size_t bytes = std::max(minimumAllocation, static_cast<size_t>(width) * height * bytesPerPixel);
         auto current = used.load();

@@ -92,8 +92,9 @@ RvMacSpikeSurface::RvMacSpikeSurface(std::unique_ptr<State> value)
     : state(std::move(value)) { }
 RvMacSpikeSurface::~RvMacSpikeSurface() = default;
 
-std::unique_ptr<RvMacSpikeSurface> RvMacSpikeSurface::create(int width, int height, bool (*makeCurrent)(), bool bounded)
+std::unique_ptr<RvMacSpikeSurface> RvMacSpikeSurface::create(int width, int height, bool (*makeCurrent)(), bool bounded, bool* exhausted)
 {
+    if (exhausted) *exhausted = false;
     if (width <= 0 || height <= 0 || width > std::numeric_limits<int>::max() / 4
         || !makeCurrent || !makeCurrent() || !rvMacSpikeDisplay())
         return nullptr;
@@ -127,9 +128,13 @@ std::unique_ptr<RvMacSpikeSurface> RvMacSpikeSurface::create(int width, int heig
     if (bounded) {
         if (!supportsPipeline() || rowBytes / 4 > std::numeric_limits<int>::max())
             return nullptr;
-        value->charge = RvGpuMemoryBudget::acquire(static_cast<int>(rowBytes / 4), height, 8);
-        if (!value->charge)
+        if (!RvGpuMemoryBudget::canFit(static_cast<int>(rowBytes / 4), height, 8))
             return nullptr;
+        value->charge = RvGpuMemoryBudget::acquire(static_cast<int>(rowBytes / 4), height, 8);
+        if (!value->charge) {
+            if (exhausted) *exhausted = true;
+            return nullptr;
+        }
     }
     @autoreleasepool {
         NSDictionary* properties = @{

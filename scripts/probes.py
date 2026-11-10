@@ -117,6 +117,7 @@ PROBES = [
     *[probe('Verify Linux shared EGLImage frames and retained lifetimes',
             'python -I tests/gpu/linux_egl.py {native}/libRanvierWebCoreHost.so',
             'python -I tests/gpu/linux_egl.py {native}/libRanvierWebCoreHost.so --pipeline',
+            'python -I tests/gpu/egl_extension_matrix.py',
             'python -I tests/gpu/linux_egl.py {native}/libRanvierWebCoreHost.so --context-lifecycle',
             'python -I tests/gpu/linux_egl_teardown.py {native}/libRanvierWebCoreHost.so',
             'python -I tests/gpu/linux_egl_teardown.py {native}/libRanvierWebCoreHost.so --wrong-context',

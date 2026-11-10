@@ -134,7 +134,7 @@ int32_t rv_host_ime_surrounding_window(RvHost* host, int32_t maxUnits, char* buf
     auto& client = static_cast<RvEditorClient&>(host->page->editorClient());
     auto& chrome = static_cast<RvChromeClient&>(host->page->chrome().client());
     if (!++imeServedSequence) ++imeServedSequence;
-    host->imeWindow.emplace();
+    host->imeWindow.emplace(RvHost::ImeWindow { });
     auto& saved = *host->imeWindow;
     saved.token = *token = imeServedSequence;
     saved.document = document.ptr(); saved.target = target.get();

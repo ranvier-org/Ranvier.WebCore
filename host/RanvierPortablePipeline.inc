@@ -81,14 +81,15 @@ static int32_t submitPortableFrame(RvHost* host, uint64_t frameId)
         auto& surface = pipeline->surfaces[slot];
         if (surface && !surface->matches(size.width(), size.height()))
             surface.reset();
+        bool exhausted = false;
         if (!surface) {
             surface = RvPlatformSurface::create(size.width(), size.height(), [] {
                 auto* context = compositingContext();
                 return context && context->makeContextCurrent();
-            }, true);
+            }, true, &exhausted);
         }
         if (!surface)
-            return RV_NOT_READY;
+            return exhausted ? RV_NOT_READY : RV_ERR_UNSUPPORTED;
         if (!surface->beginProducer())
             return RV_ERR_DEVICE_LOST;
         RELEASE_ASSERT(pipeline->state.reserve(frameId) == slot);
