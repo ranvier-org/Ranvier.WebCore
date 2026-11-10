@@ -65,6 +65,7 @@ typedef int32_t (*RvEventCallback)(void* context, RvEvent* event);
 
 enum {
     RV_OK = 0,
+    RV_NOT_READY = 1,
     RV_ERR_NULL_ARGUMENT = -1,
     RV_ERR_WRONG_THREAD = -2,
     RV_ERR_DOM_EXCEPTION = -3,
@@ -76,6 +77,7 @@ enum {
     RV_ERR_UNSUPPORTED = -9,
     /* A generated function's handle argument is an object of another interface (RanvierWebCoreDom.h). */
     RV_ERR_WRONG_INTERFACE = -11,
+    RV_ERR_DEVICE_LOST = -12,
 };
 
 /* String properties of rv_node_get_string and rv_node_set_string. */
@@ -2812,6 +2814,7 @@ enum {
     RV_HOST_TRACE_STYLE_LAYOUT = 2,
     RV_HOST_TRACE_PAINT = 3,
     RV_HOST_TRACE_RENDERING_UPDATE = 4,
+    RV_HOST_TRACE_GPU_SUBMIT = 5,
     RV_HOST_TRACE_SOURCE_HOST = 1,
 };
 typedef struct RvHostTraceEvent {
@@ -2832,6 +2835,21 @@ RV_EXPORT int32_t rv_host_trace_drain(RvHost*, RvHostTraceEvent* events, int32_t
  * Owner thread only. Counter wraps modulo 2^32 and resets with the frame view (e.g. navigation).
  * Compare samples only within one document lifetime. Errors leave count unchanged. */
 RV_EXPORT int32_t rv_host_layout_count(RvHost*, uint32_t* count);
+
+/* v67: "gpu-frame-pipeline-v1", Windows D3D11. Owner-thread calls; legacy acquire/release is unchanged.
+ * Configure retains a real ID3D11Device. A replacement device waits (RV_NOT_READY) for old leases to retire.
+ * Submission IDs are nonzero and increase after every successful submission. RV_NOT_READY means no submission
+ * was accepted; retry the same ID later. Successful submission may perform CPU layout/paint but uses only
+ * zero-time mutex readiness checks. No hard driver-call latency guarantee is made.
+ * Try-acquire transfers the newest completed frame; no frame/id on RV_NOT_READY. Late older completions are
+ * discarded. Release uses rv_gpu_frame_release, including after host destruction. Three surfaces per host
+ * across resize generations; process-wide 256 MiB accounted output color/depth + input cache storage cap
+ * (excludes driver overhead, WebCore backing stores and legacy allocations). Preserve the previous image on
+ * RV_NOT_READY; retry on a subsequent scheduled frame, never spin or fall back to CPU for congestion.
+ * RV_ERR_DEVICE_LOST requires rebuilding the consumer device and configuring again after releasing leases. */
+RV_EXPORT int32_t rv_host_configure_gpu_pipeline(RvHost*, void* consumer_device);
+RV_EXPORT int32_t rv_host_submit_gpu_frame(RvHost*, uint64_t frame_id);
+RV_EXPORT int32_t rv_host_try_acquire_completed_gpu_frame(RvHost*, uint64_t* frame_id, RvGpuFrame** frame);
 
 /* Disabled by default. The latest failure after presentation acquisition starts replaces any previous record. Argument,
  * thread and preflight failures use the direct return status only. native_code is the

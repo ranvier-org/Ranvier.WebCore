@@ -651,6 +651,9 @@ module Calls =
             "rv_host_trace_enable"
             "rv_host_trace_drain"
             "rv_host_layout_count"
+            "rv_host_configure_gpu_pipeline"
+            "rv_host_submit_gpu_frame"
+            "rv_host_try_acquire_completed_gpu_frame"
             "rv_host_error_enable"
             "rv_host_error_take"
             "rv_host_set_file_picker_handler"
@@ -2075,6 +2078,15 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_host_layout_count(nativeint host, uint32& count)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_configure_gpu_pipeline(nativeint host, nativeint consumer_device)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_submit_gpu_frame(nativeint host, uint64 frame_id)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_try_acquire_completed_gpu_frame(nativeint host, uint64& frame_id, nativeint& frame)
 
     [<DllImport(Lib)>]
     extern int rv_host_error_enable(nativeint host, int enabled)
@@ -6554,13 +6566,49 @@ let rv_host_layout_count (host: nativeint, count: byref<uint32>) : int =
     else
         Raw.rv_host_layout_count (host, &count)
 
+let rv_host_configure_gpu_pipeline (host: nativeint, consumer_device: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_configure_gpu_pipeline (host, consumer_device)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[340] <- Calls.Counts[340] + 1L
+        Calls.Ticks[340] <- Calls.Ticks[340] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_configure_gpu_pipeline (host, consumer_device)
+
+let rv_host_submit_gpu_frame (host: nativeint, frame_id: uint64) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_submit_gpu_frame (host, frame_id)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[341] <- Calls.Counts[341] + 1L
+        Calls.Ticks[341] <- Calls.Ticks[341] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_submit_gpu_frame (host, frame_id)
+
+let rv_host_try_acquire_completed_gpu_frame (host: nativeint, frame_id: byref<uint64>, frame: byref<nativeint>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_try_acquire_completed_gpu_frame (host, &frame_id, &frame)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[342] <- Calls.Counts[342] + 1L
+        Calls.Ticks[342] <- Calls.Ticks[342] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_try_acquire_completed_gpu_frame (host, &frame_id, &frame)
+
 let rv_host_error_enable (host: nativeint, enabled: int) : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_error_enable (host, enabled)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[340] <- Calls.Counts[340] + 1L
-        Calls.Ticks[340] <- Calls.Ticks[340] + spent
+        Calls.Counts[343] <- Calls.Counts[343] + 1L
+        Calls.Ticks[343] <- Calls.Ticks[343] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -6571,8 +6619,8 @@ let rv_host_error_take (host: nativeint, record: nativeint, present: byref<int>)
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_error_take (host, record, &present)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[341] <- Calls.Counts[341] + 1L
-        Calls.Ticks[341] <- Calls.Ticks[341] + spent
+        Calls.Counts[344] <- Calls.Counts[344] + 1L
+        Calls.Ticks[344] <- Calls.Ticks[344] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -6583,8 +6631,8 @@ let rv_host_set_file_picker_handler (host: nativeint, callback: nativeint, conte
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_set_file_picker_handler (host, callback, context)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[342] <- Calls.Counts[342] + 1L
-        Calls.Ticks[342] <- Calls.Ticks[342] + spent
+        Calls.Counts[345] <- Calls.Counts[345] + 1L
+        Calls.Ticks[345] <- Calls.Ticks[345] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -6595,8 +6643,8 @@ let rv_host_file_picker_available (host: nativeint) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_file_picker_available (host)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[343] <- Calls.Counts[343] + 1L
-        Calls.Ticks[343] <- Calls.Ticks[343] + spent
+        Calls.Counts[346] <- Calls.Counts[346] + 1L
+        Calls.Ticks[346] <- Calls.Ticks[346] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -6607,8 +6655,8 @@ let rv_host_file_picker_filter_count (host: nativeint, request: uint64, kind: in
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_file_picker_filter_count (host, request, kind, &count)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[344] <- Calls.Counts[344] + 1L
-        Calls.Ticks[344] <- Calls.Ticks[344] + spent
+        Calls.Counts[347] <- Calls.Counts[347] + 1L
+        Calls.Ticks[347] <- Calls.Ticks[347] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -6624,8 +6672,8 @@ let rv_host_file_picker_filter
             Raw.rv_host_file_picker_filter (host, request, kind, index, buffer, capacity, length)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[345] <- Calls.Counts[345] + 1L
-        Calls.Ticks[345] <- Calls.Ticks[345] + spent
+        Calls.Counts[348] <- Calls.Counts[348] + 1L
+        Calls.Ticks[348] <- Calls.Ticks[348] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -6641,8 +6689,8 @@ let rv_host_file_picker_complete
             Raw.rv_host_file_picker_complete (host, request, outcome, paths, lengths, count)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[346] <- Calls.Counts[346] + 1L
-        Calls.Ticks[346] <- Calls.Ticks[346] + spent
+        Calls.Counts[349] <- Calls.Counts[349] + 1L
+        Calls.Ticks[349] <- Calls.Ticks[349] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -6666,8 +6714,8 @@ let rv_host_ime_surrounding
             Raw.rv_host_ime_surrounding (host, buffer, capacity, length, &cursor, &anchor, &state, &token)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[347] <- Calls.Counts[347] + 1L
-        Calls.Ticks[347] <- Calls.Ticks[347] + spent
+        Calls.Counts[350] <- Calls.Counts[350] + 1L
+        Calls.Ticks[350] <- Calls.Ticks[350] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -6678,8 +6726,8 @@ let rv_host_ime_delete_surrounding (host: nativeint, token: uint64, start: int, 
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_ime_delete_surrounding (host, token, start, ``end``)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[348] <- Calls.Counts[348] + 1L
-        Calls.Ticks[348] <- Calls.Ticks[348] + spent
+        Calls.Counts[351] <- Calls.Counts[351] + 1L
+        Calls.Ticks[351] <- Calls.Ticks[351] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -6703,8 +6751,8 @@ let rv_ax_text_style_run
             Raw.rv_ax_text_style_run (ax, offset, property, &start, &``end``, buffer, capacity, length)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[349] <- Calls.Counts[349] + 1L
-        Calls.Ticks[349] <- Calls.Ticks[349] + spent
+        Calls.Counts[352] <- Calls.Counts[352] + 1L
+        Calls.Ticks[352] <- Calls.Ticks[352] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -6715,8 +6763,8 @@ let rv_host_acquire_iosurface_frame (host: nativeint, frame: byref<nativeint>) :
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_acquire_iosurface_frame (host, &frame)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[350] <- Calls.Counts[350] + 1L
-        Calls.Ticks[350] <- Calls.Ticks[350] + spent
+        Calls.Counts[353] <- Calls.Counts[353] + 1L
+        Calls.Ticks[353] <- Calls.Ticks[353] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -6727,8 +6775,8 @@ let rv_host_bind_iosurface (host: nativeint, target: nativeint, surface: nativei
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_bind_iosurface (host, target, surface, flipY)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[351] <- Calls.Counts[351] + 1L
-        Calls.Ticks[351] <- Calls.Ticks[351] + spent
+        Calls.Counts[354] <- Calls.Counts[354] + 1L
+        Calls.Ticks[354] <- Calls.Ticks[354] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else

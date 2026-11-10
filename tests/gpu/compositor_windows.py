@@ -21,6 +21,10 @@ def main():
     try:
         library = build_helper(consumer, args.compiler_environment, texture_input=True)
         failures = []
+        pipeline = subprocess.run([sys.executable, '-I', str(Path(__file__).with_name('frame_pipeline.py')),
+                                   str(args.native_directory.resolve()), str(library)], timeout=120)
+        if pipeline.returncode:
+            failures.append(('frame_pipeline', pipeline.returncode))
         for name in ['compositor_dpi_windows', 'compositor_input_windows', 'compositor_fractional_edges']:
             result = subprocess.run([
                 sys.executable, '-I', str(Path(__file__).with_name(name + '.py')),

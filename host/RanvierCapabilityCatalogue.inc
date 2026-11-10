@@ -413,6 +413,7 @@ static constexpr const char* capabilityAbiNames[] = {
     "dom-type-query:AnimationEffect",
     "dom-type-query:AnimationTimeline",
     "dom-type-query:WebAnimation",
+    "gpu-frame-pipeline-v1",
     "host-layout-metrics",
     "host-tracing",
     "host-errors",

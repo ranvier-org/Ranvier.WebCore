@@ -45,6 +45,20 @@ TEST_EXPORT void native_input_release(void* texturePointer)
     if (texturePointer) static_cast<ID3D11Texture2D*>(texturePointer)->Release();
 }
 
+TEST_EXPORT int32_t native_input_hold(void* texturePointer)
+{
+    ComPtr<IDXGIKeyedMutex> mutex;
+    auto result = static_cast<ID3D11Texture2D*>(texturePointer)->QueryInterface(IID_PPV_ARGS(&mutex));
+    return FAILED(result) ? result : mutex->AcquireSync(0, 0);
+}
+
+TEST_EXPORT int32_t native_input_unhold(void* texturePointer)
+{
+    ComPtr<IDXGIKeyedMutex> mutex;
+    auto result = static_cast<ID3D11Texture2D*>(texturePointer)->QueryInterface(IID_PPV_ARGS(&mutex));
+    return FAILED(result) ? result : mutex->ReleaseSync(0);
+}
+
 TEST_EXPORT int32_t native_input_quadrants(void* texturePointer)
 {
     auto* texture = static_cast<ID3D11Texture2D*>(texturePointer);
@@ -107,4 +121,11 @@ TEST_EXPORT int32_t native_input_remove(void* removalPointer, void* texturePoint
 TEST_EXPORT void native_input_removal_release(void* pointer)
 {
     if (pointer) static_cast<ID3D12Device5*>(pointer)->Release();
+}
+
+TEST_EXPORT void* native_input_device(void* texturePointer)
+{
+    ID3D11Device* device = nullptr;
+    static_cast<ID3D11Texture2D*>(texturePointer)->GetDevice(&device);
+    return device;
 }

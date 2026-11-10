@@ -1,4 +1,5 @@
 #pragma once
+#include "RanvierGpuRetirement.h"
 #if defined(_WIN32) && RANVIER_COMPOSITING
 #include <windows.h>
 #include <d3d11_1.h>
@@ -29,6 +30,12 @@ struct RvNativeTextureInput final : WebCore::TextureMapperPlatformLayer {
     GLuint texture { 0 };
     bool locked { false };
     bool failed { false };
+    ComPtr<ID3D11Texture2D> cachedTexture;
+    EGLImageKHR cachedImage { EGL_NO_IMAGE_KHR };
+    GLuint cachedGlTexture { 0 };
+    size_t cachedBytes { 0 };
+    bool cachedValid { false };
+    bool usingCache { false };
 
     bool healthy() const
     {
@@ -117,12 +124,67 @@ struct RvNativeTextureInput final : WebCore::TextureMapperPlatformLayer {
         return true;
     }
 
-    bool begin()
+    bool begin(bool nonblocking = false)
     {
+        usingCache = nonblocking;
+        if (nonblocking)
+            return beginCached();
         if (!healthy() || mutex->AcquireSync(1, 16) != S_OK)
             return false;
         locked = true;
         return true;
+    }
+
+    bool beginCached()
+    {
+        if (!healthy())
+            return false;
+        if (!cachedTexture) {
+            RvGpuRetirement::collect();
+            D3D11_TEXTURE2D_DESC desc { };
+            openedTexture->GetDesc(&desc);
+            cachedBytes = RvGpuMemoryBudget::acquire(desc.Width, desc.Height, 4);
+            if (!cachedBytes)
+                return false;
+            desc.MiscFlags = 0;
+            if (FAILED(compositorDevice->CreateTexture2D(&desc, nullptr, &cachedTexture))) {
+                failed = true;
+                return false;
+            }
+            auto createImage = reinterpret_cast<PFNEGLCREATEIMAGEKHRPROC>(eglGetProcAddress("eglCreateImageKHR"));
+            auto imageTarget = reinterpret_cast<PFNGLEGLIMAGETARGETTEXTURE2DOESPROC>(eglGetProcAddress("glEGLImageTargetTexture2DOES"));
+            cachedImage = createImage(display, EGL_NO_CONTEXT, EGL_D3D11_TEXTURE_ANGLE, cachedTexture.Get(), nullptr);
+            if (cachedImage == EGL_NO_IMAGE_KHR) {
+                failed = true;
+                return false;
+            }
+            glGenTextures(1, &cachedGlTexture);
+            glBindTexture(GL_TEXTURE_2D, cachedGlTexture);
+            imageTarget(GL_TEXTURE_2D, cachedImage);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glBindTexture(GL_TEXTURE_2D, 0);
+            if (glGetError() != GL_NO_ERROR) {
+                failed = true;
+                return false;
+            }
+        }
+        auto acquired = mutex->AcquireSync(1, 0);
+        if (acquired == WAIT_TIMEOUT)
+            return cachedValid;
+        if (acquired != S_OK) {
+            failed = true;
+            return false;
+        }
+        // The owned shared image is copied on ANGLE's device. Future paints sample only this cache.
+        glFlush();
+        ComPtr<ID3D11DeviceContext> context;
+        compositorDevice->GetImmediateContext(&context);
+        context->CopyResource(cachedTexture.Get(), openedTexture.Get());
+        context->Flush();
+        failed = FAILED(mutex->ReleaseSync(0));
+        cachedValid = !failed;
+        return cachedValid;
     }
 
     void end()
@@ -137,8 +199,8 @@ struct RvNativeTextureInput final : WebCore::TextureMapperPlatformLayer {
     void paintToTextureMapper(WebCore::TextureMapper& mapper, const WebCore::FloatRect& rect,
         const WebCore::TransformationMatrix& matrix, float opacity) final
     {
-        if (locked)
-            rv_native_texture_draw(&mapper, texture, &rect, &matrix, opacity);
+        if (usingCache ? cachedValid : locked)
+            rv_native_texture_draw(&mapper, usingCache ? cachedGlTexture : texture, &rect, &matrix, opacity);
     }
 
     ~RvNativeTextureInput()
@@ -147,9 +209,15 @@ struct RvNativeTextureInput final : WebCore::TextureMapperPlatformLayer {
         if (makeCurrent && makeCurrent()) {
             end();
             glDeleteTextures(1, &texture);
+            glDeleteTextures(1, &cachedGlTexture);
             if (image != EGL_NO_IMAGE_KHR)
                 destroyImage(display, image);
+            if (cachedImage != EGL_NO_IMAGE_KHR)
+                destroyImage(display, cachedImage);
+            glFlush();
         }
+        RvGpuRetirement::retire(cachedBytes, compositorDevice.Get(), cachedTexture.Get());
+        cachedTexture.Reset();
         openedTexture.Reset();
         mutex.Reset();
         if (compositorDevice) {

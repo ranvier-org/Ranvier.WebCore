@@ -48,6 +48,7 @@ PROBES = [
             'python -I tests/abi/file_picker.py --native-directory {native}', rid=rid, flavor=None)
       for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],
     *[probe('Verify host tracing, deferred rendering teardown, partial repaints, GPU painting and compositor paths',
+            'python -I tests/gpu/pipeline_state.py',
             'python -I tests/abi/host_tracing.py {native}',
             'python -I tests/abi/layout_phase_trace.py {native}',
             'python -I tests/abi/host_error_lifetime.py {native}',

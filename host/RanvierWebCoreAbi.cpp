@@ -267,6 +267,7 @@
 #include <WebCore/TextureMapperLayer.h>
 #if defined(_WIN32)
 #include "RanvierWebCoreD3D11.h"
+#include "RanvierD3D11Pipeline.h"
 #endif
 #endif
 
@@ -1062,6 +1063,7 @@ struct RvHost {
     bool gpuPainting { true };
 #if defined(_WIN32)
     std::shared_ptr<RvD3D11Surface> presentationSurface;
+    std::shared_ptr<RvD3D11Pipeline> framePipeline;
 #elif defined(__linux__)
     std::shared_ptr<RvEGLSurface> presentationSurface;
 #endif
@@ -1985,7 +1987,7 @@ static_assert(sizeof(RvMediaVideoConfiguration) == 64 && offsetof(RvMediaVideoCo
 static_assert(sizeof(RvSnapshotOptions) == 64 && offsetof(RvSnapshotOptions, scale) == 8 && offsetof(RvSnapshotOptions, x) == 24 && offsetof(RvSnapshotOptions, quality) == 64 - 8);
 static_assert(sizeof(RvMediaAudioConfiguration) == 64 && offsetof(RvMediaAudioConfiguration, bitrate) == 40 && offsetof(RvMediaAudioConfiguration, spatial_rendering) == 56);
 
-int32_t rv_abi_version(void) { return 66; }
+int32_t rv_abi_version(void) { return 67; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -1999,6 +2001,13 @@ int32_t rv_abi_has(const char* feature)
 {
     if (!feature)
         return 0;
+    if (!std::strcmp(feature, "gpu-frame-pipeline-v1")) {
+#if defined(_WIN32) && RANVIER_COMPOSITING
+        return 1;
+#else
+        return 0;
+#endif
+    }
     if (!std::strcmp(feature, "host-layout-metrics"))
         return 1;
     if (!std::strcmp(feature, "host-tracing"))
@@ -2742,6 +2751,10 @@ int32_t rv_host_load_html(RvHost* host, const uint8_t* html, int32_t html_length
     if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
         return RV_ERR_DETACHED;
     host->documentTransaction = RvHost::DocumentTransaction::Replacing;
+#if defined(_WIN32) && RANVIER_COMPOSITING
+    if (host->framePipeline)
+        ++host->framePipeline->generation;
+#endif
     static_cast<RvEditorClient&>(host->page->editorClient()).documentWillChange();
 #if (defined(_WIN32) || defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE)) && RANVIER_COMPOSITING
     host->nativeTextures.clear();
@@ -2773,6 +2786,10 @@ int32_t rv_host_load_svg(RvHost* host, const uint8_t* svg, int32_t svg_length)
     if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
         return RV_ERR_DETACHED;
     host->documentTransaction = RvHost::DocumentTransaction::Replacing;
+#if defined(_WIN32) && RANVIER_COMPOSITING
+    if (host->framePipeline)
+        ++host->framePipeline->generation;
+#endif
     static_cast<RvEditorClient&>(host->page->editorClient()).documentWillChange();
 #if (defined(_WIN32) || defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE)) && RANVIER_COMPOSITING
     host->nativeTextures.clear();
@@ -3106,7 +3123,7 @@ void rv_node_release(RvNode* target)
 }
 
 #if RANVIER_COMPOSITING
-static int32_t composite(RvHost& host, RvCompositor& compositor, LocalFrameView& view, uint8_t* rgba, GLuint targetFramebuffer = 0)
+static int32_t composite(RvHost& host, RvCompositor& compositor, LocalFrameView& view, uint8_t* rgba, GLuint targetFramebuffer = 0, bool nonblocking = false)
 {
     if (!compositor.context->makeContextCurrent())
         return RV_ERR_PAINT_FAILED;
@@ -3163,8 +3180,13 @@ static int32_t composite(RvHost& host, RvCompositor& compositor, LocalFrameView&
         ~InputLocks() { for (auto& input : host.nativeTextures) input->end(); }
     } inputLocks { host };
     for (auto& input : host.nativeTextures) {
+#if defined(_WIN32)
+        if (input->attach() && !input->begin(nonblocking))
+            return nonblocking ? (input->healthy() ? RV_NOT_READY : RV_ERR_DEVICE_LOST) : RV_ERR_UNSUPPORTED;
+#else
         if (input->attach() && !input->begin())
             return RV_ERR_UNSUPPORTED;
+#endif
     }
 #endif
     auto& rootLayer = downcast<GraphicsLayerTextureMapper>(*compositor.root);
@@ -3229,6 +3251,8 @@ static int32_t composite(RvHost& host, RvCompositor& compositor, LocalFrameView&
 struct RvGpuFrame {
 #if defined(_WIN32) && RANVIER_COMPOSITING
     std::shared_ptr<RvD3D11Surface> surface;
+    std::shared_ptr<RvD3D11Pipeline> pipeline;
+    int slot { -1 };
 #elif defined(__linux__) && RANVIER_COMPOSITING
     std::shared_ptr<RvEGLSurface> surface;
 #elif defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
@@ -3535,6 +3559,8 @@ int32_t rv_host_acquire_d3d11_frame(RvHost* host, void* consumerDevice, RvGpuFra
 #endif
 }
 
+#include "RanvierGpuPipeline.inc"
+
 int32_t rv_gpu_frame_info(RvGpuFrame* frame, void** texture, int32_t* width, int32_t* height, int32_t* format)
 {
     if (!frame || !texture || !width || !height || !format)
@@ -3570,7 +3596,9 @@ int32_t rv_gpu_frame_release(RvGpuFrame* frame)
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
 #if defined(_WIN32) && RANVIER_COMPOSITING
-    bool released = frame->surface->releaseConsumer();
+    bool released = frame->surface->releaseConsumer(!!frame->pipeline);
+    if (frame->pipeline)
+        frame->pipeline->state.retire(frame->slot);
     delete frame;
     return released ? RV_OK : RV_ERR_PAINT_FAILED;
 #elif defined(__linux__) && RANVIER_COMPOSITING
