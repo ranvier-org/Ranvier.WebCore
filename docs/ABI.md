@@ -8,8 +8,8 @@
 | `RanvierWebCoreDom.h` | The generated DOM functions `rv_dom_*`, one per IDL attribute getter, setter and operation of the interfaces in `gen/dom.json`. Source: `host/RanvierWebCoreDom.h`, written by `gen/domgen.py` (`docs/GENERATOR.md`). |
 
 The boundary is C scalars, UTF-8 strings with explicit byte counts, opaque handles and caller-owned buffers. It is
-identical on every port that compiles `host/RanvierWebCoreAbi.cpp`. Calls are valid on one thread; see
-`docs/HOSTING.md`.
+identical on every port that compiles `host/RanvierWebCoreAbi.cpp`. Host/DOM calls are valid on the owner
+thread; see `docs/HOSTING.md`. The detached image encoding functions below are an explicit exception.
 
 ## Version
 
@@ -34,6 +34,17 @@ without flushing pending style/layout. Unlike a trace span around a layout-check
 delta means no layout pass completed. It excludes child frames and style-only work, wraps at 32 bits,
 and resets with the frame view. Compare only within one document lifetime. Synchronous geometry getters
 retain their browser semantics.
+
+ABI 70 adds `detached-image-encoding-v1`. `rv_host_snapshot_bounded` captures on the owner with the
+existing resource-delivery contract, rejecting cropped/scaled backend dimensions above 8192 or 64 MiB
+of RGBA8 before image-buffer allocation or rasterization. The legacy `rv_host_snapshot` remains unchanged.
+After host initialization, `rv_image_encode_rgba`, `rv_encoded_image_bytes` and `rv_encoded_image_release`
+may run on a worker. They use immutable input pixels and worker-local image objects, retain no host,
+and remain valid after host destruction. Serialize access to each encoded-image handle with its release.
+The encoder enforces the same input limits; it does not make owner-thread capture asynchronous.
+
+Host trace phases 6, 7, 8 and 9 separately measure buffer creation, snapshot rasterization, image encoding
+and pixel copying. They complement layout/paint/submission timings and do not impose latency thresholds.
 
 ABI 67 adds Windows `gpu-frame-pipeline-v1`. Configure a retained consumer device, submit monotonically
 increasing nonzero IDs, then try acquiring the newest completed frame. `RV_NOT_READY` (1) is backpressure,
