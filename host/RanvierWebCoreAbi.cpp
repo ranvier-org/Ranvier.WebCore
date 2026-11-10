@@ -297,6 +297,8 @@ class RvChromeClient final : public EmptyChromeClient {
     WTF_MAKE_TZONE_ALLOCATED_INLINE(RvChromeClient);
 public:
     RvHost* host { nullptr };
+    uint64_t focusGeneration { 0 };
+    void focusedElementChanged(Element*, LocalFrame*, FocusOptions, BroadcastFocusedElement) final { ++focusGeneration; }
     bool isEmptyChromeClient() const final { return false; }
 #if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
     GraphicsLayerFactory* graphicsLayerFactory() const final { return macSpikeLayerFactory(); }
@@ -439,6 +441,7 @@ public:
     void setCompositionSuspended(bool value) { m_compositionSuspended = value; }
     void discardUnsafeCompositionHistory() { clearUndoRedoOperations(); }
     uint64_t historyGeneration() const { return m_historyGeneration; }
+    uint64_t imeGeneration() const { return m_imeGeneration; }
     UndoStep* lastUndoStep() const { return m_undo.isEmpty() ? nullptr : m_undo.last().ptr(); }
     void undoOwnedComposition(UndoStep* step, uint64_t generation, const Function<bool(LocalFrame&)>* selectionObserver = nullptr)
     {
@@ -526,10 +529,11 @@ private:
     void didApplyStyle() final { }
     bool shouldMoveRangeAfterDelete(const SimpleRange&, const SimpleRange&) final { return true; }
 
-    void didBeginEditing() final { }
-    void respondToChangedContents() final { }
+    void didBeginEditing() final { ++m_imeGeneration; }
+    void respondToChangedContents() final { ++m_imeGeneration; }
     void respondToChangedSelection(LocalFrame* frame) final
     {
+        ++m_imeGeneration;
         if (!frame || m_replaying != Replay::Undo || !m_ownedCompositionSelectionObserver)
             return;
         auto* observer = std::exchange(m_ownedCompositionSelectionObserver, nullptr);
@@ -540,7 +544,7 @@ private:
     void discardedComposition(const Document&) final { }
     void canceledComposition() final { }
     void didUpdateComposition() final { }
-    void didEndEditing() final { }
+    void didEndEditing() final { ++m_imeGeneration; }
     void didEndUserTriggeredSelectionChanges() final { }
     void willWriteSelectionToPasteboard(const std::optional<SimpleRange>&) final { }
     void didWriteSelectionToPasteboard() final { }
@@ -555,6 +559,7 @@ private:
     const Function<bool(LocalFrame&)>* m_ownedCompositionSelectionObserver { nullptr };
     bool m_compositionSuspended { false };
     uint64_t m_historyGeneration { 0 };
+    uint64_t m_imeGeneration { 0 };
     uint64_t m_replayGeneration { 0 };
     uint64_t m_documentGeneration { 0 };
     std::optional<uint64_t> m_editDocumentGeneration;
@@ -1151,6 +1156,14 @@ struct RvHost {
         bool composing { false };
     };
     std::optional<ImeServed> imeServed;
+    struct ImeWindow {
+        uint64_t token { 0 }, treeVersion { 0 }, focusGeneration { 0 }, imeGeneration { 0 }, historyGeneration { 0 }, editingSequence { 0 };
+        WeakPtr<Document, WeakPtrImplWithEventTargetData> document;
+        WeakPtr<Node, WeakPtrImplWithEventTargetData> target;
+        int32_t origin { 0 }, length { 0 }, cursor { 0 }, anchor { 0 };
+        String text;
+    };
+    std::optional<ImeWindow> imeWindow;
     bool destroyAfterEditing { false };
     bool updateWanted { false };
     std::shared_ptr<RvHostTraceBuffer> traceBuffer;
@@ -1987,7 +2000,7 @@ static_assert(sizeof(RvMediaVideoConfiguration) == 64 && offsetof(RvMediaVideoCo
 static_assert(sizeof(RvSnapshotOptions) == 64 && offsetof(RvSnapshotOptions, scale) == 8 && offsetof(RvSnapshotOptions, x) == 24 && offsetof(RvSnapshotOptions, quality) == 64 - 8);
 static_assert(sizeof(RvMediaAudioConfiguration) == 64 && offsetof(RvMediaAudioConfiguration, bitrate) == 40 && offsetof(RvMediaAudioConfiguration, spatial_rendering) == 56);
 
-int32_t rv_abi_version(void) { return 67; }
+int32_t rv_abi_version(void) { return 68; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -2097,6 +2110,8 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "media-capabilities"))
         return 1;
     if (!std::strcmp(feature, "snapshot-options"))
+        return 1;
+    if (!std::strcmp(feature, "ime-surrounding-window-v1"))
         return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "accessibility-uia"))
@@ -5381,6 +5396,7 @@ int32_t rv_host_set_focused(RvHost* host, int32_t focused)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
+    host->imeWindow.reset();
     auto& focus = host->page->focusController();
     return dispatchCountingFailures([&] {
         // The first activation fires one window focus event when the main frame is focused while the page is unfocused.
@@ -6516,6 +6532,8 @@ int32_t rv_host_ime_delete_surrounding(RvHost* host, uint64_t token, int32_t sta
     });
     return failedCompositionTransaction ? RV_ERR_UNSUPPORTED : result >= 0 && endedComposition ? 2 : result;
 }
+
+#include "RanvierImeWindow.inc"
 
 static Element* elementOf(RvNode* handle) { return handle ? dynamicDowncast<Element>(*node(handle)) : nullptr; }
 

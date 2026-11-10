@@ -38,6 +38,9 @@ PROBES = [
             'python -I tests/abi/ime_surrounding.py --native-directory {native}',
             'python -I tests/abi/ime_surrounding_delete.py --native-directory {native}', rid=rid, flavor=None)
       for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],
+    *[probe('Verify bounded IME control context and stale deletion',
+            'python -I tests/abi/ime_surrounding_window.py --native-directory {native}', rid=rid, flavor=None)
+      for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64', 'osx-arm64']],
     *[probe('Verify surrounding deletion undo and redo preserve selected composition',
             'python -I tests/abi/ime_surrounding_history.py --native-directory {native}', rid=rid, flavor=None)
       for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],

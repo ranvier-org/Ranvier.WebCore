@@ -74,3 +74,4 @@
 0076-texture-mapper-gpu-paint-batch.patch
 0077-adwaita-empty-scroll-corner.patch
 0078-viewport-constrained-movement-layout.patch
+0079-embedder-focus-generation.patch

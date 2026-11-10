@@ -2896,6 +2896,18 @@ RV_EXPORT int32_t rv_host_ime_surrounding(RvHost*, char* buffer, int32_t capacit
  * undo/redo, including unrelated earlier edits; a proven unchanged no-op retains valid history. */
 RV_EXPORT int32_t rv_host_ime_delete_surrounding(RvHost*, uint64_t token, int32_t start, int32_t end);
 
+// Bounded UTF-16 context (1..4096 units), centered around and including both selection ends.
+// State: 0 absent/readonly, 1 available, 2 unavailable (composition, oversized selection or unsupported
+// editable structure), 3 secure. Origin is a UTF-16 offset in the control; cursor/anchor are window-relative.
+// Examines at most 64 flat inner-editor nodes, never serializes or scans the full control value.
+// Arbitrary contenteditable is unavailable. Surrogate pairs are never split at window boundaries.
+// Token is issued only on successful copy, supersedes the prior window, and rejects stale deletes.
+RV_EXPORT int32_t rv_host_ime_surrounding_window(RvHost*, int32_t max_units, char* buffer, int32_t capacity,
+    int32_t* length, int32_t* origin, int32_t* cursor, int32_t* anchor, int32_t* state, uint64_t* token);
+// Relative UTF-16 deletion, using the existing undoable editing transaction. The edit itself may be
+// linear in control size. Rejects stale tokens and surrogate splits; composition remains unavailable.
+RV_EXPORT int32_t rv_host_ime_delete_surrounding_window(RvHost*, uint64_t token, int32_t start, int32_t end);
+
 /* "accessibility-text-style": a rendered text run in the same UTF-16 coordinates as rv_ax_text.
  * property is color, background-color, font-family, font-size, font-weight, font-style,
  * text-decoration-line, visibility or direction. Hidden text is omitted as in rv_ax_text.

@@ -456,6 +456,7 @@ static constexpr const char* capabilityAbiNames[] = {
     "notifications",
     "media-capabilities",
     "snapshot-options",
+    "ime-surrounding-window-v1",
     "accessibility-uia",
     "resize",
     "input",

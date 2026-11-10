@@ -663,6 +663,8 @@ module Calls =
             "rv_host_file_picker_complete"
             "rv_host_ime_surrounding"
             "rv_host_ime_delete_surrounding"
+            "rv_host_ime_surrounding_window"
+            "rv_host_ime_delete_surrounding_window"
             "rv_ax_text_style_run"
             "rv_host_acquire_iosurface_frame"
             "rv_host_bind_iosurface"
@@ -2138,6 +2140,23 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_host_ime_delete_surrounding(nativeint host, uint64 token, int start, int ``end``)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_ime_surrounding_window(
+        nativeint host,
+        int max_units,
+        byte[] buffer,
+        int capacity,
+        int[] length,
+        int& origin,
+        int& cursor,
+        int& anchor,
+        int& state,
+        uint64& token
+    )
+
+    [<DllImport(Lib)>]
+    extern int rv_host_ime_delete_surrounding_window(nativeint host, uint64 token, int start, int ``end``)
 
     [<DllImport(Lib)>]
     extern int rv_ax_text_style_run(
@@ -6733,6 +6752,67 @@ let rv_host_ime_delete_surrounding (host: nativeint, token: uint64, start: int, 
     else
         Raw.rv_host_ime_delete_surrounding (host, token, start, ``end``)
 
+let rv_host_ime_surrounding_window
+    (
+        host: nativeint,
+        max_units: int,
+        buffer: byte[],
+        capacity: int,
+        length: int[],
+        origin: byref<int>,
+        cursor: byref<int>,
+        anchor: byref<int>,
+        state: byref<int>,
+        token: byref<uint64>
+    ) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+
+        let result =
+            Raw.rv_host_ime_surrounding_window (
+                host,
+                max_units,
+                buffer,
+                capacity,
+                length,
+                &origin,
+                &cursor,
+                &anchor,
+                &state,
+                &token
+            )
+
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[352] <- Calls.Counts[352] + 1L
+        Calls.Ticks[352] <- Calls.Ticks[352] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_ime_surrounding_window (
+            host,
+            max_units,
+            buffer,
+            capacity,
+            length,
+            &origin,
+            &cursor,
+            &anchor,
+            &state,
+            &token
+        )
+
+let rv_host_ime_delete_surrounding_window (host: nativeint, token: uint64, start: int, ``end``: int) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_ime_delete_surrounding_window (host, token, start, ``end``)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[353] <- Calls.Counts[353] + 1L
+        Calls.Ticks[353] <- Calls.Ticks[353] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_ime_delete_surrounding_window (host, token, start, ``end``)
+
 let rv_ax_text_style_run
     (
         ax: nativeint,
@@ -6751,8 +6831,8 @@ let rv_ax_text_style_run
             Raw.rv_ax_text_style_run (ax, offset, property, &start, &``end``, buffer, capacity, length)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[352] <- Calls.Counts[352] + 1L
-        Calls.Ticks[352] <- Calls.Ticks[352] + spent
+        Calls.Counts[354] <- Calls.Counts[354] + 1L
+        Calls.Ticks[354] <- Calls.Ticks[354] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -6763,8 +6843,8 @@ let rv_host_acquire_iosurface_frame (host: nativeint, frame: byref<nativeint>) :
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_acquire_iosurface_frame (host, &frame)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[353] <- Calls.Counts[353] + 1L
-        Calls.Ticks[353] <- Calls.Ticks[353] + spent
+        Calls.Counts[355] <- Calls.Counts[355] + 1L
+        Calls.Ticks[355] <- Calls.Ticks[355] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -6775,8 +6855,8 @@ let rv_host_bind_iosurface (host: nativeint, target: nativeint, surface: nativei
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_bind_iosurface (host, target, surface, flipY)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[354] <- Calls.Counts[354] + 1L
-        Calls.Ticks[354] <- Calls.Ticks[354] + spent
+        Calls.Counts[356] <- Calls.Counts[356] + 1L
+        Calls.Ticks[356] <- Calls.Ticks[356] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
