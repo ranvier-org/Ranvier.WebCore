@@ -650,6 +650,7 @@ module Calls =
             "rv_print_pdf_result"
             "rv_host_trace_enable"
             "rv_host_trace_drain"
+            "rv_host_layout_count"
             "rv_host_error_enable"
             "rv_host_error_take"
             "rv_host_set_file_picker_handler"
@@ -2071,6 +2072,9 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_host_trace_drain(nativeint host, nativeint events, int capacity, int& written, uint64& dropped)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_layout_count(nativeint host, uint32& count)
 
     [<DllImport(Lib)>]
     extern int rv_host_error_enable(nativeint host, int enabled)
@@ -6538,13 +6542,25 @@ let rv_host_trace_drain
     else
         Raw.rv_host_trace_drain (host, events, capacity, &written, &dropped)
 
+let rv_host_layout_count (host: nativeint, count: byref<uint32>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_layout_count (host, &count)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[339] <- Calls.Counts[339] + 1L
+        Calls.Ticks[339] <- Calls.Ticks[339] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_layout_count (host, &count)
+
 let rv_host_error_enable (host: nativeint, enabled: int) : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_error_enable (host, enabled)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[339] <- Calls.Counts[339] + 1L
-        Calls.Ticks[339] <- Calls.Ticks[339] + spent
+        Calls.Counts[340] <- Calls.Counts[340] + 1L
+        Calls.Ticks[340] <- Calls.Ticks[340] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -6555,8 +6571,8 @@ let rv_host_error_take (host: nativeint, record: nativeint, present: byref<int>)
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_error_take (host, record, &present)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[340] <- Calls.Counts[340] + 1L
-        Calls.Ticks[340] <- Calls.Ticks[340] + spent
+        Calls.Counts[341] <- Calls.Counts[341] + 1L
+        Calls.Ticks[341] <- Calls.Ticks[341] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -6567,8 +6583,8 @@ let rv_host_set_file_picker_handler (host: nativeint, callback: nativeint, conte
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_set_file_picker_handler (host, callback, context)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[341] <- Calls.Counts[341] + 1L
-        Calls.Ticks[341] <- Calls.Ticks[341] + spent
+        Calls.Counts[342] <- Calls.Counts[342] + 1L
+        Calls.Ticks[342] <- Calls.Ticks[342] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -6579,8 +6595,8 @@ let rv_host_file_picker_available (host: nativeint) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_file_picker_available (host)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[342] <- Calls.Counts[342] + 1L
-        Calls.Ticks[342] <- Calls.Ticks[342] + spent
+        Calls.Counts[343] <- Calls.Counts[343] + 1L
+        Calls.Ticks[343] <- Calls.Ticks[343] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -6591,8 +6607,8 @@ let rv_host_file_picker_filter_count (host: nativeint, request: uint64, kind: in
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_file_picker_filter_count (host, request, kind, &count)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[343] <- Calls.Counts[343] + 1L
-        Calls.Ticks[343] <- Calls.Ticks[343] + spent
+        Calls.Counts[344] <- Calls.Counts[344] + 1L
+        Calls.Ticks[344] <- Calls.Ticks[344] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -6608,8 +6624,8 @@ let rv_host_file_picker_filter
             Raw.rv_host_file_picker_filter (host, request, kind, index, buffer, capacity, length)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[344] <- Calls.Counts[344] + 1L
-        Calls.Ticks[344] <- Calls.Ticks[344] + spent
+        Calls.Counts[345] <- Calls.Counts[345] + 1L
+        Calls.Ticks[345] <- Calls.Ticks[345] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -6625,8 +6641,8 @@ let rv_host_file_picker_complete
             Raw.rv_host_file_picker_complete (host, request, outcome, paths, lengths, count)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[345] <- Calls.Counts[345] + 1L
-        Calls.Ticks[345] <- Calls.Ticks[345] + spent
+        Calls.Counts[346] <- Calls.Counts[346] + 1L
+        Calls.Ticks[346] <- Calls.Ticks[346] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -6650,8 +6666,8 @@ let rv_host_ime_surrounding
             Raw.rv_host_ime_surrounding (host, buffer, capacity, length, &cursor, &anchor, &state, &token)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[346] <- Calls.Counts[346] + 1L
-        Calls.Ticks[346] <- Calls.Ticks[346] + spent
+        Calls.Counts[347] <- Calls.Counts[347] + 1L
+        Calls.Ticks[347] <- Calls.Ticks[347] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -6662,8 +6678,8 @@ let rv_host_ime_delete_surrounding (host: nativeint, token: uint64, start: int, 
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_ime_delete_surrounding (host, token, start, ``end``)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[347] <- Calls.Counts[347] + 1L
-        Calls.Ticks[347] <- Calls.Ticks[347] + spent
+        Calls.Counts[348] <- Calls.Counts[348] + 1L
+        Calls.Ticks[348] <- Calls.Ticks[348] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -6687,8 +6703,8 @@ let rv_ax_text_style_run
             Raw.rv_ax_text_style_run (ax, offset, property, &start, &``end``, buffer, capacity, length)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[348] <- Calls.Counts[348] + 1L
-        Calls.Ticks[348] <- Calls.Ticks[348] + spent
+        Calls.Counts[349] <- Calls.Counts[349] + 1L
+        Calls.Ticks[349] <- Calls.Ticks[349] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -6699,8 +6715,8 @@ let rv_host_acquire_iosurface_frame (host: nativeint, frame: byref<nativeint>) :
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_acquire_iosurface_frame (host, &frame)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[349] <- Calls.Counts[349] + 1L
-        Calls.Ticks[349] <- Calls.Ticks[349] + spent
+        Calls.Counts[350] <- Calls.Counts[350] + 1L
+        Calls.Ticks[350] <- Calls.Ticks[350] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -6711,8 +6727,8 @@ let rv_host_bind_iosurface (host: nativeint, target: nativeint, surface: nativei
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_host_bind_iosurface (host, target, surface, flipY)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[350] <- Calls.Counts[350] + 1L
-        Calls.Ticks[350] <- Calls.Ticks[350] + spent
+        Calls.Counts[351] <- Calls.Counts[351] + 1L
+        Calls.Ticks[351] <- Calls.Ticks[351] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else

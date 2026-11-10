@@ -27,7 +27,13 @@ changes, such as the explicit UTF-8 byte counts on string inputs.
 `rv_abi_has(name)` returns 1 when the loaded library exports and implements the named group, so a newer managed
 package can run against an older host. Names mark the version that added them in the header; examples are
 `accessibility`, `accessibility-events`, `accessibility-text`, `clipboard`, `drag-out`, `host-errors`,
-`host-tracing`, `diagnostics`, `printing-pdf`, `snapshot-options` and `media-preferences`.
+`host-tracing`, `host-layout-metrics`, `diagnostics`, `printing-pdf`, `snapshot-options` and `media-preferences`.
+
+ABI 66 adds `rv_host_layout_count`: completed main-frame layout passes, including subtree layout,
+without flushing pending style/layout. Unlike a trace span around a layout-checking call, a zero counter
+delta means no layout pass completed. It excludes child frames and style-only work, wraps at 32 bits,
+and resets with the frame view. Compare only within one document lifetime. Synchronous geometry getters
+retain their browser semantics.
 
 For deeper queries (is a facility exported, implemented, enabled, permitted, available) use the capability queries
 in `docs/CAPABILITIES.md`. The full set of names is `host/RanvierCapabilityCatalogue.inc`.

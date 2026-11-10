@@ -2827,6 +2827,12 @@ RV_EXPORT int32_t rv_host_trace_enable(RvHost*, int32_t enabled);
  * capacity. Writes the number copied and events dropped since the preceding drain, then clears that count. */
 RV_EXPORT int32_t rv_host_trace_drain(RvHost*, RvHostTraceEvent* events, int32_t capacity, int32_t* written, uint64_t* dropped);
 
+/* Feature "host-layout-metrics". Completed main-frame layout passes, including subtree layouts;
+ * excludes child frames and style-only updates. Observation never flushes pending work.
+ * Owner thread only. Counter wraps modulo 2^32 and resets with the frame view (e.g. navigation).
+ * Compare samples only within one document lifetime. Errors leave count unchanged. */
+RV_EXPORT int32_t rv_host_layout_count(RvHost*, uint32_t* count);
+
 /* Disabled by default. The latest failure after presentation acquisition starts replaces any previous record. Argument,
  * thread and preflight failures use the direct return status only. native_code is the
  * signed D3D11 device removal HRESULT when available, otherwise zero. Taking a record clears it; a transition between

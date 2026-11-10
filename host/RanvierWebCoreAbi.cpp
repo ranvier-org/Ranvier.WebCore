@@ -1985,7 +1985,7 @@ static_assert(sizeof(RvMediaVideoConfiguration) == 64 && offsetof(RvMediaVideoCo
 static_assert(sizeof(RvSnapshotOptions) == 64 && offsetof(RvSnapshotOptions, scale) == 8 && offsetof(RvSnapshotOptions, x) == 24 && offsetof(RvSnapshotOptions, quality) == 64 - 8);
 static_assert(sizeof(RvMediaAudioConfiguration) == 64 && offsetof(RvMediaAudioConfiguration, bitrate) == 40 && offsetof(RvMediaAudioConfiguration, spatial_rendering) == 56);
 
-int32_t rv_abi_version(void) { return 65; }
+int32_t rv_abi_version(void) { return 66; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -1999,6 +1999,8 @@ int32_t rv_abi_has(const char* feature)
 {
     if (!feature)
         return 0;
+    if (!std::strcmp(feature, "host-layout-metrics"))
+        return 1;
     if (!std::strcmp(feature, "host-tracing"))
         return 1;
     if (!std::strcmp(feature, "host-errors"))
@@ -5375,6 +5377,19 @@ int32_t rv_host_set_frame_callback(RvHost* host, RvFrameCallback callback, void*
     // A page that already wants a frame asks for it at once.
     if (host->updateWanted || !host->dirty.isEmpty())
         host->requestFrame();
+    return RV_OK;
+}
+
+int32_t rv_host_layout_count(RvHost* host, uint32_t* count)
+{
+    if (!host || !count)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_DETACHED;
+    auto* view = host->frame().view();
+    *count = view ? view->layoutUpdateCount() : 0;
     return RV_OK;
 }
 

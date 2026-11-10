@@ -49,6 +49,7 @@ PROBES = [
       for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],
     *[probe('Verify host tracing, deferred rendering teardown, partial repaints, GPU painting and compositor paths',
             'python -I tests/abi/host_tracing.py {native}',
+            'python -I tests/abi/layout_phase_trace.py {native}',
             'python -I tests/abi/host_error_lifetime.py {native}',
             'python -I tests/abi/partial_repaint.py {native}',
             'python -I tests/abi/gpu_painting.py {native}',

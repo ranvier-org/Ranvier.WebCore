@@ -96,6 +96,8 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
         return "int64&", ""
     if ctype == "RvBlob* const*":
         return "nativeint[]", "[<In>] "
+    if ctype == "uint32_t*":
+        return "uint32&", ""
     if ctype == "uint64_t*":
         return "uint64&", ""
     if ctype == "float":
