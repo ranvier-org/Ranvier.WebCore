@@ -2846,7 +2846,14 @@ RV_EXPORT int32_t rv_host_layout_count(RvHost*, uint32_t* count);
  * across resize generations; process-wide 256 MiB accounted output color/depth + input cache storage cap
  * (excludes driver overhead, WebCore backing stores and legacy allocations). Preserve the previous image on
  * RV_NOT_READY; retry on a subsequent scheduled frame, never spin or fall back to CPU for congestion.
- * RV_ERR_DEVICE_LOST requires rebuilding the consumer device and configuring again after releasing leases. */
+ * RV_ERR_DEVICE_LOST requires rebuilding the consumer device and configuring again after releasing leases.
+ * v69 extends this capability to EGL/ANGLE-Metal only with EGL_KHR_fence_sync. Linux consumer_device is the
+ * current EGLContext on the configured EGLDisplay; keep it alive through all frame releases. macOS uses a
+ * nonnull consumer queue identity (borrowed, not dereferenced); the caller MUST prove Metal reads completed
+ * before rv_gpu_frame_release. Linux release inserts a consumer fence without waiting. These backends
+ * require recreating the host after device/context loss. Unproved failed fences retain their budget charge.
+ * External image bindings retain the legacy completed-read contract: submit returns UNSUPPORTED for them.
+ * Legacy glFinish paths remain unchanged. SDL/window presentation can still block in platform drivers. */
 RV_EXPORT int32_t rv_host_configure_gpu_pipeline(RvHost*, void* consumer_device);
 RV_EXPORT int32_t rv_host_submit_gpu_frame(RvHost*, uint64_t frame_id);
 RV_EXPORT int32_t rv_host_try_acquire_completed_gpu_frame(RvHost*, uint64_t* frame_id, RvGpuFrame** frame);

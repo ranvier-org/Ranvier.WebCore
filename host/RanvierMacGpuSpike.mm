@@ -14,10 +14,15 @@
 #include <cstring>
 #include <limits>
 #include <string>
+#include "RanvierGpuMemoryBudget.h"
+#include <utility>
 
 namespace {
 EGLDisplay display { EGL_NO_DISPLAY };
 std::string identity;
+auto createSync = reinterpret_cast<PFNEGLCREATESYNCKHRPROC>(eglGetProcAddress("eglCreateSyncKHR"));
+auto waitSync = reinterpret_cast<PFNEGLCLIENTWAITSYNCKHRPROC>(eglGetProcAddress("eglClientWaitSyncKHR"));
+auto destroySync = reinterpret_cast<PFNEGLDESTROYSYNCKHRPROC>(eglGetProcAddress("eglDestroySyncKHR"));
 
 bool extension(const char* extensions, const char* name)
 {
@@ -60,11 +65,15 @@ struct RvMacSpikeSurface::State {
     int width { 0 };
     int height { 0 };
     bool bound { false };
+    EGLSyncKHR fence { EGL_NO_SYNC_KHR };
+    size_t charge { 0 };
     bool (*makeCurrent)() { nullptr };
 
     ~State()
     {
         if (makeCurrent && makeCurrent()) {
+            if (fence != EGL_NO_SYNC_KHR)
+                destroySync(display, fence);
             if (bound)
                 eglReleaseTexImage(display, eglSurface, EGL_BACK_BUFFER);
             glDeleteFramebuffers(1, &target);
@@ -75,6 +84,7 @@ struct RvMacSpikeSurface::State {
             eglDestroySurface(display, eglSurface);
         if (ioSurface)
             CFRelease(ioSurface);
+        RvGpuMemoryBudget::release(charge);
     }
 };
 
@@ -82,7 +92,7 @@ RvMacSpikeSurface::RvMacSpikeSurface(std::unique_ptr<State> value)
     : state(std::move(value)) { }
 RvMacSpikeSurface::~RvMacSpikeSurface() = default;
 
-std::unique_ptr<RvMacSpikeSurface> RvMacSpikeSurface::create(int width, int height, bool (*makeCurrent)())
+std::unique_ptr<RvMacSpikeSurface> RvMacSpikeSurface::create(int width, int height, bool (*makeCurrent)(), bool bounded)
 {
     if (width <= 0 || height <= 0 || width > std::numeric_limits<int>::max() / 4
         || !makeCurrent || !makeCurrent() || !rvMacSpikeDisplay())
@@ -114,6 +124,13 @@ std::unique_ptr<RvMacSpikeSurface> RvMacSpikeSurface::create(int width, int heig
     value->width = width;
     value->height = height;
     value->makeCurrent = makeCurrent;
+    if (bounded) {
+        if (!supportsPipeline() || rowBytes / 4 > std::numeric_limits<int>::max())
+            return nullptr;
+        value->charge = RvGpuMemoryBudget::acquire(static_cast<int>(rowBytes / 4), height, 8);
+        if (!value->charge)
+            return nullptr;
+    }
     @autoreleasepool {
         NSDictionary* properties = @{
             (__bridge id)kIOSurfaceWidth: @(width), (__bridge id)kIOSurfaceHeight: @(height),
@@ -173,6 +190,44 @@ bool RvMacSpikeSurface::finishProducer()
     bool released = eglReleaseTexImage(display, state->eglSurface, EGL_BACK_BUFFER);
     state->bound = !released;
     return released;
+}
+
+bool RvMacSpikeSurface::supportsPipeline()
+{
+    return rvMacSpikeDisplay() && createSync && waitSync && destroySync
+        && extension(eglQueryString(display, EGL_EXTENSIONS), "EGL_KHR_fence_sync");
+}
+bool RvMacSpikeSurface::matches(int width, int height) const { return state->width == width && state->height == height; }
+bool RvMacSpikeSurface::beginProducer()
+{
+    if (!state->makeCurrent())
+        return false;
+    if (!state->bound) {
+        glBindTexture(GL_TEXTURE_2D, state->texture);
+        state->bound = eglBindTexImage(display, state->eglSurface, EGL_BACK_BUFFER);
+    }
+    return state->bound && glGetError() == GL_NO_ERROR;
+}
+bool RvMacSpikeSurface::submitProducer(void*)
+{
+    state->fence = createSync(display, EGL_SYNC_FENCE_KHR, nullptr);
+    glFlush();
+    return state->fence != EGL_NO_SYNC_KHR && glGetError() == GL_NO_ERROR;
+}
+int RvMacSpikeSurface::producerReady()
+{
+    if (state->fence == EGL_NO_SYNC_KHR)
+        return -1;
+    auto status = waitSync(display, state->fence, 0, 0);
+    if (status == EGL_TIMEOUT_EXPIRED_KHR)
+        return 1;
+    if (status != EGL_CONDITION_SATISFIED_KHR || !state->makeCurrent())
+        return -1;
+    if (!eglReleaseTexImage(display, state->eglSurface, EGL_BACK_BUFFER))
+        return -1;
+    state->bound = false;
+    destroySync(display, std::exchange(state->fence, EGL_NO_SYNC_KHR));
+    return 0;
 }
 
 const char* rvMacSpikeIdentity()

@@ -6,6 +6,7 @@
 #include <epoxy/gl.h>
 #include <WebCore/GLContext.h>
 #include <utility>
+#include "RanvierGpuMemoryBudget.h"
 
 RvEGLContextScope::RvEGLContextScope()
     : display(eglGetCurrentDisplay()), context(eglGetCurrentContext())
@@ -47,6 +48,9 @@ struct RvEGLSurface::State {
     int width { 0 };
     int height { 0 };
     bool acquired { false };
+    EGLSyncKHR producerFence { EGL_NO_SYNC_KHR };
+    EGLSyncKHR consumerFence { EGL_NO_SYNC_KHR };
+    size_t charge { 0 };
     EGLContext consumerContext { EGL_NO_CONTEXT };
     bool (*makeCurrent)() { nullptr };
 
@@ -55,11 +59,16 @@ struct RvEGLSurface::State {
         RvEGLContextScope scope;
         if (!makeCurrent || !makeCurrent())
             return;
+        if (producerFence != EGL_NO_SYNC_KHR)
+            eglDestroySyncKHR(display, producerFence);
+        if (consumerFence != EGL_NO_SYNC_KHR)
+            eglDestroySyncKHR(display, consumerFence);
         if (image != EGL_NO_IMAGE_KHR)
             eglDestroyImageKHR(display, image);
         glDeleteFramebuffers(1, &framebuffer);
         glDeleteRenderbuffers(1, &depthStencil);
         glDeleteTextures(1, &texture);
+        RvGpuMemoryBudget::release(charge);
     }
 };
 
@@ -67,7 +76,7 @@ RvEGLSurface::RvEGLSurface(std::unique_ptr<State> state)
     : state(std::move(state)) { }
 RvEGLSurface::~RvEGLSurface() = default;
 
-std::shared_ptr<RvEGLSurface> RvEGLSurface::create(int width, int height, bool (*makeCurrent)())
+std::shared_ptr<RvEGLSurface> RvEGLSurface::create(int width, int height, bool (*makeCurrent)(), bool bounded)
 {
     RvEGLContextScope scope;
     auto state = std::make_unique<State>();
@@ -77,6 +86,11 @@ std::shared_ptr<RvEGLSurface> RvEGLSurface::create(int width, int height, bool (
     state->display = eglGetCurrentDisplay();
     state->width = width;
     state->height = height;
+    if (bounded) {
+        state->charge = RvGpuMemoryBudget::acquire(width, height, 8);
+        if (!state->charge || !supportsPipeline(state->display))
+            return nullptr;
+    }
     if (!epoxy_has_egl_extension(state->display, "EGL_KHR_image_base")
         || !epoxy_has_egl_extension(state->display, "EGL_KHR_gl_texture_2D_image"))
         return nullptr;
@@ -117,16 +131,59 @@ bool RvEGLSurface::finishProducer(void* consumerContext)
     return true;
 }
 void RvEGLSurface::cancelProducer() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
-bool RvEGLSurface::releaseConsumer()
+bool RvEGLSurface::releaseConsumer(bool nonblocking)
 {
     if (!state->acquired || eglGetCurrentDisplay() != state->display || eglGetCurrentContext() != state->consumerContext)
         return false;
+    if (nonblocking) {
+        state->consumerFence = eglCreateSyncKHR(state->display, EGL_SYNC_FENCE_KHR, nullptr);
+        glFlush();
+        if (state->consumerFence == EGL_NO_SYNC_KHR || glGetError() != GL_NO_ERROR)
+            return false;
+        state->acquired = false;
+        return true;
+    }
     glFinish();
     if (glGetError() != GL_NO_ERROR)
         return false;
     state->acquired = false;
     return true;
 }
+bool RvEGLSurface::supportsPipeline(void* display)
+{
+    return display && epoxy_has_egl_extension(display, "EGL_KHR_fence_sync");
+}
+bool RvEGLSurface::submitProducer(void* consumerContext)
+{
+    state->consumerContext = consumerContext;
+    state->producerFence = eglCreateSyncKHR(state->display, EGL_SYNC_FENCE_KHR, nullptr);
+    glFlush();
+    return state->producerFence != EGL_NO_SYNC_KHR && glGetError() == GL_NO_ERROR;
+}
+static int pollFence(EGLDisplay display, EGLSyncKHR& fence)
+{
+    if (fence == EGL_NO_SYNC_KHR)
+        return -1;
+    auto status = eglClientWaitSyncKHR(display, fence, 0, 0);
+    if (status == EGL_TIMEOUT_EXPIRED_KHR)
+        return 1;
+    if (status != EGL_CONDITION_SATISFIED_KHR)
+        return -1;
+    eglDestroySyncKHR(display, std::exchange(fence, EGL_NO_SYNC_KHR));
+    return 0;
+}
+int RvEGLSurface::producerReady()
+{
+    auto result = pollFence(state->display, state->producerFence);
+    if (!result)
+        state->acquired = true;
+    return result;
+}
+int RvEGLSurface::retirementReady()
+{
+    return pollFence(state->display, state->consumerFence);
+}
+void RvEGLSurface::discardReady() { state->acquired = false; }
 unsigned RvEGLSurface::framebuffer() const { return state->framebuffer; }
 void* RvEGLSurface::image() const { return state->image; }
 int RvEGLSurface::width() const { return state->width; }

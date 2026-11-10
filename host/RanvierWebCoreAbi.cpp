@@ -269,6 +269,15 @@
 #include "RanvierWebCoreD3D11.h"
 #include "RanvierD3D11Pipeline.h"
 #endif
+#if defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE)
+#include "RanvierPortablePipeline.h"
+#if defined(__linux__)
+using RvPlatformSurface = RvEGLSurface;
+#else
+using RvPlatformSurface = RvMacSpikeSurface;
+#endif
+using RvPlatformPipeline = RvPortablePipeline<RvPlatformSurface>;
+#endif
 #endif
 
 using namespace WebCore;
@@ -1071,6 +1080,9 @@ struct RvHost {
     std::shared_ptr<RvD3D11Pipeline> framePipeline;
 #elif defined(__linux__)
     std::shared_ptr<RvEGLSurface> presentationSurface;
+#endif
+#if defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE)
+    std::shared_ptr<RvPlatformPipeline> framePipeline;
 #endif
 #endif
     float deviceScale { 1 };
@@ -2000,7 +2012,7 @@ static_assert(sizeof(RvMediaVideoConfiguration) == 64 && offsetof(RvMediaVideoCo
 static_assert(sizeof(RvSnapshotOptions) == 64 && offsetof(RvSnapshotOptions, scale) == 8 && offsetof(RvSnapshotOptions, x) == 24 && offsetof(RvSnapshotOptions, quality) == 64 - 8);
 static_assert(sizeof(RvMediaAudioConfiguration) == 64 && offsetof(RvMediaAudioConfiguration, bitrate) == 40 && offsetof(RvMediaAudioConfiguration, spatial_rendering) == 56);
 
-int32_t rv_abi_version(void) { return 68; }
+int32_t rv_abi_version(void) { return 69; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -2017,6 +2029,10 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "gpu-frame-pipeline-v1")) {
 #if defined(_WIN32) && RANVIER_COMPOSITING
         return 1;
+#elif defined(__linux__) && RANVIER_COMPOSITING
+        return onOwningThread() && RvEGLSurface::supportsPipeline(configuredEGLDisplay);
+#elif defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+        return onOwningThread() && RvMacSpikeSurface::supportsPipeline();
 #else
         return 0;
 #endif
@@ -2766,7 +2782,7 @@ int32_t rv_host_load_html(RvHost* host, const uint8_t* html, int32_t html_length
     if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
         return RV_ERR_DETACHED;
     host->documentTransaction = RvHost::DocumentTransaction::Replacing;
-#if defined(_WIN32) && RANVIER_COMPOSITING
+#if (defined(_WIN32) || defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE)) && RANVIER_COMPOSITING
     if (host->framePipeline)
         ++host->framePipeline->generation;
 #endif
@@ -2801,7 +2817,7 @@ int32_t rv_host_load_svg(RvHost* host, const uint8_t* svg, int32_t svg_length)
     if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
         return RV_ERR_DETACHED;
     host->documentTransaction = RvHost::DocumentTransaction::Replacing;
-#if defined(_WIN32) && RANVIER_COMPOSITING
+#if (defined(_WIN32) || defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE)) && RANVIER_COMPOSITING
     if (host->framePipeline)
         ++host->framePipeline->generation;
 #endif
@@ -3270,8 +3286,12 @@ struct RvGpuFrame {
     int slot { -1 };
 #elif defined(__linux__) && RANVIER_COMPOSITING
     std::shared_ptr<RvEGLSurface> surface;
+    std::shared_ptr<RvPlatformPipeline> pipeline;
+    int slot { -1 };
 #elif defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
     std::unique_ptr<RvMacSpikeFrame> macFrame;
+    std::shared_ptr<RvPlatformPipeline> pipeline;
+    int slot { -1 };
 #endif
 };
 
@@ -3595,6 +3615,14 @@ int32_t rv_gpu_frame_info(RvGpuFrame* frame, void** texture, int32_t* width, int
     *format = RV_GPU_RGBA8_PREMULTIPLIED;
     return RV_OK;
 #elif defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+    if (frame->pipeline) {
+        auto& surface = frame->pipeline->surfaces[frame->slot];
+        *texture = surface->surface();
+        *width = surface->width();
+        *height = surface->height();
+        *format = RV_GPU_BGRA8_PREMULTIPLIED;
+        return RV_OK;
+    }
     auto result = rv_mac_spike_frame_info(frame->macFrame.get(), texture, width, height);
     if (result == RV_OK)
         *format = RV_GPU_BGRA8_PREMULTIPLIED;
@@ -3617,12 +3645,18 @@ int32_t rv_gpu_frame_release(RvGpuFrame* frame)
     delete frame;
     return released ? RV_OK : RV_ERR_PAINT_FAILED;
 #elif defined(__linux__) && RANVIER_COMPOSITING
-    bool released = frame->surface->releaseConsumer();
+    bool released = frame->surface->releaseConsumer(!!frame->pipeline);
     if (!released)
         return RV_ERR_PAINT_FAILED;
+    if (frame->pipeline)
+        frame->pipeline->state.retire(frame->slot);
     delete frame;
     return RV_OK;
 #elif defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+    if (frame->pipeline) {
+        frame->pipeline->state.retire(frame->slot);
+        frame->pipeline->state.recycle(frame->slot);
+    }
     delete frame;
     return RV_OK;
 #else

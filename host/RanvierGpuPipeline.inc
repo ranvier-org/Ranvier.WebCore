@@ -11,6 +11,8 @@ static int32_t validateGpuPipelineHost(RvHost* host)
     return RV_OK;
 }
 
+#include "RanvierPortablePipeline.inc"
+
 int32_t rv_host_configure_gpu_pipeline(RvHost* host, void* consumerDevice)
 {
     auto valid = validateGpuPipelineHost(host);
@@ -43,6 +45,8 @@ int32_t rv_host_configure_gpu_pipeline(RvHost* host, void* consumerDevice)
     }
     pipeline.device = device;
     return RV_OK;
+#elif RANVIER_COMPOSITING && (defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE))
+    return configurePortablePipeline(host, consumerDevice);
 #else
     return RV_ERR_UNSUPPORTED;
 #endif
@@ -136,6 +140,8 @@ int32_t rv_host_submit_gpu_frame(RvHost* host, uint64_t frameId)
     if (finishDocumentTransaction(host) != RV_OK)
         return RV_ERR_DETACHED;
     return result;
+#elif RANVIER_COMPOSITING && (defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE))
+    return submitPortableFrame(host, frameId);
 #else
     return RV_ERR_UNSUPPORTED;
 #endif
@@ -174,6 +180,8 @@ int32_t rv_host_try_acquire_completed_gpu_frame(RvHost* host, uint64_t* frameId,
     *frameId = pipeline->state.slots[newest].id;
     *frame = new RvGpuFrame { pipeline->surfaces[newest], pipeline, newest };
     return RV_OK;
+#elif RANVIER_COMPOSITING && (defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE))
+    return acquirePortableFrame(host, frameId, frame);
 #else
     return RV_ERR_UNSUPPORTED;
 #endif

@@ -35,10 +35,17 @@ const char* rvMacSpikeIdentity();
 
 class RvMacSpikeSurface {
 public:
-    static std::unique_ptr<RvMacSpikeSurface> create(int width, int height, bool (*makeCurrent)());
+    static std::unique_ptr<RvMacSpikeSurface> create(int width, int height, bool (*makeCurrent)(), bool bounded = false);
+    static bool supportsPipeline();
     ~RvMacSpikeSurface();
     unsigned framebuffer() const;
     bool finishProducer();
+    bool beginProducer();
+    bool submitProducer(void*);
+    int producerReady();
+    int retirementReady() { return 0; } // Caller releases only after its Metal completion proof.
+    void discardReady() { }
+    bool matches(int width, int height) const;
     void* surface() const;
     int width() const;
     int height() const;

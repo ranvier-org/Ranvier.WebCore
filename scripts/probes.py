@@ -29,6 +29,8 @@ def probe(name, *commands, rid=None, flavor=('slim', 'gpu'), timeout=TIMEOUT, en
 
 PROBES = [
     probe('Verify macOS public IOSurface frames and native texture input',
+          'python -I tests/gpu/pipeline_state.py',
+          'python -I tests/gpu/mac/pipeline.py {native}',
           'python -I tests/gpu/mac/qualify_package.py --native-directory {native} --output {work}/mac-gpu-public-qualification',
           rid='osx-arm64', flavor='gpu', timeout=900),
     probe('Verify Windows native owner-thread exit and font timer teardown',
@@ -114,6 +116,7 @@ PROBES = [
       for rid in ['linux-x64', 'linux-arm64']],
     *[probe('Verify Linux shared EGLImage frames and retained lifetimes',
             'python -I tests/gpu/linux_egl.py {native}/libRanvierWebCoreHost.so',
+            'python -I tests/gpu/linux_egl.py {native}/libRanvierWebCoreHost.so --pipeline',
             'python -I tests/gpu/linux_egl.py {native}/libRanvierWebCoreHost.so --context-lifecycle',
             'python -I tests/gpu/linux_egl_teardown.py {native}/libRanvierWebCoreHost.so',
             'python -I tests/gpu/linux_egl_teardown.py {native}/libRanvierWebCoreHost.so --wrong-context',

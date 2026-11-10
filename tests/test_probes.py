@@ -271,12 +271,13 @@ class WorkflowTests(unittest.TestCase):
             selected = [entry for entry in probes.PROBES if probes.applies(entry, rid, 'gpu')]
             frames = [entry for entry in selected if any('tests/gpu/linux_egl.py' in command for command in entry['commands'])]
             self.assertEqual(len(frames), 1, rid)
-            self.assertEqual(len(frames[0]['commands']), 4, rid)
+            self.assertEqual(len(frames[0]['commands']), 5, rid)
             self.assertIn(probes.NATIVE + '/libRanvierWebCoreHost.so', frames[0]['commands'][0])
             self.assertNotIn('--context-lifecycle', frames[0]['commands'][0])
-            self.assertEqual(frames[0]['commands'][1], frames[0]['commands'][0] + ' --context-lifecycle')
-            self.assertIn('linux_egl_teardown.py', frames[0]['commands'][2])
-            self.assertEqual(frames[0]['commands'][3], frames[0]['commands'][2] + ' --wrong-context')
+            self.assertEqual(frames[0]['commands'][1], frames[0]['commands'][0] + ' --pipeline')
+            self.assertEqual(frames[0]['commands'][2], frames[0]['commands'][0] + ' --context-lifecycle')
+            self.assertIn('linux_egl_teardown.py', frames[0]['commands'][3])
+            self.assertEqual(frames[0]['commands'][4], frames[0]['commands'][3] + ' --wrong-context')
             self.assertEqual(frames[0]['env'], {'EGL_PLATFORM': 'surfaceless', 'LIBGL_ALWAYS_SOFTWARE': '1'})
             self.assertFalse(probes.applies(frames[0], rid, 'slim'))
             self.assertFalse(probes.applies(frames[0], 'win-x64', 'gpu'))
