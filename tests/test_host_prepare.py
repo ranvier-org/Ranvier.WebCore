@@ -97,6 +97,10 @@ class HostPrepare(unittest.TestCase):
                 '#define USE(feature) USE_##feature\n#define ENABLE(feature) 0\n#define PLATFORM(feature) 0\n'
                 'int ranvier_dom_has(const char*) { return 0; }\n'
                 'int ranvier_print_pdf_supported() { return PRINT_SUPPORTED; }\n'
+                'bool onOwningThread() { return true; }\n'
+                'void* configuredEGLDisplay = nullptr;\n'
+                'struct RvEGLSurface { static bool supportsPipeline(void*) { return false; } };\n'
+                'struct RvMacSpikeSurface { static bool supportsPipeline() { return false; } };\n'
                 'int32_t rv_abi_has(const char* feature)'+capability+'\n}\n'
                 'int main() { return rv_abi_has("view-transitions") != EXPECT_SUPPORTED || '
                 'rv_abi_has("printing-pdf") != PRINT_SUPPORTED; }\n')

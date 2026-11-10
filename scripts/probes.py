@@ -29,6 +29,8 @@ def probe(name, *commands, rid=None, flavor=('slim', 'gpu'), timeout=TIMEOUT, en
 
 PROBES = [
     probe('Verify macOS public IOSurface frames and native texture input',
+          'python -I tests/gpu/pipeline_state.py',
+          'python -I tests/gpu/mac/pipeline.py {native}',
           'python -I tests/gpu/mac/qualify_package.py --native-directory {native} --output {work}/mac-gpu-public-qualification',
           rid='osx-arm64', flavor='gpu', timeout=900),
     probe('Verify Windows native owner-thread exit and font timer teardown',
@@ -38,6 +40,9 @@ PROBES = [
             'python -I tests/abi/ime_surrounding.py --native-directory {native}',
             'python -I tests/abi/ime_surrounding_delete.py --native-directory {native}', rid=rid, flavor=None)
       for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],
+    *[probe('Verify bounded IME control context and stale deletion',
+            'python -I tests/abi/ime_surrounding_window.py --native-directory {native}', rid=rid, flavor=None)
+      for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64', 'osx-arm64']],
     *[probe('Verify surrounding deletion undo and redo preserve selected composition',
             'python -I tests/abi/ime_surrounding_history.py --native-directory {native}', rid=rid, flavor=None)
       for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],
@@ -48,7 +53,9 @@ PROBES = [
             'python -I tests/abi/file_picker.py --native-directory {native}', rid=rid, flavor=None)
       for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],
     *[probe('Verify host tracing, deferred rendering teardown, partial repaints, GPU painting and compositor paths',
+            'python -I tests/gpu/pipeline_state.py',
             'python -I tests/abi/host_tracing.py {native}',
+            'python -I tests/abi/layout_phase_trace.py {native}',
             'python -I tests/abi/host_error_lifetime.py {native}',
             'python -I tests/abi/partial_repaint.py {native}',
             'python -I tests/abi/gpu_painting.py {native}',
@@ -109,6 +116,8 @@ PROBES = [
       for rid in ['linux-x64', 'linux-arm64']],
     *[probe('Verify Linux shared EGLImage frames and retained lifetimes',
             'python -I tests/gpu/linux_egl.py {native}/libRanvierWebCoreHost.so',
+            'python -I tests/gpu/linux_egl.py {native}/libRanvierWebCoreHost.so --pipeline',
+            'python -I tests/gpu/egl_extension_matrix.py',
             'python -I tests/gpu/linux_egl.py {native}/libRanvierWebCoreHost.so --context-lifecycle',
             'python -I tests/gpu/linux_egl_teardown.py {native}/libRanvierWebCoreHost.so',
             'python -I tests/gpu/linux_egl_teardown.py {native}/libRanvierWebCoreHost.so --wrong-context',
@@ -271,6 +280,12 @@ PROBES = [
           'python -I -X utf8 tests/abi/mutation_observation.py --native-directory {native}', flavor=None),
     probe('Verify media capability queries, their delivery and teardown against the Chromium oracle',
           'python -I -X utf8 tests/abi/media_capabilities.py --native-directory {native}'),
+    probe('Verify detached image encoding on worker threads',
+          'python -I tests/abi/detached_encoding.py {native}'),
+    probe('Verify snapshot bounds precede allocation and rasterization',
+          'python -I tests/abi/bounded_capture.py {native}'),
+    probe('Measure capture allocation raster encoding and copy phases',
+          'python -I tests/abi/capture_costs.py {native}'),
     probe('Verify snapshot scale, crop, color space, encodings and delivery',
           'python -I -X utf8 tests/abi/snapshot_options.py --native-directory {native}'),
     probe('Verify form submission keeps the host document',

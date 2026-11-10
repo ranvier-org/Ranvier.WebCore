@@ -1,0 +1,12 @@
+diff --git a/Source/WebCore/loader/EmptyClients.h b/Source/WebCore/loader/EmptyClients.h
+--- a/Source/WebCore/loader/EmptyClients.h
++++ b/Source/WebCore/loader/EmptyClients.h
+@@ -73,7 +73,7 @@
+     bool canTakeFocus(FocusDirection) const final { return false; }
+     void takeFocus(FocusDirection) final { }
+ 
+-    void focusedElementChanged(Element*, LocalFrame*, FocusOptions, BroadcastFocusedElement) final { }
++    void focusedElementChanged(Element*, LocalFrame*, FocusOptions, BroadcastFocusedElement) override { }
+     void focusedFrameChanged(Frame*) final { }
+ 
+     RefPtr<Page> createWindow(LocalFrame&, const String&, const WindowFeatures&, const NavigationAction&) final;

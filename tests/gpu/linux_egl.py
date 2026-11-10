@@ -3,10 +3,14 @@ import argparse
 import ctypes as C
 import json
 import threading
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 parser = argparse.ArgumentParser()
 parser.add_argument("runtime")
 parser.add_argument("--context-lifecycle", action="store_true")
+parser.add_argument("--pipeline", action="store_true")
 args = parser.parse_args()
 runtime = C.CDLL(args.runtime)
 assert hasattr(runtime, "rv_configure_egl_display"), "Linux EGL display configuration is missing"
@@ -106,6 +110,30 @@ if args.context_lifecycle:
 html = b"<style>html,body{margin:0;background:rgb(17,34,51)}div{width:30px;height:20px;background:rgb(221,17,34);transform:translate3d(7px,9px,0)}</style><div id=box></div>"
 assert load(host, html, len(html)) == 0
 assert update(host) == 0
+if args.pipeline:
+    from portable_pipeline import exercise
+    def inspect(frame, expected_width, expected_height):
+        image, width, height, format_ = ptr(), integer(), integer(), integer()
+        assert info(frame, C.byref(image), C.byref(width), C.byref(height), C.byref(format_)) == 0
+        assert (width.value, height.value, format_.value) == (expected_width, expected_height, 1)
+        assert make_current(display, None, None, context)
+        texture, framebuffer = uint(), uint()
+        gen_texture(1, C.byref(texture))
+        bind_texture(0x0DE1, texture)
+        image_target(0x0DE1, image)
+        gen_fbo(1, C.byref(framebuffer))
+        bind_fbo(0x8D40, framebuffer)
+        attach(0x8D40, 0x8CE0, 0x0DE1, texture, 0)
+        pixel = (C.c_ubyte * 4)()
+        read(0, 0, 1, 1, 0x1908, 0x1401, pixel)
+        assert list(pixel) == [17, 34, 51, 255], list(pixel)
+        bind(gl, "glDeleteFramebuffers", None, integer, C.POINTER(uint))(1, C.byref(framebuffer))
+        bind(gl, "glDeleteTextures", None, integer, C.POINTER(uint))(1, C.byref(texture))
+    assert make_current(display, None, None, context)
+    def activate():
+        assert make_current(display, None, None, context)
+    exercise(runtime, host, context, inspect, activate)
+    raise SystemExit(0)
 element = bind(runtime, "rv_document_get_element_by_id", ptr, ptr, C.c_char_p, integer)(host, b"box", 3)
 style_buffer, style_length = C.create_string_buffer(128), integer()
 assert bind(runtime, "rv_element_computed_style", integer, ptr, C.c_char_p, ptr, integer, C.POINTER(integer))(

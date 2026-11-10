@@ -24,7 +24,7 @@ on:
         default: false
 
 concurrency:
-  group: ${{ format('{0}-{1}-{2}', github.workflow, github.ref, inputs.flavor || 'slim') }}
+  group: ${{ format('{0}-{1}-{2}-{3}', github.workflow, github.ref, inputs.flavor || 'slim', inputs.rids || 'all') }}
   cancel-in-progress: true
 
 jobs:
@@ -44,6 +44,7 @@ jobs:
       - run: python -I tests/test_release.py
       - run: python -I tests/test_publish_gate.py
       - run: python -I tests/test_probes.py
+      - run: python -I tests/gpu/egl_consumer_fence.py
       - run: python -I tests/test_abi_cohort_entry.py
       - run: python -I tests/test_abi_driver_workspace.py
       - run: python -I tests/abi/test_abi_expectation.py

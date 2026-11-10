@@ -1,4 +1,5 @@
 #include "RanvierWebCoreD3D11.h"
+#include "RanvierGpuRetirement.h"
 #if defined(_WIN32) && RANVIER_COMPOSITING
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -31,7 +32,8 @@ struct RvD3D11Surface::State {
     GLuint depthStencil { 0 };
     int width { 0 };
     int height { 0 };
-    enum class Owner { None, Producer, Consumer, Failed } owner { Owner::None };
+    size_t accountedBytes { 0 };
+    enum class Owner { None, Producer, Pending, Consumer, Retiring, Failed } owner { Owner::None };
 
     bool healthy() const
     {
@@ -53,7 +55,9 @@ struct RvD3D11Surface::State {
             glDeleteTextures(1, &texture);
             if (image != EGL_NO_IMAGE_KHR)
                 destroyImage(display, image);
+            glFlush();
         }
+        RvGpuRetirement::retire(accountedBytes, producerDevice.Get(), producerTexture.Get(), consumerDevice.Get(), consumerTexture.Get());
         // D3D11 defers resource destruction until Flush, including a shared texture whose open failed.
         // Drop every resource interface first; otherwise repeated failed acquires retain kernel handles.
         consumerMutex.Reset();
@@ -72,11 +76,17 @@ RvD3D11Surface::RvD3D11Surface(std::unique_ptr<State> state)
     : state(std::move(state)) { }
 RvD3D11Surface::~RvD3D11Surface() = default;
 
-std::shared_ptr<RvD3D11Surface> RvD3D11Surface::create(void* consumer, int width, int height, bool (*makeCurrent)())
+std::shared_ptr<RvD3D11Surface> RvD3D11Surface::create(void* consumer, int width, int height, bool (*makeCurrent)(), bool bounded)
 {
     if (!consumer || width <= 0 || height <= 0 || !makeCurrent || !makeCurrent())
         return nullptr;
+    RvGpuRetirement::collect();
     auto state = std::make_unique<State>();
+    if (bounded) {
+        state->accountedBytes = RvGpuMemoryBudget::acquire(width, height, 8);
+        if (!state->accountedBytes)
+            return nullptr;
+    }
     state->makeCurrent = makeCurrent;
     state->display = eglGetCurrentDisplay();
     auto queryDisplay = reinterpret_cast<PFNEGLQUERYDISPLAYATTRIBEXTPROC>(eglGetProcAddress("eglQueryDisplayAttribEXT"));
@@ -186,13 +196,72 @@ void RvD3D11Surface::cancelProducer()
         state->owner = SUCCEEDED(state->producerMutex->ReleaseSync(0)) ? State::Owner::None : State::Owner::Failed;
     }
 }
-bool RvD3D11Surface::releaseConsumer()
+bool RvD3D11Surface::releaseConsumer(bool retiring)
 {
     if (state->owner != State::Owner::Consumer)
         return false;
     state->consumerContext->Flush();
-    state->owner = SUCCEEDED(state->consumerMutex->ReleaseSync(0)) ? State::Owner::None : State::Owner::Failed;
-    return state->owner == State::Owner::None;
+    state->owner = SUCCEEDED(state->consumerMutex->ReleaseSync(0))
+        ? (retiring ? State::Owner::Retiring : State::Owner::None) : State::Owner::Failed;
+    return state->owner != State::Owner::Failed;
+}
+
+RvGpuReadiness RvD3D11Surface::tryBeginProducer()
+{
+    if (!available() || !state->healthy() || !state->makeCurrent())
+        return RvGpuReadiness::Failed;
+    auto result = state->producerMutex->AcquireSync(0, 0);
+    if (result == WAIT_TIMEOUT)
+        return RvGpuReadiness::NotReady;
+    if (result != S_OK) {
+        state->owner = State::Owner::Failed;
+        return RvGpuReadiness::Failed;
+    }
+    state->owner = State::Owner::Producer;
+    return RvGpuReadiness::Ready;
+}
+
+bool RvD3D11Surface::submitProducer()
+{
+    if (state->owner != State::Owner::Producer)
+        return false;
+    glFlush();
+    if (glGetError() != GL_NO_ERROR) {
+        cancelProducer();
+        return false;
+    }
+    state->owner = SUCCEEDED(state->producerMutex->ReleaseSync(1)) ? State::Owner::Pending : State::Owner::Failed;
+    return state->owner == State::Owner::Pending;
+}
+
+RvGpuReadiness RvD3D11Surface::tryAcquireConsumer()
+{
+    if (state->owner != State::Owner::Pending || !state->healthy())
+        return RvGpuReadiness::Failed;
+    auto result = state->consumerMutex->AcquireSync(1, 0);
+    if (result == WAIT_TIMEOUT)
+        return RvGpuReadiness::NotReady;
+    state->owner = result == S_OK ? State::Owner::Consumer : State::Owner::Failed;
+    return result == S_OK ? RvGpuReadiness::Ready : RvGpuReadiness::Failed;
+}
+
+RvGpuReadiness RvD3D11Surface::tryRetire()
+{
+    if (!state->healthy())
+        return RvGpuReadiness::Failed;
+    if (state->owner == State::Owner::None)
+        return RvGpuReadiness::Ready;
+    if (state->owner != State::Owner::Retiring)
+        return RvGpuReadiness::Failed;
+    auto result = state->producerMutex->AcquireSync(0, 0);
+    if (result == WAIT_TIMEOUT)
+        return RvGpuReadiness::NotReady;
+    if (result != S_OK) {
+        state->owner = State::Owner::Failed;
+        return RvGpuReadiness::Failed;
+    }
+    state->owner = SUCCEEDED(state->producerMutex->ReleaseSync(0)) ? State::Owner::None : State::Owner::Failed;
+    return state->owner == State::Owner::None ? RvGpuReadiness::Ready : RvGpuReadiness::Failed;
 }
 unsigned RvD3D11Surface::framebuffer() const { return state->framebuffer; }
 void* RvD3D11Surface::texture() const { return state->consumerTexture.Get(); }

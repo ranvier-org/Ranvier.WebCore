@@ -65,6 +65,7 @@ typedef int32_t (*RvEventCallback)(void* context, RvEvent* event);
 
 enum {
     RV_OK = 0,
+    RV_NOT_READY = 1,
     RV_ERR_NULL_ARGUMENT = -1,
     RV_ERR_WRONG_THREAD = -2,
     RV_ERR_DOM_EXCEPTION = -3,
@@ -76,6 +77,7 @@ enum {
     RV_ERR_UNSUPPORTED = -9,
     /* A generated function's handle argument is an object of another interface (RanvierWebCoreDom.h). */
     RV_ERR_WRONG_INTERFACE = -11,
+    RV_ERR_DEVICE_LOST = -12,
 };
 
 /* String properties of rv_node_get_string and rv_node_set_string. */
@@ -1964,10 +1966,27 @@ typedef struct RvSnapshotOptions {
  * element without a box. */
 RV_EXPORT int32_t rv_host_snapshot(RvHost*, RvNode* element, const RvSnapshotOptions* options, RvResourceCompletion completion,
     void* context, uint64_t* operation);
+/* Opt-in capture with the same delivery contract, rejecting before buffer allocation/rasterization when the
+ * cropped, scaled backend size exceeds 8192 in either dimension or 64 MiB of RGBA8. Returns RV_ERR_UNSUPPORTED
+ * and leaves *operation untouched on rejection. Included in "detached-image-encoding-v1". */
+RV_EXPORT int32_t rv_host_snapshot_bounded(RvHost*, RvNode* element, const RvSnapshotOptions* options, RvResourceCompletion completion,
+    void* context, uint64_t* operation);
 /* Copies a delivered snapshot's bytes and writes their count to *length, until rv_resource_release. A capacity below
  * the count returns RV_ERR_BUFFER_TOO_SMALL with *length written and buffer untouched; capacity 0 with a NULL buffer
  * queries the count. RV_ERR_UNSUPPORTED before delivery and for another operation. */
 RV_EXPORT int32_t rv_snapshot_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length);
+
+/* v70: "detached-image-encoding-v1". After host initialization, these three functions may run on any thread.
+ * rgba is immutable unpremultiplied RGBA8 for the call, exactly width * height * 4 bytes; dimensions are 1..8192,
+ * with at most 64 MiB of pixels. Encoding/color space use the snapshot enums. All codec objects are worker-local.
+ * No host is retained. Unsupported formats/sizes return RV_ERR_UNSUPPORTED with a null result. */
+typedef struct RvEncodedImage RvEncodedImage;
+RV_EXPORT int32_t rv_image_encode_rgba(const uint8_t* rgba, int64_t length, int32_t width, int32_t height,
+    int32_t color_space, int32_t encoding, double quality, RvEncodedImage** result);
+/* Immutable bytes, valid until release. Short/null buffers report RV_ERR_BUFFER_TOO_SMALL and required length.
+ * Serialize access to a handle with its release. See tests/abi/detached_encoding.py for cross-thread lifetime. */
+RV_EXPORT int32_t rv_encoded_image_bytes(RvEncodedImage*, uint8_t* buffer, int64_t capacity, int64_t* length);
+RV_EXPORT void rv_encoded_image_release(RvEncodedImage*);
 
 enum {
     RV_FILE_READER_RESULT_NULL = 0,
@@ -2812,6 +2831,11 @@ enum {
     RV_HOST_TRACE_STYLE_LAYOUT = 2,
     RV_HOST_TRACE_PAINT = 3,
     RV_HOST_TRACE_RENDERING_UPDATE = 4,
+    RV_HOST_TRACE_GPU_SUBMIT = 5,
+    RV_HOST_TRACE_BUFFER_CREATE = 6,
+    RV_HOST_TRACE_CAPTURE_RASTER = 7,
+    RV_HOST_TRACE_IMAGE_ENCODE = 8,
+    RV_HOST_TRACE_PIXEL_COPY = 9,
     RV_HOST_TRACE_SOURCE_HOST = 1,
 };
 typedef struct RvHostTraceEvent {
@@ -2826,6 +2850,34 @@ RV_EXPORT int32_t rv_host_trace_enable(RvHost*, int32_t enabled);
 /* Copies and removes up to capacity oldest events. Capacity is 0..256; events may be NULL only for zero
  * capacity. Writes the number copied and events dropped since the preceding drain, then clears that count. */
 RV_EXPORT int32_t rv_host_trace_drain(RvHost*, RvHostTraceEvent* events, int32_t capacity, int32_t* written, uint64_t* dropped);
+
+/* Feature "host-layout-metrics". Completed main-frame layout passes, including subtree layouts;
+ * excludes child frames and style-only updates. Observation never flushes pending work.
+ * Owner thread only. Counter wraps modulo 2^32 and resets with the frame view (e.g. navigation).
+ * Compare samples only within one document lifetime. Errors leave count unchanged. */
+RV_EXPORT int32_t rv_host_layout_count(RvHost*, uint32_t* count);
+
+/* v67: "gpu-frame-pipeline-v1", Windows D3D11. Owner-thread calls; legacy acquire/release is unchanged.
+ * Configure retains a real ID3D11Device. A replacement device waits (RV_NOT_READY) for old leases to retire.
+ * Submission IDs are nonzero and increase after every successful submission. RV_NOT_READY means no submission
+ * was accepted; retry the same ID later. Successful submission may perform CPU layout/paint but uses only
+ * zero-time mutex readiness checks. No hard driver-call latency guarantee is made.
+ * Try-acquire transfers the newest completed frame; no frame/id on RV_NOT_READY. Late older completions are
+ * discarded. Release uses rv_gpu_frame_release, including after host destruction. Three surfaces per host
+ * across resize generations; process-wide 256 MiB accounted output color/depth + input cache storage cap
+ * (excludes driver overhead, WebCore backing stores and legacy allocations). Preserve the previous image on
+ * RV_NOT_READY; retry on a subsequent scheduled frame, never spin or fall back to CPU for congestion.
+ * RV_ERR_DEVICE_LOST requires rebuilding the consumer device and configuring again after releasing leases.
+ * v69 extends this capability to EGL/ANGLE-Metal only with EGL_KHR_fence_sync. Linux consumer_device is the
+ * current EGLContext on the configured EGLDisplay; keep it alive through all frame releases. macOS uses a
+ * nonnull consumer queue identity (borrowed, not dereferenced); the caller MUST prove Metal reads completed
+ * before rv_gpu_frame_release. Linux release inserts a consumer fence without waiting. These backends
+ * require recreating the host after device/context loss. Unproved failed fences retain their budget charge.
+ * External image bindings retain the legacy completed-read contract: submit returns UNSUPPORTED for them.
+ * Legacy glFinish paths remain unchanged. SDL/window presentation can still block in platform drivers. */
+RV_EXPORT int32_t rv_host_configure_gpu_pipeline(RvHost*, void* consumer_device);
+RV_EXPORT int32_t rv_host_submit_gpu_frame(RvHost*, uint64_t frame_id);
+RV_EXPORT int32_t rv_host_try_acquire_completed_gpu_frame(RvHost*, uint64_t* frame_id, RvGpuFrame** frame);
 
 /* Disabled by default. The latest failure after presentation acquisition starts replaces any previous record. Argument,
  * thread and preflight failures use the direct return status only. native_code is the
@@ -2871,6 +2923,18 @@ RV_EXPORT int32_t rv_host_ime_surrounding(RvHost*, char* buffer, int32_t capacit
  * read a new snapshot. Actual edits remain and composition ends. Partial/unknown failure clears ALL native
  * undo/redo, including unrelated earlier edits; a proven unchanged no-op retains valid history. */
 RV_EXPORT int32_t rv_host_ime_delete_surrounding(RvHost*, uint64_t token, int32_t start, int32_t end);
+
+// Bounded UTF-16 context (1..4096 units), centered around and including both selection ends.
+// State: 0 absent/readonly, 1 available, 2 unavailable (composition, oversized selection or unsupported
+// editable structure), 3 secure. Origin is a UTF-16 offset in the control; cursor/anchor are window-relative.
+// Examines at most 64 flat inner-editor nodes, never serializes or scans the full control value.
+// Arbitrary contenteditable is unavailable. Surrogate pairs are never split at window boundaries.
+// Token is issued only on successful copy, supersedes the prior window, and rejects stale deletes.
+RV_EXPORT int32_t rv_host_ime_surrounding_window(RvHost*, int32_t max_units, char* buffer, int32_t capacity,
+    int32_t* length, int32_t* origin, int32_t* cursor, int32_t* anchor, int32_t* state, uint64_t* token);
+// Relative UTF-16 deletion, using the existing undoable editing transaction. The edit itself may be
+// linear in control size. Rejects stale tokens and surrogate splits; composition remains unavailable.
+RV_EXPORT int32_t rv_host_ime_delete_surrounding_window(RvHost*, uint64_t token, int32_t start, int32_t end);
 
 /* "accessibility-text-style": a rendered text run in the same UTF-16 coordinates as rv_ax_text.
  * property is color, background-color, font-family, font-size, font-weight, font-style,

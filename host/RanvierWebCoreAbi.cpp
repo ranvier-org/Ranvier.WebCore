@@ -267,6 +267,16 @@
 #include <WebCore/TextureMapperLayer.h>
 #if defined(_WIN32)
 #include "RanvierWebCoreD3D11.h"
+#include "RanvierD3D11Pipeline.h"
+#endif
+#if defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE)
+#include "RanvierPortablePipeline.h"
+#if defined(__linux__)
+using RvPlatformSurface = RvEGLSurface;
+#else
+using RvPlatformSurface = RvMacSpikeSurface;
+#endif
+using RvPlatformPipeline = RvPortablePipeline<RvPlatformSurface>;
 #endif
 #endif
 
@@ -296,6 +306,8 @@ class RvChromeClient final : public EmptyChromeClient {
     WTF_MAKE_TZONE_ALLOCATED_INLINE(RvChromeClient);
 public:
     RvHost* host { nullptr };
+    uint64_t focusGeneration { 0 };
+    void focusedElementChanged(Element*, LocalFrame*, FocusOptions, BroadcastFocusedElement) final { ++focusGeneration; }
     bool isEmptyChromeClient() const final { return false; }
 #if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
     GraphicsLayerFactory* graphicsLayerFactory() const final { return macSpikeLayerFactory(); }
@@ -438,6 +450,7 @@ public:
     void setCompositionSuspended(bool value) { m_compositionSuspended = value; }
     void discardUnsafeCompositionHistory() { clearUndoRedoOperations(); }
     uint64_t historyGeneration() const { return m_historyGeneration; }
+    uint64_t imeGeneration() const { return m_imeGeneration; }
     UndoStep* lastUndoStep() const { return m_undo.isEmpty() ? nullptr : m_undo.last().ptr(); }
     void undoOwnedComposition(UndoStep* step, uint64_t generation, const Function<bool(LocalFrame&)>* selectionObserver = nullptr)
     {
@@ -525,10 +538,11 @@ private:
     void didApplyStyle() final { }
     bool shouldMoveRangeAfterDelete(const SimpleRange&, const SimpleRange&) final { return true; }
 
-    void didBeginEditing() final { }
-    void respondToChangedContents() final { }
+    void didBeginEditing() final { ++m_imeGeneration; }
+    void respondToChangedContents() final { ++m_imeGeneration; }
     void respondToChangedSelection(LocalFrame* frame) final
     {
+        ++m_imeGeneration;
         if (!frame || m_replaying != Replay::Undo || !m_ownedCompositionSelectionObserver)
             return;
         auto* observer = std::exchange(m_ownedCompositionSelectionObserver, nullptr);
@@ -539,7 +553,7 @@ private:
     void discardedComposition(const Document&) final { }
     void canceledComposition() final { }
     void didUpdateComposition() final { }
-    void didEndEditing() final { }
+    void didEndEditing() final { ++m_imeGeneration; }
     void didEndUserTriggeredSelectionChanges() final { }
     void willWriteSelectionToPasteboard(const std::optional<SimpleRange>&) final { }
     void didWriteSelectionToPasteboard() final { }
@@ -554,6 +568,7 @@ private:
     const Function<bool(LocalFrame&)>* m_ownedCompositionSelectionObserver { nullptr };
     bool m_compositionSuspended { false };
     uint64_t m_historyGeneration { 0 };
+    uint64_t m_imeGeneration { 0 };
     uint64_t m_replayGeneration { 0 };
     uint64_t m_documentGeneration { 0 };
     std::optional<uint64_t> m_editDocumentGeneration;
@@ -1062,8 +1077,12 @@ struct RvHost {
     bool gpuPainting { true };
 #if defined(_WIN32)
     std::shared_ptr<RvD3D11Surface> presentationSurface;
+    std::shared_ptr<RvD3D11Pipeline> framePipeline;
 #elif defined(__linux__)
     std::shared_ptr<RvEGLSurface> presentationSurface;
+#endif
+#if defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE)
+    std::shared_ptr<RvPlatformPipeline> framePipeline;
 #endif
 #endif
     float deviceScale { 1 };
@@ -1149,6 +1168,14 @@ struct RvHost {
         bool composing { false };
     };
     std::optional<ImeServed> imeServed;
+    struct ImeWindow {
+        uint64_t token { 0 }, treeVersion { 0 }, focusGeneration { 0 }, imeGeneration { 0 }, historyGeneration { 0 }, editingSequence { 0 };
+        WeakPtr<Document, WeakPtrImplWithEventTargetData> document;
+        WeakPtr<Node, WeakPtrImplWithEventTargetData> target;
+        int32_t origin { 0 }, length { 0 }, cursor { 0 }, anchor { 0 };
+        String text;
+    };
+    std::optional<ImeWindow> imeWindow;
     bool destroyAfterEditing { false };
     bool updateWanted { false };
     std::shared_ptr<RvHostTraceBuffer> traceBuffer;
@@ -1985,7 +2012,7 @@ static_assert(sizeof(RvMediaVideoConfiguration) == 64 && offsetof(RvMediaVideoCo
 static_assert(sizeof(RvSnapshotOptions) == 64 && offsetof(RvSnapshotOptions, scale) == 8 && offsetof(RvSnapshotOptions, x) == 24 && offsetof(RvSnapshotOptions, quality) == 64 - 8);
 static_assert(sizeof(RvMediaAudioConfiguration) == 64 && offsetof(RvMediaAudioConfiguration, bitrate) == 40 && offsetof(RvMediaAudioConfiguration, spatial_rendering) == 56);
 
-int32_t rv_abi_version(void) { return 65; }
+int32_t rv_abi_version(void) { return 70; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -1999,6 +2026,21 @@ int32_t rv_abi_has(const char* feature)
 {
     if (!feature)
         return 0;
+    if (!std::strcmp(feature, "detached-image-encoding-v1"))
+        return 1;
+    if (!std::strcmp(feature, "gpu-frame-pipeline-v1")) {
+#if defined(_WIN32) && RANVIER_COMPOSITING
+        return 1;
+#elif defined(__linux__) && RANVIER_COMPOSITING
+        return onOwningThread() && RvEGLSurface::supportsPipeline(configuredEGLDisplay);
+#elif defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+        return onOwningThread() && RvMacSpikeSurface::supportsPipeline();
+#else
+        return 0;
+#endif
+    }
+    if (!std::strcmp(feature, "host-layout-metrics"))
+        return 1;
     if (!std::strcmp(feature, "host-tracing"))
         return 1;
     if (!std::strcmp(feature, "host-errors"))
@@ -2086,6 +2128,8 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "media-capabilities"))
         return 1;
     if (!std::strcmp(feature, "snapshot-options"))
+        return 1;
+    if (!std::strcmp(feature, "ime-surrounding-window-v1"))
         return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "accessibility-uia"))
@@ -2740,6 +2784,10 @@ int32_t rv_host_load_html(RvHost* host, const uint8_t* html, int32_t html_length
     if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
         return RV_ERR_DETACHED;
     host->documentTransaction = RvHost::DocumentTransaction::Replacing;
+#if (defined(_WIN32) || defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE)) && RANVIER_COMPOSITING
+    if (host->framePipeline)
+        ++host->framePipeline->generation;
+#endif
     static_cast<RvEditorClient&>(host->page->editorClient()).documentWillChange();
 #if (defined(_WIN32) || defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE)) && RANVIER_COMPOSITING
     host->nativeTextures.clear();
@@ -2771,6 +2819,10 @@ int32_t rv_host_load_svg(RvHost* host, const uint8_t* svg, int32_t svg_length)
     if (!liveHosts.contains(host) || host->documentTransaction != RvHost::DocumentTransaction::Idle)
         return RV_ERR_DETACHED;
     host->documentTransaction = RvHost::DocumentTransaction::Replacing;
+#if (defined(_WIN32) || defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE)) && RANVIER_COMPOSITING
+    if (host->framePipeline)
+        ++host->framePipeline->generation;
+#endif
     static_cast<RvEditorClient&>(host->page->editorClient()).documentWillChange();
 #if (defined(_WIN32) || defined(__linux__) || (defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE)) && RANVIER_COMPOSITING
     host->nativeTextures.clear();
@@ -3104,7 +3156,7 @@ void rv_node_release(RvNode* target)
 }
 
 #if RANVIER_COMPOSITING
-static int32_t composite(RvHost& host, RvCompositor& compositor, LocalFrameView& view, uint8_t* rgba, GLuint targetFramebuffer = 0)
+static int32_t composite(RvHost& host, RvCompositor& compositor, LocalFrameView& view, uint8_t* rgba, GLuint targetFramebuffer = 0, bool nonblocking = false)
 {
     if (!compositor.context->makeContextCurrent())
         return RV_ERR_PAINT_FAILED;
@@ -3161,8 +3213,13 @@ static int32_t composite(RvHost& host, RvCompositor& compositor, LocalFrameView&
         ~InputLocks() { for (auto& input : host.nativeTextures) input->end(); }
     } inputLocks { host };
     for (auto& input : host.nativeTextures) {
+#if defined(_WIN32)
+        if (input->attach() && !input->begin(nonblocking))
+            return nonblocking ? (input->healthy() ? RV_NOT_READY : RV_ERR_DEVICE_LOST) : RV_ERR_UNSUPPORTED;
+#else
         if (input->attach() && !input->begin())
             return RV_ERR_UNSUPPORTED;
+#endif
     }
 #endif
     auto& rootLayer = downcast<GraphicsLayerTextureMapper>(*compositor.root);
@@ -3227,10 +3284,16 @@ static int32_t composite(RvHost& host, RvCompositor& compositor, LocalFrameView&
 struct RvGpuFrame {
 #if defined(_WIN32) && RANVIER_COMPOSITING
     std::shared_ptr<RvD3D11Surface> surface;
+    std::shared_ptr<RvD3D11Pipeline> pipeline;
+    int slot { -1 };
 #elif defined(__linux__) && RANVIER_COMPOSITING
     std::shared_ptr<RvEGLSurface> surface;
+    std::shared_ptr<RvPlatformPipeline> pipeline;
+    int slot { -1 };
 #elif defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
     std::unique_ptr<RvMacSpikeFrame> macFrame;
+    std::shared_ptr<RvPlatformPipeline> pipeline;
+    int slot { -1 };
 #endif
 };
 
@@ -3533,6 +3596,8 @@ int32_t rv_host_acquire_d3d11_frame(RvHost* host, void* consumerDevice, RvGpuFra
 #endif
 }
 
+#include "RanvierGpuPipeline.inc"
+
 int32_t rv_gpu_frame_info(RvGpuFrame* frame, void** texture, int32_t* width, int32_t* height, int32_t* format)
 {
     if (!frame || !texture || !width || !height || !format)
@@ -3552,6 +3617,14 @@ int32_t rv_gpu_frame_info(RvGpuFrame* frame, void** texture, int32_t* width, int
     *format = RV_GPU_RGBA8_PREMULTIPLIED;
     return RV_OK;
 #elif defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+    if (frame->pipeline) {
+        auto& surface = frame->pipeline->surfaces[frame->slot];
+        *texture = surface->surface();
+        *width = surface->width();
+        *height = surface->height();
+        *format = RV_GPU_BGRA8_PREMULTIPLIED;
+        return RV_OK;
+    }
     auto result = rv_mac_spike_frame_info(frame->macFrame.get(), texture, width, height);
     if (result == RV_OK)
         *format = RV_GPU_BGRA8_PREMULTIPLIED;
@@ -3568,16 +3641,24 @@ int32_t rv_gpu_frame_release(RvGpuFrame* frame)
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
 #if defined(_WIN32) && RANVIER_COMPOSITING
-    bool released = frame->surface->releaseConsumer();
+    bool released = frame->surface->releaseConsumer(!!frame->pipeline);
+    if (frame->pipeline)
+        frame->pipeline->state.retire(frame->slot);
     delete frame;
     return released ? RV_OK : RV_ERR_PAINT_FAILED;
 #elif defined(__linux__) && RANVIER_COMPOSITING
-    bool released = frame->surface->releaseConsumer();
+    bool released = frame->surface->releaseConsumer(!!frame->pipeline);
     if (!released)
         return RV_ERR_PAINT_FAILED;
+    if (frame->pipeline)
+        frame->pipeline->state.retire(frame->slot);
     delete frame;
     return RV_OK;
 #elif defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
+    if (frame->pipeline) {
+        frame->pipeline->state.retire(frame->slot);
+        frame->pipeline->state.recycle(frame->slot);
+    }
     delete frame;
     return RV_OK;
 #else
@@ -3636,8 +3717,11 @@ static int32_t paintArea(RvHost& host, uint8_t* rgba, int32_t length, IntRect ar
 #endif
     RefPtr<ImageBuffer> buffer;
     if (!area.isEmpty()) {
-        buffer = ImageBuffer::create(FloatSize { area.size() }, RenderingMode::Unaccelerated,
-            RenderingPurpose::Unspecified, host.deviceScale, DestinationColorSpace::SRGB(), PixelFormat::BGRA8);
+        {
+            RvTraceSpan span(host, RV_HOST_TRACE_BUFFER_CREATE);
+            buffer = ImageBuffer::create(FloatSize { area.size() }, RenderingMode::Unaccelerated,
+                RenderingPurpose::Unspecified, host.deviceScale, DestinationColorSpace::SRGB(), PixelFormat::BGRA8);
+        }
         if (buffer) {
             buffer->context().translate(-area.x(), -area.y());
             auto behavior = view->paintBehavior();
@@ -5351,6 +5435,7 @@ int32_t rv_host_set_focused(RvHost* host, int32_t focused)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
+    host->imeWindow.reset();
     auto& focus = host->page->focusController();
     return dispatchCountingFailures([&] {
         // The first activation fires one window focus event when the main frame is focused while the page is unfocused.
@@ -5375,6 +5460,19 @@ int32_t rv_host_set_frame_callback(RvHost* host, RvFrameCallback callback, void*
     // A page that already wants a frame asks for it at once.
     if (host->updateWanted || !host->dirty.isEmpty())
         host->requestFrame();
+    return RV_OK;
+}
+
+int32_t rv_host_layout_count(RvHost* host, uint32_t* count)
+{
+    if (!host || !count)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_DETACHED;
+    auto* view = host->frame().view();
+    *count = view ? view->layoutUpdateCount() : 0;
     return RV_OK;
 }
 
@@ -6474,6 +6572,8 @@ int32_t rv_host_ime_delete_surrounding(RvHost* host, uint64_t token, int32_t sta
     return failedCompositionTransaction ? RV_ERR_UNSUPPORTED : result >= 0 && endedComposition ? 2 : result;
 }
 
+#include "RanvierImeWindow.inc"
+
 static Element* elementOf(RvNode* handle) { return handle ? dynamicDowncast<Element>(*node(handle)) : nullptr; }
 
 int32_t rv_element_class(RvNode* target, const uint8_t* token, int32_t token_length, int32_t operation)
@@ -7330,7 +7430,7 @@ int32_t rv_element_snapshot(RvNode* target, uint8_t* rgba, int32_t length, int32
 // Paints the subject's area, or the viewport's for a null subject, at scale into a new buffer in colorSpace.
 // rect is the painted area in CSS pixels: the element's paint bounds or the viewport, intersected with the crop.
 static RefPtr<ImageBuffer> captureSnapshot(RvHost& host, Node* subject, const RvSnapshotOptions& options, float scale,
-    const DestinationColorSpace& colorSpace, int32_t& status)
+    const DestinationColorSpace& colorSpace, bool bounded, int32_t& status)
 {
     status = RV_ERR_PAINT_FAILED;
     host.document().updateLayoutIgnorePendingStylesheets();
@@ -7356,26 +7456,41 @@ static RefPtr<ImageBuffer> captureSnapshot(RvHost& host, Node* subject, const Rv
         status = RV_ERR_UNSUPPORTED;
         return nullptr;
     }
-    auto buffer = ImageBuffer::create(FloatSize { rect.size() }, RenderingMode::Unaccelerated, RenderingPurpose::Snapshot, scale,
-        colorSpace, PixelFormat::BGRA8);
+    if (bounded) {
+        auto pixels = ImageBuffer::calculateBackendSize(FloatSize { rect.size() }, scale);
+        if (pixels.isEmpty() || pixels.width() > 8192 || pixels.height() > 8192
+            || static_cast<int64_t>(pixels.width()) * pixels.height() > 16 * 1024 * 1024) {
+            status = RV_ERR_UNSUPPORTED;
+            return nullptr;
+        }
+    }
+    RefPtr<ImageBuffer> buffer;
+    {
+        RvTraceSpan span(host, RV_HOST_TRACE_BUFFER_CREATE);
+        buffer = ImageBuffer::create(FloatSize { rect.size() }, RenderingMode::Unaccelerated, RenderingPurpose::Snapshot, scale,
+            colorSpace, PixelFormat::BGRA8);
+    }
     if (!buffer)
         return nullptr;
     buffer->context().translate(-rect.x(), -rect.y());
     host.inFrame = true;
     auto behavior = view->paintBehavior();
-    if (subject) {
-        // As rv_element_snapshot paints it: the subtree alone, over a transparent base background.
-        auto background = view->baseBackgroundColor();
-        view->setBaseBackgroundColor(Color::transparentBlack);
-        view->paintContentsForSnapshot(buffer->context(), rect, subject, LocalFrameView::IncludeSelection, LocalFrameView::DocumentCoordinates);
-        view->setBaseBackgroundColor(background);
-    } else {
-        // As rv_host_paint_rgba's CPU path paints the viewport.
-        view->setPaintBehavior(behavior | PaintBehavior::FlattenCompositingLayers);
-        view->paint(buffer->context(), rect);
+    {
+        RvTraceSpan span(host, RV_HOST_TRACE_CAPTURE_RASTER);
+        if (subject) {
+            // As rv_element_snapshot paints it: the subtree alone, over a transparent base background.
+            auto background = view->baseBackgroundColor();
+            view->setBaseBackgroundColor(Color::transparentBlack);
+            view->paintContentsForSnapshot(buffer->context(), rect, subject, LocalFrameView::IncludeSelection, LocalFrameView::DocumentCoordinates);
+            view->setBaseBackgroundColor(background);
+        } else {
+            // As rv_host_paint_rgba's CPU path paints the viewport.
+            view->setPaintBehavior(behavior | PaintBehavior::FlattenCompositingLayers);
+            view->paint(buffer->context(), rect);
+        }
+        view->setPaintBehavior(behavior);
+        host.inFrame = false;
     }
-    view->setPaintBehavior(behavior);
-    host.inFrame = false;
     if (host.updateWanted)
         host.requestFrame();
     buffer->flushDrawingContext();
@@ -7383,8 +7498,8 @@ static RefPtr<ImageBuffer> captureSnapshot(RvHost& host, Node* subject, const Rv
     return buffer;
 }
 
-int32_t rv_host_snapshot(RvHost* host, RvNode* element, const RvSnapshotOptions* options, RvResourceCompletion completion,
-    void* context, uint64_t* operation)
+static int32_t hostSnapshot(RvHost* host, RvNode* element, const RvSnapshotOptions* options, RvResourceCompletion completion,
+    void* context, uint64_t* operation, bool bounded)
 {
     if (!host || !options || !completion || !operation)
         return RV_ERR_NULL_ARGUMENT;
@@ -7416,12 +7531,13 @@ int32_t rv_host_snapshot(RvHost* host, RvNode* element, const RvSnapshotOptions*
             return RV_ERR_WRONG_HOST;
     }
     int32_t status = RV_OK;
-    auto buffer = captureSnapshot(*host, subject.get(), *options, scale, *colorSpace, status);
+    auto buffer = captureSnapshot(*host, subject.get(), *options, scale, *colorSpace, bounded, status);
     if (!buffer)
         return status;
     Vector<uint8_t> bytes;
     IntSize pixelSize;
     if (options->encoding == RV_IMAGE_ENCODING_RGBA8) {
+        RvTraceSpan span(*host, RV_HOST_TRACE_PIXEL_COPY);
         PixelBufferFormat format { AlphaPremultiplication::Unpremultiplied, PixelFormat::RGBA8, *colorSpace };
         auto pixels = buffer->getPixelBuffer(format, IntRect { { }, buffer->truncatedLogicalSize() });
         if (!pixels)
@@ -7430,12 +7546,26 @@ int32_t rv_host_snapshot(RvHost* host, RvNode* element, const RvSnapshotOptions*
         bytes.append(pixels->bytes());
     } else {
         pixelSize = buffer->backendSize();
+        RvTraceSpan span(*host, RV_HOST_TRACE_IMAGE_ENCODE);
         bytes = Ranvier::Internal::encodeImage(WTF::move(buffer), options->encoding, options->quality);
         if (bytes.isEmpty())
             return RV_ERR_PAINT_FAILED;
     }
+    RvTraceSpan span(*host, RV_HOST_TRACE_PIXEL_COPY);
     return ranvier_resource_settled_bytes(reinterpret_cast<RvNode*>(&host->document()), bytes.span().data(),
         static_cast<int64_t>(bytes.size()), pixelSize.width(), pixelSize.height(), completion, context, operation);
+}
+
+int32_t rv_host_snapshot(RvHost* host, RvNode* element, const RvSnapshotOptions* options, RvResourceCompletion completion,
+    void* context, uint64_t* operation)
+{
+    return hostSnapshot(host, element, options, completion, context, operation, false);
+}
+
+int32_t rv_host_snapshot_bounded(RvHost* host, RvNode* element, const RvSnapshotOptions* options, RvResourceCompletion completion,
+    void* context, uint64_t* operation)
+{
+    return hostSnapshot(host, element, options, completion, context, operation, true);
 }
 
 int32_t rv_snapshot_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length)
