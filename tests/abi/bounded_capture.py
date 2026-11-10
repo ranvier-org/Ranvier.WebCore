@@ -1,6 +1,9 @@
 """Reject oversized opt-in captures before buffer allocation or rasterization."""
 import ctypes as C
 import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
 from snapshot_options import Options, Completion, options
 from host_tracing import Event
