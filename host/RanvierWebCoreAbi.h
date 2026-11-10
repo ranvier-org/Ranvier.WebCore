@@ -1966,6 +1966,11 @@ typedef struct RvSnapshotOptions {
  * element without a box. */
 RV_EXPORT int32_t rv_host_snapshot(RvHost*, RvNode* element, const RvSnapshotOptions* options, RvResourceCompletion completion,
     void* context, uint64_t* operation);
+/* Opt-in capture with the same delivery contract, rejecting before buffer allocation/rasterization when the
+ * cropped, scaled backend size exceeds 8192 in either dimension or 64 MiB of RGBA8. Returns RV_ERR_UNSUPPORTED
+ * and leaves *operation untouched on rejection. Included in "detached-image-encoding-v1". */
+RV_EXPORT int32_t rv_host_snapshot_bounded(RvHost*, RvNode* element, const RvSnapshotOptions* options, RvResourceCompletion completion,
+    void* context, uint64_t* operation);
 /* Copies a delivered snapshot's bytes and writes their count to *length, until rv_resource_release. A capacity below
  * the count returns RV_ERR_BUFFER_TOO_SMALL with *length written and buffer untouched; capacity 0 with a NULL buffer
  * queries the count. RV_ERR_UNSUPPORTED before delivery and for another operation. */

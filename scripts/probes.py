@@ -282,6 +282,8 @@ PROBES = [
           'python -I -X utf8 tests/abi/media_capabilities.py --native-directory {native}'),
     probe('Verify detached image encoding on worker threads',
           'python -I tests/abi/detached_encoding.py {native}'),
+    probe('Verify snapshot bounds precede allocation and rasterization',
+          'python -I tests/abi/bounded_capture.py {native}'),
     probe('Measure capture allocation raster encoding and copy phases',
           'python -I tests/abi/capture_costs.py {native}'),
     probe('Verify snapshot scale, crop, color space, encodings and delivery',

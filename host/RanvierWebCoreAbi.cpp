@@ -7430,7 +7430,7 @@ int32_t rv_element_snapshot(RvNode* target, uint8_t* rgba, int32_t length, int32
 // Paints the subject's area, or the viewport's for a null subject, at scale into a new buffer in colorSpace.
 // rect is the painted area in CSS pixels: the element's paint bounds or the viewport, intersected with the crop.
 static RefPtr<ImageBuffer> captureSnapshot(RvHost& host, Node* subject, const RvSnapshotOptions& options, float scale,
-    const DestinationColorSpace& colorSpace, int32_t& status)
+    const DestinationColorSpace& colorSpace, bool bounded, int32_t& status)
 {
     status = RV_ERR_PAINT_FAILED;
     host.document().updateLayoutIgnorePendingStylesheets();
@@ -7455,6 +7455,14 @@ static RefPtr<ImageBuffer> captureSnapshot(RvHost& host, Node* subject, const Rv
     if (rect.isEmpty()) {
         status = RV_ERR_UNSUPPORTED;
         return nullptr;
+    }
+    if (bounded) {
+        auto pixels = ImageBuffer::calculateBackendSize(FloatSize { rect.size() }, scale);
+        if (pixels.isEmpty() || pixels.width() > 8192 || pixels.height() > 8192
+            || static_cast<int64_t>(pixels.width()) * pixels.height() > 16 * 1024 * 1024) {
+            status = RV_ERR_UNSUPPORTED;
+            return nullptr;
+        }
     }
     RefPtr<ImageBuffer> buffer;
     {
@@ -7490,8 +7498,8 @@ static RefPtr<ImageBuffer> captureSnapshot(RvHost& host, Node* subject, const Rv
     return buffer;
 }
 
-int32_t rv_host_snapshot(RvHost* host, RvNode* element, const RvSnapshotOptions* options, RvResourceCompletion completion,
-    void* context, uint64_t* operation)
+static int32_t hostSnapshot(RvHost* host, RvNode* element, const RvSnapshotOptions* options, RvResourceCompletion completion,
+    void* context, uint64_t* operation, bool bounded)
 {
     if (!host || !options || !completion || !operation)
         return RV_ERR_NULL_ARGUMENT;
@@ -7523,7 +7531,7 @@ int32_t rv_host_snapshot(RvHost* host, RvNode* element, const RvSnapshotOptions*
             return RV_ERR_WRONG_HOST;
     }
     int32_t status = RV_OK;
-    auto buffer = captureSnapshot(*host, subject.get(), *options, scale, *colorSpace, status);
+    auto buffer = captureSnapshot(*host, subject.get(), *options, scale, *colorSpace, bounded, status);
     if (!buffer)
         return status;
     Vector<uint8_t> bytes;
@@ -7546,6 +7554,18 @@ int32_t rv_host_snapshot(RvHost* host, RvNode* element, const RvSnapshotOptions*
     RvTraceSpan span(*host, RV_HOST_TRACE_PIXEL_COPY);
     return ranvier_resource_settled_bytes(reinterpret_cast<RvNode*>(&host->document()), bytes.span().data(),
         static_cast<int64_t>(bytes.size()), pixelSize.width(), pixelSize.height(), completion, context, operation);
+}
+
+int32_t rv_host_snapshot(RvHost* host, RvNode* element, const RvSnapshotOptions* options, RvResourceCompletion completion,
+    void* context, uint64_t* operation)
+{
+    return hostSnapshot(host, element, options, completion, context, operation, false);
+}
+
+int32_t rv_host_snapshot_bounded(RvHost* host, RvNode* element, const RvSnapshotOptions* options, RvResourceCompletion completion,
+    void* context, uint64_t* operation)
+{
+    return hostSnapshot(host, element, options, completion, context, operation, true);
 }
 
 int32_t rv_snapshot_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length)
