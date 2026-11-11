@@ -75,3 +75,6 @@
 0077-adwaita-empty-scroll-corner.patch
 0078-viewport-constrained-movement-layout.patch
 0079-embedder-focus-generation.patch
+0080-layout-boundary-simplified-ancestors.patch
+0081-texture-mapper-merge-near-repaints.patch
+0082-texture-mapper-angle-d3d11-paint-order.patch

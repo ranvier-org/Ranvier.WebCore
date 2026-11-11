@@ -1,0 +1,28 @@
+diff --git a/Source/WebCore/platform/graphics/texmap/GraphicsLayerTextureMapper.cpp b/Source/WebCore/platform/graphics/texmap/GraphicsLayerTextureMapper.cpp
+index 9049449..468f9f1 100644
+--- a/Source/WebCore/platform/graphics/texmap/GraphicsLayerTextureMapper.cpp
++++ b/Source/WebCore/platform/graphics/texmap/GraphicsLayerTextureMapper.cpp
+@@ -109,6 +109,23 @@ void GraphicsLayerTextureMapper::addNeedsDisplayRect(const FloatRect& rect)
+     }
+     m_needsDisplayRects.removeAllMatching([&](auto& existing) { return rect.contains(existing); });
+     m_needsDisplayRects.append(rect);
++    // Each rectangle is a paint pass of its own: a walk of the layer tree and, on the GPU, a surface and a flush.
++    // Two rectangles merge when their union adds less area than a pass is worth.
++    static constexpr float maximumAddedArea = 256 * 256;
++    bool merged;
++    do {
++        merged = false;
++        for (size_t i = 0; i < m_needsDisplayRects.size() && !merged; ++i) {
++            for (size_t j = i + 1; j < m_needsDisplayRects.size() && !merged; ++j) {
++                auto bounds = unionRect(m_needsDisplayRects[i], m_needsDisplayRects[j]);
++                if (bounds.area() - m_needsDisplayRects[i].area() - m_needsDisplayRects[j].area() > maximumAddedArea)
++                    continue;
++                m_needsDisplayRects[i] = bounds;
++                m_needsDisplayRects.removeAt(j);
++                merged = true;
++            }
++        }
++    } while (merged);
+     static constexpr size_t maximumRects = 8;
+     if (m_needsDisplayRects.size() > maximumRects) {
+         FloatRect bounds;
