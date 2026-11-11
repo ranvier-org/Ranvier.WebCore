@@ -35,8 +35,8 @@ with SvgProbe(sys.argv[1], 64, 48) as p:
         return output.raw
 
     def phases():
-        events, count, lost = (Event * 1024)(), I(), U()
-        assert drain(p.host, events, 1024, C.byref(count), C.byref(lost)) == 0 and not lost.value
+        events, count, lost = (Event * 256)(), I(), U()
+        assert drain(p.host, events, 256, C.byref(count), C.byref(lost)) == 0 and not lost.value
         return [event.phase for event in events[:count.value]]
 
     p.load('<style>html,body{margin:0;background:red}</style><div id="fill" style="position:absolute;inset:0;background:red"></div>', standalone=False)
