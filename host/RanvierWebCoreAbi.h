@@ -1988,6 +1988,19 @@ RV_EXPORT int32_t rv_image_encode_rgba(const uint8_t* rgba, int64_t length, int3
 RV_EXPORT int32_t rv_encoded_image_bytes(RvEncodedImage*, uint8_t* buffer, int64_t capacity, int64_t* length);
 RV_EXPORT void rv_encoded_image_release(RvEncodedImage*);
 
+/* v71: "snapshot-pixels-v1". Capture runs synchronously on the host owner thread and enforces the bounded
+ * snapshot limits. options->encoding must be RGBA8. On success the caller owns *result, an immutable capture
+ * independent of host/document lifetime. Stable viewport captures may reuse pixels until rendering invalidates
+ * them; elements are always repainted. On failure *result is NULL. Width/height are device pixels.
+ * Copy, encode and release may run on any thread after capture. Do not release a handle while a call uses it. */
+typedef struct RvSnapshotPixels RvSnapshotPixels;
+RV_EXPORT int32_t rv_host_snapshot_pixels(RvHost*, RvNode* element, const RvSnapshotOptions* options,
+    RvSnapshotPixels** result, int32_t* width, int32_t* height);
+/* The required RGBA byte count is always written to length; insufficient capacity returns BUFFER_TOO_SMALL. */
+RV_EXPORT int32_t rv_snapshot_pixels_copy(RvSnapshotPixels*, uint8_t* buffer, int64_t capacity, int64_t* length);
+RV_EXPORT int32_t rv_snapshot_pixels_encode(RvSnapshotPixels*, int32_t encoding, double quality, RvEncodedImage** result);
+RV_EXPORT void rv_snapshot_pixels_release(RvSnapshotPixels*);
+
 enum {
     RV_FILE_READER_RESULT_NULL = 0,
     RV_FILE_READER_RESULT_STRING = 1,

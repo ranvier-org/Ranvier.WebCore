@@ -3,6 +3,7 @@
 #include "dom/RanvierDomGlue.h"
 #include "RanvierSvgViewGlue.h"
 #include "RanvierImageEncoding.h"
+#include "RanvierSnapshotPixels.h"
 #include <wtf/text/Base64.h>
 #include <wtf/Scope.h>
 #include "RanvierResourceGlue.h"
@@ -1095,6 +1096,14 @@ struct RvHost {
 #endif
     // The viewport area invalidated since the last paint, which rv_host_dirty_rect reports.
     IntRect dirty;
+    RefPtr<PixelBuffer> snapshotPixels;
+    RvSnapshotOptions snapshotOptions { };
+    uint64_t snapshotGeneration { 0 };
+    void invalidateSnapshot()
+    {
+        snapshotPixels = nullptr;
+        ++snapshotGeneration;
+    }
     // What the compositor's root layer repaints on its next composite, apart from dirty: a viewport scroll moves the
     // root layer's pixels by rootScroll inside rootScrollRect (RvChromeClient::scroll), and only what it exposes
     // repaints. rootRepaintAll repaints the whole layer, as a scroll the compositor cannot move does.
@@ -1104,6 +1113,7 @@ struct RvHost {
     IntRect rootScrollRect;
     void invalidateAll()
     {
+        invalidateSnapshot();
         dirty = { { }, size };
         rootRepaintAll = true;
     }
@@ -1309,6 +1319,7 @@ void RvChromeClient::invalidate(const IntRect& rect, bool repaint)
 {
     if (!host)
         return;
+    host->invalidateSnapshot();
     if (host->traceBuffer)
         host->traceBuffer->record(RV_HOST_TRACE_UPDATE_REQUESTED, traceNow(), 0);
     auto viewportRect = intersection(rect, IntRect { { }, host->size });
@@ -1324,6 +1335,7 @@ void RvChromeClient::scroll(const IntSize& scrollDelta, const IntRect& rectToScr
 {
     if (!host)
         return;
+    host->invalidateSnapshot();
     auto rect = intersection(intersection(rectToScroll, clipRect), IntRect { { }, host->size });
     if (rect.isEmpty() || scrollDelta.isZero())
         return;
@@ -1424,6 +1436,7 @@ void RvChromeClient::wantUpdate()
 {
     if (!host)
         return;
+    host->invalidateSnapshot();
     if (host->traceBuffer)
         host->traceBuffer->record(RV_HOST_TRACE_UPDATE_REQUESTED, traceNow(), 0);
     host->updateWanted = true;
@@ -2012,7 +2025,7 @@ static_assert(sizeof(RvMediaVideoConfiguration) == 64 && offsetof(RvMediaVideoCo
 static_assert(sizeof(RvSnapshotOptions) == 64 && offsetof(RvSnapshotOptions, scale) == 8 && offsetof(RvSnapshotOptions, x) == 24 && offsetof(RvSnapshotOptions, quality) == 64 - 8);
 static_assert(sizeof(RvMediaAudioConfiguration) == 64 && offsetof(RvMediaAudioConfiguration, bitrate) == 40 && offsetof(RvMediaAudioConfiguration, spatial_rendering) == 56);
 
-int32_t rv_abi_version(void) { return 70; }
+int32_t rv_abi_version(void) { return 71; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -2026,6 +2039,8 @@ int32_t rv_abi_has(const char* feature)
 {
     if (!feature)
         return 0;
+    if (!std::strcmp(feature, "snapshot-pixels-v1"))
+        return 1;
     if (!std::strcmp(feature, "detached-image-encoding-v1"))
         return 1;
     if (!std::strcmp(feature, "gpu-frame-pipeline-v1")) {
@@ -5564,6 +5579,7 @@ int32_t rv_host_update(RvHost* host)
         return RV_ERR_DETACHED;
     if (host->documentTransaction != RvHost::DocumentTransaction::Idle || host->inFrame)
         return RV_ERR_UNSUPPORTED;
+    host->invalidateSnapshot();
     host->documentTransaction = RvHost::DocumentTransaction::Rendering;
     Ref page = host->page;
     host->inFrame = true;
@@ -7496,6 +7512,83 @@ static RefPtr<ImageBuffer> captureSnapshot(RvHost& host, Node* subject, const Rv
     buffer->flushDrawingContext();
     status = RV_OK;
     return buffer;
+}
+
+int32_t rv_host_snapshot_pixels(RvHost* host, RvNode* element, const RvSnapshotOptions* options,
+    RvSnapshotPixels** result, int32_t* width, int32_t* height)
+{
+    if (!result)
+        return RV_ERR_NULL_ARGUMENT;
+    *result = nullptr;
+    if (!host || !options || !width || !height)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host) || options->size != static_cast<int32_t>(sizeof(RvSnapshotOptions))
+        || options->encoding != RV_IMAGE_ENCODING_RGBA8)
+        return RV_ERR_UNSUPPORTED;
+    if (host->documentTransaction != RvHost::DocumentTransaction::Idle || host->inFrame)
+        return RV_ERR_UNSUPPORTED;
+    float scale = options->scale == 0 ? host->deviceScale : static_cast<float>(options->scale);
+    if (!(scale >= 0.25f && scale <= 8) || (options->crop != 0 && options->crop != 1))
+        return RV_ERR_UNSUPPORTED;
+    if (options->crop && !(std::isfinite(options->x) && std::isfinite(options->y) && options->width > 0 && options->height > 0
+        && std::isfinite(options->width) && std::isfinite(options->height)))
+        return RV_ERR_UNSUPPORTED;
+    const DestinationColorSpace* colorSpace = nullptr;
+    if (options->color_space == RV_SNAPSHOT_SRGB)
+        colorSpace = &DestinationColorSpace::SRGB();
+#if ENABLE(DESTINATION_COLOR_SPACE_DISPLAY_P3)
+    else if (options->color_space == RV_SNAPSHOT_DISPLAY_P3)
+        colorSpace = &DestinationColorSpace::DisplayP3();
+#endif
+    if (!colorSpace)
+        return RV_ERR_UNSUPPORTED;
+    RefPtr<Node> subject;
+    if (element) {
+        subject = node(element);
+        if (&subject->document() != &host->document())
+            return RV_ERR_WRONG_HOST;
+    }
+    host->documentTransaction = RvHost::DocumentTransaction::Rendering;
+    auto transaction = makeScopeExit([&] { finishDocumentTransaction(host); });
+    // Flush pending style/layout before considering reuse: DOM/CSS changes can defer repaint invalidation.
+    host->document().updateLayoutIgnorePendingStylesheets();
+    RefPtr view = host->frame().view();
+    if (!view)
+        return RV_ERR_PAINT_FAILED;
+    view->updateLayoutAndStyleIfNeededRecursive();
+    auto key = *options;
+    key.scale = scale;
+    auto& previous = host->snapshotOptions;
+    bool same = !subject && host->snapshotPixels && previous.scale == key.scale && previous.color_space == key.color_space
+        && previous.crop == key.crop && (!key.crop || (previous.x == key.x && previous.y == key.y
+            && previous.width == key.width && previous.height == key.height));
+    RefPtr<PixelBuffer> pixels = same ? host->snapshotPixels : nullptr;
+    if (!pixels) {
+        if (!subject)
+            host->snapshotPixels = nullptr;
+        auto generation = host->snapshotGeneration;
+        int32_t status;
+        auto buffer = captureSnapshot(*host, subject.get(), *options, scale, *colorSpace, true, status);
+        if (!buffer)
+            return status;
+        {
+            RvTraceSpan span(*host, RV_HOST_TRACE_PIXEL_COPY);
+            pixels = buffer->getPixelBuffer({ AlphaPremultiplication::Unpremultiplied, PixelFormat::RGBA8, *colorSpace },
+                IntRect { { }, buffer->truncatedLogicalSize() });
+        }
+        if (!pixels)
+            return RV_ERR_PAINT_FAILED;
+        if (!subject && generation == host->snapshotGeneration) {
+            host->snapshotPixels = pixels;
+            host->snapshotOptions = key;
+        }
+    }
+    *width = pixels->size().width();
+    *height = pixels->size().height();
+    *result = new RvSnapshotPixels { pixels.releaseNonNull(), options->color_space };
+    return RV_OK;
 }
 
 static int32_t hostSnapshot(RvHost* host, RvNode* element, const RvSnapshotOptions* options, RvResourceCompletion completion,
