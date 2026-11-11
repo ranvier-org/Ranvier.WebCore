@@ -468,6 +468,46 @@ although only its position had changed. Fixed boxes now get an out-of-flow movem
 composited layer, and their layers a compositing geometry update. Sticky boxes keep the full layout. Safari never
 reaches this path for a scroll, since it scrolls asynchronously.
 
+## 0080-layout-boundary-simplified-ancestors
+
+A layout boundary (an SVG root, a text control, a box with layout and size containment, a clipped box of fixed size)
+lays out by itself as a subtree, because nothing in it can change the layout around it. When a second box needs
+layout in the same frame, WebKit turns the subtree layout into one from the top
+(`LocalFrameViewLayoutContext::scheduleSubtreeLayout`, `convertSubtreeLayoutToFullLayout`) and marked the boundary's
+ancestors as having a child to lay out. A grid ancestor then ran its track sizing again, which lays a stretched item
+out twice, at its content height and at its row's, and `RenderElement::repaintAfterLayoutIfNeeded` repainted the
+item for the height that came and went.
+
+A chart tooltip is the common case: the pointer moves an SVG shape (`cx`, `x1` are layout changes inside the SVG
+root) and an absolutely positioned tooltip over it, and every frame repainted the whole grid card around the chart
+(1068 by 619 px for a 2 px crosshair, a 14 px point and a 190 px tooltip in the Motion example).
+
+`RenderObject::markContainingBlocksForLayout` now marks the ancestors of a boundary that joins a wider layout for a
+simplified layout, the marking a positioned descendant already uses above its containing block: they reach the
+boundary, lay it out and recompute their overflow, and do no layout of their own. An ancestor whose overflow can
+change its layout (`overflowChangesMayAffectLayout`) still gets a normal layout, as before. A boundary that needs
+layout itself marks its ancestors from `setNeedsLayout` as it always did. `tests/abi/boundary_repaint.py` holds the
+invalidated area and compares the partial repaints with a full one.
+
+## 0081-texture-mapper-merge-near-repaints
+
+0075 keeps up to eight rectangles to repaint, and each is a paint pass of its own: a walk of the layer tree and, on
+the GPU, a Skia surface, a context switch and a flush. The seven rectangles of the tooltip case above (28,000 px
+together) took longer to paint than the whole card had. Two rectangles now merge when their union adds at most
+256 by 256 px to their areas, so nearby damage paints in one pass and the far-apart rectangles 0075 was written for
+stay separate.
+
+## 0082-texture-mapper-angle-d3d11-paint-order
+
+0076 makes the compositing context wait once for the layers Skia painted in its own context. Where the display has
+no fence support, which is the case under ANGLE on Windows, `SkiaUtilities::flushAndSubmitWithFence` falls back to
+`GrDirectContext::submit(GrSyncCpu::kYes)`, a `glFinish`: every frame that painted a layer blocked until the GPU
+had finished all of its work. Each GPU paint also began with a `glFlush` of the compositing context.
+
+ANGLE's D3D11 renderer issues the calls of every context of a display on one immediate device context, in the
+order they are made, so the compositor already reads what Skia drew. On Windows the paints are now submitted
+without the wait and without the flush before each one. Other platforms keep the fence.
+
 ## Working on the series
 
 ```

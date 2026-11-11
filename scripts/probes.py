@@ -58,6 +58,7 @@ PROBES = [
             'python -I tests/abi/layout_phase_trace.py {native}',
             'python -I tests/abi/host_error_lifetime.py {native}',
             'python -I tests/abi/partial_repaint.py {native}',
+            'python -I tests/abi/boundary_repaint.py {native}',
             'python -I tests/abi/gpu_painting.py {native}',
             'python -I tests/abi/compositor_paths.py {native}', rid=rid, flavor=None)
       for rid in ['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64']],

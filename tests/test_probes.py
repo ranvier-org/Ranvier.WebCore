@@ -94,7 +94,7 @@ class ProbeRunnerTests(unittest.TestCase):
             for flavor in ['slim', 'gpu']:
                 commands = [command for entry in probes.PROBES if probes.applies(entry, rid, flavor)
                             for command in entry['commands']]
-                for name in ['file_picker.py', 'host_tracing.py', 'host_error_lifetime.py', 'partial_repaint.py', 'gpu_painting.py',
+                for name in ['file_picker.py', 'host_tracing.py', 'host_error_lifetime.py', 'partial_repaint.py', 'boundary_repaint.py', 'gpu_painting.py',
                              'compositor_paths.py']:
                     self.assertEqual(sum(name in command for command in commands), 1, (rid, flavor, name))
 

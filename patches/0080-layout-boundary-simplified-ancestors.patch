@@ -1,0 +1,18 @@
+diff --git a/Source/WebCore/rendering/RenderObject.cpp b/Source/WebCore/rendering/RenderObject.cpp
+index e539bb0..86cfb24 100644
+--- a/Source/WebCore/rendering/RenderObject.cpp
++++ b/Source/WebCore/rendering/RenderObject.cpp
+@@ -600,6 +600,13 @@ RenderElement* RenderObject::markContainingBlocksForLayout(RenderElement* layout
+     CheckedPtr ancestor = container();
+ 
+     bool simplifiedNormalFlowLayout = needsSimplifiedNormalFlowLayout() && !selfNeedsLayout() && !normalChildNeedsLayout();
++    // A layout boundary lays out without changing its ancestors' layout. When its subtree layout joins a wider one,
++    // the ancestors only have to reach it: a normal layout of them would redo unrelated work, and a grid or flex
++    // container would lay its items out again and repaint them.
++    if (layoutRoot) {
++        if (auto* boundary = dynamicDowncast<RenderElement>(*this); boundary && isLayoutBoundary(*boundary))
++            simplifiedNormalFlowLayout = true;
++    }
+     bool hasOutOfFlowPosition = isOutOfFlowPositioned();
+ 
+     while (ancestor) {
