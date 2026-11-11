@@ -1,5 +1,6 @@
 #include "config.h"
 #include "RanvierImageEncoding.h"
+#include "RanvierSnapshotPixels.h"
 
 #include "RanvierWebCoreAbi.h"
 #include <WebCore/ImageBuffer.h>
@@ -81,6 +82,35 @@ int32_t rv_encoded_image_bytes(RvEncodedImage* image, uint8_t* buffer, int64_t c
 void rv_encoded_image_release(RvEncodedImage* image)
 {
     delete image;
+}
+
+int32_t rv_snapshot_pixels_copy(RvSnapshotPixels* capture, uint8_t* buffer, int64_t capacity, int64_t* length)
+{
+    if (!capture || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    auto bytes = capture->pixels->bytes();
+    *length = static_cast<int64_t>(bytes.size());
+    if (!buffer || capacity < *length)
+        return RV_ERR_BUFFER_TOO_SMALL;
+    std::memcpy(buffer, bytes.data(), bytes.size());
+    return RV_OK;
+}
+
+int32_t rv_snapshot_pixels_encode(RvSnapshotPixels* capture, int32_t encoding, double quality, RvEncodedImage** result)
+{
+    if (!result)
+        return RV_ERR_NULL_ARGUMENT;
+    *result = nullptr;
+    if (!capture)
+        return RV_ERR_NULL_ARGUMENT;
+    auto& pixels = capture->pixels;
+    return rv_image_encode_rgba(pixels->bytes().data(), static_cast<int64_t>(pixels->bytes().size()),
+        pixels->size().width(), pixels->size().height(), capture->colorSpace, encoding, quality, result);
+}
+
+void rv_snapshot_pixels_release(RvSnapshotPixels* capture)
+{
+    delete capture;
 }
 
 namespace Ranvier::Internal {

@@ -218,7 +218,7 @@ def prepare():
                  'RanvierWebCoreUia.cpp', 'RanvierWebCoreD3D11.h', 'RanvierWebCoreD3D11.cpp', 'RanvierWebCoreEGL.h', 'RanvierWebCoreEGL.cpp',
                  'RanvierD3D11Pipeline.h', 'RanvierFramePipeline.h', 'RanvierGpuMemoryBudget.h', 'RanvierGpuPipeline.inc',
                  'RanvierPortablePipeline.h', 'RanvierPortablePipeline.inc',
-                 'RanvierGpuRetirement.h', 'RanvierImeWindow.inc',
+                 'RanvierGpuRetirement.h', 'RanvierImeWindow.inc', 'RanvierSnapshotPixels.h',
                  'RanvierNativeTextureInput.h', 'RanvierNativeTextureEGLInput.h', 'RanvierImageEncoding.h', 'RanvierImageEncoding.cpp', 'dom/RanvierDomGlue.h',
                  'RanvierCapabilities.inc', 'RanvierCapabilityCatalogue.inc', 'RanvierSvgViewGlue.h', 'RanvierResourceGlue.h', 'RanvierEventGlue.h', 'RanvierMutationGlue.h', 'RanvierPrintGlue.h', 'RanvierPrintOptions.h', 'RanvierViewportGlue.h', 'RanvierInspectGlue.h', 'RanvierCanvasGlue.h', 'RanvierWakeLockGlue.h', 'RanvierNotificationGlue.h', 'RanvierTransferGlue.h', 'RanvierPointerGlue.h', 'RanvierCanvasPixelsGlue.h', 'RanvierCanvasExportGlue.h']:
         shutil.copy2(root / 'host' / name, api / 'RanvierAbi' / name)

@@ -43,6 +43,19 @@ may run on a worker. They use immutable input pixels and worker-local image obje
 and remain valid after host destruction. Serialize access to each encoded-image handle with its release.
 The encoder enforces the same input limits; it does not make owner-thread capture asynchronous.
 
+ABI 71 adds `snapshot-pixels-v1`. `rv_host_snapshot_pixels` returns an owned immutable native RGBA
+capture (bounded to 64 MiB) instead of copying it through a resource and managed array. Its copy,
+encode and release functions work after document replacement and host destruction, including on
+workers; callers must serialize release against reads/encoding. Encoding uses worker-local graphics
+objects. DOM layout and initial painting still run on the owner thread.
+
+One viewport pixel buffer per host may be reused for identical crop, scale and color space. Pending
+style/layout is flushed before checking reuse. Invalidation, scrolling, rendering-update requests,
+rendering updates, resize and document replacement discard the cache. Element snapshots always
+repaint. The cache retains at most 64 MiB; independently retained capture handles can outlive it.
+No cache-hit latency claim applies to changed/animated pages. WebKit's pinned display lists retain
+non-thread-safe font objects and are not transferred to workers.
+
 Host trace phases 6, 7, 8 and 9 separately measure buffer creation, snapshot rasterization, image encoding
 and pixel copying. They complement layout/paint/submission timings and do not impose latency thresholds.
 
