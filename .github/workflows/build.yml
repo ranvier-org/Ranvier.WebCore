@@ -1035,4 +1035,39 @@ jobs:
         env:
           NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
         run: dotnet nuget push "**/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY" --skip-duplicate
+      # nuget.org lists a package only after validating it, which has taken more than twenty minutes for a GPU
+      # runtime. A consumer that restores the new version before then fails with NU1102, so the release is done
+      # only when every pushed package can be downloaded.
+      - name: Wait until nuget.org serves every package
+        timeout-minutes: 120
+        run: |
+          python3 -I - <<'PY'
+          import glob, re, sys, time, urllib.error, urllib.request, zipfile
 
+          pending = {}
+          for path in sorted(glob.glob('**/*.nupkg', recursive=True)):
+              with zipfile.ZipFile(path) as package:
+                  name = next(entry for entry in package.namelist() if '/' not in entry and entry.endswith('.nuspec'))
+                  nuspec = package.read(name).decode('utf-8-sig')
+              identity = re.search(r'<id>\s*([^<\s]+)\s*</id>', nuspec).group(1).lower()
+              version = re.search(r'<version>\s*([^<\s]+)\s*</version>', nuspec).group(1).lower().split('+')[0]
+              pending[f'{identity} {version}'] = f'https://api.nuget.org/v3-flatcontainer/{identity}/{version}/{identity}.nuspec'
+          if not pending:
+              sys.exit('No package was pushed.')
+
+          deadline = time.monotonic() + 110 * 60
+          while True:
+              for package, url in list(pending.items()):
+                  try:
+                      with urllib.request.urlopen(urllib.request.Request(url, method='HEAD'), timeout=30):
+                          print(f'available: {package}', flush=True)
+                          del pending[package]
+                  except (urllib.error.URLError, TimeoutError):
+                      pass
+              if not pending:
+                  break
+              if time.monotonic() > deadline:
+                  sys.exit('nuget.org does not serve: ' + ', '.join(sorted(pending)))
+              print(f'waiting for {len(pending)} package(s)', flush=True)
+              time.sleep(60)
+          PY
