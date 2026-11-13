@@ -393,12 +393,20 @@ jobs:
           path: C:\rw\tools\llvm
           key: ${{ steps.keys.outputs.llvm }}
 
+      - name: Restore ICU
+        id: icu
+        if: runner.os == 'Linux'
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.RANVIER_WORK }}/tools/icu${{ env.FLAVOR == 'lean' && '-lean' || '' }}
+          key: ${{ steps.keys.outputs.icu }}
+
       - name: Package version from the tag
         if: startsWith(github.ref, 'refs/tags/v')
         shell: pwsh
         run: Add-Content $env:GITHUB_ENV "RANVIER_PACKAGE_VERSION=$($env:GITHUB_REF_NAME.Substring(1))"
 
-      - name: Fetch WebKit (and on Windows vcpkg and LLVM)
+      - name: Fetch WebKit (and on Windows vcpkg and LLVM; on Linux static ICU)
         run: python scripts/build.py fetch --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
 
       - name: Save LLVM
@@ -407,6 +415,13 @@ jobs:
         with:
           path: C:\rw\tools\llvm
           key: ${{ steps.keys.outputs.llvm }}
+
+      - name: Save ICU
+        if: ${{ !startsWith(github.ref, 'refs/tags/') && runner.os == 'Linux' && steps.icu.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.RANVIER_WORK }}/tools/icu${{ env.FLAVOR == 'lean' && '-lean' || '' }}
+          key: ${{ steps.keys.outputs.icu }}
 
       - name: Install and configure sccache
         id: sccache-install
@@ -893,7 +908,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y cmake ninja-build pkg-config libglib2.0-dev libatspi2.0-dev python3-gi gir1.2-atspi-2.0 at-spi2-core dbus-x11 fonts-dejavu-core unzip
-          sudo apt-get install -y libharfbuzz-icu0 libicu74 libjpeg-turbo8 libepoxy0 libgcrypt20 libsoup-3.0-0 libtasn1-6 libxkbcommon0 libxml2 libpng16-16t64 libsqlite3-0 libwebp7 libwebpdemux2 libwebpmux3 zlib1g libfreetype6 libfontconfig1 libwoff1 libdrm2 libegl1 libgles2 liblcms2-2 libatomic1
+          sudo apt-get install -y libharfbuzz0b libjpeg-turbo8 libepoxy0 libgcrypt20 libsoup-3.0-0 libtasn1-6 libxkbcommon0 libxml2 libpng16-16t64 libsqlite3-0 libwebp7 libwebpdemux2 libwebpmux3 zlib1g libfreetype6 libfontconfig1 libwoff1 libdrm2 libegl1 libgles2 liblcms2-2 libatomic1
       - name: Stage this run's host
         run: |
           W="$RUNNER_TEMP/atspi"; echo "W=$W" >> "$GITHUB_ENV"

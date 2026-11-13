@@ -423,9 +423,16 @@ def keys(args):
         lines['downloads-prefix'] = f'vcpkg-downloads-{rid}-'
         # The tree holds vcpkg_installed, whose headers precompiled headers record.
         tools = [tools, llvm, vcpkg]
+    elif system == 'linux':
+        # The build compiles against the static ICU prefix (<work>/tools/icu), whose headers precompiled headers record.
+        icu_slim = flavor != 'lean'
+        icu = digest(pins['icu'], icu_slim, files_digest('scripts/icu_data.py', 'scripts/linux_icu.py'), tools)
+        lines['icu'] = f'icu-{rid}-{"slim" if icu_slim else "lean"}-{icu}'
+        tools = [tools, icu]
     tool = digest(tools)
     # Everything the native build reads from this repository, by blob id.
-    core = files_digest('patches', 'config', 'scripts/build.py', 'scripts/patches.py')
+    core = files_digest('patches', 'config', 'scripts/build.py', 'scripts/patches.py',
+                        'scripts/icu_data.py', 'scripts/linux_icu.py')
     host = files_digest('host')
     base = f'tree-{rid}-{flavor}-{webkit[:12]}-{tool}-'
     # A restored cache with an older source-manifest format is cleared by normalise. Give the

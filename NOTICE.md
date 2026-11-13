@@ -7,9 +7,9 @@ the package does not yet carry the full license texts.
 | DLL | Component | License |
 |---|---|---|
 | `WebCore.dll`, `JavaScriptCore.dll` | WebKit (`Source/WebCore`, `Source/JavaScriptCore`, `Source/WTF`, bundled Skia) | LGPL-2.1 and BSD-style, per file; Skia BSD-3-Clause |
-| `RanvierWebCoreHost.dll` | This repository's `host/`, with code that follows WebKit's `TestPage.cpp` and `EmptyClients.cpp` | Ranvier's license; the WebKit-derived parts BSD-2-Clause |
-| `icudt77.dll`, `icuin77.dll`, `icuuc77.dll` | ICU 77.1 | Unicode License v3 |
-| `harfbuzz.dll`, `harfbuzz-icu.dll` | HarfBuzz | MIT ("Old MIT") |
+| `RanvierWebCoreHost.dll`, `libRanvierWebCoreHost.so`, `libRanvierWebCoreHost.dylib` | This repository's `host/`, with code that follows WebKit's `TestPage.cpp` and `EmptyClients.cpp` (and on Linux embeds WebCore, JavaScriptCore, WTF, Skia, ICU 77.1 and the HarfBuzz-ICU adapter statically) | Ranvier's license; the WebKit-derived parts BSD-2-Clause |
+| `icudt77.dll`, `icuin77.dll`, `icuuc77.dll` (Windows); static `libicudata.a`, `libicui18n.a`, `libicuuc.a` in `libRanvierWebCoreHost.so` (Linux) | ICU 77.1 | Unicode License v3 |
+| `harfbuzz.dll`, `harfbuzz-icu.dll` (Windows); static `libharfbuzz-icu.a` in `libRanvierWebCoreHost.so` (Linux) | HarfBuzz / HarfBuzz-ICU glue | MIT ("Old MIT") |
 | `libxml2.dll` | libxml2 | MIT |
 | `jpeg62.dll` | libjpeg-turbo | IJG, BSD-3-Clause, zlib |
 | `libpng16.dll` | libpng | libpng license |

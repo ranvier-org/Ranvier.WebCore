@@ -1,7 +1,8 @@
 # Builds the RanvierWebCoreHost library and the libraries it loads from the pinned WebKit commit for one
 # runtime identifier, and packages them.
 #
-#   build.py fetch      clone WebKit at its pin into the work directory; on Windows also vcpkg, and LLVM unless --llvm
+#   build.py fetch      clone WebKit at its pin into the work directory; on Windows also vcpkg, and LLVM unless --llvm;
+#                       on Linux build the static ICU and HarfBuzz-ICU archives unless --icu
 #   build.py prepare    check the generated DOM functions against WebKit's IDL (gen/domgen.py), apply
 #                       patches/series to WebKit and install host/ into Tools/TestWebKitAPI
 #   build.py configure  run CMake with config/<flavor>.cmake; on Windows vcpkg installs the dependencies here
@@ -9,11 +10,11 @@
 #   build.py package    stage the libraries RanvierWebCoreHost loads and pack the NuGet package
 #   build.py smoke      check the staged files against the manifest and paint a page with them (scripts/smoke.py),
 #                       then run the F# ABI tests against them (scripts/abi_tests.py); on Linux the manifest
-#                       check only, as loading there is untested
+#                       and static-ICU linkage checks only, as loading there is untested
 #   build.py all        every step above, in order
 #
 # The runtime identifier (--rid) picks the WebKit port: win-* builds PORT=Win with clang-cl and vcpkg,
-# linux-* builds PORT=WPE against the distribution's libraries, osx-* builds PORT=Mac. Every path defaults
+# linux-* builds PORT=WPE against the distribution's ABI-stable libraries plus pinned static ICU, osx-* builds PORT=Mac. Every path defaults
 # to a location under --work, so a fresh machine needs only the tools of docs/CI.md on PATH (or in
 # --tool-path) and Python 3.12 or later.
 import argparse, hashlib, json, os, pathlib, re, shutil, subprocess, sys, tarfile, time, urllib.request
@@ -33,6 +34,7 @@ parser.add_argument('--source', help='WebKit checkout (default <work>/src)')
 parser.add_argument('--build-dir', help='build directory (default <work>/build-<flavor>)')
 parser.add_argument('--vcpkg', help='vcpkg root (default <work>/vcpkg)')
 parser.add_argument('--llvm', help="LLVM's bin directory (default <work>/tools/llvm/bin, which fetch fills)")
+parser.add_argument('--icu', help='Linux static ICU prefix (default <work>/tools/icu, which fetch builds)')
 parser.add_argument('--webkit-repo', default=pins['webkit']['repository'], help='where fetch clones WebKit from')
 parser.add_argument('--tool-path', action='append',
                     default=[p for p in os.environ.get('RANVIER_TOOL_PATH', '').split(os.pathsep) if p],
@@ -59,6 +61,7 @@ source = pathlib.Path(args.source) if args.source else work / 'src'
 build = pathlib.Path(args.build_dir) if args.build_dir else work / f'build-{args.flavor}'
 vcpkg = pathlib.Path(args.vcpkg) if args.vcpkg else work / 'vcpkg'
 llvm = pathlib.Path(args.llvm) if args.llvm else work / 'tools/llvm/bin'
+icu_prefix = pathlib.Path(args.icu) if args.icu else work / ('tools/icu-lean' if args.flavor == 'lean' else 'tools/icu')
 installed = build / 'vcpkg_installed'
 triplet = installed / f'{arch}-windows-webkit'
 out = work / 'out' / args.flavor
@@ -182,9 +185,35 @@ def toolchain_env():
     return env
 
 
+def ensure_linux_icu(env):
+    """Builds the static ICU and HarfBuzz-ICU prefix on Linux unless a restored or earlier prefix matches."""
+    if args.icu:
+        return
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('linux_icu', root / 'scripts/linux_icu.py')
+    linux_icu = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(linux_icu)
+    icu = pins['icu']
+    filtered = args.flavor != 'lean'
+    cxx = shutil.which(env.get('CXX', 'clang++'), path=env['PATH']) or env.get('CXX', 'clang++')
+    cc_line = subprocess.run([cxx, '--version'], capture_output=True, text=True, check=True, env=env).stdout.splitlines()[0]
+    if linux_icu.is_up_to_date(icu_prefix.resolve(), linux_icu.expected_stamp(icu, filtered, cc_line)):
+        print(f'linux_icu: {icu_prefix} is up to date ({icu["version"]}, filtered={filtered})', flush=True)
+        return
+    archive = work / 'downloads' / icu['url'].rsplit('/', 1)[1]
+    download(icu['url'], archive, icu['sha256'])
+    command = [sys.executable, '-I', root / 'scripts/linux_icu.py', '--archive', archive, '--out', icu_prefix, '--jobs', str(args.jobs)]
+    if not filtered:
+        command.append('--unfiltered')
+    run(command, env=env)
+
+
 def fetch():
     # WebKit's test and website trees are most of its checkout, and the build reads none of them.
     clone(args.webkit_repo, commit, source, exclude=['LayoutTests', 'JSTests', 'PerformanceTests', 'Websites', 'ManualTests'])
+    if system == 'linux':
+        ensure_linux_icu(toolchain_env())
+        return
     if not windows:
         return
     clone(pins['vcpkg']['repository'], pins['vcpkg']['commit'], vcpkg)
@@ -276,6 +305,11 @@ def configure(env):
     command.append('-DRANVIER_ENABLE_PDF=' + ('ON' if getattr(args, 'enable_pdf', True) else 'OFF'))
     if args.rid.startswith('osx-'):
         command.append('-DCMAKE_EXPORT_COMPILE_COMMANDS=ON')
+    if args.rid.startswith('linux-'):
+        if 'ensure_linux_icu' in globals():
+            ensure_linux_icu(env)
+        icu_dir = pathlib.Path(getattr(args, 'icu', None) or (build.parent / ('tools/icu-lean' if args.flavor == 'lean' else 'tools/icu')))
+        command.append(f'-DRANVIER_ICU_ROOT={icu_dir.resolve().as_posix()}')
     if windows:
         clang = (llvm / 'clang-cl.exe').as_posix()
         command += [f'-DCMAKE_C_COMPILER={clang}', f'-DCMAKE_CXX_COMPILER={clang}',

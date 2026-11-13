@@ -1,6 +1,7 @@
 # Linux: WebKit's WPE port, made for embedding, with Skia's CPU raster as on Windows. config/common.cmake
-# includes this file for linux-* runtime identifiers. The package links the distribution's libraries
-# (GLib, ICU, HarfBuzz, FreeType, fontconfig and the image codecs) and does not carry them.
+# includes this file for linux-* runtime identifiers. The package links the distribution's ABI-stable
+# libraries (GLib, HarfBuzz, FreeType, fontconfig and the image codecs) and statically links the pinned
+# ICU and HarfBuzz-ICU glue (config/wpe-project.cmake, scripts/linux_icu.py).
 #
 # The host builds only WebCore and JavaScriptCore under TestWebKitAPI, so WPE's own embedding layers and
 # their dependencies are off: the WPE platform backends, the libwpe API, and the integrations a browser
@@ -8,6 +9,7 @@
 # the host does not link it.
 
 set(PORT "WPE" CACHE STRING "")
+set(CMAKE_PROJECT_WebKit_INCLUDE "${CMAKE_CURRENT_LIST_DIR}/wpe-project.cmake" CACHE FILEPATH "")
 
 set(ENABLE_WPE_PLATFORM ON CACHE BOOL "")
 set(ENABLE_WPE_PLATFORM_DRM OFF CACHE BOOL "")

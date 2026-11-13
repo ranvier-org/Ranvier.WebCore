@@ -47,11 +47,14 @@ slim flavor. The GPU flavor (`config/gpu.cmake`) is the slim flavor with the GPU
   command line, so `/OPT:SAFEICF` overrides `OptionsMSVC.cmake`'s `/OPT:NOICF`: identical functions whose
   address is not taken are folded. `dwrite.lib` is linked because WebCore otherwise receives it only through
   `PlatformWin.cmake`'s MediaFoundation target, which `ENABLE_VIDEO=OFF` removes.
-- **Filtered ICU data** (`scripts/icu_data.py`): `icudt77.dll` from 31.90 MB to 7.20 MB. Kept: break
-  iterators and their dictionaries, normalisation, IDNA and stringprep, emoji and layout properties,
-  converter aliases, supplemental data, and root and English locale data. Removed: converters, character
-  names, transliteration and every other locale. The input is `icudt77l.dat` from ICU's release archive,
-  checked against `pins.json`; it is the same file vcpkg's ICU port builds from.
+- **Filtered ICU data** (`scripts/icu_data.py`, `scripts/linux_icu.py`): `icudt77.dll` on Windows and static
+  `libicudata.a` on Linux from 31.90 MB to 7.20 MB. Kept: break iterators and their dictionaries, normalisation,
+  IDNA and stringprep, emoji and layout properties, converter aliases, supplemental data, and root and English
+  locale data. Removed: converters, character names, transliteration and every other locale. The input is
+  `icudt77l.dat` from ICU's release archive, checked against `pins.json`; it is the same file vcpkg's ICU port
+  builds from. On Linux (`config/wpe-project.cmake`), `libicuuc.a`, `libicui18n.a`, `libicudata.a` and
+  `libharfbuzz-icu.a` are linked statically into `libRanvierWebCoreHost.so` with `--exclude-libs` so the package
+  has no runtime dependency on a distribution's `libicu*.so.<major>` or `libharfbuzz-icu.so.0`.
 
 ## mac.cmake (osx-* runtimes)
 

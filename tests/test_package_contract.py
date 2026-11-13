@@ -1,7 +1,10 @@
 import pathlib
+import hashlib
 import importlib.util
 import json
+import struct
 import tempfile
+import types
 import unittest
 import xml.etree.ElementTree as ET
 import zipfile
@@ -12,6 +15,54 @@ RIDS = {'win-x64', 'win-arm64', 'linux-x64', 'linux-arm64', 'osx-arm64'}
 SPEC = importlib.util.spec_from_file_location('package_managed', ROOT / 'scripts/package_managed.py')
 PACKAGING = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(PACKAGING)
+SMOKE_SPEC = importlib.util.spec_from_file_location('smoke', ROOT / 'scripts/smoke.py')
+SMOKE = importlib.util.module_from_spec(SMOKE_SPEC)
+SMOKE_SPEC.loader.exec_module(SMOKE)
+
+
+def synthetic_elf_so(needed=(), exports=()):
+    dynstr = bytearray(b'\x00')
+    dyn_entries = bytearray()
+    for name in needed:
+        off = len(dynstr)
+        dynstr += name.encode('utf-8') + b'\x00'
+        dyn_entries += struct.pack('<qQ', 1, off)
+    dyn_entries += struct.pack('<qQ', 0, 0)
+
+    symstr = bytearray(b'\x00')
+    dynsym = bytearray(struct.pack('<IBBHQQ', 0, 0, 0, 0, 0, 0))
+    for sym in exports:
+        off = len(symstr)
+        symstr += sym.encode('utf-8') + b'\x00'
+        dynsym += struct.pack('<IBBHQQ', off, (1 << 4) | 2, 0, 1, 0x1000, 16)
+
+    body = bytearray(64)
+    def add_blob(blob):
+        while len(body) % 8:
+            body.append(0)
+        start = len(body)
+        body.extend(blob)
+        return start, len(blob)
+
+    dynstr_off, dynstr_sz = add_blob(dynstr)
+    dyn_off, dyn_sz = add_blob(dyn_entries)
+    symstr_off, symstr_sz = add_blob(symstr)
+    sym_off, sym_sz = add_blob(dynsym)
+    while len(body) % 8:
+        body.append(0)
+    shoff = len(body)
+    sections = [
+        struct.pack('<IIQQQQIIQQ', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        struct.pack('<IIQQQQIIQQ', 0, 3, 0, 0, dynstr_off, dynstr_sz, 0, 0, 1, 0),
+        struct.pack('<IIQQQQIIQQ', 0, 6, 0, 0, dyn_off, dyn_sz, 1, 0, 8, 16),
+        struct.pack('<IIQQQQIIQQ', 0, 3, 0, 0, symstr_off, symstr_sz, 0, 0, 1, 0),
+        struct.pack('<IIQQQQIIQQ', 0, 11, 0, 0, sym_off, sym_sz, 3, 1, 8, 24),
+    ]
+    body += b''.join(sections)
+    ident = b'\x7fELF\x02\x01\x01' + b'\x00' * 9
+    header = struct.pack('<16sHHIQQQIHHHHHH', ident, 3, 62, 1, 0, 0, shoff, 0, 64, 0, 0, 64, len(sections), 0)
+    body[:64] = header
+    return bytes(body)
 
 
 class PackageContract(unittest.TestCase):
@@ -122,6 +173,52 @@ class PackageContract(unittest.TestCase):
                 archive.writestr('manifest.json', json.dumps(manifest))
             with self.assertRaisesRegex(ValueError, 'one ABI'):
                 PACKAGING.validate_runtimes(packages, '0.1.0-preview.6', (21, 'pinned', 'same'))
+
+    def test_linux_smoke_enforces_static_hidden_icu(self):
+        args = types.SimpleNamespace(expect_flavor=None, expect_version=None, expect_commit=None, build_dir=None, no_load=True)
+        with tempfile.TemporaryDirectory() as temporary:
+            stage = pathlib.Path(temporary)
+            native = stage / 'runtimes/linux-x64/native'
+            native.mkdir(parents=True)
+            host = native / 'libRanvierWebCoreHost.so'
+
+            def write_stage(needed, exports):
+                payload = synthetic_elf_so(needed=needed, exports=exports)
+                host.write_bytes(payload)
+                manifest = dict(
+                    rid='linux-x64', flavor='slim', version='0.1.1-rc.9', webkit='pinned', abi=64,
+                    source=dict(commit='a' * 40, dirty=False, builder='ci'),
+                    total_bytes=len(payload),
+                    files=[dict(name='libRanvierWebCoreHost.so', bytes=len(payload), sha256=hashlib.sha256(payload).hexdigest())],
+                )
+                (stage / 'manifest.json').write_text(json.dumps(manifest))
+
+            write_stage(['libharfbuzz.so.0', 'libglib-2.0.so.0', 'libc.so.6'], ['rv_abi_version', 'rv_host_create'])
+            SMOKE.check(stage, args)
+
+            for bad_needed in ('libicuuc.so.74', 'libicui18n.so.74', 'libicudata.so.74', 'libharfbuzz-icu.so.0'):
+                with self.subTest(needed=bad_needed):
+                    write_stage(['libharfbuzz.so.0', bad_needed], ['rv_abi_version'])
+                    with self.assertRaises(SystemExit) as cm:
+                        SMOKE.check(stage, args)
+                    self.assertIn(bad_needed, str(cm.exception))
+
+            for leaked in ('hb_icu_script_to_script', 'icudt77_dat'):
+                with self.subTest(leaked=leaked):
+                    write_stage(['libharfbuzz.so.0'], ['rv_abi_version', leaked])
+                    with self.assertRaises(SystemExit) as cm:
+                        SMOKE.check(stage, args)
+                    self.assertIn(leaked, str(cm.exception))
+
+    def test_linux_workflows_and_package_list_require_no_distro_icu(self):
+        packages = [line.strip() for line in (ROOT / 'scripts/linux-packages.txt').read_text().splitlines()
+                    if line.strip() and not line.lstrip().startswith('#')]
+        self.assertNotIn('libicu-dev', packages)
+        for rel in ('.github/workflows/build.yml', '.github/workflows/atspi-provider.yml'):
+            with self.subTest(workflow=rel):
+                text = (ROOT / rel).read_text()
+                self.assertNotIn('libicu74', text)
+                self.assertNotIn('libharfbuzz-icu0', text)
 
 
 if __name__ == '__main__':
