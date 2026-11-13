@@ -104,5 +104,10 @@ if (ENABLE_WEBCORE)
         # being one of those clients; build.py package sets the install name back to its file name. The
         # option goes with the libraries because they follow CMake's own -install_name, and the last wins.
         target_link_libraries(RanvierWebCoreHost PRIVATE "-Wl,-install_name,@rpath/libTestWebCore.dylib")
+    elseif (PORT STREQUAL "WPE")
+        # Keep statically linked ICU and HarfBuzz-ICU archives out of libRanvierWebCoreHost.so's dynamic symbol table.
+        target_link_libraries(RanvierWebCoreHost PRIVATE
+            "-Wl,--exclude-libs=libicuuc.a:libicui18n.a:libicudata.a:libharfbuzz-icu.a"
+        )
     endif ()
 endif ()

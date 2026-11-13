@@ -5,7 +5,7 @@ import re
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-SAVES = ['Save gperf', 'Save LLVM', 'Save vcpkg archives', 'Save vcpkg downloads']
+SAVES = ['Save gperf', 'Save LLVM', 'Save ICU', 'Save vcpkg archives', 'Save vcpkg downloads']
 
 
 def condition(name):

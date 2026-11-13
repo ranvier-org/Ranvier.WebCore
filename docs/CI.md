@@ -101,6 +101,7 @@ tree's key names the toolchain.
 |---|---|---|---|
 | gperf (Windows, from Chocolatey) | its version and the RID: a cache entry holds paths relative to the workspace, whose drive differs between the x64 and ARM64 images | always | its install |
 | LLVM (Windows) | the RID's archive hash in `pins.json` | always | fetch |
+| ICU (Linux) | the RID, whether data is filtered, `pins.json`'s ICU pin, `scripts/icu_data.py`, `scripts/linux_icu.py` and the toolchain | always | fetch |
 | build tree | see [Build tree](#build-tree) | unless a manual run sets `clean` | the build |
 | vcpkg binary archives (Windows) | the RID, the flavor and vcpkg's ABI inputs: the vcpkg and WebKit pins, any patch that writes WebKit's `vcpkg.json`, `vcpkg-configuration.json` or `WebKitLibraries/triplets/`, the flavor's `VCPKG_MANIFEST_FEATURES`, and the MSVC toolset's identity (as in the build tree's key) | when no build tree was restored | a successful configure |
 | vcpkg downloads (Windows) | the RID and the vcpkg, WebKit and ICU pins | when the archives missed | a successful configure |
@@ -138,8 +139,8 @@ tree-<rid>-<flavor>-<WebKit pin>-<toolchain>-<core>-<host>
 
 | Part | Hash of |
 |---|---|
-| toolchain | Windows: the MSVC toolset and Windows SDK versions, the hash of `cl.exe`, the paths and sizes of their headers, the LLVM pin and the vcpkg key (the tree holds `vcpkg_installed`). Runner images ship the same toolset version with other binaries and headers: on 2026-11-01 vcpkg's compiler hash differed between `windows-2025` images 20261021.278.1 and 20261030.294.1, both MSVC 14.51.36231. Linux: `clang --version` and the image. macOS: `xcodebuild -version` and the SDK version. |
-| core | the blob ids of `patches/`, `config/`, `scripts/build.py` and `scripts/patches.py` |
+| toolchain | Windows: the MSVC toolset and Windows SDK versions, the hash of `cl.exe`, the paths and sizes of their headers, the LLVM pin and the vcpkg key (the tree holds `vcpkg_installed`). Runner images ship the same toolset version with other binaries and headers: on 2026-11-01 vcpkg's compiler hash differed between `windows-2025` images 20261021.278.1 and 20261030.294.1, both MSVC 14.51.36231. Linux: `clang --version`, the image and the static ICU key. macOS: `xcodebuild -version` and the SDK version. |
+| core | the blob ids of `patches/`, `config/`, `scripts/build.py`, `scripts/patches.py`, `scripts/icu_data.py` and `scripts/linux_icu.py` |
 | host | the blob ids of `host/` |
 
 - An exact hit restores a tree built from the same inputs: ninja has nothing to do, and nothing is saved.

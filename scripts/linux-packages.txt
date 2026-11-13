@@ -13,7 +13,6 @@ patchelf
 # Libraries WPE requires
 libglib2.0-dev
 libharfbuzz-dev
-libicu-dev
 libjpeg-dev
 libepoxy-dev
 libgcrypt20-dev
