@@ -1,0 +1,13 @@
+version: 2
+# Rolls only the Fickl compiler in .config/dotnet-tools.json. Dependabot opens the pull request so
+# that CI runs on it: a pull request opened with GITHUB_TOKEN triggers no workflows.
+updates:
+  - package-ecosystem: nuget
+    directory: "/"
+    schedule:
+      interval: daily
+    allow:
+      - dependency-name: "fickl"
+    commit-message:
+      prefix: "chore(deps)"
+    open-pull-requests-limit: 1
