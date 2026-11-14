@@ -114,8 +114,12 @@ jobs:
     # The matrix of runtime and flavor cells, filtered by the manual run's rids input. A version tag push builds
     # the Slim runtimes and the GPU runtimes side by side, so one publish releases both flavors. On a version tag
     # whose release holds a cell's package, attached by scripts/release.py as the repository owner, that cell goes
-    # to prebuilt instead.
+    # to prebuilt instead. So does a cell whose package this workflow's successful main run already built from the
+    # tag's commit at the tag's version: a tag pushed after that run rebuilds only what the run did not build.
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     outputs:
       matrix: ${{ steps.plan.outputs.matrix }}
       prebuilt: ${{ steps.plan.outputs.prebuilt }}
@@ -175,11 +179,32 @@ jobs:
               # Only the owner's: anyone who can push a tag could otherwise attach a package to be published.
               assets = {a['name'] for a in release['assets'] if a['uploader']['login'] == owner} \
                   if release and release['author']['login'] == owner else set()
-              base = json.load(open('pins.json'))['package']['id']
+              package = json.load(open('pins.json'))['package']
+              base = package['id']
+              # The main run stamps pins.json's version, so its packages serve a tag only of that same version.
+              # Only this workflow's own successful push run on main for the tag's commit is taken: a pull
+              # request's or another workflow's artifact of the same name is not.
+              built, run_id = set(), None
+              if package['version'] == tag[1:]:
+                  def api(path):
+                      request = urllib.request.Request(
+                          f"{os.environ['GITHUB_API_URL']}/repos/{os.environ['GITHUB_REPOSITORY']}/actions/{path}",
+                          headers={'Authorization': f"Bearer {os.environ['GH_TOKEN']}", 'Accept': 'application/vnd.github+json'})
+                      return json.load(urllib.request.urlopen(request, timeout=60))
+                  runs = api(f"runs?head_sha={os.environ['GITHUB_SHA']}&branch=main&event=push&status=success&per_page=100")
+                  runs = [r for r in runs['workflow_runs'] if r['path'] == '.github/workflows/build.yml'
+                          and r['head_sha'] == os.environ['GITHUB_SHA'] and r['head_branch'] == 'main'
+                          and r['event'] == 'push' and r['conclusion'] == 'success'
+                          and r['repository']['full_name'] == os.environ['GITHUB_REPOSITORY']]
+                  if runs:
+                      run_id = max(r['id'] for r in runs)
+                      built = {a['name'] for a in api(f'runs/{run_id}/artifacts?per_page=100')['artifacts'] if not a['expired']}
               for cell in cells:
                   name = f"{base}{ {'slim': '.Cpu', 'gpu': '', 'lean': '.Lean'}[cell['flavor']] }.{cell['rid']}.{tag[1:]}.nupkg"
                   if name in assets:
-                      prebuilt.append(dict(cell, asset=name))
+                      prebuilt.append(dict(cell, asset=name, run=''))
+                  elif f"package-{cell['rid']}-{cell['flavor']}" in built:
+                      prebuilt.append(dict(cell, asset=name, run=str(run_id)))
           done = {(p['rid'], p['flavor']) for p in prebuilt}
           build = [c for c in cells if (c['rid'], c['flavor']) not in done]
           print('build:', *(f"{c['rid']}/{c['flavor']}" for c in build), '- prebuilt:', *(f"{p['rid']}/{p['flavor']}" for p in prebuilt))
@@ -189,9 +214,13 @@ jobs:
               out.write('prebuilt=' + (json.dumps(dict(include=prebuilt)) if prebuilt else '') + '\n')
 
   prebuilt:
-    # A runtime whose package was built and checked on the owner's machine by scripts/release.py: checked
-    # again here, on a clean runner of its platform, against the tag's commit, then passed to publish.
+    # A runtime whose package was built and checked on the owner's machine by scripts/release.py, or built by
+    # the main run of the tag's commit (matrix.run names that run): checked again here, on a clean runner of
+    # its platform, against the tag's commit, then passed to publish.
     needs: plan
+    permissions:
+      contents: read
+      actions: read
     if: ${{ needs.plan.outputs.prebuilt != '' }}
     strategy:
       fail-fast: false
@@ -207,10 +236,20 @@ jobs:
           python-version: '3.14'
 
       - name: Download the package from the release
+        if: matrix.run == ''
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release download "$GITHUB_REF_NAME" --pattern '${{ matrix.asset }}' --dir packages
+
+      - name: Download the package from the main run of this commit
+        if: matrix.run != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: package-${{ matrix.rid }}-${{ env.FLAVOR }}
+          run-id: ${{ matrix.run }}
+          github-token: ${{ github.token }}
+          path: packages
 
       - name: Check the package and paint a page
         shell: bash

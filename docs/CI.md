@@ -24,8 +24,8 @@ Jobs, in dependency order:
 | Job | Runs | Does |
 |---|---|---|
 | `package-contract` | always, on `ubuntu-latest` | The unit tests of packaging, release, probe and generator contracts (the explicit list of `python -I tests/...` steps in the job), `capability_catalogue.py --check`, `generate_native.py check`, the managed contract builds, Fantomas, Fable and Chromium proofs of the generated DOM. A new test file runs in CI only when it is added to this list. |
-| `plan` | always | Computes the matrix of runtime and flavor cells (filtered by `rids`): the selected flavor's runtimes, plus the four GPU runtimes on a `v*` tag push. On a tag whose release holds a package the repository owner attached for a cell, that cell goes to `prebuilt` instead of `native`. |
-| `prebuilt` | when `plan` lists attached packages | Downloads the package on a clean runner of its platform and runs `smoke.py`. The manifest must name the tag's commit, a clean tree and the tag's version. |
+| `plan` | always | Computes the matrix of runtime and flavor cells (filtered by `rids`): the selected flavor's runtimes, plus the four GPU runtimes on a `v*` tag push. On a tag whose release holds a package the repository owner attached for a cell, that cell goes to `prebuilt` instead of `native`. So does a cell whose package the successful `main` run of the tag's commit already built at the tag's version (see "Tagging a commit `main` has built"). |
+| `prebuilt` | when `plan` lists attached or already built packages | Downloads the package, from the release or from the `main` run that built it, on a clean runner of its platform and runs `smoke.py`. The manifest must name the tag's commit, a clean tree and the tag's version. |
 | `native` | one job per runtime and flavor | Builds with `scripts/build.py` step by step, runs `smoke.py`, the F# ABI tests (Windows, macOS) and `scripts/probes.py`, packs the `.nupkg`, and uploads `package-*` artifacts. The five runtimes are `win-x64`, `win-arm64`, `linux-x64`, `linux-arm64`, `osx-arm64`. |
 | `managed` | after `native`, `prebuilt`, `package-contract` | Packs `Ranvier.WebCore` and the `Ranvier.WebCore.Native.Cpu` aggregate from the five Slim packages with `scripts/package_managed.py`. On a tag it also packs the default `Ranvier.WebCore.Native` aggregate from the four GPU packages and the CPU `win-arm64` package, and its `Ranvier.WebCore.Native.Gpu` alias; a partial GPU set fails the job. Skipped for a pull request that is neither from a `codex/batch-*` branch nor labelled `full-matrix`. |
 | `result` | always | The `CI result` check that branch protection requires. Fails when any job above failed or was cancelled, when `package-contract` or `plan` did not succeed, or when `native` did not succeed outside a `v*` tag. |
@@ -67,6 +67,23 @@ packages attached. Creating the release pushes the tag, whose run takes the atta
 `--flavor gpu` builds `Ranvier.WebCore.Native.<rid>` and the default `--flavor slim` builds `Ranvier.WebCore.Native.Cpu.<rid>`; `--dry-run` stops before the release. The attached
 package must come from the repository owner; anyone who can push a tag could otherwise get a package of their own
 published. A workstation package records `"builder": "local"` in `manifest.json`; CI records `"ci"`.
+
+### Tagging a commit `main` has built
+
+A push to `main` builds the five Slim runtimes at `pins.json`'s version. A `v<version>` tag on that same commit takes
+those packages instead of building them again, when all of these hold:
+
+- the `build` run for the push to `main` has finished and succeeded before the tag is pushed (`plan` reads it once, at
+  the start of the tag's run; a tag pushed while that run is still going builds everything);
+- `pins.json`'s `package.version` at the commit is the tag's version, since that is the version the `main` run stamped;
+- the run's `package-<rid>-<flavor>` artifact has not expired.
+
+`plan` takes only this workflow's own successful `push` run on `main` for the tag's commit, never a pull request's
+run. Each taken package goes through `prebuilt`, which checks its commit, clean tree, version and flavor again. The
+four GPU runtimes are built only on a tag, so a tag run still builds those; an owner-attached release package takes
+precedence over a `main` run's.
+
+So, to release: merge the version change, wait for the `main` run to go green, then push the tag.
 
 ## Cocoa replay
 
