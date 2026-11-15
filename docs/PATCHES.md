@@ -508,6 +508,72 @@ ANGLE's D3D11 renderer issues the calls of every context of a display on one imm
 order they are made, so the compositor already reads what Skia drew. On Windows the paints are now submitted
 without the wait and without the flush before each one. Other platforms keep the fence.
 
+## 0084-libpas-windows-lazy-commit
+
+`USE_LIBPAS_LAZY_COMMIT`, declared in `Source/bmalloc/CMakeLists.txt`; `config/slim.cmake` sets it for `win-*`. It
+defines `PAS_WINDOWS_LAZY_COMMIT`, which `pas_config.h` rejects on any other system.
+
+libpas maps all of its memory through `pas_page_malloc.c`, which on Windows commits a mapping as it reserves it
+(`MEM_COMMIT | MEM_RESERVE`); elsewhere the same call is an `mmap` the kernel backs on first touch. Windows charges
+commit when a page is committed, so four mappings cost commit that a process mostly never uses:
+
+| Mapping | Mapped | Owner |
+|---|---|---|
+| Compact heap reservation | 128 MB, on the first allocation | `pas_compact_heap_reservation.c` |
+| Megapage | 32 MB each: a 16 MB megapage and 16 MB to align it | `pas_megapage_cache.c` |
+| Large expendable memory | 64 MB: 32 MB and 32 MB to align it | `pas_large_expendable_memory.c` |
+| Compact expendable memory | 20 MB of the reservation | `pas_compact_expendable_memory.c` |
+
+With the option each is reserved, and its owner commits what it hands out:
+
+- **Reservation:** commits up to the end of each allocation, as the PlayStation branch of the same function does.
+- **Megapage cache:** commits a page when the page leaves the cache. This applies only to the two bootstrap heap
+  providers; a cache over a client's reserved memory keeps that provider's commit state.
+- **Expendable memories:** commit a payload page when the bump pointer first reaches it. Scavenging discards the
+  page's contents and leaves it committed, as before, so a reader still never meets a page that faults.
+- **Padding:** the address space that aligns a reserved mapping stays reserved and unused. It used to go to the
+  bootstrap free heap, which would hand it out as committed memory.
+
+`pas_page_malloc_reserve_only_alignment` and `pas_compact_heap_reservation_reserve_only_size` select the one
+mapping an owner wants reserved. The owner sets them around its call with the heap lock held, and they are zero
+at all other times.
+
+The patch edits `Source/bmalloc/CMakeLists.txt` and, under `libpas/src/libpas`, `pas_config.h`,
+`pas_page_malloc.{c,h}`, `pas_compact_heap_reservation.{c,h}`, `pas_megapage_cache.c`,
+`pas_expendable_memory.c`, `pas_large_expendable_memory.c` and `pas_compact_expendable_memory.c`.
+
+Measured on Windows 11 x64 on 2026-11-16 with `tests/libpas_commit`, which builds libpas alone at the pin with
+clang-cl 23.1.4 and reads the process's private commit:
+
+| `commit_test` | Without the option | With it |
+|---|---|---|
+| `first`: commit added by one 64-byte allocation | 160.37 MB | 0.18 MB |
+| `workload`: commit added with 29.46 MB in use | 256.70 MB | 36.89 MB |
+| `stress`: commit left after the last scavenge | 289.22 MB | 3.82 MB |
+| `stress`: wall time, median of five alternating runs | 3.05 s | 3.23 s |
+
+`stress` allocates, writes, verifies, reallocates and frees objects of 1 byte to 5 MB on four threads and
+scavenges between rounds; it passes in both builds. The patched sources built without the option give the
+left-hand column.
+
+Measured the same day on a host: a Python process loads `RanvierWebCoreHost.dll`, creates a 1280 by 800 host and
+paints a page of 12,250 nodes on the CPU. The left column is the `Ranvier.WebCore.Native.Cpu.win-x64` 0.1.1
+package, the right a slim `win-x64` build of this series. Working set did not change (42.5 MB and 68.4 MB at the
+first two rows): the pages the option leaves uncommitted were never touched.
+
+| Private commit after | 0.1.1 | With the option |
+|---|---|---|
+| `rv_host_create` | 314.2 MB | 36.4 MB |
+| the page is painted | 315.0 MB | 56.1 MB |
+| a second host paints the same page | 347.6 MB | 69.4 MB |
+
+`build.py smoke` passes against that build: the staged files match the manifest, a page paints, and the F# ABI
+driver and its probes report no failure.
+
+Not covered: a megapage in a client's reserved memory is still committed whole by `pas_large_heap`. JavaScriptCore's
+structure heap is one, and its 16 MB is most of what `rv_host_create` still commits. libpas's own test suite
+(`libpas/src/test`) was not run.
+
 ## Working on the series
 
 ```
