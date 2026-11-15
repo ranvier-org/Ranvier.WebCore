@@ -583,6 +583,22 @@ first two rows): the pages the option leaves uncommitted were never touched.
 `build.py smoke` passes against that build: the staged files match the manifest, a page paints, and the F# ABI
 driver and its probes report no failure.
 
+Measured the same day on five example applications, each in an unattended mode that exits by itself, first with
+the 0.1.1 GPU engine their packages ship and then with the GPU flavor of this series through 0086 copied over it.
+All eight runs exit 0 with both engines. Peak working set moved by less than 6% either way in every run: it is
+set by the .NET heap, the GPU driver and wgpu's upload memory, which the engine does not own.
+
+| Application and mode | Peak commit, 0.1.1 | Peak commit, this series |
+|---|---|---|
+| AstroShowcase `--check` | 908.2 MB | 638.8 MB |
+| AstroShowcase `--soak 20` | 1,140.9 MB | 907.4 MB |
+| AstroShowcase `--bench` | 1,038.7 MB | 778.7 MB |
+| Ranvier.D5.Dashboards `--native-probe` | 447.5 MB | 195.7 MB |
+| Ranvier.D5.Dashboards `--capture` | 482.4 MB | 201.9 MB |
+| Ranvier.D5.Gallery `--capture` | 332.2 MB | 89.8 MB |
+| RanvierWgpuBim `--smoke` | 886.9 MB | 609.8 MB |
+| RanvierWgpuAtlas `--smoke` | 920.7 MB | 677.4 MB |
+
 Not covered: a megapage in a client's reserved memory is still committed whole by `pas_large_heap`. JavaScriptCore's
 structure heap is one, and its 16 MB is most of what `rv_host_create` still commits. libpas's own test suite
 (`libpas/src/test`) was not run.
@@ -638,6 +654,11 @@ to 0085 with the host's direct conversion against the same with 0086:
 | 1280 by 800, 12,250 nodes | 3.96 ms | 2.68 ms |
 | 1280 by 800, 980 nodes | 3.37 ms | 2.32 ms |
 | 2560 by 1600, 980 nodes | 11.22 ms | 6.70 ms |
+
+In an application: `Ranvier.D5.Dashboards --native-probe` paints each of ten dashboards 300 times through
+`rv_host_paint_rgba`. With the 0.1.1 engine its idle frames took 10.22 ms to 21.26 ms by dashboard, 15.9 ms on
+average; with this series (the host's direct conversion and 0086 together) 6.34 ms to 16.36 ms, 11.4 ms on
+average. Both runs were made one after the other on an otherwise idle machine.
 
 The pixels are the same: two pages at four device scales, painted whole and in part, hash alike in both builds
 when the two are run one after the other. (The hashes of one build did change between two runs minutes apart,
