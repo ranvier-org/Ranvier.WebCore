@@ -567,7 +567,9 @@ clang-cl 23.1.4 and reads the process's private commit:
 
 `stress` allocates, writes, verifies, reallocates and frees objects of 1 byte to 5 MB on four threads and
 scavenges between rounds; it passes in both builds. The patched sources built without the option give the
-left-hand column.
+left-hand column. `compact-tail` frees a block at the reservation's bump pointer, has the compact expendable memory
+take its payload, and writes to what the compact bootstrap free heap hands out next; it passes in both builds, and
+faulted with the option before the payload was taken straight from the reservation.
 
 Measured the same day on a host: a Python process loads `RanvierWebCoreHost.dll`, creates a 1280 by 800 host and
 paints a page of 12,250 nodes on the CPU. The left column is the `Ranvier.WebCore.Native.Cpu.win-x64` 0.1.1

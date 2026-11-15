@@ -2,7 +2,7 @@
 # 0084 can be checked in minutes without a WebKit build. Windows only.
 #
 #   python -I tests/libpas_commit/build.py --source <webkit> --out <dir> [--lazy] [--llvm <bin dir>]
-#   <dir>/commit_test.exe first | workload | stress [regions]
+#   <dir>/commit_test.exe first | workload | stress | compact-tail [regions]
 #
 # --source needs only Source/bmalloc, with patches/series applied. --lazy defines PAS_WINDOWS_LAZY_COMMIT=1,
 # which is what USE_LIBPAS_LAZY_COMMIT does in the WebKit build; without it the build is WebKit's own, and
