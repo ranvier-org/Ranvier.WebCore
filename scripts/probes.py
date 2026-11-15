@@ -183,6 +183,8 @@ PROBES = [
           'python -I tests/abi/font_readiness.py --native-directory {native} --webkit-source {work}/src'),
     probe('Verify FontFace construction from bytes and URLs and FontFaceSet registration without JavaScript',
           'python -I tests/abi/font_construction.py --native-directory {native} --webkit-source {work}/src'),
+    probe('Verify generic font families map to installed fonts on Windows',
+          'python -I tests/abi/generic_font_families.py --native-directory {native}'),
     probe('Verify delayed image decode readiness and drawing',
           'python -I tests/abi/image_readiness.py --native-directory {native}'),
     probe('Verify SVGTests lists after attribute removal',

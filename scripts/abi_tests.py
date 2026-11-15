@@ -156,6 +156,7 @@ with workspace as temp:
     probe([sys.executable, '-I', tests / 'font_load.py', '--native-directory', out, '--webkit-source', args.source])
     probe([sys.executable, '-I', tests / 'font_readiness.py', '--native-directory', out, '--webkit-source', args.source])
     probe([sys.executable, '-I', tests / 'font_construction.py', '--native-directory', out, '--webkit-source', args.source])
+    probe([sys.executable, '-I', tests / 'generic_font_families.py', '--native-directory', out])
     probe([sys.executable, '-I', tests / 'image_readiness.py', '--native-directory', out])
     probe([sys.executable, '-I', tests / 'svg_tests_lists.py', '--native-directory', out])
     probe([sys.executable, '-I', tests / 'mathml_surface.py', '--native-directory', out])

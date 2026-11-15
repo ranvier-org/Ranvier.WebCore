@@ -859,6 +859,16 @@ static Ref<Page> createPage(IntSize viewportSize, RvScreenOrientationManager& or
 #if ENABLE(VIDEO)
     page->settings().setMediaEnabled(false);
 #endif
+#if PLATFORM(WIN)
+    // WebCore's generic font families are empty until the embedder sets them, and an empty one renders in the last-resort
+    // font. These are Chromium's defaults on Windows, with its alternate fixed family.
+    page->settings().setStandardFontFamily("Times New Roman"_s);
+    page->settings().setSerifFontFamily("Times New Roman"_s);
+    page->settings().setSansSerifFontFamily("Arial"_s);
+    page->settings().setFixedFontFamily("Consolas"_s);
+    page->settings().setCursiveFontFamily("Comic Sans MS"_s);
+    page->settings().setFantasyFontFamily("Impact"_s);
+#endif
     RefPtr frame = page->localMainFrame();
     RELEASE_ASSERT(frame);
     frame->setView(LocalFrameView::create(*frame, viewportSize));
