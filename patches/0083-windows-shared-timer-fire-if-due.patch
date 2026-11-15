@@ -1,0 +1,92 @@
+diff --git a/Source/WebCore/platform/MainThreadSharedTimer.h b/Source/WebCore/platform/MainThreadSharedTimer.h
+index c117f78..60d94a3 100644
+--- a/Source/WebCore/platform/MainThreadSharedTimer.h
++++ b/Source/WebCore/platform/MainThreadSharedTimer.h
+@@ -63,6 +63,11 @@ public:
+ 
+     WEBCORE_EXPORT static bool& NODELETE shouldSetupPowerObserver();
+     WEBCORE_EXPORT static void restartSharedTimer();
++#if OS(WINDOWS)
++    // For an embedder that polls its run loop: posts the fired message when the armed fire time has passed,
++    // instead of leaving it to the timer-queue callback or WM_TIMER, which run up to a clock tick later.
++    WEBCORE_EXPORT static void fireIfDue();
++#endif
+ 
+ private:
+     MainThreadSharedTimer();
+diff --git a/Source/WebCore/platform/win/MainThreadSharedTimerWin.cpp b/Source/WebCore/platform/win/MainThreadSharedTimerWin.cpp
+index 04d4383..24fa522 100644
+--- a/Source/WebCore/platform/win/MainThreadSharedTimerWin.cpp
++++ b/Source/WebCore/platform/win/MainThreadSharedTimerWin.cpp
+@@ -30,6 +30,7 @@
+ #include "WebCoreInstanceHandle.h"
+ #include "Widget.h"
+ #include <wtf/Assertions.h>
++#include <wtf/MonotonicTime.h>
+ #include <wtf/WindowsExtras.h>
+ 
+ #include <mmsystem.h>
+@@ -61,6 +62,8 @@ static HANDLE timerQueue;
+ static bool highResTimerActive;
+ static bool processingCustomTimerMessage = false;
+ static LONG pendingTimers;
++// When the armed timer-queue timer or WM_TIMER is due. Unset while neither is armed. Main thread only.
++static MonotonicTime armedFireTime;
+ 
+ const int timerResolution = 1; // To improve timer resolution, we call timeBeginPeriod/timeEndPeriod with this value to increase timer resolution to 1ms.
+ const int highResolutionThresholdMsec = 16; // Only activate high-res timer for sub-16ms timers (Windows can fire timers at 16ms intervals without changing the system resolution).
+@@ -76,6 +79,7 @@ LRESULT CALLBACK TimerWindowWndProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
+     if (message == WM_TIMER) {
+         if (wParam == sharedTimerID) {
+             KillTimer(timerWindowHandle, sharedTimerID);
++            armedFireTime = MonotonicTime { };
+             MainThreadSharedTimer::singleton().fired();
+         } else if (wParam == endHighResTimerID) {
+             KillTimer(timerWindowHandle, endHighResTimerID);
+@@ -84,6 +88,7 @@ LRESULT CALLBACK TimerWindowWndProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
+         }
+     } else if (message == timerFiredMessage) {
+         InterlockedExchange(&pendingTimers, 0);
++        armedFireTime = MonotonicTime { };
+         processingCustomTimerMessage = true;
+         MainThreadSharedTimer::singleton().fired();
+         processingCustomTimerMessage = false;
+@@ -132,6 +137,7 @@ void MainThreadSharedTimer::setFireInterval(Seconds intervalInSeconds)
+ 
+     initializeOffScreenTimerWindow();
+     bool timerSet = false;
++    armedFireTime = MonotonicTime::now() + intervalInSeconds;
+ 
+     if (interval < highResolutionThresholdMsec) {
+         if (!highResTimerActive) {
+@@ -153,6 +159,7 @@ void MainThreadSharedTimer::setFireInterval(Seconds intervalInSeconds)
+             if (InterlockedIncrement(&pendingTimers) == 1)
+                 PostMessage(timerWindowHandle, timerFiredMessage, 0, 0);
+             timerSet = true;
++            armedFireTime = MonotonicTime { };
+         } else {
+             // Otherwise, delay the PostMessage via a CreateTimerQueueTimer
+             if (!timerQueue)
+@@ -174,8 +181,22 @@ void MainThreadSharedTimer::setFireInterval(Seconds intervalInSeconds)
+     }
+ }
+ 
++void MainThreadSharedTimer::fireIfDue()
++{
++    if (!armedFireTime || armedFireTime > MonotonicTime::now())
++        return;
++
++    // The caller is outside the message loop, so this post cannot keep a loop that drains the queue from ending.
++    // stop() cancels the timer-queue timer or WM_TIMER; pendingTimers keeps a callback already running from
++    // posting a second message.
++    singleton().stop();
++    if (InterlockedIncrement(&pendingTimers) == 1)
++        PostMessage(timerWindowHandle, timerFiredMessage, 0, 0);
++}
++
+ void MainThreadSharedTimer::stop()
+ {
++    armedFireTime = MonotonicTime { };
+     if (timerQueue && timer) {
+         DeleteTimerQueueTimer(timerQueue, timer, 0);
+         timer = 0;
