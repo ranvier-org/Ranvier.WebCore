@@ -23,13 +23,29 @@ SAMPLES = 21
 ZERO_CYCLE_LIMIT_MS = 10.0
 BOUNDED_MS = 20
 TOGGLES = 20
-CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_void_p)
+# Three clock ticks of the default Windows timer period (15.6 ms).
+SETTLE_MS = 50
+CALLBACK =ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_void_p)
 
 
 def timed(cycle, milliseconds):
     start = time.perf_counter()
     cycles = cycle(milliseconds)
     return cycles, (time.perf_counter() - start) * 1000.0
+
+
+def settle(native, cycle, show, hide, target, toggles):
+    """Opens and closes the popover once, and cycles after each until the timers it starts have fired.
+
+    Delivering the first toggle starts a zero-delay timer while WebCore fires its timers, once the page resolves a
+    font family. The Windows shared timer hands a timer started at that point to a timer-queue callback, which posts
+    up to a clock tick later, and ThreadTimers arms nothing new for a task queued before that post. That delay is
+    the shared timer's, not rv_run_loop_cycle(0)'s, so queued_tasks measures after it."""
+    native.expect(show(target, None) == 0, 'settling show status')
+    cycle(SETTLE_MS)
+    native.expect(hide(target) == 0, 'settling hide status')
+    cycle(SETTLE_MS)
+    native.expect(len(toggles) == 2, f'settling toggles delivered: {len(toggles)} != 2')
 
 
 def queued_tasks(native, cycle):
@@ -45,6 +61,7 @@ def queued_tasks(native, cycle):
     show = native.bind('rv_dom_html_element_show_popover', I, [P, P])
     hide = native.bind('rv_dom_html_element_hide_popover', I, [P])
     cycle(20)
+    settle(native, cycle, show, hide, target, toggles)
     for index in range(TOGGLES):
         before = len(toggles)
         native.expect((show(target, None) if index % 2 == 0 else hide(target)) == 0, f'toggle {index} status')
