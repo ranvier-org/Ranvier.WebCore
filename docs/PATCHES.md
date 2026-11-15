@@ -574,6 +574,37 @@ Not covered: a megapage in a client's reserved memory is still committed whole b
 structure heap is one, and its 16 MB is most of what `rv_host_create` still commits. libpas's own test suite
 (`libpas/src/test`) was not run.
 
+## 0085-interface-object-stub
+
+`USE_INTERFACE_OBJECT_STUB`, declared in `Source/cmake/OptionsCommon.cmake`; `config/slim.cmake` sets it for
+`win-*`. The script bindings are generated without interface objects: the constructors script reaches as
+`window.Node`, `window.Event` and so on. The wrapper classes, their prototypes and `toJS` stay. The host runs no
+script, so nothing reads an interface object.
+
+- **Generator:** `CodeGeneratorJS.pm` and `preprocess-idls.pl` treat every interface as one declared
+  `[LegacyNoInterfaceObject]` when the option adds `NO_INTERFACE_OBJECTS` to the generators' defines. Callback
+  interfaces and namespaces are generated as before.
+- **Global objects:** their implementation calls `toJSDOMGlobalObject`, defined in a header the interface object's
+  code used to include, so the generator adds that include for them.
+- **Hand-written code:** `constructJSHTMLElement` in `JSHTMLElementCustom.cpp`, which the `HTMLElement` interface
+  object called, is compiled out.
+
+Why it matters beyond size: each interface object's class record points at a symbol imported from
+`JavaScriptCore.dll`, which the linker cannot resolve, so the compiler emits a function that fills the record in
+when `WebCore.dll` loads. There were 529 of them, spread a page apart through the bindings.
+
+Measured on Windows 11 x64 on 2026-11-16, slim `win-x64`, the series up to 0084 against the series with 0085:
+
+| | Without | With |
+|---|---|---|
+| `WebCore.dll` | 45.76 MB | 43.38 MB |
+| Bindings code linked into it | 7.72 MB | 6.03 MB |
+| `WebCore.dll` pages resident once the library is loaded | 4.36 MB | 2.01 MB |
+| Bindings code on those pages | 2.64 MB | 0.46 MB |
+| `WebCore.dll` pages resident with a 12,250-node page painted | 14.30 MB | 11.99 MB |
+
+`build.py smoke` passes against the build.
+
 ## Working on the series
 
 ```

@@ -40,6 +40,7 @@ slim flavor. The GPU flavor (`config/gpu.cmake`) is the slim flavor with the GPU
 | `ENABLE_WEBGL`, `ENABLE_VIDEO`, `ENABLE_REMOTE_INSPECTOR`, `ENABLE_WEBDRIVER` | OFF | Browser features with no use in presentation. With the link folding below, WebKit's own options remove 3.78 MB from `WebCore.dll`. |
 | `USE_*_STUB` | ON | The patch series; `docs/PATCHES.md`. |
 | `USE_AX_EMBEDDER_NOTIFICATIONS` | ON | Patch 0011: accessibility notifications reach the host's chrome client, for `RvAxCallback`; `docs/ACCESSIBILITY.md`. Adds 2.5 KB to `WebCore.dll`. |
+| `USE_INTERFACE_OBJECT_STUB` | ON for `win-*` | Patch 0085: script bindings without interface objects. `WebCore.dll` 45.76 MB to 43.38 MB, and 2.3 MB fewer of its pages resident; `docs/PATCHES.md`. |
 | `USE_LIBPAS_LAZY_COMMIT` | ON for `win-*` | Patch 0084: libpas reserves its large mappings and commits them as they are used. A process's first allocation commits 0.18 MB in place of 160.37 MB, measured on libpas alone; `docs/PATCHES.md`. |
 
 ## Outside CMake (slim only)

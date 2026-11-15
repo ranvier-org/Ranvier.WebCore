@@ -1,0 +1,96 @@
+diff --git a/Source/WebCore/CMakeLists.txt b/Source/WebCore/CMakeLists.txt
+index bdd1b26..12a273f 100644
+--- a/Source/WebCore/CMakeLists.txt
++++ b/Source/WebCore/CMakeLists.txt
+@@ -2978,6 +2978,10 @@ if (WebCore_USER_AGENT_SCRIPTS)
+ endif ()
+ 
+ set(FEATURE_DEFINES_JAVASCRIPT "LANGUAGE_JAVASCRIPT ${FEATURE_DEFINES_WITH_SPACE_SEPARATOR}")
++if (USE_INTERFACE_OBJECT_STUB)
++    # Read by preprocess-idls.pl and CodeGeneratorJS.pm.
++    string(APPEND FEATURE_DEFINES_JAVASCRIPT " NO_INTERFACE_OBJECTS")
++endif ()
+ 
+ set(SETTINGS_TEMPLATES
+     ${WEBCORE_DIR}/Scripts/SettingsTemplates/InternalSettingsGenerated.cpp.erb
+diff --git a/Source/WebCore/bindings/js/JSHTMLElementCustom.cpp b/Source/WebCore/bindings/js/JSHTMLElementCustom.cpp
+index 3e015a3..d54b04b 100644
+--- a/Source/WebCore/bindings/js/JSHTMLElementCustom.cpp
++++ b/Source/WebCore/bindings/js/JSHTMLElementCustom.cpp
+@@ -49,6 +49,8 @@ namespace WebCore {
+ 
+ using namespace JSC;
+ 
++// The HTMLElement interface object calls this; a build without interface objects has no caller.
++#if !USE(INTERFACE_OBJECT_STUB)
+ EncodedJSValue constructJSHTMLElement(JSGlobalObject* lexicalGlobalObject, CallFrame& callFrame)
+ {
+     VM& vm = lexicalGlobalObject->vm();
+@@ -121,6 +123,7 @@ EncodedJSValue constructJSHTMLElement(JSGlobalObject* lexicalGlobalObject, CallF
+ 
+     return JSValue::encode(elementWrapperValue);
+ }
++#endif
+ 
+ JSScope* JSHTMLElement::pushEventHandlerScope(JSGlobalObject* lexicalGlobalObject, JSScope* scope) const
+ {
+diff --git a/Source/WebCore/bindings/scripts/CodeGeneratorJS.pm b/Source/WebCore/bindings/scripts/CodeGeneratorJS.pm
+index 4fb119a..3f3784e 100644
+--- a/Source/WebCore/bindings/scripts/CodeGeneratorJS.pm
++++ b/Source/WebCore/bindings/scripts/CodeGeneratorJS.pm
+@@ -173,6 +173,12 @@ sub GenerateInterface
+ {
+     my ($object, $interface, $defines, $enumerations, $dictionaries) = @_;
+ 
++    # USE_INTERFACE_OBJECT_STUB: every interface is generated as one declared [LegacyNoInterfaceObject].
++    if ($defines =~ /\bNO_INTERFACE_OBJECTS\b/ && !$interface->isCallback) {
++        $interface->extendedAttributes->{LegacyNoInterfaceObject} = 1;
++        $interface->extendedAttributes->{InterfaceObjectStub} = 1;
++    }
++
+     $codeGenerator->LinkOverloadedOperations($interface);
+ 
+     AddIterableOperationIfNeeded($interface);
+@@ -5371,6 +5377,10 @@ sub GenerateImplementation
+         push(@implContent, "}\n\n");
+     }
+ 
++    # A global object's implementation calls toJSDOMGlobalObject, defined in the header that the interface
++    # object's code would have included.
++    AddToImplIncludes("JSDOMGlobalObjectInlines.h") if $interface->extendedAttributes->{InterfaceObjectStub};
++
+     if (!$interface->extendedAttributes->{LegacyNoInterfaceObject}) {
+         AddToImplIncludes("JSDOMGlobalObjectInlines.h");
+         push(@implContent, "JSValue ${className}::getConstructor(VM& vm, const JSGlobalObject* globalObject)\n");
+diff --git a/Source/WebCore/bindings/scripts/preprocess-idls.pl b/Source/WebCore/bindings/scripts/preprocess-idls.pl
+index ae42cfe..9684ceb 100644
+--- a/Source/WebCore/bindings/scripts/preprocess-idls.pl
++++ b/Source/WebCore/bindings/scripts/preprocess-idls.pl
+@@ -281,6 +281,9 @@ foreach my $idlFileName (sort keys %idlFileNameHash) {
+     #   property must exist on the ECMAScript environment's global object.
+     # See https://webidl.spec.whatwg.org/#es-interfaces
+     my $extendedAttributes = getInterfaceExtendedAttributesFromIDL($idlFile);
++    # USE_INTERFACE_OBJECT_STUB: no global object gets a property for an interface, as CodeGeneratorJS.pm
++    # generates none.
++    $extendedAttributes->{"LegacyNoInterfaceObject"} = 1 if $defines =~ /\bNO_INTERFACE_OBJECTS\b/ && !$isCallbackInterface;
+     if (!$extendedAttributes->{"LegacyNoInterfaceObject"} && (!$isCallbackInterface || containsInterfaceWithConstantsFromIDL($idlFile))) {
+         my $exposedAttribute = $extendedAttributes->{"Exposed"};
+         if (!$exposedAttribute) {
+diff --git a/Source/cmake/OptionsCommon.cmake b/Source/cmake/OptionsCommon.cmake
+index 782235f..12a541d 100644
+--- a/Source/cmake/OptionsCommon.cmake
++++ b/Source/cmake/OptionsCommon.cmake
+@@ -197,6 +197,13 @@ if (USE_AX_EMBEDDER_NOTIFICATIONS)
+     SET_AND_EXPOSE_TO_BUILD(USE_AX_EMBEDDER_NOTIFICATIONS ON)
+ endif ()
+ 
++# Generates the script bindings without interface objects (the constructors script reaches as window.Node,
++# window.Event and so on), for an embedder that runs no script. The wrapper classes stay.
++option(USE_INTERFACE_OBJECT_STUB "Generate script bindings without interface objects" OFF)
++if (USE_INTERFACE_OBJECT_STUB)
++    SET_AND_EXPOSE_TO_BUILD(USE_INTERFACE_OBJECT_STUB ON)
++endif ()
++
+ option(CLANG_TIME_TRACE "Generate Clang time trace profiling output" OFF)
+ if (CLANG_TIME_TRACE AND COMPILER_IS_CLANG)
+     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ftime-trace")

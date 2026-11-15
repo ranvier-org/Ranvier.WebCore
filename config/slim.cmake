@@ -34,4 +34,5 @@ set(USE_JSC_INSPECTOR_STUB ON CACHE BOOL "")  # 0009: no JavaScriptCore inspecto
 set(USE_AX_EMBEDDER_NOTIFICATIONS ON CACHE BOOL "")  # 0011: accessibility notifications reach the host
 if (RANVIER_RID MATCHES "^win-")
     set(USE_LIBPAS_LAZY_COMMIT ON CACHE BOOL "")     # 0084: libpas commits its large reservations as they are used
+    set(USE_INTERFACE_OBJECT_STUB ON CACHE BOOL "")  # 0085: script bindings without interface objects
 endif ()
