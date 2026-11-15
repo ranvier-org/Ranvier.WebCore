@@ -25,7 +25,7 @@ BOUNDED_MS = 20
 TOGGLES = 20
 # Three clock ticks of the default Windows timer period (15.6 ms).
 SETTLE_MS = 50
-CALLBACK =ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_void_p)
+CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_void_p)
 
 
 def timed(cycle, milliseconds):
