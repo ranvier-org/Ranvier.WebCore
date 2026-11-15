@@ -187,6 +187,23 @@ class FlavorMatrixTests(unittest.TestCase):
         self.assertIn('--expect-version "${GITHUB_REF_NAME#v}"', job)
         self.assertIn('actions: read', job)
 
+    def test_the_prebuilt_job_installs_the_linux_runtime_libraries_before_it_loads_a_package(self):
+        workflow = (ROOT / '.github/workflows/build.yml').read_text()
+        job = workflow.split('\n  prebuilt:\n', 1)[1].split('\n  native:\n', 1)[0]
+        steps = job.split('\n      - ')
+        install = [index for index, step in enumerate(steps) if 'scripts/linux-runtime-packages.txt' in step]
+        self.assertEqual(len(install), 1)
+        self.assertIn("if: runner.os == 'Linux'", steps[install[0]])
+        self.assertIn('apt-get', steps[install[0]])
+        loads = [index for index, step in enumerate(steps) if 'scripts/check_package_api.py' in step]
+        self.assertEqual(len(loads), 2)
+        self.assertLess(install[0], min(loads))
+        packages = [line for line in (ROOT / 'scripts/linux-runtime-packages.txt').read_text().split('\n')
+                    if line and not line.startswith('#')]
+        # The library the v0.1.2 tag run could not open on its clean Linux runners.
+        self.assertIn('libsoup-3.0-0', packages)
+        self.assertEqual(len(packages), len(set(packages)))
+
     def test_cells_read_their_flavor_and_do_not_queue_behind_each_other(self):
         workflow = (ROOT / '.github/workflows/build.yml').read_text()
         self.assertNotIn('\n  gpu-cohort:\n', workflow)

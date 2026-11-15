@@ -251,6 +251,13 @@ jobs:
           github-token: ${{ github.token }}
           path: packages
 
+      - name: Install the Linux runtime libraries
+        # The packaged probes below load the host, and a clean Linux runner has none of the libraries it links.
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get -o Acquire::Retries=5 update -q
+          grep -v '^#' scripts/linux-runtime-packages.txt | xargs sudo apt-get -o Acquire::Retries=5 install -y -q --no-install-recommends
+
       - name: Check the package and paint a page
         shell: bash
         run: >-
@@ -261,6 +268,9 @@ jobs:
       - name: Verify packaged CSS queries, computed styles and fragment rectangles
         if: env.FLAVOR == 'slim'
         shell: bash
+        env:
+          EGL_PLATFORM: ${{ startsWith(matrix.rid, 'linux-') && 'surfaceless' || '' }}
+          LIBGL_ALWAYS_SOFTWARE: ${{ startsWith(matrix.rid, 'linux-') && '1' || '' }}
         run: python -I scripts/check_package_api.py --package 'packages/${{ matrix.asset }}'
 
       - name: Select macOS packaged GPU consumer tools
