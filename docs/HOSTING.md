@@ -77,6 +77,11 @@ in `docs/CLIPBOARD-DND.md`.
 and changes the page through the DOM calls: the hand-written `rv_document_*`, `rv_node_*`, `rv_element_*` calls and
 the generated `rv_dom_*` functions (`docs/GENERATOR.md`).
 
+On Windows the host maps the generic font families to installed fonts: `serif` and text with no `font-family` to
+Times New Roman, `sans-serif` to Arial, `monospace` to Consolas, `cursive` to Comic Sans MS and `fantasy` to Impact.
+`system-ui` has no mapping there and renders in the last-resort font, Times New Roman, so name a font before it. The
+mapping applies on Windows only; the other platforms keep WebKit's own resolution.
+
 ## Teardown
 
 Release nodes, listeners, watches' targets, accessibility nodes, GPU frames and diagnostic snapshots, detach any
