@@ -119,8 +119,9 @@
       "hadSysPathInsert": true
     },
     "run_loop_cycle.py": {
-      "astSha256": "6e466df695ebcbd60af6a61cc92200426f10367658f733d7d55706ba6c516ae8",
-      "hadSysPathInsert": true
+      "astSha256": "b2fb347918a8f2b0a2198dec52d588cd3e73cd1a357c7aed69d5b26f7d28b37a",
+      "hadSysPathInsert": true,
+      "changedAfterSourceCommit": "settle() added: the popover opens and closes once before the 20 measured toggles; their assertions are unchanged"
     },
     "screen_metrics.py": {
       "astSha256": "74e84cb551d971b5ccac232ccbeead8d5a1277c036c598d394edcb1d2ee6caa5",
