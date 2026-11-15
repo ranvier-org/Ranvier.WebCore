@@ -1102,6 +1102,14 @@ struct RvHost {
 #endif
 #endif
     float deviceScale { 1 };
+    // The surface a CPU paint of the whole viewport draws into, kept from one paint to the next: a new one costs a
+    // page fault for each of its pages in every frame. rv_run_loop_cycle drops it once no paint has used it for
+    // paintBufferIdle, and rv_release_memory drops it at once.
+    RefPtr<ImageBuffer> paintBuffer;
+    IntSize paintBufferSize;
+    float paintBufferScale { 0 };
+    MonotonicTime paintBufferUsed;
+    static constexpr Seconds paintBufferIdle { 2_s };
 #if defined(_WIN32) && RANVIER_COMPOSITING
     Vector<std::unique_ptr<RvNativeTextureInput>> nativeTextures;
 #elif defined(__linux__) && RANVIER_COMPOSITING
@@ -3798,12 +3806,32 @@ static int32_t paintArea(RvHost& host, uint8_t* rgba, int32_t length, IntRect ar
 #endif
     RefPtr<ImageBuffer> buffer;
     if (!area.isEmpty()) {
+        // Only a paint of the whole viewport keeps its surface: partial paints vary in size from call to call.
+        bool keepsSurface = area == IntRect { { }, host.size };
+        bool reused = keepsSurface && host.paintBuffer && host.paintBufferSize == area.size()
+            && host.paintBufferScale == host.deviceScale;
         {
             RvTraceSpan span(host, RV_HOST_TRACE_BUFFER_CREATE);
-            buffer = ImageBuffer::create(FloatSize { area.size() }, RenderingMode::Unaccelerated,
-                RenderingPurpose::Unspecified, host.deviceScale, DestinationColorSpace::SRGB(), PixelFormat::BGRA8);
+            if (reused)
+                buffer = host.paintBuffer;
+            else {
+                buffer = ImageBuffer::create(FloatSize { area.size() }, RenderingMode::Unaccelerated,
+                    RenderingPurpose::Unspecified, host.deviceScale, DestinationColorSpace::SRGB(), PixelFormat::BGRA8);
+            }
+        }
+        if (keepsSurface) {
+            host.paintBuffer = buffer;
+            host.paintBufferSize = area.size();
+            host.paintBufferScale = host.deviceScale;
+            host.paintBufferUsed = MonotonicTime::now();
         }
         if (buffer) {
+            // The saver leaves a kept surface's context as a new one's is: no translation, no clip.
+            GraphicsContextStateSaver stateSaver(buffer->context());
+            // A new surface is transparent. A kept one holds the last frame; the rectangle is a pixel larger than
+            // the area on each side so that it covers the surface's last row and column at a fractional scale.
+            if (reused)
+                buffer->context().clearRect(FloatRect { -1, -1, area.width() + 2.f, area.height() + 2.f });
             buffer->context().translate(-area.x(), -area.y());
             auto behavior = view->paintBehavior();
             view->setPaintBehavior(behavior | PaintBehavior::FlattenCompositingLayers);
@@ -4709,8 +4737,11 @@ void rv_watch_release(RvWatch* watch)
 
 void rv_release_memory(void)
 {
-    if (onOwningThread())
-        releaseMemory(Critical::Yes, Synchronous::Yes);
+    if (!onOwningThread())
+        return;
+    for (auto* host : liveHosts)
+        host->paintBuffer = nullptr;
+    releaseMemory(Critical::Yes, Synchronous::Yes);
 }
 
 void rv_collect_garbage(void)
@@ -4801,6 +4832,9 @@ int32_t rv_run_loop_cycle(int32_t milliseconds)
         ++cycles;
         auto hosts = liveHosts;
         for (auto* host : hosts) {
+            if (liveHosts.contains(host) && host->paintBuffer
+                && MonotonicTime::now() - host->paintBufferUsed > RvHost::paintBufferIdle)
+                host->paintBuffer = nullptr;
             if (liveHosts.contains(host) && host->filePicker && (!host->filePicker->isValid()
                     || !host->filePickerElement || !host->filePickerElement->isConnected()
                     || host->filePickerElement->document().page() != host->page.ptr()))
