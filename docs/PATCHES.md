@@ -605,6 +605,31 @@ Measured on Windows 11 x64 on 2026-11-16, slim `win-x64`, the series up to 0084 
 
 `build.py smoke` passes against the build.
 
+## 0086-opaque-pixel-conversion
+
+Always applies; it edits `Source/WebCore/platform/graphics/PixelBufferConversion.cpp`, the Skia branch only.
+
+Reading an image buffer back as unpremultiplied pixels (`getPixelBuffer`, which a CPU paint and
+`getImageData` use) went through Skia's general conversion, which divides each channel of each pixel by its alpha.
+A pixel whose alpha is 255 is unchanged by that. When every source pixel is opaque, `convertImagePixelsSkia` now
+declares both sides opaque, and Skia takes its channel-reordering path. An image with any other alpha value takes
+the path it took before. `SkPixmap::computeIsOpaque` decides, and stops at the first pixel that is not opaque.
+
+A page painted by the host is opaque: the frame view paints a base background under it.
+
+Measured on Windows 11 x64 on 2026-11-16, slim `win-x64`, median of 40 `rv_host_paint_rgba` calls, the series up
+to 0085 with the host's direct conversion against the same with 0086:
+
+| Frame | Without | With |
+|---|---|---|
+| 1280 by 800, 12,250 nodes | 3.96 ms | 2.68 ms |
+| 1280 by 800, 980 nodes | 3.37 ms | 2.32 ms |
+| 2560 by 1600, 980 nodes | 11.22 ms | 6.70 ms |
+
+The pixels are the same: two pages at four device scales, painted whole and in part, hash alike in both builds
+when the two are run one after the other. (The hashes of one build did change between two runs minutes apart,
+for a reason not found; text rendering settings are the suspect.) `build.py smoke` passes against the build.
+
 ## Working on the series
 
 ```

@@ -1,0 +1,25 @@
+diff --git a/Source/WebCore/platform/graphics/PixelBufferConversion.cpp b/Source/WebCore/platform/graphics/PixelBufferConversion.cpp
+index 1328fff..c7b3ce4 100644
+--- a/Source/WebCore/platform/graphics/PixelBufferConversion.cpp
++++ b/Source/WebCore/platform/graphics/PixelBufferConversion.cpp
+@@ -208,11 +208,19 @@ static bool convertImagePixelsSkia(const ConstPixelBufferConversionView& source,
+         return false;
+     // Utilize SkPixmap which is a raw bytes wrapper capable of performing conversions.
+     SkPixmap sourcePixmap(sourceImageInfo, source.rows.data(), source.bytesPerRow);
++    // Premultiplying or unpremultiplying a pixel whose alpha is 255 leaves it as it is. When every source pixel is
++    // opaque, as a painted page's are, both sides are declared opaque, and Skia reorders the channels in place of
++    // multiplying or dividing each one by alpha.
++    auto destinationSkiaAlphaType = toSkiaAlphaType(destination.format.alphaFormat);
++    if (source.format.alphaFormat != destination.format.alphaFormat && sourcePixmap.computeIsOpaque()) {
++        sourcePixmap.reset(sourceImageInfo.makeAlphaType(SkAlphaType::kOpaque_SkAlphaType), source.rows.data(), source.bytesPerRow);
++        destinationSkiaAlphaType = SkAlphaType::kOpaque_SkAlphaType;
++    }
+     SkImageInfo destinationImageInfo = SkImageInfo::Make(
+         destinationSize.width(),
+         destinationSize.height(),
+         *destinationSkiaColorType,
+-        toSkiaAlphaType(destination.format.alphaFormat),
++        destinationSkiaAlphaType,
+         destination.format.colorSpace.platformColorSpace()
+     );
+     // Read pixels from source to destination and convert pixels if necessary.
