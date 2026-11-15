@@ -61,6 +61,7 @@
 #include <WebCore/HTMLSelectElement.h>
 #include <WebCore/HTMLTextAreaElement.h>
 #include <WebCore/ImageBuffer.h>
+#include <WebCore/ImageBufferAllocator.h>
 #include <WebCore/ImportNodeOptions.h>
 #include <WebCore/KeyboardEvent.h>
 #include <WebCore/LocalFrame.h>
@@ -3704,6 +3705,48 @@ int32_t rv_gpu_frame_release(RvGpuFrame* frame)
 #endif
 }
 
+// A pixel buffer over memory the caller owns. ImageBuffer::getPixelBuffer converts into it in place of a buffer of
+// its own, which a paint would then copy to the caller row by row.
+class RvCallerPixelBuffer final : public PixelBuffer {
+public:
+    static Ref<RvCallerPixelBuffer> create(const PixelBufferFormat& format, const IntSize& size, std::span<uint8_t> bytes)
+    {
+        return adoptRef(*new RvCallerPixelBuffer(format, size, bytes));
+    }
+
+private:
+    RvCallerPixelBuffer(const PixelBufferFormat& format, const IntSize& size, std::span<uint8_t> bytes)
+        : PixelBuffer(format, size, bytes)
+    {
+    }
+
+    Type type() const final { return Type::Other; }
+    RefPtr<PixelBuffer> createScratchPixelBuffer(const IntSize&) const final { return nullptr; }
+};
+
+// Hands getPixelBuffer the caller's image when the pixels it asks for are the whole of that image, so each row has
+// the caller's stride. Any other size gets WebCore's own buffer.
+class RvCallerPixelBufferAllocator final : public ImageBufferAllocator {
+public:
+    RvCallerPixelBufferAllocator(std::span<uint8_t> bytes, IntSize size)
+        : m_bytes(bytes)
+        , m_size(size)
+    {
+    }
+
+private:
+    RefPtr<ImageBuffer> createImageBuffer(const FloatSize&, const DestinationColorSpace&, RenderingMode) const final { return nullptr; }
+    RefPtr<PixelBuffer> createPixelBuffer(const PixelBufferFormat& format, const IntSize& size) const final
+    {
+        if (size != m_size)
+            return ImageBufferAllocator::createPixelBuffer(format, size);
+        return RvCallerPixelBuffer::create(format, size, m_bytes);
+    }
+
+    std::span<uint8_t> m_bytes;
+    IntSize m_size;
+};
+
 // Paints area, in CSS pixels of the viewport, into its place in rgba, an image of paintSize.
 static int32_t paintArea(RvHost& host, uint8_t* rgba, int32_t length, IntRect area)
 {
@@ -3781,18 +3824,23 @@ static int32_t paintArea(RvHost& host, uint8_t* rgba, int32_t length, IntRect ar
         return RV_ERR_PAINT_FAILED;
     buffer->flushDrawingContext();
     PixelBufferFormat format { AlphaPremultiplication::Unpremultiplied, PixelFormat::RGBA8, DestinationColorSpace::SRGB() };
-    // getPixelBuffer takes CSS pixels and scales them as paintSize does.
-    auto pixels = buffer->getPixelBuffer(format, IntRect { { }, area.size() });
+    // getPixelBuffer takes CSS pixels and scales them as paintSize does. A paint of the whole viewport asks for
+    // pixels of the caller's size and is converted straight into rgba; a partial paint is converted into a buffer
+    // of its own size and copied to its place.
+    RvCallerPixelBufferAllocator allocator { std::span { rgba, required }, pixelSize };
+    auto pixels = buffer->getPixelBuffer(format, IntRect { { }, area.size() }, allocator);
     if (!pixels)
         return RV_ERR_PAINT_FAILED;
-    auto origin = area.location();
-    origin.scale(host.deviceScale);
-    auto columns = std::min(pixels->size().width(), pixelSize.width() - origin.x());
-    auto rows = std::min(pixels->size().height(), pixelSize.height() - origin.y());
-    auto source = pixels->bytes();
-    for (int row = 0; row < rows; ++row) {
-        std::memcpy(rgba + (static_cast<size_t>(origin.y() + row) * pixelSize.width() + origin.x()) * 4,
-            source.data() + static_cast<size_t>(row) * pixels->size().width() * 4, static_cast<size_t>(columns) * 4);
+    if (pixels->bytes().data() != rgba) {
+        auto origin = area.location();
+        origin.scale(host.deviceScale);
+        auto columns = std::min(pixels->size().width(), pixelSize.width() - origin.x());
+        auto rows = std::min(pixels->size().height(), pixelSize.height() - origin.y());
+        auto source = pixels->bytes();
+        for (int row = 0; row < rows; ++row) {
+            std::memcpy(rgba + (static_cast<size_t>(origin.y() + row) * pixelSize.width() + origin.x()) * 4,
+                source.data() + static_cast<size_t>(row) * pixels->size().width() * 4, static_cast<size_t>(columns) * 4);
+        }
     }
     // An update wanted during the paint, such as a layout that started an animation, needs another frame.
     if (host.updateWanted)
