@@ -3826,8 +3826,10 @@ static int32_t paintArea(RvHost& host, uint8_t* rgba, int32_t length, IntRect ar
     PixelBufferFormat format { AlphaPremultiplication::Unpremultiplied, PixelFormat::RGBA8, DestinationColorSpace::SRGB() };
     // getPixelBuffer takes CSS pixels and scales them as paintSize does. A paint of the whole viewport asks for
     // pixels of the caller's size and is converted straight into rgba; a partial paint is converted into a buffer
-    // of its own size and copied to its place.
-    RvCallerPixelBufferAllocator allocator { std::span { rgba, required }, pixelSize };
+    // of its own size and copied to its place. Below a device scale of 1 a partial paint can round to the caller's
+    // size and still begin at a later column, so only the whole viewport is offered the caller's image.
+    bool wholeViewport = area == IntRect { { }, host.size };
+    RvCallerPixelBufferAllocator allocator { std::span { rgba, required }, wholeViewport ? pixelSize : IntSize { } };
     auto pixels = buffer->getPixelBuffer(format, IntRect { { }, area.size() }, allocator);
     if (!pixels)
         return RV_ERR_PAINT_FAILED;
