@@ -534,9 +534,22 @@ With the option each is reserved, and its owner commits what it hands out:
 - **Padding:** the address space that aligns a reserved mapping stays reserved and unused. It used to go to the
   bootstrap free heap, which would hand it out as committed memory.
 
-`pas_page_malloc_reserve_only_alignment` and `pas_compact_heap_reservation_reserve_only_size` select the one
-mapping an owner wants reserved. The owner sets them around its call with the heap lock held, and they are zero
-at all other times.
+Reserved memory never enters a free heap, which would hand it out as committed:
+
+- **Megapages and the large expendable memory** are mapped through the bootstrap free heaps. Their owner sets
+  `pas_page_malloc_reserve_only_alignment` around the one call, with the heap lock held; a mapping asked for with
+  that alignment is reserved and returned without its padding. Their alignment is at least their size, so the
+  free heap can never join such a mapping to a neighbouring free block.
+- **The reservation** is reserved by `pas_page_malloc_try_reserve`, not through the flag: its alignment is 1,
+  which `pas_enumerator_region.c` also asks for, without the heap lock.
+- **The compact expendable memory** takes its payload straight from the reservation
+  (`pas_compact_heap_reservation_try_allocate_reserved`), not through the compact bootstrap free heap. That heap
+  can join a free block ending where the payload begins to it, return a range starting in the block, and keep the
+  reserved pages beyond the range's end in its free list.
+
+A commit that fails for want of memory asserts, after libpas's ten retries of 50 ms, where the upstream mapping
+would have returned null to a caller that can take it. Upstream already asserts on the recommit of a page the
+scavenger decommitted.
 
 The patch edits `Source/bmalloc/CMakeLists.txt` and, under `libpas/src/libpas`, `pas_config.h`,
 `pas_page_malloc.{c,h}`, `pas_compact_heap_reservation.{c,h}`, `pas_megapage_cache.c`,

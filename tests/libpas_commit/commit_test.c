@@ -1,9 +1,13 @@
 /* Commit-charge and correctness harness for libpas on Windows.
  *   commit_test first     one small allocation must cost less than 8 MB of commit
  *   commit_test workload  commit must stay within the bytes in use plus 24 MB
- *   commit_test stress    allocate, write, verify, free and scavenge across every size class and four threads */
+ *   commit_test stress    allocate, write, verify, free and scavenge across every size class and four threads
+ *   commit_test compact-tail  memory the compact bootstrap heap hands out after the expendable payload is writable */
 #include "bmalloc_heap.h"
 #include "bmalloc_heap_inlines.h"
+#include "pas_compact_bootstrap_free_heap.h"
+#include "pas_compact_expendable_memory.h"
+#include "pas_heap_lock.h"
 #include "pas_scavenger.h"
 /* A WebKit build hides libpas's out-of-line entry points; bmalloc's C++ calls these inline ones. */
 #define bmalloc_allocate bmalloc_allocate_inline
@@ -210,11 +214,37 @@ static int test_stress(void)
     return 0;
 }
 
+/* The compact bootstrap free heap joins a free block that ends at the reservation's bump pointer to the next
+   mapping it takes from the reservation. This frees such a block, one that holds a 16 KB boundary, then has the
+   compact expendable memory take its 20 MB payload, then writes to everything the heap hands out next. A payload
+   that reached the heap while reserved leaves reserved pages in its free list, and a write to one faults. */
+static int test_compact_tail(void)
+{
+    enum { block_size = 40 * 1024, probes = 24, probe_size = 16 * 1024 };
+    char* block;
+
+    pas_heap_lock_lock();
+    /* The heap's first deallocation allocates its free list from the reservation. Have that happen now, so
+       that nothing is bumped between the block freed below and the payload. */
+    block = pas_compact_bootstrap_free_heap_allocate_simple(64, "commit_test/warm-up", pas_object_allocation);
+    pas_compact_bootstrap_free_heap_deallocate(block, 64, pas_object_allocation);
+    block = pas_compact_bootstrap_free_heap_allocate_simple(block_size, "commit_test/block", pas_object_allocation);
+    memset(block, 1, block_size);
+    pas_compact_bootstrap_free_heap_deallocate(block, block_size, pas_object_allocation);
+    memset(pas_compact_expendable_memory_allocate(64, 8, "commit_test/expendable"), 2, 64);
+    for (int i = 0; i < probes; ++i)
+        memset(pas_compact_bootstrap_free_heap_allocate_simple(probe_size, "commit_test/probe", pas_object_allocation), 3, probe_size);
+    pas_heap_lock_unlock();
+    printf("PASS compact-tail: %d blocks after the expendable payload are writable\n", probes);
+    return 0;
+}
+
 int main(int argc, char** argv)
 {
     const char* mode = argc > 1 ? argv[1] : "";
     int status = !strcmp(mode, "first") ? test_first() : !strcmp(mode, "workload") ? test_workload()
-        : !strcmp(mode, "stress") ? test_stress() : (printf("usage: commit_test first|workload|stress\n"), 2);
+        : !strcmp(mode, "stress") ? test_stress() : !strcmp(mode, "compact-tail") ? test_compact_tail()
+        : (printf("usage: commit_test first|workload|stress|compact-tail\n"), 2);
     if (argc > 2 && !strcmp(argv[2], "regions"))
         report_regions();
     return status;

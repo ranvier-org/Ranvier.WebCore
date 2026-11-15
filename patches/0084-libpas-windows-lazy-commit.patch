@@ -15,7 +15,7 @@ index b9eedea..77deff3 100644
      add_compile_options(/wd4206)
      if (WTF_CPU_X86_64)
 diff --git a/Source/bmalloc/libpas/src/libpas/pas_compact_expendable_memory.c b/Source/bmalloc/libpas/src/libpas/pas_compact_expendable_memory.c
-index d730e5e..77b12cc 100644
+index d730e5e..228bfbe 100644
 --- a/Source/bmalloc/libpas/src/libpas/pas_compact_expendable_memory.c
 +++ b/Source/bmalloc/libpas/src/libpas/pas_compact_expendable_memory.c
 @@ -30,6 +30,7 @@
@@ -26,61 +26,75 @@ index d730e5e..77b12cc 100644
  #include "pas_heap_lock.h"
  
  pas_compact_expendable_memory pas_compact_expendable_memory_header;
-@@ -46,11 +47,18 @@ void* pas_compact_expendable_memory_allocate(size_t size,
+@@ -46,11 +47,28 @@ void* pas_compact_expendable_memory_allocate(size_t size,
      if (!pas_compact_expendable_memory_payload) {
          pas_allocation_result new_memory_result;
  
 +#if PAS_WINDOWS_LAZY_COMMIT
-+        /* pas_expendable_memory_try_allocate commits the payload's pages as it hands them out. */
-+        pas_compact_heap_reservation_reserve_only_size = PAS_COMPACT_EXPENDABLE_MEMORY_PAYLOAD_SIZE;
-+#endif
++        /* The payload comes straight from the reservation and is left reserved:
++           pas_expendable_memory_try_allocate commits its pages as it hands them out. It does not come through
++           the compact bootstrap free heap. That heap can join a free block that ends where the payload begins
++           to it and return a range that starts inside the block; the reserved pages beyond the range's end
++           would then be in its free list, to be handed out as committed memory. The padding before the
++           payload, less than one expendable page, is committed and stays unused. */
++        pas_aligned_allocation_result reserved_result;
++
++        reserved_result = pas_compact_heap_reservation_try_allocate_reserved(
++            PAS_COMPACT_EXPENDABLE_MEMORY_PAYLOAD_SIZE, PAS_EXPENDABLE_MEMORY_PAGE_SIZE);
++        new_memory_result = reserved_result.result
++            ? pas_allocation_result_create_success_with_zero_mode(
++                (uintptr_t)reserved_result.result, reserved_result.zero_mode)
++            : pas_allocation_result_create_failure();
++#else
          new_memory_result = pas_compact_bootstrap_free_heap_allocate_with_alignment(
              PAS_COMPACT_EXPENDABLE_MEMORY_PAYLOAD_SIZE,
              pas_alignment_create_traditional(PAS_EXPENDABLE_MEMORY_PAGE_SIZE),
              "pas_large_expendable_memory",
              pas_delegate_allocation);
-+#if PAS_WINDOWS_LAZY_COMMIT
-+        pas_compact_heap_reservation_reserve_only_size = 0;
 +#endif
          PAS_ASSERT(new_memory_result.did_succeed);
          PAS_ASSERT(new_memory_result.begin);
          
 diff --git a/Source/bmalloc/libpas/src/libpas/pas_compact_heap_reservation.c b/Source/bmalloc/libpas/src/libpas/pas_compact_heap_reservation.c
-index ecf0d83..2a75d20 100644
+index ecf0d83..c989803 100644
 --- a/Source/bmalloc/libpas/src/libpas/pas_compact_heap_reservation.c
 +++ b/Source/bmalloc/libpas/src/libpas/pas_compact_heap_reservation.c
-@@ -47,6 +47,14 @@ size_t pas_compact_heap_reservation_bump = 0;
+@@ -47,7 +47,14 @@ size_t pas_compact_heap_reservation_bump = 0;
  uintptr_t pas_compact_heap_reservation_committed = 0;
  #endif
  
+-pas_aligned_allocation_result pas_compact_heap_reservation_try_allocate(size_t size, size_t alignment)
 +#if PAS_WINDOWS_LAZY_COMMIT
-+size_t pas_compact_heap_reservation_reserve_only_size = 0;
-+
 +/* Every page of the reservation below this address is committed, or belongs to an allocation that was
 +   left reserved for its owner to commit. */
 +static uintptr_t compact_heap_reservation_commit_frontier = 0;
 +#endif
 +
- pas_aligned_allocation_result pas_compact_heap_reservation_try_allocate(size_t size, size_t alignment)
++static pas_aligned_allocation_result compact_heap_reservation_try_allocate(
++    size_t size, size_t alignment, bool leave_reserved)
  {
      pas_aligned_allocation_result result;
-@@ -70,8 +78,15 @@ pas_aligned_allocation_result pas_compact_heap_reservation_try_allocate(size_t s
+     uintptr_t reservation_end;
+@@ -69,9 +76,18 @@ pas_aligned_allocation_result pas_compact_heap_reservation_try_allocate(size_t s
+ 
          page_result.result = memory_extra_vss_reserve(pas_compact_heap_reservation_size, pas_page_malloc_alignment());
          PAS_ASSERT(page_result.result);
- #else
++#else
 +#if PAS_WINDOWS_LAZY_COMMIT
-+        pas_page_malloc_reserve_only_alignment = pas_alignment_create_trivial().alignment;
-+#endif
++        pas_zero_memory(&page_result, sizeof(pas_aligned_allocation_result));
++
++        page_result.result = pas_page_malloc_try_reserve(pas_compact_heap_reservation_size);
++        page_result.result_size = pas_compact_heap_reservation_size;
++        page_result.zero_mode = pas_zero_mode_is_all_zero;
++        compact_heap_reservation_commit_frontier = (uintptr_t)page_result.result;
+ #else
          page_result = pas_page_malloc_try_allocate_without_deallocating_padding(
              pas_compact_heap_reservation_size, pas_alignment_create_trivial(), false);
-+#if PAS_WINDOWS_LAZY_COMMIT
-+        pas_page_malloc_reserve_only_alignment = 0;
-+        compact_heap_reservation_commit_frontier = (uintptr_t)page_result.result;
 +#endif
          PAS_ASSERT(!page_result.left_padding_size);
          PAS_ASSERT(!page_result.right_padding_size);
          PAS_ASSERT(page_result.result);
-@@ -125,6 +140,34 @@ pas_aligned_allocation_result pas_compact_heap_reservation_try_allocate(size_t s
+@@ -125,6 +141,31 @@ pas_aligned_allocation_result pas_compact_heap_reservation_try_allocate(size_t s
      }
  #endif
  
@@ -90,12 +104,9 @@ index ecf0d83..2a75d20 100644
 +       its first page, and the frontier then skips to its last page. */
 +    {
 +        size_t page_size;
-+        bool leave_reserved;
 +        uintptr_t commit_end;
 +
 +        page_size = pas_page_malloc_alignment();
-+        leave_reserved = pas_compact_heap_reservation_reserve_only_size
-+            && size == pas_compact_heap_reservation_reserve_only_size;
 +        commit_end = pas_round_up_to_power_of_2(leave_reserved ? allocation_start : allocation_end, page_size);
 +        if (commit_end > compact_heap_reservation_commit_frontier) {
 +            pas_page_malloc_commit(
@@ -115,19 +126,42 @@ index ecf0d83..2a75d20 100644
      result.left_padding = (void*)padding_start;
      result.left_padding_size = allocation_start - padding_start;
      result.result = (void*)allocation_start;
+@@ -133,7 +174,21 @@ pas_aligned_allocation_result pas_compact_heap_reservation_try_allocate(size_t s
+     result.right_padding_size = 0;
+     result.zero_mode = pas_zero_mode_is_all_zero;
+ 
++    PAS_UNUSED_PARAM(leave_reserved);
++
+     return result;
+ }
+ 
++pas_aligned_allocation_result pas_compact_heap_reservation_try_allocate(size_t size, size_t alignment)
++{
++    return compact_heap_reservation_try_allocate(size, alignment, false);
++}
++
++#if PAS_WINDOWS_LAZY_COMMIT
++pas_aligned_allocation_result pas_compact_heap_reservation_try_allocate_reserved(size_t size, size_t alignment)
++{
++    return compact_heap_reservation_try_allocate(size, alignment, true);
++}
++#endif
++
+ #endif /* LIBPAS_ENABLED */
 diff --git a/Source/bmalloc/libpas/src/libpas/pas_compact_heap_reservation.h b/Source/bmalloc/libpas/src/libpas/pas_compact_heap_reservation.h
-index 4cffe9a..0c3e206 100644
+index 4cffe9a..1836930 100644
 --- a/Source/bmalloc/libpas/src/libpas/pas_compact_heap_reservation.h
 +++ b/Source/bmalloc/libpas/src/libpas/pas_compact_heap_reservation.h
-@@ -38,6 +38,13 @@ PAS_API extern size_t pas_compact_heap_reservation_available_size;
+@@ -38,6 +38,14 @@ PAS_API extern size_t pas_compact_heap_reservation_available_size;
  PAS_API extern size_t pas_compact_heap_reservation_bump;
  
  /* FIXME: This should support pas_alignment at some point. */
 +#if PAS_WINDOWS_LAZY_COMMIT
-+/* While this is nonzero, an allocation of exactly this size is left reserved: its owner commits the pages
-+   it uses. The padding before it is committed as for any other allocation. Zero at all other times; set
-+   with the heap lock held. */
-+PAS_API extern size_t pas_compact_heap_reservation_reserve_only_size;
++/* As pas_compact_heap_reservation_try_allocate, but the result is left reserved: its owner commits the pages
++   it uses. The padding before the result is committed, as for any other allocation. The caller keeps the
++   result out of every free heap, which would hand its pages out as committed memory. */
++PAS_API pas_aligned_allocation_result pas_compact_heap_reservation_try_allocate_reserved(
++    size_t size, size_t alignment);
 +#endif
 +
  PAS_API pas_aligned_allocation_result pas_compact_heap_reservation_try_allocate(
@@ -278,15 +312,27 @@ index e21ad43..5062544 100644
      return (void*)result.begin;
  }
 diff --git a/Source/bmalloc/libpas/src/libpas/pas_page_malloc.c b/Source/bmalloc/libpas/src/libpas/pas_page_malloc.c
-index ac0e48a..416d33a 100644
+index ac0e48a..04dc8f6 100644
 --- a/Source/bmalloc/libpas/src/libpas/pas_page_malloc.c
 +++ b/Source/bmalloc/libpas/src/libpas/pas_page_malloc.c
-@@ -161,8 +161,12 @@ PAS_NEVER_INLINE size_t pas_page_malloc_alignment_shift_slow(void)
+@@ -161,8 +161,24 @@ PAS_NEVER_INLINE size_t pas_page_malloc_alignment_shift_slow(void)
      return result;
  }
  
 +#if PAS_WINDOWS_LAZY_COMMIT
 +size_t pas_page_malloc_reserve_only_alignment = 0;
++
++void* pas_page_malloc_try_reserve(size_t size)
++{
++    void* result;
++
++    PAS_ASSERT(pas_is_aligned(size, pas_page_malloc_alignment()));
++
++    result = VirtualAlloc(NULL, size, MEM_RESERVE, PAGE_READWRITE);
++    if (result)
++        pas_page_malloc_num_allocated_bytes += size;
++    return result;
++}
 +#endif
 +
  static void*
@@ -295,7 +341,7 @@ index ac0e48a..416d33a 100644
  {
  
  #if PAS_OS(WINDOWS)
-@@ -176,9 +180,12 @@ pas_page_malloc_try_map_pages(size_t size, bool may_contain_small_or_medium)
+@@ -176,9 +192,12 @@ pas_page_malloc_try_map_pages(size_t size, bool may_contain_small_or_medium)
       */
      PAS_TESTING_ASSERT(!PAS_ENABLE_STATS);
  
@@ -308,7 +354,7 @@ index ac0e48a..416d33a 100644
  
      PAS_PROFILE(PAGE_ALLOCATION, size, may_contain_small_or_medium, PAS_VM_TAG);
      PAS_MTE_HANDLE(PAGE_ALLOCATION, size, may_contain_small_or_medium, PAS_VM_TAG);
-@@ -216,6 +223,13 @@ pas_page_malloc_try_allocate_without_deallocating_padding(
+@@ -216,6 +235,13 @@ pas_page_malloc_try_allocate_without_deallocating_padding(
      char* aligned_end;
      pas_aligned_allocation_result result;
      size_t page_allocation_alignment;
@@ -322,7 +368,7 @@ index ac0e48a..416d33a 100644
  
      if (verbose)
          pas_log("Allocating pages, size = %zu.\n", size);
-@@ -238,7 +252,7 @@ pas_page_malloc_try_allocate_without_deallocating_padding(
+@@ -238,7 +264,7 @@ pas_page_malloc_try_allocate_without_deallocating_padding(
              return result;
      }
  
@@ -331,7 +377,7 @@ index ac0e48a..416d33a 100644
      if (!mmap_result)
          return result;
  
-@@ -281,6 +295,13 @@ pas_page_malloc_try_allocate_without_deallocating_padding(
+@@ -281,6 +307,13 @@ pas_page_malloc_try_allocate_without_deallocating_padding(
      result.right_padding_size = (size_t)(mapped_end - aligned_end);
      result.zero_mode = pas_zero_mode_is_all_zero;
  
@@ -346,10 +392,10 @@ index ac0e48a..416d33a 100644
  }
  
 diff --git a/Source/bmalloc/libpas/src/libpas/pas_page_malloc.h b/Source/bmalloc/libpas/src/libpas/pas_page_malloc.h
-index d46e7a8..ba96b8d 100644
+index d46e7a8..49b5ad3 100644
 --- a/Source/bmalloc/libpas/src/libpas/pas_page_malloc.h
 +++ b/Source/bmalloc/libpas/src/libpas/pas_page_malloc.h
-@@ -62,6 +62,15 @@ PAS_API pas_aligned_allocation_result
+@@ -62,6 +62,19 @@ PAS_API pas_aligned_allocation_result
  pas_page_malloc_try_allocate_without_deallocating_padding(
      size_t size, pas_alignment alignment, bool may_contain_small_or_medium);
  
@@ -360,6 +406,10 @@ index d46e7a8..ba96b8d 100644
 +   the one call that maps its memory, with the heap lock held, and passes an alignment no allocation
 +   nested in that call asks for. */
 +PAS_API extern size_t pas_page_malloc_reserve_only_alignment;
++
++/* Reserves size bytes of address space, a multiple of the page size, and commits none of it. Returns NULL when
++   the address space is not to be had. */
++PAS_API void* pas_page_malloc_try_reserve(size_t size);
 +#endif
 +
  PAS_API void pas_page_malloc_deallocate(void* base, size_t size);
