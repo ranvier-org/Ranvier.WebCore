@@ -4732,8 +4732,8 @@ int32_t rv_run_loop_cycle(int32_t milliseconds)
 #else
 #if defined(_WIN32)
         // A WebCore timer armed while timers fire, such as a zero-delay timer a task starts, is handed to a
-        // timer-queue callback that posts up to a clock tick later (patches/0083). Posting here, before the pass
-        // drains the queue, delivers a timer due at entry in this pass and adds no post inside the drain.
+        // timer-queue callback that posts up to a clock tick later (patches/0083). Firing it here, before the pass
+        // drains the queue, delivers a timer due at entry in this pass and posts nothing.
         MainThreadSharedTimer::fireIfDue();
 #endif
         RunLoop::cycle();

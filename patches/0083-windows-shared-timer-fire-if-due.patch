@@ -1,5 +1,5 @@
 diff --git a/Source/WebCore/platform/MainThreadSharedTimer.h b/Source/WebCore/platform/MainThreadSharedTimer.h
-index c117f78..60d94a3 100644
+index c117f78..e27b765 100644
 --- a/Source/WebCore/platform/MainThreadSharedTimer.h
 +++ b/Source/WebCore/platform/MainThreadSharedTimer.h
 @@ -63,6 +63,11 @@ public:
@@ -7,15 +7,15 @@ index c117f78..60d94a3 100644
      WEBCORE_EXPORT static bool& NODELETE shouldSetupPowerObserver();
      WEBCORE_EXPORT static void restartSharedTimer();
 +#if OS(WINDOWS)
-+    // For an embedder that polls its run loop: posts the fired message when the armed fire time has passed,
-+    // instead of leaving it to the timer-queue callback or WM_TIMER, which run up to a clock tick later.
++    // For an embedder that polls its run loop: fires the timers when the armed fire time has passed, instead of
++    // leaving it to the timer-queue callback or WM_TIMER, which run up to a clock tick later.
 +    WEBCORE_EXPORT static void fireIfDue();
 +#endif
  
  private:
      MainThreadSharedTimer();
 diff --git a/Source/WebCore/platform/win/MainThreadSharedTimerWin.cpp b/Source/WebCore/platform/win/MainThreadSharedTimerWin.cpp
-index 04d4383..24fa522 100644
+index 04d4383..fa87324 100644
 --- a/Source/WebCore/platform/win/MainThreadSharedTimerWin.cpp
 +++ b/Source/WebCore/platform/win/MainThreadSharedTimerWin.cpp
 @@ -30,6 +30,7 @@
@@ -67,7 +67,7 @@ index 04d4383..24fa522 100644
          } else {
              // Otherwise, delay the PostMessage via a CreateTimerQueueTimer
              if (!timerQueue)
-@@ -174,8 +181,22 @@ void MainThreadSharedTimer::setFireInterval(Seconds intervalInSeconds)
+@@ -174,8 +181,26 @@ void MainThreadSharedTimer::setFireInterval(Seconds intervalInSeconds)
      }
  }
  
@@ -76,12 +76,16 @@ index 04d4383..24fa522 100644
 +    if (!armedFireTime || armedFireTime > MonotonicTime::now())
 +        return;
 +
-+    // The caller is outside the message loop, so this post cannot keep a loop that drains the queue from ending.
-+    // stop() cancels the timer-queue timer or WM_TIMER; pendingTimers keeps a callback already running from
-+    // posting a second message.
++    // Fires here and posts nothing. A timer-queue callback that is running has counted itself in pendingTimers
++    // and may not have posted yet, so a post that defers to that count can leave the caller's queue empty.
++    // stop() cancels the timer-queue timer or WM_TIMER; a callback already running still posts once, and that
++    // message fires whatever is due when it is handled. processingCustomTimerMessage makes a timer armed while
++    // these fire wait for the timer queue or the next call, as it does while the fired message is handled.
 +    singleton().stop();
-+    if (InterlockedIncrement(&pendingTimers) == 1)
-+        PostMessage(timerWindowHandle, timerFiredMessage, 0, 0);
++    bool wasProcessing = processingCustomTimerMessage;
++    processingCustomTimerMessage = true;
++    singleton().fired();
++    processingCustomTimerMessage = wasProcessing;
 +}
 +
  void MainThreadSharedTimer::stop()
