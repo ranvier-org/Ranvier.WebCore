@@ -6,6 +6,8 @@
     <Description>Managed interop for the versioned Ranvier WebCore C ABI.</Description>
     <PackageTags>webkit;webcore;native;fsharp;ranvier</PackageTags>
     <IsAotCompatible>true</IsAotCompatible>
+    <!-- The package's minimum FSharp.Core: the first .NET 10 SDK's version, so a release does not raise it to the version of the SDK that built it. -->
+    <FSharpCoreImplicitPackageVersion>10.0.100</FSharpCoreImplicitPackageVersion>
     <PackageLicenseFile>NOTICE.md</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
@@ -13,7 +15,6 @@
     <Compile Include="../../tests/abi/Native.fs" Link="Native.fs" />
     <Compile Include="../../tests/abi/NativeDom.fs" Link="NativeDom.fs" />
     <Compile Include="../../tests/abi/Traversal.fs" Link="Traversal.fs" />
-    <PackageReference Update="FSharp.Core" Version="10.1.401" />
     <None Include="../../NOTICE.md" Pack="true" PackagePath="" />
     <None Include="../../packaging/README.md" Pack="true" PackagePath="README.md" />
     <None Include="../../host/RanvierWebCoreAbi.h" Pack="true" PackagePath="include/" />
