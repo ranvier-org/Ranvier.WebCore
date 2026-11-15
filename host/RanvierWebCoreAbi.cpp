@@ -66,6 +66,7 @@
 #include <WebCore/LocalFrame.h>
 #include <WebCore/LocalFrameView.h>
 #include <JavaScriptCore/JSLock.h>
+#include <JavaScriptCore/Options.h>
 #include <WebCore/CommonVM.h>
 #include <WebCore/GarbageCollectionController.h>
 #include <WebCore/MemoryRelease.h>
@@ -2561,12 +2562,21 @@ int32_t rv_diagnostic_live_count(void)
     return liveDiagnostics.load();
 }
 
+// The host runs no script, so the collector's heap holds only what WebCore itself allocates there. One marker is
+// enough for it: the default, up to eight, starts seven helper threads at the first collection, each with a stack.
+static void initializeJavaScriptCore()
+{
+    JSC::initialize([] {
+        JSC::Options::numberOfGCMarkers() = 1;
+    });
+}
+
 int32_t rv_configure_egl_display(void* display)
 {
     if (!display)
         return RV_ERR_NULL_ARGUMENT;
 #if PLATFORM(WPE) && RANVIER_COMPOSITING
-    JSC::initialize();
+    initializeJavaScriptCore();
     WTF::initializeMainThread();
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
@@ -2585,7 +2595,7 @@ RvHost* rv_host_create(int32_t width, int32_t height)
 {
     static bool initialized;
     if (!initialized) {
-        JSC::initialize();
+        initializeJavaScriptCore();
         WTF::initializeMainThread();
         setPlatformStrategies(new RvPlatformStrategies);
 #if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
