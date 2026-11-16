@@ -234,6 +234,8 @@ PROBES = [
           'python -I -X utf8 tests/abi/run_loop_cycle.py --native-directory {native}'),
     probe('Verify that a run-loop cycle fires a timer armed while timers fired, and ends when a timer re-arms itself',
           'python -I -X utf8 tests/abi/run_loop_due_timers.py --native-directory {native}'),
+    probe('Verify that a host gives back the surface it keeps between whole-viewport paints',
+          'python -I -X utf8 tests/abi/paint_surface_release.py --native-directory {native}'),
     probe('Verify URL, URLSearchParams and URLPattern against the Chromium oracle',
           'python -I -X utf8 tests/abi/url_values.py --native-directory {native}'),
     probe('Verify the WPT URL and URLPattern corpus against the Chromium record',

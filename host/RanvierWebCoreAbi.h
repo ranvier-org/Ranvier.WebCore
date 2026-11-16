@@ -375,7 +375,8 @@ RV_EXPORT int32_t rv_watch_alive(RvWatch*);
 RV_EXPORT RvNode* rv_watch_node(RvWatch*);
 RV_EXPORT void rv_watch_release(RvWatch*);
 /* Releases WebCore's caches as under critical memory pressure, synchronously. Among them are each
- * document's cached querySelectorAll results, which hold their elements. */
+ * document's cached querySelectorAll results, which hold their elements. Also drops the surface each host
+ * keeps between paints of the whole viewport; a host drops it by itself a few seconds after its last such paint. */
 RV_EXPORT void rv_release_memory(void);
 /* Runs a synchronous full JavaScriptCore garbage collection, then returns free memory to the system. */
 RV_EXPORT void rv_collect_garbage(void);

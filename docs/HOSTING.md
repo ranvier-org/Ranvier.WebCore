@@ -47,7 +47,10 @@ rv_host_destroy(host);                                 /* after releasing every 
 
 ## Presenting
 
-- **CPU:** `rv_host_paint_rgba` into a caller buffer, uploaded by the app.
+- **CPU:** `rv_host_paint_rgba` into a caller buffer, uploaded by the app. The host keeps the surface it draws
+  into, one frame of pixels (4 bytes per device pixel), so the next paint does not make a new one. It drops the
+  surface two to four seconds after the last such paint, and at once on `rv_release_memory`.
+  A paint of part of the viewport (`rv_host_paint_rgba_rect`) keeps none.
 - **GPU (GPU flavor):** `rv_host_set_accelerated_compositing` selects off, always or when-needed. The app then
   acquires the composited frame without readback: `rv_host_acquire_d3d11_frame` (Windows, shared texture on the
   app's device), `rv_host_acquire_egl_frame` after `rv_configure_egl_display` (Linux), or

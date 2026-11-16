@@ -189,6 +189,7 @@ with workspace as temp:
     probe([sys.executable, '-I', '-X', 'utf8', tests / 'screen_metrics.py', '--native-directory', out])
     probe([sys.executable, '-I', '-X', 'utf8', tests / 'run_loop_cycle.py', '--native-directory', out])
     probe([sys.executable, '-I', '-X', 'utf8', tests / 'run_loop_due_timers.py', '--native-directory', out])
+    probe([sys.executable, '-I', '-X', 'utf8', tests / 'paint_surface_release.py', '--native-directory', out])
     probe([sys.executable, '-I', '-X', 'utf8', tests / 'url_values.py', '--native-directory', out])
     probe([sys.executable, '-I', '-X', 'utf8', tests / 'url_wpt.py', '--native-directory', out])
     probe([sys.executable, '-I', '-X', 'utf8', tests / 'text_segmentation.py', '--native-directory', out])
