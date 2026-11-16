@@ -83,6 +83,7 @@
 #include <WebCore/Settings.h>
 #include <WebCore/MIMETypeRegistry.h>
 #include <WebCore/Text.h>
+#include <WebCore/Timer.h>
 #include <WebCore/TrustedHTML.h>
 #include <WebCore/DocumentLoader.h>
 #include <WebCore/DocumentPage.h>
@@ -1103,13 +1104,13 @@ struct RvHost {
 #endif
     float deviceScale { 1 };
     // The surface a CPU paint of the whole viewport draws into, kept from one paint to the next: a new one costs a
-    // page fault for each of its pages in every frame. rv_run_loop_cycle drops it once no paint has used it for
-    // paintBufferIdle, and rv_release_memory drops it at once.
+    // page fault for each of its pages in every frame. The timer drops it between two and four seconds after the
+    // last such paint, and rv_release_memory drops it at once. A WebCore timer fires in rv_run_loop_cycle and in
+    // an app's own message loop alike.
     RefPtr<ImageBuffer> paintBuffer;
     IntSize paintBufferSize;
     float paintBufferScale { 0 };
-    MonotonicTime paintBufferUsed;
-    static constexpr Seconds paintBufferIdle { 2_s };
+    DeferrableOneShotTimer paintBufferIdle { [this] { paintBuffer = nullptr; }, 2_s };
 #if defined(_WIN32) && RANVIER_COMPOSITING
     Vector<std::unique_ptr<RvNativeTextureInput>> nativeTextures;
 #elif defined(__linux__) && RANVIER_COMPOSITING
@@ -3823,7 +3824,7 @@ static int32_t paintArea(RvHost& host, uint8_t* rgba, int32_t length, IntRect ar
             host.paintBuffer = buffer;
             host.paintBufferSize = area.size();
             host.paintBufferScale = host.deviceScale;
-            host.paintBufferUsed = MonotonicTime::now();
+            host.paintBufferIdle.restart();
         }
         if (buffer) {
             // The saver leaves a kept surface's context as a new one's is: no translation, no clip.
@@ -4832,9 +4833,6 @@ int32_t rv_run_loop_cycle(int32_t milliseconds)
         ++cycles;
         auto hosts = liveHosts;
         for (auto* host : hosts) {
-            if (liveHosts.contains(host) && host->paintBuffer
-                && MonotonicTime::now() - host->paintBufferUsed > RvHost::paintBufferIdle)
-                host->paintBuffer = nullptr;
             if (liveHosts.contains(host) && host->filePicker && (!host->filePicker->isValid()
                     || !host->filePickerElement || !host->filePickerElement->isConnected()
                     || host->filePickerElement->document().page() != host->page.ptr()))
