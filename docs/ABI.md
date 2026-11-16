@@ -7,9 +7,12 @@
 | `RanvierWebCoreAbi.h` | The hand-written boundary: hosts, nodes, events, input, painting, GPU frames, accessibility, clipboard, observers, diagnostics. Source: `host/RanvierWebCoreAbi.h`. |
 | `RanvierWebCoreDom.h` | The generated DOM functions `rv_dom_*`, one per IDL attribute getter, setter and operation of the interfaces in `gen/dom.json`. Source: `host/RanvierWebCoreDom.h`, written by `gen/domgen.py` (`docs/GENERATOR.md`). |
 
-The boundary is C scalars, UTF-8 strings with explicit byte counts, opaque handles and caller-owned buffers. It is
-identical on every port that compiles `host/RanvierWebCoreAbi.cpp`. Host/DOM calls are valid on the owner
-thread; see `docs/HOSTING.md`. The detached image encoding functions below are an explicit exception.
+The boundary is C scalars, UTF-8 strings, opaque handles and caller-owned buffers. Free text crosses as bytes with
+an explicit count; identifiers and protocol strings (element and attribute names, selectors, MIME types, URLs,
+feature names) are NUL-terminated. It is identical on every port that compiles `host/RanvierWebCoreAbi.cpp`.
+Host/DOM calls are valid on the owner thread; see `docs/HOSTING.md`. The exceptions are the detached image
+encoding functions and the snapshot pixel functions below, the `rv_diagnostic_*` readers and
+`rv_text_segments_release`. `docs/ABI-GUIDE.md` goes through these rules with examples.
 
 ## Version
 
@@ -59,7 +62,8 @@ non-thread-safe font objects and are not transferred to workers.
 Host trace phases 6, 7, 8 and 9 separately measure buffer creation, snapshot rasterization, image encoding
 and pixel copying. They complement layout/paint/submission timings and do not impose latency thresholds.
 
-ABI 67 adds Windows `gpu-frame-pipeline-v1`. Configure a retained consumer device, submit monotonically
+ABI 67 adds `gpu-frame-pipeline-v1` on Windows; ABI 69 extends it to EGL and ANGLE-Metal where
+`EGL_KHR_fence_sync` is present. Configure a retained consumer device, submit monotonically
 increasing nonzero IDs, then try acquiring the newest completed frame. `RV_NOT_READY` (1) is backpressure,
 not a paint error: preserve the prior image and retry at a scheduled frame. A submit returning NotReady
 accepted no ID. An acquire returning NotReady clears both outputs. `RV_ERR_DEVICE_LOST` (-12) requires
@@ -86,7 +90,12 @@ in `docs/CAPABILITIES.md`. The full set of names is `host/RanvierCapabilityCatal
 
 Functions return `RV_OK` (0), pipeline `RV_NOT_READY` (1), or a negative `RV_ERR_*` status: `NULL_ARGUMENT`, `WRONG_THREAD`, `DOM_EXCEPTION`
 (with `rv_last_exception`), `NOT_ELEMENT`, `PAINT_FAILED`, `BUFFER_TOO_SMALL`, `UNSUPPORTED`, `DETACHED`,
-`WRONG_INTERFACE`, `WRONG_HOST` and others. The header lists the full enumeration.
+`WRONG_INTERFACE`, `WRONG_HOST`, `LISTENER_FAILED`, `NOT_INPUT` and `DEVICE_LOST`. The header's first enumeration
+lists most of them; `DETACHED` (-10) and `WRONG_HOST` (-12) are declared beside the groups that introduced them.
+
+`DEVICE_LOST` and `WRONG_HOST` share the value -12. Only the `gpu-frame-pipeline-v1` functions return
+`DEVICE_LOST`, and only functions that take an object of a document return `WRONG_HOST`, so the function called
+tells them apart. Released managed packages test for -12 in each sense, so neither value changes.
 
 ## Managed bindings
 

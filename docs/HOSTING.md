@@ -62,8 +62,9 @@ rv_host_destroy(host);                                 /* after releasing every 
 - **GPU painting (GPU flavor, Windows and Linux):** a composited frame rasterizes layer contents (text, borders,
   blurred shadows, filters) with Skia's GPU backend in the compositor's GL share group, so a repaint over a blurred
   `box-shadow` costs GPU time, not a CPU blur. It is on for a new host; `rv_host_set_gpu_painting(host, 0)` paints
-  layer contents on the CPU, the same pixels the slim flavor would paint, for screenshot tests that compare frames
-  across machines. When Skia's GL context cannot be created (no usable GPU driver), frames are painted on the CPU
+  layer contents on the CPU, as the slim flavor paints its frames. The frame is still composited on the GPU, and a
+  composited frame can differ between GPUs: for screenshot tests that compare frames across machines, turn
+  compositing off as well (`RV_COMPOSITING_OFF`) or use the CPU flavor. When Skia's GL context cannot be created (no usable GPU driver), frames are painted on the CPU
   whatever the setting; `rv_host_gpu_painting` reports which. Frames that do not composite are painted on the CPU.
 - Check `rv_abi_has` before relying on a group (see `docs/ABI.md`).
 
@@ -88,5 +89,7 @@ mapping applies on Windows only; the other platforms keep WebKit's own resolutio
 ## Teardown
 
 Release nodes, listeners, watches' targets, accessibility nodes, GPU frames and diagnostic snapshots, detach any
-UI Automation bridge, then call `rv_host_destroy`. A destruction request made from inside a callback is deferred
-until the call ends.
+UI Automation bridge, then call `rv_host_destroy`. A destruction request made from inside a callback of
+`rv_host_update`, a document load, a print, a snapshot, a frame acquire, or an input or editing call is deferred until
+that call ends. The first five then return `RV_ERR_DETACHED`. From any other callback, such as a listener run by a
+dispatch the app made itself, the host is destroyed at once.
