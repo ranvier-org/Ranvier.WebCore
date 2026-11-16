@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "title": "WebCore host",
+  "description": "WebKit's WebCore behind a C ABI: packages, flavors, hosting, the ABI and its upkeep.",
+  "content": "docs",
+  "static": false,
+  "index": "README.md",
+  "sections": [
+    {
+      "title": "Start here",
+      "pages": [
+        { "path": "README.md", "title": "Overview of the docs" },
+        "OVERVIEW.md",
+        "PACKAGES.md",
+        "FLAVORS.md"
+      ]
+    },
+    {
+      "title": "Host a page",
+      "pages": [
+        "HOSTING.md",
+        "OPERATION.md",
+        "MANAGED.md",
+        "MEMORY.md",
+        "TROUBLESHOOTING.md",
+        "FIELD-NOTES.md"
+      ]
+    },
+    {
+      "title": "The C ABI",
+      "pages": [
+        "ABI.md",
+        "ABI-GUIDE.md",
+        "CAPABILITIES.md",
+        "GENERATOR.md",
+        "DIAGNOSTICS.md"
+      ]
+    },
+    {
+      "title": "Features",
+      "pages": [
+        "ACCESSIBILITY.md",
+        "CLIPBOARD-DND.md",
+        "ANIMATIONS.md",
+        "MUTATION-OBSERVATION.md",
+        "PRINTING.md"
+      ]
+    },
+    {
+      "title": "Maintain the repository",
+      "pages": [
+        "CI.md",
+        "PATCHES.md",
+        "SETTINGS.md",
+        "UPDATING.md",
+        "BURN-HARNESS.md",
+        "HANDOVER.md",
+        "FOOTGUNS.md"
+      ]
+    }
+  ]
+}
