@@ -1,5 +1,6 @@
 /*
- * Ranvier native WebCore C ABI, version 55.
+ * Ranvier native WebCore C ABI. rv_abi_version() returns its version; the definition in RanvierWebCoreAbi.cpp is
+ * the one place the number is written.
  *
  * The boundary consists of C scalars, UTF-8 strings, opaque handles and a caller-owned RGBA8 buffer,
  * and is identical on every WebCore port that compiles RanvierWebCoreAbi.cpp.
@@ -75,8 +76,13 @@ enum {
     RV_ERR_LISTENER_FAILED = -7,
     RV_ERR_NOT_INPUT = -8,
     RV_ERR_UNSUPPORTED = -9,
+    /* -10 is RV_ERR_DETACHED, declared with the accessibility types below. */
     /* A generated function's handle argument is an object of another interface (RanvierWebCoreDom.h). */
     RV_ERR_WRONG_INTERFACE = -11,
+    /* The GPU device was lost. Only the gpu-frame-pipeline-v1 functions return it. It has the value of
+     * RV_ERR_WRONG_HOST, declared with the coordinate spaces below, which only functions taking an object of a
+     * document return: no function returns both, so the function called tells them apart. Released managed
+     * packages test for -12 in each sense, so neither value changes. */
     RV_ERR_DEVICE_LOST = -12,
 };
 
@@ -2036,13 +2042,14 @@ typedef struct RvTextSegments {
 /* Segments length UTF-16 code units of text at granularity for locale, a BCP 47 language tag; NULL or "" is the
  * root locale. text may be NULL for length 0, which gives zero segments. A locale that is not a well-formed tag
  * returns RV_ERR_DOM_EXCEPTION with a RangeError. Runs on the owning thread after the first rv_host_create, and
- * keeps working after every host is destroyed. Windows packages segment with their own ICU 77; Linux and macOS
- * packages use the system ICU, so results follow its version (rv_text_segmentation_version). */
+ * keeps working after every host is destroyed. Windows and Linux packages segment with the ICU 77 they carry (linked
+ * statically on Linux); macOS packages use the system ICU, so results follow its version
+ * (rv_text_segmentation_version). */
 RV_EXPORT int32_t rv_text_segment(int32_t granularity, const char* locale, const uint16_t* text, int32_t length, RvTextSegments* result);
 /* Frees the buffers of segments and zeroes it; on any thread. */
 RV_EXPORT void rv_text_segments_release(RvTextSegments* segments);
 /* The ICU and Unicode versions behind rv_text_segment, such as "icu=77.1 unicode=16.0", as rv_node_get_string
- * copies a string. Windows packages carry ICU; Linux and macOS packages use the system's. */
+ * copies a string. Windows and Linux packages carry ICU; macOS packages use the system's. */
 RV_EXPORT int32_t rv_text_segmentation_version(char* buffer, int32_t capacity, int32_t* length);
 
 /* v45: "page-scale" and "obscured-insets" for rv_abi_has, and "visual-viewport" for the generated
@@ -2255,7 +2262,8 @@ enum {
     RV_QUAD_MARGIN_BOX = 3,
 };
 enum {
-    /* The anchors of a conversion belong to different hosts. */
+    /* The anchors of a conversion belong to different hosts; elsewhere, an object of another host or document.
+     * It has the value of RV_ERR_DEVICE_LOST, which only the gpu-frame-pipeline-v1 functions return. */
     RV_ERR_WRONG_HOST = -12,
 };
 /* Converts count points of xy, as x0, y0, x1, y1 and so on, from fromSpace anchored at from to toSpace anchored at to,

@@ -29,7 +29,7 @@ records it, with the WebKit commit, the source commit and every file's SHA-256, 
 | Flavor | Use when | Painting |
 |---|---|---|
 | GPU (default) | Any app that presents frames: accelerated compositing, GPU painting and a native GPU frame without CPU readback, as a shared D3D11 texture on Windows, an EGLImage on Linux or an IOSurface on macOS. | Composited frames: GPU raster (`rv_host_set_gpu_painting`), CPU raster where no GPU context exists; other frames CPU |
-| CPU (Slim) | The app needs the smallest package, no GPU code, or pixels that do not depend on the GPU, such as screenshot tests compared across machines (in the GPU flavor, `rv_host_set_gpu_painting(host, 0)` gives CPU painting per host). | CPU |
+| CPU (Slim) | The app needs the smallest package, no GPU code, or pixels that do not depend on the GPU, such as screenshot tests compared across machines (in the GPU flavor, `RV_COMPOSITING_OFF` gives CPU frames per host; `rv_host_set_gpu_painting(host, 0)` alone paints layers on the CPU and still composites on the GPU). | CPU |
 | Lean | Comparing against unpatched WebKit. | CPU |
 
 The CPU flavor, Slim, cuts WebKit to what presentation needs: no network stack, crypto library, GPU code, browser storage, service
