@@ -61,11 +61,13 @@
 #include <WebCore/HTMLSelectElement.h>
 #include <WebCore/HTMLTextAreaElement.h>
 #include <WebCore/ImageBuffer.h>
+#include <WebCore/ImageBufferAllocator.h>
 #include <WebCore/ImportNodeOptions.h>
 #include <WebCore/KeyboardEvent.h>
 #include <WebCore/LocalFrame.h>
 #include <WebCore/LocalFrameView.h>
 #include <JavaScriptCore/JSLock.h>
+#include <JavaScriptCore/Options.h>
 #include <WebCore/CommonVM.h>
 #include <WebCore/GarbageCollectionController.h>
 #include <WebCore/MemoryRelease.h>
@@ -2561,12 +2563,21 @@ int32_t rv_diagnostic_live_count(void)
     return liveDiagnostics.load();
 }
 
+// The host runs no script, so the collector's heap holds only what WebCore itself allocates there. One marker is
+// enough for it: the default, up to eight, starts seven helper threads at the first collection, each with a stack.
+static void initializeJavaScriptCore()
+{
+    JSC::initialize([] {
+        JSC::Options::numberOfGCMarkers() = 1;
+    });
+}
+
 int32_t rv_configure_egl_display(void* display)
 {
     if (!display)
         return RV_ERR_NULL_ARGUMENT;
 #if PLATFORM(WPE) && RANVIER_COMPOSITING
-    JSC::initialize();
+    initializeJavaScriptCore();
     WTF::initializeMainThread();
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
@@ -2585,7 +2596,7 @@ RvHost* rv_host_create(int32_t width, int32_t height)
 {
     static bool initialized;
     if (!initialized) {
-        JSC::initialize();
+        initializeJavaScriptCore();
         WTF::initializeMainThread();
         setPlatformStrategies(new RvPlatformStrategies);
 #if defined(RANVIER_MAC_GPU_SPIKE) && RANVIER_MAC_GPU_SPIKE
@@ -3694,6 +3705,48 @@ int32_t rv_gpu_frame_release(RvGpuFrame* frame)
 #endif
 }
 
+// A pixel buffer over memory the caller owns. ImageBuffer::getPixelBuffer converts into it in place of a buffer of
+// its own, which a paint would then copy to the caller row by row.
+class RvCallerPixelBuffer final : public PixelBuffer {
+public:
+    static Ref<RvCallerPixelBuffer> create(const PixelBufferFormat& format, const IntSize& size, std::span<uint8_t> bytes)
+    {
+        return adoptRef(*new RvCallerPixelBuffer(format, size, bytes));
+    }
+
+private:
+    RvCallerPixelBuffer(const PixelBufferFormat& format, const IntSize& size, std::span<uint8_t> bytes)
+        : PixelBuffer(format, size, bytes)
+    {
+    }
+
+    Type type() const final { return Type::Other; }
+    RefPtr<PixelBuffer> createScratchPixelBuffer(const IntSize&) const final { return nullptr; }
+};
+
+// Hands getPixelBuffer the caller's image when the pixels it asks for are the whole of that image, so each row has
+// the caller's stride. Any other size gets WebCore's own buffer.
+class RvCallerPixelBufferAllocator final : public ImageBufferAllocator {
+public:
+    RvCallerPixelBufferAllocator(std::span<uint8_t> bytes, IntSize size)
+        : m_bytes(bytes)
+        , m_size(size)
+    {
+    }
+
+private:
+    RefPtr<ImageBuffer> createImageBuffer(const FloatSize&, const DestinationColorSpace&, RenderingMode) const final { return nullptr; }
+    RefPtr<PixelBuffer> createPixelBuffer(const PixelBufferFormat& format, const IntSize& size) const final
+    {
+        if (size != m_size)
+            return ImageBufferAllocator::createPixelBuffer(format, size);
+        return RvCallerPixelBuffer::create(format, size, m_bytes);
+    }
+
+    std::span<uint8_t> m_bytes;
+    IntSize m_size;
+};
+
 // Paints area, in CSS pixels of the viewport, into its place in rgba, an image of paintSize.
 static int32_t paintArea(RvHost& host, uint8_t* rgba, int32_t length, IntRect area)
 {
@@ -3771,18 +3824,25 @@ static int32_t paintArea(RvHost& host, uint8_t* rgba, int32_t length, IntRect ar
         return RV_ERR_PAINT_FAILED;
     buffer->flushDrawingContext();
     PixelBufferFormat format { AlphaPremultiplication::Unpremultiplied, PixelFormat::RGBA8, DestinationColorSpace::SRGB() };
-    // getPixelBuffer takes CSS pixels and scales them as paintSize does.
-    auto pixels = buffer->getPixelBuffer(format, IntRect { { }, area.size() });
+    // getPixelBuffer takes CSS pixels and scales them as paintSize does. A paint of the whole viewport asks for
+    // pixels of the caller's size and is converted straight into rgba; a partial paint is converted into a buffer
+    // of its own size and copied to its place. Below a device scale of 1 a partial paint can round to the caller's
+    // size and still begin at a later column, so only the whole viewport is offered the caller's image.
+    bool wholeViewport = area == IntRect { { }, host.size };
+    RvCallerPixelBufferAllocator allocator { std::span { rgba, required }, wholeViewport ? pixelSize : IntSize { } };
+    auto pixels = buffer->getPixelBuffer(format, IntRect { { }, area.size() }, allocator);
     if (!pixels)
         return RV_ERR_PAINT_FAILED;
-    auto origin = area.location();
-    origin.scale(host.deviceScale);
-    auto columns = std::min(pixels->size().width(), pixelSize.width() - origin.x());
-    auto rows = std::min(pixels->size().height(), pixelSize.height() - origin.y());
-    auto source = pixels->bytes();
-    for (int row = 0; row < rows; ++row) {
-        std::memcpy(rgba + (static_cast<size_t>(origin.y() + row) * pixelSize.width() + origin.x()) * 4,
-            source.data() + static_cast<size_t>(row) * pixels->size().width() * 4, static_cast<size_t>(columns) * 4);
+    if (pixels->bytes().data() != rgba) {
+        auto origin = area.location();
+        origin.scale(host.deviceScale);
+        auto columns = std::min(pixels->size().width(), pixelSize.width() - origin.x());
+        auto rows = std::min(pixels->size().height(), pixelSize.height() - origin.y());
+        auto source = pixels->bytes();
+        for (int row = 0; row < rows; ++row) {
+            std::memcpy(rgba + (static_cast<size_t>(origin.y() + row) * pixelSize.width() + origin.x()) * 4,
+                source.data() + static_cast<size_t>(row) * pixels->size().width() * 4, static_cast<size_t>(columns) * 4);
+        }
     }
     // An update wanted during the paint, such as a layout that started an animation, needs another frame.
     if (host.updateWanted)

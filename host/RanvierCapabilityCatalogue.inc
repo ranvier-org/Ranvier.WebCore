@@ -888,6 +888,13 @@ static constexpr CapabilityBuildFlag capabilityBuildFlags[] = {
 #else
     {"build:USE_INSPECTOR_STUB", -1},
 #endif
+#if defined(RV_CAP_USE_INTERFACE_OBJECT_STUB)
+    {"build:USE_INTERFACE_OBJECT_STUB", RV_CAP_USE_INTERFACE_OBJECT_STUB},
+#elif defined(USE_INTERFACE_OBJECT_STUB)
+    {"build:USE_INTERFACE_OBJECT_STUB", USE_INTERFACE_OBJECT_STUB},
+#else
+    {"build:USE_INTERFACE_OBJECT_STUB", -1},
+#endif
 #if defined(RV_CAP_USE_JPEGXL)
     {"build:USE_JPEGXL", RV_CAP_USE_JPEGXL},
 #elif defined(USE_JPEGXL)
@@ -922,6 +929,13 @@ static constexpr CapabilityBuildFlag capabilityBuildFlags[] = {
     {"build:USE_LIBHYPHEN", USE_LIBHYPHEN},
 #else
     {"build:USE_LIBHYPHEN", -1},
+#endif
+#if defined(RV_CAP_USE_LIBPAS_LAZY_COMMIT)
+    {"build:USE_LIBPAS_LAZY_COMMIT", RV_CAP_USE_LIBPAS_LAZY_COMMIT},
+#elif defined(USE_LIBPAS_LAZY_COMMIT)
+    {"build:USE_LIBPAS_LAZY_COMMIT", USE_LIBPAS_LAZY_COMMIT},
+#else
+    {"build:USE_LIBPAS_LAZY_COMMIT", -1},
 #endif
 #if defined(RV_CAP_USE_NETWORK_STUB)
     {"build:USE_NETWORK_STUB", RV_CAP_USE_NETWORK_STUB},

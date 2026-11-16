@@ -79,3 +79,6 @@
 0081-texture-mapper-merge-near-repaints.patch
 0082-texture-mapper-angle-d3d11-paint-order.patch
 0083-windows-shared-timer-fire-if-due.patch
+0084-libpas-windows-lazy-commit.patch
+0085-interface-object-stub.patch
+0086-opaque-pixel-conversion.patch

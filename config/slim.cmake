@@ -32,3 +32,7 @@ set(USE_BROWSER_API_STUB ON CACHE BOOL "")    # 0007: no WebGPU, WebXR, File Sys
 set(USE_INSPECTOR_STUB ON CACHE BOOL "")      # 0008: no WebCore inspector
 set(USE_JSC_INSPECTOR_STUB ON CACHE BOOL "")  # 0009: no JavaScriptCore inspector (requires USE_INSPECTOR_STUB)
 set(USE_AX_EMBEDDER_NOTIFICATIONS ON CACHE BOOL "")  # 0011: accessibility notifications reach the host
+if (RANVIER_RID MATCHES "^win-")
+    set(USE_LIBPAS_LAZY_COMMIT ON CACHE BOOL "")     # 0084: libpas commits its large reservations as they are used
+    set(USE_INTERFACE_OBJECT_STUB ON CACHE BOOL "")  # 0085: script bindings without interface objects
+endif ()

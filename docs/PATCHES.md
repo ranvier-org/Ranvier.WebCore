@@ -508,6 +508,164 @@ ANGLE's D3D11 renderer issues the calls of every context of a display on one imm
 order they are made, so the compositor already reads what Skia drew. On Windows the paints are now submitted
 without the wait and without the flush before each one. Other platforms keep the fence.
 
+## 0084-libpas-windows-lazy-commit
+
+`USE_LIBPAS_LAZY_COMMIT`, declared in `Source/bmalloc/CMakeLists.txt`; `config/slim.cmake` sets it for `win-*`. It
+defines `PAS_WINDOWS_LAZY_COMMIT`, which `pas_config.h` rejects on any other system.
+
+libpas maps all of its memory through `pas_page_malloc.c`, which on Windows commits a mapping as it reserves it
+(`MEM_COMMIT | MEM_RESERVE`); elsewhere the same call is an `mmap` the kernel backs on first touch. Windows charges
+commit when a page is committed, so four mappings cost commit that a process mostly never uses:
+
+| Mapping | Mapped | Owner |
+|---|---|---|
+| Compact heap reservation | 128 MB, on the first allocation | `pas_compact_heap_reservation.c` |
+| Megapage | 32 MB each: a 16 MB megapage and 16 MB to align it | `pas_megapage_cache.c` |
+| Large expendable memory | 64 MB: 32 MB and 32 MB to align it | `pas_large_expendable_memory.c` |
+| Compact expendable memory | 20 MB of the reservation | `pas_compact_expendable_memory.c` |
+
+With the option each is reserved, and its owner commits what it hands out:
+
+- **Reservation:** commits up to the end of each allocation, as the PlayStation branch of the same function does.
+- **Megapage cache:** commits a page when the page leaves the cache. This applies only to the two bootstrap heap
+  providers; a cache over a client's reserved memory keeps that provider's commit state.
+- **Expendable memories:** commit a payload page when the bump pointer first reaches it. Scavenging discards the
+  page's contents and leaves it committed, as before, so a reader still never meets a page that faults.
+- **Padding:** the address space that aligns a reserved mapping stays reserved and unused. It used to go to the
+  bootstrap free heap, which would hand it out as committed memory.
+
+Reserved memory never enters a free heap, which would hand it out as committed:
+
+- **Megapages and the large expendable memory** are mapped through the bootstrap free heaps. Their owner sets
+  `pas_page_malloc_reserve_only_alignment` around the one call, with the heap lock held; a mapping asked for with
+  that alignment is reserved and returned without its padding. Their alignment is at least their size, so the
+  free heap can never join such a mapping to a neighbouring free block.
+- **The reservation** is reserved by `pas_page_malloc_try_reserve`, not through the flag: its alignment is 1,
+  which `pas_enumerator_region.c` also asks for, without the heap lock.
+- **The compact expendable memory** takes its payload straight from the reservation
+  (`pas_compact_heap_reservation_try_allocate_reserved`), not through the compact bootstrap free heap. That heap
+  can join a free block ending where the payload begins to it, return a range starting in the block, and keep the
+  reserved pages beyond the range's end in its free list.
+
+A commit that fails for want of memory asserts, after libpas's ten retries of 50 ms, where the upstream mapping
+would have returned null to a caller that can take it. Upstream already asserts on the recommit of a page the
+scavenger decommitted.
+
+The patch edits `Source/bmalloc/CMakeLists.txt` and, under `libpas/src/libpas`, `pas_config.h`,
+`pas_page_malloc.{c,h}`, `pas_compact_heap_reservation.{c,h}`, `pas_megapage_cache.c`,
+`pas_expendable_memory.c`, `pas_large_expendable_memory.c` and `pas_compact_expendable_memory.c`.
+
+Measured on Windows 11 x64 on 2026-11-16 with `tests/libpas_commit`, which builds libpas alone at the pin with
+clang-cl 23.1.4 and reads the process's private commit:
+
+| `commit_test` | Without the option | With it |
+|---|---|---|
+| `first`: commit added by one 64-byte allocation | 160.37 MB | 0.18 MB |
+| `workload`: commit added with 29.46 MB in use | 256.70 MB | 36.89 MB |
+| `stress`: commit left after the last scavenge | 289.22 MB | 3.82 MB |
+| `stress`: wall time, median of five alternating runs | 3.05 s | 3.23 s |
+
+`stress` allocates, writes, verifies, reallocates and frees objects of 1 byte to 5 MB on four threads and
+scavenges between rounds; it passes in both builds. The patched sources built without the option give the
+left-hand column. `compact-tail` frees a block at the reservation's bump pointer, has the compact expendable memory
+take its payload, and writes to what the compact bootstrap free heap hands out next; it passes in both builds, and
+faulted with the option before the payload was taken straight from the reservation.
+
+Measured the same day on a host: a Python process loads `RanvierWebCoreHost.dll`, creates a 1280 by 800 host and
+paints a page of 12,250 nodes on the CPU. The left column is the `Ranvier.WebCore.Native.Cpu.win-x64` 0.1.1
+package, the right a slim `win-x64` build of this series. Working set did not change (42.5 MB and 68.4 MB at the
+first two rows): the pages the option leaves uncommitted were never touched.
+
+| Private commit after | 0.1.1 | With the option |
+|---|---|---|
+| `rv_host_create` | 314.2 MB | 36.4 MB |
+| the page is painted | 315.0 MB | 56.1 MB |
+| a second host paints the same page | 347.6 MB | 69.4 MB |
+
+`build.py smoke` passes against that build: the staged files match the manifest, a page paints, and the F# ABI
+driver and its probes report no failure.
+
+Measured the same day on five example applications, each in an unattended mode that exits by itself, first with
+the 0.1.1 GPU engine their packages ship and then with the GPU flavor of this series through 0086 copied over it.
+All eight runs exit 0 with both engines. Peak working set moved by less than 6% either way in every run: it is
+set by the .NET heap, the GPU driver and wgpu's upload memory, which the engine does not own.
+
+| Application and mode | Peak commit, 0.1.1 | Peak commit, this series |
+|---|---|---|
+| AstroShowcase `--check` | 908.2 MB | 638.8 MB |
+| AstroShowcase `--soak 20` | 1,140.9 MB | 907.4 MB |
+| AstroShowcase `--bench` | 1,038.7 MB | 778.7 MB |
+| Ranvier.D5.Dashboards `--native-probe` | 447.5 MB | 195.7 MB |
+| Ranvier.D5.Dashboards `--capture` | 482.4 MB | 201.9 MB |
+| Ranvier.D5.Gallery `--capture` | 332.2 MB | 89.8 MB |
+| RanvierWgpuBim `--smoke` | 886.9 MB | 609.8 MB |
+| RanvierWgpuAtlas `--smoke` | 920.7 MB | 677.4 MB |
+
+Not covered: a megapage in a client's reserved memory is still committed whole by `pas_large_heap`. JavaScriptCore's
+structure heap is one, and its 16 MB is most of what `rv_host_create` still commits. libpas's own test suite
+(`libpas/src/test`) was not run.
+
+## 0085-interface-object-stub
+
+`USE_INTERFACE_OBJECT_STUB`, declared in `Source/cmake/OptionsCommon.cmake`; `config/slim.cmake` sets it for
+`win-*`. The script bindings are generated without interface objects: the constructors script reaches as
+`window.Node`, `window.Event` and so on. The wrapper classes, their prototypes and `toJS` stay. The host runs no
+script, so nothing reads an interface object.
+
+- **Generator:** `CodeGeneratorJS.pm` and `preprocess-idls.pl` treat every interface as one declared
+  `[LegacyNoInterfaceObject]` when the option adds `NO_INTERFACE_OBJECTS` to the generators' defines. Callback
+  interfaces and namespaces are generated as before.
+- **Global objects:** their implementation calls `toJSDOMGlobalObject`, defined in a header the interface object's
+  code used to include, so the generator adds that include for them.
+- **Hand-written code:** `constructJSHTMLElement` in `JSHTMLElementCustom.cpp`, which the `HTMLElement` interface
+  object called, is compiled out.
+
+Why it matters beyond size: each interface object's class record points at a symbol imported from
+`JavaScriptCore.dll`, which the linker cannot resolve, so the compiler emits a function that fills the record in
+when `WebCore.dll` loads. There were 529 of them, spread a page apart through the bindings.
+
+Measured on Windows 11 x64 on 2026-11-16, slim `win-x64`, the series up to 0084 against the series with 0085:
+
+| | Without | With |
+|---|---|---|
+| `WebCore.dll` | 45.76 MB | 43.38 MB |
+| Bindings code linked into it | 7.72 MB | 6.03 MB |
+| `WebCore.dll` pages resident once the library is loaded | 4.36 MB | 2.01 MB |
+| Bindings code on those pages | 2.64 MB | 0.46 MB |
+| `WebCore.dll` pages resident with a 12,250-node page painted | 14.30 MB | 11.99 MB |
+
+`build.py smoke` passes against the build.
+
+## 0086-opaque-pixel-conversion
+
+Always applies; it edits `Source/WebCore/platform/graphics/PixelBufferConversion.cpp`, the Skia branch only.
+
+Reading an image buffer back as unpremultiplied pixels (`getPixelBuffer`, which a CPU paint and
+`getImageData` use) went through Skia's general conversion, which divides each channel of each pixel by its alpha.
+A pixel whose alpha is 255 is unchanged by that. When every source pixel is opaque, `convertImagePixelsSkia` now
+declares both sides opaque, and Skia takes its channel-reordering path. An image with any other alpha value takes
+the path it took before. `SkPixmap::computeIsOpaque` decides, and stops at the first pixel that is not opaque.
+
+A page painted by the host is opaque: the frame view paints a base background under it.
+
+Measured on Windows 11 x64 on 2026-11-16, slim `win-x64`, median of 40 `rv_host_paint_rgba` calls, the series up
+to 0085 with the host's direct conversion against the same with 0086:
+
+| Frame | Without | With |
+|---|---|---|
+| 1280 by 800, 12,250 nodes | 3.96 ms | 2.68 ms |
+| 1280 by 800, 980 nodes | 3.37 ms | 2.32 ms |
+| 2560 by 1600, 980 nodes | 11.22 ms | 6.70 ms |
+
+In an application: `Ranvier.D5.Dashboards --native-probe` paints each of ten dashboards 300 times through
+`rv_host_paint_rgba`. With the 0.1.1 engine its idle frames took 10.22 ms to 21.26 ms by dashboard, 15.9 ms on
+average; with this series (the host's direct conversion and 0086 together) 6.34 ms to 16.36 ms, 11.4 ms on
+average. Both runs were made one after the other on an otherwise idle machine.
+
+The pixels are the same: two pages at four device scales, painted whole and in part, hash alike in both builds
+when the two are run one after the other. (The hashes of one build did change between two runs minutes apart,
+for a reason not found; text rendering settings are the suspect.) `build.py smoke` passes against the build.
+
 ## Working on the series
 
 ```
