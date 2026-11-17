@@ -13,7 +13,7 @@ NuGet packages for `win-x64`, `win-arm64`, `linux-x64`, `linux-arm64` and `osx-a
 | `Ranvier.WebCore.Native.Gpu` | Former name of `Ranvier.WebCore.Native`, on which it depends. |
 | `Ranvier.WebCore.Accessibility.Atspi` | Optional Linux AT-SPI accessibility provider. |
 
-Documentation is indexed in [docs/README.md](docs/README.md). The WebKit pin and package version are in
+Documentation is indexed in [docs/index.md](docs/index.md). The WebKit pin and package version are in
 [`pins.json`](pins.json); the patch series is [`patches/series`](patches/series).
 
 ## Build

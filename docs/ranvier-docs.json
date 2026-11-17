@@ -4,12 +4,13 @@
   "description": "WebKit's WebCore behind a C ABI: packages, flavors, hosting, the ABI and its upkeep.",
   "content": "docs",
   "static": false,
-  "index": "README.md",
+  "index": "index.md",
+  "exclude": ["README.md"],
   "sections": [
     {
       "title": "Start here",
       "pages": [
-        { "path": "README.md", "title": "Overview of the docs" },
+        { "path": "index.md", "title": "Overview of the docs" },
         "OVERVIEW.md",
         "PACKAGES.md",
         "FLAVORS.md"
