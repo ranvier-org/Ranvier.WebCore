@@ -14,9 +14,9 @@ SPEC.loader.exec_module(MEDIA)
 class PackageGraphs(unittest.TestCase):
     def graph(self, directory, traced, extra=(), pair=True):
         suffix = '.Traced' if traced else ''
-        packages = [f'Ranvier.View.WebCore{suffix}/0.1.0-alpha.45']
+        packages = [f'Ranvier.View.WebCore{suffix}/0.3.0']
         if pair:
-            packages.append(f'Ranvier.View.WebCore.Sdl{suffix}/0.1.0-alpha.45')
+            packages.append(f'Ranvier.View.WebCore.Sdl{suffix}/0.2.3')
         packages.extend(extra)
         path = directory / 'project.assets.json'
         path.write_text(json.dumps({'libraries': {name: {'type': 'package'} for name in packages}}), encoding='utf-8')
@@ -38,7 +38,7 @@ class PackageGraphs(unittest.TestCase):
                 opposing = family if traced else family + '.Traced'
                 with self.subTest(traced=traced, family=family), tempfile.TemporaryDirectory() as temporary:
                     path = Path(temporary)
-                    self.graph(path, traced, extra=(opposing.lower() + '/0.1.0-alpha.45',))
+                    self.graph(path, traced, extra=(opposing.lower() + '/0.3.0',))
                     with self.assertRaisesRegex(AssertionError, 'opposingViewPackages'):
                         self.validate(path, traced)
 

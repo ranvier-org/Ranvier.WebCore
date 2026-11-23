@@ -16,7 +16,7 @@
     <PackageReference Update="FSharp.Core" Version="10.1.401" />
   </ItemGroup>
   <ItemGroup Condition="'$(RanvierViewRoot)' == ''">
-    <PackageReference Include="$(RanvierViewWebCoreSdlPackageId)" Version="0.1.0-alpha.45" />
+    <PackageReference Include="$(RanvierViewWebCoreSdlPackageId)" Version="0.2.3" />
   </ItemGroup>
   <ItemGroup Condition="'$(RanvierViewRoot)' != ''">
     <ProjectReference Include="$(RanvierViewRoot)/src/Ranvier.View.WebCore.Sdl/Ranvier.View.WebCore.Sdl.fsproj" />

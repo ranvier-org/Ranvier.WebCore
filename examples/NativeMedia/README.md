@@ -17,7 +17,7 @@ python examples/NativeMedia/build_windows.py --output media-provider
 
 Reference `Managed/NativeMedia.fsproj` from the application and set
 `NativeMediaDllPath` to the resulting absolute `RanvierNativeMedia.dll` path.
-The project references the public `Ranvier.View.WebCore` alpha.45 package.
+The project references the public `Ranvier.View.WebCore` 0.3.0 package.
 Set `RanvierTrace=true` for its matching traced package. `RanvierViewRoot` is an
 explicit source override for prerelease qualification; leave it unset for an
 ordinary package consumer.
