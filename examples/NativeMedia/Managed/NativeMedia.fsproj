@@ -5,7 +5,7 @@
     <IsAotCompatible>true</IsAotCompatible>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <WarnOn>$(WarnOn);3390</WarnOn>
-    <RanvierViewWebCoreVersion Condition="'$(RanvierViewWebCoreVersion)' == ''">0.1.0-alpha.45</RanvierViewWebCoreVersion>
+    <RanvierViewWebCoreVersion Condition="'$(RanvierViewWebCoreVersion)' == ''">0.3.0</RanvierViewWebCoreVersion>
     <RanvierViewWebCorePackageId Condition="'$(RanvierViewWebCorePackageId)' == '' and '$(RanvierTrace)' == 'true'">Ranvier.View.WebCore.Traced</RanvierViewWebCorePackageId>
     <RanvierViewWebCorePackageId Condition="'$(RanvierViewWebCorePackageId)' == ''">Ranvier.View.WebCore</RanvierViewWebCorePackageId>
   </PropertyGroup>

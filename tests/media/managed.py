@@ -13,8 +13,8 @@ import tempfile
 
 def check_package_graphs(artifacts, traced, sha):
     suffix = '.Traced' if traced else ''
-    expected = {f'Ranvier.View.WebCore{suffix}/0.1.0-alpha.45'.casefold(),
-                f'Ranvier.View.WebCore.Sdl{suffix}/0.1.0-alpha.45'.casefold()}
+    expected = {f'Ranvier.View.WebCore{suffix}/0.3.0'.casefold(),
+                f'Ranvier.View.WebCore.Sdl{suffix}/0.2.3'.casefold()}
     families = ['Ranvier.View', 'Ranvier.View.Dom', 'Ranvier.View.WebCore', 'Ranvier.View.WebCore.Sdl']
     opposing = {(name if traced else name + '.Traced').casefold() for name in families}
     graphs = []
